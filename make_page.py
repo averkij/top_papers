@@ -26,7 +26,7 @@ def try_rename_file(fpath, new_name=None):
     if not new_name:
         new_name = fpath
     if os.path.isfile(fpath):
-        log(f'Renaming previous data. {fpath} to {f'{date}_{new_name}'}')
+        log(f'Renaming previous data. {fpath} to {date}_{new_name}')
         date = datetime.now().strftime("%Y-%m-%d")
         os.rename(fpath, f'{date}_{new_name}')
     else:
