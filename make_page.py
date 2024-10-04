@@ -29,6 +29,8 @@ def try_rename_file(fpath, new_name=None):
         log(f'Renaming previous data. {fpath} to {f'{date}_{new_name}'}')
         date = datetime.now().strftime("%Y-%m-%d")
         os.rename(fpath, f'{date}_{new_name}')
+    else:
+        log(f'No file to rename. {fpath}')
 
 log('Get feed.')
 
@@ -116,6 +118,7 @@ if os.path.isfile(DATA_FILE):
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         prev_papers = json.load(f)
 else:
+    log('No previous papers found.')
     prev_papers = {}
 
 
