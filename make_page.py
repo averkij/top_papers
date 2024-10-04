@@ -410,25 +410,28 @@ def make_html(data):
         # print(item)
         print(item["data"])
 
-        explanation = item["data"]["desc"]
-        tags = " ".join(item["data"]["tags"])
-        html += f"""
-        <article>
-            <div class="background-digit">{index + 1}</div>
-            <div class="article-content" onclick="toggleAbstract({index})">
-                <h2>{item['data']['emoji']} {item['title']}</h2>
-                <p class="meta">{item['data']['title']}</p>
-                <p class="tags">{tags}</p>
-                <div id="abstract-{index}" class="abstract">
-                    <p>{explanation}</p>
-                    <div id="toggle-{index}" class="abstract-toggle">...</div>
+        try:
+            explanation = item["data"]["desc"]
+            tags = " ".join(item["data"]["tags"])
+            html += f"""
+            <article>
+                <div class="background-digit">{index + 1}</div>
+                <div class="article-content" onclick="toggleAbstract({index})">
+                    <h2>{item['data']['emoji']} {item['title']}</h2>
+                    <p class="meta">{item['data']['title']}</p>
+                    <p class="tags">{tags}</p>
+                    <div id="abstract-{index}" class="abstract">
+                        <p>{explanation}</p>
+                        <div id="toggle-{index}" class="abstract-toggle">...</div>
+                    </div>
+                    <div class="links">
+                        <a href="{item['url']}" target="_blank">Статья</a>
+                    </div>
                 </div>
-                <div class="links">
-                    <a href="{item['url']}" target="_blank">Статья</a>
-                </div>
-            </div>
-        </article>
+            </article>
         """
+        except Exception as e:
+            print(e)   
 
     html += """
         </main>
