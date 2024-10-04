@@ -1,0 +1,41 @@
+name: Run Python Script Periodically
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 * * * *"
+
+jobs:
+  run-python-script:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository content
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run Python script
+      run: python test.py
+
+    - name: Test commit
+      run: |
+        echo "Log from workflow" >> test2.txt
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git add file.txt
+        git commit -m "Automated commit made by GitHub Actions"
+
+    - name: Push changes back to GitHub
+      run: git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
