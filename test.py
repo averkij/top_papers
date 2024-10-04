@@ -4,7 +4,7 @@ print('Start stuff')
 from datetime import datetime
 
 with open('test.txt', 'w') as fout:
-    fout.write(f'{datetime.now()} some logs...')
+    fout.write(f'{datetime.now()} some logs...\n')
 
 
 #test secret
@@ -17,7 +17,7 @@ else:
     print("API key not found")
 
 with open('test.txt', 'a') as fout:
-    fout.write(f'{datetime.now()} {api_key}')
+    fout.write(f'{datetime.now()} {api_key}\n')
 
 
 #test LLM API call
@@ -42,4 +42,4 @@ response = requests.post(base_url, headers=headers, json=payload)
 text = response.json()["choices"][0]["message"]["content"]
 
 with open('test.txt', 'a') as fout:
-    fout.write(f'{datetime.now()} {text}')
+    fout.write(f'{datetime.now()} {text}\n')
