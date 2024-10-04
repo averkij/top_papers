@@ -134,6 +134,7 @@ for paper in tqdm(feed['papers']):
         log(f'Using data from previous issue: {json.dumps(prev_data, ensure_ascii=False)}')
         paper["data"] = prev_data
     else:
+        log('Querying the API.')
         abs = paper["abstract"][:3000]
         prompt = f"Read abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms, do not use terms like БЯМ. 'tags': array of tags related to article, 3 tags, but specific, not general like #ml or #ai. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
         paper["data"] = get_data(prompt)
