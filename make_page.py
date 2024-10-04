@@ -227,7 +227,7 @@ def make_html(data):
             background-color: #414141;
         }
         body.light-theme>div>main>article:hover {
-            background-color: #ffae3233;
+            background-color: #fff9e7;
         }
         article {
             border-radius: 8px;
