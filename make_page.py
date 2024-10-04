@@ -3,7 +3,7 @@
 import os
 import html
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import anthropic
 import requests
@@ -26,8 +26,9 @@ def try_rename_file(fpath, new_name=None):
     if not new_name:
         new_name = fpath
     if os.path.isfile(fpath):
+        date = datetime.now() - timedelta(1)
+        date = date.strftime("%Y-%m-%d")
         log(f'Renaming previous data. {fpath} to {date}_{new_name}')
-        date = datetime.now().strftime("%Y-%m-%d")
         os.rename(fpath, f'{date}_{new_name}')
     else:
         log(f'No file to rename. {fpath}')
