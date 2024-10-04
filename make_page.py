@@ -1,241 +1,172 @@
 
 #%%
+import os
 import html
 import json
-import os
-import random
-import re
-from collections import defaultdict
 from datetime import datetime
 
-import feedparser
-import pymupdf
+import anthropic
 import requests
-# import trafilatura
-from boilerpy3 import extractors
+from babel.dates import format_date
 from bs4 import BeautifulSoup
-from openai import OpenAI
 from tqdm import tqdm
 
-#get feed
-rss_url = 'https://nlp.elvissaravia.com/feed'
-feed = feedparser.parse(rss_url)
 
-if feed.status == 200:
-    for entry in feed.entries:
-        print(entry.title)
-        print(entry.link)
-else:
-    print("Failed to get RSS feed. Status code:", feed.status)
+LOG_FILE = 'log.txt'
+DATA_FILE = 'hf_papers.json'
+PAGE_FILE = 'index.html'
 
+def log(msg):
+    print(msg)
+    with open(LOG_FILE, 'a') as fout:
+        date = datetime.now().strftime("%d.%m.%Y %H:%M")
+        fout.write(f'[{date}] {msg}\n')
 
-#parse feed
-months = {
-    "January": "января",
-    "February": "февраля",
-    "March": "марта",
-    "April": "апреля",
-    "May": "мая",
-    "June": "июня",
-    "July": "июля",
-    "August": "августа",
-    "September": "сентября",
-    "October": "октября",
-    "November": "ноября",
-    "December": "декабря",
-}
+def try_rename_file(fpath, new_name=None):
+    if not new_name:
+        new_name = fpath
+    if os.path.isfile(fpath):
+        date = datetime.now().strftime("%Y-%m-%d")
+        os.rename(fpath, f'{date}_{new_name}')
 
-def extract_ps(text):
-    pattern = re.compile(r'<p>(.*?)<\/p>', re.DOTALL)
-    matches = pattern.findall(text)
-    return matches
+log('Get feed.')
 
-def parse_p(text):
-    pattern = re.compile(r'<strong>(.*?)<\/strong>', re.DOTALL)
-    title = pattern.findall(text)[0]
-    title = ' '.join(title.split()[1:])
-    title = html.unescape(title)
+#from https://github.com/capjamesg/hugging-face-papers-rss/blob/main/app.py
+BASE_URL = "https://huggingface.co/papers"
 
-    soup = BeautifulSoup(text, 'html.parser')
-    href_dict = {}
-    links = soup.find_all('a')
-    for link in links:
-        href_dict[link.get_text()] = link.get('href')
-
-    return {'title': title, 'links': href_dict}
-
-def format_date_ru(date):
-    date = datetime.strptime(f"{date.strip()} {datetime.now().year}", "%B %d %Y")
-    date = date.strftime("%d %B")
-    for en_month, ru_month in months.items():
-        date = date.replace(en_month, ru_month)
-    return date
-
-def get_dates(text):
-    pat = re.compile(r"\((.*?)\)")
-    dates = pat.findall(text)[0]
-    start, end = dates.split("-")
-    start = format_date_ru(start)
-    end = format_date_ru(end)
-    return start, end
-
-xml = feed['entries'][0]['content'][0]['value']
-
-start_date, end_date = get_dates(feed['entries'][0]['summary'])
-ps = extract_ps(xml)
+page = requests.get(BASE_URL)
+soup = BeautifulSoup(page.content, "html.parser")
+h3s = soup.find_all("h3")
 papers = []
-for p in ps:
-    parsed = parse_p(p)
-    papers.append(parsed)
 
-res = {
-        "date": f"{start_date} — {end_date}",
-        "papers": papers,
-    }
-
-print(res)
-
-#%%
-#get abstracts
-def extract_content(html):
-    # return trafilatura.extract(html)
-    extractor = extractors.ArticleExtractor()
-    return extractor.get_content(html)
-
-def get_arxiv_abstract(url):
-    response = requests.get(url)
-    if response.status_code != 200:
-        return "Failed to retrieve the page."
-    soup = BeautifulSoup(response.content, "html.parser")
-    abstract_tag = soup.find("blockquote", class_="abstract")
-    if not abstract_tag:
-        return "Abstract not found."
-    abstract = abstract_tag.text.replace("Abstract:", "").strip()
+def extract_abstract(url):
+    page = requests.get(url)
+    soup = BeautifulSoup(page.content, "html.parser")
+    abstract = soup.find("div", {"class": "pb-8 pr-4 md:pr-16"}).text
+    if abstract.startswith("Abstract\n"):
+        abstract = abstract[len("Abstract\n") :]
+    abstract = abstract.replace("\n", " ")
     return abstract
 
-def download_pdf(pdf_url, save_path):
-    response = requests.get(pdf_url)
-    if response.status_code == 200:
-        with open(save_path, "wb") as file:
-            file.write(response.content)
-    else:
-        print(f"Failed to download PDF. Status: {response.status_code}")
 
-def extract_abstract_from_pdf(pdf_path):
-    abstract_text = ""
-    doc = pymupdf.open(pdf_path)
+for h3 in tqdm(h3s):
+    a = h3.find("a")
+    title = a.text
+    link = a["href"]
+    url = f"https://huggingface.co{link}"
+    try:
+        abstract = extract_abstract(url)
+    except Exception as e:
+        log(f"Error. Failed to extract abstract for {url}: {e}")
+        abstract = ""
 
-    for page in doc:
-        text = page.get_text()
-        if "Abstract" in text:
-            start_index = text.find("Abstract")
-            end_index = text.find("Introduction")
-            if end_index == -1:
-                end_index = len(text)
-            abstract_text = text[start_index:end_index].strip()
-            break
+    papers.append({"title": title, "url": url, "abstract": abstract})
 
-    return abstract_text.replace("Abstract", "").strip(":").strip()
+current_date = datetime.now()
+formatted_date = format_date(current_date, format='d MMMM', locale='ru_RU')
 
+feed = {
+    "version": "https://jsonfeed.org/version/1",
+    "title": f"Hugging Face Papers",
+    "home_page_url": BASE_URL,
+    "feed_url": "https://example.org/feed.json",
+    "papers": [
+        {
+            "id": p["url"],
+            "title": p["title"].strip(),
+            "abstract": p["abstract"].strip(),
+            "url": p["url"],
+        }
+        for p in papers
+    ],
+    "date": formatted_date
+}
 
-for paper in tqdm(res['papers']):
-    url = paper["links"]['paper']
-    print(url)
-    if url.endswith(".pdf"):
-        _temp = "./_temp.pdf"
-        download_pdf(url, _temp)
-        text = extract_abstract_from_pdf(_temp)
-        os.remove(_temp)
-    elif 'arxiv.org' in url:
-        text = get_arxiv_abstract(url)
-    else:
-        resp = requests.get(url)
-        text = extract_content(resp.text)
-    paper["abstract"] = text
-
-#%%
-#check abstracts
-for paper in res['papers']:
+for i,paper in enumerate(feed['papers']):
     print('*' * 80)
-    print(paper['abstract'][:3000])
+    log(f'Abstract {i}. {paper['abstract'][:300]}...')
 
-
-#%%
-#add reviews via LLM
-
-OPENAI_API_KEY = "YOU_KEY"
-client = OpenAI(
-    api_key=OPENAI_API_KEY,
+API_KEY = os.getenv('CLAUDE_KEY')
+client = anthropic.Anthropic(
+    api_key=API_KEY,
 )
 
-def get_data(prompt):
-    chat_completion = client.chat.completions.create(
+def get_data(prompt, system_prompt=""):
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20240620",
+        max_tokens=512,
+        system=system_prompt,
         messages=[
-            {
-                "role": "user",
-                "content": prompt,
-            }
+            {"role": "user", "content": prompt},
         ],
-        model="gpt-4o",
-        response_format={"type": "json_object"},
     )
-    return json.loads(chat_completion.choices[0].message.content)
+    resp = message.content[0].text.strip('"')
+    log(f'Got response. {resp}')
+    try:
+        doc = json.loads(resp)
+    except:
+        log(f"Error. Failed to parse JSON from LLM. {resp}")
+        doc = {'error': 'Parsing error', 'raw_data': resp}
+
+    return doc
+
+log('Read previous papers.')
+if os.path.isfile(DATA_FILE):
+    with open(DATA_FILE, "r", encoding="utf-8") as f:
+        prev_papers = json.load(f)
+else:
+    prev_papers = {}
 
 
-# %%
-for style_id, paper in tqdm(enumerate(res['papers'])):
-    abs = paper["abstract"][:3000]
-    # style_id = random.randint(0,9)
-    styles = {
-        0: 'Magister Yoda',
-        1: 'Donald Trump',
-        2: 'Sherlock Holmes',
-        3: 'Gandalf',
-        4: 'Homer Simpson',
-        5: 'Tyler Durden',
-        6: 'Hannibal Lecter',
-        7: 'Forrest Gump',
-        8: 'Gregory House from TV series',
-        9: 'Groot from Guardians of the Galaxy',}
-        
-    prompt = f"I will give you the abstract of a paper. Read it and return a JSON with fields: 'desc': explanation of a paper in style of {styles[style_id]}. In Russian 'tags': array of tags related to article (like #cv, #nlp, etc.) 3-4 tags, but specific, not general like #ml or #ai. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
+log('Generating reviews via LLM API.')
+for paper in tqdm(feed['papers']):
+    prev_data = {}
+    if 'papers' in prev_papers:
+        prev_ids = [x['id'] for x in prev_papers['papers']]
+        if paper['url'] in prev_ids:
+            prev_data = [x for x in prev_papers['papers'] if x['id']==paper['url']][0]
+    
+    if prev_data:
+        log(f'Using data from previous issue: {json.dumps(prev_data, ensure_ascii=False)}')
+        paper["data"] = prev_data
+    else:
+        abs = paper["abstract"][:3000]
+        prompt = f"Read abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms, do not use terms like БЯМ. 'tags': array of tags related to article, 3 tags, but specific, not general like #ml or #ai. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
+        paper["data"] = get_data(prompt)
 
-    paper["data"] = get_data(prompt)
-    paper["style_id"] = style_id
-
+try_rename_file(DATA_FILE)
 
 json.dump(
-    res,
-    open("dg_papers.json", "w", encoding="utf-8"),
+    feed,
+    open(DATA_FILE, "w", encoding="utf-8"),
     ensure_ascii=False,
     indent=4,
 )
 
-#%%
-def generate_html(data):
+def make_html(data):
     html = (
         """
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DoomGrad ML News</title>
+    <title>Обзор статей с HF</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #6200ea;
+            --primary-color: #0989eacf;
             --secondary-color: #03dac6;
             --background-color: #f5f5f5;
             --text-color: #333333;
-            --card-color: #ffffff;
+            --header-color: #0989eacf;
+            --body-color: #f5f5f5;
         }
         body {
             font-family: 'Roboto Slab', sans-serif;
             line-height: 1.6;
             color: var(--text-color);
-            background-color: var(--background-color);
             margin: 0;
             padding: 0;
         }
@@ -245,8 +176,6 @@ def generate_html(data):
             padding: 0 20px;
         }
         header {
-            background-color: var(--primary-color);
-            color: white;
             padding: 2em 0;
             text-align: center;
         }
@@ -266,18 +195,34 @@ def generate_html(data):
             gap: 2em;
             padding: 2em 0;
         }
+        body.dark-tmeme>header {
+            background-color: background-color: #333333;
+            color: white;
+        }
+        body.light-theme>header {
+            background-color: var(--header-color);
+            color: white;
+        }
+        body.dark-theme>div>main>article {
+            background-color: #444;
+        }
+        body.light-theme>div>main>article {
+            background-color: #fff;
+        }
+        body.dark-theme>div>main>article:hover {
+            background-color: #414141;
+        }
+        body.light-theme>div>main>article:hover {
+            background-color: #ffae3233;
+        }
         article {
-            background-color: var(--card-color);
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
             transition: background-color 0.2s ease;
             display: flex;
             flex-direction: column;
             position: relative;
-        }
-        article:hover {
-            background: #ffffee;
         }
         .article-content {
             padding: 1.5em;
@@ -290,7 +235,7 @@ def generate_html(data):
         }
         h2 {
             # color: var(--primary-color);
-            font-size: 1.6em;
+            font-size: 1.4em;
             margin-top: 0;
             margin-bottom: 0.5em;
         }
@@ -316,7 +261,7 @@ def generate_html(data):
         }
         .abstract {
             position: relative;
-            max-height: 140px;
+            max-height: 244px;
             overflow: hidden;
             transition: max-height 0.3s ease;
             cursor: pointer;
@@ -358,6 +303,63 @@ def generate_html(data):
             padding: 1em 0;
             margin-top: 2em;
         }
+        .light-theme {
+            background-color: var(--body-color);
+            color: #333333;
+        }
+        .dark-theme {
+            background-color: #333333;
+            color: #ffffff;
+        }
+        .theme-switch {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .switch-label {
+            margin-right: 10px;
+        }
     </style>
     <script>
     function toggleAbstract(id) {
@@ -374,11 +376,17 @@ def generate_html(data):
     </script>
 </head>"""
         + f"""
-<body>
+<body class="light-theme">
     <header>
         <div class="container">
-            <h1>🔺 это статьи</h1>
-            <p>за {res['date']}</p>
+            <h1 id="doomgrad">🔺 хф дэйли</h1>
+            <p>{feed['date']}</p>
+        </div>
+        <div class="theme-switch">
+            <label class="switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
         </div>
     </header>
     <div class="container">
@@ -387,23 +395,25 @@ def generate_html(data):
     )
 
     for index, item in enumerate(data['papers']):
-        print(item["data"])
+        if 'error' in item:
+            log(f'Omitting JSON. {item["raw_data"]}')
+            continue
+
         explanation = item["data"]["desc"]
         tags = " ".join(item["data"]["tags"])
         html += f"""
         <article>
             <div class="background-digit">{index + 1}</div>
             <div class="article-content" onclick="toggleAbstract({index})">
-                <h2>{item['title']}</h2>
-                <p class="meta">{item['data']['emoji']} {item['data']['title']}</p>
+                <h2>{item['data']['emoji']} {item['title']}</h2>
+                <p class="meta">{item['data']['title']}</p>
                 <p class="tags">{tags}</p>
                 <div id="abstract-{index}" class="abstract">
                     <p>{explanation}</p>
                     <div id="toggle-{index}" class="abstract-toggle">...</div>
                 </div>
                 <div class="links">
-                    <a href="{item['links']['paper']}" target="_blank">Статья</a> | 
-                    <a href="{item['links']['tweet']}" target="_blank">Твит</a>
+                    <a href="{item['url']}" target="_blank">Статья</a>
                 </div>
             </div>
         </article>
@@ -414,21 +424,59 @@ def generate_html(data):
     </div>
     <footer>
         <div class="container">
-            <p>&copy; 2024 <a style="color:white;" href="https://t.me/doomgrad">градиент обреченный</a></p>
+            <p><a style="color:white;" href="https://t.me/doomgrad">градиент обреченный</a> ✖️ claude</p>
         </div>
     </footer>
+    <script>    
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('light-theme');
+            body.classList.toggle('dark-theme');
+
+            const isDarkMode = body.classList.contains('dark-theme');
+            localStorage.setItem('darkMode', isDarkMode);
+
+            
+            if (isDarkMode) {
+                const title = document.getElementById('doomgrad');
+                title.innerHTML = "🔺 хф найтли";
+            }  else {
+                const title = document.getElementById('doomgrad');
+                title.innerHTML = "🔺 хф дэйли";
+            }
+        }
+
+        function loadThemePreference() {
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            if (isDarkMode) {
+                document.body.classList.remove('light-theme');
+                document.body.classList.add('dark-theme');
+                themeToggle.checked = true;
+                const title = document.getElementById('doomgrad');
+                title.innerHTML = "🔺 хф найтли";
+            }
+        }
+        document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
+        window.addEventListener('load', () => {
+            loadThemePreference();
+        });
+    </script>
 </body>
 </html>
     """
     return html
 
-
-with open("dg_papers.json", "r", encoding="utf-8") as f:
+with open(DATA_FILE, "r", encoding="utf-8") as f:
     data = json.load(f)
 
-html = generate_html(data)
+html = make_html(data)
 
-with open("dg_news.html", "w", encoding="utf-8") as f:
+try_rename_file(PAGE_FILE, "_papers.html")
+
+log('Writing result.')
+with open(PAGE_FILE, "w", encoding="utf-8") as f:
     f.write(html)
 
-# %%
+log('Done.')
