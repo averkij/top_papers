@@ -18,7 +18,7 @@ PAGE_FILE = 'index.html'
 
 def log(msg):
     print(msg)
-    with open(LOG_FILE, 'a') as fout:
+    with open(LOG_FILE, 'a', encoding="utf-8") as fout:
         date = datetime.now().strftime("%d.%m.%Y %H:%M")
         fout.write(f'[{date}] {msg}\n')
 
@@ -28,8 +28,13 @@ def try_rename_file(fpath, new_name=None):
     if os.path.isfile(fpath):
         date = datetime.now() - timedelta(1)
         date = date.strftime("%Y-%m-%d")
-        log(f'Renaming previous data. {fpath} to {date}_{new_name}')
-        os.rename(fpath, f'{date}_{new_name}')
+        new_fpath = f'{date}_{new_name}'
+        log(f'Renaming previous data. {fpath} to {new_fpath}')
+        try:
+            os.remove(new_fpath)
+        except OSError:
+            pass
+        os.rename(fpath, new_fpath)
     else:
         log(f'No file to rename. {fpath}')
 
@@ -129,7 +134,7 @@ for paper in tqdm(feed['papers']):
     if 'papers' in prev_papers:
         prev_ids = [x['id'] for x in prev_papers['papers']]
         if paper['url'] in prev_ids:
-            prev_data = [x for x in prev_papers['papers'] if x['id']==paper['url']][0]
+            prev_data = [x for x in prev_papers['papers'] if x['id']==paper['url']][0]['data']
     
     if prev_data:
         log(f'Using data from previous issue: {json.dumps(prev_data, ensure_ascii=False)[:300]}')
@@ -151,6 +156,7 @@ json.dump(
     indent=4,
 )
 
+#%%
 def make_html(data):
     html = (
         """
@@ -410,28 +416,25 @@ def make_html(data):
         # print(item)
         print(item["data"])
 
-        try:
-            explanation = item["data"]["desc"]
-            tags = " ".join(item["data"]["tags"])
-            html += f"""
-            <article>
-                <div class="background-digit">{index + 1}</div>
-                <div class="article-content" onclick="toggleAbstract({index})">
-                    <h2>{item['data']['emoji']} {item['title']}</h2>
-                    <p class="meta">{item['data']['title']}</p>
-                    <p class="tags">{tags}</p>
-                    <div id="abstract-{index}" class="abstract">
-                        <p>{explanation}</p>
-                        <div id="toggle-{index}" class="abstract-toggle">...</div>
-                    </div>
-                    <div class="links">
-                        <a href="{item['url']}" target="_blank">Статья</a>
-                    </div>
+        explanation = item["data"]["desc"]
+        tags = " ".join(item["data"]["tags"])
+        html += f"""
+        <article>
+            <div class="background-digit">{index + 1}</div>
+            <div class="article-content" onclick="toggleAbstract({index})">
+                <h2>{item['data']['emoji']} {item['title']}</h2>
+                <p class="meta">{item['data']['title']}</p>
+                <p class="tags">{tags}</p>
+                <div id="abstract-{index}" class="abstract">
+                    <p>{explanation}</p>
+                    <div id="toggle-{index}" class="abstract-toggle">...</div>
                 </div>
-            </article>
-        """
-        except Exception as e:
-            print(e)   
+                <div class="links">
+                    <a href="{item['url']}" target="_blank">Статья</a>
+                </div>
+            </div>
+        </article>
+    """
 
     html += """
         </main>
