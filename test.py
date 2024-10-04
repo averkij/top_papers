@@ -23,7 +23,7 @@ with open('test.txt', 'a') as fout:
 #test LLM API call
 import requests
 
-mistral_key = os.getenv('MISTRAL')
+mistral_key = os.getenv('MISTRAL_KEY')
 model = "mistral-large-latest"
 
 base_url = "https://api.mistral.ai/v1/chat/completions"
