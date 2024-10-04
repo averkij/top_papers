@@ -143,7 +143,7 @@ for paper in tqdm(feed['papers']):
 log('Renaming data file.')
 try_rename_file(DATA_FILE)
 
-log('Saving data file.')
+log('Saving new data file.')
 json.dump(
     feed,
     open(DATA_FILE, "w", encoding="utf-8"),
@@ -407,6 +407,9 @@ def make_html(data):
             log(f'Omitting JSON. {item["raw_data"]}')
             continue
 
+        # print(item)
+        print(item["data"])
+
         explanation = item["data"]["desc"]
         tags = " ".join(item["data"]["tags"])
         html += f"""
@@ -476,11 +479,10 @@ def make_html(data):
     """
     return html
 
-with open(DATA_FILE, "r", encoding="utf-8") as f:
-    data = json.load(f)
+log('Generating page.')
+html = make_html(feed)
 
-html = make_html(data)
-
+log('Renaming previous page.')
 try_rename_file(PAGE_FILE, "papers.html")
 
 log('Writing result.')
