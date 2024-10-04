@@ -48,7 +48,11 @@ def try_rename_file(fpath, new_name=None):
     if not new_name:
         new_name = fpath
     if os.path.isfile(fpath):
+        print('Renaming')
         date = datetime.now().strftime("%Y-%m-%d")
         os.rename(fpath, f'{date}_{new_name}')
+    else:
+        print('No file to rename')
+
 
 try_rename_file('test.txt')
