@@ -26,6 +26,7 @@ def try_rename_file(fpath, new_name=None):
     if not new_name:
         new_name = fpath
     if os.path.isfile(fpath):
+        log(f'Renaming previous data. {fpath} to {f'{date}_{new_name}'}')
         date = datetime.now().strftime("%Y-%m-%d")
         os.rename(fpath, f'{date}_{new_name}')
 
@@ -110,8 +111,8 @@ def get_data(prompt, system_prompt=""):
 
     return doc
 
-log('Read previous papers.')
 if os.path.isfile(DATA_FILE):
+    log('Read previous papers.')
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         prev_papers = json.load(f)
 else:
@@ -473,7 +474,7 @@ with open(DATA_FILE, "r", encoding="utf-8") as f:
 
 html = make_html(data)
 
-try_rename_file(PAGE_FILE, "_papers.html")
+try_rename_file(PAGE_FILE, "papers.html")
 
 log('Writing result.')
 with open(PAGE_FILE, "w", encoding="utf-8") as f:
