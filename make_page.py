@@ -4,6 +4,7 @@ import json
 import os
 import re
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import anthropic
 import requests
@@ -11,11 +12,18 @@ from babel.dates import format_date
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
+TITLE_LIGHT = "🔺 хф дэйли"
+TITLE_DARK = "🔺 хф найтли"
+
 LOG_FILE = "log.txt"
 DATA_FILE = "hf_papers.json"
 PAGE_FILE = "index.html"
-TITLE_LIGHT = "🔺 хф дэйли"
-TITLE_DARK = "🔺 хф найтли"
+
+LOG_DIR = "./logs"
+DATA_DIR = "./prev_papers"
+
+Path(LOG_DIR).mkdir(exist_ok=True)
+Path(DATA_DIR).mkdir(exist_ok=True)
 
 def log(msg):
     print(msg)
@@ -23,7 +31,7 @@ def log(msg):
         date = datetime.now().strftime("%d.%m.%Y %H:%M")
         fout.write(f"[{date}] {msg}\n")
 
-def try_rename_file(fpath, new_name=None):
+def try_rename_file(fpath, dir, new_name=None):
     if not new_name:
         new_name = fpath
     if os.path.isfile(fpath):
@@ -35,7 +43,7 @@ def try_rename_file(fpath, new_name=None):
             os.remove(new_fpath)
         except OSError:
             pass
-        os.rename(fpath, new_fpath)
+        os.replace(fpath, os.path.join(dir, new_fpath))
     else:
         log(f"No file to rename. {fpath}")
 
@@ -185,7 +193,7 @@ for paper in tqdm(feed["papers"]):
         paper["data"] = get_data(prompt)
 
 log("Renaming data file.")
-try_rename_file(DATA_FILE)
+try_rename_file(DATA_FILE, DATA_DIR)
 
 log("Saving new data file.")
 json.dump(
@@ -511,7 +519,7 @@ def make_html(data):
                 document.body.classList.add('dark-theme');
                 themeToggle.checked = true;
                 const title = document.getElementById('doomgrad');
-                title.innerHTML = "{TITLE_LIGHT}";
+                title.innerHTML = "{TITLE_DARK}";
             }}
         }}
         document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
@@ -529,12 +537,13 @@ log("Generating page.")
 html = make_html(feed)
 
 log("Renaming previous page.")
-try_rename_file(PAGE_FILE, "papers.html")
+try_rename_file(PAGE_FILE, DATA_DIR, "hf_papers.html")
 
 log("Writing result.")
 with open(PAGE_FILE, "w", encoding="utf-8") as f:
     f.write(html)
 
-log("Done.")
+log("Renaming log file.")
+try_rename_file(LOG_FILE, LOG_DIR, "last_log.txt")
 
 # %%
