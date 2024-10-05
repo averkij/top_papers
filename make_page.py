@@ -25,11 +25,13 @@ DATA_DIR = "./prev_papers"
 Path(LOG_DIR).mkdir(exist_ok=True)
 Path(DATA_DIR).mkdir(exist_ok=True)
 
+
 def log(msg):
     print(msg)
     with open(LOG_FILE, "a", encoding="utf-8") as fout:
         date = datetime.now().strftime("%d.%m.%Y %H:%M")
         fout.write(f"[{date}] {msg}\n")
+
 
 def try_rename_file(fpath, dir, new_name=None):
     if not new_name:
@@ -47,11 +49,13 @@ def try_rename_file(fpath, dir, new_name=None):
     else:
         log(f"No file to rename. {fpath}")
 
+
 def try_get_score(text):
     score_pat = re.compile(r'<div class="leading-none">(\d+)<\/div>')
     score = score_pat.findall(str(text))
     score = int(score[0]) if score else 0
     return score
+
 
 if os.path.isfile(DATA_FILE):
     # log('Read previous papers.')
@@ -60,6 +64,11 @@ if os.path.isfile(DATA_FILE):
 else:
     log("No previous papers found.")
     PREV_PAPERS = {}
+
+if "issue_id" in PREV_PAPERS:
+    ISSUE_ID = PREV_PAPERS["issue_id"]
+else:
+    ISSUE_ID = 0
 
 
 def try_get_prev_paper(paper):
@@ -73,7 +82,7 @@ def try_get_prev_paper(paper):
 
 log("Get feed.")
 
-# from https://github.com/capjamesg/hugging-face-papers-rss/blob/main/app.py
+# modified version of https://github.com/capjamesg/hugging-face-papers-rss/blob/main/app.py
 BASE_URL = "https://huggingface.co/papers"
 
 page = requests.get(BASE_URL)
@@ -103,8 +112,10 @@ for article in tqdm(articles):
         if ok:
             log(f"Get abstract from previous paper. URL: {url}")
             abstract = prev_data["abstract"]
+            issue_id = prev_data["issue_id"] if "issue_id" in prev_data else ISSUE_ID
         else:
             abstract = extract_abstract(url)
+            issue_id = ISSUE_ID + 1
     except Exception as e:
         log(f"Failed to extract abstract for {url}: {e}")
         abstract = ""
@@ -115,6 +126,7 @@ for article in tqdm(articles):
             "url": url,
             "abstract": abstract,
             "score": try_get_score(article),
+            "issue_id": issue_id
         }
     )
 
@@ -122,10 +134,9 @@ current_date = datetime.now()
 formatted_date = format_date(current_date, format="d MMMM", locale="ru_RU")
 
 feed = {
-    "version": "https://jsonfeed.org/version/1",
-    "title": f"Hugging Face Papers",
+    "date": formatted_date,
+    "issue_id": ISSUE_ID + 1,
     "home_page_url": BASE_URL,
-    "feed_url": "https://example.org/feed.json",
     "papers": [
         {
             "id": p["url"],
@@ -133,10 +144,10 @@ feed = {
             "abstract": p["abstract"].strip(),
             "url": p["url"],
             "score": p["score"],
+            "issue_id": p["issue_id"],
         }
         for p in papers
-    ],
-    "date": formatted_date,
+    ]
 }
 
 for i, paper in enumerate(feed["papers"]):
@@ -242,9 +253,15 @@ def make_html(data):
             text-align: center;
         }
         h1 {
-            font-size: 3.5em;
+            font-size: 3.0em;
             margin: 0;
             font-weight: 700;
+        }
+        h2 {
+            # color: var(--primary-color);
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 0.5em;
         }
         header p {
             font-size: 1.2em;
@@ -301,12 +318,6 @@ def make_html(data):
             z-index: 1;
             cursor: pointer;
         }
-        h2 {
-            # color: var(--primary-color);
-            font-size: 1.4em;
-            margin-top: 0;
-            margin-bottom: 0.5em;
-        }
         .meta {
             color: #666;
             font-size: 0.9em;
@@ -331,7 +342,7 @@ def make_html(data):
         }
         .abstract {
             position: relative;
-            max-height: 244px;
+            max-height: 175px;
             overflow: hidden;
             transition: max-height 0.3s ease;
             cursor: pointer;
@@ -341,7 +352,7 @@ def make_html(data):
         }
         .abstract-toggle {
             position: absolute;
-            bottom: 0px;
+            bottom: 4px;
             right: 0;
             cursor: pointer;
             color: var(--primary-color);
@@ -451,7 +462,7 @@ def make_html(data):
     <header>
         <div class="container">
             <h1 id="doomgrad">{TITLE_LIGHT}</h1>
-            <p>{feed['date']}</p>
+            <p>{feed['date']} | {len(data["papers"])} статей</p>
         </div>
         <div class="theme-switch">
             <label class="switch">
