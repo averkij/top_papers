@@ -264,6 +264,9 @@ def make_html(data):
         body.dark-theme>div>main>article>div.article-content>p.meta {
             color: #fff;
         }
+        body.light-theme>div>main>article>div.article-content>p.meta {
+            color: #555;
+        }
         body.light-theme>header {
             background-color: var(--header-color);
             color: white;
@@ -313,6 +316,8 @@ def make_html(data):
             color: #9e9e9e;
             font-size: 0.9em;
             margin-bottom: 1em;
+            position: absolute;
+            bottom: 10px;
         }
         .background-digit {
             position: absolute;
@@ -351,6 +356,7 @@ def make_html(data):
         }
         .links {
             margin-top: 1.5em;
+            margin-bottom: 80px;
         }
         a {
             color: var(--primary-color);
@@ -470,8 +476,9 @@ def make_html(data):
             <div class="background-digit">{index + 1}</div>
             <div class="article-content" onclick="toggleAbstract({index})">
                 <h2>{item['data']['emoji']} {item['title']}</h2>
-                <p class="meta">{item['data']['title']}</p>
-                <p class="tags">{tags}</p>
+
+                <p class="meta"><svg class="text-sm peer-checked:text-gray-500 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12"><path transform="translate(0, 2)" fill="currentColor" d="M5.19 2.67a.94.94 0 0 1 1.62 0l3.31 5.72a.94.94 0 0 1-.82 1.4H2.7a.94.94 0 0 1-.82-1.4l3.31-5.7v-.02Z"></path></svg> {item['score']}. {item['data']['title']}</p>
+
                 <div id="abstract-{index}" class="abstract">
                     <p>{explanation}</p>
                     <div id="toggle-{index}" class="abstract-toggle">...</div>
@@ -479,6 +486,7 @@ def make_html(data):
                 <div class="links">
                     <a href="{item['url']}" target="_blank">Статья</a>
                 </div>
+                <p class="tags">{tags}</p>
             </div>
         </article>
     """
@@ -488,7 +496,7 @@ def make_html(data):
     </div>
     <footer>
         <div class="container">
-            <p><a style="color:white;" href="https://t.me/doomgrad">градиент обреченный</a> ✖️ claude</p>
+            <p><a style="color:white;" href="https://t.me/doomgrad">градиент обреченный</a> ✖️ <a style="color:white;" href="https://huggingface.co/papers">hugging face</a></p>
         </div>
     </footer>
     <script>    
