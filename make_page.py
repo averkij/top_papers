@@ -1,8 +1,8 @@
-
-#%%
-import os
+# %%
 import html
 import json
+import os
+import re
 from datetime import datetime, timedelta
 
 import anthropic
@@ -11,16 +11,17 @@ from babel.dates import format_date
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
-
-LOG_FILE = 'log.txt'
-DATA_FILE = 'hf_papers.json'
-PAGE_FILE = 'index.html'
+LOG_FILE = "log.txt"
+DATA_FILE = "hf_papers.json"
+PAGE_FILE = "index.html"
+TITLE_LIGHT = "🔺 хф дэйли"
+TITLE_DARK = "🔺 хф найтли"
 
 def log(msg):
     print(msg)
-    with open(LOG_FILE, 'a', encoding="utf-8") as fout:
+    with open(LOG_FILE, "a", encoding="utf-8") as fout:
         date = datetime.now().strftime("%d.%m.%Y %H:%M")
-        fout.write(f'[{date}] {msg}\n')
+        fout.write(f"[{date}] {msg}\n")
 
 def try_rename_file(fpath, new_name=None):
     if not new_name:
@@ -28,25 +29,50 @@ def try_rename_file(fpath, new_name=None):
     if os.path.isfile(fpath):
         date = datetime.now() - timedelta(1)
         date = date.strftime("%Y-%m-%d")
-        new_fpath = f'{date}_{new_name}'
-        log(f'Renaming previous data. {fpath} to {new_fpath}')
+        new_fpath = f"{date}_{new_name}"
+        log(f"Renaming previous data. {fpath} to {new_fpath}")
         try:
             os.remove(new_fpath)
         except OSError:
             pass
         os.rename(fpath, new_fpath)
     else:
-        log(f'No file to rename. {fpath}')
+        log(f"No file to rename. {fpath}")
 
-log('Get feed.')
+def try_get_score(text):
+    score_pat = re.compile(r'<div class="leading-none">(\d+)<\/div>')
+    score = score_pat.findall(str(text))
+    score = int(score[0]) if score else 0
+    return score
 
-#from https://github.com/capjamesg/hugging-face-papers-rss/blob/main/app.py
+if os.path.isfile(DATA_FILE):
+    # log('Read previous papers.')
+    with open(DATA_FILE, "r", encoding="utf-8") as f:
+        PREV_PAPERS = json.load(f)
+else:
+    log("No previous papers found.")
+    PREV_PAPERS = {}
+
+
+def try_get_prev_paper(paper):
+    prev_data = None
+    if "papers" in PREV_PAPERS:
+        prev_ids = [x["id"] for x in PREV_PAPERS["papers"]]
+        if paper["id"] in prev_ids:
+            prev_data = [x for x in PREV_PAPERS["papers"] if x["id"] == paper["id"]][0]
+    return prev_data, bool(prev_data)
+
+
+log("Get feed.")
+
+# from https://github.com/capjamesg/hugging-face-papers-rss/blob/main/app.py
 BASE_URL = "https://huggingface.co/papers"
 
 page = requests.get(BASE_URL)
 soup = BeautifulSoup(page.content, "html.parser")
-h3s = soup.find_all("h3")
+articles = soup.find_all("article")
 papers = []
+
 
 def extract_abstract(url):
     page = requests.get(url)
@@ -58,21 +84,34 @@ def extract_abstract(url):
     return abstract
 
 
-for h3 in tqdm(h3s):
+for article in tqdm(articles):
+    h3 = article.find("h3")
     a = h3.find("a")
     title = a.text
     link = a["href"]
     url = f"https://huggingface.co{link}"
+    prev_data, ok = try_get_prev_paper({"id": url})
     try:
-        abstract = extract_abstract(url)
+        if ok:
+            log(f"Get abstract from previous paper. URL: {url}")
+            abstract = prev_data["abstract"]
+        else:
+            abstract = extract_abstract(url)
     except Exception as e:
-        log(f"Error. Failed to extract abstract for {url}: {e}")
+        print(f"Failed to extract abstract for {url}: {e}")
         abstract = ""
 
-    papers.append({"title": title, "url": url, "abstract": abstract})
+    papers.append(
+        {
+            "title": title,
+            "url": url,
+            "abstract": abstract,
+            "score": try_get_score(article),
+        }
+    )
 
 current_date = datetime.now()
-formatted_date = format_date(current_date, format='d MMMM', locale='ru_RU')
+formatted_date = format_date(current_date, format="d MMMM", locale="ru_RU")
 
 feed = {
     "version": "https://jsonfeed.org/version/1",
@@ -85,20 +124,22 @@ feed = {
             "title": p["title"].strip(),
             "abstract": p["abstract"].strip(),
             "url": p["url"],
+            "score": p["score"],
         }
         for p in papers
     ],
-    "date": formatted_date
+    "date": formatted_date,
 }
 
-for i,paper in enumerate(feed['papers']):
-    print('*' * 80)
+for i, paper in enumerate(feed["papers"]):
+    print("*" * 80)
     log(f'Abstract {i}. {paper["abstract"][:300]}...')
 
-API_KEY = os.getenv('CLAUDE_KEY')
+API_KEY = os.getenv("CLAUDE_KEY")
 client = anthropic.Anthropic(
     api_key=API_KEY,
 )
+
 
 def get_data(prompt, system_prompt=""):
     message = client.messages.create(
@@ -110,45 +151,43 @@ def get_data(prompt, system_prompt=""):
         ],
     )
     resp = message.content[0].text.strip('"')
-    log(f'Got response. {resp}')
+    log(f"Got response. {resp}")
     try:
         doc = json.loads(resp)
     except:
         log(f"Error. Failed to parse JSON from LLM. {resp}")
-        doc = {'error': 'Parsing error', 'raw_data': resp}
+        doc = {"error": "Parsing error", "raw_data": resp}
 
     return doc
 
+
 if os.path.isfile(DATA_FILE):
-    log('Read previous papers.')
+    log("Read previous papers.")
     with open(DATA_FILE, "r", encoding="utf-8") as f:
-        prev_papers = json.load(f)
+        PREV_PAPERS = json.load(f)
 else:
-    log('No previous papers found.')
-    prev_papers = {}
+    log("No previous papers found.")
+    PREV_PAPERS = {}
 
+log("Generating reviews via LLM API.")
+for paper in tqdm(feed["papers"]):
+    prev_data, ok = try_get_prev_paper(paper)
 
-log('Generating reviews via LLM API.')
-for paper in tqdm(feed['papers']):
-    prev_data = {}
-    if 'papers' in prev_papers:
-        prev_ids = [x['id'] for x in prev_papers['papers']]
-        if paper['url'] in prev_ids:
-            prev_data = [x for x in prev_papers['papers'] if x['id']==paper['url']][0]['data']
-    
-    if prev_data:
-        log(f'Using data from previous issue: {json.dumps(prev_data, ensure_ascii=False)[:300]}')
-        paper["data"] = prev_data
+    if ok:
+        log(
+            f'Using data from previous issue: {json.dumps(prev_data["data"], ensure_ascii=False)[:300]}'
+        )
+        paper["data"] = prev_data["data"]
     else:
-        log('Querying the API.')
+        log("Querying the API.")
         abs = paper["abstract"][:3000]
         prompt = f"Read abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms, do not use terms like БЯМ. 'tags': array of tags related to article, 3 tags, but specific, not general like #ml or #ai. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
         paper["data"] = get_data(prompt)
 
-log('Renaming data file.')
+log("Renaming data file.")
 try_rename_file(DATA_FILE)
 
-log('Saving new data file.')
+log("Saving new data file.")
 json.dump(
     feed,
     open(DATA_FILE, "w", encoding="utf-8"),
@@ -156,7 +195,8 @@ json.dump(
     indent=4,
 )
 
-#%%
+
+# %%
 def make_html(data):
     html = (
         """
@@ -213,6 +253,9 @@ def make_html(data):
             background-color: background-color: #333333;
             color: white;
         }
+        body.dark-theme>div>main>article>div.article-content>p.meta {
+            color: #fff;
+        }
         body.light-theme>header {
             background-color: var(--header-color);
             color: white;
@@ -227,7 +270,7 @@ def make_html(data):
             background-color: #414141;
         }
         body.light-theme>div>main>article:hover {
-            background-color: #fff9e7;
+            background-color: #fafafa;
         }
         article {
             border-radius: 8px;
@@ -393,7 +436,7 @@ def make_html(data):
 <body class="light-theme">
     <header>
         <div class="container">
-            <h1 id="doomgrad">🔺 хф дэйли</h1>
+            <h1 id="doomgrad">{TITLE_LIGHT}</h1>
             <p>{feed['date']}</p>
         </div>
         <div class="theme-switch">
@@ -408,12 +451,11 @@ def make_html(data):
     """
     )
 
-    for index, item in enumerate(data['papers']):
-        if 'error' in item:
+    for index, item in enumerate(data["papers"]):
+        if "error" in item:
             log(f'Omitting JSON. {item["raw_data"]}')
             continue
 
-        # print(item)
         print(item["data"])
 
         explanation = item["data"]["desc"]
@@ -436,7 +478,7 @@ def make_html(data):
         </article>
     """
 
-    html += """
+    html += f"""
         </main>
     </div>
     <footer>
@@ -445,7 +487,7 @@ def make_html(data):
         </div>
     </footer>
     <script>    
-        function toggleTheme() {
+        function toggleTheme() {{
             const body = document.body;
             body.classList.toggle('light-theme');
             body.classList.toggle('dark-theme');
@@ -454,45 +496,48 @@ def make_html(data):
             localStorage.setItem('darkMode', isDarkMode);
 
             
-            if (isDarkMode) {
+            if (isDarkMode) {{
                 const title = document.getElementById('doomgrad');
-                title.innerHTML = "🔺 хф найтли";
-            }  else {
+                title.innerHTML = "{TITLE_DARK}";
+            }}  else {{
                 const title = document.getElementById('doomgrad');
-                title.innerHTML = "🔺 хф дэйли";
-            }
-        }
+                title.innerHTML = "{TITLE_LIGHT}";
+            }}
+        }}
 
-        function loadThemePreference() {
+        function loadThemePreference() {{
             const isDarkMode = localStorage.getItem('darkMode') === 'true';
             const themeToggle = document.getElementById('theme-toggle');
             
-            if (isDarkMode) {
+            if (isDarkMode) {{
                 document.body.classList.remove('light-theme');
                 document.body.classList.add('dark-theme');
                 themeToggle.checked = true;
                 const title = document.getElementById('doomgrad');
-                title.innerHTML = "🔺 хф найтли";
-            }
-        }
+                title.innerHTML = "{TITLE_LIGHT}";
+            }}
+        }}
         document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
-        window.addEventListener('load', () => {
+        window.addEventListener('load', () => {{
             loadThemePreference();
-        });
+        }});
     </script>
 </body>
 </html>
     """
     return html
 
-log('Generating page.')
+
+log("Generating page.")
 html = make_html(feed)
 
-log('Renaming previous page.')
+log("Renaming previous page.")
 try_rename_file(PAGE_FILE, "papers.html")
 
-log('Writing result.')
+log("Writing result.")
 with open(PAGE_FILE, "w", encoding="utf-8") as f:
     f.write(html)
 
-log('Done.')
+log("Done.")
+
+# %%
