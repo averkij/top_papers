@@ -98,7 +98,7 @@ for article in tqdm(articles):
         else:
             abstract = extract_abstract(url)
     except Exception as e:
-        print(f"Failed to extract abstract for {url}: {e}")
+        log(f"Failed to extract abstract for {url}: {e}")
         abstract = ""
 
     papers.append(
@@ -132,7 +132,7 @@ feed = {
 }
 
 for i, paper in enumerate(feed["papers"]):
-    print("*" * 80)
+    log("*" * 80)
     log(f'Abstract {i}. {paper["abstract"][:300]}...')
 
 API_KEY = os.getenv("CLAUDE_KEY")
@@ -455,9 +455,6 @@ def make_html(data):
         if "error" in item:
             log(f'Omitting JSON. {item["raw_data"]}')
             continue
-
-        print(item["data"])
-
         explanation = item["data"]["desc"]
         tags = " ".join(item["data"]["tags"])
         html += f"""
