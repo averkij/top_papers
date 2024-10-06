@@ -2,6 +2,8 @@
 
 Welcome to the automatically generated reviews repository for Hugging Face's daily papers! This project gathers insights and reviews of machine learning and AI research papers from Hugging Face, and presents them in a creative and informative manner.
 
+👉 [HFday.ru](https://hfday.ru)
+
 ## Project Overview
 
 This project uses Python scripts to:
@@ -43,7 +45,7 @@ The project is deployed automatically using GitHub Actions with the following wo
 
 This automation ensures that the reviews are always up-to-date and available for the audience without manual intervention.
 
-The generated HTML page is deployed at [hfday.ru](https://hfday.ru), allowing users to browse the reviews easily.
+The generated HTML page is deployed at [HFday.ru](https://hfday.ru), allowing users to browse the reviews easily.
 
 ## Usage
 
