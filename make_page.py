@@ -446,20 +446,22 @@ def make_html(data):
             margin-bottom: 0px;
             text-align: right;
         }
-        
         .sort-dropdown {
             padding: 5px 10px;
             font-size: 16px;
             border-radius: 5px;
-            border: 1px solid var(--primary-color);
+            border: 1px solid #ccc;
             background-color: white;
             color: var(--text-color);
+            font-family: 'Roboto Slab', sans-serif;
         }
-        
+        .sort-label {
+            margin-right: 10px;
+        }        
         .dark-theme .sort-dropdown {
             background-color: #444;
             color: white;
-            border-color: var(--secondary-color);
+            border-color: var(--text-color);
         }
     </style>
     <script>
@@ -493,9 +495,10 @@ def make_html(data):
     </header>
     <div class="container">
         <div class="sort-container">
+            <label class="sort-label">Сортировка</label>
             <select id="sort-dropdown" class="sort-dropdown">
-                <option value="default">Сортировка по умолчанию</option>
-                <option value="issue_id">Сортировка по issue_id</option>
+                <option value="default">по рейтингу</option>
+                <option value="issue_id">новые вверху</option>
             </select>
         </div>
         <main id="articles-container">
@@ -515,7 +518,6 @@ def make_html(data):
 
             const isDarkMode = body.classList.contains('dark-theme');
             localStorage.setItem('darkMode', isDarkMode);
-
             
             if (isDarkMode) {{
                 const title = document.getElementById('doomgrad');
@@ -526,9 +528,13 @@ def make_html(data):
             }}
         }}
 
-        function loadThemePreference() {{
+        function loadSettings() {{
             const isDarkMode = localStorage.getItem('darkMode') === 'true';
             const themeToggle = document.getElementById('theme-toggle');
+
+            const sortBy = localStorage.getItem('sort_by');
+            const sortByIssueId = sortBy === 'issue_id';
+            const sortDropdown = document.getElementById('sort-dropdown');
             
             if (isDarkMode) {{
                 document.body.classList.remove('light-theme');
@@ -537,10 +543,17 @@ def make_html(data):
                 const title = document.getElementById('doomgrad');
                 title.innerHTML = "{TITLE_DARK}";
             }}
+
+            console.log(sortBy);
+
+            if (sortByIssueId) {{
+                sortDropdown.value = sortBy;
+                sortArticles(sortBy);
+            }}
         }}
         document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
         window.addEventListener('load', () => {{
-            loadThemePreference();
+            loadSettings();
         }});
 
         const articlesData = {data["papers"]};
@@ -584,6 +597,7 @@ def make_html(data):
                 sortedArticles.sort((a, b) => a.issue_id - b.issue_id);
             }}
             renderArticles(sortedArticles);
+            localStorage.setItem('sort_by', sortBy);
         }}
         
         sortDropdown.addEventListener('change', (event) => {{
