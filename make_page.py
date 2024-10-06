@@ -126,7 +126,7 @@ for article in tqdm(articles):
             "url": url,
             "abstract": abstract,
             "score": try_get_score(article),
-            "issue_id": issue_id
+            "issue_id": issue_id,
         }
     )
 
@@ -147,7 +147,7 @@ feed = {
             "issue_id": p["issue_id"],
         }
         for p in papers
-    ]
+    ],
 }
 
 for i, paper in enumerate(feed["papers"]):
@@ -217,8 +217,7 @@ json.dump(
 
 # %%
 def make_html(data):
-    html = (
-        """
+    html = """
 <!DOCTYPE html>
 <html>
 <head>
@@ -272,7 +271,7 @@ def make_html(data):
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2em;
-            padding: 2em 0;
+            padding: 20px 0;
         }
         body.dark-tmeme>header {
             background-color: background-color: #333333;
@@ -442,6 +441,26 @@ def make_html(data):
         .switch-label {
             margin-right: 10px;
         }
+        .sort-container {
+            margin-top: 15px;
+            margin-bottom: 0px;
+            text-align: right;
+        }
+        
+        .sort-dropdown {
+            padding: 5px 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid var(--primary-color);
+            background-color: white;
+            color: var(--text-color);
+        }
+        
+        .dark-theme .sort-dropdown {
+            background-color: #444;
+            color: white;
+            border-color: var(--secondary-color);
+        }
     </style>
     <script>
     function toggleAbstract(id) {
@@ -457,7 +476,8 @@ def make_html(data):
     }
     </script>
 </head>"""
-        + f"""
+
+    html += f"""
 <body class="light-theme">
     <header>
         <div class="container">
@@ -472,37 +492,14 @@ def make_html(data):
         </div>
     </header>
     <div class="container">
-        <main>
-    """
-    )
-
-    for index, item in enumerate(data["papers"]):
-        if "error" in item:
-            log(f'Omitting JSON. {item["raw_data"]}')
-            continue
-        explanation = item["data"]["desc"]
-        tags = " ".join(item["data"]["tags"])
-        html += f"""
-        <article>
-            <div class="background-digit">{index + 1}</div>
-            <div class="article-content" onclick="toggleAbstract({index})">
-                <h2>{item['data']['emoji']} {item['title']}</h2>
-
-                <p class="meta"><svg class="text-sm peer-checked:text-gray-500 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12"><path transform="translate(0, 2)" fill="currentColor" d="M5.19 2.67a.94.94 0 0 1 1.62 0l3.31 5.72a.94.94 0 0 1-.82 1.4H2.7a.94.94 0 0 1-.82-1.4l3.31-5.7v-.02Z"></path></svg> {item['score']}. {item['data']['title']}</p>
-
-                <div id="abstract-{index}" class="abstract">
-                    <p>{explanation}</p>
-                    <div id="toggle-{index}" class="abstract-toggle">...</div>
-                </div>
-                <div class="links">
-                    <a href="{item['url']}" target="_blank">Статья</a>
-                </div>
-                <p class="tags">{tags}</p>
-            </div>
-        </article>
-    """
-
-    html += f"""
+        <div class="sort-container">
+            <select id="sort-dropdown" class="sort-dropdown">
+                <option value="default">Сортировка по умолчанию</option>
+                <option value="issue_id">Сортировка по issue_id</option>
+            </select>
+        </div>
+        <main id="articles-container">
+            <!-- Articles is here -->
         </main>
     </div>
     <footer>
@@ -545,6 +542,56 @@ def make_html(data):
         window.addEventListener('load', () => {{
             loadThemePreference();
         }});
+
+        const articlesData = {data["papers"]};
+        const articlesContainer = document.getElementById('articles-container');
+        const sortDropdown = document.getElementById('sort-dropdown');
+        
+        function renderArticles(articles) {{
+            console.log(articles)
+            articlesContainer.innerHTML = '';
+            articles.forEach((item, index) => {{
+                if ("error" in item) {{
+                    console.log(`Omitting JSON. ${{item["raw_data"]}}`);
+                    return;
+                }}
+                const explanation = item["data"]["desc"];
+                const tags = item["data"]["tags"].join(" ");
+                const articleHTML = `
+                    <article>
+                        <div class="background-digit">${{index + 1}}</div>
+                        <div class="article-content" onclick="toggleAbstract(${{index}})">
+                            <h2>${{item['data']['emoji']}} ${{item['title']}}</h2>
+                            <p class="meta"><svg class="text-sm peer-checked:text-gray-500 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12"><path transform="translate(0, 2)" fill="currentColor" d="M5.19 2.67a.94.94 0 0 1 1.62 0l3.31 5.72a.94.94 0 0 1-.82 1.4H2.7a.94.94 0 0 1-.82-1.4l3.31-5.7v-.02Z"></path></svg> ${{item['score']}}. ${{item['data']['title']}}</p>
+                            <div id="abstract-${{index}}" class="abstract">
+                                <p>${{explanation}}</p>
+                                <div id="toggle-${{index}}" class="abstract-toggle">...</div>
+                            </div>
+                            <div class="links">
+                                <a href="${{item['url']}}" target="_blank">Статья</a>
+                            </div>
+                            <p class="tags">${{tags}}</p>
+                        </div>
+                    </article>
+                `;
+                articlesContainer.innerHTML += articleHTML;
+            }});
+        }}
+        
+        function sortArticles(sortBy) {{
+            let sortedArticles = [...articlesData];
+            if (sortBy === 'issue_id') {{
+                sortedArticles.sort((a, b) => a.issue_id - b.issue_id);
+            }}
+            renderArticles(sortedArticles);
+        }}
+        
+        sortDropdown.addEventListener('change', (event) => {{
+            sortArticles(event.target.value);
+        }});
+        
+        // Initial render
+        renderArticles(articlesData);
     </script>
 </body>
 </html>
