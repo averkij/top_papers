@@ -4,6 +4,8 @@ Welcome to the automatically generated reviews repository for Hugging Face's dai
 
 👉 [HFday.ru](https://hfday.ru)
 
+🔺 [градиент обреченный](https://t.me/doomgrad)
+
 ## Project Overview
 
 This project uses Python scripts to:
