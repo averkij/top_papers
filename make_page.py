@@ -594,7 +594,7 @@ def make_html(data):
         function sortArticles(sortBy) {{
             let sortedArticles = [...articlesData];
             if (sortBy === 'issue_id') {{
-                sortedArticles.sort((a, b) => a.issue_id - b.issue_id);
+                sortedArticles.sort((a, b) => b.issue_id - a.issue_id);
             }}
             renderArticles(sortedArticles);
             localStorage.setItem('sort_by', sortBy);
@@ -612,6 +612,9 @@ def make_html(data):
     """
     return html
 
+#debug
+# with open(DATA_FILE, "r", encoding="utf-8") as f:
+#     feed = json.load(f)
 
 log("Generating page.")
 html = make_html(feed)
