@@ -25,6 +25,9 @@ DATA_DIR = "./prev_papers"
 Path(LOG_DIR).mkdir(exist_ok=True)
 Path(DATA_DIR).mkdir(exist_ok=True)
 
+CURRENT_YEAR = datetime.now().year
+CURRENT_DATE = datetime.now()
+
 
 def log(msg):
     print(msg)
@@ -55,6 +58,18 @@ def try_get_score(text):
     score = score_pat.findall(str(text))
     score = int(score[0]) if score else 0
     return score
+
+
+def parse_and_format_date(date_str, year=CURRENT_YEAR):
+    try:
+        date_obj = datetime.strptime(date_str, "%b %d").replace(year=year)
+        date_sort = date_obj.strftime("%Y-%m-%d")
+        date_ru = format_date(date_obj, format="d MMMM", locale="ru_RU")
+    except:
+        date_sort = "2024-01-01"
+        date_ru = format_date(CURRENT_DATE, format="d MMMM", locale="ru_RU")
+        log(f"Error. Unable to format date {date_str}")
+    return date_sort, date_ru
 
 
 if os.path.isfile(DATA_FILE):
@@ -91,14 +106,35 @@ articles = soup.find_all("article")
 papers = []
 
 
-def extract_abstract(url):
+def try_parse_pub_date(soup):
+    pat = r"Published on (\w+ \d{1,2})"
+    for s in soup:
+        m = re.search(pat, s.text)
+        if m:
+            return m.group(1)
+    return None
+
+
+def extract_page_data(url):
     page = requests.get(url)
     soup = BeautifulSoup(page.content, "html.parser")
     abstract = soup.find("div", {"class": "pb-8 pr-4 md:pr-16"}).text
     if abstract.startswith("Abstract\n"):
         abstract = abstract[len("Abstract\n") :]
     abstract = abstract.replace("\n", " ")
-    return abstract
+
+    main = soup.find("main")
+    main_divs = main.find_all("div")
+    pub_date_str = try_parse_pub_date(main_divs)
+    pub_date, pub_date_ru = parse_and_format_date(pub_date_str)
+
+    res = {
+        "abstract": abstract.strip(),
+        "pub_date": pub_date,
+        "pub_date_ru": pub_date_ru,
+    }
+
+    return res
 
 
 for article in tqdm(articles):
@@ -108,46 +144,46 @@ for article in tqdm(articles):
     link = a["href"]
     url = f"https://huggingface.co{link}"
     prev_data, ok = try_get_prev_paper({"id": url})
+    issue_id = ISSUE_ID + 1
     try:
         if ok:
-            log(f"Get abstract from previous paper. URL: {url}")
+            log(f"Get page data from previous paper. URL: {url}")
             abstract = prev_data["abstract"]
             issue_id = prev_data["issue_id"] if "issue_id" in prev_data else ISSUE_ID
+            pub_date = prev_data["pub_date"] if "pub_date" in prev_data else '1963-01-17'
+            pub_date_ru = prev_data["pub_date_ru"] if "pub_date_ru" in prev_data else 'надцатого мартобря'
         else:
-            abstract = extract_abstract(url)
-            issue_id = ISSUE_ID + 1
+            log(f"Extract page data from URL. URL: {url}")
+            page_data = extract_page_data(url)
+            abstract = page_data["abstract"]
+            pub_date = page_data["pub_date"]
+            pub_date_ru = page_data["pub_date_ru"]
+
     except Exception as e:
-        log(f"Failed to extract abstract for {url}: {e}")
+        log(f"Failed to extract page data for {url}: {e}")
         abstract = ""
 
     papers.append(
         {
+            "id": url,
             "title": title,
             "url": url,
             "abstract": abstract,
             "score": try_get_score(article),
             "issue_id": issue_id,
+            "pub_date": pub_date,
+            "pub_date_ru": pub_date_ru,
         }
     )
 
-current_date = datetime.now()
-formatted_date = format_date(current_date, format="d MMMM", locale="ru_RU")
+# %%
+formatted_date = format_date(CURRENT_DATE, format="d MMMM", locale="ru_RU")
 
 feed = {
     "date": formatted_date,
     "issue_id": ISSUE_ID + 1,
     "home_page_url": BASE_URL,
-    "papers": [
-        {
-            "id": p["url"],
-            "title": p["title"].strip(),
-            "abstract": p["abstract"].strip(),
-            "url": p["url"],
-            "score": p["score"],
-            "issue_id": p["issue_id"],
-        }
-        for p in papers
-    ],
+    "papers": papers,
 }
 
 for i, paper in enumerate(feed["papers"]):
@@ -253,7 +289,7 @@ def make_html(data):
             text-align: center;
         }
         h1 {
-            font-size: 3.0em;
+            font-size: 2.8em;
             margin: 0;
             font-weight: 700;
         }
@@ -496,10 +532,11 @@ def make_html(data):
     </header>
     <div class="container">
         <div class="sort-container">
-            <label class="sort-label">Сортировка</label>
+            <label class="sort-label">Сортировка по</label>
             <select id="sort-dropdown" class="sort-dropdown">
-                <option value="default">по рейтингу</option>
-                <option value="issue_id">новые вверху</option>
+                <option value="default">рейтингу</option>
+                <option value="issue_id">дате публикации</option>
+                <option value="pub_date_sort">добавлению на HF</option>
             </select>
         </div>
         <main id="articles-container">
@@ -613,7 +650,8 @@ def make_html(data):
     """
     return html
 
-#debug
+
+# debug
 # with open(DATA_FILE, "r", encoding="utf-8") as f:
 #     feed = json.load(f)
 
