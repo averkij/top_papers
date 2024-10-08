@@ -200,6 +200,7 @@ API_KEY = os.getenv("CLAUDE_KEY")
 client = anthropic.Anthropic(
     api_key=API_KEY,
 )
+MISTRAL_KEY = os.getenv("MISTRAL_KEY")
 
 
 def get_data(prompt, system_prompt=""):
@@ -220,6 +221,24 @@ def get_data(prompt, system_prompt=""):
         doc = {"error": "Parsing error", "raw_data": resp}
 
     return doc
+
+
+def get_text(prompt):
+    base_url = "https://api.mistral.ai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {MISTRAL_KEY}",
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "model": "mistral-large-latest",
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "max_tokens": 512,
+        "messages": [{"role": "user", "content": prompt}],
+    }
+    response = requests.post(base_url, headers=headers, json=payload)
+    text = response.json()["choices"][0]["message"]["content"]
+    return text
 
 
 if os.path.isfile(DATA_FILE):
@@ -262,6 +281,21 @@ json.dump(
 
 
 # %%
+def format_subtitle(number):
+    if 11 <= number % 100 <= 14:
+        word = "статей"
+    else:
+        last_digit = number % 10
+        if last_digit == 1:
+            word = "статья"
+        elif 2 <= last_digit <= 4:
+            word = "статьи"
+        else:
+            word = "статей"
+
+    return f"{number} {word}"
+
+
 def make_html(data):
     html = """
 <!DOCTYPE html>
@@ -276,8 +310,8 @@ def make_html(data):
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">"""
-    
-    html += f"<title>HF ({len(feed['papers'])} статей)</title>"
+
+    html += f"<title>HF ({format_subtitle(len(data['papers']))})</title>"
 
     html += """
     <link rel="icon" href="favicon.svg" sizes="any" type="image/svg+xml">
@@ -546,7 +580,7 @@ def make_html(data):
     <header>
         <div class="container">
             <h1 id="doomgrad">{TITLE_LIGHT}</h1>
-            <p>{feed['date']} | {len(data["papers"])} статей</p>
+            <p>{data['date']} | {format_subtitle(len(data['papers']))}</p>
         </div>
         <div class="theme-switch">
             <label class="switch">
