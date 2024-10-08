@@ -12,8 +12,8 @@ from babel.dates import format_date
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
-TITLE_LIGHT = "🔺 хф дэйли"
-TITLE_DARK = "🔺 хф найтли"
+TITLE_LIGHT = "хф дэйли"
+TITLE_DARK = "хф найтли"
 
 LOG_FILE = "log.txt"
 DATA_FILE = "hf_papers.json"
@@ -267,6 +267,14 @@ for paper in tqdm(feed["papers"]):
         prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'tags': array of tags related to article, 3 tags, but specific, not general like #ml or #ai. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
 
         paper["data"] = get_data(prompt, system_prompt=system_prompt)
+
+
+# all_abstracts = "\n\n".join([x["abstract"] for x in feed["papers"]])
+# intro_prompt = f"You are the editor of a machine learning journal. You have a set of abstract articles. Write an introduction to the journal about what awaits the reader in this issue. Write in Russian. Abstracts:\n\n{all_abstracts}"
+# log(intro_prompt)
+# intro = get_text(intro_prompt)
+# feed["intro"] = intro
+# log(intro)
 
 log("Renaming data file.")
 try_rename_file(DATA_FILE, DATA_DIR)
@@ -559,6 +567,18 @@ def make_html(data):
             color: white;
             border-color: var(--text-color);
         }
+        .title-sign {
+            display: inline-block;
+            transition: all 0.5s ease;            
+        }
+        .rotate {
+            transform: rotate(45deg) translateY(-6px);
+            transform-origin: center;
+        }
+        .title-text {
+            display: inline;
+            padding-left: 10px;
+        }
     </style>
     <script>
     function toggleAbstract(id) {
@@ -579,7 +599,7 @@ def make_html(data):
 <body class="light-theme">
     <header>
         <div class="container">
-            <h1 id="doomgrad">{TITLE_LIGHT}</h1>
+            <h1 class="title-sign" id="doomgrad-icon">🔺</h1><h1 class="title-text" id="doomgrad">{TITLE_LIGHT}</h1>
             <p>{data['date']} | {format_subtitle(len(data['papers']))}</p>
         </div>
         <div class="theme-switch">
@@ -619,9 +639,13 @@ def make_html(data):
             if (isDarkMode) {{
                 const title = document.getElementById('doomgrad');
                 title.innerHTML = "{TITLE_DARK}";
+                const titleSign = document.getElementById('doomgrad-icon');
+                titleSign.classList.add('rotate');
             }}  else {{
                 const title = document.getElementById('doomgrad');
                 title.innerHTML = "{TITLE_LIGHT}";
+                const titleSign = document.getElementById('doomgrad-icon');
+                titleSign.classList.remove('rotate');
             }}
         }}
 
@@ -638,6 +662,8 @@ def make_html(data):
                 themeToggle.checked = true;
                 const title = document.getElementById('doomgrad');
                 title.innerHTML = "{TITLE_DARK}";
+                const titleSign = document.getElementById('doomgrad-icon');
+                titleSign.classList.add('rotate');
             }}
 
             console.log(sortBy);
