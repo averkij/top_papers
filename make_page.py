@@ -357,7 +357,12 @@ def make_html(data):
         .meta {
             color: #666;
             font-size: 0.9em;
-            margin-bottom: 1em;
+            margin-bottom: 0em;
+        }
+        .pub-date {
+            color: #999;
+            font-size: 0.9em;
+            margin-bottom: 0.8em;
         }
         .tags {
             color: #9e9e9e;
@@ -535,8 +540,8 @@ def make_html(data):
             <label class="sort-label">Сортировка по</label>
             <select id="sort-dropdown" class="sort-dropdown">
                 <option value="default">рейтингу</option>
-                <option value="issue_id">дате публикации</option>
-                <option value="pub_date_sort">добавлению на HF</option>
+                <option value="pub_date">дате публикации</option>
+                <option value="issue_id">добавлению на HF</option>
             </select>
         </div>
         <main id="articles-container">
@@ -571,7 +576,6 @@ def make_html(data):
             const themeToggle = document.getElementById('theme-toggle');
 
             const sortBy = localStorage.getItem('sort_by');
-            const sortByIssueId = sortBy === 'issue_id';
             const sortDropdown = document.getElementById('sort-dropdown');
             
             if (isDarkMode) {{
@@ -583,11 +587,8 @@ def make_html(data):
             }}
 
             console.log(sortBy);
-
-            if (sortByIssueId) {{
-                sortDropdown.value = sortBy;
-                sortArticles(sortBy);
-            }}
+            sortDropdown.value = sortBy;
+            sortArticles(sortBy);
         }}
         document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
         window.addEventListener('load', () => {{
@@ -614,6 +615,7 @@ def make_html(data):
                         <div class="article-content" onclick="toggleAbstract(${{index}})">
                             <h2>${{item['data']['emoji']}} ${{item['title']}}</h2>
                             <p class="meta"><svg class="text-sm peer-checked:text-gray-500 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12"><path transform="translate(0, 2)" fill="currentColor" d="M5.19 2.67a.94.94 0 0 1 1.62 0l3.31 5.72a.94.94 0 0 1-.82 1.4H2.7a.94.94 0 0 1-.82-1.4l3.31-5.7v-.02Z"></path></svg> ${{item['score']}}. ${{item['data']['title']}}</p>
+                            <p class="pub-date">📅 Статья от ${{item['pub_date_ru']}}</p>
                             <div id="abstract-${{index}}" class="abstract">
                                 <p>${{explanation}}</p>
                                 <div id="toggle-${{index}}" class="abstract-toggle">...</div>
@@ -633,6 +635,9 @@ def make_html(data):
             let sortedArticles = [...articlesData];
             if (sortBy === 'issue_id') {{
                 sortedArticles.sort((a, b) => b.issue_id - a.issue_id);
+            }}
+            if (sortBy === 'pub_date') {{
+                sortedArticles.sort((a, b) => b.pub_date.localeCompare(a.pub_date));
             }}
             renderArticles(sortedArticles);
             localStorage.setItem('sort_by', sortBy);
