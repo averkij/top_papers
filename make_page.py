@@ -360,7 +360,7 @@ def make_html(data):
             margin-bottom: 0em;
         }
         .pub-date {
-            color: #999;
+            color: #777;
             font-size: 0.9em;
             margin-bottom: 0.8em;
         }
