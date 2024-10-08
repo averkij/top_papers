@@ -150,8 +150,14 @@ for article in tqdm(articles):
             log(f"Get page data from previous paper. URL: {url}")
             abstract = prev_data["abstract"]
             issue_id = prev_data["issue_id"] if "issue_id" in prev_data else ISSUE_ID
-            pub_date = prev_data["pub_date"] if "pub_date" in prev_data else '1963-01-17'
-            pub_date_ru = prev_data["pub_date_ru"] if "pub_date_ru" in prev_data else 'надцатого мартобря'
+            pub_date = (
+                prev_data["pub_date"] if "pub_date" in prev_data else "1963-01-17"
+            )
+            pub_date_ru = (
+                prev_data["pub_date_ru"]
+                if "pub_date_ru" in prev_data
+                else "надцатого мартобря"
+            )
         else:
             log(f"Extract page data from URL. URL: {url}")
             page_data = extract_page_data(url)
@@ -236,8 +242,11 @@ for paper in tqdm(feed["papers"]):
     else:
         log("Querying the API.")
         abs = paper["abstract"][:3000]
+
         system_prompt = "You are explaining concepts in simple words in good and native Russian. But you are using English terms like LLM and AI instead of Russian when appropriate."
+
         prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'tags': array of tags related to article, 3 tags, but specific, not general like #ml or #ai. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
+
         paper["data"] = get_data(prompt, system_prompt=system_prompt)
 
 log("Renaming data file.")
@@ -266,8 +275,12 @@ def make_html(data):
         gtag('config', 'G-C1CRWDNJ1J');
     </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Обзор статей с HF</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">"""
+    
+    html += f"<title>HF ({len(feed['papers'])} статей)</title>"
+
+    html += """
+    <link rel="icon" href="favicon.svg" sizes="any" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
     <style>
