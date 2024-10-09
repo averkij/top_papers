@@ -382,6 +382,18 @@ def make_html(data):
         body.light-theme>div>main>article>div.article-content>p.meta {
             color: #555;
         }
+        body.dark-theme>div>main>article>div.article-content>p.pub-date {
+            color: #ccc;
+        }
+        body.light-theme>div>main>article>div.article-content>p.pub-date {
+            color: #555;
+        }
+        body.dark-theme>div>main>article>div.article-content>p.tags {
+            color: #ccc;
+        }
+        body.light-theme>div>main>article>div.article-content>p.tags {
+            color: #555;
+        }
         body.light-theme>header {
             background-color: var(--header-color);
             color: white;
@@ -417,21 +429,21 @@ def make_html(data):
             cursor: pointer;
         }
         .meta {
-            color: #666;
             font-size: 0.9em;
             margin-bottom: 0em;
         }
         .pub-date {
-            color: #777;
             font-size: 0.9em;
             margin-bottom: 0.8em;
+            font-weight: 300;
         }
         .tags {
-            color: #9e9e9e;
             font-size: 0.9em;
             margin-bottom: 1em;
             position: absolute;
             bottom: 10px;
+            font-weight: 300;
+            font-family: 'Roboto Slab';
         }
         .background-digit {
             position: absolute;
