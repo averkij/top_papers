@@ -3,7 +3,7 @@ import html
 import json
 import os
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import anthropic
@@ -184,9 +184,11 @@ for article in tqdm(articles):
 
 # %%
 formatted_date = format_date(CURRENT_DATE, format="d MMMM", locale="ru_RU")
+formatted_time_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
 
 feed = {
     "date": formatted_date,
+    "time_utc": formatted_time_utc,
     "issue_id": ISSUE_ID + 1,
     "home_page_url": BASE_URL,
     "papers": papers,
@@ -557,10 +559,25 @@ def make_html(data):
         .switch-label {
             margin-right: 10px;
         }
+        .update-info-container {
+            margin-top: 15px;
+            margin-bottom: 0px;
+            text-align: left;
+        }
         .sort-container {
             margin-top: 15px;
             margin-bottom: 0px;
             text-align: right;
+        }
+        .sub-header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .update-info-container, .sort-container {
+            flex: 1;
         }
         .sort-dropdown {
             padding: 5px 10px;
@@ -591,6 +608,22 @@ def make_html(data):
             display: inline;
             padding-left: 10px;
         }
+        @media (max-width: 600px) {
+            .sub-header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .update-info-container {
+                text-align: center;
+                width: 100%;
+                margin-bottom: 0px;
+            }
+            .sort-container {
+                margin-top: 0px;
+                text-align: center;
+                width: 100%;
+            }
+        }
     </style>
     <script>
     function toggleAbstract(id) {
@@ -602,6 +635,42 @@ def make_html(data):
         } else {
             abstract.classList.add('expanded');
             toggle.textContent = '';
+        }
+    }
+    function getTimeDiffRu(dateString) {
+        const timeUnits = {
+            minute: ["минуту", "минуты", "минут"],
+            hour: ["час", "часа", "часов"],
+            day: ["день", "дня", "дней"]
+        };
+
+        function getRussianPlural(number, words) {
+            if (number % 10 === 1 && number % 100 !== 11) {
+                return words[0];
+            } else if (number % 10 >= 2 && number % 10 <= 4 && (number % 100 < 10 || number % 100 >= 20)) {
+                return words[1];
+            } else {
+                return words[2];
+            }
+        }
+
+        const pastDate = new Date(dateString.replace(" ", "T") + ":00Z");
+        const currentDate = new Date();
+        const diffInSeconds = Math.floor((currentDate - pastDate) / 1000);
+
+        const minutes = Math.floor(diffInSeconds / 60);
+        const hours = Math.floor(diffInSeconds / 3600);
+        const days = Math.floor(diffInSeconds / 86400);
+
+        if (minutes == 0) {
+            return 'только что';
+        }
+        else if (minutes < 60) {
+            return `${minutes} ${getRussianPlural(minutes, timeUnits.minute)} назад`;
+        } else if (hours < 24) {
+            return `${hours} ${getRussianPlural(hours, timeUnits.hour)} назад`;
+        } else {
+            return `${days} ${getRussianPlural(days, timeUnits.day)} назад`;
         }
     }
     </script>
@@ -622,16 +691,21 @@ def make_html(data):
         </div>
     </header>
     <div class="container">
-        <div class="sort-container">
-            <label class="sort-label">Сортировка по</label>
-            <select id="sort-dropdown" class="sort-dropdown">
-                <option value="default">рейтингу</option>
-                <option value="pub_date">дате публикации</option>
-                <option value="issue_id">добавлению на HF</option>
-            </select>
+        <div class="sub-header-container">
+            <div class="update-info-container">
+                <label class="update-info-label" id="timeDiff"></label>
+            </div>
+            <div class="sort-container">
+                <label class="sort-label">Сортировка по</label>
+                <select id="sort-dropdown" class="sort-dropdown">
+                    <option value="default">рейтингу</option>
+                    <option value="pub_date">дате публикации</option>
+                    <option value="issue_id">добавлению на HF</option>
+                </select>
+            </div>
         </div>
         <main id="articles-container">
-            <!-- Articles is here -->
+            <!-- Articles -->
         </main>
     </div>
     <footer>
@@ -739,8 +813,14 @@ def make_html(data):
             sortArticles(event.target.value);
         }});
         
+        function updateTimeDiffs() {{
+            const timeDiff = document.getElementById('timeDiff');
+            timeDiff.innerHTML = '🔄 ' + getTimeDiffRu('{data["time_utc"]}');
+        }}
+
         // Initial render
-        renderArticles(articlesData);
+        updateTimeDiffs();
+        renderArticles(articlesData);        
     </script>
 </body>
 </html>
