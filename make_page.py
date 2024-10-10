@@ -264,7 +264,7 @@ for paper in tqdm(feed["papers"]):
 
         system_prompt = "You are explaining concepts in simple words in good and native Russian. But you are using English terms like LLM and AI instead of Russian when appropriate."
 
-        prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'tags': array of tags related to article, 3 tags, but specific, not general like #ml or #ai. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
+        prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'tags': array of tags related to article, 3 tags, but specific, not general like #ml or #ai. 'categories': array of tags related to article, 5 tags, but the most general like #nlp, #cv, #rl, #dataset, #benchmark, #rag, #code, #video, etc. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
 
         paper["data"] = get_data(prompt, system_prompt=system_prompt)
 
@@ -351,7 +351,7 @@ def make_html(data):
             text-align: center;
         }
         h1 {
-            font-size: 2.8em;
+            font-size: 2.4em;
             margin: 0;
             font-weight: 700;
         }
