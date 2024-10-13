@@ -671,9 +671,6 @@ def make_html(data):
             display: none;
             margin-bottom: 10px;
             margin-top: 15px;
-            text-decoration: underline dotted;
-            text-decoration-color: #888;
-            text-underline-offset: 3px;
             cursor: pointer;
         }
         .clear-categories {
@@ -689,6 +686,23 @@ def make_html(data):
         .clear-categories:hover {
             background-color: #ff4757;
         }
+        .svg-container {
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .svg-container span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .svg-container svg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            z-index: 0;
+        }
         @media (max-width: 768px) {
             .category-filters {
                 display: none;
@@ -700,6 +714,7 @@ def make_html(data):
             }
             .category-filters.expanded {
                 display: block;
+                margin-top: 10px;
             }
         }
         @media (max-width: 600px) {
@@ -815,7 +830,17 @@ def make_html(data):
                 </select>
             </div>
         </div>
-        <div class="category-toggle" id="category-toggle">Фильтр</div>
+        <div class="category-toggle">
+            <div class="svg-container">
+                <span id="category-toggle">Фильтр</span>
+                <svg height="3" width="200">
+                    <line x1="0" y1="0" x2="200" y2="0" 
+                        stroke="black" 
+                        stroke-width="2" 
+                        stroke-dasharray="3, 3" />
+                </svg>
+            </div>
+        </div>
         <div class="category-filters" id="category-filters">
             <span class="clear-categories" id="clear-categories">✖️</span>
             <!-- Categories -->
