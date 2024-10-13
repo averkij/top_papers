@@ -405,7 +405,7 @@ def make_html(data):
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2em;
-            padding: 20px 0;
+            padding: 10px 0 20px 0;
         }
         body.dark-tmeme>header {
             background-color: background-color: #333333;
