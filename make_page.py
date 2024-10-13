@@ -382,7 +382,7 @@ def make_html(data):
             padding: 0 20px;
         }
         header {
-            padding: 2em 0;
+            padding: 1.6em 0;
             text-align: center;
         }
         h1 {
@@ -553,8 +553,8 @@ def make_html(data):
         .switch {
             position: relative;
             display: inline-block;
-            width: 60px;
-            height: 34px;
+            width: 50px;
+            height: 30px;
         }
         .switch input {
             opacity: 0;
@@ -570,15 +570,15 @@ def make_html(data):
             bottom: 0;
             background-color: #ccc;
             transition: .4s;
-            border-radius: 34px;
+            border-radius: 30px;
         }
         .slider:before {
             position: absolute;
             content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
+            height: 24px;
+            width: 24px;
+            left: 3px;
+            bottom: 3px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
@@ -587,7 +587,7 @@ def make_html(data):
             background-color: var(--primary-color);
         }
         input:checked + .slider:before {
-            transform: translateX(26px);
+            transform: translateX(20px);
         }
         .switch-label {
             margin-right: 10px;
@@ -609,8 +609,11 @@ def make_html(data):
             flex-wrap: wrap;
             gap: 15px;
         }
-        .update-info-container, .sort-container {
+        .update-info-container {
             flex: 1;
+        }
+        .sort-container {
+            flex: 2;
         }
         .sort-dropdown {
             padding: 5px 10px;
@@ -731,6 +734,13 @@ def make_html(data):
                 margin-top: 0px;
                 text-align: left;
                 width: 100%;
+            .sort-dropdown {
+                float: right;
+            }
+            .sort-label {
+                margin-top: 5px;
+                float: left;
+            }
         }
     </style>
     <script>
