@@ -684,7 +684,7 @@ def make_html(data):
             transition: background-color 0.3s ease;
         }
         .clear-categories:hover {
-            background-color: #ff4757;
+            background-color: #bbb;
         }
         .svg-container {
             display: inline-block;
@@ -710,7 +710,7 @@ def make_html(data):
             .category-toggle {
                 display: inline-block;
                 width: 100%;
-                text-align: center;
+                text-align: left;
             }
             .category-filters.expanded {
                 display: block;
@@ -723,13 +723,13 @@ def make_html(data):
                 align-items: flex-start;
             }
             .update-info-container {
-                text-align: center;
+                text-align: left;
                 width: 100%;
                 margin-bottom: 0px;
             }
             .sort-container {
                 margin-top: 0px;
-                text-align: center;
+                text-align: left;
                 width: 100%;
         }
     </style>
@@ -822,7 +822,7 @@ def make_html(data):
                 <label class="update-info-label" id="timeDiff"></label>
             </div>
             <div class="sort-container">
-                <label class="sort-label">Сортировка по</label>
+                <label class="sort-label">🔀 Сортировка по</label>
                 <select id="sort-dropdown" class="sort-dropdown">
                     <option value="default">рейтингу</option>
                     <option value="pub_date">дате публикации</option>
@@ -832,7 +832,7 @@ def make_html(data):
         </div>
         <div class="category-toggle">
             <div class="svg-container">
-                <span id="category-toggle">Фильтр</span>
+                <span id="category-toggle">🔍 Фильтр</span>
                 <svg height="3" width="200">
                     <line x1="0" y1="0" x2="200" y2="0" 
                         stroke="black" 
@@ -842,7 +842,7 @@ def make_html(data):
             </div>
         </div>
         <div class="category-filters" id="category-filters">
-            <span class="clear-categories" id="clear-categories">✖️</span>
+            <span class="clear-categories" id="clear-categories">🧹</span>
             <!-- Categories -->
         </div>
         <main id="articles-container">
@@ -949,9 +949,9 @@ def make_html(data):
 
         function updateSelectedArticlesTitle() {{
             if (selectedArticles.length === articlesData.length) {{
-                categoryToggle.textContent = 'Фильтр';
+                categoryToggle.textContent = '🏷️ Фильтр';
             }} else {{
-                categoryToggle.textContent = `Фильтр (${{formatArticlesTitle(selectedArticles.length)}})`;
+                categoryToggle.textContent = `🏷️ Фильтр (${{formatArticlesTitle(selectedArticles.length)}})`;
             }}
         }}
 
