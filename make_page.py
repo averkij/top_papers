@@ -28,6 +28,31 @@ Path(DATA_DIR).mkdir(exist_ok=True)
 CURRENT_YEAR = datetime.now().year
 CURRENT_DATE = datetime.now()
 
+EXCLUDE_CATS = [
+    "#ai",
+    "#ml",
+    "#machinelearning",
+    "#machine-learning",
+    "#generative",
+    "#llm",
+    "#autoregressive",
+    "#training",
+]
+RENAME_CATS = {
+    "#multi-modal": "#multimodal",
+    "#transformer": "#transformers",
+    "#efficiency": "#optimization",
+    "#deployment": "#inference",
+    "#deploy": "#inference",
+    "#motion": "#3d",
+    "#mathematics": "#math",
+    "#humancomputerinteraction": "#interaction",
+    "#algorithm": "#algo",
+    "#algorithms": "#algo",
+    "#cnn": "#architecture",
+    "#prompt": "#prompts",
+}
+
 
 def log(msg):
     print(msg)
@@ -266,10 +291,18 @@ for paper in tqdm(feed["papers"]):
 
         system_prompt = "You are explaining concepts in simple words in good and native Russian. But you are using English terms like LLM and AI instead of Russian when appropriate."
 
-        prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'tags': array of tags related to article, 3 tags, but specific, not general like #ml or #ai. 'categories': array of tags related to article, 5 tags, but the most general like #nlp, #cv, #rl, #dataset, #benchmark, #rag, #code, #video, etc. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
+        prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'tags': array of tags related to article, 3 tags, but specific, not general like #ml or #ai. 'categories': array of tags related to article, 5 tags, but the most general like #nlp, #cv, #rlhf, #dataset (if authors contributing a dataset), #benchmark (if article is about benchmarking), #rag (if article is about retrieval augmented generation), #code (if article about code models), #video, #multimodal, etc. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
 
         paper["data"] = get_data(prompt, system_prompt=system_prompt)
 
+    # fix categories
+    if "categories" in paper["data"]:
+        paper["data"]["categories"] = [
+            x for x in paper["data"]["categories"] if x not in EXCLUDE_CATS
+        ]
+        paper["data"]["categories"] = [
+            x if x not in RENAME_CATS else RENAME_CATS[x] for x in paper["data"]["categories"] 
+        ]
 
 # all_abstracts = "\n\n".join([x["abstract"] for x in feed["papers"]])
 # intro_prompt = f"You are the editor of a machine learning journal. You have a set of abstract articles. Write an introduction to the journal about what awaits the reader in this issue. Write in Russian. Abstracts:\n\n{all_abstracts}"
@@ -608,6 +641,67 @@ def make_html(data):
             display: inline;
             padding-left: 10px;
         }
+        .category-filters {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .category-button {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background-color: #f0f0f0;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .category-button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .dark-theme .category-button {
+            background-color: #555;
+            color: #fff;
+        }
+        .dark-theme .category-button.active {
+            background-color: var(--primary-color);
+        }
+        .category-toggle {
+            display: none;
+            margin-bottom: 10px;
+            margin-top: 15px;
+            text-decoration: underline dotted;
+            text-decoration-color: #888;
+            text-underline-offset: 3px;
+            cursor: pointer;
+        }
+        .clear-categories {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background-color: #f0f0f0;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .clear-categories:hover {
+            background-color: #ff4757;
+        }
+        @media (max-width: 768px) {
+            .category-filters {
+                display: none;
+            }
+            .category-toggle {
+                display: inline-block;
+                width: 100%;
+                text-align: center;
+            }
+            .category-filters.expanded {
+                display: block;
+            }
+        }
         @media (max-width: 600px) {
             .sub-header-container {
                 flex-direction: column;
@@ -622,7 +716,6 @@ def make_html(data):
                 margin-top: 0px;
                 text-align: center;
                 width: 100%;
-            }
         }
     </style>
     <script>
@@ -673,6 +766,24 @@ def make_html(data):
             return `${days} ${getRussianPlural(days, timeUnits.day)} назад`;
         }
     }
+    function formatArticlesTitle(number) {
+        const lastDigit = number % 10;
+        const lastTwoDigits = number % 100;
+
+        let word;
+
+        if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+            word = "статей";
+        } else if (lastDigit === 1) {
+            word = "статья";
+        } else if (lastDigit >= 2 && lastDigit <= 4) {
+            word = "статьи";
+        } else {
+            word = "статей";
+        }
+
+        return `${number} ${word}`;
+    }
     </script>
 </head>"""
 
@@ -703,6 +814,11 @@ def make_html(data):
                     <option value="issue_id">добавлению на HF</option>
                 </select>
             </div>
+        </div>
+        <div class="category-toggle" id="category-toggle">Фильтр</div>
+        <div class="category-filters" id="category-filters">
+            <span class="clear-categories" id="clear-categories">✖️</span>
+            <!-- Categories -->
         </div>
         <main id="articles-container">
             <!-- Articles -->
@@ -735,11 +851,20 @@ def make_html(data):
             }}
         }}
 
+        const articlesData = {data["papers"]};
+        const articlesContainer = document.getElementById('articles-container');
+        const sortDropdown = document.getElementById('sort-dropdown');
+        const categoryFiltersContainer = document.getElementById('category-filters');
+        const categoryToggle = document.getElementById('category-toggle');
+        const clearCategoriesButton = document.getElementById('clear-categories');
+        let selectedCategories = [];
+        let selectedArticles = [];
+        let sortBy = 'default';        
+
         function loadSettings() {{
             const isDarkMode = localStorage.getItem('darkMode') === 'true';
             const themeToggle = document.getElementById('theme-toggle');
-
-            const sortBy = localStorage.getItem('sort_by');
+            const settingSortBy = localStorage.getItem('sort_by');
             const sortDropdown = document.getElementById('sort-dropdown');
             
             if (isDarkMode) {{
@@ -751,22 +876,119 @@ def make_html(data):
                 const titleSign = document.getElementById('doomgrad-icon');
                 titleSign.classList.add('rotate');
             }}
-
-            console.log(sortBy);
-            sortDropdown.value = sortBy;
-            sortArticles(sortBy);
+            
+            sortDropdown.value = settingSortBy;
+            sortBy = settingSortBy;
         }}
-        document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
-        window.addEventListener('load', () => {{
-            loadSettings();
-        }});
 
-        const articlesData = {data["papers"]};
-        const articlesContainer = document.getElementById('articles-container');
-        const sortDropdown = document.getElementById('sort-dropdown');
+        document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
+
+        function getUniqueCategories(articles) {{
+            const categories = new Set();
+            articles.forEach(article => {{
+                if (article.data && article.data.categories) {{
+                    article.data.categories.forEach(cat => categories.add(cat));
+                }}
+            }});
+            return Array.from(categories);
+        }}
         
+        function createCategoryButtons() {{
+            const categories = getUniqueCategories(articlesData);
+            categories.forEach(category => {{
+                const button = document.createElement('span');
+                button.textContent = category;
+                button.className = 'category-button';
+                button.onclick = () => toggleCategory(category, button);
+                categoryFiltersContainer.appendChild(button);
+            }});
+        }}
+
+        function toggleCategory(category, button) {{
+            const index = selectedCategories.indexOf(category);
+            if (index === -1) {{
+                selectedCategories.push(category);
+                button.classList.add('active');
+            }} else {{
+                selectedCategories.splice(index, 1);
+                button.classList.remove('active');
+            }}         
+            filterAndRenderArticles();
+            saveCategorySelection();
+            updateSelectedArticlesTitle();
+        }}
+
+        function saveCategorySelection() {{
+            localStorage.setItem('selectedCategories', JSON.stringify(selectedCategories));
+        }}
+
+        function updateSelectedArticlesTitle() {{
+            if (selectedArticles.length === articlesData.length) {{
+                categoryToggle.textContent = 'Фильтр';
+            }} else {{
+                categoryToggle.textContent = `Фильтр (${{formatArticlesTitle(selectedArticles.length)}})`;
+            }}
+        }}
+
+        function cleanCategorySelection() {{
+            localStorage.setItem('selectedCategories', JSON.stringify('[]'));
+        }}
+
+        function loadCategorySelection() {{
+            const savedCategories = localStorage.getItem('selectedCategories');
+            if (savedCategories) {{
+                if (savedCategories != '"[]"') {{
+                    selectedCategories = JSON.parse(savedCategories);
+                    updateCategoryButtonStates();
+                }}
+            }}
+        }}
+
+        function updateCategoryButtonStates() {{
+            const buttons = categoryFiltersContainer.getElementsByClassName('category-button');
+            Array.from(buttons).forEach(button => {{
+                if (selectedCategories.includes(button.textContent)) {{
+                    button.classList.add('active');
+                }} else {{
+                    button.classList.remove('active');
+                }}
+            }});
+        }}
+
+        function filterAndRenderArticles() {{
+            console.log(selectedCategories);
+            let filteredArticles = selectedCategories.length === 0
+                ? articlesData
+                : articlesData.filter(article => 
+                    article.data && article.data.categories && 
+                    article.data.categories.some(cat => selectedCategories.includes(cat))
+                );
+
+            console.log('filteredArticles', filteredArticles)
+
+            if (filteredArticles.length === 0) {{
+                selectedArticles = articlesData;
+                selectedCategories = [];
+                cleanCategorySelection();
+            }} else {{
+                selectedArticles = filteredArticles;
+            }}
+
+            console.log('selectedArticles', selectedArticles)
+
+            sortArticles(selectedArticles);
+        }}
+
+        function clearAllCategories() {{
+            selectedCategories = [];
+            updateCategoryButtonStates();
+            filterAndRenderArticles();
+            saveCategorySelection();
+            updateSelectedArticlesTitle();
+        }}
+
         function renderArticles(articles) {{
-            console.log(articles)
+            console.log(articles);
             articlesContainer.innerHTML = '';
             articles.forEach((item, index) => {{
                 if ("error" in item) {{
@@ -797,8 +1019,8 @@ def make_html(data):
             }});
         }}
         
-        function sortArticles(sortBy) {{
-            let sortedArticles = [...articlesData];
+        function sortArticles() {{
+            let sortedArticles = [...selectedArticles];
             if (sortBy === 'issue_id') {{
                 sortedArticles.sort((a, b) => b.issue_id - a.issue_id);
             }}
@@ -810,17 +1032,27 @@ def make_html(data):
         }}
         
         sortDropdown.addEventListener('change', (event) => {{
+            sortBy = event.target.value;
             sortArticles(event.target.value);
         }});
+
+        categoryToggle.addEventListener('click', () => {{
+            categoryFiltersContainer.classList.toggle('expanded');
+        }});
+
+        clearCategoriesButton.addEventListener('click', clearAllCategories);
         
         function updateTimeDiffs() {{
             const timeDiff = document.getElementById('timeDiff');
             timeDiff.innerHTML = '🔄 ' + getTimeDiffRu('{data["time_utc"]}');
-        }}
+        }} 
 
-        // Initial render
-        updateTimeDiffs();
-        renderArticles(articlesData);        
+        loadSettings();
+        createCategoryButtons();
+        loadCategorySelection();
+        filterAndRenderArticles();
+        updateSelectedArticlesTitle();
+        updateTimeDiffs();  
     </script>
 </body>
 </html>
