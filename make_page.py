@@ -291,7 +291,7 @@ for paper in tqdm(feed["papers"]):
 
         system_prompt = "You are explaining concepts in simple words in good and native Russian. But you are using English terms like LLM and AI instead of Russian when appropriate."
 
-        prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'tags': array of tags related to article, 3 tags, but specific, not general like #ml or #ai. 'categories': array of tags related to article, 5 tags, but the most general like #nlp, #cv, #rlhf, #dataset (if authors contributing a dataset), #benchmark (if article is about benchmarking), #rag (if article is about retrieval augmented generation), #code (if article about code models), #video, #multimodal, etc. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
+        prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'tags': array of tags related to article, 3 tags, but specific, not general like #ml or #ai. 'categories': array of tags related to article, up to 5 tags, but the most general like #nlp, #cv, #rlhf, #dataset (if authors contributing a dataset), #benchmark (if article is about benchmarking), #rag (if article is about retrieval augmented generation), #code (if article about code models), #video, #multimodal, etc. All tags must be relative to article. Do not add irrelevant tags. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
 
         paper["data"] = get_data(prompt, system_prompt=system_prompt)
 
@@ -301,7 +301,11 @@ for paper in tqdm(feed["papers"]):
             x for x in paper["data"]["categories"] if x not in EXCLUDE_CATS
         ]
         paper["data"]["categories"] = [
-            x if x not in RENAME_CATS else RENAME_CATS[x] for x in paper["data"]["categories"] 
+            x if x not in RENAME_CATS else RENAME_CATS[x]
+            for x in paper["data"]["categories"]
+        ]
+        paper["data"]["categories"] = [
+            f"#{x.replace('#','')}" for x in paper["data"]["categories"]
         ]
 
 # all_abstracts = "\n\n".join([x["abstract"] for x in feed["papers"]])
