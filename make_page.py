@@ -736,7 +736,6 @@ def make_html(data):
             }
             .sort-container {
                 margin-top: 0px;
-                text-align: left;
                 width: 100%;
             .sort-dropdown {
                 float: right;
@@ -744,6 +743,7 @@ def make_html(data):
             .sort-label {
                 margin-top: 5px;
                 float: left;
+                font-size: 1.0em !important;
             }
         }
     </style>
@@ -836,7 +836,7 @@ def make_html(data):
                 <label class="update-info-label" id="timeDiff"></label>
             </div>
             <div class="sort-container">
-                <label class="sort-label">🔀 Сортировка по</label>
+                <div class="sort-label">🔀 Сортировка по</div>
                 <select id="sort-dropdown" class="sort-dropdown">
                     <option value="default">рейтингу</option>
                     <option value="pub_date">дате публикации</option>
