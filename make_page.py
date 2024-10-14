@@ -315,6 +315,24 @@ for paper in tqdm(feed["papers"]):
 # feed["intro"] = intro
 # log(intro)
 
+if "zh" not in PREV_PAPERS:
+    log("Trying to get texts in Chinese.")
+    first_abstract = feed["papers"][0]["abstract"]
+    zh_prompt = f"Write simple and brief explanation (2-3 sentences) of an article in Chinese. Text:\n\n{first_abstract}"
+    zh_text = get_text(zh_prompt)
+    feed["zh"] = {'text': zh_text}
+
+    zh_prompt = f"Write pinyin transcription for text. Text:\n\n{feed['zh']['text']}"
+    zh_text = get_text(zh_prompt)
+    feed["zh"]["pinyin"] = zh_text
+
+    zh_prompt = f"Write vocab of difficult words for this text as an array of objects with fields 'word', 'pinyin', 'trans'. Return as python list without formatting. Return list and nothing else. Text:\n\n{feed['zh']['text']}"
+    zh_text = get_text(zh_prompt)
+    feed["zh"]["vocab"] = zh_text
+else:
+    log("Loading Chinese text from previous data.")
+    feed["zh"] = PREV_PAPERS["zh"]
+
 log("Renaming data file.")
 try_rename_file(DATA_FILE, DATA_DIR)
 
