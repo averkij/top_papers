@@ -496,7 +496,7 @@ def make_html(data):
         }
         .abstract {
             position: relative;
-            max-height: 173px;
+            max-height: 170px;
             overflow: hidden;
             transition: max-height 0.3s ease;
             cursor: pointer;
