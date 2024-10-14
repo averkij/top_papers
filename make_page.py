@@ -496,7 +496,7 @@ def make_html(data):
         }
         .abstract {
             position: relative;
-            max-height: 175px;
+            max-height: 173px;
             overflow: hidden;
             transition: max-height 0.3s ease;
             cursor: pointer;
@@ -903,7 +903,7 @@ def make_html(data):
         function loadSettings() {{
             const isDarkMode = localStorage.getItem('darkMode') === 'true';
             const themeToggle = document.getElementById('theme-toggle');
-            const settingSortBy = localStorage.getItem('sort_by');
+            let settingSortBy = localStorage.getItem('sort_by');
             const sortDropdown = document.getElementById('sort-dropdown');
             
             if (isDarkMode) {{
@@ -914,6 +914,10 @@ def make_html(data):
                 title.innerHTML = "{TITLE_DARK}";
                 const titleSign = document.getElementById('doomgrad-icon');
                 titleSign.classList.add('rotate');
+            }}
+
+            if ((!settingSortBy) || (settingSortBy === 'null')) {{
+                settingSortBy = 'default';
             }}
             
             sortDropdown.value = settingSortBy;
