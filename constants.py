@@ -1,0 +1,34 @@
+TITLE_LIGHT = "хф дэйли"
+TITLE_DARK = "хф найтли"
+
+DATA_FILE = "hf_papers.json"
+PAGE_FILE = "index.html"
+LOG_FILE = "log.txt"
+
+LOG_DIR = "./logs"
+DATA_DIR = "./prev_papers"
+
+EXCLUDE_CATS = [
+    "#ai",
+    "#ml",
+    "#machinelearning",
+    "#machine-learning",
+    "#generative",
+    "#llm",
+    "#autoregressive",
+    "#training",
+]
+RENAME_CATS = {
+    "#multi-modal": "#multimodal",
+    "#transformer": "#transformers",
+    "#efficiency": "#optimization",
+    "#deployment": "#inference",
+    "#deploy": "#inference",
+    "#motion": "#3d",
+    "#mathematics": "#math",
+    "#humancomputerinteraction": "#interaction",
+    "#algorithm": "#algo",
+    "#algorithms": "#algo",
+    "#cnn": "#architecture",
+    "#prompt": "#prompts",
+}

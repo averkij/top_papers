@@ -2,122 +2,18 @@
 import html
 import json
 import os
-import re
-from datetime import datetime, timedelta, timezone
-from pathlib import Path
+from datetime import datetime, timezone
 
-import anthropic
 import requests
 from babel.dates import format_date
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
-TITLE_LIGHT = "хф дэйли"
-TITLE_DARK = "хф найтли"
+import constants as con
+import helper
+from helper import log
 
-LOG_FILE = "log.txt"
-DATA_FILE = "hf_papers.json"
-PAGE_FILE = "index.html"
-
-LOG_DIR = "./logs"
-DATA_DIR = "./prev_papers"
-
-Path(LOG_DIR).mkdir(exist_ok=True)
-Path(DATA_DIR).mkdir(exist_ok=True)
-
-CURRENT_YEAR = datetime.now().year
-CURRENT_DATE = datetime.now()
-
-EXCLUDE_CATS = [
-    "#ai",
-    "#ml",
-    "#machinelearning",
-    "#machine-learning",
-    "#generative",
-    "#llm",
-    "#autoregressive",
-    "#training",
-]
-RENAME_CATS = {
-    "#multi-modal": "#multimodal",
-    "#transformer": "#transformers",
-    "#efficiency": "#optimization",
-    "#deployment": "#inference",
-    "#deploy": "#inference",
-    "#motion": "#3d",
-    "#mathematics": "#math",
-    "#humancomputerinteraction": "#interaction",
-    "#algorithm": "#algo",
-    "#algorithms": "#algo",
-    "#cnn": "#architecture",
-    "#prompt": "#prompts",
-}
-
-
-def log(msg):
-    print(msg)
-    with open(LOG_FILE, "a", encoding="utf-8") as fout:
-        date = datetime.now().strftime("%d.%m.%Y %H:%M")
-        fout.write(f"[{date}] {msg}\n")
-
-
-def try_rename_file(fpath, dir, new_name=None):
-    if not new_name:
-        new_name = fpath
-    if os.path.isfile(fpath):
-        date = datetime.now() - timedelta(1)
-        date = date.strftime("%Y-%m-%d")
-        new_fpath = f"{date}_{new_name}"
-        log(f"Renaming previous data. {fpath} to {new_fpath}")
-        try:
-            os.remove(new_fpath)
-        except OSError:
-            pass
-        os.replace(fpath, os.path.join(dir, new_fpath))
-    else:
-        log(f"No file to rename. {fpath}")
-
-
-def try_get_score(text):
-    score_pat = re.compile(r'<div class="leading-none">(\d+)<\/div>')
-    score = score_pat.findall(str(text))
-    score = int(score[0]) if score else 0
-    return score
-
-
-def parse_and_format_date(date_str, year=CURRENT_YEAR):
-    try:
-        date_obj = datetime.strptime(date_str, "%b %d").replace(year=year)
-        date_sort = date_obj.strftime("%Y-%m-%d")
-        date_ru = format_date(date_obj, format="d MMMM", locale="ru_RU")
-    except:
-        date_sort = "2024-01-01"
-        date_ru = format_date(CURRENT_DATE, format="d MMMM", locale="ru_RU")
-        log(f"Error. Unable to format date {date_str}")
-    return date_sort, date_ru
-
-
-if os.path.isfile(DATA_FILE):
-    # log('Read previous papers.')
-    with open(DATA_FILE, "r", encoding="utf-8") as f:
-        PREV_PAPERS = json.load(f)
-else:
-    log("No previous papers found.")
-    PREV_PAPERS = {}
-
-if "issue_id" in PREV_PAPERS:
-    ISSUE_ID = PREV_PAPERS["issue_id"]
-else:
-    ISSUE_ID = 0
-
-
-def try_get_prev_paper(paper):
-    prev_data = None
-    if "papers" in PREV_PAPERS:
-        prev_ids = [x["id"] for x in PREV_PAPERS["papers"]]
-        if paper["id"] in prev_ids:
-            prev_data = [x for x in PREV_PAPERS["papers"] if x["id"] == paper["id"]][0]
-    return prev_data, bool(prev_data)
+_prev_papers, _issue_id = helper.init()
 
 
 log("Get feed.")
@@ -131,50 +27,19 @@ articles = soup.find_all("article")
 papers = []
 
 
-def try_parse_pub_date(soup):
-    pat = r"Published on (\w+ \d{1,2})"
-    for s in soup:
-        m = re.search(pat, s.text)
-        if m:
-            return m.group(1)
-    return None
-
-
-def extract_page_data(url):
-    page = requests.get(url)
-    soup = BeautifulSoup(page.content, "html.parser")
-    abstract = soup.find("div", {"class": "pb-8 pr-4 md:pr-16"}).text
-    if abstract.startswith("Abstract\n"):
-        abstract = abstract[len("Abstract\n") :]
-    abstract = abstract.replace("\n", " ")
-
-    main = soup.find("main")
-    main_divs = main.find_all("div")
-    pub_date_str = try_parse_pub_date(main_divs)
-    pub_date, pub_date_ru = parse_and_format_date(pub_date_str)
-
-    res = {
-        "abstract": abstract.strip(),
-        "pub_date": pub_date,
-        "pub_date_ru": pub_date_ru,
-    }
-
-    return res
-
-
 for article in tqdm(articles):
     h3 = article.find("h3")
     a = h3.find("a")
     title = a.text
     link = a["href"]
     url = f"https://huggingface.co{link}"
-    prev_data, ok = try_get_prev_paper({"id": url})
-    issue_id = ISSUE_ID + 1
+    prev_data, ok = helper.try_get_prev_paper({"id": url}, _prev_papers)
+    issue_id = _issue_id + 1
     try:
         if ok:
             log(f"Get page data from previous paper. URL: {url}")
             abstract = prev_data["abstract"]
-            issue_id = prev_data["issue_id"] if "issue_id" in prev_data else ISSUE_ID
+            issue_id = prev_data["issue_id"] if "issue_id" in prev_data else _issue_id
             pub_date = (
                 prev_data["pub_date"] if "pub_date" in prev_data else "1963-01-17"
             )
@@ -185,7 +50,7 @@ for article in tqdm(articles):
             )
         else:
             log(f"Extract page data from URL. URL: {url}")
-            page_data = extract_page_data(url)
+            page_data = helper.extract_page_data(url)
             abstract = page_data["abstract"]
             pub_date = page_data["pub_date"]
             pub_date_ru = page_data["pub_date_ru"]
@@ -200,7 +65,7 @@ for article in tqdm(articles):
             "title": title,
             "url": url,
             "abstract": abstract,
-            "score": try_get_score(article),
+            "score": helper.try_get_score(article),
             "issue_id": issue_id,
             "pub_date": pub_date,
             "pub_date_ru": pub_date_ru,
@@ -208,13 +73,13 @@ for article in tqdm(articles):
     )
 
 # %%
-formatted_date = format_date(CURRENT_DATE, format="d MMMM", locale="ru_RU")
+formatted_date = format_date(helper.CURRENT_DATE, format="d MMMM", locale="ru_RU")
 formatted_time_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
 
 feed = {
     "date": formatted_date,
     "time_utc": formatted_time_utc,
-    "issue_id": ISSUE_ID + 1,
+    "issue_id": _issue_id + 1,
     "home_page_url": BASE_URL,
     "papers": papers,
 }
@@ -223,56 +88,10 @@ for i, paper in enumerate(feed["papers"]):
     log("*" * 80)
     log(f'Abstract {i}. {paper["abstract"][:300]}...')
 
-API_KEY = os.getenv("CLAUDE_KEY")
-client = anthropic.Anthropic(
-    api_key=API_KEY,
-)
-MISTRAL_KEY = os.getenv("MISTRAL_KEY")
 
-
-def get_data(prompt, system_prompt=""):
-    message = client.messages.create(
-        model="claude-3-5-sonnet-20240620",
-        max_tokens=512,
-        system=system_prompt,
-        messages=[
-            {"role": "user", "content": prompt},
-        ],
-    )
-    resp = message.content[0].text.strip('"')
-    log(f"Got response. {resp}")
-    try:
-        doc = json.loads(resp)
-    except:
-        log(f"Error. Failed to parse JSON from LLM. {resp}")
-        doc = {"error": "Parsing error", "raw_data": resp}
-
-    return doc
-
-
-def get_text(prompt):
-    log(f"Mistral request. {prompt}")
-    base_url = "https://api.mistral.ai/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {MISTRAL_KEY}",
-        "Content-Type": "application/json",
-    }
-    payload = {
-        "model": "mistral-large-latest",
-        "temperature": 0.6,
-        "top_p": 0.95,
-        "max_tokens": 512,
-        "messages": [{"role": "user", "content": prompt}],
-    }
-    response = requests.post(base_url, headers=headers, json=payload)
-    log(f"Mistral response. {json.dumps(response.json())}")
-    text = response.json()["choices"][0]["message"]["content"]
-    return text
-
-
-if os.path.isfile(DATA_FILE):
+if os.path.isfile(con.DATA_FILE):
     log("Read previous papers.")
-    with open(DATA_FILE, "r", encoding="utf-8") as f:
+    with open(con.DATA_FILE, "r", encoding="utf-8") as f:
         PREV_PAPERS = json.load(f)
 else:
     log("No previous papers found.")
@@ -280,7 +99,7 @@ else:
 
 log("Generating reviews via LLM API.")
 for paper in tqdm(feed["papers"]):
-    prev_data, ok = try_get_prev_paper(paper)
+    prev_data, ok = helper.try_get_prev_paper(paper, _prev_papers)
 
     if ok:
         log(
@@ -295,15 +114,15 @@ for paper in tqdm(feed["papers"]):
 
         prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'categories': array of tags related to article, up to 5 tags, 3 minimum, but general like #nlp, #cv, #rlhf, #rl (generally it about robots), #dataset (if authors contributing a dataset), #benchmark (if article is about benchmarking), #rag (if article is about retrieval augmented generation), #code (if article about code models), #video, #multimodal, etc. All tags must be relative to article. Do not add irrelevant tags. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
 
-        paper["data"] = get_data(prompt, system_prompt=system_prompt)
+        paper["data"] = helper.get_data(prompt, system_prompt=system_prompt)
 
     # fix categories
     if "categories" in paper["data"]:
         paper["data"]["categories"] = [
-            x for x in paper["data"]["categories"] if x not in EXCLUDE_CATS
+            x for x in paper["data"]["categories"] if x not in con.EXCLUDE_CATS
         ]
         paper["data"]["categories"] = [
-            x if x not in RENAME_CATS else RENAME_CATS[x]
+            x if x not in con.RENAME_CATS else con.RENAME_CATS[x]
             for x in paper["data"]["categories"]
         ]
         paper["data"]["categories"] = [
@@ -318,55 +137,42 @@ for paper in tqdm(feed["papers"]):
 # log(intro)
 
 try:
-    if "zh" not in PREV_PAPERS:
+    if "zh" not in _prev_papers:
         log("Trying to get texts in Chinese.")
         first_abstract = feed["papers"][0]["abstract"]
         zh_prompt = f"Write simple and brief explanation (2-3 sentences) of an article in Chinese. Text:\n\n{first_abstract}"
-        zh_text = get_text(zh_prompt)
-        feed["zh"] = {'text': zh_text}
+        zh_text = helper.get_text(zh_prompt)
+        feed["zh"] = {"text": zh_text}
 
-        zh_prompt = f"Write pinyin transcription for text. Text:\n\n{feed['zh']['text']}"
-        zh_text = get_text(zh_prompt)
+        zh_prompt = (
+            f"Write pinyin transcription for text. Text:\n\n{feed['zh']['text']}"
+        )
+        zh_text = helper.get_text(zh_prompt)
         feed["zh"]["pinyin"] = zh_text
 
         zh_prompt = f"Write vocab of difficult words for this text as an array of objects with fields 'word', 'pinyin', 'trans'. Return as python list without formatting. Return list and nothing else. Text:\n\n{feed['zh']['text']}"
-        zh_text = get_text(zh_prompt)
+        zh_text = helper.get_text(zh_prompt)
         feed["zh"]["vocab"] = zh_text
     else:
         log("Loading Chinese text from previous data.")
-        feed["zh"] = PREV_PAPERS["zh"]
+        feed["zh"] = _prev_papers["zh"]
 
 except Exception as e:
     log(f"Failed to get Chinese text: {e}")
 
 log("Renaming data file.")
-try_rename_file(DATA_FILE, DATA_DIR)
+helper.try_rename_file(con.DATA_FILE, con.DATA_DIR)
 
 log("Saving new data file.")
 json.dump(
     feed,
-    open(DATA_FILE, "w", encoding="utf-8"),
+    open(con.DATA_FILE, "w", encoding="utf-8"),
     ensure_ascii=False,
     indent=4,
 )
 
 
 # %%
-def format_subtitle(number):
-    if 11 <= number % 100 <= 14:
-        word = "статей"
-    else:
-        last_digit = number % 10
-        if last_digit == 1:
-            word = "статья"
-        elif 2 <= last_digit <= 4:
-            word = "статьи"
-        else:
-            word = "статей"
-
-    return f"{number} {word}"
-
-
 def make_html(data):
     html = """
 <!DOCTYPE html>
@@ -382,7 +188,7 @@ def make_html(data):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">"""
 
-    html += f"<title>HF ({format_subtitle(len(data['papers']))})</title>"
+    html += f"<title>HF ({helper.format_subtitle(len(data['papers']))})</title>"
 
     html += """
     <link rel="icon" href="favicon.svg" sizes="any" type="image/svg+xml">
@@ -845,8 +651,8 @@ def make_html(data):
 <body class="light-theme">
     <header>
         <div class="container">
-            <h1 class="title-sign" id="doomgrad-icon">🔺</h1><h1 class="title-text" id="doomgrad">{TITLE_LIGHT}</h1>
-            <p>{data['date']} | {format_subtitle(len(data['papers']))}</p>
+            <h1 class="title-sign" id="doomgrad-icon">🔺</h1><h1 class="title-text" id="doomgrad">{con.TITLE_LIGHT}</h1>
+            <p>{data['date']} | {helper.format_subtitle(len(data['papers']))}</p>
         </div>
         <div class="theme-switch">
             <label class="switch">
@@ -904,12 +710,12 @@ def make_html(data):
             
             if (isDarkMode) {{
                 const title = document.getElementById('doomgrad');
-                title.innerHTML = "{TITLE_DARK}";
+                title.innerHTML = "{con.TITLE_DARK}";
                 const titleSign = document.getElementById('doomgrad-icon');
                 titleSign.classList.add('rotate');
             }}  else {{
                 const title = document.getElementById('doomgrad');
-                title.innerHTML = "{TITLE_LIGHT}";
+                title.innerHTML = "{con.TITLE_LIGHT}";
                 const titleSign = document.getElementById('doomgrad-icon');
                 titleSign.classList.remove('rotate');
             }}
@@ -936,7 +742,7 @@ def make_html(data):
                 document.body.classList.add('dark-theme');
                 themeToggle.checked = true;
                 const title = document.getElementById('doomgrad');
-                title.innerHTML = "{TITLE_DARK}";
+                title.innerHTML = "{con.TITLE_DARK}";
                 const titleSign = document.getElementById('doomgrad-icon');
                 titleSign.classList.add('rotate');
             }}
@@ -1129,20 +935,20 @@ def make_html(data):
 
 
 # debug
-# with open(DATA_FILE, "r", encoding="utf-8") as f:
-#     feed = json.load(f)
+with open(con.DATA_FILE, "r", encoding="utf-8") as f:
+    feed = json.load(f)
 
 log("Generating page.")
 html = make_html(feed)
 
 log("Renaming previous page.")
-try_rename_file(PAGE_FILE, DATA_DIR, "hf_papers.html")
+helper.try_rename_file(con.PAGE_FILE, con.DATA_DIR, "hf_papers.html")
 
 log("Writing result.")
-with open(PAGE_FILE, "w", encoding="utf-8") as f:
+with open(con.PAGE_FILE, "w", encoding="utf-8") as f:
     f.write(html)
 
 log("Renaming log file.")
-try_rename_file(LOG_FILE, LOG_DIR, "last_log.txt")
+helper.try_rename_file(con.LOG_FILE, con.LOG_DIR, "last_log.txt")
 
 # %%
