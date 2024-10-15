@@ -13,6 +13,8 @@ import constants as con
 import helper
 from helper import log
 
+import api
+
 _prev_papers, _issue_id = helper.init()
 
 
@@ -114,7 +116,7 @@ for paper in tqdm(feed["papers"]):
 
         prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'categories': array of tags related to article, up to 5 tags, 3 minimum, but general like #nlp, #cv, #rlhf, #rl (generally it about robots), #dataset (if authors contributing a dataset), #benchmark (if article is about benchmarking), #rag (if article is about retrieval augmented generation), #code (if article about code models), #video, #multimodal, etc. All tags must be relative to article. Do not add irrelevant tags. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
 
-        paper["data"] = helper.get_data(prompt, system_prompt=system_prompt)
+        paper["data"] = api.get_data(prompt, system_prompt=system_prompt)
 
     # fix categories
     if "categories" in paper["data"]:
@@ -141,18 +143,18 @@ try:
         log("Trying to get texts in Chinese.")
         first_abstract = feed["papers"][0]["abstract"]
         zh_prompt = f"Write simple and brief explanation (2-3 sentences) of an article in Chinese. Text:\n\n{first_abstract}"
-        zh_text = helper.get_text(zh_prompt)
+        zh_text = api.get_text(zh_prompt)
         feed["zh"] = {"text": zh_text}
         feed["zh"]["title"] = feed["papers"][0]["title"]
 
         zh_prompt = (
             f"Write pinyin transcription for text. Text:\n\n{feed['zh']['text']}"
         )
-        zh_text = helper.get_text(zh_prompt)
+        zh_text = api.get_text(zh_prompt)
         feed["zh"]["pinyin"] = zh_text
 
         zh_prompt = f"Write vocab of difficult words for this text as an array of objects with fields 'word', 'pinyin', 'trans'. Return as python list without formatting. Return list and nothing else. Text:\n\n{feed['zh']['text']}"
-        zh_text = helper.get_text(zh_prompt)
+        zh_text = api.get_text(zh_prompt)
         feed["zh"]["vocab"] = zh_text
     else:
         log("Loading Chinese text from previous data.")
