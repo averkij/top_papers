@@ -143,6 +143,7 @@ try:
         zh_prompt = f"Write simple and brief explanation (2-3 sentences) of an article in Chinese. Text:\n\n{first_abstract}"
         zh_text = helper.get_text(zh_prompt)
         feed["zh"] = {"text": zh_text}
+        feed["zh"]["title"] = feed["papers"][0]["title"]
 
         zh_prompt = (
             f"Write pinyin transcription for text. Text:\n\n{feed['zh']['text']}"
@@ -934,19 +935,129 @@ def make_html(data):
     return html
 
 
+def make_html_zh(data):
+    data_zh = data["zh"]
+    title = data["zh"]["title"] if "title" in data["zh"] else "Title"
+    try:
+        data_zh["vocab"] = data_zh["vocab"].strip().strip(']').strip(',') + ']'
+        data_zh["vocab"] = json.loads(data_zh["vocab"])
+    except:
+        data_zh["vocab"] = []
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Chinese reading task about ML</title>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f9;
+                color: #333;
+                margin: 0;
+                padding: 20px;
+            }}
+            .container {{
+                max-width: 800px;
+                margin: 0 auto;
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }}
+            h1 {{
+                color: #0056b3;
+                text-align: center;
+            }}
+            p {{
+                line-height: 1.6;
+            }}
+            .pinyin {{
+                font-style: italic;
+                color: #888;
+                margin-bottom: 20px;
+            }}
+            table {{
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }}
+            th, td {{
+                padding: 12px;
+                border: 1px solid #ddd;
+                text-align: left;
+            }}
+            th {{
+                background-color: #0056b3;
+                color: #fff;
+            }}
+            td {{
+                background-color: #f9f9f9;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>{title}</h1>
+            <p>{data_zh['text']}</p>
+            <div class="pinyin">
+                <p><strong>Pinyin:</strong> {data_zh['pinyin']}</p>
+            </div>
+            <h2>Vocabulary</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Word</th>
+                        <th>Pinyin</th>
+                        <th>Translation</th>
+                    </tr>
+                </thead>
+                <tbody>
+    """
+
+    for vocab_item in data_zh['vocab']:
+        html_content += f"""
+                    <tr>
+                        <td>{vocab_item['word']}</td>
+                        <td>{vocab_item['pinyin']}</td>
+                        <td>{vocab_item['trans']}</td>
+                    </tr>
+        """
+
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </body>
+    </html>
+    """
+
+    return html_content
+
 # debug
 with open(con.DATA_FILE, "r", encoding="utf-8") as f:
     feed = json.load(f)
 
 log("Generating page.")
-html = make_html(feed)
+html_index = make_html(feed)
+
+log("Generating Chinese page for reading.")
+html_zh = make_html_zh(feed)
 
 log("Renaming previous page.")
 helper.try_rename_file(con.PAGE_FILE, con.DATA_DIR, "hf_papers.html")
 
+log("Renaming previous Chinese page.")
+helper.try_rename_file("zh.html", con.DATA_DIR, "zh_reading_task.html")
+
 log("Writing result.")
 with open(con.PAGE_FILE, "w", encoding="utf-8") as f:
-    f.write(html)
+    f.write(html_index)
+
+log("Writing Chinese reading task.")
+with open("zh.html", "w", encoding="utf-8") as f:
+    f.write(html_zh)
 
 log("Renaming log file.")
 helper.try_rename_file(con.LOG_FILE, con.LOG_DIR, "last_log.txt")
