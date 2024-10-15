@@ -100,6 +100,7 @@ else:
     PREV_PAPERS = {}
 
 log("Generating reviews via LLM API.")
+
 for paper in tqdm(feed["papers"]):
     prev_data, ok = helper.try_get_prev_paper(paper, _prev_papers)
 
@@ -118,6 +119,10 @@ for paper in tqdm(feed["papers"]):
 
         paper["data"] = api.get_data(prompt, system_prompt=system_prompt)
 
+        # add embedding
+        log("Get embedding for a paper via LLM API.")
+        paper["data"]["embedding"] = api.get_embedding(paper["abstract"][:6000])
+
     # fix categories
     if "categories" in paper["data"]:
         paper["data"]["categories"] = [
@@ -130,6 +135,7 @@ for paper in tqdm(feed["papers"]):
         paper["data"]["categories"] = [
             f"#{x.replace('#','')}" for x in paper["data"]["categories"]
         ]
+
 
 # all_abstracts = "\n\n".join([x["abstract"] for x in feed["papers"]])
 # intro_prompt = f"You are the editor of a machine learning journal. You have a set of abstract articles. Write an introduction to the journal about what awaits the reader in this issue. Write in Russian. Abstracts:\n\n{all_abstracts}"
@@ -950,14 +956,24 @@ def make_html(data):
 def make_html_zh(data):
     data_zh = data["zh"]
     title = data["zh"]["title"] if "title" in data["zh"] else "Title"
-    pinyin = "\n".join([f"<p>{i+1}. {x}</p>" for i,x in enumerate(data_zh["pinyin"].strip('.').split("."))])
-    text_zh = "\n".join([f"<p class='zh-text'>{i+1}. {x}。</p>" for i,x in enumerate(data_zh['text'].strip('。').split("。"))])
+    pinyin = "\n".join(
+        [
+            f"<p>{i+1}. {x}</p>"
+            for i, x in enumerate(data_zh["pinyin"].strip(".").split("."))
+        ]
+    )
+    text_zh = "\n".join(
+        [
+            f"<p class='zh-text'>{i+1}. {x}。</p>"
+            for i, x in enumerate(data_zh["text"].strip("。").split("。"))
+        ]
+    )
     try:
         data_zh["vocab"] = data_zh["vocab"].replace("'", '"')
         data_zh["vocab"] = json.loads(data_zh["vocab"])
     except:
         data_zh["vocab"] = []
-    
+
     log(f"Chinese vocab {data_zh['vocab']}")
     html_content = f"""
     <!DOCTYPE html>
