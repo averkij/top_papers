@@ -293,7 +293,7 @@ for paper in tqdm(feed["papers"]):
 
         system_prompt = "You are explaining concepts in simple words in good and native Russian. But you are using English terms like LLM and AI instead of Russian when appropriate."
 
-        prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'tags': array of tags related to article, 3 tags, but specific, not general like #ml or #ai. 'categories': array of tags related to article, up to 5 tags, but the most general like #nlp, #cv, #rlhf, #dataset (if authors contributing a dataset), #benchmark (if article is about benchmarking), #rag (if article is about retrieval augmented generation), #code (if article about code models), #video, #multimodal, etc. All tags must be relative to article. Do not add irrelevant tags. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
+        prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'categories': array of tags related to article, up to 5 tags, 3 minimum, but general like #nlp, #cv, #rlhf, #rl (generally it about robots), #dataset (if authors contributing a dataset), #benchmark (if article is about benchmarking), #rag (if article is about retrieval augmented generation), #code (if article about code models), #video, #multimodal, etc. All tags must be relative to article. Do not add irrelevant tags. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
 
         paper["data"] = get_data(prompt, system_prompt=system_prompt)
 
@@ -1064,7 +1064,7 @@ def make_html(data):
                     return;
                 }}
                 const explanation = item["data"]["desc"];
-                const tags = item["data"]["tags"].join(" ");
+                const cats = item["data"]["categories"].join(" ");
                 const articleHTML = `
                     <article>
                         <div class="background-digit">${{index + 1}}</div>
@@ -1079,7 +1079,7 @@ def make_html(data):
                             <div class="links">
                                 <a href="${{item['url']}}" target="_blank">Статья</a>
                             </div>
-                            <p class="tags">${{tags}}</p>
+                            <p class="tags">${{cats}}</p>
                         </div>
                     </article>
                 `;
