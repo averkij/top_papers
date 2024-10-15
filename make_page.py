@@ -1,5 +1,4 @@
 # %%
-import html
 import json
 import os
 from datetime import datetime, timezone
@@ -171,6 +170,10 @@ try:
         zh_prompt = f"Write vocab of difficult words for this text as an array of objects with fields 'word', 'pinyin', 'trans'. Return as python list without formatting. Return list and nothing else. Text:\n\n{feed['zh']['text']}"
         zh_text = api.get_text(zh_prompt)
         feed["zh"]["vocab"] = zh_text
+
+        zh_prompt = f"Translate this text in English. Text:\n\n{feed['zh']['text']}"
+        zh_text = api.get_text(zh_prompt)
+        feed["zh"]["trans"] = zh_text
         feed["zh"]["update_ts"] = formatted_time_utc
     else:
         log("Loading Chinese text from previous data.")
@@ -968,6 +971,12 @@ def make_html_zh(data):
             for i, x in enumerate(data_zh["text"].strip("。").split("。"))
         ]
     )
+    text_en = "\n".join(
+        [
+            f"<p>{i+1}. {x}.</p>"
+            for i, x in enumerate(data_zh["trans"].strip(".").split("."))
+        ]
+    )
     try:
         data_zh["vocab"] = data_zh["vocab"].replace("'", '"')
         data_zh["vocab"] = json.loads(data_zh["vocab"])
@@ -1053,10 +1062,11 @@ def make_html_zh(data):
     <body>
         <div class="container">
             <h1>{title}</h1>
-            <p>{text_zh}</p>
+            <div>{text_zh}</div>
             <div class="pinyin">
                 {pinyin}
             </div>
+            <div>{text_en}</div>
             <h2>Vocabulary</h2>
             <table>
                 <thead>
