@@ -950,7 +950,8 @@ def make_html(data):
 def make_html_zh(data):
     data_zh = data["zh"]
     title = data["zh"]["title"] if "title" in data["zh"] else "Title"
-    pinyin = "\n".join(["<p>" + x + "</p>" for x in data_zh["pinyin"].split(".")])
+    pinyin = "\n".join([f"<p>{i+1}. {x}</p>" for i,x in enumerate(data_zh["pinyin"].strip('.').split("."))])
+    text_zh = "\n".join([f"<p class='zh-text'>{i+1}. {x}。</p>" for i,x in enumerate(data_zh['text'].strip('。').split("。"))])
     try:
         data_zh["vocab"] = data_zh["vocab"].replace("'", '"')
         data_zh["vocab"] = json.loads(data_zh["vocab"])
@@ -969,6 +970,8 @@ def make_html_zh(data):
             gtag('js', new Date());
             gtag('config', 'G-C1CRWDNJ1J');
         </script>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&display=swap" rel="stylesheet">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Chinese reading task about ML</title>
@@ -995,10 +998,17 @@ def make_html_zh(data):
             p {{
                 line-height: 1.6;
             }}
+            .zh-text {{
+                font-size: 1.3em;
+                font-family: 'Noto Sans SC';
+                font-weight: 300;
+                margin: 0 0 5px 0;
+            }}
             .pinyin {{
+                padding-top: 5px;
+                padding-bottom: 5px;
                 font-style: italic;
                 color: #888;
-                margin-bottom: 20px;
             }}
             table {{
                 width: 100%;
@@ -1017,12 +1027,17 @@ def make_html_zh(data):
             td {{
                 background-color: #f9f9f9;
             }}
+            td.zh {{
+                font-family: 'Noto Sans SC';
+                font-size: 1.2em;
+                font-weight: 400;
+            }}
         </style>
     </head>
     <body>
         <div class="container">
             <h1>{title}</h1>
-            <p>{data_zh['text']}</p>
+            <p>{text_zh}</p>
             <div class="pinyin">
                 {pinyin}
             </div>
@@ -1041,7 +1056,7 @@ def make_html_zh(data):
     for vocab_item in data_zh["vocab"]:
         html_content += f"""
                     <tr>
-                        <td>{vocab_item['word']}</td>
+                        <td class="zh">{vocab_item['word']}</td>
                         <td>{vocab_item['pinyin']}</td>
                         <td>{vocab_item['trans']}</td>
                     </tr>
