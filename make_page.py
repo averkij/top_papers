@@ -139,9 +139,6 @@ for paper in tqdm(feed["papers"]):
 # log(intro)
 
 
-given_datetime_str = "2024-09-22 13:40"
-
-
 def renew_zh(dt_str):
     dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M")
     dt_now = datetime.now(timezone.utc)
@@ -955,11 +952,12 @@ def make_html_zh(data):
     title = data["zh"]["title"] if "title" in data["zh"] else "Title"
     pinyin = "\n".join(["<p>" + x + "</p>" for x in data_zh["pinyin"].split(".")])
     try:
-        data_zh["vocab"] = data_zh["vocab"].strip().strip("]").strip(",") + "]"
-        log(f"Chinese vocab {data_zh['vocab']}")
+        data_zh["vocab"] = data_zh["vocab"].replace("'", '"')
         data_zh["vocab"] = json.loads(data_zh["vocab"])
     except:
         data_zh["vocab"] = []
+    
+    log(f"Chinese vocab {data_zh['vocab']}")
     html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
