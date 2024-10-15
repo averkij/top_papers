@@ -1074,8 +1074,8 @@ def make_html_zh(data):
 
 
 # debug
-with open(con.DATA_FILE, "r", encoding="utf-8") as f:
-    feed = json.load(f)
+# with open(con.DATA_FILE, "r", encoding="utf-8") as f:
+#     feed = json.load(f)
 
 log("Generating page.")
 html_index = make_html(feed)
