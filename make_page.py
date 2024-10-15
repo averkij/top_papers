@@ -138,11 +138,23 @@ for paper in tqdm(feed["papers"]):
 # feed["intro"] = intro
 # log(intro)
 
+
+given_datetime_str = "2024-09-22 13:40"
+
+
+def renew_zh(dt_str):
+    dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M")
+    dt_now = datetime.now(timezone.utc)
+    if (dt.day != dt_now.day) and dt_now.hour > 8:
+        return True
+    return False
+
+
 try:
-    if "zh" not in _prev_papers:
+    if "zh" not in _prev_papers or renew_zh(_prev_papers["zh"]["update_ts"]):
         log("Trying to get texts in Chinese.")
         first_abstract = feed["papers"][0]["abstract"]
-        zh_prompt = f"Write simple and brief explanation (2-3 sentences) of an article in Chinese. Text:\n\n{first_abstract}"
+        zh_prompt = f"Write simple and brief explanation (4-5 sentences) of an article in Chinese. Use short sentences. Text:\n\n{first_abstract}"
         zh_text = api.get_text(zh_prompt)
         feed["zh"] = {"text": zh_text}
         feed["zh"]["title"] = feed["papers"][0]["title"]
@@ -156,6 +168,7 @@ try:
         zh_prompt = f"Write vocab of difficult words for this text as an array of objects with fields 'word', 'pinyin', 'trans'. Return as python list without formatting. Return list and nothing else. Text:\n\n{feed['zh']['text']}"
         zh_text = api.get_text(zh_prompt)
         feed["zh"]["vocab"] = zh_text
+        feed["zh"]["update_ts"] = formatted_time_utc
     else:
         log("Loading Chinese text from previous data.")
         feed["zh"] = _prev_papers["zh"]
@@ -940,8 +953,10 @@ def make_html(data):
 def make_html_zh(data):
     data_zh = data["zh"]
     title = data["zh"]["title"] if "title" in data["zh"] else "Title"
+    pinyin = "\n".join(["<p>" + x + "</p>" for x in data_zh["pinyin"].split(".")])
     try:
-        data_zh["vocab"] = data_zh["vocab"].strip().strip(']').strip(',') + ']'
+        data_zh["vocab"] = data_zh["vocab"].strip().strip("]").strip(",") + "]"
+        log(f"Chinese vocab {data_zh['vocab']}")
         data_zh["vocab"] = json.loads(data_zh["vocab"])
     except:
         data_zh["vocab"] = []
@@ -1004,7 +1019,7 @@ def make_html_zh(data):
             <h1>{title}</h1>
             <p>{data_zh['text']}</p>
             <div class="pinyin">
-                <p><strong>Pinyin:</strong> {data_zh['pinyin']}</p>
+                {pinyin}
             </div>
             <h2>Vocabulary</h2>
             <table>
@@ -1018,7 +1033,7 @@ def make_html_zh(data):
                 <tbody>
     """
 
-    for vocab_item in data_zh['vocab']:
+    for vocab_item in data_zh["vocab"]:
         html_content += f"""
                     <tr>
                         <td>{vocab_item['word']}</td>
@@ -1036,6 +1051,7 @@ def make_html_zh(data):
     """
 
     return html_content
+
 
 # debug
 with open(con.DATA_FILE, "r", encoding="utf-8") as f:

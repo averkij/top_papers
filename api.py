@@ -45,7 +45,7 @@ def get_text(prompt):
         "model": "mistral-large-latest",
         "temperature": 0.6,
         "top_p": 0.95,
-        "max_tokens": 512,
+        "max_tokens": 1024,
         "messages": [{"role": "user", "content": prompt}],
     }
     response = requests.post(base_url, headers=headers, json=payload)
