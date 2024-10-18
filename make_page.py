@@ -70,6 +70,7 @@ for article in tqdm(articles):
             "issue_id": issue_id,
             "pub_date": pub_date,
             "pub_date_ru": pub_date_ru,
+            "hash": helper.get_hash(url)
         }
     )
 
@@ -1111,12 +1112,11 @@ def make_html_zh(data):
 log("Generating page.")
 html_index = make_html(feed)
 
-log("Generating Chinese page for reading.")
-html_zh = make_html_zh(feed)
-
 log("Renaming previous page.")
 helper.try_rename_file(con.PAGE_FILE, con.DATA_DIR, "hf_papers.html")
 
+log("[Experimental] Generating Chinese page for reading.")
+html_zh = make_html_zh(feed)
 log("Renaming previous Chinese page.")
 helper.try_rename_file("zh.html", con.DATA_DIR, "zh_reading_task.html")
 
@@ -1131,4 +1131,10 @@ with open("zh.html", "w", encoding="utf-8") as f:
 log("Renaming log file.")
 helper.try_rename_file(con.LOG_FILE, con.LOG_DIR, "last_log.txt")
 
-# %%
+paper = feed["papers"][0]
+log(f"[Experimental] Generating an image for paper {paper['title']}.")
+img_name = f"{paper['hash']}.jpg"
+if not helper.if_paper_image_exists(paper):
+    api.generate_image_for_paper(paper, img_name)
+else:
+    log(f"[Experimental] Image for paper {paper['title']} already exists.")
