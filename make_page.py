@@ -757,7 +757,7 @@ def make_html(data):
         const clearCategoriesButton = document.getElementById('clear-categories');
         let selectedCategories = [];
         let selectedArticles = [];
-        let sortBy = 'default';        
+        let sortBy = 'issue_id';        
 
         function loadSettings() {{
             const isDarkMode = localStorage.getItem('darkMode') === 'true';
@@ -776,7 +776,7 @@ def make_html(data):
             }}
 
             if ((!settingSortBy) || (settingSortBy === 'null')) {{
-                settingSortBy = 'default';
+                settingSortBy = 'issue_id';
             }}
             
             sortDropdown.value = settingSortBy;
