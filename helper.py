@@ -82,7 +82,9 @@ def try_get_prev_paper(paper, prev_papers):
     if "papers" in prev_papers:
         prev_ids = [x["id"] for x in prev_papers["papers"]]
         if paper["id"] in prev_ids:
-            prev_data = [x for x in prev_papers["papers"] if x["id"] == paper["id"]][0]
+            prev_paper = [x for x in prev_papers["papers"] if x["id"] == paper["id"]][0]
+            if "data" in prev_paper and not "error" in prev_paper:
+                prev_data = prev_paper
     return prev_data, bool(prev_data)
 
 

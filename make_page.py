@@ -116,7 +116,11 @@ for paper in tqdm(feed["papers"]):
 
         prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'categories': array of tags related to article, up to 5 tags, 3 minimum, but general like #nlp, #cv, #rlhf, #rl (generally it about robots), #dataset (if authors contributing a dataset), #benchmark (if article is about benchmarking), #rag (if article is about retrieval augmented generation), #code (if article about code models), #video, #multimodal, etc. All tags must be relative to article. Do not add irrelevant tags. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
 
-        paper["data"] = api.get_data(prompt, system_prompt=system_prompt)
+        try:
+            paper["data"] = api.get_data(prompt, system_prompt=system_prompt)
+        except Exception as e:
+            paper["data"] = {"error": str(e)}
+            log(f"Error getting data: {e}")
 
         # add embedding
         log("Get embedding for a paper via LLM API.")
@@ -196,6 +200,7 @@ json.dump(
 
 # %%
 def make_html(data):
+    data["papers"] = [x for x in data["papers"] if "error" not in x]
     html = """
 <!DOCTYPE html>
 <html>
