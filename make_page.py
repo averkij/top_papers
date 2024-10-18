@@ -202,6 +202,14 @@ json.dump(
 # %%
 def make_html(data):
     data["papers"] = [x for x in data["papers"] if "error" not in x]
+    article_classes = ""
+    for paper in data["papers"]:
+        article_classes += f'body.light-theme>div>main>article.x{paper["hash"]} {{ background: url("img/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: lighten !important; background-color: rgba(255,255,255,0.9) !important;}}\n'
+        article_classes += f'body.light-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(255,255,255,0.85) !important;}}\n'
+        
+        article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]} {{ background: url("img/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: hue !important; background-color: rgba(44,44,44,0.9) !important;}}\n'
+        article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(44,44,44,0.85) !important;}}\n'
+
     html = """
 <!DOCTYPE html>
 <html>
@@ -294,18 +302,6 @@ def make_html(data):
         body.light-theme>header {
             background-color: var(--header-color);
             color: white;
-        }
-        body.dark-theme>div>main>article {
-            background-color: #444;
-        }
-        body.light-theme>div>main>article {
-            background-color: #fff;
-        }
-        body.dark-theme>div>main>article:hover {
-            background-color: #414141;
-        }
-        body.light-theme>div>main>article:hover {
-            background-color: #fafafa;
         }
         article {
             border-radius: 8px;
@@ -569,6 +565,7 @@ def make_html(data):
             left: 0;
             z-index: 0;
         }
+        """ + article_classes + """
         @media (max-width: 768px) {
             .category-filters {
                 display: none;
@@ -900,7 +897,7 @@ def make_html(data):
                 const explanation = item["data"]["desc"];
                 const cats = item["data"]["categories"].join(" ");
                 const articleHTML = `
-                    <article>
+                    <article class='x${{item["hash"]}}'>
                         <div class="background-digit">${{index + 1}}</div>
                         <div class="article-content" onclick="toggleAbstract(${{index}})">
                             <h2>${{item['data']['emoji']}} ${{item['title']}}</h2>
@@ -984,10 +981,12 @@ def make_html_zh(data):
         ]
     )
     try:
-        data_zh["vocab"] = data_zh["vocab"].replace("'", '"')
-        data_zh["vocab"] = json.loads(data_zh["vocab"])
-    except:
+        if isinstance(data_zh["vocab"], str):
+            data_zh["vocab"] = data_zh["vocab"].replace("'", '"')
+            data_zh["vocab"] = json.loads(data_zh["vocab"])
+    except Exception as e:
         data_zh["vocab"] = []
+        log(f"Can't parse vocab. {e}")
 
     log(f"Chinese vocab {data_zh['vocab']}")
     html_content = f"""
@@ -1131,10 +1130,12 @@ with open("zh.html", "w", encoding="utf-8") as f:
 log("Renaming log file.")
 helper.try_rename_file(con.LOG_FILE, con.LOG_DIR, "last_log.txt")
 
-paper = feed["papers"][0]
-log(f"[Experimental] Generating an image for paper {paper['title']}.")
-img_name = f"{paper['hash']}.jpg"
-if not helper.if_paper_image_exists(paper):
-    api.generate_image_for_paper(paper, img_name)
-else:
-    log(f"[Experimental] Image for paper {paper['title']} already exists.")
+for paper in feed["papers"]:
+    if paper["score"] >= 20:
+        log(f"[Experimental] Generating an image for paper {paper['title']}.")
+        img_name = f"{paper['hash']}.jpg"
+        if not helper.if_paper_image_exists(paper):
+            api.generate_image_for_paper(paper, img_name)
+        else:
+            log(f"[Experimental] Image for paper {paper['title']} already exists.")
+
