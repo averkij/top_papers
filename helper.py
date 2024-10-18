@@ -1,10 +1,12 @@
-from datetime import datetime, timedelta
-import re
+import hashlib
+import json
 import os
+import re
+from datetime import datetime, timedelta
+from pathlib import Path
+
 import requests
 from babel.dates import format_date
-from pathlib import Path
-import json
 
 import constants as con
 
@@ -132,3 +134,13 @@ def format_subtitle(number):
             word = "статей"
 
     return f"{number} {word}"
+
+
+def get_hash(s):
+    return hashlib.md5(s.encode('utf-8')).hexdigest()[:16]
+
+
+def if_paper_image_exists(paper):
+    img_path = os.path.join(con.IMG_DIR, f"{paper['hash']}.jpg")
+    return os.path.isfile(img_path)
+    

@@ -6,6 +6,7 @@ PAGE_FILE = "index.html"
 LOG_FILE = "log.txt"
 
 LOG_DIR = "./logs"
+IMG_DIR = "./img"
 DATA_DIR = "./prev_papers"
 
 EXCLUDE_CATS = [
