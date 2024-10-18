@@ -1,3 +1,4 @@
+import io
 import json
 import os
 from pathlib import Path
@@ -7,6 +8,7 @@ import fal_client
 import numpy as np
 import openai
 import requests
+from PIL import Image
 
 import constants as con
 from helper import log
@@ -113,7 +115,10 @@ def generate_and_save_image(name, prompt):
             arguments={
                 "prompt": prompt,
                 "seed": 42,
-                "image_size": "landscape_4_3",
+                "image_size":  {
+                    "width": 384,
+                    "height": 720
+                    },
                 "num_images": 1
             },
             with_logs=True,
@@ -127,8 +132,13 @@ def generate_and_save_image(name, prompt):
                 "User-Agent": "Mozilla/5.0"
             }
         response = requests.get(img["url"], headers=headers)
+        image = Image.open(io.BytesIO(response.content))
+        output_io = io.BytesIO()
+        image.save(output_io, format="JPEG", quality=70)
+        output_io.seek(0)        
+
         with open(image_path, 'wb') as fout:
-            fout.write(response.content)
+            fout.write(output_io.read())
     except Exception as e:
         log(f"Error generating an image: {e}")
         result = ""
