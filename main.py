@@ -838,7 +838,7 @@ def make_html(data):
 
         function getUrlParameters() {{
             const urlParams = new URLSearchParams(window.location.search);
-            const categoriesParam = urlParams.get('categories');
+            const categoriesParam = urlParams.get('cat');
             let categories = categoriesParam ? categoriesParam.split(',') : [];
             categories = categories.map(element => `#${{element}}`);
             return categories
@@ -847,7 +847,7 @@ def make_html(data):
         function updateUrlWithCategories() {{
             let cleanedCategories = selectedCategories.map(element => element.replace(/^#/, ''));
             const newUrl = cleanedCategories.length > 0 
-                ? `${{window.location.pathname}}?categories=${{cleanedCategories.join(',')}}`
+                ? `${{window.location.pathname}}?cat=${{cleanedCategories.join(',')}}`
                 : window.location.pathname;
             console.log("cleanedCategories", cleanedCategories)
             window.history.pushState({{}}, '', newUrl);
