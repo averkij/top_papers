@@ -32,4 +32,5 @@ RENAME_CATS = {
     "#algorithms": "#algo",
     "#cnn": "#architecture",
     "#prompt": "#prompts",
+    "#prompt": "#prompts",
 }

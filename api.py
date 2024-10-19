@@ -1,6 +1,7 @@
 import io
 import json
 import os
+import re
 from pathlib import Path
 
 import anthropic
@@ -13,36 +14,39 @@ from PIL import Image
 import constants as con
 from helper import log
 
-API_KEY = os.getenv("CLAUDE_KEY")
-client = anthropic.Anthropic(
-    api_key=API_KEY,
+CLAUDE_KEY = os.getenv("CLAUDE_KEY")
+claude_client = anthropic.Anthropic(
+    api_key=CLAUDE_KEY,
 )
 MISTRAL_KEY = os.getenv("MISTRAL_KEY")
 openai.api_key = os.getenv("OPENAI_KEY")
 
 
-def get_data(prompt, system_prompt=""):
-    message = client.messages.create(
-        model="claude-3-5-sonnet-20240620",
-        max_tokens=512,
-        system=system_prompt,
-        messages=[
-            {"role": "user", "content": prompt},
-        ],
-    )
-    resp = message.content[0].text.strip('"')
-    log(f"Got response. {resp}")
+def get_json(prompt, api, model, temperature, system_prompt="You are a helpful assistant."):
+    text = get_text(prompt=prompt, system_prompt=system_prompt, api=api, model=model, temperature=temperature)
+    text = re.sub(r'```json|```', '', text).strip()
     try:
-        doc = json.loads(resp)
+        doc = json.loads(text)
     except:
-        log(f"Error. Failed to parse JSON from LLM. {resp}")
-        doc = {"error": "Parsing error", "raw_data": resp}
-
+        log(f"Error. Failed to parse JSON from LLM. {text}")
+        doc = {"error": "Parsing error", "raw_data": text}
     return doc
 
 
-def get_text(prompt, api="mistral", model="mistral-large-latest"):
-    if api=="mistral":
+def get_text(prompt, api, model, temperature=0.5, system_prompt="You are a helpful assistant."):
+    if api=="claude":
+        log(f"Claude request. Model: {model}. Prompt: {prompt}")
+        message = claude_client.messages.create(
+            model=model,
+            max_tokens=512,
+            system=system_prompt,
+            messages=[
+                {"role": "user", "content": prompt},
+            ],
+            temperature=temperature
+        )
+        text = message.content[0].text.strip('"')
+    elif api=="mistral":
         log(f"Mistral request. Model: {model}. Prompt: {prompt}")
         base_url = "https://api.mistral.ai/v1/chat/completions"
         headers = {
@@ -51,7 +55,7 @@ def get_text(prompt, api="mistral", model="mistral-large-latest"):
         }
         payload = {
             "model": model,
-            "temperature": 0.2,
+            "temperature": temperature,
             "top_p": 0.95,
             "max_tokens": 2048,
             "messages": [{"role": "user", "content": prompt}],
@@ -64,9 +68,10 @@ def get_text(prompt, api="mistral", model="mistral-large-latest"):
         completion = openai.chat.completions.create(
             model=model,
             messages=[
-                    # {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "system", "content": system_prompt},
                     {"role": "user", "content": prompt}
-            ])
+            ],
+            temperature=temperature)
         text = completion.choices[0].message.content
     else:
         log(f"Error. Unknown API: {api}.")
@@ -150,6 +155,6 @@ def generate_image_for_paper(paper, img_name):
     title = paper["title"]
     abstract = paper["abstract"]
     prompt = f"Write a text with image prompt in style of surrealism and modern art based on the following paper. Use key themes and elements from it. Add instruction to write a text that reads as brief paper title as a label on some object on an image. Return only prompt and nothing else. Title: '{title}' Text: '{abstract}'"
-    img_prompt = get_text(prompt, api="openai", model="gpt-4o-mini")
+    img_prompt = get_text(prompt, api="openai", model="gpt-4o-mini", temperature=0.8)
     img_dir = os.path.join(con.IMG_DIR, paper["pub_date"].replace('-', ''))
     generate_and_save_image(name=img_name, img_dir=img_dir, prompt=img_prompt)
