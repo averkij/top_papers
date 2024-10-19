@@ -70,7 +70,7 @@ for article in tqdm(articles):
             "issue_id": issue_id,
             "pub_date": pub_date,
             "pub_date_ru": pub_date_ru,
-            "hash": helper.get_hash(url)
+            "hash": helper.get_hash(url),
         }
     )
 
@@ -108,56 +108,7 @@ for paper in tqdm(feed["papers"]):
         log(
             f'Using data from previous issue: {json.dumps(prev_data["data"], ensure_ascii=False)[:300]}'
         )
-        abs = paper["abstract"][:3000]
-
-        system_prompt = "You are explaining concepts in simple words in good and native Russian. But you are using English terms like LLM and AI instead of Russian when appropriate."
-
-        prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
-
-        prompt_cls = f"""You are an expert classifier of machine learning research papers. Analyze the following research paper text and classify it into one or more relevant categories from the list below. Consider the paper's main contributions, methodologies, and applications.
-
-Categories:
-1. DATASET: Papers that introduce new datasets or make significant modifications to existing ones
-2. DATA: Papers focusing on data processing, cleaning, collection, or curation methodologies
-3. BENCHMARK: Papers proposing or analyzing model evaluation frameworks and benchmarks
-4. AGENTS: Papers exploring autonomous agents, web agents, or agent-based architectures 
-5. NLP: Papers advancing natural language processing techniques or applications
-6. CV: Papers developing computer vision methods or visual processing systems
-7. RL: Papers investigating reinforcement learning theory or applications
-8. RLHF: Papers specifically about human feedback in RL (PPO, DPO, etc.)
-9. RAG: Papers advancing retrieval-augmented generation techniques
-10. CODE: Papers about code-related models or programming benchmarks
-11. INFERENCE: Papers optimizing model deployment (quantization, pruning, etc.)
-12. 3D: Papers on 3D content generation, processing, or understanding
-13. AUDIO: Papers advancing speech/audio processing or generation
-14. VIDEO: Papers on video analysis, generation, or understanding
-15. MULTIMODAL: Papers combining multiple input/output modalities
-16. MATH: Papers focused on mathematical theory and algorithms
-17. MULTILINGUAL: Papers addressing multiple languages or cross-lingual capabilities
-18. ARCHITECTURE: Papers proposing novel neural architectures or components
-19. MEDICINE: Papers applying ML to medical/healthcare domains
-20. TRAINING: Papers improving model training or fine-tuning methods
-21. ROBOTICS: Papers on robotic systems and embodied AI
-22. AGI: Papers discussing artificial general intelligence concepts
-23. GAMES: Papers applying ML to games or game development
-24. INTERPRETABILITY: Papers analyzing model behavior and explanations
-25. REASONING: Papers enhancing logical reasoning capabilities
-26. TRANSFER_LEARNING: Papers on knowledge transfer between models/domains
-27. GRAPHS: Papers advancing graph neural networks and applications
-28. ETHICS: Papers addressing AI ethics, fairness, and bias
-29. SECURITY: Papers on model security and adversarial robustness
-30. QUANTUM: Papers combining quantum computing and ML
-31. EDGE_COMPUTING: Papers on ML deployment for resource-constrained devices
-32. OPTIMIZATION: Papers advancing training optimization methods
-33. SURVEY: Papers comprehensively reviewing research areas
-34. DIFFUSION: Papers on diffusion-based generative models
-
-Return only JSON with flat array of categories that match the given text.
-
-Paper text to classify:\n\n""{abs}"""""
-        
         paper["data"] = prev_data["data"]
-        paper["data"]["categories"] = api.get_json(prompt_cls, api="openai", model="gpt-4o-mini", temperature=0.0)
     else:
         log("Querying the API.")
         abs = paper["abstract"][:3000]
@@ -166,7 +117,8 @@ Paper text to classify:\n\n""{abs}"""""
 
         prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
 
-        prompt_cls = f"""You are an expert classifier of machine learning research papers. Analyze the following research paper text and classify it into one or more relevant categories from the list below. Consider the paper's main contributions, methodologies, and applications.
+        prompt_cls = (
+            f"""You are an expert classifier of machine learning research papers. Analyze the following research paper text and classify it into one or more relevant categories from the list below. Consider the paper's main contributions, methodologies, and applications.
 
 Categories:
 1. DATASET: Papers that introduce new datasets or make significant modifications to existing ones
@@ -207,10 +159,21 @@ Categories:
 
 Return only JSON with flat array of categories that match the given text.
 
-Paper text to classify:\n\n""{abs}"""""
+Paper text to classify:\n\n""{abs}"""
+            ""
+        )
 
         try:
-            paper["data"] = api.get_json(prompt, system_prompt=system_prompt, api="claude", model="claude-3-5-sonnet-20240620", temperature=1.0)
+            paper["data"] = api.get_json(
+                prompt,
+                system_prompt=system_prompt,
+                api="claude",
+                model="claude-3-5-sonnet-20240620",
+                temperature=1.0,
+            )
+            paper["data"]["categories"] = api.get_json(
+                prompt_cls, api="openai", model="gpt-4o-mini", temperature=0.0
+            )
         except Exception as e:
             paper["data"] = {"error": str(e)}
             log(f"Error getting data: {e}")
@@ -254,22 +217,30 @@ try:
         log("Trying to get texts in Chinese.")
         first_abstract = feed["papers"][0]["abstract"]
         zh_prompt = f"Write simple and brief explanation (4-5 sentences) of an article in Chinese. Use short sentences. Text:\n\n{first_abstract}"
-        zh_text = api.get_text(zh_prompt, api="mistral", model="mistral-large-latest", temparature=0.5)
+        zh_text = api.get_text(
+            zh_prompt, api="mistral", model="mistral-large-latest", temparature=0.5
+        )
         feed["zh"] = {"text": zh_text}
         feed["zh"]["title"] = feed["papers"][0]["title"]
 
         zh_prompt = (
             f"Write pinyin transcription for text. Text:\n\n{feed['zh']['text']}"
         )
-        zh_text = api.get_text(zh_prompt, api="mistral", model="mistral-large-latest", temparature=0.0)
+        zh_text = api.get_text(
+            zh_prompt, api="mistral", model="mistral-large-latest", temparature=0.0
+        )
         feed["zh"]["pinyin"] = zh_text
 
         zh_prompt = f"Write vocab of difficult words for this text as an array of objects with fields 'word', 'pinyin', 'trans'. Return as python list without formatting. Return list and nothing else. Text:\n\n{feed['zh']['text']}"
-        zh_text = api.get_text(zh_prompt, api="mistral", model="mistral-large-latest", temparature=0.0)
+        zh_text = api.get_text(
+            zh_prompt, api="mistral", model="mistral-large-latest", temparature=0.0
+        )
         feed["zh"]["vocab"] = zh_text
 
         zh_prompt = f"Translate this text in English. Text:\n\n{feed['zh']['text']}"
-        zh_text = api.get_text(zh_prompt, api="mistral", model="mistral-large-latest", temparature=0.5)
+        zh_text = api.get_text(
+            zh_prompt, api="mistral", model="mistral-large-latest", temparature=0.5
+        )
         feed["zh"]["trans"] = zh_text
         feed["zh"]["update_ts"] = formatted_time_utc
     else:
@@ -290,15 +261,16 @@ json.dump(
     indent=4,
 )
 
+
 # %%
 def make_html(data):
     data["papers"] = [x for x in data["papers"] if "error" not in x]
     article_classes = ""
     for paper in data["papers"]:
-        if paper['score'] >= 20:
+        if paper["score"] >= 20:
             article_classes += f'body.light-theme>div>main>article.x{paper["hash"]} {{ background: url("img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: lighten !important; background-color: rgba(255,255,255,0.9) !important;}}\n'
             article_classes += f'body.light-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(255,255,255,0.87) !important;}}\n'
-            
+
             article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]} {{ background: url("img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: hue !important; background-color: rgba(44,44,44,0.9) !important;}}\n'
             article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(44,44,44,0.87) !important;}}\n'
 
@@ -318,7 +290,8 @@ def make_html(data):
 
     html += f"<title>HF ({helper.format_subtitle(len(data['papers']))})</title>"
 
-    html += """
+    html += (
+        """
     <link rel="icon" href="favicon.svg" sizes="any" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
@@ -669,7 +642,9 @@ def make_html(data):
             left: 0;
             z-index: 0;
         }
-        """ + article_classes + """
+        """
+        + article_classes
+        + """
         @media (max-width: 768px) {
             .category-filters {
                 display: none;
@@ -775,6 +750,7 @@ def make_html(data):
     }
     </script>
 </head>"""
+    )
 
     html += f"""
 <body class="light-theme">
@@ -1245,4 +1221,3 @@ for paper in feed["papers"]:
 
 
 # %%
-
