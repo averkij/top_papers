@@ -1,7 +1,7 @@
 # %%
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 import requests
 from babel.dates import format_date
@@ -74,16 +74,42 @@ for article in tqdm(articles):
         }
     )
 
-# %%
-formatted_date = format_date(helper.CURRENT_DATE, format="d MMMM", locale="ru_RU")
-formatted_time_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
+#%%
+weekday = datetime.now(timezone.utc).weekday()
+feed_date = helper.CURRENT_DATE
+prev_feed_date = feed_date - timedelta(1)
+next_feed_date = feed_date + timedelta(1)
+
+#HF Daily don't have updates on weekend
+if weekday == 0: #Monday
+    prev_feed_date = prev_feed_date - timedelta(2)
+if weekday == 4: #Friday
+    next_feed_date = next_feed_date + timedelta(2)
+if weekday == 5: #Saturday
+    weekday = 4
+    feed_date = feed_date - timedelta(1)
+    prev_feed_date = prev_feed_date - timedelta(1)
+    next_feed_date = next_feed_date + timedelta(1)
+elif weekday == 6: #Sunday
+    weekday = 4
+    feed_date = feed_date - timedelta(2)
+    prev_feed_date = prev_feed_date - timedelta(2)
+
+formatted_date = format_date(feed_date, format="d MMMM", locale="ru_RU")
+formatted_time_utc = helper.CURRENT_DATE.strftime("%Y-%m-%d %H:%M")
+
+link_prev = f"{prev_feed_date.strftime('%Y-%m-%d')}.html"
+link_next = f"{next_feed_date.strftime('%Y-%m-%d')}.html"
 
 feed = {
     "date": formatted_date,
     "time_utc": formatted_time_utc,
+    "weekday": weekday,
     "issue_id": _issue_id + 1,
     "home_page_url": BASE_URL,
     "papers": papers,
+    "link_prev": link_prev,
+    "link_next": link_next,
 }
 
 for i, paper in enumerate(feed["papers"]):
@@ -251,7 +277,7 @@ except Exception as e:
     log(f"Failed to get Chinese text: {e}")
 
 log("Renaming data file.")
-helper.try_rename_file(con.DATA_FILE, con.DATA_DIR)
+helper.try_rename_file(con.DATA_FILE, con.DATA_DIR, helper.add_date_to_name(name=".json", date=feed_date))
 
 log("Saving new data file.")
 json.dump(
@@ -1214,12 +1240,12 @@ log("Generating page.")
 html_index = make_html(feed)
 
 log("Renaming previous page.")
-helper.try_rename_file(con.PAGE_FILE, con.DATA_DIR, "hf_papers.html")
+helper.try_rename_file(con.PAGE_FILE, con.DATA_DIR, helper.add_date_to_name(name=".html", date=feed_date))
 
 log("[Experimental] Generating Chinese page for reading.")
 html_zh = make_html_zh(feed)
 log("Renaming previous Chinese page.")
-helper.try_rename_file("zh.html", con.DATA_DIR, "zh_reading_task.html")
+helper.try_rename_file("zh.html", con.DATA_DIR, helper.add_date_to_name("_zh_reading_task.html"))
 
 log("Writing result.")
 with open(con.PAGE_FILE, "w", encoding="utf-8") as f:
@@ -1230,7 +1256,7 @@ with open("zh.html", "w", encoding="utf-8") as f:
     f.write(html_zh)
 
 log("Renaming log file.")
-helper.try_rename_file(con.LOG_FILE, con.LOG_DIR, "last_log.txt")
+helper.try_rename_file(con.LOG_FILE, con.LOG_DIR, helper.add_date_to_name("_last_log.txt", helper.CURRENT_DATE))
 
 for paper in feed["papers"]:
     if paper["score"] >= 20:

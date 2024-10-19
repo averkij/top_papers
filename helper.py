@@ -2,7 +2,7 @@ import hashlib
 import json
 import os
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import requests
@@ -10,8 +10,8 @@ from babel.dates import format_date
 
 import constants as con
 
-CURRENT_YEAR = datetime.now().year
-CURRENT_DATE = datetime.now()
+CURRENT_YEAR = datetime.now(timezone.utc).year
+CURRENT_DATE = datetime.now(timezone.utc)
 
 from bs4 import BeautifulSoup
 
@@ -43,21 +43,27 @@ def log(msg):
         fout.write(f"[{date}] {msg}\n")
 
 
-def try_rename_file(fpath, dir, new_name=None):
+def try_rename_file(fpath, new_dir, new_name=None):
     if not new_name:
-        new_name = fpath
+        new_fpath = os.path.join(new_dir, fpath)
+    else:
+        new_fpath = os.path.join(new_dir, new_name)
     if os.path.isfile(fpath):
-        date = datetime.now() - timedelta(1)
-        date = date.strftime("%Y-%m-%d")
-        new_fpath = f"{date}_{new_name}"
         log(f"Renaming previous data. {fpath} to {new_fpath}")
         try:
             os.remove(new_fpath)
         except OSError:
             pass
-        os.replace(fpath, os.path.join(dir, new_fpath))
+        os.replace(fpath, new_fpath)
     else:
         log(f"No file to rename. {fpath}")
+
+def add_date_to_name(name, date=None):
+    if not date:    
+        date = datetime.now() - timedelta(1)        
+    date = date.strftime("%Y-%m-%d")
+    new_fpath = f"{date}{name}"
+    return new_fpath
 
 
 def try_get_score(text):

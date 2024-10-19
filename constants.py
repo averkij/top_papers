@@ -7,7 +7,7 @@ LOG_FILE = "log.txt"
 
 LOG_DIR = "./logs"
 IMG_DIR = "./img"
-DATA_DIR = "./prev_papers"
+DATA_DIR = "./d"
 
 EXCLUDE_CATS = [
     "#ai",
