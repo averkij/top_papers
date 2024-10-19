@@ -1012,6 +1012,7 @@ def make_html(data):
             filterAndRenderArticles();
             saveCategorySelection();
             updateSelectedArticlesTitle();
+            updateUrlWithCategories();
         }}
 
         function renderArticles(articles) {{
