@@ -73,7 +73,7 @@ def parse_and_format_date(date_str, year=CURRENT_YEAR):
         date_sort = date_obj.strftime("%Y-%m-%d")
         date_ru = format_date(date_obj, format="d MMMM", locale="ru_RU")
     except:
-        date_sort = "2024-01-01"
+        date_sort = "1963-01-17"
         date_ru = format_date(CURRENT_DATE, format="d MMMM", locale="ru_RU")
         log(f"Error. Unable to format date {date_str}")
     return date_sort, date_ru
@@ -137,10 +137,11 @@ def format_subtitle(number):
 
 
 def get_hash(s):
-    return hashlib.md5(s.encode('utf-8')).hexdigest()[:16]
+    return hashlib.md5(s.encode("utf-8")).hexdigest()[:16]
 
 
 def if_paper_image_exists(paper):
-    img_path = os.path.join(con.IMG_DIR, f"{paper['hash']}.jpg")
+    img_path = os.path.join(
+        con.IMG_DIR, paper["pub_date"].replace("-", ""), f"{paper['hash']}.jpg"
+    )
     return os.path.isfile(img_path)
-    

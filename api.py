@@ -107,7 +107,7 @@ def on_queue_update(update):
            print(log["message"])
 
 
-def generate_and_save_image(name, prompt):
+def generate_and_save_image(name, img_dir, prompt):
     log(f'Generating image by prompt: {prompt}.')
     try:
         result = fal_client.subscribe(
@@ -126,8 +126,8 @@ def generate_and_save_image(name, prompt):
         )
         img = result['images'][0]
         log(f'Saving generated image from {img["url"]} to {name}.')
-        Path(con.IMG_DIR).mkdir(exist_ok=True)
-        image_path = os.path.join(con.IMG_DIR, name)
+        Path(img_dir).mkdir(exist_ok=True)
+        image_path = os.path.join(img_dir, name)
         headers = {
                 "User-Agent": "Mozilla/5.0"
             }
@@ -151,4 +151,5 @@ def generate_image_for_paper(paper, img_name):
     abstract = paper["abstract"]
     prompt = f"Write a text with image prompt in style of surrealism and modern art based on the following paper. Use key themes and elements from it. Add instruction to write a text that reads as brief paper title as a label on some object on an image. Return only prompt and nothing else. Title: '{title}' Text: '{abstract}'"
     img_prompt = get_text(prompt, api="openai", model="gpt-4o-mini")
-    generate_and_save_image(name=img_name, prompt=img_prompt)
+    img_dir = os.path.join(con.IMG_DIR, paper["pub_date"].replace('-', ''))
+    generate_and_save_image(name=img_name, img_dir=img_dir, prompt=img_prompt)
