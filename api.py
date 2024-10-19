@@ -77,6 +77,8 @@ def get_text(prompt, api, model, temperature=0.5, system_prompt="You are a helpf
         log(f"Error. Unknown API: {api}.")
         text = ""
 
+    log(f"Response: {text}")
+
     return text
 
 
