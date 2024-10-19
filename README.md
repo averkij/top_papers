@@ -41,7 +41,7 @@ The project is deployed automatically using GitHub Actions with the following wo
   - **Checkout Repository Content**: The repository content is checked out using `actions/checkout@v2`.
   - **Set Up Python**: Python 3.9 is set up using `actions/setup-python@v2`.
   - **Install Dependencies**: Required dependencies are installed using `pip install -r requirements.txt`.
-  - **Run Python Script**: The `make_page.py` script is executed to generate the reviews.
+  - **Run Python Script**: The `main.py` script is executed to generate the reviews.
   - **Commit Changes**: The changes are committed with a timestamped message.
   - **Push Changes**: The changes are pushed back to the GitHub repository.
 
