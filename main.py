@@ -834,7 +834,24 @@ def make_html(data):
         const clearCategoriesButton = document.getElementById('clear-categories');
         let selectedCategories = [];
         let selectedArticles = [];
-        let sortBy = 'issue_id';        
+        let sortBy = 'issue_id';     
+
+        function getUrlParameters() {{
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoriesParam = urlParams.get('categories');
+            let categories = categoriesParam ? categoriesParam.split(',') : [];
+            categories = categories.map(element => `#${{element}}`);
+            return categories
+        }}
+
+        function updateUrlWithCategories() {{
+            let cleanedCategories = selectedCategories.map(element => element.replace(/^#/, ''));
+            const newUrl = cleanedCategories.length > 0 
+                ? `${{window.location.pathname}}?categories=${{cleanedCategories.join(',')}}`
+                : window.location.pathname;
+            console.log("cleanedCategories", cleanedCategories)
+            window.history.pushState({{}}, '', newUrl);
+        }}
 
         function loadSettings() {{
             const isDarkMode = localStorage.getItem('darkMode') === 'true';
@@ -895,6 +912,7 @@ def make_html(data):
             filterAndRenderArticles();
             saveCategorySelection();
             updateSelectedArticlesTitle();
+            updateUrlWithCategories();
         }}
 
         function saveCategorySelection() {{
@@ -914,13 +932,17 @@ def make_html(data):
         }}
 
         function loadCategorySelection() {{
-            const savedCategories = localStorage.getItem('selectedCategories');
-            if (savedCategories) {{
-                if (savedCategories != '"[]"') {{
-                    selectedCategories = JSON.parse(savedCategories);
-                    updateCategoryButtonStates();
+            const urlCategories = getUrlParameters();
+            if (urlCategories.length > 0) {{
+                selectedCategories = urlCategories;
+                saveCategorySelection();
+            }} else {{
+                const savedCategories = localStorage.getItem('selectedCategories');
+                if (savedCategories && savedCategories !== '"[]"') {{
+                    selectedCategories = JSON.parse(savedCategories);                    
                 }}
             }}
+            updateCategoryButtonStates();
         }}
 
         function updateCategoryButtonStates() {{
