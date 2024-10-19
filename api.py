@@ -134,7 +134,7 @@ def generate_and_save_image(name, prompt):
         response = requests.get(img["url"], headers=headers)
         image = Image.open(io.BytesIO(response.content))
         output_io = io.BytesIO()
-        image.save(output_io, format="JPEG", quality=70)
+        image.save(output_io, format="JPEG", quality=60)
         output_io.seek(0)        
 
         with open(image_path, 'wb') as fout:
