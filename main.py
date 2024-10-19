@@ -294,11 +294,13 @@ def make_html(data):
     article_classes = ""
     for paper in data["papers"]:
         if paper["score"] >= 20:
-            article_classes += f'body.light-theme>div>main>article.x{paper["hash"]} {{ background: url("img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: lighten !important; background-color: rgba(255,255,255,0.9) !important;}}\n'
-            article_classes += f'body.light-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(255,255,255,0.87) !important;}}\n'
+            article_classes += f'body.light-theme>div>main>article.x{paper["hash"]} {{ background: url("img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: lighten !important; background-color: rgba(255,255,255,0.9) !important; -webkit-filter: grayscale(100%);}}\n'
 
-            article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]} {{ background: url("img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: hue !important; background-color: rgba(44,44,44,0.9) !important;}}\n'
-            article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(44,44,44,0.87) !important;}}\n'
+            article_classes += f'body.light-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(255,255,255,0.87) !important; filter: none; -webkit-filter: grayscale(0%);}}\n'
+
+            article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]} {{ background: url("img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: hue !important; background-color: rgba(60,60,60,0.9) !important; -webkit-filter: grayscale(100%);}}\n'
+
+            article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(60,60,60,0.87) !important; filter: none; -webkit-filter: grayscale(0%);}}\n'
 
     html = """
 <!DOCTYPE html>
@@ -324,7 +326,7 @@ def make_html(data):
     <style>
         :root {
             --primary-color: #0989eacf;
-            --secondary-color: #03dac6;
+            --secondary-color: #fff;
             --background-color: #f5f5f5;
             --text-color: #333333;
             --header-color: #0989eacf;
