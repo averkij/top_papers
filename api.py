@@ -56,7 +56,7 @@ def get_text(prompt, api, model, temperature=0.5, system_prompt="You are a helpf
         payload = {
             "model": model,
             "temperature": temperature,
-            "top_p": 0.95,
+            "top_p": 1 if temperature==0 else 0.95,
             "max_tokens": 2048,
             "messages": [{"role": "user", "content": prompt}],
         }
