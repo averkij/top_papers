@@ -75,26 +75,29 @@ for article in tqdm(articles):
     )
 
 #%%
-weekday = datetime.now(timezone.utc).weekday()
-feed_date = helper.CURRENT_DATE
-prev_feed_date = feed_date - timedelta(1)
-next_feed_date = feed_date + timedelta(1)
+def get_week_info(date):
+    weekday = date.weekday()
+    feed_date = date
+    prev_feed_date = feed_date - timedelta(1)
+    next_feed_date = feed_date + timedelta(1)
 
-#HF Daily don't have updates on weekend
-if weekday == 0: #Monday
-    prev_feed_date = prev_feed_date - timedelta(2)
-if weekday == 4: #Friday
-    next_feed_date = next_feed_date + timedelta(2)
-if weekday == 5: #Saturday
-    weekday = 4
-    feed_date = feed_date - timedelta(1)
-    prev_feed_date = prev_feed_date - timedelta(1)
-    next_feed_date = next_feed_date + timedelta(1)
-elif weekday == 6: #Sunday
-    weekday = 4
-    feed_date = feed_date - timedelta(2)
-    prev_feed_date = prev_feed_date - timedelta(2)
+    #HF Daily don't have updates on weekend
+    if weekday == 0: #Monday
+        prev_feed_date = prev_feed_date - timedelta(2)
+    if weekday == 4: #Friday
+        next_feed_date = next_feed_date + timedelta(2)
+    if weekday == 5: #Saturday
+        weekday = 4
+        feed_date = feed_date - timedelta(1)
+        prev_feed_date = prev_feed_date - timedelta(1)
+        next_feed_date = next_feed_date + timedelta(1)
+    elif weekday == 6: #Sunday
+        weekday = 4
+        feed_date = feed_date - timedelta(2)
+        prev_feed_date = prev_feed_date - timedelta(2)
+    return weekday, feed_date, prev_feed_date, next_feed_date
 
+weekday, feed_date, prev_feed_date, next_feed_date = get_week_info(helper.CURRENT_DATE)
 formatted_date = format_date(feed_date, format="d MMMM", locale="ru_RU")
 formatted_time_utc = helper.CURRENT_DATE.strftime("%Y-%m-%d %H:%M")
 
@@ -294,12 +297,12 @@ def make_html(data):
     article_classes = ""
     for paper in data["papers"]:
         if paper["score"] >= 20:
-            article_classes += f'body.light-theme>div>main>article.x{paper["hash"]} {{ background: url("img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: lighten !important; background-color: rgba(255,255,255,0.94) !important; -webkit-filter: grayscale(100%);}}\n'
+            article_classes += f'body.light-theme>div>main>article.x{paper["hash"]} {{ background: url("https://hfday.ru/img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: lighten !important; background-color: rgba(255,255,255,0.94) !important; -webkit-filter: grayscale(100%);}}\n'
 
 
             article_classes += f'body.light-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(255,255,255,0.92) !important; filter: none; -webkit-filter: grayscale(0%);}}\n'
 
-            article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]} {{ background: url("img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: hue !important; background-color: rgba(60,60,60,0.9) !important; -webkit-filter: grayscale(100%);}}\n'
+            article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]} {{ background: url("https://hfday.ru/img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: hue !important; background-color: rgba(60,60,60,0.9) !important; -webkit-filter: grayscale(100%);}}\n'
 
             article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(60,60,60,0.87) !important; filter: none; -webkit-filter: grayscale(0%);}}\n'
 
