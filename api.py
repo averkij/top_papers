@@ -156,7 +156,7 @@ def generate_and_save_image(name, img_dir, prompt):
 def generate_image_for_paper(paper, img_name):
     title = paper["title"]
     abstract = paper["abstract"]
-    prompt = f"Write a text with image prompt in style of surrealism and modern art based on the following paper. Use key themes and elements from it. Add instruction to write a text that reads as brief paper title as a label on some object on an image. Return only prompt and nothing else. Title: '{title}' Text: '{abstract}'"
+    prompt = f"Write a text with image prompt in style of surrealism and modern art based on the following paper. Use key themes and elements from it. Add instruction to write a text that reads as brief paper title as a label on some object on an image. Style: linear art on white background. Return only prompt and nothing else. Title: '{title}' Text: '{abstract}'"
     img_prompt = get_text(prompt, api="openai", model="gpt-4o-mini", temperature=0.8)
     img_dir = os.path.join(con.IMG_DIR, paper["pub_date"].replace('-', ''))
     generate_and_save_image(name=img_name, img_dir=img_dir, prompt=img_prompt)
