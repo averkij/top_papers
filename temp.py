@@ -297,13 +297,13 @@ def make_html(data):
     article_classes = ""
     for paper in data["papers"]:
         if paper["score"] >= 20:
-            article_classes += f'body.light-theme>div>main>article.x{paper["hash"]} {{ background: url("https://hfday.ru/img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: lighten !important; background-color: rgba(255,255,255,0.94) !important;}}\n'
+            article_classes += f'body.light-theme>div>main>article.x{paper["hash"]} {{ background: url("https://hfday.ru/img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: lighten !important; background-color: rgba(255,255,255,0.91) !important;}}\n'
 
-            article_classes += f'body.light-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(255,255,255,0.92) !important;}}\n'
+            article_classes += f'body.light-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(255,255,255,0.95) !important;}}\n'
 
             article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]} {{ background: url("https://hfday.ru/img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: hue !important; background-color: rgba(60,60,60,0.9) !important; }}\n'
 
-            article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(60,60,60,0.87) !important;}}\n'
+            article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(60,60,60,0.92) !important;}}\n'
 
     html = """
 <!DOCTYPE html>
@@ -334,6 +334,7 @@ def make_html(data):
             --text-color: #333333;
             --header-color: #0989eacf;
             --body-color: #f5f5f5;
+            --menu-color: #002370;
         }
         body {
             font-family: 'Roboto Slab', sans-serif;
@@ -348,7 +349,7 @@ def make_html(data):
             padding: 0 20px;
         }
         header {
-            padding: 1.6em 0;
+            padding: 3em 0;
             text-align: center;
         }
         h1 {
@@ -661,17 +662,67 @@ def make_html(data):
             position: relative;
             overflow: hidden;
         }
-
         .svg-container span {
             position: relative;
             z-index: 1;
         }
-
         .svg-container svg {
             position: absolute;
             bottom: 0;
             left: 0;
             z-index: 0;
+        }
+
+        .nav-menu {
+            background-color: var(--menu-color);
+            padding: 2px 0 5px 0;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px;
+            display: flex;
+            justify-content: center;
+            gap: 2em;
+        }
+        
+        .nav-item {
+            color: white;
+            padding: 0.2em 1.0em 0 1em;
+            cursor: pointer;
+            font-weight: 400;
+        }
+        
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .dark-theme .nav-menu {
+            background-color: #333;
+        }
+        .dark-theme .nav-item {
+            color: white;
+        }
+        
+        .dark-theme .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        @media (max-width: 600px) {
+            .nav-container {
+                flex-direction: row;
+                gap: 1em;
+            }
+            
+            .nav-item {
+                padding: 0.3em 0.8em;
+                font-size: 0.9em;
+            }
         }
         """
         + article_classes
@@ -797,6 +848,14 @@ def make_html(data):
             </label>
         </div>
     </header>
+    <div class="nav-menu">
+        <div class="nav-container">
+            <span class="nav-item" id="nav-prev">Назад</span>
+            <span class="nav-item" id="nav-weekly">Топ за неделю</span>
+            <span class="nav-item" id="nav-weekly">Топ за месяц</span>
+            <span class="nav-item" id="nav-next">Вперед</span>
+        </div>
+    </div>
     <div class="container">
         <div class="sub-header-container">
             <div class="update-info-container">
@@ -1245,16 +1304,17 @@ def make_html_zh(data):
 log("Generating page.")
 html_index = make_html(feed)
 
-log("Renaming previous page.")
-helper.try_rename_file(con.PAGE_FILE, con.DATA_DIR, helper.add_date_to_name(name=".html", date=feed_date))
+# log("Renaming previous page.")
+# helper.try_rename_file(con.PAGE_FILE, con.DATA_DIR, helper.add_date_to_name(name=".html", date=feed_date))
 
 log("[Experimental] Generating Chinese page for reading.")
 html_zh = make_html_zh(feed)
 log("Renaming previous Chinese page.")
 helper.try_rename_file("zh.html", con.DATA_DIR, helper.add_date_to_name("_zh_reading_task.html"))
 
+#debug
 log("Writing result.")
-with open(con.PAGE_FILE, "w", encoding="utf-8") as f:
+with open("temp.html", "w", encoding="utf-8") as f:
     f.write(html_index)
 
 log("Writing Chinese reading task.")
