@@ -675,7 +675,7 @@ def make_html(data):
 
         .nav-menu {
             background-color: var(--menu-color);
-            padding: 2px 0 5px 0;
+            padding: 2px 0 2px 0;
             display: inline-block;
             position: relative;
             overflow: hidden;
@@ -689,10 +689,13 @@ def make_html(data):
             justify-content: center;
             gap: 2em;
         }
+        .nav-container span a {
+            color: white;
+        }
         
         .nav-item {
             color: white;
-            padding: 0.2em 1.0em 0 1em;
+            padding: 3px 10px;
             cursor: pointer;
             font-weight: 400;
         }
@@ -838,7 +841,7 @@ def make_html(data):
 <body class="light-theme">
     <header>
         <div class="container">
-            <h1 class="title-sign" id="doomgrad-icon">🔺</h1><h1 class="title-text" id="doomgrad">{con.TITLE_LIGHT}</h1>
+            <h1 class="title-sign" id="doomgrad-icon">🔺</h1><h1 class="title-text" id="doomgrad">hf daily</h1>
             <p>{data['date']} | {helper.format_subtitle(len(data['papers']))}</p>
         </div>
         <div class="theme-switch">
@@ -850,10 +853,10 @@ def make_html(data):
     </header>
     <div class="nav-menu">
         <div class="nav-container">
-            <span class="nav-item" id="nav-prev">Назад</span>
+            <span class="nav-item" id="nav-prev"><a href="d/{feed['link_prev']}">Назад</a></span>
+            <span class="nav-item" id="nav-next"><a href="d/{feed['link_next']}">Вперед</a></span>
             <span class="nav-item" id="nav-weekly">Топ за неделю</span>
             <span class="nav-item" id="nav-weekly">Топ за месяц</span>
-            <span class="nav-item" id="nav-next">Вперед</span>
         </div>
     </div>
     <div class="container">
@@ -976,7 +979,9 @@ def make_html(data):
                     article.data.categories.forEach(cat => categories.add(cat));
                 }}
             }});
-            return Array.from(categories);
+            let res = Array.from(categories);
+            res.sort();
+            return res;
         }}
         
         function createCategoryButtons() {{
