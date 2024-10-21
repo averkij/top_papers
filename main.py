@@ -917,7 +917,9 @@ def make_html(data):
                     article.data.categories.forEach(cat => categories.add(cat));
                 }}
             }});
-            return Array.from(categories);
+            let res = Array.from(categories);
+            res.sort();
+            return res;
         }}
         
         function createCategoryButtons() {{
