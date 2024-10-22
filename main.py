@@ -159,7 +159,7 @@ Categories:
 7. RL: Papers investigating reinforcement learning theory or applications
 8. RLHF: Papers specifically about human feedback in RL (PPO, DPO, etc.)
 9. RAG: Papers advancing retrieval-augmented generation techniques
-10. CODE: Papers about code-related models or programming benchmarks
+10. PLP: Papers about Programming Language Processing models or programming benchmarks
 11. INFERENCE: Papers optimizing model deployment (quantization, pruning, etc.)
 12. 3D: Papers on 3D content generation, processing, or understanding
 13. AUDIO: Papers advancing speech/audio processing or generation
@@ -185,6 +185,7 @@ Categories:
 33. SURVEY: Papers comprehensively reviewing research areas
 34. DIFFUSION: Papers on diffusion-based generative models
 35. ALIGNMENT: Papers about aligning language models with human values, preferences, and intended behavior
+36. STORY_GENERATION: Papers on story generation, including plot generation and author style adaptation
 
 Return only JSON with flat array of categories that match the given text.
 
