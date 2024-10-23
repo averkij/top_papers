@@ -852,7 +852,7 @@ def make_html(data):
 <body class="light-theme">
     <header>
         <div class="container">
-            <h1 class="title-sign" id="doomgrad-icon">🔺</h1><h1 class="title-text" id="doomgrad">hf daily</h1>
+            <h1 class="title-sign" id="doomgrad-icon">🔺</h1><h1 class="title-text" id="doomgrad">{con.TITLE_LIGHT}</h1>
             <p>{data['date']} | {helper.format_subtitle(len(data['papers']))}</p>
         </div>
         <div class="theme-switch">
