@@ -146,53 +146,6 @@ for paper in tqdm(feed["papers"]):
 
         prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
 
-        prompt_cls = (
-            f"""You are an expert classifier of machine learning research papers. Analyze the following research paper text and classify it into one or more relevant categories from the list below. Consider the paper's main contributions, methodologies, and applications.
-
-Categories:
-1. DATASET: Papers that introduce new datasets or make significant modifications to existing ones
-2. DATA: Papers focusing on data processing, cleaning, collection, or curation methodologies
-3. BENCHMARK: Papers proposing or analyzing model evaluation frameworks and benchmarks
-4. AGENTS: Papers exploring autonomous agents, web agents, or agent-based architectures 
-5. NLP: Papers advancing natural language processing techniques or applications
-6. CV: Papers developing computer vision methods or visual processing systems
-7. RL: Papers investigating reinforcement learning theory or applications
-8. RLHF: Papers specifically about human feedback in RL (PPO, DPO, etc.)
-9. RAG: Papers advancing retrieval-augmented generation techniques
-10. PLP: Papers about Programming Language Processing models or programming benchmarks
-11. INFERENCE: Papers optimizing model deployment (quantization, pruning, etc.)
-12. 3D: Papers on 3D content generation, processing, or understanding
-13. AUDIO: Papers advancing speech/audio processing or generation
-14. VIDEO: Papers on video analysis, generation, or understanding
-15. MULTIMODAL: Papers combining multiple input/output modalities
-16. MATH: Papers focused on mathematical theory and algorithms
-17. MULTILINGUAL: Papers addressing multiple languages or cross-lingual capabilities
-18. ARCHITECTURE: Papers proposing novel neural architectures or components
-19. MEDICINE: Papers applying ML to medical/healthcare domains
-20. TRAINING: Papers improving model training or fine-tuning methods
-21. ROBOTICS: Papers on robotic systems and embodied AI
-22. AGI: Papers discussing artificial general intelligence concepts
-23. GAMES: Papers applying ML to games or game development
-24. INTERPRETABILITY: Papers analyzing model behavior and explanations
-25. REASONING: Papers enhancing logical reasoning capabilities
-26. TRANSFER_LEARNING: Papers on knowledge transfer between models/domains
-27. GRAPHS: Papers advancing graph neural networks and applications
-28. ETHICS: Papers addressing AI ethics, fairness, and bias
-29. SECURITY: Papers on model security and adversarial robustness
-30. QUANTUM: Papers combining quantum computing and ML
-31. EDGE_COMPUTING: Papers on ML deployment for resource-constrained devices
-32. OPTIMIZATION: Papers advancing training optimization methods
-33. SURVEY: Papers comprehensively reviewing research areas
-34. DIFFUSION: Papers on diffusion-based generative models
-35. ALIGNMENT: Papers about aligning language models with human values, preferences, and intended behavior
-36. STORY_GENERATION: Papers on story generation, including plot generation and author style adaptation
-
-Return only JSON with flat array of categories that match the given text.
-
-Paper text to classify:\n\n""{abs}"""
-            ""
-        )
-
         try:
             paper["data"] = api.get_json(
                 prompt,
@@ -201,9 +154,7 @@ Paper text to classify:\n\n""{abs}"""
                 model="claude-3-5-sonnet-20240620",
                 temperature=1.0,
             )
-            paper["data"]["categories"] = api.get_json(
-                prompt_cls, api="openai", model="gpt-4o-mini", temperature=0.0
-            )
+            paper["data"]["categories"] = api.get_categories(text=abs)
         except Exception as e:
             paper["data"] = {"error": str(e)}
             log(f"Error getting data: {e}")

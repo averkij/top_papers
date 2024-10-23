@@ -160,3 +160,55 @@ def generate_image_for_paper(paper, img_name):
     img_prompt = get_text(prompt, api="openai", model="gpt-4o-mini", temperature=0.8)
     img_dir = os.path.join(con.IMG_DIR, paper["pub_date"].replace('-', ''))
     generate_and_save_image(name=img_name, img_dir=img_dir, prompt=img_prompt)
+
+
+def get_categories(text):
+    prompt_cls = (
+            f"""You are an expert classifier of machine learning research papers. Analyze the following research paper text and classify it into one or more relevant categories from the list below. Consider the paper's main contributions, methodologies, and applications.
+
+Categories:
+1. DATASET: Papers that introduce new datasets or make significant modifications to existing ones
+2. DATA: Papers focusing on data processing, cleaning, collection, or curation methodologies
+3. BENCHMARK: Papers proposing or analyzing model evaluation frameworks and benchmarks
+4. AGENTS: Papers exploring autonomous agents, web agents, or agent-based architectures
+5. CV: Papers developing computer vision methods or visual processing systems
+6. RL: Papers investigating reinforcement learning theory or applications
+7. RLHF: Papers specifically about human feedback in RL (PPO, DPO, etc.)
+8. RAG: Papers advancing retrieval-augmented generation techniques
+9. PLP: Papers about Programming Language Processing models or programming benchmarks
+10. INFERENCE: Papers optimizing model deployment (quantization, pruning, etc.)
+11. 3D: Papers on 3D content generation, processing, or understanding
+12. AUDIO: Papers advancing speech/audio processing or generation
+13. VIDEO: Papers on video analysis, generation, or understanding
+14. MULTIMODAL: Papers combining multiple input/output modalities
+15. MATH: Papers focused on mathematical theory and algorithms
+16. MULTILINGUAL: Papers addressing multiple languages or cross-lingual capabilities
+17. ARCHITECTURE: Papers proposing novel neural architectures or components
+18. MEDICINE: Papers applying ML to medical/healthcare domains
+19. TRAINING: Papers improving model training or fine-tuning methods
+20. ROBOTICS: Papers on robotic systems and embodied AI
+21. AGI: Papers discussing artificial general intelligence concepts
+22. GAMES: Papers applying ML to games or game development
+23. INTERPRETABILITY: Papers analyzing model behavior and explanations
+24. REASONING: Papers enhancing logical reasoning capabilities
+25. TRANSFER_LEARNING: Papers on knowledge transfer between models/domains
+26. GRAPHS: Papers advancing graph neural networks and applications
+27. ETHICS: Papers addressing AI ethics, fairness, and bias
+28. SECURITY: Papers on model security and adversarial robustness
+29. QUANTUM: Papers combining quantum computing and ML
+30. EDGE_COMPUTING: Papers on ML deployment for resource-constrained devices
+31. OPTIMIZATION: Papers advancing training optimization methods
+32. SURVEY: Papers comprehensively reviewing research areas
+33. DIFFUSION: Papers on diffusion-based generative models
+34. ALIGNMENT: Papers about aligning language models with human values, preferences, and intended behavior
+35. STORY_GENERATION: Papers on story generation, including plot generation and author style adaptation
+36. HALLUCINATION: Papers about the hallucinations in language models, hallucinations analysis and mitigation
+
+Return only JSON with flat array of categories that match the given text.
+
+Paper text to classify:\n\n"{text}"
+"""
+        )    
+    categories = get_json(prompt_cls, api="openai", model="gpt-4o-mini", temperature=0.0)
+
+    return categories
