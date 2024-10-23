@@ -257,7 +257,7 @@ json.dump(
 
 # %%
 def make_html(data):
-    data["papers"] = [x for x in data["papers"] if "error" not in x]
+    data["papers"] = [x for x in data["papers"] if "error" not in x['data']]
     article_classes = ""
     for paper in data["papers"]:
         if paper["score"] >= 20:
