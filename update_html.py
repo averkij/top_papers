@@ -10,7 +10,7 @@ len(prev_papers)
 
 #%%
 def make_html(data):
-    data["papers"] = [x for x in data["papers"] if "error" not in x]
+    data["papers"] = [x for x in data["papers"] if "error" not in x['data']]
     article_classes = ""
     for paper in data["papers"]:
         if paper["score"] >= 20:
@@ -401,22 +401,20 @@ def make_html(data):
         .nav-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 10px;
+            padding: 0 20px;
             display: flex;
-            justify-content: center;
-            gap: 2em;
+            justify-content: left;
+            gap: 3em;
         }
         .nav-container span a {
             color: white;
-        }
-        
+        }        
         .nav-item {
             color: white;
-            padding: 3px 10px;
+            padding: 3px 0px;
             cursor: pointer;
             font-weight: 400;
-        }
-        
+        }        
         .nav-item:hover {
             background-color: rgba(255, 255, 255, 0.1);
             border-color: rgba(255, 255, 255, 0.3);
@@ -436,11 +434,10 @@ def make_html(data):
         @media (max-width: 600px) {
             .nav-container {
                 flex-direction: row;
-                gap: 1em;
-            }
-            
+                gap: 1.5em;
+            }            
             .nav-item {
-                padding: 3px 3px;
+                padding: 3px 0px;
             }
         }
         """
@@ -530,6 +527,15 @@ def make_html(data):
         } else {
             return `${days} ${getRussianPlural(days, timeUnits.day)} назад`;
         }
+    }
+    function isToday(dateString) {
+        const inputDate = new Date(dateString);
+        const today = new Date();
+        return (
+            inputDate.getFullYear() === today.getFullYear() &&
+            inputDate.getMonth() === today.getMonth() &&
+            inputDate.getDate() === today.getDate()
+        );
     }
     function formatArticlesTitle(number) {
         const lastDigit = number % 10;
@@ -858,6 +864,14 @@ def make_html(data):
         function updateTimeDiffs() {{
             const timeDiff = document.getElementById('timeDiff');
             timeDiff.innerHTML = '🔄 ' + getTimeDiffRu('{data["time_utc"]}');
+        }} 
+        function hideNextLink() {{
+            if (isToday('{data["time_utc"]}')) {{
+                const element = document.getElementById('nav-next');
+                if (element) {{    
+                    element.style.display = 'none';
+                }}
+            }}
         }}
 
         loadSettings();
@@ -865,7 +879,8 @@ def make_html(data):
         loadCategorySelection();
         filterAndRenderArticles();
         updateSelectedArticlesTitle();
-        updateTimeDiffs();  
+        updateTimeDiffs();
+        hideNextLink(); 
     </script>
 </body>
 </html>
