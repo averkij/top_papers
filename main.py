@@ -298,6 +298,7 @@ def make_html(data):
             --text-color: #333333;
             --header-color: #0989eacf;
             --body-color: #f5f5f5;
+            --menu-color: #002370;
         }
         body {
             font-family: 'Roboto Slab', sans-serif;
@@ -312,7 +313,7 @@ def make_html(data):
             padding: 0 20px;
         }
         header {
-            padding: 1.6em 0;
+            padding: 3em 0;
             text-align: center;
         }
         h1 {
@@ -625,17 +626,66 @@ def make_html(data):
             position: relative;
             overflow: hidden;
         }
-
         .svg-container span {
             position: relative;
             z-index: 1;
         }
-
         .svg-container svg {
             position: absolute;
             bottom: 0;
             left: 0;
             z-index: 0;
+        }
+
+        .nav-menu {
+            background-color: var(--menu-color);
+            padding: 2px 0 2px 0;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: left;
+            gap: 3em;
+        }
+        .nav-container span a {
+            color: white;
+        }        
+        .nav-item {
+            color: white;
+            padding: 3px 0px;
+            cursor: pointer;
+            font-weight: 400;
+        }        
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .dark-theme .nav-menu {
+            background-color: #333;
+        }
+        .dark-theme .nav-item {
+            color: white;
+        }
+        
+        .dark-theme .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        @media (max-width: 600px) {
+            .nav-container {
+                flex-direction: row;
+                gap: 1.5em;
+            }            
+            .nav-item {
+                padding: 3px 0px;
+            }
         }
         """
         + article_classes
@@ -725,6 +775,15 @@ def make_html(data):
             return `${days} ${getRussianPlural(days, timeUnits.day)} назад`;
         }
     }
+    function isToday(dateString) {
+        const inputDate = new Date(dateString);
+        const today = new Date();
+        return (
+            inputDate.getFullYear() === today.getFullYear() &&
+            inputDate.getMonth() === today.getMonth() &&
+            inputDate.getDate() === today.getDate()
+        );
+    }
     function formatArticlesTitle(number) {
         const lastDigit = number % 10;
         const lastTwoDigits = number % 100;
@@ -761,6 +820,14 @@ def make_html(data):
             </label>
         </div>
     </header>
+    <div class="nav-menu">
+        <div class="nav-container">
+            <span class="nav-item" id="nav-prev"><a href="/d/{feed['link_prev']}">⬅️ {feed['short_date_prev']}</a></span>
+            <span class="nav-item" id="nav-next"><a href="/d/{feed['link_next']}">➡️ {feed['short_date_next']}</a></span>
+            <!--<span class="nav-item" id="nav-weekly">Топ за неделю</span>
+            <span class="nav-item" id="nav-weekly">Топ за месяц</span>-->
+        </div>
+    </div>
     <div class="container">
         <div class="sub-header-container">
             <div class="update-info-container">
@@ -1045,13 +1112,22 @@ def make_html(data):
             const timeDiff = document.getElementById('timeDiff');
             timeDiff.innerHTML = '🔄 ' + getTimeDiffRu('{data["time_utc"]}');
         }} 
+        function hideNextLink() {{
+            if (isToday('{data["time_utc"]}')) {{
+                const element = document.getElementById('nav-next');
+                if (element) {{    
+                    element.style.display = 'none';
+                }}
+            }}
+        }}
 
         loadSettings();
         createCategoryButtons();
         loadCategorySelection();
         filterAndRenderArticles();
         updateSelectedArticlesTitle();
-        updateTimeDiffs();  
+        updateTimeDiffs();
+        hideNextLink(); 
     </script>
 </body>
 </html>
