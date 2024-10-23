@@ -1,5 +1,5 @@
-TITLE_LIGHT = "хф дэйли"
-TITLE_DARK = "хф найтли"
+TITLE_LIGHT = "hf daily"
+TITLE_DARK = "hf nightly"
 
 DATA_FILE = "hf_papers.json"
 PAGE_FILE = "index.html"
