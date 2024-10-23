@@ -98,7 +98,14 @@ def get_week_info(date):
     return weekday, feed_date, prev_feed_date, next_feed_date
 
 weekday, feed_date, prev_feed_date, next_feed_date = get_week_info(helper.CURRENT_DATE)
+
 formatted_date = format_date(feed_date, format="d MMMM", locale="ru_RU")
+formatted_date_en = format_date(feed_date, format="d MMMM", locale="en_US")
+formatted_date_prev = format_date(prev_feed_date, format="d MMMM", locale="ru_RU")
+formatted_date_next = format_date(next_feed_date, format="d MMMM", locale="ru_RU")
+short_date_prev = prev_feed_date.strftime('%d.%m')
+short_date_next = next_feed_date.strftime('%d.%m')
+
 formatted_time_utc = helper.CURRENT_DATE.strftime("%Y-%m-%d %H:%M")
 
 link_prev = f"{prev_feed_date.strftime('%Y-%m-%d')}.html"
@@ -106,6 +113,7 @@ link_next = f"{next_feed_date.strftime('%Y-%m-%d')}.html"
 
 feed = {
     "date": formatted_date,
+    "date_en": formatted_date_en,
     "time_utc": formatted_time_utc,
     "weekday": weekday,
     "issue_id": _issue_id + 1,
@@ -113,6 +121,10 @@ feed = {
     "papers": papers,
     "link_prev": link_prev,
     "link_next": link_next,
+    "date_prev": formatted_date_prev,
+    "date_next": formatted_date_next,
+    "short_date_prev": short_date_prev,
+    "short_date_next": short_date_next,
 }
 
 for i, paper in enumerate(feed["papers"]):
