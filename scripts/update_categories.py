@@ -3,6 +3,7 @@ from glob import glob
 import helper
 import constants as con
 import api
+import json
 
 prev_papers = glob('./d/*.json')
 
@@ -54,4 +55,20 @@ for doc in prev_papers:
     )
 
     
+# %%
+#add hashes
+
+for doc in prev_papers:
+    with open(doc, "r", encoding="utf-8") as fin:
+        feed = json.load(fin)
+
+        for paper in feed["papers"]:
+            paper['hash'] = helper.get_hash(paper['url'])
+
+    json.dump(
+        feed,
+        open(doc, "w", encoding="utf-8"),
+        ensure_ascii=False,
+        indent=4,
+    )
 # %%

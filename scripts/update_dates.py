@@ -4,7 +4,7 @@ from babel.dates import format_date
 import json
 from datetime import datetime, timezone, timedelta
 
-prev_papers = glob('../d/*.json')
+prev_papers = glob('./d/*.json')
 
 len(prev_papers)
 
@@ -37,7 +37,9 @@ for doc in prev_papers:
     with open(doc, "r", encoding="utf-8") as fin:
         feed = json.load(fin)
 
-        weekday, feed_date, prev_feed_date, next_feed_date = get_week_info(CURRENT_DATE)
+        feed_date_str = f"{doc[4:14]} 20:26"    
+        feed_date = datetime.strptime(feed_date_str, "%Y-%m-%d %H:%M")
+        weekday, feed_date, prev_feed_date, next_feed_date = get_week_info(feed_date)
 
         formatted_date = format_date(feed_date, format="d MMMM", locale="ru_RU")
         formatted_date_en = format_date(feed_date, format="d MMMM", locale="en_US")
