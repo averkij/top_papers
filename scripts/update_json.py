@@ -72,3 +72,18 @@ for doc in prev_papers:
         indent=4,
     )
 # %%
+# add counted categories
+
+for doc in prev_papers:
+    with open(doc, "r", encoding="utf-8") as fin:
+        feed = json.load(fin)
+
+        feed["categories"] = helper.counted_cats(feed["papers"])
+
+    json.dump(
+        feed,
+        open(doc, "w", encoding="utf-8"),
+        ensure_ascii=False,
+        indent=4,
+    )
+# %%
