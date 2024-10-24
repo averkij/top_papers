@@ -126,7 +126,7 @@ feed = {
     "date_prev": formatted_date_prev,
     "date_next": formatted_date_next,
     "short_date_prev": short_date_prev,
-    "short_date_next": short_date_next,
+    "short_date_next": short_date_next
 }
 
 for i, paper in enumerate(feed["papers"]):
@@ -190,6 +190,8 @@ for paper in tqdm(feed["papers"]):
             f"#{x.replace('#','')}".lower() for x in paper["data"]["categories"]
         ]
 
+#count presented categories
+feed["categories"] = helper.counted_cats(feed["papers"])
 
 # all_abstracts = "\n\n".join([x["abstract"] for x in feed["papers"]])
 # intro_prompt = f"You are the editor of a machine learning journal. You have a set of abstract articles. Write an introduction to the journal about what awaits the reader in this issue. Write in Russian. Abstracts:\n\n{all_abstracts}"
@@ -272,6 +274,8 @@ def make_html(data):
             article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]} {{ background: url("https://hfday.ru/img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: hue !important; background-color: rgba(60,60,60,0.9) !important; }}\n'
 
             article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(60,60,60,0.92) !important;}}\n'
+
+    cats_html = sorted([f"{k} ({v})" if v else k for k,v in data['categories'].items()])
 
     html = """
 <!DOCTYPE html>
@@ -588,6 +592,11 @@ def make_html(data):
             margin-top: 20px;
             margin-bottom: 20px;
             text-align: center;
+            display: none;
+        }
+        .category-filters.expanded {
+                display: block;
+                margin-top: 10px;
         }
         .category-button {
             display: inline-block;
@@ -603,6 +612,9 @@ def make_html(data):
             background-color: var(--primary-color);
             color: white;
         }
+        .category-button.inactive:not(.active) {
+            color: #ccc;
+        }
         .dark-theme .category-button {
             background-color: #555;
             color: #fff;
@@ -611,7 +623,7 @@ def make_html(data):
             background-color: var(--primary-color);
         }
         .category-toggle {
-            display: none;
+            display: inline-block;
             margin-bottom: 10px;
             margin-top: 15px;
             cursor: pointer;
@@ -852,7 +864,7 @@ def make_html(data):
         </div>
         <div class="category-toggle">
             <div class="svg-container">
-                <span id="category-toggle">🔍 Фильтр</span>
+                <span id="category-toggle">🏷️ Фильтр</span>
                 <svg height="3" width="200">
                     <line x1="0" y1="0" x2="200" y2="0" 
                         stroke="black" 
@@ -960,14 +972,21 @@ def make_html(data):
             res.sort();
             return res;
         }}
-        
+
         function createCategoryButtons() {{
-            const categories = getUniqueCategories(articlesData);
+            //const categories = getUniqueCategories(articlesData);
+            const categories = {cats_html};
+
             categories.forEach(category => {{
+                let catNameSplitted = category.split(/(\s+)/);
+                let catName = catNameSplitted[0];
                 const button = document.createElement('span');
-                button.textContent = category;
+                button.textContent = catName;
                 button.className = 'category-button';
-                button.onclick = () => toggleCategory(category, button);
+                if (catNameSplitted.length < 2) {{
+                    button.classList.add('inactive');
+                }};
+                button.onclick = () => toggleCategory(catName, button);
                 categoryFiltersContainer.appendChild(button);
             }});
         }}
@@ -992,7 +1011,7 @@ def make_html(data):
         }}
 
         function updateSelectedArticlesTitle() {{
-            if (selectedArticles.length === articlesData.length) {{
+            if ((selectedArticles.length === articlesData.length) & (selectedCategories.length === 0)) {{
                 categoryToggle.textContent = '🏷️ Фильтр';
             }} else {{
                 categoryToggle.textContent = `🏷️ Фильтр (${{formatArticlesTitle(selectedArticles.length)}})`;
@@ -1039,13 +1058,15 @@ def make_html(data):
 
             console.log('filteredArticles', filteredArticles)
 
-            if (filteredArticles.length === 0) {{
-                selectedArticles = articlesData;
-                selectedCategories = [];
-                cleanCategorySelection();
-            }} else {{
-                selectedArticles = filteredArticles;
-            }}
+            //if (filteredArticles.length === 0) {{
+            //    selectedArticles = articlesData;
+            //    selectedCategories = [];
+            //    cleanCategorySelection();
+            //}} else {{
+            //    selectedArticles = filteredArticles;
+            //}}
+
+            selectedArticles = filteredArticles;
 
             console.log('selectedArticles', selectedArticles)
 
