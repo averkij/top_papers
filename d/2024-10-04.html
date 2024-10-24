@@ -308,6 +308,11 @@
             margin-top: 20px;
             margin-bottom: 20px;
             text-align: center;
+            display: none;
+        }
+        .category-filters.expanded {
+                display: block;
+                margin-top: 10px;
         }
         .category-button {
             display: inline-block;
@@ -323,6 +328,9 @@
             background-color: var(--primary-color);
             color: white;
         }
+        .category-button.inactive:not(.active) {
+            color: #ccc;
+        }
         .dark-theme .category-button {
             background-color: #555;
             color: #fff;
@@ -331,7 +339,7 @@
             background-color: var(--primary-color);
         }
         .category-toggle {
-            display: none;
+            display: inline-block;
             margin-bottom: 10px;
             margin-top: 15px;
             cursor: pointer;
@@ -571,7 +579,7 @@ body.dark-theme>div>main>article.x2e806ebbdf3cc22d:hover { background-color: rgb
         </div>
         <div class="category-toggle">
             <div class="svg-container">
-                <span id="category-toggle">🔍 Фильтр</span>
+                <span id="category-toggle">🏷️ Фильтр</span>
                 <svg height="3" width="200">
                     <line x1="0" y1="0" x2="200" y2="0" 
                         stroke="black" 
@@ -679,14 +687,21 @@ body.dark-theme>div>main>article.x2e806ebbdf3cc22d:hover { background-color: rgb
             res.sort();
             return res;
         }
-        
+
         function createCategoryButtons() {
-            const categories = getUniqueCategories(articlesData);
+            //const categories = getUniqueCategories(articlesData);
+            const categories = ['#3d (1)', '#agents (2)', '#agi', '#alignment (1)', '#architecture (4)', '#audio', '#benchmark (2)', '#cv (1)', '#data', '#dataset (2)', '#diffusion (1)', '#edge_computing', '#ethics', '#games', '#graphs', '#hallucination', '#inference (3)', '#interpretability (1)', '#math (2)', '#medicine (2)', '#multilingual', '#multimodal (4)', '#optimization (3)', '#plp (2)', '#quantum', '#rag', '#reasoning (1)', '#rl (2)', '#rlhf (1)', '#robotics (1)', '#robots', '#security', '#story_generation', '#survey (1)', '#training (2)', '#transfer_learning (1)', '#video'];
+
             categories.forEach(category => {
+                let catNameSplitted = category.split(/(\s+)/);
+                let catName = catNameSplitted[0];
                 const button = document.createElement('span');
-                button.textContent = category;
+                button.textContent = catName;
                 button.className = 'category-button';
-                button.onclick = () => toggleCategory(category, button);
+                if (catNameSplitted.length < 2) {
+                    button.classList.add('inactive');
+                };
+                button.onclick = () => toggleCategory(catName, button);
                 categoryFiltersContainer.appendChild(button);
             });
         }
@@ -711,7 +726,7 @@ body.dark-theme>div>main>article.x2e806ebbdf3cc22d:hover { background-color: rgb
         }
 
         function updateSelectedArticlesTitle() {
-            if (selectedArticles.length === articlesData.length) {
+            if ((selectedArticles.length === articlesData.length) & (selectedCategories.length === 0)) {
                 categoryToggle.textContent = '🏷️ Фильтр';
             } else {
                 categoryToggle.textContent = `🏷️ Фильтр (${formatArticlesTitle(selectedArticles.length)})`;
@@ -758,13 +773,15 @@ body.dark-theme>div>main>article.x2e806ebbdf3cc22d:hover { background-color: rgb
 
             console.log('filteredArticles', filteredArticles)
 
-            if (filteredArticles.length === 0) {
-                selectedArticles = articlesData;
-                selectedCategories = [];
-                cleanCategorySelection();
-            } else {
-                selectedArticles = filteredArticles;
-            }
+            //if (filteredArticles.length === 0) {
+            //    selectedArticles = articlesData;
+            //    selectedCategories = [];
+            //    cleanCategorySelection();
+            //} else {
+            //    selectedArticles = filteredArticles;
+            //}
+
+            selectedArticles = filteredArticles;
 
             console.log('selectedArticles', selectedArticles)
 
