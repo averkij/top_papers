@@ -15,6 +15,8 @@ CURRENT_DATE = datetime.now(timezone.utc)
 
 from bs4 import BeautifulSoup
 
+from copy import copy
+
 
 def init():
     Path(con.LOG_DIR).mkdir(exist_ok=True)
@@ -151,3 +153,20 @@ def if_paper_image_exists(paper):
         con.IMG_DIR, paper["pub_date"].replace("-", ""), f"{paper['hash']}.jpg"
     )
     return os.path.isfile(img_path)
+
+
+def counted_cats(papers):
+    cats = copy(con.CATEGORIES)
+    for paper in papers:
+        if "categories" in paper["data"]:
+            for c in paper["data"]["categories"]:
+                if c not in cats:
+                    cats[c] = 0
+                else:
+                    cats[c] += 1
+    return cats
+
+
+# def make_cats_for_page(papers):
+#     cats = counted_cats(papers)
+
