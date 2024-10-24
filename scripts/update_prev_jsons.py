@@ -1,14 +1,15 @@
-#%%
+# %%
 from glob import glob
 from babel.dates import format_date
 import helper
 import constants as con
 
-prev_papers = glob('./prev_papers/*.json')
+prev_papers = glob("./prev_papers/*.json")
 
 len(prev_papers)
 
-#%%
+
+# %%
 def make_html(data):
     data["papers"] = [x for x in data["papers"] if "error" not in x]
     article_classes = ""
@@ -808,9 +809,12 @@ def make_html(data):
 </html>
     """
     return html
+
+
 # %%
 import json
 from datetime import datetime, timezone, timedelta
+
 
 def get_week_info(date):
     weekday = date.weekday()
@@ -818,21 +822,22 @@ def get_week_info(date):
     prev_feed_date = feed_date - timedelta(1)
     next_feed_date = feed_date + timedelta(1)
 
-    #HF Daily don't have updates on weekend
-    if weekday == 0: #Monday
+    # HF Daily don't have updates on weekend
+    if weekday == 0:  # Monday
         prev_feed_date = prev_feed_date - timedelta(2)
-    if weekday == 4: #Friday
+    if weekday == 4:  # Friday
         next_feed_date = next_feed_date + timedelta(2)
-    if weekday == 5: #Saturday
+    if weekday == 5:  # Saturday
         weekday = 4
         feed_date = feed_date - timedelta(1)
         prev_feed_date = prev_feed_date - timedelta(1)
         next_feed_date = next_feed_date + timedelta(1)
-    elif weekday == 6: #Sunday
+    elif weekday == 6:  # Sunday
         weekday = 4
         feed_date = feed_date - timedelta(2)
         prev_feed_date = prev_feed_date - timedelta(2)
     return weekday, feed_date, prev_feed_date, next_feed_date
+
 
 for doc in prev_papers:
     with open(doc, "r", encoding="utf-8") as fin:
@@ -840,7 +845,9 @@ for doc in prev_papers:
         feed_old_date_str = f"{doc[14:24]} 20:26"
         feed_old_date = datetime.strptime(feed_old_date_str, "%Y-%m-%d %H:%M")
 
-        weekday, feed_date, prev_feed_date, next_feed_date = get_week_info(feed_old_date)
+        weekday, feed_date, prev_feed_date, next_feed_date = get_week_info(
+            feed_old_date
+        )
         formatted_date = format_date(feed_date, format="d MMMM", locale="ru_RU")
 
         link_prev = f"{prev_feed_date.strftime('%Y-%m-%d')}.html"
@@ -863,7 +870,7 @@ for doc in prev_papers:
 
         json.dump(
             feed,
-            open(f'./d/{feed_new_date_str}.json', "w", encoding="utf-8"),
+            open(f"./d/{feed_new_date_str}.json", "w", encoding="utf-8"),
             ensure_ascii=False,
             indent=4,
         )
@@ -874,7 +881,7 @@ for doc in prev_papers:
 
         html_index = make_html(feed)
 
-        with open(f'./d/{feed_new_date_str}.html', 'w', encoding="utf-8") as fout:
+        with open(f"./d/{feed_new_date_str}.html", "w", encoding="utf-8") as fout:
             fout.write(html_index)
 
     # break

@@ -1,14 +1,15 @@
-#%%
+# %%
 from glob import glob
 from babel.dates import format_date
 import json
 from datetime import datetime, timezone, timedelta
 
-prev_papers = glob('./d/*.json')
+prev_papers = glob("./d/*.json")
 
 len(prev_papers)
 
 CURRENT_DATE = datetime.now(timezone.utc)
+
 
 # %%
 def get_week_info(date):
@@ -17,36 +18,41 @@ def get_week_info(date):
     prev_feed_date = feed_date - timedelta(1)
     next_feed_date = feed_date + timedelta(1)
 
-    #HF Daily don't have updates on weekend
-    if weekday == 0: #Monday
+    # HF Daily don't have updates on weekend
+    if weekday == 0:  # Monday
         prev_feed_date = prev_feed_date - timedelta(2)
-    if weekday == 4: #Friday
+    if weekday == 4:  # Friday
         next_feed_date = next_feed_date + timedelta(2)
-    if weekday == 5: #Saturday
+    if weekday == 5:  # Saturday
         weekday = 4
         feed_date = feed_date - timedelta(1)
         prev_feed_date = prev_feed_date - timedelta(1)
         next_feed_date = next_feed_date + timedelta(1)
-    elif weekday == 6: #Sunday
+    elif weekday == 6:  # Sunday
         weekday = 4
         feed_date = feed_date - timedelta(2)
         prev_feed_date = prev_feed_date - timedelta(2)
     return weekday, feed_date, prev_feed_date, next_feed_date
 
+
 for doc in prev_papers:
     with open(doc, "r", encoding="utf-8") as fin:
         feed = json.load(fin)
 
-        feed_date_str = f"{doc[4:14]} 20:26"    
+        feed_date_str = f"{doc[4:14]} 20:26"
         feed_date = datetime.strptime(feed_date_str, "%Y-%m-%d %H:%M")
         weekday, feed_date, prev_feed_date, next_feed_date = get_week_info(feed_date)
 
         formatted_date = format_date(feed_date, format="d MMMM", locale="ru_RU")
         formatted_date_en = format_date(feed_date, format="d MMMM", locale="en_US")
-        formatted_date_prev = format_date(prev_feed_date, format="d MMMM", locale="ru_RU")
-        formatted_date_next = format_date(next_feed_date, format="d MMMM", locale="ru_RU")
-        short_date_prev = prev_feed_date.strftime('%d.%m')
-        short_date_next = next_feed_date.strftime('%d.%m')
+        formatted_date_prev = format_date(
+            prev_feed_date, format="d MMMM", locale="ru_RU"
+        )
+        formatted_date_next = format_date(
+            next_feed_date, format="d MMMM", locale="ru_RU"
+        )
+        short_date_prev = prev_feed_date.strftime("%d.%m")
+        short_date_next = next_feed_date.strftime("%d.%m")
 
         feed["date_en"] = formatted_date_en
         feed["date_prev"] = formatted_date_prev

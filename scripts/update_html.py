@@ -1,16 +1,17 @@
-#%%
+# %%
 from glob import glob
 from babel.dates import format_date
 import helper
 import constants as con
 
-prev_papers = glob('./d/*.json')
+prev_papers = glob("./d/*.json")
 
 len(prev_papers)
 
-#%%
+
+# %%
 def make_html(data):
-    data["papers"] = [x for x in data["papers"] if "error" not in x['data']]
+    data["papers"] = [x for x in data["papers"] if "error" not in x["data"]]
     article_classes = ""
     for paper in data["papers"]:
         if paper["score"] >= 20:
@@ -64,6 +65,10 @@ def make_html(data):
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
+        }
+        .a-clean {
+            color: var(--secondary-color);
+            text-decoration: none;
         }
         header {
             padding: 3em 0;
@@ -563,7 +568,7 @@ def make_html(data):
 <body class="light-theme">
     <header>
         <div class="container">
-            <h1 class="title-sign" id="doomgrad-icon">🔺</h1><h1 class="title-text" id="doomgrad">{con.TITLE_LIGHT}</h1>
+            <a href="https://hfday.ru" class="a-clean"><h1 class="title-sign" id="doomgrad-icon">🔺</h1><h1 class="title-text" id="doomgrad">{con.TITLE_LIGHT}</h1></a>
             <p>{data['date']} | {helper.format_subtitle(len(data['papers']))}</p>
         </div>
         <div class="theme-switch">
@@ -897,15 +902,12 @@ for doc in prev_papers:
 
         html_index = make_html(feed)
 
-    html_path = doc.replace('json', 'html')
+    html_path = doc.replace("json", "html")
 
     with open(html_path, "w", encoding="utf-8") as fout:
         fout.write(html_index)
 
     # break
-
-
-
 
 
 # %%

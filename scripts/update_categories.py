@@ -1,11 +1,11 @@
-#%%
+# %%
 from glob import glob
 import helper
 import constants as con
 import api
 import json
 
-prev_papers = glob('./d/*.json')
+prev_papers = glob("./d/*.json")
 
 len(prev_papers)
 
@@ -54,16 +54,16 @@ for doc in prev_papers:
         indent=4,
     )
 
-    
+
 # %%
-#add hashes
+# add hashes
 
 for doc in prev_papers:
     with open(doc, "r", encoding="utf-8") as fin:
         feed = json.load(fin)
 
         for paper in feed["papers"]:
-            paper['hash'] = helper.get_hash(paper['url'])
+            paper["hash"] = helper.get_hash(paper["url"])
 
     json.dump(
         feed,

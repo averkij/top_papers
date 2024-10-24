@@ -74,28 +74,30 @@ for article in tqdm(articles):
         }
     )
 
-#%%
+
+# %%
 def get_week_info(date):
     weekday = date.weekday()
     feed_date = date
     prev_feed_date = feed_date - timedelta(1)
     next_feed_date = feed_date + timedelta(1)
 
-    #HF Daily don't have updates on weekend
-    if weekday == 0: #Monday
+    # HF Daily don't have updates on weekend
+    if weekday == 0:  # Monday
         prev_feed_date = prev_feed_date - timedelta(2)
-    if weekday == 4: #Friday
+    if weekday == 4:  # Friday
         next_feed_date = next_feed_date + timedelta(2)
-    if weekday == 5: #Saturday
+    if weekday == 5:  # Saturday
         weekday = 4
         feed_date = feed_date - timedelta(1)
         prev_feed_date = prev_feed_date - timedelta(1)
         next_feed_date = next_feed_date + timedelta(1)
-    elif weekday == 6: #Sunday
+    elif weekday == 6:  # Sunday
         weekday = 4
         feed_date = feed_date - timedelta(2)
         prev_feed_date = prev_feed_date - timedelta(2)
     return weekday, feed_date, prev_feed_date, next_feed_date
+
 
 weekday, feed_date, prev_feed_date, next_feed_date = get_week_info(helper.CURRENT_DATE)
 
@@ -103,8 +105,8 @@ formatted_date = format_date(feed_date, format="d MMMM", locale="ru_RU")
 formatted_date_en = format_date(feed_date, format="d MMMM", locale="en_US")
 formatted_date_prev = format_date(prev_feed_date, format="d MMMM", locale="ru_RU")
 formatted_date_next = format_date(next_feed_date, format="d MMMM", locale="ru_RU")
-short_date_prev = prev_feed_date.strftime('%d.%m')
-short_date_next = next_feed_date.strftime('%d.%m')
+short_date_prev = prev_feed_date.strftime("%d.%m")
+short_date_next = next_feed_date.strftime("%d.%m")
 
 formatted_time_utc = helper.CURRENT_DATE.strftime("%Y-%m-%d %H:%M")
 
@@ -244,7 +246,9 @@ except Exception as e:
     log(f"Failed to get Chinese text: {e}")
 
 log("Renaming data file.")
-helper.try_rename_file(con.DATA_FILE, con.DATA_DIR, helper.add_date_to_name(name=".json", date=feed_date))
+helper.try_rename_file(
+    con.DATA_FILE, con.DATA_DIR, helper.add_date_to_name(name=".json", date=feed_date)
+)
 
 log("Saving new data file.")
 json.dump(
@@ -257,7 +261,7 @@ json.dump(
 
 # %%
 def make_html(data):
-    data["papers"] = [x for x in data["papers"] if "error" not in x['data']]
+    data["papers"] = [x for x in data["papers"] if "error" not in x["data"]]
     article_classes = ""
     for paper in data["papers"]:
         if paper["score"] >= 20:
@@ -1292,12 +1296,16 @@ log("Generating page.")
 html_index = make_html(feed)
 
 log("Renaming previous page.")
-helper.try_rename_file(con.PAGE_FILE, con.DATA_DIR, helper.add_date_to_name(name=".html", date=feed_date))
+helper.try_rename_file(
+    con.PAGE_FILE, con.DATA_DIR, helper.add_date_to_name(name=".html", date=feed_date)
+)
 
 log("[Experimental] Generating Chinese page for reading.")
 html_zh = make_html_zh(feed)
 log("Renaming previous Chinese page.")
-helper.try_rename_file("zh.html", con.DATA_DIR, helper.add_date_to_name("_zh_reading_task.html"))
+helper.try_rename_file(
+    "zh.html", con.DATA_DIR, helper.add_date_to_name("_zh_reading_task.html")
+)
 
 log("Writing result.")
 with open(con.PAGE_FILE, "w", encoding="utf-8") as f:
@@ -1308,7 +1316,11 @@ with open("zh.html", "w", encoding="utf-8") as f:
     f.write(html_zh)
 
 log("Renaming log file.")
-helper.try_rename_file(con.LOG_FILE, con.LOG_DIR, helper.add_date_to_name("_last_log.txt", helper.CURRENT_DATE))
+helper.try_rename_file(
+    con.LOG_FILE,
+    con.LOG_DIR,
+    helper.add_date_to_name("_last_log.txt", helper.CURRENT_DATE),
+)
 
 for paper in feed["papers"]:
     if paper["score"] >= 20:
