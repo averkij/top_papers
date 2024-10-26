@@ -502,7 +502,7 @@ def make_html(data):
             transition: color 0.3s ease;
         }
         a:hover {
-            color: var(--secondary-color);
+            color: #e73838;
         }
         footer {
             background-color: var(--primary-color);
