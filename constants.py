@@ -70,5 +70,6 @@ CATEGORIES = {
     '#diffusion': 0,
     '#alignment': 0,
     '#story_generation': 0,
-    '#hallucination': 0
+    '#hallucinations': 0,
+    '#long_context': 0
 }

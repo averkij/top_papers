@@ -3,6 +3,7 @@ import json
 import os
 import re
 from pathlib import Path
+from typing import Type
 
 import anthropic
 import fal_client
@@ -10,6 +11,7 @@ import numpy as np
 import openai
 import requests
 from PIL import Image
+from pydantic import BaseModel
 
 import constants as con
 from helper import log
@@ -22,6 +24,11 @@ MISTRAL_KEY = os.getenv("MISTRAL_KEY")
 openai.api_key = os.getenv("OPENAI_KEY")
 
 
+class ArticleEn(BaseModel):
+    desc: str
+    title: str
+
+
 def get_json(prompt, api, model, temperature, system_prompt="You are a helpful assistant."):
     text = get_text(prompt=prompt, system_prompt=system_prompt, api=api, model=model, temperature=temperature)
     text = re.sub(r'```json|```', '', text).strip()
@@ -31,6 +38,32 @@ def get_json(prompt, api, model, temperature, system_prompt="You are a helpful a
         log(f"Error. Failed to parse JSON from LLM. {text}")
         doc = {"error": "Parsing error", "raw_data": text}
     return doc
+
+
+def get_structured(prompt, cls, model, temperature, system_prompt="You are a helpful assistant."):
+    obj = cls()
+    resp = ''
+    # try:
+    completion = openai.beta.chat.completions.parse(
+        model=model,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt}
+        ],
+        response_format=cls,
+        max_tokens=1024,
+        temperature=temperature
+    )
+    resp = completion.choices[0].message
+    if resp.parsed:
+        log(f"Response: {resp}")
+        obj = resp.parsed
+    elif resp.refusal:
+        log(f"Error. Refused. Failed to parse JSON. Response: {resp}")
+    # except Exception as e:
+    #     log(f"Error. Failed to parse JSON. Response: {resp}")
+
+    return obj
 
 
 def get_text(prompt, api, model, temperature=0.5, system_prompt="You are a helpful assistant."):
@@ -195,14 +228,14 @@ Categories:
 26. GRAPHS: Papers advancing graph neural networks and applications
 27. ETHICS: Papers addressing AI ethics, fairness, and bias
 28. SECURITY: Papers on model security and adversarial robustness
-29. QUANTUM: Papers combining quantum computing and ML
-30. EDGE_COMPUTING: Papers on ML deployment for resource-constrained devices
-31. OPTIMIZATION: Papers advancing training optimization methods
-32. SURVEY: Papers comprehensively reviewing research areas
-33. DIFFUSION: Papers on diffusion-based generative models
-34. ALIGNMENT: Papers about aligning language models with human values, preferences, and intended behavior
-35. STORY_GENERATION: Papers on story generation, including plot generation and author style adaptation
-36. HALLUCINATION: Papers about the hallucinations in language models, hallucinations analysis and mitigation
+29. EDGE_COMPUTING: Papers on ML deployment for resource-constrained devices
+30. OPTIMIZATION: Papers advancing training optimization methods
+31. SURVEY: Papers comprehensively reviewing research areas
+32. DIFFUSION: Papers on diffusion-based generative models
+33. ALIGNMENT: Papers about aligning language models with human values, preferences, and intended behavior
+34. STORY_GENERATION: Papers on story generation, including plot generation and author style adaptation
+35. HALLUCINATIONS: Papers about the hallucinations, hallucinations analysis and mitigation
+36. LONG_CONTEXT: Papers about long context handling, including techniques to extend context length and process long sequences.
 
 Return only JSON with flat array of categories that match the given text.
 
