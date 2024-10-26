@@ -126,7 +126,7 @@ feed = {
     "date_prev": formatted_date_prev,
     "date_next": formatted_date_next,
     "short_date_prev": short_date_prev,
-    "short_date_next": short_date_next
+    "short_date_next": short_date_next,
 }
 
 for i, paper in enumerate(feed["papers"]):
@@ -157,8 +157,13 @@ for paper in tqdm(feed["papers"]):
         abs = paper["abstract"][:3000]
 
         system_prompt = "You are explaining concepts in simple words in good and native Russian. But you are using English terms like LLM and AI instead of Russian when appropriate."
-
         prompt = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.\n\n{abs}"
+
+        system_prompt_en = "You are explaining concepts in simple words."
+        prompt_en = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper (4 sentences), use correct machine learning terms. 'title': a slogan of a main idea of the article. Return only JSON and nothing else.\n\n{abs}"
+
+        system_prompt_zh = "You are explaining concepts in simple words in Chinese."
+        prompt_zh = f"Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Chinese (4 sentences), use correct machine learning terms. 'title': a slogan of a main idea of the article in Chinese. Return only JSON and nothing else.\n\n{abs}"
 
         try:
             paper["data"] = api.get_json(
@@ -168,14 +173,40 @@ for paper in tqdm(feed["papers"]):
                 model="claude-3-5-sonnet-20240620",
                 temperature=1.0,
             )
-            paper["data"]["categories"] = api.get_categories(text=abs)
+            if not "error" in paper["data"]:
+                # classification
+                paper["data"]["categories"] = api.get_categories(text=abs)
+
+                # add English desc
+                paper["data_en"] = api.get_structured(
+                    prompt=prompt_en,
+                    system_prompt=system_prompt_en,
+                    cls=api.Article,
+                    temperature=0,
+                    model="gpt-4o-mini",
+                )
+                # add Chinese desc
+                paper["data_zh"] = api.get_structured(
+                    prompt=prompt_zh,
+                    system_prompt=system_prompt_zh,
+                    cls=api.Article,
+                    temperature=0,
+                    model="gpt-4o-mini",
+                )
+
+                #TODO: add fallback
+
+                #rearrange localized data
+                paper["data"] = helper.rearrange_data(paper)
+                paper.pop('data_en', None)
+                paper.pop('data_zh', None)
         except Exception as e:
             paper["data"] = {"error": str(e)}
             log(f"Error getting data: {e}")
 
         # add embedding
-        log("Get embedding for a paper via LLM API.")
-        paper["data"]["embedding"] = api.get_embedding(paper["abstract"][:6000])
+        # log("Get embedding for a paper via LLM API.")
+        # paper["data"]["embedding"] = api.get_embedding(paper["abstract"][:6000])
 
     # fix categories
     if "categories" in paper["data"]:
@@ -190,7 +221,7 @@ for paper in tqdm(feed["papers"]):
             f"#{x.replace('#','')}".lower() for x in paper["data"]["categories"]
         ]
 
-#count presented categories
+# count presented categories
 feed["categories"] = helper.counted_cats(feed["papers"])
 
 # all_abstracts = "\n\n".join([x["abstract"] for x in feed["papers"]])
@@ -275,7 +306,9 @@ def make_html(data):
 
             article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(60,60,60,0.92) !important;}}\n'
 
-    cats_html = sorted([f"{k} ({v})" if v else k for k,v in data['categories'].items()])
+    cats_html = sorted(
+        [f"{k} ({v})" if v else k for k, v in data["categories"].items()]
+    )
 
     html = """
 <!DOCTYPE html>
@@ -1084,20 +1117,21 @@ def make_html(data):
 
         function renderArticles(articles) {{
             console.log(articles);
+            let lang = 'ru'
             articlesContainer.innerHTML = '';
             articles.forEach((item, index) => {{
                 if ("error" in item) {{
                     console.log(`Omitting JSON. ${{item["raw_data"]}}`);
                     return;
                 }}
-                const explanation = item["data"]["desc"];
+                let explanation = item["data"][lang]["desc"];
                 const cats = item["data"]["categories"].join(" ");
                 const articleHTML = `
                     <article class='x${{item["hash"]}}'>
                         <div class="background-digit">${{index + 1}}</div>
                         <div class="article-content" onclick="toggleAbstract(${{index}})">
                             <h2>${{item['data']['emoji']}} ${{item['title']}}</h2>
-                            <p class="meta"><svg class="text-sm peer-checked:text-gray-500 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12"><path transform="translate(0, 2)" fill="currentColor" d="M5.19 2.67a.94.94 0 0 1 1.62 0l3.31 5.72a.94.94 0 0 1-.82 1.4H2.7a.94.94 0 0 1-.82-1.4l3.31-5.7v-.02Z"></path></svg> ${{item['score']}}. ${{item['data']['title']}}</p>
+                            <p class="meta"><svg class="text-sm peer-checked:text-gray-500 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12"><path transform="translate(0, 2)" fill="currentColor" d="M5.19 2.67a.94.94 0 0 1 1.62 0l3.31 5.72a.94.94 0 0 1-.82 1.4H2.7a.94.94 0 0 1-.82-1.4l3.31-5.7v-.02Z"></path></svg> ${{item['score']}}. ${{item['data'][lang]['title']}}</p>
                             <p class="pub-date">📅 Статья от ${{item['pub_date_ru']}}</p>
                             <div id="abstract-${{index}}" class="abstract">
                                 <p>${{explanation}}</p>

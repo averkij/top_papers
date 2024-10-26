@@ -24,7 +24,7 @@ MISTRAL_KEY = os.getenv("MISTRAL_KEY")
 openai.api_key = os.getenv("OPENAI_KEY")
 
 
-class ArticleEn(BaseModel):
+class Article(BaseModel):
     desc: str
     title: str
 
@@ -41,29 +41,30 @@ def get_json(prompt, api, model, temperature, system_prompt="You are a helpful a
 
 
 def get_structured(prompt, cls, model, temperature, system_prompt="You are a helpful assistant."):
-    obj = cls()
+    doc = {"error": "Parsing error"}
     resp = ''
-    # try:
-    completion = openai.beta.chat.completions.parse(
-        model=model,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt}
-        ],
-        response_format=cls,
-        max_tokens=1024,
-        temperature=temperature
-    )
-    resp = completion.choices[0].message
-    if resp.parsed:
-        log(f"Response: {resp}")
-        obj = resp.parsed
-    elif resp.refusal:
-        log(f"Error. Refused. Failed to parse JSON. Response: {resp}")
-    # except Exception as e:
-    #     log(f"Error. Failed to parse JSON. Response: {resp}")
+    try:
+        completion = openai.beta.chat.completions.parse(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+            response_format=cls,
+            max_tokens=1024,
+            temperature=temperature
+        )
+        resp = completion.choices[0].message
+        if resp.parsed:
+            log(f"Response: {resp}")
+            doc = resp.parsed.dict()
+        elif resp.refusal:
+            log(f"Error. Refused. Failed to parse JSON. Response: {resp}")
+    except Exception as e:
+        log(f"Error. Failed to parse JSON. Details: {e}. Response: {resp}")
+        doc["raw_data"] = resp
 
-    return obj
+    return doc
 
 
 def get_text(prompt, api, model, temperature=0.5, system_prompt="You are a helpful assistant."):

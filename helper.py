@@ -60,9 +60,10 @@ def try_rename_file(fpath, new_dir, new_name=None):
     else:
         log(f"No file to rename. {fpath}")
 
+
 def add_date_to_name(name, date=None):
-    if not date:    
-        date = datetime.now() - timedelta(1)        
+    if not date:
+        date = datetime.now() - timedelta(1)
     date = date.strftime("%Y-%m-%d")
     new_fpath = f"{date}{name}"
     return new_fpath
@@ -167,6 +168,28 @@ def counted_cats(papers):
     return cats
 
 
-# def make_cats_for_page(papers):
-#     cats = counted_cats(papers)
+def _get(data, key, sub_key, default):
+    if "error" in data or key not in data or sub_key not in data[key]:
+        return default
+    return data[key][sub_key]
 
+
+def rearrange_data(paper):
+    data = {
+        "categories": _get(paper, "data", "categories", []),
+        "emoji": _get(paper, "data", "emoji", "🔺"),
+        "ru": {
+            "title": _get(paper, "data", "title", ""),
+            "desc": _get(paper, "data", "desc", ""),
+        },
+        "en": {
+            "title": _get(paper, "data_en", "title", ""),
+            "desc": _get(paper, "data_en", "desc", ""),
+        },
+        "zh": {
+            "title": _get(paper, "data_zh", "title", ""),
+            "desc": _get(paper, "data_zh", "desc", ""),
+        },
+    }
+
+    return data
