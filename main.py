@@ -939,7 +939,7 @@ def make_html(data):
             <a href="https://hfday.ru" class="a-clean"><h1 class="title-sign" id="doomgrad-icon">🔺</h1><h1 class="title-text" id="doomgrad">{con.TITLE_LIGHT}</h1></a>
             <p><span id="title-date">{data['date']['ru']}</span> | <span id="title-articles-count">{helper.format_subtitle(len(data['papers']))}</span></p>
         </div>
-        <div class="theme-switch">f
+        <div class="theme-switch">
             <label class="switch">
                 <input type="checkbox" id="theme-toggle">
                 <span class="slider"></span>
@@ -1538,3 +1538,5 @@ for paper in feed["papers"]:
             log(f"[Experimental] Image for paper {paper['title']} already exists.")
 
 
+
+# %%
