@@ -193,3 +193,8 @@ def rearrange_data(paper):
     }
 
     return data
+
+def format_date_zh(date):
+    month = date.month
+    day = date.day
+    return f"{month}月{day}日"

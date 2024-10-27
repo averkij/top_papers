@@ -102,11 +102,14 @@ def get_week_info(date):
 weekday, feed_date, prev_feed_date, next_feed_date = get_week_info(helper.CURRENT_DATE)
 
 formatted_date = format_date(feed_date, format="d MMMM", locale="ru_RU")
-formatted_date_en = format_date(feed_date, format="d MMMM", locale="en_US")
-formatted_date_prev = format_date(prev_feed_date, format="d MMMM", locale="ru_RU")
-formatted_date_next = format_date(next_feed_date, format="d MMMM", locale="ru_RU")
+formatted_date_en = format_date(feed_date, format="MMMM d", locale="en_US")
+formatted_date_zh = helper.format_date_zh(feed_date)
 short_date_prev = prev_feed_date.strftime("%d.%m")
 short_date_next = next_feed_date.strftime("%d.%m")
+short_date_prev_en = prev_feed_date.strftime("%m/%d")
+short_date_next_en = next_feed_date.strftime("%m/%d")
+short_date_prev_zh = helper.format_date_zh(prev_feed_date)
+short_date_next_zh = helper.format_date_zh(next_feed_date)
 
 formatted_time_utc = helper.CURRENT_DATE.strftime("%Y-%m-%d %H:%M")
 
@@ -114,8 +117,7 @@ link_prev = f"{prev_feed_date.strftime('%Y-%m-%d')}.html"
 link_next = f"{next_feed_date.strftime('%Y-%m-%d')}.html"
 
 feed = {
-    "date": formatted_date,
-    "date_en": formatted_date_en,
+    "date": {'ru': formatted_date, 'en': formatted_date_en, 'zh': formatted_date_zh},
     "time_utc": formatted_time_utc,
     "weekday": weekday,
     "issue_id": _issue_id + 1,
@@ -123,10 +125,9 @@ feed = {
     "papers": papers,
     "link_prev": link_prev,
     "link_next": link_next,
-    "date_prev": formatted_date_prev,
-    "date_next": formatted_date_next,
-    "short_date_prev": short_date_prev,
-    "short_date_next": short_date_next,
+    "short_date_prev": {'ru': short_date_prev, 'en': short_date_prev_en, 'zh': short_date_prev_zh},
+    "short_date_next": {'ru': short_date_next, 'en': short_date_next_en, 'zh': short_date_next_zh},
+
 }
 
 for i, paper in enumerate(feed["papers"]):
@@ -299,11 +300,8 @@ def make_html(data):
     for paper in data["papers"]:
         if paper["score"] >= 20:
             article_classes += f'body.light-theme>div>main>article.x{paper["hash"]} {{ background: url("https://hfday.ru/img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: lighten !important; background-color: rgba(255,255,255,0.91) !important;}}\n'
-
             article_classes += f'body.light-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(255,255,255,0.95) !important;}}\n'
-
             article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]} {{ background: url("https://hfday.ru/img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: hue !important; background-color: rgba(60,60,60,0.9) !important; }}\n'
-
             article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(60,60,60,0.92) !important;}}\n'
 
     cats_html = sorted(
@@ -815,40 +813,78 @@ def make_html(data):
             toggle.textContent = '';
         }
     }
-    function getTimeDiffRu(dateString) {
+    function getTimeDiff(dateString, lang='ru') {
         const timeUnits = {
-            minute: ["минуту", "минуты", "минут"],
-            hour: ["час", "часа", "часов"],
-            day: ["день", "дня", "дней"]
+            ru: {
+                minute: ["минуту", "минуты", "минут"],
+                hour: ["час", "часа", "часов"],
+                day: ["день", "дня", "дней"],
+                justNow: "только что",
+                ago: "назад"
+            },
+            en: {
+                minute: ["minute", "minutes", "minutes"],
+                hour: ["hour", "hours", "hours"],
+                day: ["day", "days", "days"],
+                justNow: "just now",
+                ago: "ago"
+            },
+            zh: {
+                minute: ["分钟", "分钟", "分钟"],
+                hour: ["小时", "小时", "小时"],
+                day: ["天", "天", "天"],
+                justNow: "刚刚",
+                ago: "前"
+            }
         };
 
-        function getRussianPlural(number, words) {
-            if (number % 10 === 1 && number % 100 !== 11) {
-                return words[0];
-            } else if (number % 10 >= 2 && number % 10 <= 4 && (number % 100 < 10 || number % 100 >= 20)) {
-                return words[1];
+        function getPlural(number, words, lang) {
+            if (lang === 'ru') {
+                if (number % 10 === 1 && number % 100 !== 11) {
+                    return words[0];
+                } else if (number % 10 >= 2 && number % 10 <= 4 && (number % 100 < 10 || number % 100 >= 20)) {
+                    return words[1];
+                } else {
+                    return words[2];
+                }
+            } else if (lang === 'en') {
+                return number === 1 ? words[0] : words[1];
             } else {
-                return words[2];
+                // Chinese doesn't need plural forms
+                return words[0];
             }
+        }
+
+        function formatTimeDiff(number, unit, lang) {
+            const unitWord = getPlural(number, timeUnits[lang][unit], lang);
+            
+            if (lang === 'zh') {
+                return `${number}${unitWord}${timeUnits[lang].ago}`;
+            } else {
+                return `${number} ${unitWord} ${timeUnits[lang].ago}`;
+            }
+        }
+
+        if (!['ru', 'en', 'zh'].includes(lang)) {
+            throw new Error('Unsupported language. Supported languages are: ru, en, zh');
         }
 
         const pastDate = new Date(dateString.replace(" ", "T") + ":00Z");
         const currentDate = new Date();
         const diffInSeconds = Math.floor((currentDate - pastDate) / 1000);
-
+        
         const minutes = Math.floor(diffInSeconds / 60);
         const hours = Math.floor(diffInSeconds / 3600);
         const days = Math.floor(diffInSeconds / 86400);
 
-        if (minutes == 0) {
-            return 'только что';
-        }
-        else if (minutes < 60) {
-            return `${minutes} ${getRussianPlural(minutes, timeUnits.minute)} назад`;
+        if (minutes === 0) {
+            return timeUnits[lang].justNow;
+        } else if (minutes < 60) {
+            return formatTimeDiff(minutes, 'minute', lang);
         } else if (hours < 24) {
-            return `${hours} ${getRussianPlural(hours, timeUnits.hour)} назад`;
+            return formatTimeDiff(hours, 'hour', lang);
         } else {
-            return `${days} ${getRussianPlural(days, timeUnits.day)} назад`;
+            return formatTimeDiff(days, 'day', lang);
         }
     }
     function isToday(dateString) {
@@ -887,7 +923,7 @@ def make_html(data):
     <header>
         <div class="container">            
             <a href="https://hfday.ru" class="a-clean"><h1 class="title-sign" id="doomgrad-icon">🔺</h1><h1 class="title-text" id="doomgrad">{con.TITLE_LIGHT}</h1></a>
-            <p>{data['date']} | {helper.format_subtitle(len(data['papers']))}</p>
+            <p><span id="title-date">{data['date']['ru']}</span> | <span id="title-articles-count">{helper.format_subtitle(len(data['papers']))}</span></p>
         </div>
         <div class="theme-switch">
             <label class="switch">
@@ -898,8 +934,8 @@ def make_html(data):
     </header>
     <div class="nav-menu">
         <div class="nav-container">
-            <span class="nav-item" id="nav-prev"><a href="/d/{feed['link_prev']}">⬅️ {feed['short_date_prev']}</a></span>
-            <span class="nav-item" id="nav-next"><a href="/d/{feed['link_next']}">➡️ {feed['short_date_next']}</a></span>
+            <span class="nav-item" id="nav-prev"><a href="/d/{feed['link_prev']}">⬅️ <span id="prev-date">{feed['short_date_prev']['ru']}</span></a></span>
+            <span class="nav-item" id="nav-next"><a href="/d/{feed['link_next']}">➡️ <span id="next-date">{feed['short_date_next']['ru']}</span></a></span>
             <!--<span class="nav-item" id="nav-weekly">Топ за неделю</span>
             <span class="nav-item" id="nav-weekly">Топ за месяц</span>-->
             <div class="language-flags">
@@ -950,6 +986,10 @@ def make_html(data):
     <script>
         // Language handling
         let currentLang = localStorage.getItem('selectedLang') || 'ru';
+        let feedDate = {data['date']};
+        let feedDateNext = {data['short_date_next']};
+        let feedDatePrev = {data['short_date_prev']};
+        let filterLabel = {{'ru': 'Фильтр', 'en': 'Topics', 'zh': '主题筛选'}}
         
         function initializeLanguageFlags() {{
             const flags = document.querySelectorAll('.flag-svg');
@@ -962,6 +1002,8 @@ def make_html(data):
                     flag.classList.add('active');
                     currentLang = flag.dataset.lang;
                     localStorage.setItem('selectedLang', currentLang);
+                    updateTimeDiffs();
+                    updateLocalization();
                     filterAndRenderArticles();
                 }});
             }});
@@ -1091,9 +1133,9 @@ def make_html(data):
 
         function updateSelectedArticlesTitle() {{
             if ((selectedArticles.length === articlesData.length) & (selectedCategories.length === 0)) {{
-                categoryToggle.textContent = '🏷️ Фильтр';
+                categoryToggle.textContent = `🏷️ ${{filterLabel[currentLang]}}`;
             }} else {{
-                categoryToggle.textContent = `🏷️ Фильтр (${{formatArticlesTitle(selectedArticles.length)}})`;
+                categoryToggle.textContent = `🏷️ ${{filterLabel[currentLang]}} (${{formatArticlesTitle(selectedArticles.length)}})`;
             }}
         }}
 
@@ -1222,7 +1264,16 @@ def make_html(data):
         
         function updateTimeDiffs() {{
             const timeDiff = document.getElementById('timeDiff');
-            timeDiff.innerHTML = '🔄 ' + getTimeDiffRu('{data["time_utc"]}');
+            timeDiff.innerHTML = '🔄 ' + getTimeDiff('{data["time_utc"]}',lang=currentLang);
+        }}
+        function updateLocalization() {{
+            const titleDate = document.getElementById('title-date');
+            const prevDate = document.getElementById('prev-date');
+            const nextDate = document.getElementById('next-date');
+            titleDate.innerHTML = feedDate[currentLang];
+            prevDate.innerHTML = feedDatePrev[currentLang];
+            nextDate.innerHTML = feedDateNext[currentLang];
+            updateSelectedArticlesTitle();
         }} 
         function hideNextLink() {{
             if (isToday('{data["time_utc"]}')) {{
@@ -1241,6 +1292,7 @@ def make_html(data):
         updateTimeDiffs();
         hideNextLink(); 
         initializeLanguageFlags();
+        updateLocalization();
     </script>
 </body>
 </html>
@@ -1437,4 +1489,3 @@ for paper in feed["papers"]:
             log(f"[Experimental] Image for paper {paper['title']} already exists.")
 
 
-# %%
