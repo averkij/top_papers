@@ -16,11 +16,8 @@ def make_html(data):
     for paper in data["papers"]:
         if paper["score"] >= 20:
             article_classes += f'body.light-theme>div>main>article.x{paper["hash"]} {{ background: url("https://hfday.ru/img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: lighten !important; background-color: rgba(255,255,255,0.91) !important;}}\n'
-
             article_classes += f'body.light-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(255,255,255,0.95) !important;}}\n'
-
             article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]} {{ background: url("https://hfday.ru/img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: hue !important; background-color: rgba(60,60,60,0.9) !important; }}\n'
-
             article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(60,60,60,0.92) !important;}}\n'
 
     cats_html = sorted(
@@ -532,40 +529,78 @@ def make_html(data):
             toggle.textContent = '';
         }
     }
-    function getTimeDiffRu(dateString) {
+    function getTimeDiff(dateString, lang='ru') {
         const timeUnits = {
-            minute: ["минуту", "минуты", "минут"],
-            hour: ["час", "часа", "часов"],
-            day: ["день", "дня", "дней"]
+            ru: {
+                minute: ["минуту", "минуты", "минут"],
+                hour: ["час", "часа", "часов"],
+                day: ["день", "дня", "дней"],
+                justNow: "только что",
+                ago: "назад"
+            },
+            en: {
+                minute: ["minute", "minutes", "minutes"],
+                hour: ["hour", "hours", "hours"],
+                day: ["day", "days", "days"],
+                justNow: "just now",
+                ago: "ago"
+            },
+            zh: {
+                minute: ["分钟", "分钟", "分钟"],
+                hour: ["小时", "小时", "小时"],
+                day: ["天", "天", "天"],
+                justNow: "刚刚",
+                ago: "前"
+            }
         };
 
-        function getRussianPlural(number, words) {
-            if (number % 10 === 1 && number % 100 !== 11) {
-                return words[0];
-            } else if (number % 10 >= 2 && number % 10 <= 4 && (number % 100 < 10 || number % 100 >= 20)) {
-                return words[1];
+        function getPlural(number, words, lang) {
+            if (lang === 'ru') {
+                if (number % 10 === 1 && number % 100 !== 11) {
+                    return words[0];
+                } else if (number % 10 >= 2 && number % 10 <= 4 && (number % 100 < 10 || number % 100 >= 20)) {
+                    return words[1];
+                } else {
+                    return words[2];
+                }
+            } else if (lang === 'en') {
+                return number === 1 ? words[0] : words[1];
             } else {
-                return words[2];
+                // Chinese doesn't need plural forms
+                return words[0];
             }
+        }
+
+        function formatTimeDiff(number, unit, lang) {
+            const unitWord = getPlural(number, timeUnits[lang][unit], lang);
+            
+            if (lang === 'zh') {
+                return `${number}${unitWord}${timeUnits[lang].ago}`;
+            } else {
+                return `${number} ${unitWord} ${timeUnits[lang].ago}`;
+            }
+        }
+
+        if (!['ru', 'en', 'zh'].includes(lang)) {
+            throw new Error('Unsupported language. Supported languages are: ru, en, zh');
         }
 
         const pastDate = new Date(dateString.replace(" ", "T") + ":00Z");
         const currentDate = new Date();
         const diffInSeconds = Math.floor((currentDate - pastDate) / 1000);
-
+        
         const minutes = Math.floor(diffInSeconds / 60);
         const hours = Math.floor(diffInSeconds / 3600);
         const days = Math.floor(diffInSeconds / 86400);
 
-        if (minutes == 0) {
-            return 'только что';
-        }
-        else if (minutes < 60) {
-            return `${minutes} ${getRussianPlural(minutes, timeUnits.minute)} назад`;
+        if (minutes === 0) {
+            return timeUnits[lang].justNow;
+        } else if (minutes < 60) {
+            return formatTimeDiff(minutes, 'minute', lang);
         } else if (hours < 24) {
-            return `${hours} ${getRussianPlural(hours, timeUnits.hour)} назад`;
+            return formatTimeDiff(hours, 'hour', lang);
         } else {
-            return `${days} ${getRussianPlural(days, timeUnits.day)} назад`;
+            return formatTimeDiff(days, 'day', lang);
         }
     }
     function isToday(dateString) {
@@ -577,23 +612,40 @@ def make_html(data):
             inputDate.getDate() === today.getDate()
         );
     }
-    function formatArticlesTitle(number) {
+    function formatArticlesTitle(number, lang='ru') {
         const lastDigit = number % 10;
         const lastTwoDigits = number % 100;
-
         let word;
 
-        if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
-            word = "статей";
-        } else if (lastDigit === 1) {
-            word = "статья";
-        } else if (lastDigit >= 2 && lastDigit <= 4) {
-            word = "статьи";
-        } else {
-            word = "статей";
+        if (!['ru', 'en', 'zh'].includes(lang)) {
+            throw new Error('Unsupported language. Supported languages are: ru, en, zh');
         }
 
-        return `${number} ${word}`;
+        if (lang === 'ru') {
+            if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+                word = "статей";
+            } else if (lastDigit === 1) {
+                word = "статья";
+            } else if (lastDigit >= 2 && lastDigit <= 4) {
+                word = "статьи";
+            } else {
+                word = "статей";
+            }
+        } else if (lang === 'en') {
+            if (number === 1) {
+                word = 'paper'
+            } else {
+                word = 'papers'
+            }
+        } else if (lang === 'zh') {
+            word = "篇论文"
+        }
+
+        if (lang === 'zh') {
+            return `${number}${word}`;
+        } else {
+            return `${number} ${word}`;
+        }
     }
     </script>
 </head>"""
@@ -602,9 +654,9 @@ def make_html(data):
     html += f"""
 <body class="light-theme">
     <header>
-        <div class="container">
+        <div class="container">            
             <a href="https://hfday.ru" class="a-clean"><h1 class="title-sign" id="doomgrad-icon">🔺</h1><h1 class="title-text" id="doomgrad">{con.TITLE_LIGHT}</h1></a>
-            <p>{data['date']} | {helper.format_subtitle(len(data['papers']))}</p>
+            <p><span id="title-date">{data['date']['ru']}</span> | <span id="title-articles-count">{helper.format_subtitle(len(data['papers']))}</span></p>
         </div>
         <div class="theme-switch">
             <label class="switch">
@@ -615,8 +667,8 @@ def make_html(data):
     </header>
     <div class="nav-menu">
         <div class="nav-container">
-            <span class="nav-item" id="nav-prev"><a href="/d/{feed['link_prev']}">⬅️ {feed['short_date_prev']}</a></span>
-            <span class="nav-item" id="nav-next"><a href="/d/{feed['link_next']}">➡️ {feed['short_date_next']}</a></span>
+            <span class="nav-item" id="nav-prev"><a href="/d/{feed['link_prev']}">⬅️ <span id="prev-date">{feed['short_date_prev']['ru']}</span></a></span>
+            <span class="nav-item" id="nav-next"><a href="/d/{feed['link_next']}">➡️ <span id="next-date">{feed['short_date_next']['ru']}</span></a></span>
             <!--<span class="nav-item" id="nav-weekly">Топ за неделю</span>
             <span class="nav-item" id="nav-weekly">Топ за месяц</span>-->
             <div class="language-flags">
@@ -632,7 +684,7 @@ def make_html(data):
                 <label class="update-info-label" id="timeDiff"></label>
             </div>
             <div class="sort-container">
-                <label class="sort-label">🔀 Сортировка по</label>
+                <label class="sort-label">🔀 <span id="sort-label-text">Сортировка по</span></label>
                 <select id="sort-dropdown" class="sort-dropdown">
                     <option value="default">рейтингу</option>
                     <option value="pub_date">дате публикации</option>
@@ -667,6 +719,13 @@ def make_html(data):
     <script>
         // Language handling
         let currentLang = localStorage.getItem('selectedLang') || 'ru';
+        let feedDate = {data['date']};
+        let feedDateNext = {data['short_date_next']};
+        let feedDatePrev = {data['short_date_prev']};
+        let filterLabel = {{'ru': 'Фильтр', 'en': 'Topics', 'zh': '主题筛选'}}
+        let publishedLabel = {{'ru': 'Статья от ', 'en': 'Published on ', 'zh': '发表于'}}
+        let sortLabel = {{'ru': 'Сортировка по', 'en': 'Sort by', 'zh': '排序方式'}}
+        let paperLabel = {{'ru': 'Статья', 'en': 'Paper', 'zh': '论文'}}
         
         function initializeLanguageFlags() {{
             const flags = document.querySelectorAll('.flag-svg');
@@ -679,6 +738,8 @@ def make_html(data):
                     flag.classList.add('active');
                     currentLang = flag.dataset.lang;
                     localStorage.setItem('selectedLang', currentLang);
+                    updateTimeDiffs();
+                    updateLocalization();
                     filterAndRenderArticles();
                 }});
             }});
@@ -808,9 +869,9 @@ def make_html(data):
 
         function updateSelectedArticlesTitle() {{
             if ((selectedArticles.length === articlesData.length) & (selectedCategories.length === 0)) {{
-                categoryToggle.textContent = '🏷️ Фильтр';
+                categoryToggle.textContent = `🏷️ ${{filterLabel[currentLang]}}`;
             }} else {{
-                categoryToggle.textContent = `🏷️ Фильтр (${{formatArticlesTitle(selectedArticles.length)}})`;
+                categoryToggle.textContent = `🏷️ ${{filterLabel[currentLang]}} (${{formatArticlesTitle(selectedArticles.length, currentLang)}})`;
             }}
         }}
 
@@ -880,7 +941,6 @@ def make_html(data):
 
         function renderArticles(articles) {{
             console.log(articles);
-            let lang = 'ru'
             articlesContainer.innerHTML = '';
             articles.forEach((item, index) => {{
                 if ("error" in item) {{
@@ -898,13 +958,13 @@ def make_html(data):
                         <div class="article-content" onclick="toggleAbstract(${{index}})">
                             <h2>${{item['data']['emoji']}} ${{item['title']}}</h2>
                             <p class="meta"><svg class="text-sm peer-checked:text-gray-500 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12"><path transform="translate(0, 2)" fill="currentColor" d="M5.19 2.67a.94.94 0 0 1 1.62 0l3.31 5.72a.94.94 0 0 1-.82 1.4H2.7a.94.94 0 0 1-.82-1.4l3.31-5.7v-.02Z"></path></svg> ${{item['score']}}. ${{title}}</p>
-                            <p class="pub-date">📅 Статья от ${{item['pub_date_ru']}}</p>
+                            <p class="pub-date">📝 ${{publishedLabel[currentLang]}}${{item['pub_date_card'][currentLang]}}</p>
                             <div id="abstract-${{index}}" class="abstract">
                                 <p>${{explanation}}</p>
                                 <div id="toggle-${{index}}" class="abstract-toggle">...</div>
                             </div>
                             <div class="links">
-                                <a href="${{item['url']}}" target="_blank">Статья</a>
+                                <a href="${{item['url']}}" target="_blank">${{paperLabel[currentLang]}}</a>
                             </div>
                             <p class="tags">${{cats}}</p>
                         </div>
@@ -939,7 +999,49 @@ def make_html(data):
         
         function updateTimeDiffs() {{
             const timeDiff = document.getElementById('timeDiff');
-            timeDiff.innerHTML = '🔄 ' + getTimeDiffRu('{data["time_utc"]}');
+            timeDiff.innerHTML = '🔄 ' + getTimeDiff('{data["time_utc"]}',lang=currentLang);
+        }}
+        function updateSortingOptions() {{
+            const sortingLabels = {{
+                ru: {{
+                    default: "рейтингу",
+                    pub_date: "дате публикации",
+                    issue_id: "добавлению на HF"
+                }},
+                en: {{
+                    default: "rating",
+                    pub_date: "publication date",
+                    issue_id: "HF addition date"
+                }},
+                zh: {{
+                    default: "评分",
+                    pub_date: "发布日期",
+                    issue_id: "HF上传日期"
+                }}
+            }};
+
+            const dropdown = document.getElementById('sort-dropdown');
+            const options = dropdown.options;
+
+            for (let i = 0; i < options.length; i++) {{
+                const optionValue = options[i].value;
+                console.log(sortingLabels)
+                options[i].text = sortingLabels[currentLang][optionValue];
+            }}
+        }}
+        function updateLocalization() {{
+            const titleDate = document.getElementById('title-date');
+            const prevDate = document.getElementById('prev-date');
+            const nextDate = document.getElementById('next-date');
+            const papersCount = document.getElementById('title-articles-count');
+            const sortLabelText = document.getElementById('sort-label-text');
+            titleDate.innerHTML = feedDate[currentLang];
+            prevDate.innerHTML = feedDatePrev[currentLang];
+            nextDate.innerHTML = feedDateNext[currentLang];
+            papersCount.innerHTML = formatArticlesTitle(articlesData.length, currentLang);
+            sortLabelText.innerHTML = sortLabel[currentLang];       
+            updateSelectedArticlesTitle();
+            updateSortingOptions();
         }} 
         function hideNextLink() {{
             if (isToday('{data["time_utc"]}')) {{
@@ -958,6 +1060,7 @@ def make_html(data):
         updateTimeDiffs();
         hideNextLink(); 
         initializeLanguageFlags();
+        updateLocalization();
     </script>
 </body>
 </html>
