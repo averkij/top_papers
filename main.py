@@ -150,6 +150,26 @@ for paper in tqdm(feed["papers"]):
             f'Using data from previous issue: {json.dumps(prev_data["data"], ensure_ascii=False)[:300]}'
         )
         paper["data"] = prev_data["data"]
+
+        # DEBUG
+        # data_en = api.get_structured(
+        #     prompt=prompt_en,
+        #     system_prompt=system_prompt_en,
+        #     cls=api.Article,
+        #     temperature=0,
+        #     model="gpt-4o-mini",
+        # )
+        # data_zh = api.get_structured(
+        #     prompt=prompt_zh,
+        #     system_prompt=system_prompt_zh,
+        #     cls=api.Article,
+        #     temperature=0,
+        #     model="gpt-4o-mini",
+        # )
+        # paper["data"]["en"]["title"] = data_en["title"]
+        # paper["data"]["en"]["desc"] = data_en["desc"]
+        # paper["data"]["zh"]["title"] = data_zh["title"]
+        # paper["data"]["zh"]["desc"] = data_zh["desc"]
     else:
         log("Querying the API.")
         abs = paper["abstract"][:3000]
