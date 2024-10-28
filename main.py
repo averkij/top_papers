@@ -1024,7 +1024,7 @@ def make_html(data):
     </footer>
     <script>
         // Language handling
-        let currentLang = localStorage.getItem('selectedLang') || 'ru';
+        let currentLang = localStorage.getItem('selectedLang') || 'en';
         let feedDate = {data['date']};
         let feedDateNext = {data['short_date_next']};
         let feedDatePrev = {data['short_date_prev']};
