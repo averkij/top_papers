@@ -63,7 +63,6 @@ CATEGORIES = {
     '#graphs': 0,
     '#ethics': 0,
     '#security': 0,
-    '#quantum': 0,
     '#edge_computing': 0,
     '#optimization': 0,
     '#survey': 0,
