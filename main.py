@@ -1019,7 +1019,7 @@ def make_html(data):
     </div>
     <footer>
         <div class="container">
-            <p><a style="color:white;" href="https://t.me/doomgrad">градиент обреченный</a> ✖️ <a style="color:white;" href="https://huggingface.co/papers">hugging face</a></p>
+            <p><a style="color:white;" href="https://t.me/doomgrad">doomgrad</a> ✖️ <a style="color:white;" href="https://huggingface.co/papers">hugging face</a></p>
         </div>
     </footer>
     <script>
