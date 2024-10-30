@@ -1,10 +1,10 @@
-# 🔥 HF Daily Reviews by "градиент обреченный"
+# 🔥 HF Daily Reviews by @doomgrad
 
 Welcome to the automatically generated reviews repository for Hugging Face's daily papers! This project gathers insights and reviews of machine learning and AI research papers from Hugging Face, and presents them in a creative and informative manner.
 
 👉 [HFday.ru](https://hfday.ru)
 
-🔺 [градиент обреченный](https://t.me/doomgrad)
+🔺 [@doomgrad](https://t.me/doomgrad)
 
 ## Project Overview
 
