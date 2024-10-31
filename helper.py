@@ -131,16 +131,21 @@ def extract_page_data(url):
 
 
 def format_subtitle(number):
-    if 11 <= number % 100 <= 14:
-        word = "статей"
+    # if 11 <= number % 100 <= 14:
+    #     word = "статей"
+    # else:
+    #     last_digit = number % 10
+    #     if last_digit == 1:
+    #         word = "статья"
+    #     elif 2 <= last_digit <= 4:
+    #         word = "статьи"
+    #     else:
+    #         word = "статей"
+
+    if number == 1:
+        word = 'paper'
     else:
-        last_digit = number % 10
-        if last_digit == 1:
-            word = "статья"
-        elif 2 <= last_digit <= 4:
-            word = "статьи"
-        else:
-            word = "статей"
+        word = 'papers'
 
     return f"{number} {word}"
 
