@@ -237,6 +237,7 @@ Categories:
 34. STORY_GENERATION: Papers on story generation, including plot generation and author style adaptation
 35. HALLUCINATIONS: Papers about the hallucinations, hallucinations analysis and mitigation
 36. LONG_CONTEXT: Papers about long context handling, including techniques to extend context length and process long sequences.
+37. SYNTHETIC: Papers about using synthetic data for training, including methods for generating and leveraging artificial data.
 
 Return only JSON with flat array of categories that match the given text.
 

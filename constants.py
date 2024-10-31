@@ -70,5 +70,6 @@ CATEGORIES = {
     '#alignment': 0,
     '#story_generation': 0,
     '#hallucinations': 0,
-    '#long_context': 0
+    '#long_context': 0,
+    '#synthetic': 0
 }
