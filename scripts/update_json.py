@@ -77,7 +77,6 @@ for doc in prev_papers:
 for doc in prev_papers:
     with open(doc, "r", encoding="utf-8") as fin:
         feed = json.load(fin)
-
         feed["categories"] = helper.counted_cats(feed["papers"])
 
     json.dump(
@@ -226,4 +225,44 @@ for doc in prev_papers:
         indent=4,
     )
 
+# %%
+#update categories with new ones
+# %%
+import json
+from datetime import datetime, timedelta
+
+for doc in prev_papers:
+    with open(doc, "r", encoding="utf-8") as fin:
+        feed = json.load(fin)
+
+        for paper in feed["papers"]:
+            # paper["data"]["categories"] = sorted(paper["data"]["categories"])
+
+            abs = paper["abstract"][:3000]
+            new_cats = api.get_categories_additional(abs)
+            if new_cats:
+                print(paper['title'], new_cats)
+            all_cats = new_cats + paper["data"]["categories"]
+            all_cats = sorted(list(set(all_cats)))
+            paper["data"]["categories"] = all_cats
+
+    json.dump(
+        feed,
+        open(doc, "w", encoding="utf-8"),
+        ensure_ascii=False,
+        indent=4,
+    )
+
+# %%
+for doc in prev_papers:
+    with open(doc, "r", encoding="utf-8") as fin:
+        feed = json.load(fin)
+        feed["categories"] = helper.counted_cats(feed["papers"])
+
+    json.dump(
+        feed,
+        open(doc, "w", encoding="utf-8"),
+        ensure_ascii=False,
+        indent=4,
+    )
 # %%
