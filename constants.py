@@ -34,6 +34,9 @@ RENAME_CATS = {
     "#prompt": "#prompts",
     "#prompt": "#prompts",
 }
+RENAME_TERMS = {
+    'БЯМ': 'LLM'
+}
 CATEGORIES = {
     '#dataset': 0,
     '#data': 0,
