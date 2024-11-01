@@ -225,7 +225,7 @@ Categories:
 13. VIDEO: Papers on video analysis, generation, or understanding
 14. MULTIMODAL: Papers combining multiple input/output modalities
 15. MATH: Papers focused on mathematical theory and algorithms
-16. MULTILINGUAL: Papers addressing multiple languages or cross-lingual capabilities
+16. MULTILINGUAL: Papers addressing multiple languages or cross-lingual capabilities, including all non English models
 17. ARCHITECTURE: Papers proposing novel neural architectures or components
 18. MEDICINE: Papers applying ML to medical/healthcare domains
 19. TRAINING: Papers improving model training or fine-tuning methods
@@ -245,8 +245,9 @@ Categories:
 33. ALIGNMENT: Papers about aligning language models with human values, preferences, and intended behavior
 34. STORY_GENERATION: Papers on story generation, including plot generation and author style adaptation
 35. HALLUCINATIONS: Papers about the hallucinations, hallucinations analysis and mitigation
-36. LONG_CONTEXT: Papers about long context handling, including techniques to extend context length and process long sequences.
-37. SYNTHETIC: Papers about using synthetic data for training, including methods for generating and leveraging artificial data.
+36. LONG_CONTEXT: Papers about long context handling, including techniques to extend context length
+37. SYNTHETIC: Papers about using synthetic data for training, including methods for generating and leveraging artificial data
+38. TRANSLATION: 'Papers about machine translation, including techniques, data and applications for translating between languages'
 
 Return only JSON with flat array of categories that match the given text.
 
