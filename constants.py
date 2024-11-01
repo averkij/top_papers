@@ -17,7 +17,6 @@ EXCLUDE_CATS = [
     "#generative",
     "#llm",
     "#autoregressive",
-    "#training",
 ]
 RENAME_CATS = {
     "#multi-modal": "#multimodal",
