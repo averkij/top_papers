@@ -247,7 +247,7 @@ Categories:
 35. HALLUCINATIONS: Papers about the hallucinations, hallucinations analysis and mitigation
 36. LONG_CONTEXT: Papers about long context handling, including techniques to extend context length
 37. SYNTHETIC: Papers about using synthetic data for training, including methods for generating and leveraging artificial data
-38. TRANSLATION: 'Papers about machine translation, including techniques, data and applications for translating between languages'
+38. TRANSLATION: Papers about machine translation, including techniques, data and applications for translating between languages
 
 Return only JSON with flat array of categories that match the given text.
 
