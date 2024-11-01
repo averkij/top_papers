@@ -28,15 +28,24 @@ class Article(BaseModel):
     desc: str
     title: str
 
+
 class ArticleFull(BaseModel):
     desc: str
     emoji: str
     title: str
 
 
-def get_json(prompt, api, model, temperature, system_prompt="You are a helpful assistant."):
-    text = get_text(prompt=prompt, system_prompt=system_prompt, api=api, model=model, temperature=temperature)
-    text = re.sub(r'```json|```', '', text).strip()
+def get_json(
+    prompt, api, model, temperature, system_prompt="You are a helpful assistant."
+):
+    text = get_text(
+        prompt=prompt,
+        system_prompt=system_prompt,
+        api=api,
+        model=model,
+        temperature=temperature,
+    )
+    text = re.sub(r"```json|```", "", text).strip()
     try:
         doc = json.loads(text)
     except:
@@ -45,19 +54,21 @@ def get_json(prompt, api, model, temperature, system_prompt="You are a helpful a
     return doc
 
 
-def get_structured(prompt, cls, model, temperature, system_prompt="You are a helpful assistant."):
+def get_structured(
+    prompt, cls, model, temperature, system_prompt="You are a helpful assistant."
+):
     doc = {"error": "Parsing error"}
-    resp = ''
+    resp = ""
     try:
         completion = openai.beta.chat.completions.parse(
             model=model,
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": prompt},
             ],
             response_format=cls,
             max_tokens=1024,
-            temperature=temperature
+            temperature=temperature,
         )
         resp = completion.choices[0].message
         if resp.parsed:
@@ -72,8 +83,10 @@ def get_structured(prompt, cls, model, temperature, system_prompt="You are a hel
     return doc
 
 
-def get_text(prompt, api, model, temperature=0.5, system_prompt="You are a helpful assistant."):
-    if api=="claude":
+def get_text(
+    prompt, api, model, temperature=0.5, system_prompt="You are a helpful assistant."
+):
+    if api == "claude":
         log(f"Claude request. Model: {model}. Prompt: {prompt}")
         message = claude_client.messages.create(
             model=model,
@@ -82,10 +95,10 @@ def get_text(prompt, api, model, temperature=0.5, system_prompt="You are a helpf
             messages=[
                 {"role": "user", "content": prompt},
             ],
-            temperature=temperature
+            temperature=temperature,
         )
         text = message.content[0].text.strip('"')
-    elif api=="mistral":
+    elif api == "mistral":
         log(f"Mistral request. Model: {model}. Prompt: {prompt}")
         base_url = "https://api.mistral.ai/v1/chat/completions"
         headers = {
@@ -95,22 +108,23 @@ def get_text(prompt, api, model, temperature=0.5, system_prompt="You are a helpf
         payload = {
             "model": model,
             "temperature": temperature,
-            "top_p": 1 if temperature==0 else 0.95,
+            "top_p": 1 if temperature == 0 else 0.95,
             "max_tokens": 2048,
             "messages": [{"role": "user", "content": prompt}],
         }
         response = requests.post(base_url, headers=headers, json=payload)
         log(f"Mistral response. {json.dumps(response.json())}")
         text = response.json()["choices"][0]["message"]["content"]
-    elif api=="openai":
+    elif api == "openai":
         log(f"OpenAI request. Model: {model}. Prompt: {prompt}")
         completion = openai.chat.completions.create(
             model=model,
             messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt}
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt},
             ],
-            temperature=temperature)
+            temperature=temperature,
+        )
         text = completion.choices[0].message.content
     else:
         log(f"Error. Unknown API: {api}.")
@@ -118,9 +132,9 @@ def get_text(prompt, api, model, temperature=0.5, system_prompt="You are a helpf
 
     log(f"Response: {text}")
     if any([x in text for x in con.RENAME_TERMS.keys()]):
-        log('Renaming some terms.')
-        for k,v in con.RENAME_TERMS.items():
-            text = text.replace(k,v)        
+        log("Renaming some terms.")
+        for k, v in con.RENAME_TERMS.items():
+            text = text.replace(k, v)
 
     return text
 
@@ -154,40 +168,35 @@ def normalize_l2(x):
 def on_queue_update(update):
     if isinstance(update, fal_client.InProgress):
         for log in update.logs:
-           print(log["message"])
+            print(log["message"])
 
 
 def generate_and_save_image(name, img_dir, prompt):
-    log(f'Generating image by prompt: {prompt}.')
+    log(f"Generating image by prompt: {prompt}.")
     try:
         result = fal_client.subscribe(
             "fal-ai/flux/schnell",
             arguments={
                 "prompt": prompt,
                 "seed": 42,
-                "image_size":  {
-                    "width": 384,
-                    "height": 720
-                    },
-                "num_images": 1
+                "image_size": {"width": 384, "height": 720},
+                "num_images": 1,
             },
             with_logs=True,
             on_queue_update=on_queue_update,
         )
-        img = result['images'][0]
+        img = result["images"][0]
         log(f'Saving generated image from {img["url"]} to {name}.')
         Path(img_dir).mkdir(exist_ok=True)
         image_path = os.path.join(img_dir, name)
-        headers = {
-                "User-Agent": "Mozilla/5.0"
-            }
+        headers = {"User-Agent": "Mozilla/5.0"}
         response = requests.get(img["url"], headers=headers)
         image = Image.open(io.BytesIO(response.content))
         output_io = io.BytesIO()
         image.save(output_io, format="JPEG", quality=60)
-        output_io.seek(0)        
+        output_io.seek(0)
 
-        with open(image_path, 'wb') as fout:
+        with open(image_path, "wb") as fout:
             fout.write(output_io.read())
     except Exception as e:
         log(f"Error generating an image: {e}")
@@ -201,13 +210,12 @@ def generate_image_for_paper(paper, img_name):
     abstract = paper["abstract"]
     prompt = f"Write a text with image prompt in style of surrealism and modern art based on the following paper. Use key themes and elements from it. Add instruction to write a text that reads as brief paper title as a label on some object on an image. Style: linear art on white background. Return only prompt and nothing else. Title: '{title}' Text: '{abstract}'"
     img_prompt = get_text(prompt, api="openai", model="gpt-4o-mini", temperature=0.8)
-    img_dir = os.path.join(con.IMG_DIR, paper["pub_date"].replace('-', ''))
+    img_dir = os.path.join(con.IMG_DIR, paper["pub_date"].replace("-", ""))
     generate_and_save_image(name=img_name, img_dir=img_dir, prompt=img_prompt)
 
 
 def get_categories(text):
-    prompt_cls = (
-            f"""You are an expert classifier of machine learning research papers. Analyze the following research paper text and classify it into one or more relevant categories from the list below. Consider the paper's main contributions, methodologies, and applications.
+    prompt_cls = f"""You are an expert classifier of machine learning research papers. Analyze the following research paper text and classify it into one or more relevant categories from the list below. Consider the paper's main contributions, methodologies, and applications.
 
 Categories:
 1. DATASET: Papers that introduce new datasets or make significant modifications to existing ones
@@ -253,7 +261,34 @@ Return only JSON with flat array of categories that match the given text.
 
 Paper text to classify:\n\n"{text}"
 """
-        )    
-    categories = get_json(prompt_cls, api="openai", model="gpt-4o-mini", temperature=0.0)
+    categories = get_json(
+        prompt_cls, api="openai", model="gpt-4o-mini", temperature=0.0
+    )
+
+    return categories
+
+
+def get_categories_additional(text):
+    prompt_cls = f"""You are an expert classifier of machine learning research papers. Analyze the following research paper text and classify it into one or more relevant categories from the list below.
+
+Categories:
+1. MULTILINGUAL: Papers addressing multiple languages or cross-lingual capabilities, including all non English models
+2. LONG_CONTEXT: Papers about long context handling, including techniques to extend context length
+3. SYNTHETIC: Papers about using synthetic data for training, including methods for generating and leveraging artificial data
+4. TRANSLATION: Papers about machine translation, including techniques, data and applications for translating between languages
+5. TRAINING: Papers about machine translation, including techniques, data and applications for translating between languages
+
+Return only JSON with flat array of categories that match the given text. If no category fit return empty list.
+
+Paper text to classify:\n\n"{text}"
+"""
+    categories = get_json(
+        prompt_cls, api="openai", model="gpt-4o-mini", temperature=0.0
+    )
+    categories = [x for x in categories if x not in con.EXCLUDE_CATS]
+    categories = [
+        x if x not in con.RENAME_CATS else con.RENAME_CATS[x] for x in categories
+    ]
+    categories = [f"#{x.replace('#','')}".lower() for x in categories]
 
     return categories
