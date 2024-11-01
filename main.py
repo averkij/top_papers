@@ -190,12 +190,23 @@ for paper in tqdm(feed["papers"]):
 
         try:
             paper["data"] = api.get_json(
-                prompt,
+                prompt=prompt,
                 system_prompt=system_prompt,
                 api="claude",
                 model="claude-3-5-sonnet-20240620",
                 temperature=1.0,
             )
+            #fallback
+            if "error" in paper["data"]:
+                log("Fallback to OpenAI.")
+                paper["data"] = api.get_structured(
+                    prompt=prompt,
+                    system_prompt=system_prompt,
+                    cls=api.ArticleFull,
+                    temperature=0,
+                    model="gpt-4o",
+                )
+
             if not "error" in paper["data"]:
                 # classification
                 paper["data"]["categories"] = api.get_categories(text=abs)

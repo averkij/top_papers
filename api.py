@@ -28,6 +28,11 @@ class Article(BaseModel):
     desc: str
     title: str
 
+class ArticleFull(BaseModel):
+    desc: str
+    emoji: str
+    title: str
+
 
 def get_json(prompt, api, model, temperature, system_prompt="You are a helpful assistant."):
     text = get_text(prompt=prompt, system_prompt=system_prompt, api=api, model=model, temperature=temperature)
@@ -112,6 +117,10 @@ def get_text(prompt, api, model, temperature=0.5, system_prompt="You are a helpf
         text = ""
 
     log(f"Response: {text}")
+    if any([x in text for x in con.RENAME_TERMS.keys()]):
+        log('Renaming some terms.')
+        for k,v in con.RENAME_TERMS.items():
+            text = text.replace(k,v)        
 
     return text
 
