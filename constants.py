@@ -17,6 +17,12 @@ EXCLUDE_CATS = [
     "#generative",
     "#llm",
     "#autoregressive",
+    "#classification",
+    "#generative_models",
+    "#human_computer_interaction",
+    "#nlp",
+    "#planning",
+    "#editing",
 ]
 RENAME_CATS = {
     "#multi-modal": "#multimodal",
@@ -31,7 +37,7 @@ RENAME_CATS = {
     "#algorithms": "#algo",
     "#cnn": "#architecture",
     "#prompt": "#prompts",
-    "#prompt": "#prompts",
+    "#graph": "#graphs",
 }
 RENAME_TERMS = {
     'БЯМ': 'LLM'
