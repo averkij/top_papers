@@ -206,11 +206,11 @@ def format_date_zh(date):
     return f"{month}月{day}日"
 
 
-def make_html(data):
+def make_html(data, bg_images=True):
     data["papers"] = [x for x in data["papers"] if "error" not in x["data"]]
     article_classes = ""
     for paper in data["papers"]:
-        if paper["score"] >= 10:
+        if paper["score"] >= 10 and bg_images:
             article_classes += f'body.light-theme>div>main>article.x{paper["hash"]} {{ background: url("https://hfday.ru/img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: lighten !important; background-color: rgba(255,255,255,0.91) !important;}}\n'
             article_classes += f'body.light-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(255,255,255,0.95) !important;}}\n'
             article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]} {{ background: url("https://hfday.ru/img/{paper["pub_date"].replace("-","")}/{paper["hash"]}.jpg") !important; background-size: cover !important; background-position: center !important; background-blend-mode: hue !important; background-color: rgba(60,60,60,0.9) !important; }}\n'
