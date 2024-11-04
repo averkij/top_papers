@@ -240,7 +240,7 @@ def make_html(data, bg_images=True):
         """
     <link rel="icon" href="favicon.svg" sizes="any" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&family=Tiny5&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #0989eacf;
@@ -371,10 +371,11 @@ def make_html(data, bg_images=True):
         }
         .background-digit {
             position: absolute;
+            font-family: 'Tiny5';
             bottom: -20px;
             right: -10px;
-            font-size: 12em;
-            font-weight: bold;
+            font-size: 8em;
+            font-weight: 400;
             color: rgba(0, 0, 0, 0.03);
             z-index: 0;
             line-height: 1;
@@ -970,6 +971,7 @@ def make_html(data, bg_images=True):
         let selectedCategories = [];
         let selectedArticles = [];
         let sortBy = 'issue_id';     
+        let showLimitHint = false; 
 
         function getUrlParameters() {{
             const urlParams = new URLSearchParams(window.location.search);
@@ -1136,6 +1138,12 @@ def make_html(data, bg_images=True):
         }}
 
         function renderArticles(articles) {{
+            if (articles.length > 100) {{
+                articles = articles.slice(0, 50);
+                showLimitHint = true;
+            }} else {{
+                showLimitHint = false;
+            }}
             console.log(articles);
             articlesContainer.innerHTML = '';
             articles.forEach((item, index) => {{
