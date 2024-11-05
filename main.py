@@ -343,7 +343,7 @@ json.dump(
 #     feed = json.load(f)
 
 log("Generating page.")
-html_index = helper.make_html(feed)
+html_index = helper.make_html(feed, bg_images=False)
 
 log("Renaming previous page.")
 helper.try_rename_file(
@@ -372,14 +372,14 @@ helper.try_rename_file(
     helper.add_date_to_name("_last_log.txt", helper.CURRENT_DATE),
 )
 
-for paper in feed["papers"]:
-    if paper["score"] >= 10:
-        log(f"[Experimental] Generating an image for paper {paper['title']}.")
-        img_name = f"{paper['hash']}.jpg"
-        if not helper.if_paper_image_exists(paper):
-            api.generate_image_for_paper(paper, img_name)
-        else:
-            log(f"[Experimental] Image for paper {paper['title']} already exists.")
+# for paper in feed["papers"]:
+#     if paper["score"] >= 10:
+#         log(f"[Experimental] Generating an image for paper {paper['title']}.")
+#         img_name = f"{paper['hash']}.jpg"
+#         if not helper.if_paper_image_exists(paper):
+#             api.generate_image_for_paper(paper, img_name)
+#         else:
+#             log(f"[Experimental] Image for paper {paper['title']} already exists.")
 
 # %%
 # TOP MONTHLY
@@ -403,8 +403,8 @@ _prev_papers, _issue_id = helper.init()
 
 prev_papers = glob("./d/*.json")
 
-# month_to_generate = datetime.now(timezone.utc)
-month_to_generate = datetime.now(timezone.utc) - timedelta(days=30)
+month_to_generate = datetime.now(timezone.utc)
+# month_to_generate = datetime.now(timezone.utc) - timedelta(days=30)
 
 month_to_generate_str = month_to_generate.strftime("%Y-%m")
 prev_papers = [paper for paper in prev_papers if month_to_generate_str in paper]
