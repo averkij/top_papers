@@ -222,7 +222,7 @@ def make_html(data, bg_images=True, format="daily"):
         link_folder = "d"
         primary_color = "#0989eacf"
         bg_digit_color = "#0989ea22"
-        nav_month_item = f"""<span class="nav-item" id="nav-monthly"><a href="/m/{data['link_month']}">📈 Топ за месяц</a></span>"""
+        nav_month_item = f"""<span class="nav-item" id="nav-monthly"><a href="/m/{data['link_month']}">📈 <span id='top-month-label'>Топ за месяц</span></a></span>"""
         daily_title = con.TITLE_LIGHT
 
     article_classes = ""
@@ -991,6 +991,7 @@ def make_html(data, bg_images=True, format="daily"):
         let publishedLabel = {{'ru': 'Статья от ', 'en': 'Published on ', 'zh': '发表于'}}
         let sortLabel = {{'ru': 'Сортировка по', 'en': 'Sort by', 'zh': '排序方式'}}
         let paperLabel = {{'ru': 'Статья', 'en': 'Paper', 'zh': '论文'}}
+        let topMonthLabel = {{'ru': 'Топ за месяц', 'en': 'Top by Month', 'zh': '月度热门论文'}}
         
         function initializeLanguageFlags() {{
             const flags = document.querySelectorAll('.flag-svg');
@@ -1341,13 +1342,15 @@ def make_html(data, bg_images=True, format="daily"):
             const titleDate = document.getElementById('title-date');
             const prevDate = document.getElementById('prev-date');
             const nextDate = document.getElementById('next-date');
+            const topMonth = document.getElementById('top-month-label');
             const papersCount = document.getElementById('title-articles-count');
             const sortLabelText = document.getElementById('sort-label-text');
             titleDate.innerHTML = feedDate[currentLang];
             prevDate.innerHTML = feedDatePrev[currentLang];
             nextDate.innerHTML = feedDateNext[currentLang];
             papersCount.innerHTML = formatArticlesTitle(articlesData.length, currentLang);
-            sortLabelText.innerHTML = sortLabel[currentLang];       
+            sortLabelText.innerHTML = sortLabel[currentLang];   
+            topMonth.innerHTML = topMonthLabel[currentLang];
             updateSelectedArticlesTitle();
             updateSortingOptions();
         }} 
