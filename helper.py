@@ -1349,8 +1349,10 @@ def make_html(data, bg_images=True, format="daily"):
             prevDate.innerHTML = feedDatePrev[currentLang];
             nextDate.innerHTML = feedDateNext[currentLang];
             papersCount.innerHTML = formatArticlesTitle(articlesData.length, currentLang);
-            sortLabelText.innerHTML = sortLabel[currentLang];   
-            topMonth.innerHTML = topMonthLabel[currentLang];
+            sortLabelText.innerHTML = sortLabel[currentLang];
+            if (topMonth) {{
+                topMonth.innerHTML = topMonthLabel[currentLang];
+            }}             
             updateSelectedArticlesTitle();
             updateSortingOptions();
         }} 
