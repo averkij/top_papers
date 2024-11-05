@@ -17,7 +17,7 @@ for doc in prev_papers:
     with open(doc, "r", encoding="utf-8") as fin:
         feed = json.load(fin)
 
-        html_index = helper.make_html(feed)
+        html_index = helper.make_html(feed, bg_images=False)
 
     html_path = doc.replace("json", "html")
 
