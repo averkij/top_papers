@@ -215,8 +215,11 @@ for doc in prev_papers:
         short_date_prev_zh = helper.format_date_zh(prev_feed_date)
         short_date_next_zh = helper.format_date_zh(next_feed_date)
         
+        top_current_month_link = f"{feed_date.strftime('%Y-%m')}.html"
+        
         feed["short_date_prev"] = {'ru': short_date_prev, 'en': short_date_prev_en, 'zh': short_date_prev_zh}
         feed["short_date_next"] = {'ru': short_date_next, 'en': short_date_next_en, 'zh': short_date_next_zh}
+        feed["link_month"] = top_current_month_link
 
     json.dump(
         feed,
