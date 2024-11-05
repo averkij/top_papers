@@ -1,4 +1,5 @@
 TITLE_LIGHT = "hf daily"
+TITLE_LIGHT_MONTHLY = "hf monthly"
 TITLE_DARK = "hf nightly"
 
 DATA_FILE = "hf_papers.json"
