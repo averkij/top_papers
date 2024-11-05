@@ -200,14 +200,31 @@ def rearrange_data(paper):
     return data
 
 
-def format_date_zh(date):
+def format_date_zh(date, month_only=False):
+    year = date.year
     month = date.month
     day = date.day
+    if month_only:
+        return f"{month}月{year}年"
     return f"{month}月{day}日"
 
 
-def make_html(data, bg_images=True):
+def make_html(data, bg_images=True, format="daily"):
     data["papers"] = [x for x in data["papers"] if "error" not in x["data"]]
+
+    if format == "monthly":
+        link_folder = "m"
+        primary_color = "#7a30efcf"
+        bg_digit_color = "#7a30ef17"
+        nav_month_item = ""
+        daily_title = con.TITLE_LIGHT_MONTHLY
+    else:
+        link_folder = "d"
+        primary_color = "#0989eacf"
+        bg_digit_color = "#0989ea22"
+        nav_month_item = f"""<span class="nav-item" id="nav-monthly"><a href="/m/{data['link_month']}">📈 Топ за месяц</a></span>"""
+        daily_title = con.TITLE_LIGHT
+
     article_classes = ""
     for paper in data["papers"]:
         if paper["score"] >= 10 and bg_images:
@@ -234,23 +251,34 @@ def make_html(data, bg_images=True):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">"""
 
-    html += f"<title>HF. {format_subtitle(len(data['papers']))}. {data['date']['en']}.</title>"
-
-    html += (
-        """
-    <link rel="icon" href="favicon.svg" sizes="any" type="image/svg+xml">
+    html += f"""<title>HF. {format_subtitle(len(data['papers']))}. {data['date']['en']}.</title>
+<link rel="icon" href="favicon.svg" sizes="any" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&family=Tiny5&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #0989eacf;
+        :root {{
+            --primary-color: {primary_color};
             --secondary-color: #fff;
             --background-color: #f5f5f5;
             --text-color: #333333;
-            --header-color: #0989eacf;
+            --header-color: {primary_color};
             --body-color: #f5f5f5;
             --menu-color: #002370;
-        }
+        }}        
+        .background-digit {{
+            position: absolute;
+            font-family: 'Tiny5';
+            bottom: -20px;
+            right: -10px;
+            font-size: 8em;
+            font-weight: 400;
+            color: {bg_digit_color};
+            z-index: 0;
+            line-height: 1;
+        }}"""
+
+    html += (
+        """
         body {
             font-family: 'Roboto Slab', sans-serif;
             line-height: 1.6;
@@ -332,7 +360,7 @@ def make_html(data, bg_images=True):
             position: relative;
         }
         .article-content {
-            padding: 1.5em;
+            padding: 1.3em;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -368,17 +396,6 @@ def make_html(data, bg_images=True):
             bottom: 10px;
             font-weight: 300;
             font-family: 'Roboto Slab';
-        }
-        .background-digit {
-            position: absolute;
-            font-family: 'Tiny5';
-            bottom: -20px;
-            right: -10px;
-            font-size: 8em;
-            font-weight: 400;
-            color: rgba(0, 0, 0, 0.03);
-            z-index: 0;
-            line-height: 1;
         }
         .abstract {
             position: relative;
@@ -434,7 +451,7 @@ def make_html(data, bg_images=True):
             color: #ffffff;
         }
         .theme-switch {
-            position: fixed;
+            position: absolute;
             top: 20px;
             right: 20px;
             display: flex;
@@ -482,16 +499,7 @@ def make_html(data, bg_images=True):
         .switch-label {
             margin-right: 10px;
         }
-        .update-info-container {
-            margin-top: 15px;
-            margin-bottom: 0px;
-            text-align: left;
-        }
-        .sort-container {
-            margin-top: 15px;
-            margin-bottom: 0px;
-            text-align: right;
-        }
+
         .sub-header-container {
             display: flex;
             justify-content: space-between;
@@ -499,12 +507,43 @@ def make_html(data, bg_images=True):
             flex-wrap: wrap;
             gap: 15px;
         }
+        .sub-header-container-2 {
+            display: flex;
+            justify-content: left;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 0 auto;
+        }
         .update-info-container {
+            margin-top: 15px;
+            margin-bottom: 0px;
+            text-align: left;
             flex: 1;
         }
         .sort-container {
+            margin-top: 15px;
+            margin-bottom: 0px;
+            text-align: right;
             flex: 2;
         }
+        
+        .category-toggle-container {
+            display: inline-block;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .category-option-container {
+            margin-top: 15px;
+            margin-bottom: 10px;
+            display: none;
+            margin-left: auto;
+        }
+        .category-option-container.expanded {
+            display: block;
+        }
+
         .sort-dropdown {
             padding: 5px 10px;
             font-size: 16px;
@@ -542,8 +581,8 @@ def make_html(data, bg_images=True):
             display: none;
         }
         .category-filters.expanded {
-                display: block;
-                margin-top: 10px;
+            display: block;
+            margin-top: 10px;
         }
         .category-button {
             display: inline-block;
@@ -569,11 +608,8 @@ def make_html(data, bg_images=True):
         .dark-theme .category-button.active {
             background-color: var(--primary-color);
         }
-        .category-toggle {
-            display: inline-block;
-            margin-bottom: 10px;
-            margin-top: 15px;
-            cursor: pointer;
+        .dark-theme .category-button.inactive:not(.active) {
+            color: #888;
         }
         .clear-categories {
             display: inline-block;
@@ -664,6 +700,8 @@ def make_html(data, bg_images=True):
         .dark-theme .nav-item:hover {
             background-color: rgba(255, 255, 255, 0.05);
         }
+
+        .pointer { cursor: pointer; }
         
         @media (max-width: 600px) {
             .nav-container {
@@ -696,21 +734,38 @@ def make_html(data, bg_images=True):
                 flex-direction: column;
                 align-items: flex-start;
             }
+            .sort-container {
+                width: 100%;
+                display: flex;
+                justify-content: left;
+                margin: 0 auto;
+            }
+            .sort-dropdown {
+                margin-left: auto;
+            }
+            .sort-label {
+                margin-top: 5px;
+                float: left;
+            }
+
+            .sub-header-container-2 {
+                flex-direction: row;
+                align-items: flex-start;
+            }
             .update-info-container {
                 text-align: left;
                 width: 100%;
                 margin-bottom: 0px;
             }
-            .sort-container {
-                margin-top: 0px;
+            .category-toggle-container {
+                margin-top: 15px;
                 text-align: left;
-                width: 100%;
-            .sort-dropdown {
-                float: right;
+                margin-bottom: 10px;
             }
-            .sort-label {
-                margin-top: 5px;
-                float: left;
+            .category-option-container {
+                margin-top: 15px;
+                text-align: center;
+                margin-bottom: 10px;
             }
         }
     </style>
@@ -809,6 +864,14 @@ def make_html(data, bg_images=True):
             inputDate.getDate() === today.getDate()
         );
     }
+    function isCurrentMonth(dateString) {
+        const inputDate = new Date(dateString);
+        const today = new Date();
+        return (
+            inputDate.getFullYear() === today.getFullYear() &&
+            inputDate.getMonth() === today.getMonth()
+        );
+    }
     function formatArticlesTitle(number, lang='ru') {
         const lastDigit = number % 10;
         const lastTwoDigits = number % 100;
@@ -852,7 +915,7 @@ def make_html(data, bg_images=True):
 <body class="light-theme">
     <header>
         <div class="container">            
-            <a href="https://hfday.ru" class="a-clean"><h1 class="title-sign" id="doomgrad-icon">🔺</h1><h1 class="title-text" id="doomgrad">{con.TITLE_LIGHT}</h1></a>
+            <a href="https://hfday.ru" class="a-clean"><h1 class="title-sign" id="doomgrad-icon">🔺</h1><h1 class="title-text" id="doomgrad">{daily_title}</h1></a>
             <p><span id="title-date">{data['date']['ru']}</span> | <span id="title-articles-count">{format_subtitle(len(data['papers']))}</span></p>
         </div>
         <div class="theme-switch">
@@ -864,10 +927,9 @@ def make_html(data, bg_images=True):
     </header>
     <div class="nav-menu">
         <div class="nav-container">
-            <span class="nav-item" id="nav-prev"><a href="/d/{data['link_prev']}">⬅️ <span id="prev-date">{data['short_date_prev']['ru']}</span></a></span>
-            <span class="nav-item" id="nav-next"><a href="/d/{data['link_next']}">➡️ <span id="next-date">{data['short_date_next']['ru']}</span></a></span>
-            <!--<span class="nav-item" id="nav-weekly">Топ за неделю</span>
-            <span class="nav-item" id="nav-weekly">Топ за месяц</span>-->
+            <span class="nav-item" id="nav-prev"><a href="/{link_folder}/{data['link_prev']}">⬅️ <span id="prev-date">{data['short_date_prev']['ru']}</span></a></span>
+            <span class="nav-item" id="nav-next"><a href="/{link_folder}/{data['link_next']}">➡️ <span id="next-date">{data['short_date_next']['ru']}</span></a></span>
+            {nav_month_item}
             <div class="language-flags">
                 <svg class="flag-svg" data-lang="ru" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="#1435a1" d="M1 11H31V21H1z"></path><path d="M5,4H27c2.208,0,4,1.792,4,4v4H1v-4c0-2.208,1.792-4,4-4Z" fill="#fff"></path><path d="M5,20H27c2.208,0,4,1.792,4,4v4H1v-4c0-2.208,1.792-4,4-4Z" transform="rotate(180 16 24)" fill="#c53a28"></path><path d="M27,4H5c-2.209,0-4,1.791-4,4V24c0,2.209,1.791,4,4,4H27c2.209,0,4-1.791,4-4V8c0-2.209-1.791-4-4-4Zm3,20c0,1.654-1.346,3-3,3H5c-1.654,0-3-1.346-3-3V8c0-1.654,1.346-3,3-3H27c1.654,0,3,1.346,3,3V24Z" opacity=".15"></path><path d="M27,5H5c-1.657,0-3,1.343-3,3v1c0-1.657,1.343-3,3-3H27c1.657,0,3,1.343,3,3v-1c0-1.657-1.343-3-3-3Z" fill="#fff" opacity=".2"></path></svg>
                 <svg class="flag-svg" data-lang="zh" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect x="1" y="4" width="30" height="24" rx="4" ry="4" fill="#db362f"></rect><path d="M27,4H5c-2.209,0-4,1.791-4,4V24c0,2.209,1.791,4,4,4H27c2.209,0,4-1.791,4-4V8c0-2.209-1.791-4-4-4Zm3,20c0,1.654-1.346,3-3,3H5c-1.654,0-3-1.346-3-3V8c0-1.654,1.346-3,3-3H27c1.654,0,3,1.346,3,3V24Z" opacity=".15"></path><path fill="#ff0" d="M7.958 10.152L7.19 7.786 6.421 10.152 3.934 10.152 5.946 11.614 5.177 13.979 7.19 12.517 9.202 13.979 8.433 11.614 10.446 10.152 7.958 10.152z"></path><path fill="#ff0" d="M12.725 8.187L13.152 8.898 13.224 8.072 14.032 7.886 13.269 7.562 13.342 6.736 12.798 7.361 12.035 7.037 12.461 7.748 11.917 8.373 12.725 8.187z"></path><path fill="#ff0" d="M14.865 10.372L14.982 11.193 15.37 10.46 16.187 10.602 15.61 10.007 15.997 9.274 15.253 9.639 14.675 9.044 14.793 9.865 14.048 10.23 14.865 10.372z"></path><path fill="#ff0" d="M15.597 13.612L16.25 13.101 15.421 13.13 15.137 12.352 14.909 13.149 14.081 13.179 14.769 13.642 14.541 14.439 15.194 13.928 15.881 14.391 15.597 13.612z"></path><path fill="#ff0" d="M13.26 15.535L13.298 14.707 12.78 15.354 12.005 15.062 12.46 15.754 11.942 16.402 12.742 16.182 13.198 16.875 13.236 16.047 14.036 15.827 13.26 15.535z"></path><path d="M27,5H5c-1.657,0-3,1.343-3,3v1c0-1.657,1.343-3,3-3H27c1.657,0,3,1.343,3,3v-1c0-1.657-1.343-3-3-3Z" fill="#fff" opacity=".2"></path></svg>
@@ -889,16 +951,22 @@ def make_html(data, bg_images=True):
                 </select>
             </div>
         </div>
-        <div class="category-toggle">
-            <div class="svg-container">
-                <span id="category-toggle">🏷️ Фильтр</span>
-                <svg height="3" width="200">
-                    <line x1="0" y1="0" x2="200" y2="0" 
-                        stroke="black" 
-                        stroke-width="2" 
-                        stroke-dasharray="3, 3" />
-                </svg>
+        <div class="sub-header-container-2">
+            <div class="category-toggle-container">
+                <div class="svg-container">
+                    <span id="category-toggle">🏷️ Фильтр</span>
+                    <svg height="3" width="200">
+                        <line x1="0" y1="0" x2="200" y2="0" 
+                            stroke="black" 
+                            stroke-width="2" 
+                            stroke-dasharray="3, 3" />
+                    </svg>
+                </div>
             </div>
+            <div class="category-option-container" id="category-options">                
+                <label class="pointer" for="filter-logic-or"><input type="radio" id="filter-logic-or" name="filter-logic" value="or"> A∪B</label>
+                <label class="pointer" for="filter-logic-and"><input type="radio" id="filter-logic-and" name="filter-logic" value="and"> A∩B</label>
+            </div> 
         </div>
         <div class="category-filters" id="category-filters">
             <span class="clear-categories" id="clear-categories">🧹</span>
@@ -956,7 +1024,7 @@ def make_html(data, bg_images=True):
                 titleSign.classList.add('rotate');
             }}  else {{
                 const title = document.getElementById('doomgrad');
-                title.innerHTML = "{con.TITLE_LIGHT}";
+                title.innerHTML = "{daily_title}";
                 const titleSign = document.getElementById('doomgrad-icon');
                 titleSign.classList.remove('rotate');
             }}
@@ -966,12 +1034,14 @@ def make_html(data, bg_images=True):
         const articlesContainer = document.getElementById('articles-container');
         const sortDropdown = document.getElementById('sort-dropdown');
         const categoryFiltersContainer = document.getElementById('category-filters');
+        const categoryFiltersLogicOptions = document.getElementById('category-options');
         const categoryToggle = document.getElementById('category-toggle');
         const clearCategoriesButton = document.getElementById('clear-categories');
         let selectedCategories = [];
         let selectedArticles = [];
         let sortBy = 'issue_id';     
         let showLimitHint = false; 
+        let filterLogicIsAnd = false;
 
         function getUrlParameters() {{
             const urlParams = new URLSearchParams(window.location.search);
@@ -991,10 +1061,12 @@ def make_html(data, bg_images=True):
         }}
 
         function loadSettings() {{
-            const isDarkMode = localStorage.getItem('darkMode') === 'true';
             const themeToggle = document.getElementById('theme-toggle');
-            let settingSortBy = localStorage.getItem('sort_by');
             const sortDropdown = document.getElementById('sort-dropdown');
+
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            let settingSortBy = localStorage.getItem('sort_by');
+            filterLogicIsAnd = localStorage.getItem('filter_logic_is_and') === 'true';
             
             if (isDarkMode) {{
                 document.body.classList.remove('light-theme');
@@ -1009,12 +1081,30 @@ def make_html(data, bg_images=True):
             if ((!settingSortBy) || (settingSortBy === 'null')) {{
                 settingSortBy = 'issue_id';
             }}
-            
+
+            if (filterLogicIsAnd) {{
+                document.getElementById('filter-logic-and').checked = true;
+            }} else {{
+                document.getElementById('filter-logic-or').checked = true;
+            }}
+
             sortDropdown.value = settingSortBy;
             sortBy = settingSortBy;
         }}
 
         document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
+        document.getElementById('filter-logic-and').addEventListener('change', () => {{
+            filterLogicIsAnd = true;
+            localStorage.setItem('filter_logic_is_and', 'true');
+            filterAndRenderArticles();
+            updateSelectedArticlesTitle();
+        }});
+        document.getElementById('filter-logic-or').addEventListener('change', () => {{
+            filterLogicIsAnd = false;
+            localStorage.setItem('filter_logic_is_and', 'false');
+            filterAndRenderArticles();
+            updateSelectedArticlesTitle();
+        }});
 
         function getUniqueCategories(articles) {{
             const categories = new Set();
@@ -1059,6 +1149,7 @@ def make_html(data, bg_images=True):
             saveCategorySelection();
             updateSelectedArticlesTitle();
             updateUrlWithCategories();
+            setFilterOptionsVisibility();
         }}
 
         function saveCategorySelection() {{
@@ -1104,27 +1195,27 @@ def make_html(data, bg_images=True):
 
         function filterAndRenderArticles() {{
             console.log(selectedCategories);
-            let filteredArticles = selectedCategories.length === 0
-                ? articlesData
-                : articlesData.filter(article => 
-                    article.data && article.data.categories && 
-                    article.data.categories.some(cat => selectedCategories.includes(cat))
+            let filteredArticles; 
+
+            if (filterLogicIsAnd) {{
+                filteredArticles = selectedCategories.length === 0
+                    ? articlesData
+                    : articlesData.filter(article => 
+                        article.data && article.data.categories && 
+                        selectedCategories.every(cat => article.data.categories.includes(cat))
                 );
+            }} else {{
+                filteredArticles = selectedCategories.length === 0
+                    ? articlesData
+                    : articlesData.filter(article => 
+                        article.data && article.data.categories && 
+                        article.data.categories.some(cat => selectedCategories.includes(cat))
+                    );            
+            }}
 
             console.log('filteredArticles', filteredArticles)
 
-            //if (filteredArticles.length === 0) {{
-            //    selectedArticles = articlesData;
-            //    selectedCategories = [];
-            //    cleanCategorySelection();
-            //}} else {{
-            //    selectedArticles = filteredArticles;
-            //}}
-
             selectedArticles = filteredArticles;
-
-            console.log('selectedArticles', selectedArticles)
-
             sortArticles(selectedArticles);
         }}
 
@@ -1138,7 +1229,7 @@ def make_html(data, bg_images=True):
         }}
 
         function renderArticles(articles) {{
-            if (articles.length > 100) {{
+            if (articles.length > 50) {{
                 articles = articles.slice(0, 50);
                 showLimitHint = true;
             }} else {{
@@ -1182,9 +1273,10 @@ def make_html(data, bg_images=True):
             let sortedArticles = [...selectedArticles];
             if (sortBy === 'issue_id') {{
                 sortedArticles.sort((a, b) => b.issue_id - a.issue_id);
-            }}
-            if (sortBy === 'pub_date') {{
+            }} else if (sortBy === 'pub_date') {{
                 sortedArticles.sort((a, b) => b.pub_date.localeCompare(a.pub_date));
+            }} else {{
+                sortedArticles.sort((a, b) => b.score - a.score);
             }}
             renderArticles(sortedArticles);
             localStorage.setItem('sort_by', sortBy);
@@ -1197,9 +1289,21 @@ def make_html(data, bg_images=True):
 
         categoryToggle.addEventListener('click', () => {{
             categoryFiltersContainer.classList.toggle('expanded');
+            setFilterOptionsVisibility();
         }});
 
-        clearCategoriesButton.addEventListener('click', clearAllCategories);
+        clearCategoriesButton.addEventListener('click', () => {{
+            clearAllCategories();
+            setFilterOptionsVisibility();
+        }});
+
+        function setFilterOptionsVisibility() {{
+            if (selectedCategories.length > 0) {{
+                categoryFiltersLogicOptions.style.display = 'inline-block';
+            }} else {{
+                categoryFiltersLogicOptions.style.display = 'none';
+            }}
+        }} 
         
         function updateTimeDiffs() {{
             const timeDiff = document.getElementById('timeDiff');
@@ -1247,11 +1351,20 @@ def make_html(data, bg_images=True):
             updateSelectedArticlesTitle();
             updateSortingOptions();
         }} 
-        function hideNextLink() {{
-            if (isToday('{data["time_utc"]}')) {{
-                const element = document.getElementById('nav-next');
-                if (element) {{    
-                    element.style.display = 'none';
+        function hideNextLink(format) {{
+            if (format === 'monthly') {{
+                if (isCurrentMonth('{data["time_utc"]}')) {{
+                    const element = document.getElementById('nav-next');
+                    if (element) {{    
+                        element.style.display = 'none';
+                    }}
+                }}
+            }} else {{            
+                if (isToday('{data["time_utc"]}')) {{
+                    const element = document.getElementById('nav-next');
+                    if (element) {{    
+                        element.style.display = 'none';
+                    }}
                 }}
             }}
         }}
@@ -1262,9 +1375,10 @@ def make_html(data, bg_images=True):
         filterAndRenderArticles();
         updateSelectedArticlesTitle();
         updateTimeDiffs();
-        hideNextLink(); 
+        hideNextLink('{format}'); 
         initializeLanguageFlags();
         updateLocalization();
+        setFilterOptionsVisibility();
     </script>
 </body>
 </html>

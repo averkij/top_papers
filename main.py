@@ -11,6 +11,7 @@ from tqdm import tqdm
 import constants as con
 import helper
 from helper import log
+from pathlib import Path
 
 import api
 
@@ -114,6 +115,7 @@ formatted_time_utc = helper.CURRENT_DATE.strftime("%Y-%m-%d %H:%M")
 
 link_prev = f"{prev_feed_date.strftime('%Y-%m-%d')}.html"
 link_next = f"{next_feed_date.strftime('%Y-%m-%d')}.html"
+top_current_month_link = f"{feed_date.strftime('%Y-%m')}.html"
 
 feed = {
     "date": {"ru": formatted_date, "en": formatted_date_en, "zh": formatted_date_zh},
@@ -124,6 +126,7 @@ feed = {
     "papers": papers,
     "link_prev": link_prev,
     "link_next": link_next,
+    "link_month": top_current_month_link,
     "short_date_prev": {
         "ru": short_date_prev,
         "en": short_date_prev_en,
@@ -377,5 +380,134 @@ for paper in feed["papers"]:
             api.generate_image_for_paper(paper, img_name)
         else:
             log(f"[Experimental] Image for paper {paper['title']} already exists.")
+
+# %%
+# TOP MONTHLY
+from glob import glob
+import json
+import os
+from datetime import datetime, timezone, timedelta
+
+import requests
+from babel.dates import format_date
+from bs4 import BeautifulSoup
+from tqdm import tqdm
+
+import constants as con
+import helper
+from helper import log
+
+
+BASE_URL = "https://huggingface.co/papers"
+_prev_papers, _issue_id = helper.init()
+
+prev_papers = glob("./d/*.json")
+
+# month_to_generate = datetime.now(timezone.utc)
+month_to_generate = datetime.now(timezone.utc) - timedelta(days=30)
+
+month_to_generate_str = month_to_generate.strftime("%Y-%m")
+prev_papers = [paper for paper in prev_papers if month_to_generate_str in paper]
+
+papers = []
+for doc in prev_papers:
+    with open(doc, "r", encoding="utf-8") as fin:
+        prev_feed = json.load(fin)
+        for paper in prev_feed["papers"]:
+            # fix categories
+            if "categories" in paper["data"]:
+                paper["data"]["categories"] = [
+                    x for x in paper["data"]["categories"] if x not in con.EXCLUDE_CATS
+                ]
+                paper["data"]["categories"] = [
+                    x if x not in con.RENAME_CATS else con.RENAME_CATS[x]
+                    for x in paper["data"]["categories"]
+                ]
+                paper["data"]["categories"] = [
+                    f"#{x.replace('#','')}".lower() for x in paper["data"]["categories"]
+                ]
+            papers.append(paper)
+
+
+from datetime import datetime, date
+from calendar import monthrange
+
+def get_month_date(current_date):
+    feed_date = current_date
+    year = current_date.year
+    month = current_date.month
+    day = current_date.day
+
+    if month == 1:
+        prev_year = year - 1
+        prev_month = 12
+    else:
+        prev_year = year
+        prev_month = month - 1    
+    if month == 12:
+        next_year = year + 1
+        next_month = 1
+    else:
+        next_year = year
+        next_month = month + 1
+    
+    _, prev_month_days = monthrange(prev_year, prev_month)
+    _, next_month_days = monthrange(next_year, next_month)    
+    prev_day = min(day, prev_month_days)
+    next_day = min(day, next_month_days)    
+    prev_date = date(prev_year, prev_month, prev_day)
+    next_date = date(next_year, next_month, next_day)
+    
+    return feed_date, prev_date, next_date
+
+
+feed_date, prev_feed_date, next_feed_date = get_month_date(month_to_generate)
+
+formatted_date = format_date(feed_date, format="LLLL YYYY", locale="ru_RU").capitalize()
+formatted_date_en = format_date(feed_date, format="LLLL YYYY", locale="en_US")
+formatted_date_zh = helper.format_date_zh(feed_date, month_only=True)
+short_date_prev = prev_feed_date.strftime("%m.%Y")
+short_date_next = next_feed_date.strftime("%m.%Y")
+short_date_prev_en = prev_feed_date.strftime("%m/%Y")
+short_date_next_en = next_feed_date.strftime("%m/%Y")
+short_date_prev_zh = helper.format_date_zh(prev_feed_date, month_only=True)
+short_date_next_zh = helper.format_date_zh(next_feed_date, month_only=True)
+
+formatted_time_utc = month_to_generate.strftime("%Y-%m-%d %H:%M")
+
+current_month_page = f"{feed_date.strftime('%Y-%m')}.html"
+link_prev = f"{prev_feed_date.strftime('%Y-%m')}.html"
+link_next = f"{next_feed_date.strftime('%Y-%m')}.html"
+
+feed = {
+    "date": {"ru": formatted_date, "en": formatted_date_en, "zh": formatted_date_zh},
+    "time_utc": formatted_time_utc,
+    "issue_id": _issue_id + 1,
+    "home_page_url": BASE_URL,
+    "papers": papers,
+    "link_prev": link_prev,
+    "link_next": link_next,
+    "short_date_prev": {
+        "ru": short_date_prev,
+        "en": short_date_prev_en,
+        "zh": short_date_prev_zh,
+    },
+    "short_date_next": {
+        "ru": short_date_next,
+        "en": short_date_next_en,
+        "zh": short_date_next_zh,
+    },
+}
+
+feed["categories"] = helper.counted_cats(feed["papers"])
+
+log("Generating top page (month).")
+html_page = helper.make_html(feed, bg_images=False, format="monthly")
+
+log("Writing top page (month).")
+monthly_path = f"./m/{current_month_page}"
+Path(monthly_path).parent.mkdir(parents=True, exist_ok=True)
+with open(monthly_path, "w", encoding="utf-8") as f:
+    f.write(html_page)
 
 # %%
