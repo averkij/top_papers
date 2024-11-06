@@ -277,7 +277,7 @@ feed["categories"] = helper.counted_cats(feed["papers"])
 # feed["intro"] = intro
 # log(intro)
 
-
+# Chinese
 def renew_zh(dt_str):
     dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M")
     dt_now = datetime.now(timezone.utc)
