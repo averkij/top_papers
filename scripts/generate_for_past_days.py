@@ -294,7 +294,31 @@ def generate_for_day(day_str):
 
 # %%
 # Generate for one day
-generate_for_day("2024-10-04")
+# generate_for_day("2024-09-30")
+
+# generate_for_day("2024-09-27")
+# generate_for_day("2024-09-26")
+# generate_for_day("2024-09-25")
+# generate_for_day("2024-09-24")
+# generate_for_day("2024-09-23")
+
+# generate_for_day("2024-09-20")
+# generate_for_day("2024-09-19")
+# generate_for_day("2024-09-18")
+# generate_for_day("2024-09-17")
+# generate_for_day("2024-09-16")
+
+# generate_for_day("2024-09-13")
+# generate_for_day("2024-09-12")
+# generate_for_day("2024-09-11")
+# generate_for_day("2024-09-10")
+# generate_for_day("2024-09-09")
+
+# generate_for_day("2024-09-06")
+# generate_for_day("2024-09-05")
+# generate_for_day("2024-09-04")
+# generate_for_day("2024-09-03")
+# generate_for_day("2024-09-02")
 
 #%%
 #update all prev issues with missed papers
@@ -306,4 +330,6 @@ for doc in tqdm(prev_papers):
     
     generate_for_day(feed_date_str)
 
+# %%
+1+1
 # %%
