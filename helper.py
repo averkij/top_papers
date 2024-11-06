@@ -18,13 +18,13 @@ from bs4 import BeautifulSoup
 from copy import copy
 
 
-def init():
+def init(data_file=con.DATA_FILE):
     Path(con.LOG_DIR).mkdir(exist_ok=True)
     Path(con.DATA_DIR).mkdir(exist_ok=True)
 
-    if os.path.isfile(con.DATA_FILE):
+    if os.path.isfile(data_file):
         log("Read previous papers.")
-        with open(con.DATA_FILE, "r", encoding="utf-8") as f:
+        with open(data_file, "r", encoding="utf-8") as f:
             prev_papers = json.load(f)
     else:
         log("No previous papers found.")
