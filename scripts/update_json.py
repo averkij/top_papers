@@ -315,7 +315,7 @@ for doc in prev_papers:
 print('all_prev_papers:', len(all_prev_papers))
 
 #actualize scores and dates
-for doc in prev_papers[1:]:
+for doc in prev_papers:
     with open(doc, "r", encoding="utf-8") as fin:
         feed = json.load(fin)
         feed_date_str = f"{doc[4:14]}"
