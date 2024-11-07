@@ -396,6 +396,7 @@ from tqdm import tqdm
 import constants as con
 import helper
 from helper import log
+from pathlib import Path
 
 
 BASE_URL = "https://huggingface.co/papers"
@@ -404,7 +405,7 @@ _prev_papers, _issue_id = helper.init()
 prev_papers = glob("./d/*.json")
 
 month_to_generate = datetime.now(timezone.utc)
-# month_to_generate = datetime.now(timezone.utc) - timedelta(days=30)
+# month_to_generate = datetime.now(timezone.utc) - timedelta(days=60)
 
 month_to_generate_str = month_to_generate.strftime("%Y-%m")
 prev_papers = [paper for paper in prev_papers if month_to_generate_str in paper]
@@ -426,7 +427,8 @@ for doc in prev_papers:
                 paper["data"]["categories"] = [
                     f"#{x.replace('#','')}".lower() for x in paper["data"]["categories"]
                 ]
-            papers.append(paper)
+            if not paper["id"] in [x["id"] for x in papers]:
+                papers.append(paper)
 
 
 from datetime import datetime, date
