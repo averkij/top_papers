@@ -24,10 +24,10 @@ MISTRAL_KEY = os.getenv("MISTRAL_KEY")
 openai.api_key = os.getenv("OPENAI_KEY")
 
 XAI_API_KEY = os.getenv("XAIAPI_KEY")
-client_xai = OpenAI(
-    api_key=XAI_API_KEY,
-    base_url="https://api.x.ai/v1",
-)
+# client_xai = OpenAI(
+#     api_key=XAI_API_KEY,
+#     base_url="https://api.x.ai/v1",
+# )
 
 
 class Article(BaseModel):
@@ -231,51 +231,6 @@ def generate_image_for_paper(paper, img_name):
     img_dir = os.path.join(con.IMG_DIR, paper["pub_date"].replace("-", ""))
     generate_and_save_image(name=img_name, img_dir=img_dir, prompt=img_prompt)
 
-
-# CAT_MAPPING = {
-#     1: 'DATASET',
-#     2: 'DATA',
-#     3: 'BENCHMARK',
-#     4: 'AGENTS',
-#     5: 'CV',
-#     6: 'RL',
-#     7: 'RLHF',
-#     8: 'RAG',
-#     9: 'PLP',
-#     10: 'INFERENCE',
-#     11: '3D',
-#     12: 'AUDIO',
-#     13: 'VIDEO',
-#     14: 'MULTIMODAL',
-#     15: 'MATH',
-#     16: 'MULTILINGUAL',
-#     17: 'ARCHITECTURE',
-#     18: 'HEALTHCARE',
-#     19: 'TRAINING',
-#     20: 'ROBOTICS',
-#     21: 'AGI',
-#     22: 'GAMES',
-#     23: 'INTERPRETABILITY',
-#     24: 'REASONING',
-#     25: 'TRANSFER_LEARNING',
-#     26: 'GRAPHS',
-#     27: 'ETHICS',
-#     28: 'SECURITY',
-#     29: 'EDGE_COMPUTING',
-#     30: 'OPTIMIZATION',
-#     31: 'SURVEY',
-#     32: 'DIFFUSION',
-#     33: 'ALIGNMENT',
-#     34: 'STORY_GENERATION',
-#     35: 'HALLUCINATIONS',
-#     36: 'LONG_CONTEXT',
-#     37: 'SYNTHETIC',
-#     38: 'MACHINE_TRANSLATION',
-#     39: 'LEAKAGE',
-#     40: 'OPEN_SOURCE',
-#     41: 'MODELS',
-#     42: 'SCIENCE'
-# }
 
 def get_categories(text, api="openai", model="gpt-4o-mini"):
     prompt_cls_1 = f"""Analyze the following research paper text and classify it into one or more relevant topics from the list below. Consider only information from the provided text. Don't add a tag if the topic is not directly related to the article.
