@@ -167,7 +167,7 @@ def counted_cats(papers):
         if "categories" in paper["data"]:
             for c in paper["data"]["categories"]:
                 if c not in cats:
-                    cats[c] = 0
+                    cats[c] = 1
                 else:
                     cats[c] += 1
     return cats
@@ -216,14 +216,18 @@ def make_html(data, bg_images=True, format="daily"):
         link_folder = "m"
         primary_color = "#7a30efcf"
         bg_digit_color = "#7a30ef17"
-        nav_month_item = ""
+        # bg_dark = "#2f2240"
+        nav_month_item = f"""<span class="nav-item" id="nav-daily"><a href="https://hfday.ru">📈 <span id='top-day-label'>День</span></a></span>"""
         daily_title = con.TITLE_LIGHT_MONTHLY
+        nightly_title = con.TITLE_DARK_MONTHLY
     else:
         link_folder = "d"
         primary_color = "#0989eacf"
         bg_digit_color = "#0989ea22"
+        # bg_dark = "#2f2240"
         nav_month_item = f"""<span class="nav-item" id="nav-monthly"><a href="/m/{data['link_month']}">📈 <span id='top-month-label'>Месяц</span></a></span>"""
         daily_title = con.TITLE_LIGHT
+        nightly_title = con.TITLE_DARK
 
     article_classes = ""
     for paper in data["papers"]:
@@ -234,7 +238,7 @@ def make_html(data, bg_images=True, format="daily"):
             article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(60,60,60,0.92) !important;}}\n'
 
     cats_html = sorted(
-        [f"{k} ({v})" if v else k for k, v in data["categories"].items()]
+        [f"{k} ({v})" if v else k for k,v in data["categories"].items() if k in con.CATEGORIES.keys()]
     )
 
     html = """
@@ -258,6 +262,7 @@ def make_html(data, bg_images=True, format="daily"):
     <style>
         :root {{
             --primary-color: {primary_color};
+            --primary-color-dark: #fffd87cf;
             --secondary-color: #fff;
             --background-color: #f5f5f5;
             --text-color: #333333;
@@ -275,6 +280,9 @@ def make_html(data, bg_images=True, format="daily"):
             color: {bg_digit_color};
             z-index: 0;
             line-height: 1;
+        }}
+        .dark-theme .background-digit {{
+            color: #e9e78f3d;
         }}"""
 
     html += (
@@ -431,6 +439,9 @@ def make_html(data, bg_images=True, format="daily"):
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s ease;
+        }
+        .dark-theme a {
+            color: var(--primary-color-dark);
         }
         a:hover {
             color: #e73838;
@@ -992,6 +1003,7 @@ def make_html(data, bg_images=True, format="daily"):
         let sortLabel = {{'ru': 'Сортировка по', 'en': 'Sort by', 'zh': '排序方式'}}
         let paperLabel = {{'ru': 'Статья', 'en': 'Paper', 'zh': '论文'}}
         let topMonthLabel = {{'ru': 'Месяц', 'en': 'Month', 'zh': '月度论文'}}
+        let topDayLabel = {{'ru': 'День', 'en': 'Day', 'zh': '日度论文'}}
         
         function initializeLanguageFlags() {{
             const flags = document.querySelectorAll('.flag-svg');
@@ -1020,7 +1032,7 @@ def make_html(data, bg_images=True, format="daily"):
             
             if (isDarkMode) {{
                 const title = document.getElementById('doomgrad');
-                title.innerHTML = "{con.TITLE_DARK}";
+                title.innerHTML = "{nightly_title}";
                 const titleSign = document.getElementById('doomgrad-icon');
                 titleSign.classList.add('rotate');
             }}  else {{
@@ -1074,7 +1086,7 @@ def make_html(data, bg_images=True, format="daily"):
                 document.body.classList.add('dark-theme');
                 themeToggle.checked = true;
                 const title = document.getElementById('doomgrad');
-                title.innerHTML = "{con.TITLE_DARK}";
+                title.innerHTML = "{nightly_title}";
                 const titleSign = document.getElementById('doomgrad-icon');
                 titleSign.classList.add('rotate');
             }}
@@ -1343,6 +1355,7 @@ def make_html(data, bg_images=True, format="daily"):
             const prevDate = document.getElementById('prev-date');
             const nextDate = document.getElementById('next-date');
             const topMonth = document.getElementById('top-month-label');
+            const topDay = document.getElementById('top-day-label');
             const papersCount = document.getElementById('title-articles-count');
             const sortLabelText = document.getElementById('sort-label-text');
             titleDate.innerHTML = feedDate[currentLang];
@@ -1352,6 +1365,9 @@ def make_html(data, bg_images=True, format="daily"):
             sortLabelText.innerHTML = sortLabel[currentLang];
             if (topMonth) {{
                 topMonth.innerHTML = topMonthLabel[currentLang];
+            }}  
+            if (topDay) {{
+                topDay.innerHTML = topDayLabel[currentLang];
             }}             
             updateSelectedArticlesTitle();
             updateSortingOptions();
@@ -1392,145 +1408,147 @@ def make_html(data, bg_images=True, format="daily"):
 
 
 def make_html_zh(data):
-    data_zh = data["zh"]
-    title = data["zh"]["title"] if "title" in data["zh"] else "Title"
-    pinyin = "\n".join(
-        [
-            f"<p>{i+1}. {x}</p>"
-            for i, x in enumerate(data_zh["pinyin"].strip(".").split("."))
-        ]
-    )
-    text_zh = "\n".join(
-        [
-            f"<p class='zh-text'>{i+1}. {x}。</p>"
-            for i, x in enumerate(data_zh["text"].strip("。").split("。"))
-        ]
-    )
-    text_en = "\n".join(
-        [
-            f"<p>{i+1}. {x}.</p>"
-            for i, x in enumerate(data_zh["trans"].strip(".").split("."))
-        ]
-    )
-    try:
-        if isinstance(data_zh["vocab"], str):
-            data_zh["vocab"] = data_zh["vocab"].replace("'", '"')
-            data_zh["vocab"] = json.loads(data_zh["vocab"])
-    except Exception as e:
-        data_zh["vocab"] = []
-        log(f"Can't parse vocab. {e}")
+    html_content = ""
+    if "zh" in data:
+        data_zh = data["zh"]
+        title = data["zh"]["title"] if "title" in data["zh"] else "Title"
+        pinyin = "\n".join(
+            [
+                f"<p>{i+1}. {x}</p>"
+                for i, x in enumerate(data_zh["pinyin"].strip(".").split("."))
+            ]
+        )
+        text_zh = "\n".join(
+            [
+                f"<p class='zh-text'>{i+1}. {x}。</p>"
+                for i, x in enumerate(data_zh["text"].strip("。").split("。"))
+            ]
+        )
+        text_en = "\n".join(
+            [
+                f"<p>{i+1}. {x}.</p>"
+                for i, x in enumerate(data_zh["trans"].strip(".").split("."))
+            ]
+        )
+        try:
+            if isinstance(data_zh["vocab"], str):
+                data_zh["vocab"] = data_zh["vocab"].replace("'", '"')
+                data_zh["vocab"] = json.loads(data_zh["vocab"])
+        except Exception as e:
+            data_zh["vocab"] = []
+            log(f"Can't parse vocab. {e}")
 
-    log(f"Chinese vocab {data_zh['vocab']}")
-    html_content = f"""
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-C1CRWDNJ1J"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){{dataLayer.push(arguments);}}
-            gtag('js', new Date());
-            gtag('config', 'G-C1CRWDNJ1J');
-        </script>
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&display=swap" rel="stylesheet">
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Chinese reading task about ML</title>
-        <style>
-            body {{
-                font-family: Arial, sans-serif;
-                background-color: #f4f4f9;
-                color: #333;
-                margin: 0;
-                padding: 20px;
-            }}
-            .container {{
-                max-width: 800px;
-                margin: 0 auto;
-                background-color: #fff;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }}
-            h1 {{
-                color: #0056b3;
-                text-align: center;
-            }}
-            p {{
-                line-height: 1.6;
-            }}
-            .zh-text {{
-                font-size: 1.3em;
-                font-family: 'Noto Sans SC';
-                font-weight: 300;
-                margin: 0 0 5px 0;
-            }}
-            .pinyin {{
-                padding-top: 5px;
-                padding-bottom: 5px;
-                font-style: italic;
-                color: #888;
-            }}
-            table {{
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-            }}
-            th, td {{
-                padding: 12px;
-                border: 1px solid #ddd;
-                text-align: left;
-            }}
-            th {{
-                background-color: #0056b3;
-                color: #fff;
-            }}
-            td {{
-                background-color: #f9f9f9;
-            }}
-            td.zh {{
-                font-family: 'Noto Sans SC';
-                font-size: 1.2em;
-                font-weight: 400;
-            }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>{title}</h1>
-            <div>{text_zh}</div>
-            <div class="pinyin">
-                {pinyin}
-            </div>
-            <div>{text_en}</div>
-            <h2>Vocabulary</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Word</th>
-                        <th>Pinyin</th>
-                        <th>Translation</th>
-                    </tr>
-                </thead>
-                <tbody>
-    """
-
-    for vocab_item in data_zh["vocab"]:
-        html_content += f"""
-                    <tr>
-                        <td class="zh">{vocab_item['word']}</td>
-                        <td>{vocab_item['pinyin']}</td>
-                        <td>{vocab_item['trans']}</td>
-                    </tr>
+        log(f"Chinese vocab {data_zh['vocab']}")
+        html_content = f"""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <script async src="https://www.googletagmanager.com/gtag/js?id=G-C1CRWDNJ1J"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){{dataLayer.push(arguments);}}
+                gtag('js', new Date());
+                gtag('config', 'G-C1CRWDNJ1J');
+            </script>
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&display=swap" rel="stylesheet">
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Chinese reading task about ML</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    background-color: #f4f4f9;
+                    color: #333;
+                    margin: 0;
+                    padding: 20px;
+                }}
+                .container {{
+                    max-width: 800px;
+                    margin: 0 auto;
+                    background-color: #fff;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }}
+                h1 {{
+                    color: #0056b3;
+                    text-align: center;
+                }}
+                p {{
+                    line-height: 1.6;
+                }}
+                .zh-text {{
+                    font-size: 1.3em;
+                    font-family: 'Noto Sans SC';
+                    font-weight: 300;
+                    margin: 0 0 5px 0;
+                }}
+                .pinyin {{
+                    padding-top: 5px;
+                    padding-bottom: 5px;
+                    font-style: italic;
+                    color: #888;
+                }}
+                table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }}
+                th, td {{
+                    padding: 12px;
+                    border: 1px solid #ddd;
+                    text-align: left;
+                }}
+                th {{
+                    background-color: #0056b3;
+                    color: #fff;
+                }}
+                td {{
+                    background-color: #f9f9f9;
+                }}
+                td.zh {{
+                    font-family: 'Noto Sans SC';
+                    font-size: 1.2em;
+                    font-weight: 400;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>{title}</h1>
+                <div>{text_zh}</div>
+                <div class="pinyin">
+                    {pinyin}
+                </div>
+                <div>{text_en}</div>
+                <h2>Vocabulary</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Word</th>
+                            <th>Pinyin</th>
+                            <th>Translation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
         """
 
-    html_content += """
-                </tbody>
-            </table>
-        </div>
-    </body>
-    </html>
-    """
+        for vocab_item in data_zh["vocab"]:
+            html_content += f"""
+                        <tr>
+                            <td class="zh">{vocab_item['word']}</td>
+                            <td>{vocab_item['pinyin']}</td>
+                            <td>{vocab_item['trans']}</td>
+                        </tr>
+            """
+
+        html_content += """
+                    </tbody>
+                </table>
+            </div>
+        </body>
+        </html>
+        """
 
     return html_content
