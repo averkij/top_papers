@@ -352,18 +352,18 @@ helper.try_rename_file(
 
 log("[Experimental] Generating Chinese page for reading.")
 html_zh = helper.make_html_zh(feed)
-log("Renaming previous Chinese page.")
-helper.try_rename_file(
-    "zh.html", con.DATA_DIR, helper.add_date_to_name("_zh_reading_task.html")
-)
+if html_zh:
+    log("Renaming previous Chinese page.")
+    helper.try_rename_file(
+        "zh.html", con.DATA_DIR, helper.add_date_to_name("_zh_reading_task.html")
+    )
+    log("Writing Chinese reading task.")
+    with open("zh.html", "w", encoding="utf-8") as f:
+        f.write(html_zh)
 
 log("Writing result.")
 with open(con.PAGE_FILE, "w", encoding="utf-8") as f:
     f.write(html_index)
-
-log("Writing Chinese reading task.")
-with open("zh.html", "w", encoding="utf-8") as f:
-    f.write(html_zh)
 
 log("Renaming log file.")
 helper.try_rename_file(
@@ -405,7 +405,7 @@ _prev_papers, _issue_id = helper.init()
 prev_papers = glob("./d/*.json")
 
 month_to_generate = datetime.now(timezone.utc)
-# month_to_generate = datetime.now(timezone.utc) - timedelta(days=60)
+# month_to_generate = datetime.now(timezone.utc) - timedelta(days=30)
 
 month_to_generate_str = month_to_generate.strftime("%Y-%m")
 prev_papers = [paper for paper in prev_papers if month_to_generate_str in paper]
