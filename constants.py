@@ -39,6 +39,7 @@ RENAME_CATS = {
     "#cnn": "#architecture",
     "#prompt": "#prompts",
     "#graph": "#graphs",
+    "#translation": "#machine_translation",
 }
 RENAME_TERMS = {
     'БЯМ': 'LLM'
@@ -61,7 +62,7 @@ CATEGORIES = {
     '#math': 0,
     '#multilingual': 0,
     '#architecture': 0,
-    '#medicine': 0,
+    '#healthcare': 0,
     '#training': 0,
     '#robotics': 0,
     '#agi': 0,
@@ -72,7 +73,6 @@ CATEGORIES = {
     '#graphs': 0,
     '#ethics': 0,
     '#security': 0,
-    '#edge_computing': 0,
     '#optimization': 0,
     '#survey': 0,
     '#diffusion': 0,
@@ -81,5 +81,10 @@ CATEGORIES = {
     '#hallucinations': 0,
     '#long_context': 0,
     '#synthetic': 0,
-    '#translation': 0
+    '#machine_translation': 0,
+    '#leakage': 0,
+    '#open_source': 0,
+    '#small_models': 0,
+    '#science': 0,
+    '#low_resource': 0
 }
