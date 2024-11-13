@@ -269,7 +269,7 @@ def make_html(data, bg_images=True, format="daily"):
             --header-color: {primary_color};
             --body-color: #f5f5f5;
             --menu-color: #002370;
-        }}        
+        }}
         .background-digit {{
             position: absolute;
             font-family: 'Tiny5';
@@ -293,11 +293,15 @@ def make_html(data, bg_images=True, format="daily"):
             color: var(--text-color);
             margin: 0;
             padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
+            flex: 1 0 auto;
         }
         .a-clean {
             color: var(--secondary-color);
@@ -309,6 +313,14 @@ def make_html(data, bg_images=True, format="daily"):
         header {
             padding: 3.6em 0 2.4em 0;
             text-align: center;
+        }
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            margin-top: 2em;
+            flex-shrink: 0;
+            padding: 20px;
         }
         h1 {
             font-size: 2.4em;
@@ -446,13 +458,6 @@ def make_html(data, bg_images=True, format="daily"):
         a:hover {
             color: #e73838;
         }
-        footer {
-            background-color: var(--primary-color);
-            color: white;
-            text-align: center;
-            padding: 1em 0;
-            margin-top: 2em;
-        }
         .light-theme {
             background-color: var(--body-color);
             color: #333333;
@@ -517,6 +522,7 @@ def make_html(data, bg_images=True, format="daily"):
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
+            margin-top: 7px;
         }
         .sub-header-container-2 {
             display: flex;
