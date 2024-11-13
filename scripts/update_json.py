@@ -4,22 +4,48 @@ import helper
 import constants as con
 import api
 import json
+import time
 
 prev_papers = glob("./d/*.json")
 
 len(prev_papers)
 
+
 # %%
 import json
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 
 for doc in prev_papers:
     with open(doc, "r", encoding="utf-8") as fin:
+        print(doc)
         feed = json.load(fin)
 
         for paper in feed["papers"]:
             abs = paper["abstract"][:3000]
-            paper["data"]["categories"] = api.get_categories(abs)
+
+            cats = api.get_categories(abs, api="xai", model="grok-beta")
+            # cats = api.get_categories(abs)
+
+            if not "error" in cats:
+                paper["data"]["categories"] = cats
+            else:
+                paper["data"]["categories"] = api.get_categories(abs)
+
+
+            paper["data"]["categories"] = [
+                x for x in paper["data"]["categories"] if x not in con.EXCLUDE_CATS
+            ]
+            paper["data"]["categories"] = [
+                f"#{x.replace('#','')}".lower() for x in paper["data"]["categories"]
+            ]
+            paper["data"]["categories"] = [
+                x if x not in con.RENAME_CATS else con.RENAME_CATS[x]
+                for x in paper["data"]["categories"]
+            ]
+
+            time.sleep(1)
+
+        feed["categories"] = helper.counted_cats(feed["papers"])
 
     json.dump(
         feed,
