@@ -324,10 +324,11 @@ def generate_for_day(day_str):
 #update all prev issues with missed papers
 
 prev_papers = glob("./d/*.json")
-for doc in tqdm(prev_papers):
+
+for doc in tqdm(prev_papers[-10:]):
+
     feed_date_str = f"{doc[4:14]}"
     print(feed_date_str)
-    
     generate_for_day(feed_date_str)
 
 # %%
