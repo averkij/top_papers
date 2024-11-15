@@ -347,14 +347,16 @@ def get_pdf_image(pdf_path, output_path, zoom=2, crop_percent=30, threshold=250)
         # bg = Image.new("RGBA", pil_image.size, (255, 255, 255, 0))
         # bg.paste(pil_image, (0, 0), pil_image)
 
-        pixdata = pil_image.load()
-        width, height = pil_image.size
-        for y in range(height):
-            for x in range(width):
-                if pixdata[x, y] == (255, 255, 255, 255):
-                    pixdata[x, y] = (255, 255, 255, 0)
+        #transparent bg
+        
+        # pixdata = pil_image.load()
+        # width, height = pil_image.size
+        # for y in range(height):
+        #     for x in range(width):
+        #         if pixdata[x, y] == (255, 255, 255, 255):
+        #             pixdata[x, y] = (255, 255, 255, 0)
 
-        pil_image.save(output_path, "PNG", quality=80)
+        pil_image.save(output_path, "PNG", quality=70)
 
         pdf_document.close()
         
