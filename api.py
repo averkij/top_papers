@@ -52,12 +52,15 @@ def get_json(
         temperature=temperature,
     )
     text = re.sub(r"```json|```python|```", "", text).strip()
-    text = text.replace("'", '"')
     try:
         doc = json.loads(text)
     except:
-        log(f"Error. Failed to parse JSON from LLM. {text}")
-        doc = {"error": "Parsing error", "raw_data": text}
+        try:
+            text = text.replace("'", '"')
+            doc = json.loads(text)
+        except:
+            log(f"Error. Failed to parse JSON from LLM. {text}")
+            doc = {"error": "Parsing error", "raw_data": text}
     return doc
 
 
