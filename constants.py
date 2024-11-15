@@ -1,3 +1,6 @@
+
+import os
+
 TITLE_LIGHT = "hf daily"
 TITLE_LIGHT_MONTHLY = "hf monthly"
 TITLE_DARK = "hf nightly"
@@ -10,6 +13,14 @@ LOG_FILE = "log.txt"
 LOG_DIR = "./logs"
 IMG_DIR = "./img"
 DATA_DIR = "./d"
+
+ASSETS_DIR = "./assets"
+PAPER_PDF_DIR = os.path.join(ASSETS_DIR, "pdf")
+PAPER_PDF_TITLE_IMG = os.path.join(PAPER_PDF_DIR, "title_img")
+PAPER_TEXT_DIR = os.path.join(ASSETS_DIR, "texts")
+PAPER_JSON_DIR = os.path.join(ASSETS_DIR, "json")
+PAPER_IMG_DATA_DIR = os.path.join(ASSETS_DIR, "img_data")
+
 
 EXCLUDE_CATS = [
     "#ai",

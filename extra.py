@@ -1,3 +1,4 @@
+import io
 import json
 import os
 import re
@@ -11,6 +12,7 @@ from arxiv import Client, Search
 from bs4 import BeautifulSoup
 from pdfminer.high_level import extract_pages
 from pdfminer.layout import LTChar, LTTextContainer
+from PIL import Image
 
 import api
 import constants as con
@@ -290,7 +292,7 @@ class ArxivParser:
         )
 
 
-def get_pdf_image(pdf_path, output_path, zoom=2, crop_percent=50, threshold=250):
+def get_pdf_image(pdf_path, output_path, zoom=2, crop_percent=30, threshold=250):
     try:
         pdf_document = fitz.open(pdf_path)
         first_page = pdf_document[0]
@@ -306,6 +308,14 @@ def get_pdf_image(pdf_path, output_path, zoom=2, crop_percent=50, threshold=250)
         else:
             grayscale = np.mean(img_array, axis=2)
         
+        non_white_cols = np.where(np.min(grayscale, axis=0) < threshold)[0]
+        if len(non_white_cols) > 0:
+            # first_content_col = int(non_white_cols[0])
+            last_content_col = int(non_white_cols[-1])
+        else:
+            # first_content_col = 0
+            last_content_col = pix.width - 1
+
         non_white_rows = np.where(np.min(grayscale, axis=1) < threshold)[0]
         if len(non_white_rows) > 0:
             first_content_row = non_white_rows[0]
@@ -320,16 +330,32 @@ def get_pdf_image(pdf_path, output_path, zoom=2, crop_percent=50, threshold=250)
         else:
             keep_height = content_height
             
-        x0 = 0
+        x0 = int(pix.width - min(pix.width, last_content_col + 20))
         y0 = int(max(0,first_content_row-20))
-        x1 = int(pix.width)
+        x1 = int(min(pix.width, last_content_col + 20))
         y1 = int(first_content_row + keep_height)
         
         irect = fitz.IRect(x0, y0, x1, y1)
         cropped_pix = fitz.Pixmap(pix.colorspace, irect, False)
         cropped_pix.copy(pix, irect)
 
-        cropped_pix.save(output_path)
+        img_data = cropped_pix.tobytes("png")
+        pil_image = Image.open(io.BytesIO(img_data))
+
+        pil_image = pil_image.convert("RGBA")
+
+        # bg = Image.new("RGBA", pil_image.size, (255, 255, 255, 0))
+        # bg.paste(pil_image, (0, 0), pil_image)
+
+        pixdata = pil_image.load()
+        width, height = pil_image.size
+        for y in range(height):
+            for x in range(width):
+                if pixdata[x, y] == (255, 255, 255, 255):
+                    pixdata[x, y] = (255, 255, 255, 0)
+
+        pil_image.save(output_path, "PNG", quality=80)
+
         pdf_document.close()
         
         return output_path
