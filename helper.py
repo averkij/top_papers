@@ -1430,7 +1430,7 @@ def make_html(data, bg_images=True, format="daily"):
                             <p class="meta"><svg class="text-sm peer-checked:text-gray-500 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12"><path transform="translate(0, 2)" fill="currentColor" d="M5.19 2.67a.94.94 0 0 1 1.62 0l3.31 5.72a.94.94 0 0 1-.82 1.4H2.7a.94.94 0 0 1-.82-1.4l3.31-5.7v-.02Z"></path></svg> ${{item['score']}}. ${{title}}</p>
                             <p class="pub-date">📝 ${{publishedLabel[currentLang]}}${{item['pub_date_card'][currentLang]}}</p>
                             
-                            <img class="article-pdf-title-img" src="https://hfday.ru/${{item['pdf_title_img']}}" />
+                            <!-- <img class="article-pdf-title-img" src="https://hfday.ru/${{item['pdf_title_img']}}" /> -->
                             
                             <div id="abstract-${{index}}" class="abstract">
                                 <p>${{explanation}}</p>
