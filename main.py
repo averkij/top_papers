@@ -1,19 +1,19 @@
 # %%
 import json
 import os
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import requests
 from babel.dates import format_date
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
+import api
 import constants as con
 import helper
+from extra import ArxivParser, get_arxiv_id
 from helper import log
-from pathlib import Path
-
-import api
 
 _prev_papers, _issue_id = helper.init()
 
@@ -73,6 +73,37 @@ for article in tqdm(articles):
             "hash": helper.get_hash(url),
         }
     )
+
+log(f"Downloading and parsing papers (pdf, html). Total: {len(papers)}.")
+for paper in tqdm(papers):
+    url = paper["url"]
+    log(f"Downloading and parsing paper {url}.")
+    try:
+        #debug
+        # parser = ArxivParser(url, delete_pdf=False, recalculate_pdf=True, recalculate_html=False)
+       
+        parser = ArxivParser(url, delete_pdf=True, recalculate_pdf=False, recalculate_html=False)
+
+        paper_data = parser.download_and_parse_pdf()
+        paper_data = parser.parse_html()
+    except Exception as e:
+        log(f"Failed to download and parse paper {url}: {e}")
+
+
+log("Enriching papers with extra data.")
+for paper in tqdm(papers):
+    arxiv_id = get_arxiv_id(paper["url"])
+    extra_path = os.path.join(con.PAPER_JSON_DIR, f"{arxiv_id}.json")
+    if os.path.isfile(extra_path):
+        with open(extra_path, "r", encoding="utf-8") as f:
+            extra_data = json.load(f)
+            paper["authors"] = extra_data["authors"] if "authors" in extra_data else []
+            paper["affiliations"] = extra_data["affiliations"] if "affiliations" in extra_data else []
+
+    pdf_title_img_path = os.path.join(con.PAPER_PDF_TITLE_IMG, f"{arxiv_id}.png")
+    if os.path.isfile(pdf_title_img_path):
+        pdf_title_img_path = pdf_title_img_path.replace('./','')
+        paper["pdf_title_img"] = pdf_title_img_path
 
 
 # %%
@@ -381,12 +412,16 @@ helper.try_rename_file(
 #         else:
 #             log(f"[Experimental] Image for paper {paper['title']} already exists.")
 
+
 # %%
 # TOP MONTHLY
-from glob import glob
+
 import json
 import os
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
+
+from glob import glob
+from pathlib import Path
 
 import requests
 from babel.dates import format_date
@@ -396,8 +431,6 @@ from tqdm import tqdm
 import constants as con
 import helper
 from helper import log
-from pathlib import Path
-
 
 BASE_URL = "https://huggingface.co/papers"
 _prev_papers, _issue_id = helper.init()
@@ -431,8 +464,9 @@ for doc in prev_papers:
                 papers.append(paper)
 
 
-from datetime import datetime, date
 from calendar import monthrange
+from datetime import date, datetime
+
 
 def get_month_date(current_date):
     feed_date = current_date

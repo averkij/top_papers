@@ -342,7 +342,7 @@ def get_pdf_image(pdf_path, output_path, zoom=2, crop_percent=30, threshold=250)
         img_data = cropped_pix.tobytes("png")
         pil_image = Image.open(io.BytesIO(img_data))
 
-        pil_image = pil_image.convert("RGBA")
+        # pil_image = pil_image.convert("RGBA")
 
         # bg = Image.new("RGBA", pil_image.size, (255, 255, 255, 0))
         # bg.paste(pil_image, (0, 0), pil_image)
@@ -355,7 +355,6 @@ def get_pdf_image(pdf_path, output_path, zoom=2, crop_percent=30, threshold=250)
         #     for x in range(width):
         #         if pixdata[x, y] == (255, 255, 255, 255):
         #             pixdata[x, y] = (255, 255, 255, 0)
-
         pil_image.save(output_path, "PNG", quality=70)
 
         pdf_document.close()

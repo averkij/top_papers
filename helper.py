@@ -2,7 +2,8 @@ import hashlib
 import json
 import os
 import re
-from datetime import datetime, timezone, timedelta
+from copy import copy
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
@@ -12,10 +13,6 @@ import constants as con
 
 CURRENT_YEAR = datetime.now(timezone.utc).year
 CURRENT_DATE = datetime.now(timezone.utc)
-
-from bs4 import BeautifulSoup
-
-from copy import copy
 
 
 def init(data_file=con.DATA_FILE):
@@ -866,7 +863,19 @@ def make_html(data, bg_images=True, format="daily"):
         }
 
         .pointer { cursor: pointer; }
-        
+
+        .article-pdf-title-img {
+            max-width: 100%;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            display: block;
+            border-radius: 5px;
+        }
+        .dark-theme .article-pdf-title-img {
+            opacity: 0.8;
+            filter: grayscale(1);
+        }
+
         @media (max-width: 600px) {
             .nav-container {
                 flex-direction: row;
@@ -1420,6 +1429,9 @@ def make_html(data, bg_images=True, format="daily"):
                             <h2>${{item['data']['emoji']}} ${{item['title']}}</h2>
                             <p class="meta"><svg class="text-sm peer-checked:text-gray-500 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12"><path transform="translate(0, 2)" fill="currentColor" d="M5.19 2.67a.94.94 0 0 1 1.62 0l3.31 5.72a.94.94 0 0 1-.82 1.4H2.7a.94.94 0 0 1-.82-1.4l3.31-5.7v-.02Z"></path></svg> ${{item['score']}}. ${{title}}</p>
                             <p class="pub-date">📝 ${{publishedLabel[currentLang]}}${{item['pub_date_card'][currentLang]}}</p>
+                            
+                            <img class="article-pdf-title-img" src="https://hfday.ru/${{item['pdf_title_img']}}" />
+                            
                             <div id="abstract-${{index}}" class="abstract">
                                 <p>${{explanation}}</p>
                                 <div id="toggle-${{index}}" class="abstract-toggle">...</div>
