@@ -14,6 +14,7 @@ from helper import log
 from glob import glob
 
 import api
+from extra import ArxivParser, get_arxiv_id
 
 
 def generate_for_day(day_str):
@@ -77,6 +78,37 @@ def generate_for_day(day_str):
                 "hash": helper.get_hash(url),
             }
         )
+    
+    log(f"Downloading and parsing papers (pdf, html). Total: {len(papers)}.")
+    for paper in tqdm(papers):
+        url = paper["url"]
+        log(f"Downloading and parsing paper {url}.")
+        try:
+            #debug
+            # parser = ArxivParser(url, delete_pdf=False, recalculate_pdf=True, recalculate_html=False)
+        
+            parser = ArxivParser(url, delete_pdf=False, recalculate_pdf=False, recalculate_html=False)
+
+            paper_data = parser.download_and_parse_pdf()
+            paper_data = parser.parse_html()
+        except Exception as e:
+            log(f"Failed to download and parse paper {url}: {e}")
+
+
+    log("Enriching papers with extra data.")
+    for paper in tqdm(papers):
+        arxiv_id = get_arxiv_id(paper["url"])
+        extra_path = os.path.join(con.PAPER_JSON_DIR, f"{arxiv_id}.json")
+        if os.path.isfile(extra_path):
+            with open(extra_path, "r", encoding="utf-8") as f:
+                extra_data = json.load(f)
+                paper["authors"] = extra_data["authors"] if "authors" in extra_data else []
+                paper["affiliations"] = extra_data["affiliations"] if "affiliations" in extra_data else []
+
+        pdf_title_img_path = os.path.join(con.PAPER_PDF_TITLE_IMG, f"{arxiv_id}.png")
+        if os.path.isfile(pdf_title_img_path):
+            pdf_title_img_path = pdf_title_img_path.replace('./','')
+            paper["pdf_title_img"] = pdf_title_img_path
 
 
     def get_week_info(date):
@@ -142,6 +174,10 @@ def generate_for_day(day_str):
         },
     }
 
+    log("Loading Chinese text from previous data.")
+    if "zh" in _prev_papers:
+        feed["zh"] = _prev_papers["zh"]
+
     for i, paper in enumerate(feed["papers"]):
         log("*" * 80)
         log(f'Abstract {i}. {paper["abstract"][:300]}...')
@@ -161,9 +197,9 @@ def generate_for_day(day_str):
         prev_data, ok = helper.try_get_prev_paper(paper, _prev_papers)
 
         if ok:
-            log(
-                f'Using data from previous issue: {json.dumps(prev_data["data"], ensure_ascii=False)[:300]}'
-            )
+            # log(
+            #     f'Using data from previous issue: {json.dumps(prev_data["data"], ensure_ascii=False)[:300]}'
+            # )
             paper["data"] = prev_data["data"]
 
             # DEBUG
@@ -321,16 +357,18 @@ def generate_for_day(day_str):
 # generate_for_day("2024-09-02")
 
 #%%
+prev_papers = glob("./d/*.json")
+prev_papers
+
+#%%
 #update all prev issues with missed papers
 
 prev_papers = glob("./d/*.json")
 
-for doc in tqdm(prev_papers[-10:]):
+for doc in tqdm(prev_papers[-10:-8]):
 
     feed_date_str = f"{doc[4:14]}"
     print(feed_date_str)
     generate_for_day(feed_date_str)
 
-# %%
-1+1
 # %%
