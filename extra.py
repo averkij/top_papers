@@ -14,7 +14,7 @@ from pdfminer.high_level import extract_pages
 from pdfminer.layout import LTChar, LTTextContainer
 from PIL import Image
 
-import api
+import api as api_helper
 import constants as con
 from helper import log
 
@@ -208,7 +208,12 @@ class ArxivParser:
                 if start:
                     acc += section['content'] + " "
 
-            affiliations = get_affiliations(acc[:2000])
+            affiliations = get_affiliations(acc[:2000], )
+
+            #fallback
+            if "error" in affiliations:
+                affiliations = get_affiliations(acc[:2000], api="openai", model="gpt-4o-mini")
+
             parsed_data['affiliations'] = affiliations
 
         with open(f"{json_path}", "w", encoding="utf-8") as f:
@@ -365,11 +370,11 @@ def get_pdf_image(pdf_path, output_path, zoom=2, crop_percent=30, threshold=250)
         log(f"Error generating title image for PDF (pdf_path): {str(e)}")
         return None
     
-def get_affiliations(text):
+def get_affiliations(text, api='mistral', model='open-mistral-nemo'):
     log("Extracting affiliations from text.")
     prompt = f"I give you a contaminated text with start of ML paper. Extract all authors affiliations as a single institute, firm, company, etc. Return items as a Python plain list only with affiliations. If there are no affiliations return empty list.\n\nText:\"{text}\""
 
-    res = api.get_json(
-        prompt, api='mistral', model='open-mistral-nemo', temperature=0.0
+    res = api_helper.get_json(
+        prompt, api=api, model=model, temperature=0.0
     )
     return res
