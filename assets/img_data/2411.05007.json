@@ -1,0 +1,140 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.05007/x1.png",
+                "caption": "Figure 1:SVDQuant is a post-training quantization technique for 4-bit weights and activations that well maintains visual fidelity. On 12B FLUX.1-dev, it achieves 3.6× memory reduction compared to the BF16 model. By eliminating CPU offloading, it offers 8.7× speedup over the 16-bit model when on a 16GB laptop 4090 GPU, 3× faster than the NF4 W4A16 baseline. On PixArt-ΣΣ\\Sigmaroman_Σ, it demonstrates significantly superior visual quality over other W4A4 or even W4A8 baselines. “E2E” means the end-to-end latency including the text encoder and VAE decoder.",
+                "position": 89
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.05007/x2.png",
+                "caption": "Figure 2:Computationvs.parameters for LLMs and diffusion models. LLMs’ computation is measured with 512 context and 256 output tokens, and diffusion models’ computation is for a single step. Dashed lines show trends.",
+                "position": 100
+            },
+            {
+                "img": "https://arxiv.org/html/2411.05007/x3.png",
+                "caption": "Figure 3:Overview of SVDQuant. (a) Originally, both the activation𝑿𝑿{\\bm{X}}bold_italic_Xand weight𝑾𝑾{\\bm{W}}bold_italic_Wcontain outliers, making 4-bit quantization challenging.\n(b) We migrate the outliers from the activation to weight, resulting in the updated activation𝑿^^𝑿\\hat{{\\bm{X}}}over^ start_ARG bold_italic_X end_ARGand weight𝑾^^𝑾\\hat{{\\bm{W}}}over^ start_ARG bold_italic_W end_ARG. While𝑿^^𝑿\\hat{{\\bm{X}}}over^ start_ARG bold_italic_X end_ARGbecomes easier to quantize,𝑾^^𝑾\\hat{{\\bm{W}}}over^ start_ARG bold_italic_W end_ARGnow becomes more difficult.\n(c) SVDQuant further decomposes𝑾^^𝑾\\hat{{\\bm{W}}}over^ start_ARG bold_italic_W end_ARGinto a low-rank component𝑳1⁢𝑳2subscript𝑳1subscript𝑳2{\\bm{L}}_{1}{\\bm{L}}_{2}bold_italic_L start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT bold_italic_L start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPTand a residual𝑾^−𝑳1⁢𝑳2^𝑾subscript𝑳1subscript𝑳2\\hat{{\\bm{W}}}-{\\bm{L}}_{1}{\\bm{L}}_{2}over^ start_ARG bold_italic_W end_ARG - bold_italic_L start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT bold_italic_L start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPTwith SVD. Thus, the quantization difficulty is alleviated by the low-rank branch, which runs at 16-bit precision.",
+                "position": 115
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Quantization Preliminary",
+        "images": []
+    },
+    {
+        "header": "4Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.05007/x4.png",
+                "caption": "Figure 4:Example value distribution of inputs and weights in PixArt-ΣΣ\\Sigmaroman_Σ.𝝀𝝀{\\bm{\\lambda}}bold_italic_λis the smooth factor. Red indicates the outliers. Initially, both the input𝑿𝑿{\\bm{X}}bold_italic_Xand weight𝑾𝑾{\\bm{W}}bold_italic_Wcontain significant outliers. After smoothing, the range of𝑿^^𝑿\\hat{{\\bm{X}}}over^ start_ARG bold_italic_X end_ARGis reduced with much fewer outliers, while𝑾^^𝑾\\hat{{\\bm{W}}}over^ start_ARG bold_italic_W end_ARGshows more outliers. Once the SVD low-rank branch𝑳1⁢𝑳2subscript𝑳1subscript𝑳2{\\bm{L}}_{1}{\\bm{L}}_{2}bold_italic_L start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT bold_italic_L start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPTis subtracted, the residual𝑹𝑹{\\bm{R}}bold_italic_Rhas a narrower range and is free from outliers.",
+                "position": 179
+            },
+            {
+                "img": "https://arxiv.org/html/2411.05007/x5.png",
+                "caption": "Figure 5:First 64 singular values of𝑾𝑾{\\bm{W}}bold_italic_W,𝑾^^𝑾\\hat{{\\bm{W}}}over^ start_ARG bold_italic_W end_ARG, and𝑹𝑹{\\bm{R}}bold_italic_R. The first 32 singular values of𝑾^^𝑾\\hat{{\\bm{W}}}over^ start_ARG bold_italic_W end_ARGexhibit a steep drop, while the remaining values are much more gradual.",
+                "position": 289
+            },
+            {
+                "img": "https://arxiv.org/html/2411.05007/x6.png",
+                "caption": "Figure 6:(a) Naïvely running low-rank branch with rank 32 will introduce 57% latency overhead due to extra read of 16-bit inputs inDown Projectionand extra write of 16-bit outputs inUp Projection. Our Nunchaku engine optimizes this overhead with kernel fusion. (b)Down ProjectionandQuantizekernels use the same input, whileUp Projectionand4-Bit Computekernels share the same output. To reduce data movement overhead, we fuse the first two and the latter two kernels together.",
+                "position": 302
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.05007/x7.png",
+                "caption": "Figure 7:Qualitative visual results on MJHQ. Image Reward is calculated over the entire dataset. On FLUX.1 models, our 4-bit models outperform the NF4 W4A16 baselines, demonstrating superior text alignment and closer similarity to the 16-bit models. For instance, NF4 misinterprets “dinosaur style,” generating a real dinosaur. On PixArt-ΣΣ\\Sigmaroman_Σand SDXL-Turbo, our 4-bit results demonstrate noticeably better visual quality than ViDiT-Q’s and MixDQ’s W4A8 results.",
+                "position": 858
+            },
+            {
+                "img": "https://arxiv.org/html/2411.05007/x8.png",
+                "caption": "Figure 8:SVDQuant reduces the model size of the 12B FLUX.1 by 3.6×. Additionally, our engine, Nunchaku, further cuts memory usage of the 16-bit model by 3.5× and delivers 3.0× speedups over the NF4 W4A16 baseline on both the desktop and laptop NVIDIA RTX 4090 GPUs. Remarkably, on laptop 4090, it achieves in total 10.1× speedup by eliminating CPU offloading.",
+                "position": 861
+            },
+            {
+                "img": "https://arxiv.org/html/2411.05007/x9.png",
+                "caption": "Figure 9:Our INT4 model seamlessly integrates with off-the-shelf LoRAs without requiring requantization. When applying LoRAs, it matches the image quality of the original 16-bit FLUX.1-dev. See AppendixCfor the text prompts.",
+                "position": 866
+            },
+            {
+                "img": "https://arxiv.org/html/2411.05007/x10.png",
+                "caption": "Figure 10:Ablation study of SVDQuant on PixArt-ΣΣ\\Sigmaroman_Σ. The rank of the low-rank branch is 64. Image Reward is measured over 1K samples from MJHQ. Our results significantly outperform the others, achieving the highest image quality by a wide margin.",
+                "position": 871
+            },
+            {
+                "img": "https://arxiv.org/html/2411.05007/x11.png",
+                "caption": "Figure 11:Increasing the rankr𝑟ritalic_rof the low-rank branch in SVDQuant can enhance image quality, but it also leads to higher parameter and latency overhead.",
+                "position": 890
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion & Discussion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AMissing Proofs",
+        "images": []
+    },
+    {
+        "header": "Appendix BAdditional Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.05007/x12.png",
+                "caption": "Figure 12:Qualitative visual results of FLUX.1-dev on MJHQ.",
+                "position": 2649
+            },
+            {
+                "img": "https://arxiv.org/html/2411.05007/x13.png",
+                "caption": "Figure 13:Qualitative visual results of FLUX.1-schnell on MJHQ.",
+                "position": 2652
+            },
+            {
+                "img": "https://arxiv.org/html/2411.05007/x14.png",
+                "caption": "Figure 14:Qualitative visual results of PixArt-ΣΣ\\Sigmaroman_Σon MJHQ.",
+                "position": 2656
+            },
+            {
+                "img": "https://arxiv.org/html/2411.05007/x15.png",
+                "caption": "Figure 15:Qualitative visual results of SDXL on MJHQ.",
+                "position": 2659
+            },
+            {
+                "img": "https://arxiv.org/html/2411.05007/x16.png",
+                "caption": "Figure 16:Qualitative visual results of SDXL-Turbo on MJHQ.",
+                "position": 2662
+            },
+            {
+                "img": "https://arxiv.org/html/2411.05007/x17.png",
+                "caption": "Figure 17:Additional LoRA results on FLUX.1-dev. When applying LoRAs, our INT4 model matches the image quality of the original BF16 model. See AppendixCfor the detailed used text prompts.",
+                "position": 2673
+            }
+        ]
+    },
+    {
+        "header": "Appendix CText Prompts",
+        "images": []
+    }
+]
