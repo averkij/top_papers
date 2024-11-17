@@ -22,6 +22,7 @@ PAPER_JSON_DIR = os.path.join(ASSETS_DIR, "json")
 PAPER_IMG_DATA_DIR = os.path.join(ASSETS_DIR, "img_data")
 
 PAPER_PDF_IMAGE_STUB = "img/title_stub.png"
+PDF_PARSING_TIMEOUT = 5 * 60
 
 EXCLUDE_CATS = [
     "#ai",

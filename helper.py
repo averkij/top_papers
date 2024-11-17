@@ -2,6 +2,7 @@ import hashlib
 import json
 import os
 import re
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from copy import copy
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -206,6 +207,17 @@ def format_date_zh(date, month_only=False):
         return f"{month}月{year}年"
     return f"{month}月{day}日"
 
+
+def process_with_timeout(func, timeout_seconds, *args, **kwargs):
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(func, *args, **kwargs)
+        try:
+            result = future.result(timeout=timeout_seconds)
+            return result
+        except TimeoutError:
+            future.cancel()
+            raise TimeoutError(f"Function execution timed out after {timeout_seconds} seconds.")
+        
 
 def make_html_zh(data):
     html_content = ""
@@ -447,7 +459,7 @@ def make_html(data, bg_images=True, format="daily"):
             flex-direction: column;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 0 20px;
             flex: 1 0 auto;
@@ -489,7 +501,7 @@ def make_html(data, bg_images=True, format="daily"):
         }
         main {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 2em;
             padding: 10px 0 20px 0;
         }
@@ -815,7 +827,7 @@ def make_html(data, bg_images=True, format="daily"):
             width: 100%;
         }        
         .nav-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 0 20px;
             display: flex;

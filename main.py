@@ -1,6 +1,7 @@
 # %%
 import json
 import os
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -74,20 +75,41 @@ for article in tqdm(articles):
         }
     )
 
+
 log(f"Downloading and parsing papers (pdf, html). Total: {len(papers)}.")
+def do_extra_parsing(url, delete_pdf=True, recalculate_pdf=False, recalculate_html=False):
+    time.sleep(3)
+    parser = ArxivParser(url, delete_pdf=delete_pdf, recalculate_pdf=recalculate_pdf, recalculate_html=recalculate_html)
+    _ = parser.download_and_parse_pdf()
+    _ = parser.parse_html()
+
 for paper in tqdm(papers):
     url = paper["url"]
     log(f"Downloading and parsing paper {url}.")
     try:
         #debug
-        # parser = ArxivParser(url, delete_pdf=False, recalculate_pdf=True, recalculate_html=False)
-       
-        parser = ArxivParser(url, delete_pdf=True, recalculate_pdf=False, recalculate_html=False)
-
-        paper_data = parser.download_and_parse_pdf()
-        paper_data = parser.parse_html()
+        # result = helper.process_with_timeout(
+        #     do_extra_parsing,
+        #     timeout_seconds=con.PDF_PARSING_TIMEOUT,
+        #     url = url,
+        #     delete_pdf=False,
+        #     recalculate_pdf=True,
+        #     recalculate_html=False,
+        # )
+        result = helper.process_with_timeout(
+            do_extra_parsing,
+            timeout_seconds=con.PDF_PARSING_TIMEOUT,
+            url = url,
+            delete_pdf=True,
+            recalculate_pdf=False,
+            recalculate_html=False,
+        )
+        print("Success:", result)
+    except TimeoutError as e:
+        print(f"Extra parsing timeout. ({url}): {e}")    
     except Exception as e:
         log(f"Failed to download and parse paper {url}: {e}")
+
 
 
 log("Enriching papers with extra data.")
@@ -101,6 +123,7 @@ for paper in tqdm(papers):
             paper["affiliations"] = extra_data["affiliations"] if "affiliations" in extra_data else []
 
     pdf_title_img_path = os.path.join(con.PAPER_PDF_TITLE_IMG, f"{arxiv_id}.png")
+    paper["pdf_title_img"] = con.PAPER_PDF_IMAGE_STUB
     if os.path.isfile(pdf_title_img_path):
         pdf_title_img_path = pdf_title_img_path.replace('./','')
         paper["pdf_title_img"] = pdf_title_img_path
@@ -419,7 +442,6 @@ helper.try_rename_file(
 import json
 import os
 from datetime import datetime, timedelta, timezone
-
 from glob import glob
 from pathlib import Path
 
@@ -462,6 +484,18 @@ for doc in prev_papers:
                 ]
             if not paper["id"] in [x["id"] for x in papers]:
                 papers.append(paper)
+            
+            #fix pdf image titles
+            if "pdf_title_img" not in paper or not paper["pdf_title_img"]:
+                paper["pdf_title_img"] = con.PAPER_PDF_IMAGE_STUB
+
+            #fix authors
+            if "authors" not in paper or not paper["authors"]:
+                paper["authors"] = []
+
+            #fix affiliations
+            if "affiliations" not in paper or not paper["affiliations"]:
+                paper["affiliations"] = []
 
 
 from calendar import monthrange
