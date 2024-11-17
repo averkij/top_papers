@@ -19,7 +19,6 @@ import constants as con
 from helper import log
 
 Path(con.PAPER_PDF_DIR).mkdir(parents=True, exist_ok=True)
-Path(con.PAPER_TEXT_DIR).mkdir(parents=True, exist_ok=True)
 Path(con.PAPER_JSON_DIR).mkdir(parents=True, exist_ok=True)
 Path(con.PAPER_IMG_DATA_DIR).mkdir(parents=True, exist_ok=True)
 Path(con.PAPER_PDF_TITLE_IMG).mkdir(parents=True, exist_ok=True)
