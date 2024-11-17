@@ -75,7 +75,6 @@ class ArxivParser:
 
     def download_and_parse_pdf(self):
         pdf_path = os.path.join(con.PAPER_PDF_DIR, f"{self.arxiv_id_no_version}.pdf")
-        text_path = os.path.join(con.PAPER_TEXT_DIR, f"{self.arxiv_id_no_version}.txt")
         json_path = os.path.join(con.PAPER_JSON_DIR, f"{self.arxiv_id_no_version}.json")
 
         pdf_title_img_path = os.path.join(
@@ -185,15 +184,6 @@ class ArxivParser:
             "authors": [author.name for author in paper.authors],
             "sections": sections,
         }
-
-        with open(text_path, "w", encoding="utf-8") as f:
-            f.write(f"Title: {parsed_data['paper_title']}\n\n")
-            f.write(f"Authors: {', '.join(parsed_data['authors'])}\n\n")
-            f.write("\n" + "=" * 80 + "\n\n")
-
-            for section in parsed_data["sections"]:
-                f.write(f"{section['title']}\n{'=' * len(section['title'])}\n\n")
-                f.write(f"{section['content']}\n\n")
 
         get_pdf_image(pdf_path, pdf_title_img_path)
 
