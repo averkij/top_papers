@@ -102,13 +102,11 @@ for paper in tqdm(papers):
             recalculate_pdf=False,
             recalculate_html=False,
         )
-        print("Success:", result)
+        log("Success.")
     except TimeoutError as e:
-        print(f"Extra parsing timeout. ({url}): {e}")    
+        log(f"Extra parsing timeout. ({url}): {e}")    
     except Exception as e:
         log(f"Failed to download and parse paper {url}: {e}")
-
-
 
 log("Enriching papers with extra data.")
 for paper in tqdm(papers):
@@ -120,7 +118,7 @@ for paper in tqdm(papers):
             paper["authors"] = extra_data["authors"] if "authors" in extra_data else []
             paper["affiliations"] = extra_data["affiliations"] if "affiliations" in extra_data else []
 
-    pdf_title_img_path = os.path.join(con.PAPER_PDF_TITLE_IMG, f"{arxiv_id}.png")
+    pdf_title_img_path = os.path.join(con.PAPER_PDF_TITLE_IMG, f"{arxiv_id}.jpg")
     paper["pdf_title_img"] = con.PAPER_PDF_IMAGE_STUB
     if os.path.isfile(pdf_title_img_path):
         pdf_title_img_path = pdf_title_img_path.replace('./','')

@@ -77,7 +77,7 @@ class ArxivParser:
         json_path = os.path.join(con.PAPER_JSON_DIR, f"{self.arxiv_id_no_version}.json")
 
         pdf_title_img_path = os.path.join(
-            con.PAPER_PDF_TITLE_IMG, f"{self.arxiv_id_no_version}.png"
+            con.PAPER_PDF_TITLE_IMG, f"{self.arxiv_id_no_version}.jpg"
         )
 
         if os.path.exists(json_path) and not self.recalculate_pdf:
@@ -349,7 +349,7 @@ def get_pdf_image(pdf_path, output_path, zoom=2, crop_percent=30, threshold=250)
         #     for x in range(width):
         #         if pixdata[x, y] == (255, 255, 255, 255):
         #             pixdata[x, y] = (255, 255, 255, 0)
-        pil_image.save(output_path, "PNG", quality=70)
+        pil_image.save(output_path, "JPEG", quality=60)
 
         pdf_document.close()
         
