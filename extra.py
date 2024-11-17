@@ -73,6 +73,12 @@ class ArxivParser:
         return None
 
     def download_and_parse_pdf(self):
+        #debug
+
+        # if not '2411.07133' in self.arxiv_id_no_version:
+        #     print('skip')
+        #     return
+
         pdf_path = os.path.join(con.PAPER_PDF_DIR, f"{self.arxiv_id_no_version}.pdf")
         json_path = os.path.join(con.PAPER_JSON_DIR, f"{self.arxiv_id_no_version}.json")
 
@@ -158,7 +164,11 @@ class ArxivParser:
                                 }
                             )
 
-                        current_section = text
+                        if not 'Start' in [section['title'] for section in sections]:
+                            current_section = 'Start'
+                        else:
+                            current_section = text
+
                         current_text = []
                     else:
                         buffer.append(text)
@@ -197,13 +207,16 @@ class ArxivParser:
                 if start:
                     acc += section['content'] + " "
 
-            affiliations = get_affiliations(acc[:2000], )
+            affiliations = get_affiliations(acc[:2000], api="openai", model="gpt-4o-mini")
 
             #fallback
             if "error" in affiliations:
-                affiliations = get_affiliations(acc[:2000], api="openai", model="gpt-4o-mini")
+                affiliations = get_affiliations(acc[:2000])
 
             parsed_data['affiliations'] = affiliations
+        else:
+            log('No Start section detected to extract affiliations.')
+            parsed_data['affiliations'] = []
 
         with open(f"{json_path}", "w", encoding="utf-8") as f:
             json.dump(parsed_data, f, indent=4, ensure_ascii=False)
@@ -349,7 +362,7 @@ def get_pdf_image(pdf_path, output_path, zoom=2, crop_percent=30, threshold=250)
         #     for x in range(width):
         #         if pixdata[x, y] == (255, 255, 255, 255):
         #             pixdata[x, y] = (255, 255, 255, 0)
-        pil_image.save(output_path, "JPEG", quality=60)
+        pil_image.save(output_path, "JPEG", quality=65)
 
         pdf_document.close()
         
