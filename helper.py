@@ -8,9 +8,9 @@ from pathlib import Path
 
 import requests
 from babel.dates import format_date
+from bs4 import BeautifulSoup
 
 import constants as con
-from bs4 import BeautifulSoup
 
 CURRENT_YEAR = datetime.now(timezone.utc).year
 CURRENT_DATE = datetime.now(timezone.utc)
@@ -383,7 +383,11 @@ def make_html(data, bg_images=True, format="daily"):
             article_classes += f'body.dark-theme>div>main>article.x{paper["hash"]}:hover {{ background-color: rgba(60,60,60,0.92) !important;}}\n'
 
     cats_html = sorted(
-        [f"{k} ({v})" if v else k for k,v in data["categories"].items() if k in con.CATEGORIES.keys()]
+        [
+            f"{k} ({v})" if v else k
+            for k, v in data["categories"].items()
+            if k in con.CATEGORIES.keys()
+        ]
     )
 
     html = """
