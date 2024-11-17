@@ -1,7 +1,6 @@
 # %%
 import json
 import os
-import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -78,7 +77,6 @@ for article in tqdm(articles):
 
 log(f"Downloading and parsing papers (pdf, html). Total: {len(papers)}.")
 def do_extra_parsing(url, delete_pdf=True, recalculate_pdf=False, recalculate_html=False):
-    time.sleep(3)
     parser = ArxivParser(url, delete_pdf=delete_pdf, recalculate_pdf=recalculate_pdf, recalculate_html=recalculate_html)
     _ = parser.download_and_parse_pdf()
     _ = parser.parse_html()
