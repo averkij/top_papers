@@ -10,6 +10,7 @@ import requests
 from babel.dates import format_date
 
 import constants as con
+from bs4 import BeautifulSoup
 
 CURRENT_YEAR = datetime.now(timezone.utc).year
 CURRENT_DATE = datetime.now(timezone.utc)
