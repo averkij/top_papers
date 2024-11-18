@@ -1,0 +1,148 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/teaser.png",
+                "caption": "Figure 1:Effectiveness of Adaptive Caching:We show a qualitative comparison of AdaCache (right) applied on top of Open-Sora(Zheng et al.,2024)(left), a baseline video DiT. Here, we consider generating 720p - 2s video clips, and report VBench(Huang et al.,2024)quality and average latency (on a single A100 GPU) on the benchmark prompts from Open-Sora gallery. AdaCache generates videos significantly faster (i.e., 4.7×\\times×speedup) with a comparable quality. Also, the number of computed steps varies for each video. Best-viewed with zoom-in. Prompts given in supplementary.",
+                "position": 176
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Not All Videos Are Created Equal",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/step_change.png",
+                "caption": "Figure 2:Not all videos are created equal:We show frames from 720p - 2s video generations based on Open-Sora(Zheng et al.,2024). (Left) We try to break each generation by reducing the number of diffusion steps. Interestingly, not all videos have the same break point. Some sequences are extremely robust (e.g.first-two columns), while others break easily. (Right) When we plot the difference between computed representations in subsequent diffusion steps, we see unique variations (Feature distance vs. #steps). If we are to reuse similar representations, it needs to be tailored to each video. Both these observations suggest the need for a content-dependent denoising process, which is the founding motivation of Adaptive Caching. Best-viewed with zoom-in. Prompts given in supplementary.",
+                "position": 219
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/step_change.png",
+                "caption": "",
+                "position": 222
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/cache_histo.png",
+                "caption": "",
+                "position": 226
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/30v100.png",
+                "caption": "Figure 3:Videos generated at a capped-budget:There exist different configurations for generating videos at an approximately-fixed latency (e.g.having an arbitrary #denoising-steps, yet only computing a fixed #representations and reusing otherwise). We observe a significant variance in quality in such videos. Best-viewed with zoom-in. Prompts given in supplementary.",
+                "position": 232
+            }
+        ]
+    },
+    {
+        "header": "4Adaptive Caching for Faster Video DiTs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/main_fig.png",
+                "caption": "Figure 4:Overview of Adaptive Caching:(Left) During the diffusion process, we choose to cache residual computations within selected DiT blocks. The caching schedule iscontent-dependent, as we decide when to compute the next representation based on a distance metric (ctsubscript𝑐𝑡c_{t}italic_c start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT). This metric measures the rate-of-change from previously-computed (and, stored) representation to the current one, and can be evaluated per-layer or the DiT as-a-whole. Each computed residual can be cached and reused across multiple steps. (Right) We only cache the residuals (i.e., skip-connections) which amount to the actual computations (e.g.spatial-temporal/cross attention, MLP). The iteratively denoised representation (i.e.,ft+ksubscript𝑓𝑡𝑘f_{t+k}italic_f start_POSTSUBSCRIPT italic_t + italic_k end_POSTSUBSCRIPT,ftsubscript𝑓𝑡f_{t}italic_f start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT) always gets updated either with computed or cached residuals.",
+                "position": 245
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/user_study.png",
+                "caption": "Figure 5:User study:We collect human preferences, comparing AdaCache with PAB(Zhao et al.,2024c)(left) and evaluating our motion regularization (right). AdaCache\nshows a significantly-higher preference-rate over PAB at a comparable latency. Our motion- regularized variant is better-preferred, yet often tied with AdaCache in terms of perceived quality.",
+                "position": 753
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/tradeoff.png",
+                "caption": "Figure 6:Quality-Latency trade-off:We show quality vs. latency curves for different configurations of AdaCache and PAB(Zhao et al.,2024c), with Open-Sora(Zheng et al.,2024)720p - 2s generations. AdaCache outperforms PAB consistently, showing a more-stable performance while reducing latency. This stability is more-prominent in reference-free metric VBench(Huang et al.,2024)compared to reference-based metrics, validating that AdaCache generations are aligned with human preference even at its fastest speeds, despite not being exactly-aligned with the reference.",
+                "position": 768
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/moreg.png",
+                "caption": "Figure 7:Impact of Motion Regularization on Adaptive Caching:We show a qualitative comparison of AdaCache and AdaCache (w/ MoReg), applied on top of Open-Sora(Zheng et al.,2024)baseline. Here, we consider generation of 720p - 2s clips at 100-steps. Despite giving a 4.7×\\times×speedup, AdaCache can also introduce some inconsistencies over time (e.g.artifacts, motion, color). Motion Regularization helps avoid most of them by allocating more computations proportional to the amount of motion (while still giving a 4.5×\\times×speedup). Best-viewed with zoom-in. Prompts and more visualizations (see Fig.A.2) are given in supplementary.",
+                "position": 776
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/gpu-cost.png",
+                "caption": "Figure 8:Acceleration in multi-GPU setups:We evaluate the speedups with varying GPU parallelization, as cached-steps can avoid communication overheads among GPUs. Here, we compare AdaCache with PAB(Zhao et al.,2024c), on baselines Open-Sora(Zheng et al.,2024)480p - 2s generations at 30-steps and Open-Sora-Plan(Lab and etc.,2024)512×\\times×512 - 2.7s generations at 150-steps. (Left) AdaCache consistently shows better acceleration over PAB in all settings. (Right) When compared with baselines of similar parallelization, the additional speedup from AdaCache increases with more GPUs. All latency measurements are on A100 GPUs.",
+                "position": 785
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/quali.png",
+                "caption": "Table 3:Ablation study:We evaluate different design decisions of AdaCache on Open-Sora(Zheng et al.,2024)benchmark prompts, reporting VBench(Huang et al.,2024)scores (%), latency (s) and speedup. Here, we consider 32 videos generated with 100 diffusion steps, and use VBench custom dataset evaluation.",
+                "position": 820
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/quali.png",
+                "caption": "(a)",
+                "position": 823
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/quali.png",
+                "caption": "(b)",
+                "position": 840
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/quali.png",
+                "caption": "(c)",
+                "position": 859
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/quali.png",
+                "caption": "(d)",
+                "position": 874
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/quali.png",
+                "caption": "(e)",
+                "position": 891
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/quali.png",
+                "caption": "(f)",
+                "position": 907
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/quali.png",
+                "caption": "Figure 9:Qualitative comparison:We show qualitative results on multiple video-DiT baselines including Open-Sora(Zheng et al.,2024)(720p - 2s at 100-steps), Open-Sora-Plan(Lab and etc.,2024)(512×\\times×512 - 2.7s at 150-steps) and Latte(Ma et al.,2024b)(512×\\times×512 - 2s at 50-steps), while comparing against priortraining-freeinference acceleration method PAB(Zhao et al.,2024c). AdaCache shows a comparable generation quality at much-faster speeds. Best-viewed with zoom-in. Prompts and additional qualitative results (Fig.A.3) are given in supplementary.",
+                "position": 945
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "AAppendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/supp_mo_grad.png",
+                "caption": "Figure A.1:Change in motion-score and motion-gradient across steps:We show the histograms of Motion Regularization metrics (namely, motion-score and motion-gradient) across diffusion steps. Here, motion-score is estimated as latent frame-differences, which correlates well with the perceived motion of a given video sequence. However, it can be unreliable in early denoising steps as such latent representations are noisy. To predict the actual motion (i.e., motion in latter steps≈\\approx≈motion in pixel space) early, we rely on motion-gradientacross diffusion steps. Together, motion-score and motion-gradient provide a reasonable regularization. Best-viewed with zoom-in. Prompts given in supplementary.",
+                "position": 979
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/supp_moreg.png",
+                "caption": "Figure A.2:Additional qualitative results on our Motion Regularization:We show a qualitative comparison of AdaCache and AdaCache (w/ MoReg), applied on top of Open-Sora(Zheng et al.,2024)baseline. Here, we consider generation of 480p - 2s clips at 30-steps. Despite giving a 2.24×\\times×speedup, AdaCache can also introduce some inconsistencies over time. Our Motion Regularization helps avoid most of them by allocating computations proportional to the amount of motion (still giving a 2.10×\\times×speedup). Best-viewed with zoom-in. Prompts given in supplementary.",
+                "position": 1004
+            },
+            {
+                "img": "https://arxiv.org/html/2411.02397/extracted/5985260/figures/supp_sota.png",
+                "caption": "Figure A.3:Additional qualitative comparisons with prior-art:We show qualitative comparisons with prior-art on baseline Open-Sora(Zheng et al.,2024)(720p - 2s at 100-steps). Here, we evaluate against priortraining-freeinference acceleration method PAB(Zhao et al.,2024c)at a comparable speedup. AdaCache consistently shows a better generation quality. Best-viewed with zoom-in. Prompts given in supplementary.",
+                "position": 1008
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
