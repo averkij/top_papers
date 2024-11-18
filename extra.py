@@ -379,4 +379,8 @@ def get_affiliations(text, api='mistral', model='open-mistral-nemo'):
     res = api_helper.get_json(
         prompt, api=api, model=model, temperature=0.0
     )
+
+    if isinstance(res, list):
+        res = sorted(list(set(res)))
+
     return res
