@@ -80,20 +80,29 @@ def generate_for_day(day_str):
         )
     
     log(f"Downloading and parsing papers (pdf, html). Total: {len(papers)}.")
+    def do_extra_parsing(url, delete_pdf=True, recalculate_pdf=False, recalculate_html=False):
+        parser = ArxivParser(url, delete_pdf=delete_pdf, recalculate_pdf=recalculate_pdf, recalculate_html=recalculate_html)
+        _ = parser.download_and_parse_pdf()
+        _ = parser.parse_html()
+
     for paper in tqdm(papers):
         url = paper["url"]
         log(f"Downloading and parsing paper {url}.")
         try:
             #debug
-            # parser = ArxivParser(url, delete_pdf=False, recalculate_pdf=True, recalculate_html=False)
-        
-            parser = ArxivParser(url, delete_pdf=False, recalculate_pdf=False, recalculate_html=False)
-
-            paper_data = parser.download_and_parse_pdf()
-            paper_data = parser.parse_html()
+            helper.process_with_timeout(
+                do_extra_parsing,
+                timeout_seconds=con.PDF_PARSING_TIMEOUT,
+                url = url,
+                delete_pdf=False,
+                recalculate_pdf=True,
+                recalculate_html=False,
+            )
+            log("Success.")
+        except TimeoutError as e:
+            log(f"Extra parsing timeout. ({url}): {e}")    
         except Exception as e:
             log(f"Failed to download and parse paper {url}: {e}")
-
 
     log("Enriching papers with extra data.")
     for paper in tqdm(papers):
@@ -105,7 +114,8 @@ def generate_for_day(day_str):
                 paper["authors"] = extra_data["authors"] if "authors" in extra_data else []
                 paper["affiliations"] = extra_data["affiliations"] if "affiliations" in extra_data else []
 
-        pdf_title_img_path = os.path.join(con.PAPER_PDF_TITLE_IMG, f"{arxiv_id}.png")
+        pdf_title_img_path = os.path.join(con.PAPER_PDF_TITLE_IMG, f"{arxiv_id}.jpg")
+        paper["pdf_title_img"] = con.PAPER_PDF_IMAGE_STUB
         if os.path.isfile(pdf_title_img_path):
             pdf_title_img_path = pdf_title_img_path.replace('./','')
             paper["pdf_title_img"] = pdf_title_img_path
@@ -358,14 +368,14 @@ def generate_for_day(day_str):
 
 #%%
 prev_papers = glob("./d/*.json")
-prev_papers
+prev_papers[-12:-11]
 
 #%%
 #update all prev issues with missed papers
 
 prev_papers = glob("./d/*.json")
 
-for doc in tqdm(prev_papers[-10:-8]):
+for doc in tqdm(prev_papers[-12:-11]):
 
     feed_date_str = f"{doc[4:14]}"
     print(feed_date_str)
