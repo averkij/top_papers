@@ -496,7 +496,7 @@ def make_html(data, bg_images=True, format="daily"):
             min-height: 5.9em;
         }
         .dark-theme .article-title-cont {
-            background: lightslategray;
+            background: #444444;
         }
         .article-title {
             color: white;           
@@ -1487,7 +1487,18 @@ def make_html(data, bg_images=True, format="daily"):
                 let title = item["data"][currentLang]["title"];
 
                 const cats = item["data"]["categories"].slice(0, 5).join(" ");
-                const affiliations = item["affiliations"].slice(0, 10).join(", ");
+                
+                let affiliations = ""
+                if ('affiliations' in item) {{
+                    affiliations = item["affiliations"].slice(0, 10).join(", ");
+                }}
+
+                let pdfImg = "https://hfday.ru/img/title_stub.png"
+                if ('pdf_title_img' in item) {{
+                    pdfImg = 'https://hfday.ru/' + item['pdf_title_img']
+                    
+                }}                
+
                 const articleHTML = `
                     <article class='x${{item["hash"]}}'>
                         <div class="background-digit">${{index + 1}}</div>
@@ -1501,7 +1512,7 @@ def make_html(data, bg_images=True, format="daily"):
                             🔺 ${{item['score']}}. ${{item['title']}}</p>
                             <p class="pub-date">${{publishedLabel[currentLang]}}${{item['pub_date_card'][currentLang]}}</p>
                             
-                            <img class="article-pdf-title-img" src="https://hfday.ru/${{item['pdf_title_img']}}" />
+                            <img class="article-pdf-title-img" src="${{pdfImg}}" />
                             
                             <div id="abstract-${{index}}" class="abstract">
                                 <p>${{explanation}}</p>
