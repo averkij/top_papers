@@ -1,0 +1,74 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "IIntroduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.13618/x1.png",
+                "caption": "Figure 1:Performance vs log-scaled trainable parameters for FGVC (left) and StanfordCars (right) on ViT Base. Our LoLDU methods withr={1,8,16,32,64,128,256,512,768}𝑟18163264128256512768r=\\{1,8,16,32,64,128,256,512,768\\}italic_r = { 1 , 8 , 16 , 32 , 64 , 128 , 256 , 512 , 768 }exhibit superior parameter efficiency and performance when contrasted with Linear Probing[13](LP, fine tuning the classifier head only111Kindly note that the parameter count reported does not include the classification head, as it must be trained using all methods.), FourierFT[14](n={3000,10000}𝑛300010000n=\\{3000,10000\\}italic_n = { 3000 , 10000 }), LoRA[9](r=16𝑟16r=16italic_r = 16), and Full Fine-Tuning. LoLDUr=768outperforms LoRAr=16with 96.837% fewer trainable parameters. Particularly noteworthy is that LoLDU withr=1𝑟1r=1italic_r = 1achieves competitive scores with just 24 trainable parameters, while LoLDU withr=768𝑟768r=768italic_r = 768attains the highest accuracy: 42.15% for FGVC and 66.66% for StanfordCars, showcasing the scalability and effectiveness of our approach. Full Fine-Tuning (85.8M parameters) and Linear Probing represent the upper and lower performance bounds, respectively.",
+                "position": 156
+            }
+        ]
+    },
+    {
+        "header": "IIRelated Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.13618/x2.png",
+                "caption": "Figure 2:Comparison of LoRA (left) and our LoLDU (right) method.In LoRA, tunable parameters are low-rank (r𝑟ritalic_r) matricesA𝐴Aitalic_AandB𝐵Bitalic_B, withΔ⁢W=B⁢AΔ𝑊𝐵𝐴\\Delta W=BAroman_Δ italic_W = italic_B italic_A. For each weightW𝑊Witalic_W, there arer×(di⁢n+do⁢u⁢t)𝑟subscript𝑑𝑖𝑛subscript𝑑𝑜𝑢𝑡r\\times(d_{in}+d_{out})italic_r × ( italic_d start_POSTSUBSCRIPT italic_i italic_n end_POSTSUBSCRIPT + italic_d start_POSTSUBSCRIPT italic_o italic_u italic_t end_POSTSUBSCRIPT )trainable parameters. LoLDU, however, optimizes a diagonal matrix for scale transformation, preserving original model knowledge during tuning. The weight update in LoLDU isΔ⁢W=σ⋅P⋅(Lr,diag⁢(zr),Ur)Δ𝑊⋅𝜎𝑃subscript𝐿𝑟diagsubscript𝑧𝑟subscript𝑈𝑟\\Delta W=\\sigma\\cdot P\\cdot(L_{r},\\text{diag}(z_{r}),U_{r})roman_Δ italic_W = italic_σ ⋅ italic_P ⋅ ( italic_L start_POSTSUBSCRIPT italic_r end_POSTSUBSCRIPT , diag ( italic_z start_POSTSUBSCRIPT italic_r end_POSTSUBSCRIPT ) , italic_U start_POSTSUBSCRIPT italic_r end_POSTSUBSCRIPT ), involvingr+1𝑟1r+1italic_r + 1trainable parameters. The permutation matrixP𝑃Pitalic_P, while omitted in this figure for simplicity, is included in Figure3",
+                "position": 202
+            }
+        ]
+    },
+    {
+        "header": "IIIMethod",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.13618/x3.png",
+                "caption": "Figure 3:Schematic representation of our LoLDU method.The left diagram illustrates the forward pass, demonstrating the transformation of the inputx∈ℝdi⁢n𝑥superscriptℝsubscript𝑑𝑖𝑛x\\in\\mathbb{R}^{d_{in}}italic_x ∈ blackboard_R start_POSTSUPERSCRIPT italic_d start_POSTSUBSCRIPT italic_i italic_n end_POSTSUBSCRIPT end_POSTSUPERSCRIPTinto the outputh∈ℝdo⁢u⁢tℎsuperscriptℝsubscript𝑑𝑜𝑢𝑡h\\in\\mathbb{R}^{d_{out}}italic_h ∈ blackboard_R start_POSTSUPERSCRIPT italic_d start_POSTSUBSCRIPT italic_o italic_u italic_t end_POSTSUBSCRIPT end_POSTSUPERSCRIPTvia a residual subspace matrixL[r:]⁢D[r:]⁢U[r:]L_{[r:]}D_{[r:]}U_{[r:]}italic_L start_POSTSUBSCRIPT [ italic_r : ] end_POSTSUBSCRIPT italic_D start_POSTSUBSCRIPT [ italic_r : ] end_POSTSUBSCRIPT italic_U start_POSTSUBSCRIPT [ italic_r : ] end_POSTSUBSCRIPTand a decomposed subspace matrixσ⁢Lr⁢Dr⁢Ur𝜎subscript𝐿𝑟subscript𝐷𝑟subscript𝑈𝑟\\sigma L_{r}D_{r}U_{r}italic_σ italic_L start_POSTSUBSCRIPT italic_r end_POSTSUBSCRIPT italic_D start_POSTSUBSCRIPT italic_r end_POSTSUBSCRIPT italic_U start_POSTSUBSCRIPT italic_r end_POSTSUBSCRIPT. The right diagram shows the initialization process, where the residual matrix is obtained by performing LDU decomposition on the pre-trained weights, then subtracting the top-r𝑟ritalic_rsubmatrices (top-r𝑟ritalic_rrows and columns) from the permutation matrix (P), lower triangular (L), scaled diagonal (D), and upper triangular (U) matrices. Diagonal matrix is trainable (orange), while the other matrices remain fixed (blue). LoLDU enables efficient adaptation of pre-trained models via low-rank updates, reducing both computational cost and parameter count.",
+                "position": 224
+            }
+        ]
+    },
+    {
+        "header": "IVExperiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.13618/x4.png",
+                "caption": "Figure 4:Comprehensive Analysis of Rank Ablation Study Results.This figure presents the performance of the ViT-base model on various image classification tasks using the LoLDU method with different ranks. The x-axis shows ranks (1 to 768), and the y-axis indicates accuracy for datasets: FGVC, StanfordCars, CIFAR10, CIFAR100, EuroSAT, and Flowers.",
+                "position": 894
+            },
+            {
+                "img": "https://arxiv.org/html/2410.13618/x5.png",
+                "caption": "Figure 5:Concept Learning Progression In Text-to-Image Generation.Top row: target concept. Subsequent rows: generated images using LoLDU (our method), DreamBooth[6], and Textual Inversion[5], respectively, at training steps 0-600. LoLDU exhibits accelerated convergence, achieving concept acquisition within∼similar-to\\sim∼100 steps, surpassing baseline methods in efficiency.",
+                "position": 1052
+            },
+            {
+                "img": "https://arxiv.org/html/2410.13618/x6.png",
+                "caption": "Figure 6:Visualized Results of the Image Generation Task.From left to right: target reference images, outputs from LoLDU (ours), DreamBooth, and Textual Inversion. Each row represents a distinct category with a specified prompt (annotated under each row). LoLDU demonstrates efficacy in generating diverse, prompt-adherent images while preserving key attributes from the reference set.",
+                "position": 1248
+            }
+        ]
+    },
+    {
+        "header": "VConclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.13618/x7.png",
+                "caption": "Figure 7:Learning Rate Ablation Study.The figure demonstrates the effect of different learning rates on ViT-base model accuracy across FGVC, StanfordCars, CIFAR10, CIFAR100, EuroSAT, and Flowers datasets.",
+                "position": 2139
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]

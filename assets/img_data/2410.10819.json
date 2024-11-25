@@ -1,0 +1,138 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.10819/x1.png",
+                "caption": "Figure 1:Visualization of attention maps in the Llama-2-7B model for the sentence \"The best fruit is orange. What is the best fruit? Orange.\" shows the distinct roles ofretrieval heads(e.g., Layer 15, Head 12) andstreaming heads(e.g., Layer 10, Head 1). On the left, retrieval heads capture contextually relevant tokens such as \"best,\" \"fruit,\" and \"orange,\" which are crucial for processing long-context information and, therefore, require a full KV cache. In the middle, streaming heads primarily focus on initial and recent tokens without emphasizing past contextual relevance. On the right, the impact of limiting attention to the sink and recent tokens on long-context passkey retrieval accuracy is shown: modifying retrieval heads severely damages performance, while constraining streaming heads has minimal impacts.",
+                "position": 159
+            }
+        ]
+    },
+    {
+        "header": "2DuoAttention",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.10819/x2.png",
+                "caption": "Figure 2:Overview of DuoAttention:(1) In the retrieval head identification phase, we assign a trainable gate value,α𝛼\\alphaitalic_α, to each attention head, which blends the outputs of full attention and streaming attention. The training objective is to optimize these values to minimize the deviation from the full attention model’s output, while simultaneously applying a regularization loss to encourage lower gate values. This training phase is efficient, requiring only the gate values to be trainable—leaving all other model parameters frozen—thus allowing it to be completed within several hours on an 8 GPU node. (2) During deployment, these gate values are binarized to classify heads as either retrieval or streaming based on a thresholdτ𝜏\\tauitalic_τ. Retrieval heads, identified by a gate value above the threshold, use full attention, caching the KV pairs for all tokens. In contrast, streaming heads cache only the KV pairs of recent tokens and attention sinks.",
+                "position": 178
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/x3.png",
+                "caption": "Figure 3:Example from the synthetic dataset used to identify retrieval heads. We embed ten 32-word passkeys within a long text and ask the model to recall these passkeys. Distillation loss is calculated solely on the passkeys.",
+                "position": 202
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/x3.png",
+                "caption": "Figure 3:Example from the synthetic dataset used to identify retrieval heads. We embed ten 32-word passkeys within a long text and ask the model to recall these passkeys. Distillation loss is calculated solely on the passkeys.",
+                "position": 204
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/x4.png",
+                "caption": "Figure 4:Optimized gate values of four LLMs. Llama-2-7B uses MHA with 32 heads per layer, while Mistral and Llama-3 models use GQA with 8 heads per layer. Retrieval heads have higher scores. MHA models have a lower ratio of retrieval heads compared to GQA models.",
+                "position": 207
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/x5.png",
+                "caption": "Figure 5:Decoding (left) and Chunked Pre-filling (right) Processes in DuoAttention:(1) The retrieval heads’ KV cache stores all tokens, while the streaming heads’ KV cache retains only recent tokens and attention sinks, ensuring constant memory usage. (2) The chunked pre-filling process of DuoAttention’s streaming heads on a 16-token sequence, with one attention sink, two recent tokens, and a chunk size of 4. DuoAttention’s streaming heads have linear time and constant memory complexity during long sequence pre-filling.",
+                "position": 309
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/x6.png",
+                "caption": "Figure 6:DuoAttention provides comparable accuracy as full attention on the Needle-in-a-Haystack benchmark using 25% full attention ratio on the MHA model and 50% full attention ratio on the GQA model.",
+                "position": 357
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/x7.png",
+                "caption": "Figure 7:DuoAttention provides better KV budget and accuracy trade-off on LongBench benchmarks.",
+                "position": 360
+            }
+        ]
+    },
+    {
+        "header": "3Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.10819/x8.png",
+                "caption": "Figure 8:Results on short benchmarks.",
+                "position": 399
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/x8.png",
+                "caption": "Figure 8:Results on short benchmarks.",
+                "position": 402
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/x9.png",
+                "caption": "Figure 9:Per-token decoding latency and memoryusage of DuoAttention compared to full attention across varyingcontext sizes. DuoAttention uses a 25% retrieval head ratio for Llama-2-7B (MHA) and 50% for Llama-3-8B (GQA). DuoAttention achieves up to 2.45×\\times×memory reduction for MHA and 1.65×\\times×for GQA models, along with up to 2.13×\\times×latency reduction for MHA and 1.5×\\times×for GQA models. These reductions approach the inverse of the retrieval head ratios as context length increases. Out-of-memory (OOM) results are linearly extrapolated from measured data.",
+                "position": 475
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/x10.png",
+                "caption": "Figure 10:Pre-filling latency and memoryusage of DuoAttention compared to full attention across varyingpre-filling chunk sizes. DuoAttention uses a 25% retrieval head ratio for Llama-2-7B (MHA), pre-filling a context of 100K tokens, and a 50% ratio for Llama-3-8B (GQA), pre-filling a context of 320K tokens. As the pre-filling chunk size decreases, DuoAttention achieves up to 1.73×\\times×latency reduction for MHA and 1.63×\\times×for GQA models, with memory reductions up to 2.38×\\times×for MHA and 1.53×\\times×for GQA models.",
+                "position": 478
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/x11.png",
+                "caption": "Figure 11:DuoAttention’s decoding memory and latencyvs.KV budget with a fixed context length. Memory and latency are reduced linearly when the ratio of retrieval heads is reduced. DuoAttention achieves up to 2.55×\\times×memory reduction for MHA and 1.67×\\times×for GQA models, along with up to 2.18×\\times×latency reduction for MHA and 1.50×\\times×for GQA models.",
+                "position": 481
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/x11.png",
+                "caption": "Figure 11:DuoAttention’s decoding memory and latencyvs.KV budget with a fixed context length. Memory and latency are reduced linearly when the ratio of retrieval heads is reduced. DuoAttention achieves up to 2.55×\\times×memory reduction for MHA and 1.67×\\times×for GQA models, along with up to 2.18×\\times×latency reduction for MHA and 1.50×\\times×for GQA models.",
+                "position": 484
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/x12.png",
+                "caption": "Figure 12:Combined with 8-bit weight and 4-bit KV cache quantization, DuoAttention can accommodate 3.30 million tokens on a single A100-80G GPU for the Llama-3-8B model.",
+                "position": 489
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/x13.png",
+                "caption": "Figure 13:Ablation studies: (1) Comparison of retrieval head identification methods, showing the superiority of our optimization-based approach with synthetic data over attention profiling and language modeling. (2) Analysis of start and recent token sizes shows that combining sink and recent attention optimally identifies retrieval heads. (3) Deployment performance indicates 16 attention sinks and 64 recent tokens are optimal, with minimal gains beyond these values.",
+                "position": 527
+            }
+        ]
+    },
+    {
+        "header": "4Related Work",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.10819/x14.png",
+                "caption": "Figure 14:Block-sparse approximation ofΛΛ\\Lambdaroman_Λ-like attention.",
+                "position": 1367
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/extracted/5908680/figure/Mistral-7B-Instruct-v0.2_duo_attn-attn_pattern=lr=0.02-reg=0.1-ctx=1000_32000-multi_passkey4-sparsity=0.5.png",
+                "caption": "Figure 15:NIAH result on the Mistral-7B-Instruct-v0.2 model.",
+                "position": 1898
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/extracted/5908680/figure/Mistral-7B-Instruct-v0.2_duo_attn-attn_pattern=lr=0.02-reg=0.1-ctx=1000_32000-multi_passkey4-sparsity=0.5.png",
+                "caption": "Figure 15:NIAH result on the Mistral-7B-Instruct-v0.2 model.",
+                "position": 1901
+            },
+            {
+                "img": "https://arxiv.org/html/2410.10819/extracted/5908680/figure/Mistral-7B-Instruct-v0.3_duo_attn-attn_pattern=lr=0.02-reg=0.1-ctx=1000_32000-multi_passkey4-sparsity=0.5.png",
+                "caption": "Figure 16:NIAH result on the Mistral-7B-Instruct-v0.3 model.",
+                "position": 1906
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]

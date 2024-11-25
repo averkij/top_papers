@@ -1,0 +1,324 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.11081/x1.png",
+                "caption": "Figure 1:Sample quality vs. effective sampling compute (billion parameters×\\times×number of function evaluations during sampling). We compare the sample quality of different models on ImageNet 512×\\times×512, measured by FID (↓↓\\downarrow↓). Our 2-step sCM achieves sample quality comparable to the best previous generative models while using less than 10% of the effective sampling compute.",
+                "position": 118
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-intro/54.png",
+                "caption": "Figure 2:Selected 2-step samples from a continuous-time consistency model trained on ImageNet 512×\\times×512.",
+                "position": 128
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-intro/475.png",
+                "caption": "",
+                "position": 132
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-intro/303.png",
+                "caption": "",
+                "position": 132
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-intro/649.png",
+                "caption": "",
+                "position": 137
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-intro/289.png",
+                "caption": "",
+                "position": 137
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-intro/396.png",
+                "caption": "",
+                "position": 137
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-intro/89.png",
+                "caption": "",
+                "position": 142
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-intro/979.png",
+                "caption": "",
+                "position": 142
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-intro/849.png",
+                "caption": "",
+                "position": 142
+            }
+        ]
+    },
+    {
+        "header": "2Preliminaries",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.11081/x2.png",
+                "caption": "Figure 3:Discrete-time CMs (top & middle) vs. continuous-time CMs (bottom). Discrete-time CMs suffer from discretization errors from numerical ODE solvers, causing imprecise predictions during training. In contrast, continuous-time CMs stay on the ODE trajectory by following its tangent direction with infinitesimal steps.",
+                "position": 197
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/x3.png",
+                "caption": "",
+                "position": 199
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/x4.png",
+                "caption": "",
+                "position": 199
+            }
+        ]
+    },
+    {
+        "header": "3Simplifying Continuous-Time Consistency Models",
+        "images": []
+    },
+    {
+        "header": "4Stabilizing Continuous-time Consistency Models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.11081/x5.png",
+                "caption": "Figure 4:Stability of different formulations.We show the norms of both terms ind⁢𝒇θ−d⁢t=∇𝒙𝒇θ−⋅d⁢𝒙td⁢t+∂t𝒇θ−dsubscript𝒇superscript𝜃d𝑡subscript∇𝒙⋅subscript𝒇superscript𝜃dsubscript𝒙𝑡d𝑡subscript𝑡subscript𝒇superscript𝜃\\frac{\\mathrm{d}{\\bm{f}}_{\\theta^{-}}}{\\mathrm{d}t}=\\nabla_{{\\bm{x}}}{\\bm{f}}_%\n{\\theta^{-}}\\cdot\\frac{\\mathrm{d}{\\bm{x}}_{t}}{\\mathrm{d}t}+\\partial_{t}{\\bm{f%\n}}_{\\theta^{-}}divide start_ARG roman_d bold_italic_f start_POSTSUBSCRIPT italic_θ start_POSTSUPERSCRIPT - end_POSTSUPERSCRIPT end_POSTSUBSCRIPT end_ARG start_ARG roman_d italic_t end_ARG = ∇ start_POSTSUBSCRIPT bold_italic_x end_POSTSUBSCRIPT bold_italic_f start_POSTSUBSCRIPT italic_θ start_POSTSUPERSCRIPT - end_POSTSUPERSCRIPT end_POSTSUBSCRIPT ⋅ divide start_ARG roman_d bold_italic_x start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT end_ARG start_ARG roman_d italic_t end_ARG + ∂ start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT bold_italic_f start_POSTSUBSCRIPT italic_θ start_POSTSUPERSCRIPT - end_POSTSUPERSCRIPT end_POSTSUBSCRIPTfor diffusion models trained with the EDM (cnoise⁢(t)=log⁡(σd⁢tan⁡(t))subscript𝑐noise𝑡subscript𝜎𝑑𝑡c_{\\text{noise}}(t)=\\log(\\sigma_{d}\\tan(t))italic_c start_POSTSUBSCRIPT noise end_POSTSUBSCRIPT ( italic_t ) = roman_log ( italic_σ start_POSTSUBSCRIPT italic_d end_POSTSUBSCRIPT roman_tan ( italic_t ) )) and TrigFlow (cnoise⁢(t)=tsubscript𝑐noise𝑡𝑡c_{\\text{noise}}(t)=titalic_c start_POSTSUBSCRIPT noise end_POSTSUBSCRIPT ( italic_t ) = italic_t) formulations using different time embeddings. We observe that large Fourier scales in Fourier embeddings cause instabilities. In addition, the EDM formulation suffers from numerical issues whent→π2→𝑡𝜋2t\\to\\frac{\\pi}{2}italic_t → divide start_ARG italic_π end_ARG start_ARG 2 end_ARG, while TrigFlow (using positional embeddings) has stable partial derivatives for both𝒙tsubscript𝒙𝑡{\\bm{x}}_{t}bold_italic_x start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPTandt𝑡titalic_t.",
+                "position": 397
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/x6.png",
+                "caption": "",
+                "position": 407
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/x7.png",
+                "caption": "",
+                "position": 413
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/x8.png",
+                "caption": "Figure 5:Comparing different training objectives for consistency distillation.The diffusion models are EDM2(Karras et al.,2024)pretrained on ImageNet 512×\\times×512. (a) 1-step and 2-step sampling of continuous-time CMs trained by using raw tangentsd⁢𝒇θ−d⁢tdsubscript𝒇superscript𝜃d𝑡\\frac{\\mathrm{d}{\\bm{f}}_{\\theta^{-}}}{\\mathrm{d}t}divide start_ARG roman_d bold_italic_f start_POSTSUBSCRIPT italic_θ start_POSTSUPERSCRIPT - end_POSTSUPERSCRIPT end_POSTSUBSCRIPT end_ARG start_ARG roman_d italic_t end_ARG, clipped tangentsclip⁢(d⁢𝒇θ−d⁢t,−1,1)clipdsubscript𝒇superscript𝜃d𝑡11\\text{clip}(\\frac{\\mathrm{d}{\\bm{f}}_{\\theta^{-}}}{\\mathrm{d}t},-1,1)clip ( divide start_ARG roman_d bold_italic_f start_POSTSUBSCRIPT italic_θ start_POSTSUPERSCRIPT - end_POSTSUPERSCRIPT end_POSTSUBSCRIPT end_ARG start_ARG roman_d italic_t end_ARG , - 1 , 1 )and normalized tangents(d⁢𝒇θ−d⁢t)/(‖d⁢𝒇θ−d⁢t‖+0.1)dsubscript𝒇superscript𝜃d𝑡normdsubscript𝒇superscript𝜃d𝑡0.1(\\frac{\\mathrm{d}{\\bm{f}}_{\\theta^{-}}}{\\mathrm{d}t})/(\\|\\frac{\\mathrm{d}{\\bm{%\nf}}_{\\theta^{-}}}{\\mathrm{d}t}\\|+0.1)( divide start_ARG roman_d bold_italic_f start_POSTSUBSCRIPT italic_θ start_POSTSUPERSCRIPT - end_POSTSUPERSCRIPT end_POSTSUBSCRIPT end_ARG start_ARG roman_d italic_t end_ARG ) / ( ∥ divide start_ARG roman_d bold_italic_f start_POSTSUBSCRIPT italic_θ start_POSTSUPERSCRIPT - end_POSTSUPERSCRIPT end_POSTSUBSCRIPT end_ARG start_ARG roman_d italic_t end_ARG ∥ + 0.1 ). (b) Quality of 1-step and 2-step samples from continuous-time CMs trained w/ and w/o adaptive weighting, both are w/ tangent normalization. (c) Quality of 1-step samples from continuous-time CMs vs. discrete-time CMs using varying number of time steps (N𝑁Nitalic_N), trained using all techniques in Sec.4.",
+                "position": 425
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/x9.png",
+                "caption": "",
+                "position": 435
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/x10.png",
+                "caption": "",
+                "position": 441
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/x11.png",
+                "caption": "Figure 6:sCD scales commensurately with teacher diffusion models. We plot the (a) FID and (b) FID ratio against the teacher diffusion model (at the same model size) on ImageNet 64×\\times×64 and 512×\\times×512. sCD scales better than sCT, and has aconstant offsetin the FID ratio across all model sizes, implying that sCD has the same scaling property of the teacher diffusion model. Furthermore, the offset diminishes with more sampling steps.",
+                "position": 513
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/x12.png",
+                "caption": "",
+                "position": 522
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/x13.png",
+                "caption": "",
+                "position": 531
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/x14.png",
+                "caption": "",
+                "position": 535
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/x15.png",
+                "caption": "Figure 7:sCD has higher diversity compared to VSD: Sample quality comparison of the EDM2(Karras et al.,2024)diffusion model, VSD(Wang et al.,2024; Yin et al.,2024b), sCD, and the combination of VSD and sCD, across varying guidance scales. All models are of EDM2-M size and trained on ImageNet 512×\\times×512.",
+                "position": 545
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/x16.png",
+                "caption": "",
+                "position": 555
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/x17.png",
+                "caption": "",
+                "position": 561
+            }
+        ]
+    },
+    {
+        "header": "5Scaling up Continuous-Time Consistency Models",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix ATraining Algorithm of sCM",
+        "images": []
+    },
+    {
+        "header": "Appendix BTrigFlow: A Simple Framework Unifying EDM, Flow Matching and Velocity Prediction",
+        "images": []
+    },
+    {
+        "header": "Appendix CAdaptive Variational Score Distillation in TrigFlow Framework",
+        "images": []
+    },
+    {
+        "header": "Appendix DAdaptive Weighting For Diffusion Models, Consistency Models and Variational Score Distillation",
+        "images": []
+    },
+    {
+        "header": "Appendix EDiscrete-time Consistency Models with Improved Training Objectives",
+        "images": []
+    },
+    {
+        "header": "Appendix FJacobian-Vector Product of Flash Attention",
+        "images": []
+    },
+    {
+        "header": "Appendix GExperiment Settings and Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix-1step/15_batch.jpg",
+                "caption": "Figure 8:Uncurated 1-step samples generated by our sCD-XXL trained on ImageNet 512×\\times×512.",
+                "position": 5296
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix-1step/29_batch.jpg",
+                "caption": "",
+                "position": 5309
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix-1step/33_batch.jpg",
+                "caption": "",
+                "position": 5318
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix-1step/88_batch.jpg",
+                "caption": "",
+                "position": 5327
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix/15_batch.jpg",
+                "caption": "Figure 9:Uncurated 2-step samples generated by our sCD-XXL trained on ImageNet 512×\\times×512.",
+                "position": 5338
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix/29_batch.jpg",
+                "caption": "",
+                "position": 5351
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix/33_batch.jpg",
+                "caption": "",
+                "position": 5360
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix/88_batch.jpg",
+                "caption": "",
+                "position": 5373
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix-1step/127_batch.jpg",
+                "caption": "Figure 10:Uncurated 1-step samples generated by our sCD-XXL trained on ImageNet 512×\\times×512.",
+                "position": 5382
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix-1step/323_batch.jpg",
+                "caption": "",
+                "position": 5399
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix-1step/387_batch.jpg",
+                "caption": "",
+                "position": 5406
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix-1step/388_batch.jpg",
+                "caption": "",
+                "position": 5415
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix/127_batch.jpg",
+                "caption": "Figure 11:Uncurated 2-step samples generated by our sCD-XXL trained on ImageNet 512×\\times×512.",
+                "position": 5426
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix/323_batch.jpg",
+                "caption": "",
+                "position": 5439
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix/387_batch.jpg",
+                "caption": "",
+                "position": 5448
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix/388_batch.jpg",
+                "caption": "",
+                "position": 5457
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix-1step/417_batch.jpg",
+                "caption": "Figure 12:Uncurated 1-step samples generated by our sCD-XXL trained on ImageNet 512×\\times×512.",
+                "position": 5468
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix-1step/425_batch.jpg",
+                "caption": "",
+                "position": 5481
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix-1step/933_batch.jpg",
+                "caption": "",
+                "position": 5490
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix-1step/973_batch.jpg",
+                "caption": "",
+                "position": 5499
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix/417_batch.jpg",
+                "caption": "Figure 13:Uncurated 2-step samples generated by our sCD-XXL trained on ImageNet 512×\\times×512.",
+                "position": 5510
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix/425_batch.jpg",
+                "caption": "",
+                "position": 5523
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix/933_batch.jpg",
+                "caption": "",
+                "position": 5532
+            },
+            {
+                "img": "https://arxiv.org/html/2410.11081/extracted/5926597/figures/samples-appendix/973_batch.jpg",
+                "caption": "",
+                "position": 5541
+            }
+        ]
+    },
+    {
+        "header": "Appendix HAdditional Samples",
+        "images": []
+    }
+]

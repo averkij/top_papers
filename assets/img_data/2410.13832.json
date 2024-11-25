@@ -1,0 +1,118 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.13832/x1.png",
+                "caption": "Figure 1.Given a casually-captured panning video, our method synthesizes a coherent panoramic video, depicting the full dynamic scene. Our framework projects the input video on top of a panoramic canvas and harnesses a generative video model to synthesize realistic and consistent dynamic content in the unknown regions. Note that the kayaker’s paddle moves realistically, even when it is out of frame in the input video.",
+                "position": 199
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": []
+    },
+    {
+        "header": "2.Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.13832/x2.png",
+                "caption": "Figure 2.Temporal coarse-to-fine. The input video (a) is projected on to a unified panoramic canvas using estimated camera parameters. The reprojected input video (b) is temporally downsampled with temporal prefiltering. A base panoramic video is synthesized at the coarsest temporal scale (top),\nthen gradually refined by temporal upsampling, merging, and resynthesis (c). Finally, a spatial super-resolution pass is applied and the original input pixels are merged with the result to produce the output video (d).",
+                "position": 273
+            }
+        ]
+    },
+    {
+        "header": "3.Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.13832/x3.png",
+                "caption": "Figure 3.Upsampling and outpainting. The completed panorama from the previous level𝐲k+1superscript𝐲𝑘1\\mathbf{y}^{k+1}bold_y start_POSTSUPERSCRIPT italic_k + 1 end_POSTSUPERSCRIPT(a) is temporally-upsampled and composited with the current level input video𝐱ksuperscript𝐱𝑘\\mathbf{x}^{k}bold_x start_POSTSUPERSCRIPT italic_k end_POSTSUPERSCRIPTto form a partially-completed input𝐲^m⁢e⁢r⁢g⁢eksubscriptsuperscript^𝐲𝑘𝑚𝑒𝑟𝑔𝑒\\hat{\\mathbf{y}}^{k}_{merge}over^ start_ARG bold_y end_ARG start_POSTSUPERSCRIPT italic_k end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_m italic_e italic_r italic_g italic_e end_POSTSUBSCRIPT(b, input pixels shown highlighted). The model uses the full𝐲^m⁢e⁢r⁢g⁢eksubscriptsuperscript^𝐲𝑘𝑚𝑒𝑟𝑔𝑒\\hat{\\mathbf{y}}^{k}_{merge}over^ start_ARG bold_y end_ARG start_POSTSUPERSCRIPT italic_k end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_m italic_e italic_r italic_g italic_e end_POSTSUBSCRIPTfor context and resynthesizes content outside the input mask to complete the next level panorama𝐲ksuperscript𝐲𝑘\\mathbf{y}^{k}bold_y start_POSTSUPERSCRIPT italic_k end_POSTSUPERSCRIPT(c). In the time dimension, the model is applied in a sliding-window fashion with half-window overlap. In the spatial dimension, multiple overlapping predictions are computed in parallel, then aggregated and a sample is drawn from the average (d).",
+                "position": 338
+            },
+            {
+                "img": "https://arxiv.org/html/2410.13832/x4.png",
+                "caption": "Figure 4.Spatial aggregation of predicted distributions. To generate a sample in the overlap (red), we linearly interpolate the two predicted probability distributions (purple, orange) and sample from the aggregated distribution (brown). With a token-based method the distribution is a discrete distribution over the vocabulary. With diffusion, the distribution is a Gaussian distribution over pixel values, represented byμ𝜇\\muitalic_μandΣΣ\\Sigmaroman_Σ.",
+                "position": 389
+            }
+        ]
+    },
+    {
+        "header": "4.Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.13832/x5.png",
+                "caption": "Figure 5.Comparison with baseline methods. From top to bottom: linear interpolation between pixels based on time produces sharp results for stationary regions, but does not interpolate motion. ProPainter(Zhou et al.,2023)and E2FGVI(Li et al.,2022)are flow-based methods that can produce realistic results in stationary regions (scuba, Bangkok), but fail for moving cameras (skate, ski) or moving objects away from the input window (divers on left in scuba). MAGVIT(Yu et al.,2023)is a video-generation method but does not generate on a common panorama canvas, so it loses information away from the input window. Our results use a coarse-to-fine approach to build a consistent panoramic video and better match the ground-truth. Bottom: ground truth video with input window marked in yellow. See supplemental material for video results.",
+                "position": 429
+            },
+            {
+                "img": "https://arxiv.org/html/2410.13832/x6.png",
+                "caption": "Figure 6.Comparison with Panoramic Video Textures(Agarwala et al.,2005). PVT uses a graph-cut formulation to create a looping panoramic video. Our method can create similar videos, but can also include non-stationary features like the person walking behind the waterfall (boxed).",
+                "position": 586
+            },
+            {
+                "img": "https://arxiv.org/html/2410.13832/x7.png",
+                "caption": "Figure 7.Results on synthetic panning videos. Left: Phenaki model results. Middle: Lumiere model results. Right: ground-truth panoramic video captured with wide-angle camera. Darkened boxed area is the input window shown to the model. Please see supplemental material for full video results.",
+                "position": 589
+            },
+            {
+                "img": "https://arxiv.org/html/2410.13832/x8.png",
+                "caption": "Figure 8.Results on real videos. Left: representative input frames. Middle: frames projected to panorama canvas. Right: our result. Our method synthesizes realistic motions for an unseen person entering the frame (top), ocean waves (middle), and for scenery around a moving camera (bottom). See supplemental material for videos.",
+                "position": 592
+            }
+        ]
+    },
+    {
+        "header": "5.Discussion and Limitations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.13832/x9.png",
+                "caption": "Figure 9.Naive Lumiere vs. Ours. Left: Lumiere without panorama mask finetuning or temporal coarse-to-fine. Right: our result. Compare with our full method and ground-truth in Fig.5.",
+                "position": 644
+            },
+            {
+                "img": "https://arxiv.org/html/2410.13832/x10.png",
+                "caption": "Figure 10.Ablation of Temporal Coarse-to-Fine. Coarse-to-Fine synthesis (right) generates more consistent results over long videos than temporal MultiDiffusion (middle). With temporal MultiDiffusion, later generations can drift from the input pixels (orange box), while coarse-to-fine generates a plausible continuation of the pedestrian. Input pixels shown darkened.",
+                "position": 647
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix S-1Method Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.13832/x11.png",
+                "caption": "Figure 11.Base level completion. Given a reprojected input video (a), we run the video generation model at the coarsest level forwards and backwards in time (b), with the forward pass used if an earlier frame contains data at that pixel (blue) and the backwards pass where only the later frames contain data (orange). We combine the two passes to get the completed regions (c).",
+                "position": 1362
+            },
+            {
+                "img": "https://arxiv.org/html/2410.13832/x12.png",
+                "caption": "Figure 12.MAGVIT baseline in two configurations. MAGVIT operates on a context window of 16 frames. Here we show with an example two different ways we select the 16-frame subset from the synthetic videos. One way is to take 1 in 3 frames from the first 48 frames (left) to span the full scene and minimize hallucination. We compare this version with linear interpolation and our results in Fig. 5 and Table 1. Since the fast panning motion from subsampling might be challenging for MAGVIT, we additionally show a version where we run on the first 16 frames of the videos, which is closer to the panorama outpainting setting in the original work (right). The camera pans slowly with large frame-to-frame overlap, at the expense of observing a portion of the scene. In both settings, MAGVIT struggles to synthesize consistent and realistic content at spatial locations far from the observed input window.",
+                "position": 1397
+            },
+            {
+                "img": "https://arxiv.org/html/2410.13832/x13.png",
+                "caption": "Figure 13.Comparison with linear interpolation baseline (88-frame video, showing 1 in 8 frames, 11 frames total). Given an input video (a) with a left-right-left pan, the linear interpolation result (b) have degenerate motion,e.g.divers on the left cross-fade in the synthesized regions, while our result (c) have smoothly interpolated motion and look consistent with the ground-truth (d).",
+                "position": 1400
+            },
+            {
+                "img": "https://arxiv.org/html/2410.13832/x14.png",
+                "caption": "Figure 14.Ablation of the method. Left: a “naive” Phenaki result of completing the entire panorama without coarse-to-fine, spatial aggregation, or decoder finetuning. Right: our method without spatial aggregation or finetuning. Compare with our full method and ground-truth in Fig. 5. Yellow dotted lines visualize the boundary of the visible input region.",
+                "position": 1403
+            }
+        ]
+    },
+    {
+        "header": "Appendix S-2Baseline/Evaluation details",
+        "images": []
+    },
+    {
+        "header": "Appendix S-3Phenaki Ablations",
+        "images": []
+    }
+]

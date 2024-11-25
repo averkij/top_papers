@@ -1,0 +1,183 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/natural_teaser.jpg",
+                "caption": "Figure 1:NaturalBench examplesconsist of two questions and two images with alternating answers to prevent “blind” models from scoring well (e.g., those that predict the same answer regardless of the image or question, as discussed inSection 3). We compare the ground-truth answer for each (image, question) pair with predictions from leading VLMs including GPT-4o (gpt-4o-2024-08-06), Qwen2-VL (72B), Llama3.2-Vision (90B), and Molmo (72B) (seeSection 4). Even the best models like GPT-4o lags far behind human performance (which is above 90%).Figure 2shows the pipeline for collecting these natural adversarial examples.",
+                "position": 100
+            },
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/collection.jpg",
+                "caption": "Figure 2:Collecting NaturalBench.We use a semi-automated procedure to collect NaturalBench from natural image-text corpora like Flickr30K[63]. First, we identify confounding pairs of image-text samples that fail discriminative VLMs like CLIP[65]and BLIP-2[39], e.g., they wrongly match an image with another image’s caption. Next, we prompt ChatGPT to design questions that yield different answers for each image, providing the original captions in the prompt.Section 3details this procedure. We hire human annotators to filter out incorrect VQA samples, such as “Is the motorcyclist wearing a red and white uniform?”, which has an identical answer of “Yes” for both images. Unlike previous adversarial benchmarks[40,68,24,20], NaturalBench does not target any specific VQA models nor perturb the images or questions.Section 6extends this simple procedure to diverse data sources (e.g., non-English) to highlight its potential for future dynamic evaluations[31]of VLMs.",
+                "position": 103
+            }
+        ]
+    },
+    {
+        "header": "2Related Works",
+        "images": []
+    },
+    {
+        "header": "3Collecting NaturalBench",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/bias_more.jpg",
+                "caption": "Figure 3:Example questions in previous benchmarks solvable by commonsense knowledge.We provide example questions from existing VQA benchmarks that can be addressed using commonsense knowledge. For these questions, a “blind” language model, such as ChatGPT (without vision input), can already answer them without looking at the image.",
+                "position": 151
+            },
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/bias/MMMU.jpeg",
+                "caption": "Figure 4:Performance of GPT-3.5 vs. LLaVA-1.5 on previous VQA benchmarks.We split each benchmark into equal-sized training and test sets, and report zero-shot (inblue) and finetuned (ingreen) results. Previous benchmarks show strong language biases, allowing blind GPT-3.5 to exploit spurious answer patterns (seeSection 4) by finetuning on QA data without images. As a result, blind GPT-3.5 greatly surpasses random chance performance (see thereddotted line) and sometimes even matches the performance of LLaVA-1.5-7B finetuned using images. In contrast,Figure 5shows that NaturalBench can effectively prevent blind solutions from exceeding chance.",
+                "position": 192
+            },
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/bias/MMStar.jpeg",
+                "caption": "",
+                "position": 197
+            },
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/bias/MME.jpeg",
+                "caption": "",
+                "position": 198
+            },
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/bias/MMBench.jpeg",
+                "caption": "",
+                "position": 209
+            },
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/bias/ScienceQA.jpeg",
+                "caption": "",
+                "position": 210
+            },
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/bias/AI2D.jpeg",
+                "caption": "",
+                "position": 211
+            },
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/bias/NaturalBench_finetuned_g_acc_1022_score.jpeg",
+                "caption": "Figure 5:Performance of GPT-3.5, LLaVA-1.5, and GPT-4o on NaturalBench.We also split NaturalBench (the English subset) into equal-sized training and test sets, and report zero-shot (inblue) and finetuned (ingreen) results. We report group accuracy (G-Acc) (introduced inSection 4), which awards a point when all four (image, question) pairs are answered correctly. We highlight key results: (1) Blind GPT-3.5 fails to surpass random chance performance (reddotted line), regardless of finetuning. (2) LLaVA-1.5 improves by9%percent99\\%9 %by finetuning on NaturalBench’s training images. (3) Even GPT-4o gains10%percent1010\\%10 %G-Acc through vision finetuning on NaturalBench; however, it falls far behind human performance (purpledotted line). These findings confirm that NaturalBench is a more vision-centric benchmark, and a potentially useful dataset for improving already advanced VLMs.",
+                "position": 225
+            }
+        ]
+    },
+    {
+        "header": "4Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/skill_tree.jpg",
+                "caption": "Table 1:Performance on NaturalBench.We report the performance of53leading VLMs on NaturalBench. All models significantly lag behind human performance, with the performance gap (in G-Acc) between humans and models highlighted inred. The latest models, such as BLIP-3 (XGen-MM), Cambrian-1, LLaVA-OneVision, Llama3.2-Vision, Molmo, and Qwen2-VL lag significantly behind humans by 55% to 70%. Even the best closed-source GPT-4o is still 52% behind humans.",
+                "position": 248
+            }
+        ]
+    },
+    {
+        "header": "5Why is NaturalBench Challenging?",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/skill_tree.jpg",
+                "caption": "Figure 6:Skill taxonomy and tagging.Figure (a)provides an overview of the compositional reasoning skills evaluated by NaturalBench. Skill definitions and model performance per skill are presented in our Appendix.Figure (b)shows NaturalBench samples with their associated skill tags. Unlike prior benchmarks that assign a single tag per sample, NaturalBench tags each sample with all applicable skills for a fine-grained analysis.",
+                "position": 369
+            },
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/tagging_teaser.jpg",
+                "caption": "",
+                "position": 378
+            },
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/natural_supp.jpg",
+                "caption": "Table 2:Debiased performance on NaturalBench.Many models underperform on NaturalBench due to biases towards certain answers like “Yes” and “B”. To illustrate this, we compute adebiased Q-Accby adjusting the prediction threshold (as described inSection 5) to ensure the model predict different answers for the two images of the same question. Similarly,debiased I-Accensures different predicted answers for the two questions of the same image. Fordebiased G-Acc, we tune the threshold so that the model predicts one answer for two (out of four) image-question pairs, and a different answer for the other two pairs. The substantial performance gains of these metrics suggest that proper debiasing can greatly improve performance. Our Appendix evaluates existing debiasing techniques that do not require prior knowledge of image-question pairings.",
+                "position": 397
+            },
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/natural_supp.jpg",
+                "caption": "Table 3:NaturalBench statistics.We report model performance on each dataset in the Appendix.",
+                "position": 422
+            }
+        ]
+    },
+    {
+        "header": "6Extending to Dynamic Evaluation",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "8Acknowledgement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "",
+        "images": []
+    },
+    {
+        "header": "Appendix ACollection Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/natural_supp.jpg",
+                "caption": "Figure 7:More NaturalBench examples.",
+                "position": 1742
+            }
+        ]
+    },
+    {
+        "header": "Appendix BNaturalBench Performance",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/tagging_supp.jpg",
+                "caption": "Table 4:Performance on different subsets of NaturalBench.We report theG-Accperformance of 53 leading VLMs on subsets of NaturalBench.",
+                "position": 1763
+            },
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/tagging_supp.jpg",
+                "caption": "Table 5:Performance on NaturalBench-Chinese and NaturalBench-Hindi.We reportG-Accfor each dataset, evaluating only models with claimed multilingual capabilities. For both datasets, we also provide G-Acc after translating the original Chinese or Hindi questions into English. This simple translation often boosts performance, except for top models like InternVL-Chat-V1.2-Plus and GPT-4o, which seem extensively trained in Chinese. NaturalBench-Hindi remains particularly challenging for open-source models.",
+                "position": 1873
+            },
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/tagging_supp.jpg",
+                "caption": "Table 6:Ablation on different collection methods.We reportG-Accon datasets generated by different collection methods from Flickr30K. Our adversarial procedure results in a much more challenging dataset. Note that Flickr-Adversarial is the combination of Flickr-YN and Flickr-MCQ.",
+                "position": 1894
+            }
+        ]
+    },
+    {
+        "header": "Appendix CSkill Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/tagging_supp.jpg",
+                "caption": "Table 8:Skill definitions.",
+                "position": 2122
+            },
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/tagging_supp.jpg",
+                "caption": "Table 9:Model performance on Object and Attribute.We reportQ-Accon each tag.",
+                "position": 2165
+            },
+            {
+                "img": "https://arxiv.org/html/2410.14669/extracted/5946586/figures/tagging_supp.jpg",
+                "caption": "Figure 8:More NaturalBench examples with skill tags.",
+                "position": 2195
+            }
+        ]
+    },
+    {
+        "header": "Appendix DDebiasing Analysis",
+        "images": []
+    },
+    {
+        "header": "Checklist",
+        "images": []
+    }
+]
