@@ -379,7 +379,7 @@ def make_html(data, bg_images=True, format="daily"):
         nightly_title = con.TITLE_DARK_MONTHLY
     else:
         link_folder = "d"
-        primary_color = "#0989eacf"
+        primary_color = "cornflowerblue"
         bg_digit_color = "#0989ea22"
         # bg_dark = "#2f2240"
         nav_month_item = f"""<span class="nav-item" id="nav-monthly"><a href="/m/{data['link_month']}">📈 <span id='top-month-label'>Месяц</span></a></span>"""
@@ -425,10 +425,10 @@ def make_html(data, bg_images=True, format="daily"):
             --primary-color: {primary_color};
             --primary-color-dark: #fffd87cf;
             --secondary-color: #fff;
-            --background-color: #f5f5f5;
+            --background-color: #eee;
             --text-color: #333333;
             --header-color: {primary_color};
-            --body-color: #f5f5f5;
+            --body-color: #eee;
             --menu-color: #002370;
         }}
         .background-digit {{
@@ -439,7 +439,7 @@ def make_html(data, bg_images=True, format="daily"):
             font-size: 8em;
             font-weight: 400;
             color: {bg_digit_color};
-            z-index: 0;
+            z-index: 2;
             line-height: 1;
         }}
         .dark-theme .background-digit {{
@@ -459,7 +459,7 @@ def make_html(data, bg_images=True, format="daily"):
             flex-direction: column;
         }
         .container {
-            max-width: 1400px;
+            max-width: 1500px;
             margin: 0 auto;
             padding: 0 20px;
             flex: 1 0 auto;
@@ -488,6 +488,25 @@ def make_html(data, bg_images=True, format="daily"):
             margin: 0;
             font-weight: 700;
         }
+        .article-title-cont {
+            margin: -21px -21px 0px -21px;
+            padding: 10px 20px;
+            background: cornflowerblue;
+            display: table;
+            min-height: 5.9em;
+        }
+        .dark-theme .article-title-cont {
+            background: lightslategray;
+        }
+        .article-title {
+            color: white;           
+        }
+        .article-title h2 {
+            margin: 0px;
+            padding: 0px;
+            font-weight: 400;
+            text-align:center;
+        }
         h2 {
             # color: var(--primary-color);
             font-size: 1.2em;
@@ -502,7 +521,7 @@ def make_html(data, bg_images=True, format="daily"):
         main {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 2em;
+            gap: 1.5em;
             padding: 10px 0 20px 0;
         }
         body.dark-tmeme>header {
@@ -521,20 +540,20 @@ def make_html(data, bg_images=True, format="daily"):
         body.light-theme>div>main>article>div.article-content>p.pub-date {
             color: #555;
         }
-        body.dark-theme>div>main>article>div.article-content>p.tags {
+        body.dark-theme>div>main>article>div.article-content>div.tags {
             color: #ccc;
         }
-        body.light-theme>div>main>article>div.article-content>p.tags {
-            color: #555;
+        body.light-theme>div>main>article>div.article-content>div.tags {
+            color: #fff;
         }
         body.light-theme>header {
             background-color: var(--header-color);
             color: white;
         }
         article {
-            border-radius: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
             overflow: hidden;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
             transition: background-color 0.2s ease;
             display: flex;
             flex-direction: column;
@@ -551,6 +570,7 @@ def make_html(data, bg_images=True, format="daily"):
         }
         body.dark-theme>div>main>article {
             background-color: #444;
+            border: none;
         }
         body.light-theme>div>main>article {
             background-color: #fff;
@@ -564,19 +584,29 @@ def make_html(data, bg_images=True, format="daily"):
         .meta {
             font-size: 0.9em;
             margin-bottom: 0em;
+            font-weight: 500;
+            margin: 20px 0 0px 0;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
         }
         .pub-date {
-            font-size: 0.9em;
+            font-size: 0.8em;
             margin-bottom: 0.8em;
-            font-weight: 300;
+            font-weight: 400;
+            text-align: right;
+            font-family: Roboto;
         }
         .tags {
             font-size: 0.9em;
-            margin-bottom: 1em;
+            margin-bottom: 0;
             position: absolute;
-            bottom: 10px;
+            bottom: 0px;
             font-weight: 300;
             font-family: 'Roboto Slab';
+            background: #555;
+            left: 0;
+            width: 100%;
+            padding: 10px 20px;
         }
         .abstract {
             position: relative;
@@ -605,7 +635,13 @@ def make_html(data, bg_images=True, format="daily"):
         }
         .links {
             margin-top: 1.5em;
-            margin-bottom: 80px;
+            margin-bottom: 20px;
+        }
+        .affiliations {
+            margin-bottom: 50px;
+            padding:10px;
+            font-size: 0.9em;
+            text-align: center
         }
         a {
             color: var(--primary-color);
@@ -827,7 +863,7 @@ def make_html(data, bg_images=True, format="daily"):
             width: 100%;
         }        
         .nav-container {
-            max-width: 1400px;
+            max-width: 1500px;
             margin: 0 auto;
             padding: 0 20px;
             display: flex;
@@ -956,6 +992,18 @@ def make_html(data, bg_images=True, format="daily"):
                 margin-top: 15px;
                 text-align: center;
                 margin-bottom: 10px;
+            }            
+            main {
+                grid-template-columns: repeat(auto-fit);
+                gap: 0em;
+                padding: 10px 0 20px 0;
+                margin: 0 -20px;
+            }
+            footer {
+                margin-top: -20px;
+            }
+            article {
+                border-radius: 0px;
             }
         }
     </style>
@@ -1178,7 +1226,7 @@ def make_html(data, bg_images=True, format="daily"):
         let feedDateNext = {data['short_date_next']};
         let feedDatePrev = {data['short_date_prev']};
         let filterLabel = {{'ru': 'Фильтр', 'en': 'Topics', 'zh': '主题筛选'}}
-        let publishedLabel = {{'ru': 'Статья от ', 'en': 'Published on ', 'zh': '发表于'}}
+        let publishedLabel = {{'ru': 'статья от ', 'en': 'published on ', 'zh': '发表于'}}
         let sortLabel = {{'ru': 'Сортировка по', 'en': 'Sort by', 'zh': '排序方式'}}
         let paperLabel = {{'ru': 'Статья', 'en': 'Paper', 'zh': '论文'}}
         let topMonthLabel = {{'ru': 'Месяц', 'en': 'Month', 'zh': '月度论文'}}
@@ -1438,14 +1486,20 @@ def make_html(data, bg_images=True, format="daily"):
                 let explanation = item["data"][currentLang]["desc"];
                 let title = item["data"][currentLang]["title"];
 
-                const cats = item["data"]["categories"].join(" ");
+                const cats = item["data"]["categories"].slice(0, 5).join(" ");
+                const affiliations = item["affiliations"].slice(0, 10).join(", ");
                 const articleHTML = `
                     <article class='x${{item["hash"]}}'>
                         <div class="background-digit">${{index + 1}}</div>
                         <div class="article-content" onclick="toggleAbstract(${{index}})">
-                            <h2>${{item['data']['emoji']}} ${{item['title']}}</h2>
-                            <p class="meta"><svg class="text-sm peer-checked:text-gray-500 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12"><path transform="translate(0, 2)" fill="currentColor" d="M5.19 2.67a.94.94 0 0 1 1.62 0l3.31 5.72a.94.94 0 0 1-.82 1.4H2.7a.94.94 0 0 1-.82-1.4l3.31-5.7v-.02Z"></path></svg> ${{item['score']}}. ${{title}}</p>
-                            <p class="pub-date">📝 ${{publishedLabel[currentLang]}}${{item['pub_date_card'][currentLang]}}</p>
+                            <div class="article-title-cont">
+                                <div style="display:table-cell; vertical-align: middle;">
+                                    <div class="article-title"><h2>${{item['data']['emoji']}} ${{title}}</h2></div>
+                                </div>
+                            </div>
+                            <p class="meta">
+                            🔺 ${{item['score']}}. ${{item['title']}}</p>
+                            <p class="pub-date">${{publishedLabel[currentLang]}}${{item['pub_date_card'][currentLang]}}</p>
                             
                             <img class="article-pdf-title-img" src="https://hfday.ru/${{item['pdf_title_img']}}" />
                             
@@ -1453,10 +1507,14 @@ def make_html(data, bg_images=True, format="daily"):
                                 <p>${{explanation}}</p>
                                 <div id="toggle-${{index}}" class="abstract-toggle">...</div>
                             </div>
+
                             <div class="links">
                                 <a href="${{item['url']}}" target="_blank">${{paperLabel[currentLang]}}</a>
                             </div>
-                            <p class="tags">${{cats}}</p>
+
+                            <div class="affiliations">${{affiliations}}</div>
+
+                            <div class="tags">${{cats}}</div>
                         </div>
                     </article>
                 `;
