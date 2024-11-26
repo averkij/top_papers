@@ -1,0 +1,181 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.16035/x1.png",
+                "caption": "Figure 1:We find thattask-specific finetuning systematically shifts the point of emergence towards less capable models. Motivated by this finding, we develop anemergence law, which models how the point of emergence shifts as a function of the amount of finetuning data. Using this emergence law, we can then extrapolate a prediction for the point of emergence in the few-shot setting.",
+                "position": 190
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x2.png",
+                "caption": "Figure 2:Left: we predict emergence in the few-shot setting by leveraging information about how “pre-emergence” models behave after finetuning.Our key finding is thatfinetuning effectively shifts the point of emergence from stronger to weaker models. Moreover, by varying the amount of finetuning data, the emergence point is shifted accordingly. We can use this finding to predict when few-shot emergence will occur by fitting a parametric function to the results (i.e., emergence law) and then taking a limit.Right: using this approach, we can predict emergence up to 4x the FLOPs in advance.",
+                "position": 211
+            }
+        ]
+    },
+    {
+        "header": "2Background & Related Work",
+        "images": []
+    },
+    {
+        "header": "3Emergence Prediction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.16035/x3.png",
+                "caption": "Figure 3:Left: the finetuned and few-shot performance of intermediate LLM checkpoints.We plot downstream accuracy against pretraining loss for all 3B, 7B, and 13B intermediate OpenLLaMA V1 checkpoints on MMLU and GSM8K. We see that the point of emergence is systematically shifted towards weaker LLMs after finetuning. Additionally, the magnitude of the shift is consistent across all model sizes at the same pretraining loss.Right: varying the amount of finetuning data.We finetune the 3B intermediate checkpoints on subsets of the full finetuning data. We see that as we increase the amount of finetuning data, the point of emergence shifts further towards less capable LLMs.",
+                "position": 260
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x3.png",
+                "caption": "",
+                "position": 263
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x4.png",
+                "caption": "",
+                "position": 268
+            }
+        ]
+    },
+    {
+        "header": "4How does Finetuneing Interact with Emergence?",
+        "images": []
+    },
+    {
+        "header": "5Scaling Laws for Emergence Prediction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.16035/x5.png",
+                "caption": "Figure 4:Our MLE emergence law predictions on each task.The grey line is our extrapolated prediction and the multi-color lines are the fit. While our focus is on predicting the specific point of emergence (e.g., the ReLU elbow), we plot the full ReLU for visual clarity. We see that across all tasks, we are able to successfully predict the point of emergence within 0.1 nats and in many cases much less than that. For visual clarity, we plot a subset of the data used for fitting (see AppendixA.11for all).",
+                "position": 480
+            }
+        ]
+    },
+    {
+        "header": "6Evaluating the Emergence Law",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.16035/extracted/6021902/figures/emergence_cdf_v4.png",
+                "caption": "Figure 5:The cumulative distribution function (CDF) of our emergence posterior on GSM8K and MMLU(see AppendixA.11for all tasks). The CDF’s slope peaks at the mode of the distribution. We see that the distribution spikes near the true emergence point, followed by a moderately long tail.",
+                "position": 534
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x6.png",
+                "caption": "Figure 6:Ablations.The bar height represents the MLE prediction error (lower is better). The error bar represents the 5th and 95th percentile errors obtained from MCMC posterior sampling, and the circle is the median.Left:comparing emergence law functional forms.“Log Power Law” and “Power Law” refer to different functional forms forEθ⁢(D)subscript𝐸𝜃𝐷E_{\\theta}(D)italic_E start_POSTSUBSCRIPT italic_θ end_POSTSUBSCRIPT ( italic_D ). “No Few-shot” is the “Log Power Law” without theΔΔ\\Deltaroman_Δparameter. We see that removing the log worsens predictions, and theΔΔ\\Deltaroman_Δhas a minimal effect on accuracy.Right:varying the low data extrapolation limitD0subscript𝐷0D_{0}italic_D start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT.N𝑁Nitalic_Nis the number of few-shot examples. We see that within a reasonable range (e.g.,<10⁢Nabsent10𝑁<10N< 10 italic_N) the value ofD0subscript𝐷0D_{0}italic_D start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPThas minimal impact on accuracy.",
+                "position": 537
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x7.png",
+                "caption": "Figure 7:How far in advance can we predict emergence?We hold out checkpoints to see how far in advance, in pretraining FLOPS, we can successfully predict emergence. The y position of each blue bar corresponds to the FLOPS needed to train the most capable model used for fitting. The blue circle represents the median of the MCMC posterior, and the error bar represents the 5th to 95th percentiles. If the MLE prediction error is>0.1absent0.1>0.1> 0.1nats, we consider that prediction unsuccessful and denote it with a red-cross222In some cases the failed predictions would be well off the plot and we want to keep the axis bounds constrained for presentation clarity. We include the full results in AppendixA.6.. On MMLU we can predict emergence using models trained with∼1022similar-toabsentsuperscript1022\\sim 10^{22}∼ 10 start_POSTSUPERSCRIPT 22 end_POSTSUPERSCRIPTFLOPS, but no fewer. The earliest post-emergence model on MMLU was trained with∼5∗1022similar-toabsent5superscript1022\\sim 5*10^{22}∼ 5 ∗ 10 start_POSTSUPERSCRIPT 22 end_POSTSUPERSCRIPTFLOPS,hence we can predict 4-5x the FLOPS in advance on MMLU. On GSM8K we also predict4xthe FLOPS in advance333We count the earliest successful prediction for this calculation. However, GSM8K has a failed prediction between two successes, likely due to noise. In AppendixA.6, we see that this failed prediction is just outside the success threshold, with much of the error bar falling well within 0.1 nats.. However, on CoLA and CommonsenseQA we only predict2xthe FLOPS in advance.",
+                "position": 580
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x8.png",
+                "caption": "Figure 8:Comparing OpenLLaMA V1 and V2 emergence.On both MMLU and CommonsenseQA, the V2 models emerge first, suggesting that the V2 pretraining data is likely higher quality.",
+                "position": 597
+            }
+        ]
+    },
+    {
+        "header": "7A Case Study of Real World Uses for Emergence Prediction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.16035/extracted/6021902/figures/comparing_v1_v2_mle_cdf_v5.png",
+                "caption": "Figure 9:Comparing emergence predictions for OpenLLaMA V1 and V2 on MMLU.We plot the MLE predictions (left) and the CDFs (right) for both series. While our focus is on predicting the specific point of emergence (e.g., the ReLU elbow), we plot the full ReLU for visual clarity. The V2 models are correctly predicted to emerge before V1, providing initial evidence that our approach can be used to evaluate data quality. See AppendixA.11for plots with all the data used for fitting.",
+                "position": 626
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x9.png",
+                "caption": "Figure 10:Predicting emergence on APPS with LLaMA 2.On the left, we plot our MLE prediction. On the right, we convert this loss-based prediction into parameter count under the LLaMA 2 scaling law. The green point represents the MLE prediction, and the error bar represents the 5th to 95th percentiles under the MCMC posterior. We predict that emergence would most likely occur at∼325similar-toabsent325\\sim 325∼ 325B parameters with a wide error bar from∼250similar-toabsent250\\sim 250∼ 250B to∼500similar-toabsent500\\sim 500∼ 500B parameters. For visual clarity, the left plot includes a subset of the full data used for fitting (see AppendixA.11for all).",
+                "position": 640
+            }
+        ]
+    },
+    {
+        "header": "8Limitations and Future Directions",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.16035/x10.png",
+                "caption": "Figure 11:One the left we compare full fine-tuning against continuous prefix tuning on MMLU. We find that prefix tuning provides effectively no shift to the point of emergence, despite improving the performance of post-emergence models. On the right we compare 0-shot verses 5-shot prompting on MMLU. We see that using fewer shots has no meaningful effect on the point of emergence. Together these results suggest that the ability for prompt tuning to shift the point of emergence is very limited.",
+                "position": 1470
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x10.png",
+                "caption": "",
+                "position": 1473
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x11.png",
+                "caption": "",
+                "position": 1477
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x12.png",
+                "caption": "Figure 12:Comparing LoRA finetuning, with rank 1, 2, 4, and 64 against full finetuning on MMLU. We see that LoRA finetuning even with rank 1 shifts the point of emergence to a comparable degree to that of full finetuning.",
+                "position": 1484
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x13.png",
+                "caption": "Figure 13:On a standard 5-shot MMLU and 6-shot CommonsenseQA (CSQA) evaluation, we observe emergence using both the standard correct answer accuracy evaluation and a continuous LLM log-probability metric.",
+                "position": 1501
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x13.png",
+                "caption": "",
+                "position": 1504
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x14.png",
+                "caption": "",
+                "position": 1508
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x15.png",
+                "caption": "Figure 14:We plot few-shot and full data finetuning performance as a function of pretraining loss using all 3B, 7B, and 13B model checkpoints for all tasks. We see that both the point of emergence and the downstream performance scaling thereafter, as a function of pretraining loss, is consistent across model size in both the few-shot and finetuned setting.",
+                "position": 1522
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x16.png",
+                "caption": "Figure 15:We plot our scaling law fit for the LLaMA 2 series of models. We also include the learned values for our final fit on the plot. In this caseN𝑁Nitalic_Ncorresponds to parameter count in billions. We see that the LLaMA 2 models are well modeled by our scaling law.",
+                "position": 1931
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x17.png",
+                "caption": "Figure 16:We plot the maximum likelihood predictions from our emergence law on each task. These plots include results from every finetuning run used for fitting the emergence law. The grey line represents our extrapolated prediction and the multi-color lines correspond to the fit produced by the emergence law for the various data levels. We see that across all tasks we are able to successfully predict the point of emergence within 0.1 nats and in many cases much less than that.",
+                "position": 1989
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/x18.png",
+                "caption": "Figure 17:We plot the maximum likelihood predictions from our emergence law with OpenLLaMA V1 (left) and OpenLLaMA V2 (right) on MMLU. We plot C4 Validation loss on the x-axis. These plots include results from every finetuning run used for fitting the emergence law. The grey line represents our extrapolated prediction and the multi-color lines correspond to the fit produced by the emergence law for the various data levels. We see that in both cases we are able to successfully predict the point of emergence within 0.1 nats.",
+                "position": 1995
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/extracted/6021902/figures/emergence_pred_cdf_both_full_datapoints_apps_v5.png",
+                "caption": "Figure 18:We plot the MLE prediction (left) and MCMC CDF (right) for our emergence law fit using LLaMA 2 on APPS. The left plot includes results from every finetuning run used for fitting the emergence law. The grey line represents our extrapolated prediction and the multi-color lines correspond to the fit produced by the emergence law for the various data levels. We see that our emergence law predicts emergence roughly 0.15 nats beyond the LLaMA 2 70B model.",
+                "position": 2001
+            },
+            {
+                "img": "https://arxiv.org/html/2411.16035/extracted/6021902/figures/emergence_all_data_cdf_v4.png",
+                "caption": "Figure 19:We plot the cumulative distribution function of our estimated posterior distribution over the point of emergence on each task. The stars correspond to few-shot performance on the task and represent the true emergence curve. The point at which the slope of the CDF peaks represents the mode of the distribution. We see across all tasks that the distribution spikes near the true point of emergence and is followed by a moderately long tail.",
+                "position": 2007
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]
