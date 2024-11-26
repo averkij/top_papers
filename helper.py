@@ -919,10 +919,14 @@ def make_html(data, bg_images=True, format="daily"):
 
         .article-pdf-title-img {
             max-width: 100%;
+            max-height: 400px;
+            display: inline-block;
             margin-top: 10px;
             margin-bottom: 10px;
-            display: block;
             border-radius: 5px;
+        }
+        .article-pdf-title-img-cont {
+            text-align: center;
         }
         .dark-theme .article-pdf-title-img {
             opacity: 0.8;
@@ -1512,7 +1516,7 @@ def make_html(data, bg_images=True, format="daily"):
                             🔺 ${{item['score']}}. ${{item['title']}}</p>
                             <p class="pub-date">${{publishedLabel[currentLang]}}${{item['pub_date_card'][currentLang]}}</p>
                             
-                            <img class="article-pdf-title-img" src="${{pdfImg}}" />
+                            <div class="article-pdf-title-img-cont"><img class="article-pdf-title-img" src="${{pdfImg}}"/></div>
                             
                             <div id="abstract-${{index}}" class="abstract">
                                 <p>${{explanation}}</p>
