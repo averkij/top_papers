@@ -1,0 +1,119 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.17249/x1.png",
+                "caption": "Figure 1:Our method, SpectroMotion, recovers and renders dynamic scenes with higher-quality reflections compared to prior work.It introduces physical normal estimation, deformable environment maps, and a coarse-to-fine training strategy to achieve superior results in rendering dynamic scenes with reflections. Here we present a rendered test image along with its corresponding normal maps and a ground-truth image. For Deformable 3DGS, we use the shortest axes of the deformed 3D Gaussians as the normals. We have highlighted the specular regions for a scene from the NeRF-DS dataset(Yan et al.,2023)to demonstrate the effectiveness of our approach.",
+                "position": 133
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.17249/x2.png",
+                "caption": "Figure 2:Method Overview.Our method stabilizes the scene geometry through three stages. In the static stage, we stabilize the geometry of the static scene by minimizing photometric lossℒcolorsubscriptℒcolor\\mathcal{L}_{\\text{color}}caligraphic_L start_POSTSUBSCRIPT color end_POSTSUBSCRIPTbetween vanilla 3DGS renders and ground truth images. The dynamic stage combines canonical 3D GaussiansGwith a deformable Gaussian MLP to model dynamic scenes while simultaneously minimizing normal lossℒnormalsubscriptℒnormal\\mathcal{L}_{\\text{normal}}caligraphic_L start_POSTSUBSCRIPT normal end_POSTSUBSCRIPTbetween rendered normal map𝐍tsuperscript𝐍𝑡\\mathbf{N}^{t}bold_N start_POSTSUPERSCRIPT italic_t end_POSTSUPERSCRIPTand gradient normal map from depth map𝐃tsuperscript𝐃𝑡{\\mathbf{D}^{t}}bold_D start_POSTSUPERSCRIPT italic_t end_POSTSUPERSCRIPT, thus further enhancing the overall scene geometry. Finally, the specular stage introduces a deformable reflection MLP to handle changing environment lighting, deforming reflection directionsωrtsubscriptsuperscript𝜔𝑡𝑟\\omega^{t}_{r}italic_ω start_POSTSUPERSCRIPT italic_t end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_r end_POSTSUBSCRIPTto query a canonical environment map for specular color𝐜stsuperscriptsubscript𝐜𝑠𝑡\\mathbf{c}_{s}^{t}bold_c start_POSTSUBSCRIPT italic_s end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_t end_POSTSUPERSCRIPT. It is then combined with diffuse color𝐜𝐝subscript𝐜𝐝\\mathbf{c_{d}}bold_c start_POSTSUBSCRIPT bold_d end_POSTSUBSCRIPT(using zero-order spherical harmonics) and learnable specular tint𝐬𝐭𝐢𝐧𝐭subscript𝐬𝐭𝐢𝐧𝐭\\mathbf{s_{\\mathbf{tint}}}bold_s start_POSTSUBSCRIPT bold_tint end_POSTSUBSCRIPTper 3D Gaussian to obtain the final color𝐜𝐟𝐢𝐧𝐚𝐥tsuperscriptsubscript𝐜𝐟𝐢𝐧𝐚𝐥𝑡\\mathbf{c}_{\\mathbf{final}}^{t}bold_c start_POSTSUBSCRIPT bold_final end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_t end_POSTSUPERSCRIPT. This approach enables the modeling of dynamic specular scenes and high-quality novel view rendering.",
+                "position": 189
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.17249/x3.png",
+                "caption": "Figure 3:Normal estimation.(a)shows that flatter 3D Gaussians align better with scene surfaces, their shortest axis closely matching the surface normal. In contrast, less flat 3D Gaussians fit less accurately, with their shortest axis diverging from the surface normal.(b)shows that when the deformed 3D Gaussian becomes flatter (t=t1𝑡subscript𝑡1t=t_{1}italic_t = italic_t start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT), normal residualΔ⁢𝐧Δ𝐧\\Delta\\mathbf{n}roman_Δ bold_nis rotated by𝐑1tsubscriptsuperscript𝐑𝑡1\\mathbf{R}^{t}_{1}bold_R start_POSTSUPERSCRIPT italic_t end_POSTSUPERSCRIPT start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPTand scaled down byββ1t𝛽subscriptsuperscript𝛽𝑡1\\frac{\\beta}{\\beta^{t}_{1}}divide start_ARG italic_β end_ARG start_ARG italic_β start_POSTSUPERSCRIPT italic_t end_POSTSUPERSCRIPT start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT end_ARG, as flatter Gaussians require smaller normal residuals. Conversely, when the deformation results in a less flat shape (t=t2𝑡subscript𝑡2t=t_{2}italic_t = italic_t start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT),Δ⁢𝐧Δ𝐧\\Delta\\mathbf{n}roman_Δ bold_nis rotated by𝐑2tsubscriptsuperscript𝐑𝑡2\\mathbf{R}^{t}_{2}bold_R start_POSTSUPERSCRIPT italic_t end_POSTSUPERSCRIPT start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPTand amplified byββ2t𝛽subscriptsuperscript𝛽𝑡2\\frac{\\beta}{\\beta^{t}_{2}}divide start_ARG italic_β end_ARG start_ARG italic_β start_POSTSUPERSCRIPT italic_t end_POSTSUPERSCRIPT start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT end_ARG, requiring a larger correction to align the shortest axis with the surface normal.(c)shows howγksuperscript𝛾𝑘\\gamma^{k}italic_γ start_POSTSUPERSCRIPT italic_k end_POSTSUPERSCRIPTchanges withw𝑤witalic_w(wherew=|𝐯st||𝐯lt|𝑤superscriptsubscript𝐯𝑠𝑡superscriptsubscript𝐯𝑙𝑡w=\\frac{|\\mathbf{v}_{s}^{t}|}{|\\mathbf{v}_{l}^{t}|}italic_w = divide start_ARG | bold_v start_POSTSUBSCRIPT italic_s end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_t end_POSTSUPERSCRIPT | end_ARG start_ARG | bold_v start_POSTSUBSCRIPT italic_l end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_t end_POSTSUPERSCRIPT | end_ARG) fork=1𝑘1k=1italic_k = 1,k=5𝑘5k=5italic_k = 5, andk=50𝑘50k=50italic_k = 50. Largerw𝑤witalic_windicates less flat Gaussians, while smallerw𝑤witalic_wrepresents flatter Gaussians. Ask𝑘kitalic_kincreases,γksuperscript𝛾𝑘\\gamma^{k}italic_γ start_POSTSUPERSCRIPT italic_k end_POSTSUPERSCRIPTdecreases more steeply asw𝑤witalic_wrises. Fork=5𝑘5k=5italic_k = 5, we observe a balanced behavior:γksuperscript𝛾𝑘\\gamma^{k}italic_γ start_POSTSUPERSCRIPT italic_k end_POSTSUPERSCRIPTapproaches 1 for loww𝑤witalic_wand 0 for highw𝑤witalic_w, providing a nuanced penalty adjustment across different Gaussian shapes.",
+                "position": 452
+            },
+            {
+                "img": "https://arxiv.org/html/2410.17249/x4.png",
+                "caption": "Figure 4:Qualitative comparison on the NeRF-DSYan et al. (2023)dataset.",
+                "position": 850
+            },
+            {
+                "img": "https://arxiv.org/html/2410.17249/x5.png",
+                "caption": "Figure 5:Qualitative comparison on NeRF-DS dataset with labeled dynamic specular masks.",
+                "position": 1202
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.17249/x6.png",
+                "caption": "Figure 6:Visualization our deformation magnitudes.(a) The left side shows the ground truth of the dynamic object, while (b) on the right side, we render the magnitude of the output of the position residual by our deformable Gaussian MLP. The brighter areas indicate greater movement of the 3D Gaussians. The figure shows that even without mask supervision, our method can still effectively distinguish which objects are dynamic.",
+                "position": 1587
+            },
+            {
+                "img": "https://arxiv.org/html/2410.17249/x7.png",
+                "caption": "Figure 7:Visualization our specular and diffuse color.Specular regions are emphasized while non-specular areas are dimmed to highlight the results of specular region color decomposition.",
+                "position": 1590
+            },
+            {
+                "img": "https://arxiv.org/html/2410.17249/x8.png",
+                "caption": "Figure 8:Qualitative comparison of each training stage in our coarse-to-fine approach.",
+                "position": 1593
+            },
+            {
+                "img": "https://arxiv.org/html/2410.17249/x9.png",
+                "caption": "Figure 9:Qualitative comparison of ablation study without different components.",
+                "position": 1597
+            },
+            {
+                "img": "https://arxiv.org/html/2410.17249/x10.png",
+                "caption": "Figure 10:Qualitative comparison of ablation study on SH, Static environment map, and Deformable enviorment map.",
+                "position": 1600
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.17249/x11.png",
+                "caption": "Figure 11:Architecture of the deformable Gaussian MLP",
+                "position": 2273
+            },
+            {
+                "img": "https://arxiv.org/html/2410.17249/x12.png",
+                "caption": "Figure 12:Architecture of the deformable reflection MLP",
+                "position": 2276
+            },
+            {
+                "img": "https://arxiv.org/html/2410.17249/x13.png",
+                "caption": "Figure 13:Qualitative comparison on NeRF-DS dataset per-scene.",
+                "position": 2287
+            },
+            {
+                "img": "https://arxiv.org/html/2410.17249/x14.png",
+                "caption": "Figure 14:Qualitative comparison on the HyperNeRFPark et al. (2021b)dataset.",
+                "position": 2290
+            },
+            {
+                "img": "https://arxiv.org/html/2410.17249/x15.png",
+                "caption": "Figure 15:Qualitative comparison on NeRF-DS dataset per-scene with labeled dynamic specular masks.",
+                "position": 2293
+            },
+            {
+                "img": "https://arxiv.org/html/2410.17249/x16.png",
+                "caption": "Figure 16:Failure cases.In some dramatic scenes, relying solely on the Deformable Gaussian MLP is insufficient, such as when an arm enters or exits the scene, leading to many floaters occurring.",
+                "position": 2296
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAppendix / supplemental material",
+        "images": []
+    }
+]
