@@ -1,0 +1,154 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.17145/x1.png",
+                "caption": "Figure 1:We present DreamWaltz-G, a text-driven animatable 3D avatar generation framework, which can create high-quality 3D avatars from imaginative text prompts and animate them given motion sequences without manual rigging and retraining. Our method enables various downstream applications, such as expressive animation production, shape editing, human video reenactment, and multi-subject scene composition.",
+                "position": 99
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.17145/x2.png",
+                "caption": "Figure 2:The proposedskeleton-guided score distillationutilizes 2D skeleton imagesc𝑐citalic_cextracted from SMPL-X[32]to condition controllable 2D diffusion model (where we adopt ControlNet[29]), which enhances the view and pose consistencies between the rendered imagex𝑥xitalic_xand the SDS supervisionΔ⁢LcSDSΔsubscript𝐿cSDS\\Delta L_{\\text{cSDS}}roman_Δ italic_L start_POSTSUBSCRIPT cSDS end_POSTSUBSCRIPT. In addition, we introduce occlusion culling to eliminate keypoints that are invisible from the current viewpoint, preventing ambiguity for the diffusion model.",
+                "position": 419
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/x3.png",
+                "caption": "Figure 3:The proposedhybrid 3D Gaussian avatar representationintegrates efficient 3D Gaussian Splatting[4]with neural implicit field (where we adopt Instant-NGP[33]) and parameterized 3D meshes of SMPL-X[32]body parts (e.g., hands and face). Specifically, the canonical 3D Gaussian avatar is jointly represented by unconstrained 3D Gaussians𝒢usubscript𝒢u\\mathcal{G}_{\\text{u}}caligraphic_G start_POSTSUBSCRIPT u end_POSTSUBSCRIPTand mesh-binding 3D Gaussians𝒢msubscript𝒢m\\mathcal{G}_{\\text{m}}caligraphic_G start_POSTSUBSCRIPT m end_POSTSUBSCRIPTbound to parameterized 3D meshes. The colors and opacities of both𝒢usubscript𝒢u\\mathcal{G}_{\\text{u}}caligraphic_G start_POSTSUBSCRIPT u end_POSTSUBSCRIPTand𝒢msubscript𝒢m\\mathcal{G}_{\\text{m}}caligraphic_G start_POSTSUBSCRIPT m end_POSTSUBSCRIPTare predicted by the neural implicit field. For animation,𝒢usubscript𝒢u\\mathcal{G}_{\\text{u}}caligraphic_G start_POSTSUBSCRIPT u end_POSTSUBSCRIPTand𝒢msubscript𝒢m\\mathcal{G}_{\\text{m}}caligraphic_G start_POSTSUBSCRIPT m end_POSTSUBSCRIPTare deformed separately and merged to form observed 3D Gaussians, then splatted to obtain the rendered avatar image.",
+                "position": 448
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/x4.png",
+                "caption": "Figure 4:The proposed animatable 3D avatar generation frameworkDreamWaltz-Gconsists of two training stages:(I) Canonical Avatar Learningand(II) Animatable Avatar Learning. In Stage I, We adopt the static Instant-NGP[33]as canonical avatar representation. For each iteration, we extract a skeleton image from canonical SMPL-X[32]to condition ControlNet[29]. Skeleton-conditioned score distillation lossLcSDSsubscript𝐿cSDSL_{\\text{cSDS}}italic_L start_POSTSUBSCRIPT cSDS end_POSTSUBSCRIPTis used as a training objective to learn the canonical avatar. In Stage II, the proposed animatable avatar representationH3GAis first initialized with the trained Instant-NGP from Stage I and then optimized byLcSDSsubscript𝐿cSDSL_{\\text{cSDS}}italic_L start_POSTSUBSCRIPT cSDS end_POSTSUBSCRIPT. Unlike Stage I, which uses a fixed canonical pose, in Stage II, we randomly sample plausible human poses and expressions in each iteration to drive H3GA and SMPL-X, encouraging avatar learning across different motions.",
+                "position": 541
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.17145/x5.png",
+                "caption": "Figure 5:Qualitative results of canonical avatarscompared to existing text-driven 3D avatar generation methods: DreamWaltz[28], DreamHuman[25], TADA[24], GAvatar[26], HumanGaussian[27]. The text prompts used are listed on the left.",
+                "position": 652
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/x6.png",
+                "caption": "Figure 6:More examples of 3D avatars and their animationsproduced by our approach. The text prompts used are listed below.",
+                "position": 663
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/x7.png",
+                "caption": "Figure 7:Qualitative results of animatable avatarscompared to existing 3d avatar generation and animation methods: HumanGaussian[27]and TADA[24]. Compared to competing methods, our approach achieves clearer hand motions and higher-fidelity animation quality. In comparison to HumanGaussian, which is also based on 3DGS[4], we effectively avoid sharp artifacts caused by the incorrect driving of 3D Gaussians.",
+                "position": 666
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/x8.png",
+                "caption": "Figure 8:Visualization of SDS gradients and generated images under different guidance conditions.The results in the first row are conditioned only on text. In contrast, the second and third rows are conditioned on additional depth and skeleton images, respectively, as indicated in the upper left corner of each visualization. These results are based on the text prompt “superman”. It is evident that skeleton conditions, as adopted by our DreamWaltz-G, provide more informative supervision than text-only conditions. Skeleton conditions are also less restrictive than depth conditions, successfully avoiding the loss of complex appearances, such as the disappearance of Superman’s cape.",
+                "position": 737
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/x9.png",
+                "caption": "Figure 9:Ablation studies on occlusion culling.We employ occlusion culling to refine skeleton condition images by removing invisible human keypoints, such as the eyes and nose in the back view. It helps (a) ControlNet[29]to generate the character’s back view correctly, and (b) text-to-3D avatar generation to resolve the multi-face problem, as highlighted by the bounding boxes.",
+                "position": 741
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/x10.png",
+                "caption": "Figure 10:Ablation studies on the proposed Hybrid 3D Gaussian Avatar representation, which incorporates several improvements to accommodate SDS optimization and enable expressive avatar animation. Specifically, “NeRF Initialization” provides a well-structured point cloud to initialize the 3D Gaussians, facilitating the capture of complex geometries. “NeRF Encoding” utilizes Instant-NGP[33]to predict 3D Gaussian attributes, resulting in more stable SDS optimization and avoiding high-frequency noise in textures. For intricate body parts like hands, we adopt a “Mesh Binding” strategy, which binds the corresponding 3D Gaussians to the SMPL-X body parts, achieving sharp and joint-aligned geometries.",
+                "position": 752
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/x11.png",
+                "caption": "Figure 11:Ablation studies on learnable shape parameters(e.g.,βhandsubscript𝛽hand\\beta_{\\text{hand}}italic_β start_POSTSUBSCRIPT hand end_POSTSUBSCRIPTof SMPL-X[32]) for mesh-binding 3D Gaussian body parts. We use the hands of “Princess Elsa in Frozen” as an example to demonstrate. By optimizing the hand shape parameters of mesh-binding 3D Gaussians, slimmer hands that match Elsa’s characteristics can be generated.",
+                "position": 755
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/x12.png",
+                "caption": "Figure 12:Ablation studies on local geometric constraints.Without the local geometric lossLgeosubscript𝐿geoL_{\\text{geo}}italic_L start_POSTSUBSCRIPT geo end_POSTSUBSCRIPT, the generated avatar’s hands appear in a clenched fist state (highlighted by dashed boxes), exhibiting unclear geometric structures. The introduction ofLgeosubscript𝐿geoL_{\\text{geo}}italic_L start_POSTSUBSCRIPT geo end_POSTSUBSCRIPTensures that the hand structure is accurately aligned with canonical SMPL-X (highlighted by dashed boxes), avoiding erroneous geometries and facilitating subsequent rigging and hand animation.",
+                "position": 758
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/x13.png",
+                "caption": "Figure 13:Ablation studies on Animatable Avatar Learning (AAL), which is the Stage II of DreamWaltz-G. For “w/o AAL”, we train for the same iterations as “w/ AAL” but use a fixed canonical pose to ensure a fair comparison. It can be observed that the introduction of AAL fixes texture information for areas not visible in the canonical pose. Besides, it reduces animation artifacts caused by incorrect skeleton binding.",
+                "position": 761
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/x14.png",
+                "caption": "Figure 14:Ablation studies on KNN smoothing for LBS weight initialization.The proposed geometry-aware KNN Smoothing algorithm refines the 3D Gaussians’ initial LBS weights (representing the association of each 3D Gaussian to body joints). Compared to the baseline that assigns LBS weights based solely on the nearest neighbor criterion, the proposed algorithm enables (a) continuous deformation of complex clothing, e.g., the stretching of the chef’s apron; (b) accurate skeleton binding, for example, the hat hanging from Woody’s waist is not affected by arm movements.",
+                "position": 764
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/x15.png",
+                "caption": "Figure 15:Application: Shape Control and Editing.Our method enables (a) training-time shape control by modifying the SMPL-X template and (b) inference-time shape editing during inference by explicitly adjusting the 3D Gaussians. Both shape control and editing are compatible with the SMPL-X shape parametersβ𝛽\\betaitalic_β, allowing users to simply adjustβ𝛽\\betaitalic_βto achieve the desired 3D shape.",
+                "position": 767
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/x16.png",
+                "caption": "Figure 16:Application: Talking 3D Avatars.Benefiting from the proposed expressive H3GA representation, our method can learn animatable 3D avatars from 2D diffusion priors while preserving the fine details of hands and faces. This allows us to create more expressive 3D avatar animations like talking 3D avatars.",
+                "position": 770
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/x17.png",
+                "caption": "Figure 17:Application: Human Video Reenactment.Combined with 3D human pose estimation and video inpainting techniques, the 3D avatars generated by our method can be projected onto 2D human videos. This integration allows for seamless blending of animated 3D avatars with real-world footage, enhancing the realism and interactivity of the reenacted scenes.",
+                "position": 793
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/x18.png",
+                "caption": "Figure 18:Application: Multi-subject Scene Composition.The generated 3D avatars can be seamlessly integrated with existing 3D assets. The presented 3D environments are from the Mip-NeRF 360 dataset[82]and reconstructed by vanilla 3D Gaussian Splatting[4].",
+                "position": 796
+            }
+        ]
+    },
+    {
+        "header": "5Conclusions",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.17145/extracted/5879702/authors/ykh.jpg",
+                "caption": "",
+                "position": 1406
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/extracted/5879702/authors/jnw.jpg",
+                "caption": "",
+                "position": 1418
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/extracted/5879702/authors/alz.jpg",
+                "caption": "",
+                "position": 1430
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/extracted/5879702/authors/zjz.png",
+                "caption": "",
+                "position": 1442
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/extracted/5879702/authors/lz.png",
+                "caption": "",
+                "position": 1454
+            },
+            {
+                "img": "https://arxiv.org/html/2409.17145/extracted/5879702/authors/xhl.jpg",
+                "caption": "",
+                "position": 1466
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]

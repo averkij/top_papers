@@ -1,0 +1,369 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.14393/x1.png",
+                "caption": "Figure 1.We present MaskedMimic, a versatile control model that enables physically simulated characters to generate diverse behaviors from flexible user-specified constraints. MaskedMimic  can be used for a wide range of applications, including generating full-body motion from partially observed joint target positions, joystick steering, object interactions, path-following, text commands, and combinations thereof, such as text-stylized path following.",
+                "position": 217
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/x2.png",
+                "caption": "Figure 2.Partial motion plans.MaskedMimic  synthesizes full-body physics-based character animations. It achieves this by inpainting conditioned on multi-modal partial objectives. (a) The character climbs up a hill by tracking target head coordinates. (b) Text-to-motion synthesis enables the character to perform a waving motion. (c) The character navigates across irregular terrain by combining head-tracking with text-based style conditioning. (d) Interacting with a goal object, in this case sitting on an armchair, is achieved by conditioning on the object.",
+                "position": 221
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": []
+    },
+    {
+        "header": "2.Related Work",
+        "images": []
+    },
+    {
+        "header": "3.Preliminaries",
+        "images": []
+    },
+    {
+        "header": "4.System Overview",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.14393/x3.png",
+                "caption": "Figure 3.The MaskedMimic  framework:The first phase produces afully-constrained controllerπFCsuperscript𝜋FC\\pi^{\\text{FC}}italic_π start_POSTSUPERSCRIPT FC end_POSTSUPERSCRIPT. This full-body tracker is trained using reinforcement learning to imitate kinematic motion recordings across a wide range of complex scene-aware contexts. The second phase produces MaskedMimic. TreatingπFCsuperscript𝜋FC\\pi^{\\text{FC}}italic_π start_POSTSUPERSCRIPT FC end_POSTSUPERSCRIPTas a teacher, through supervised limitation learning its knowledge is distilled into apartially-constrained controllerπPCsuperscript𝜋PC\\pi^{\\text{PC}}italic_π start_POSTSUPERSCRIPT PC end_POSTSUPERSCRIPT. AsπPCsuperscript𝜋PC\\pi^{\\text{PC}}italic_π start_POSTSUPERSCRIPT PC end_POSTSUPERSCRIPTobserves masked inputs, this process enables it to perform physics-based inpainting. Finally, at inference, without any further training,πPCsuperscript𝜋PC\\pi^{\\text{PC}}italic_π start_POSTSUPERSCRIPT PC end_POSTSUPERSCRIPTis used to generate novel motions, in previously unseen scenes, from partial goals provided by the user.",
+                "position": 344
+            }
+        ]
+    },
+    {
+        "header": "5.Fully-Constrained Controller",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.14393/x4.png",
+                "caption": "Figure 4.Training scene(screenshot):The top region consists of standard flat terrain, enabling the controller to reproduce the original motions in a setting that best represents how they were recorded. The central region contains irregular terrain with stairs, slopes, and rough surfaces, allowing the controller to learn robust motion skills on varied ground geometries. The bottom region is reserved exclusively for object interactions, ensuring that the agent can practice interacting with objects in a clean and reproducible setup without interference from irregular terrain features.",
+                "position": 457
+            }
+        ]
+    },
+    {
+        "header": "6.Versatile Partially-Constrained Controller",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.14393/x5.png",
+                "caption": "(a)System overview:MaskedMimic  is modeled as a VAE with a learned prior. The prior observes the partial goals, whereas the encoder, used only during training, observes both the full target pose and the partial objectives. During training, the encoder acts as a residual to the prior. It learns to provide an offset, in the latent space, towards the precise requested motion. At inference, the encoder is no longer used and the solutions are sampled directly from the prior.",
+                "position": 529
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/x5.png",
+                "caption": "(a)System overview:MaskedMimic  is modeled as a VAE with a learned prior. The prior observes the partial goals, whereas the encoder, used only during training, observes both the full target pose and the partial objectives. During training, the encoder acts as a residual to the prior. It learns to provide an offset, in the latent space, towards the precise requested motion. At inference, the encoder is no longer used and the solutions are sampled directly from the prior.",
+                "position": 532
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/x6.png",
+                "caption": "(b)Detailed view:During training, features are extracted and masked from ground-truth motion sequences. The prior, atransformernetwork, observes the current poseqtsubscript𝑞𝑡q_{t}italic_q start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT, surrounding heightmaphtsubscriptℎ𝑡h_{t}italic_h start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT, past poses{qt−τ}subscript𝑞𝑡𝜏\\{q_{t-\\tau}\\}{ italic_q start_POSTSUBSCRIPT italic_t - italic_τ end_POSTSUBSCRIPT }, object representationotsubscript𝑜𝑡o_{t}italic_o start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT, text commandctsubscript𝑐𝑡c_{t}italic_c start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT, and target future poses{q^t+τ}subscript^𝑞𝑡𝜏\\{\\hat{q}_{t+\\tau}\\}{ over^ start_ARG italic_q end_ARG start_POSTSUBSCRIPT italic_t + italic_τ end_POSTSUBSCRIPT }. Each input modality is tokenized (encoded) using a modality-specific encoderei⁢(⋅)subscript𝑒𝑖⋅e_{i}(\\cdot)italic_e start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ( ⋅ ). Future poses are masked before encoding, ensuring the encoder only observes the conditionable joints. These tokens and the token masks are then provided to the prior (transformer). The token masks prevent the transformer from attending to unspecified inputs, such as a keyframe without any target joints, or a sequence without text or object conditioning. The encoder and decoder are modeled as fully-connected networks, and observe a flattened concatenation of the input features.",
+                "position": 538
+            }
+        ]
+    },
+    {
+        "header": "7.Experimental Setup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.14393/",
+                "caption": "(a)Full-body tracking:punching",
+                "position": 757
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/",
+                "caption": "(a)Full-body tracking:punching",
+                "position": 760
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/",
+                "caption": "(b)Full-body tracking:dancing",
+                "position": 772
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/x17.png",
+                "caption": "(c)VR tracking:cartwheel",
+                "position": 785
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/tracking/head_run/frame141.jpg",
+                "caption": "(d)Path following:run",
+                "position": 792
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/tracking/head_run/frame162.jpg",
+                "caption": "",
+                "position": 795
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/tracking/head_run/frame175.jpg",
+                "caption": "",
+                "position": 796
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/tracking/head_run/frame193.jpg",
+                "caption": "",
+                "position": 797
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/tracking/head_run/frame227.jpg",
+                "caption": "",
+                "position": 798
+            }
+        ]
+    },
+    {
+        "header": "8.Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/steering/steering_7/frame182.jpg",
+                "caption": "(a)Steering:rough terrain",
+                "position": 1094
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/steering/steering_7/frame182.jpg",
+                "caption": "(a)Steering:rough terrain",
+                "position": 1097
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/steering/steering_7/frame360.jpg",
+                "caption": "",
+                "position": 1100
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/steering/steering_7/frame470.jpg",
+                "caption": "",
+                "position": 1101
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/steering/steering_7/frame874.jpg",
+                "caption": "",
+                "position": 1102
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/steering/steering_13/frame74.jpg",
+                "caption": "(b)Steering:stairs",
+                "position": 1108
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/steering/steering_13/frame291.jpg",
+                "caption": "",
+                "position": 1111
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/steering/steering_13/frame591.jpg",
+                "caption": "",
+                "position": 1112
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/steering/steering_13/frame652.jpg",
+                "caption": "",
+                "position": 1113
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/",
+                "caption": "(c)Reach:flat terrain",
+                "position": 1120
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/reach/reach_20/frame89.jpg",
+                "caption": "(d)Reach:stairs",
+                "position": 1131
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/reach/reach_20/frame202.jpg",
+                "caption": "",
+                "position": 1134
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/reach/reach_20/frame271.jpg",
+                "caption": "",
+                "position": 1135
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/reach/reach_20/frame387.jpg",
+                "caption": "",
+                "position": 1136
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/",
+                "caption": "(e)Path-Following:walk",
+                "position": 1143
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/",
+                "caption": "(f)Path-Following + Text:“a person raises both hands and walks forward”",
+                "position": 1154
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/x30.png",
+                "caption": "(g)Path-Following:crawl",
+                "position": 1166
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/",
+                "caption": "(a)Armchair",
+                "position": 1246
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/",
+                "caption": "(a)Armchair",
+                "position": 1249
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/",
+                "caption": "(b)Table",
+                "position": 1262
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/",
+                "caption": "(c)Stool",
+                "position": 1275
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/",
+                "caption": "(d)Chair",
+                "position": 1285
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/sofa_terrain/sofa_3.jpg",
+                "caption": "(e)Sofa",
+                "position": 1299
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/sofa_terrain/sofa_8.jpg",
+                "caption": "",
+                "position": 1302
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/sofa_terrain/sofa_17.jpg",
+                "caption": "",
+                "position": 1303
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/sofa_terrain/sofa_18.jpg",
+                "caption": "",
+                "position": 1304
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/kick/frame58.jpg",
+                "caption": "(a)”a person kicking forward”",
+                "position": 1366
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/kick/frame58.jpg",
+                "caption": "(a)”a person kicking forward”",
+                "position": 1369
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/kick/frame281.jpg",
+                "caption": "",
+                "position": 1373
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/oneleg/frame151.jpg",
+                "caption": "(b)”a person standing on one leg trying to balance himself”",
+                "position": 1381
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/oneleg/frame244.jpg",
+                "caption": "",
+                "position": 1384
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/michaeljackson/frame46.jpg",
+                "caption": "(c)”a person dances like michaeljackson”",
+                "position": 1390
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/michaeljackson/frame87.jpg",
+                "caption": "",
+                "position": 1393
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/raisehands/frame58.jpg",
+                "caption": "(d)”a person raises both hands in the air and walks forward”",
+                "position": 1400
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/raisehands/frame103.jpg",
+                "caption": "",
+                "position": 1404
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/kneel/frame37.jpg",
+                "caption": "(e)”a person lifts both arms to the sides then steps forward and kneels down”",
+                "position": 1412
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/kneel/frame299.jpg",
+                "caption": "",
+                "position": 1415
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/salut/frame56.jpg",
+                "caption": "(f)”a person raises their right arm in a salute”",
+                "position": 1421
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/salut/frame97.jpg",
+                "caption": "",
+                "position": 1424
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/bow/frame5.jpg",
+                "caption": "(g)”a man bows very slowly”",
+                "position": 1430
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/bow/frame61.jpg",
+                "caption": "",
+                "position": 1433
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/handstand/frame47.jpg",
+                "caption": "(h)”a man steps forward and does a handstand”",
+                "position": 1440
+            },
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/text/handstand/frame79.jpg",
+                "caption": "",
+                "position": 1444
+            }
+        ]
+    },
+    {
+        "header": "9.Limitations and Future Work",
+        "images": []
+    },
+    {
+        "header": "10.Discussion",
+        "images": []
+    },
+    {
+        "header": "11.Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AState and action space",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.14393/extracted/5871165/figures/masked_mimic_prior.png",
+                "caption": "Figure 10.Illustration of the prior architecture. Each modality shares an encoder across all inputs of that same modality. Goal-modalities can be masked out. Each entry is a token, provided to a transformer-encoder model. The output from the transformer is provided to two fully-connected heads, producing the mean and log-std of the latent distribution.",
+                "position": 2450
+            }
+        ]
+    },
+    {
+        "header": "Appendix BMaskedMimic– Prior Construction",
+        "images": []
+    }
+]

@@ -1,0 +1,143 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.18124/x1.png",
+                "caption": "Figure 1:We presentLotus, a diffusion-based visual foundation model for dense geometry prediction. With minimal training data, Lotus achieves SoTA performance in two key geometry perception tasks,i.e., zero-shot depth and normal estimation.\n“Avg. Rank” indicates the average ranking across all metrics, where lower values are better. Bar length represents the amount of training data used.",
+                "position": 101
+            },
+            {
+                "img": "https://arxiv.org/html/2409.18124/x2.png",
+                "caption": "",
+                "position": 105
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.18124/x3.png",
+                "caption": "Figure 2:Adaptation protocol of Lotus.After the pre-trained VAE encoderℰℰ\\mathcal{E}caligraphic_Eencodes the imagexand annotationyto the latent space: ① the denoiser U-Net modelfθsubscript𝑓𝜃f_{\\theta}italic_f start_POSTSUBSCRIPT italic_θ end_POSTSUBSCRIPTis fine-tuned usingx0subscript𝑥0x_{0}italic_x start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT-prediction; ② we employ single-step diffusion formulation at time-stept=T𝑡𝑇t=Titalic_t = italic_Tfor better convergence; ③ we propose a novel detail preserver, to switch the model either to reconstruct the image or generate the dense prediction via a switchers𝑠sitalic_s, ensuring a more fine-grained prediction.\nThe noise𝐳𝐓𝐲superscriptsubscript𝐳𝐓𝐲\\mathbf{z_{T}^{y}}bold_z start_POSTSUBSCRIPT bold_T end_POSTSUBSCRIPT start_POSTSUPERSCRIPT bold_y end_POSTSUPERSCRIPTin bracket is used for our generativeLotus-Gand is omitted for the discriminativeLotus-D.",
+                "position": 123
+            },
+            {
+                "img": "https://arxiv.org/html/2409.18124/x4.png",
+                "caption": "Figure 3:Inference time comparison in depth estimation between Lotus and SoTA methods.Lotus is hundreds of times faster than Marigold and slightly faster than DepthAnything V2 at high resolutions.\nDepthAnything V2’s inference time at2048×2048204820482048\\times 20482048 × 2048is not plotted because it requires>80absent80>80> 80GB graphic memory.",
+                "position": 137
+            }
+        ]
+    },
+    {
+        "header": "2Related Works",
+        "images": []
+    },
+    {
+        "header": "3Preliminaries",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.18124/x5.png",
+                "caption": "Figure 4:Adaptation protocol of Direct Adaptation.Starting with a pre-trained Stable Diffusion model, imagexand annotationyare encoded using the pre-trained VAE. The noisy annotation𝐳𝐭𝐲subscriptsuperscript𝐳𝐲𝐭\\mathbf{z^{y}_{t}}bold_z start_POSTSUPERSCRIPT bold_y end_POSTSUPERSCRIPT start_POSTSUBSCRIPT bold_t end_POSTSUBSCRIPTis obtained by adding noise at levelt∈[1,T]𝑡1𝑇t\\in\\left[1,T\\right]italic_t ∈ [ 1 , italic_T ]. The U-Net input layer is coupled to accommodate the concatenated inputs and then fine-tuned using the standard diffusion objective,ϵitalic-ϵ\\epsilonitalic_ϵ-prediction, under the original multi-step formulation.",
+                "position": 273
+            }
+        ]
+    },
+    {
+        "header": "4Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.18124/x6.png",
+                "caption": "Figure 5:Comparisons among different parameterizations using various seeds.All models are trained onHypersim(Roberts et al.,2021)and tested on the input image for depth estimation.\nThe standard DDIM sampler is used with 50 denoising steps. Four steps are selected for clear illustration. From left (largerτ𝜏\\tauitalic_τ) to right (smallerτ𝜏\\tauitalic_τ) is the iterative denoising process.",
+                "position": 337
+            },
+            {
+                "img": "https://arxiv.org/html/2409.18124/x7.png",
+                "caption": "Figure 6:Quantitative evaluation of the predicted depth maps𝐳^τ𝐲subscriptsuperscript^𝐳𝐲𝜏\\mathbf{\\hat{z}^{y}_{\\tau}}over^ start_ARG bold_z end_ARG start_POSTSUPERSCRIPT bold_y end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPTalong the denoising process.The experimental settings are same as Fig.5. Six steps are selected for illustration. The banded regions around each line indicate the variance, wider areas representing larger variance.",
+                "position": 350
+            },
+            {
+                "img": "https://arxiv.org/html/2409.18124/x8.png",
+                "caption": "Figure 7:Comparisons among various training time-steps and data scalesevaluated on NYUv2 in depth estimation. All models are fine-tuned onHypersimusingx0subscript𝑥0x_{0}italic_x start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT-prediction.\nDuring inference, ifT′>50superscript𝑇′50T^{\\prime}>50italic_T start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPT > 50, the DDIM sampler is used with 50 denoising steps; otherwise, the number of denoising steps is equal toT′superscript𝑇′T^{\\prime}italic_T start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPT.\nThe results demonstrate improved performance with decreased training time-steps. The single-step diffusion formulation (T′=1superscript𝑇′1T^{\\prime}=1italic_T start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPT = 1) exhibits best performance across different data volumes.",
+                "position": 392
+            },
+            {
+                "img": "https://arxiv.org/html/2409.18124/x9.png",
+                "caption": "Figure 8:Depth mapsw/w/italic_w /andw/o𝑤𝑜w/oitalic_w / italic_othe detail preserver and reconstruction outputs.Fine-tuning the diffusion model for dense prediction tasks can potentially degrade its ability to generate highly detailed images, resulting in blurred predictions in regions with rich detail. To preserve these fine-grained details, we introduce a detail preserver that incorporates an additional reconstruction task, enhancing the model’s capacity to produce more accurate dense annotations.",
+                "position": 408
+            },
+            {
+                "img": "https://arxiv.org/html/2409.18124/x10.png",
+                "caption": "Figure 9:Depth maps of multiple inferences and uncertainty maps.Areas like the sky, object edges, and intricate details (e.g., cat whiskers) typically exhibit high uncertainty.",
+                "position": 443
+            },
+            {
+                "img": "https://arxiv.org/html/2409.18124/x11.png",
+                "caption": "Figure 10:Inference Pipeline of Lotus.The noise𝐳𝐓𝐲superscriptsubscript𝐳𝐓𝐲\\mathbf{z_{T}^{y}}bold_z start_POSTSUBSCRIPT bold_T end_POSTSUBSCRIPT start_POSTSUPERSCRIPT bold_y end_POSTSUPERSCRIPTin bracket is used forLotus-Gand omitted forLotus-D.",
+                "position": 459
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": []
+    },
+    {
+        "header": "6Conclusion and Future Work",
+        "images": []
+    },
+    {
+        "header": "Appendix AExperimental Settings",
+        "images": []
+    },
+    {
+        "header": "Appendix BDetails of Direct Adaption",
+        "images": []
+    },
+    {
+        "header": "Appendix CAnalysis of “direction⁢(𝐳τ𝐲)directionsubscriptsuperscript𝐳𝐲𝜏\\text{direction}(\\mathbf{z^{y}_{\\tau}})direction ( bold_z start_POSTSUPERSCRIPT bold_y end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT )” in DDIM Process (Eq.4)",
+        "images": []
+    },
+    {
+        "header": "Appendix DPerformance ofv𝑣vitalic_v-prediction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.18124/x12.png",
+                "caption": "Figure 11:Quantitative evaluation of the predicted depth maps𝐳^τ𝐲subscriptsuperscript^𝐳𝐲𝜏\\mathbf{\\hat{z}^{y}_{\\tau}}over^ start_ARG bold_z end_ARG start_POSTSUPERSCRIPT bold_y end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPTalong the denoising process.The experimental settings are same as Fig.5and6. Six steps are selected for illustration. The banded regions around each line indicate the variance, wider areas representing larger variance.",
+                "position": 1290
+            },
+            {
+                "img": "https://arxiv.org/html/2409.18124/x13.png",
+                "caption": "Figure 12:Qualitative comparison on zero-shot affine-invariant depth estimation.Lotus demonstrates higher accuracy especially in detailed areas.",
+                "position": 1305
+            },
+            {
+                "img": "https://arxiv.org/html/2409.18124/x14.png",
+                "caption": "Figure 13:Qualitative comparison on zero-shot surface normal estimation.Lotus offers improved accuracy particularly in complex regions.",
+                "position": 1310
+            }
+        ]
+    },
+    {
+        "header": "Appendix EQualitative Comparisons",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.18124/x15.png",
+                "caption": "Figure 14:Applications of Lotus.①Depth to 3D Point Clouds. ②Joint Estimation:Simultaneous depth and normal estimation with100%percent100100\\%100 %shared parameters. ③Single-View Reconstruction:Reconstructing 3D meshes from normal predictions. ④Multi-View Reconstruction:Reconstructing high-quality meshes using depth/normal predictionswithout RGB supervision.",
+                "position": 1322
+            }
+        ]
+    },
+    {
+        "header": "Appendix FApplications of Lotus",
+        "images": []
+    },
+    {
+        "header": "Appendix GFuture Work",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
