@@ -1,0 +1,97 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.01680/x1.png",
+                "caption": "Figure 1:Illustration of the modified agglomerative model training procedure. Instead of the student model learning to match the original teacher distributions, it learns to match the normalized distributions (our proposed PHI-S is shown). We show the real distributions forDFN CLIP,DINOv2,SigLIP, andSAMby projecting them down to 2D using PCA. In the original space, the variance of DFN CLIP is so small that it appears as a single point. During inference, we can estimate the original teacher distributions using the inverse normalization process on the student predictions.",
+                "position": 117
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.01680/x2.png",
+                "caption": "Figure 2:Teacher activation histograms. We show the global histogram, as well as the histograms for the channels associated with the minimum mean, maximum mean, minimum variance, and maximum variance. While all being roughly normal, they have very different centers and scales. We provide specific values in table7in the appendix.",
+                "position": 172
+            },
+            {
+                "img": "https://arxiv.org/html/2410.01680/x3.png",
+                "caption": "Figure 3:The loss curves for each of the four teachers that the ViT-B/16 student is learning to match simultaneously in original teacher space (e.g. denormalized). We emphasize “Baseline - MSE” (Blue) and “PHI Standardize” (PHI-S, Red) as they generally set the upper and lower bounds.",
+                "position": 177
+            }
+        ]
+    },
+    {
+        "header": "2Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.01680/x4.png",
+                "caption": "Figure 4:Visualization of how standardization affects the resulting data distribution. We start with the same distribution, and rotate the data by some angle. Regular standardization’s effect is directly tied to the distribution orientation. Conversely, PHI-S is invariant to any data rotation, and will produce an identical transform up to sign along each dimension. We can make the sign consistent by negating the rows of𝐇𝐇\\mathbf{H}bold_Hand𝐔𝐔\\mathbf{U}bold_Uwhich have a negative value in the diagonal position. Similarly, regular standardization will distort each dimension (shown with red/blue lines), which will have the effect of reducing the importance of high variance axis-aligned dimensions, and increasing the importance of low-variance dimensions. PHI-S is isotropic, so the change in scale is uniform.",
+                "position": 863
+            },
+            {
+                "img": "https://arxiv.org/html/2410.01680/x5.png",
+                "caption": "Figure 5:Visualization of normalization procedures. We display two axis lines in red and blue. In the original space, they’re both 2 units long, and aligned with the plot coordinate system. We also display an “error circle” which is a unit circle in the normalized coordinate system. For the three whitening transforms you can see how they only differ by rotation. We also specifically draw colored dots on the error circle corresponding to the extremal points of the error circle when denormalized into an ellipse. PCA-W places the largest error magnitude on the x-axis, given that it’s the dimension with largest eigenvalue thus estimation errors along the x dimension will have a much larger impact in the denormalized space. As we show in equation16, the error for ZCA will be proportional to the original distribution’s covariance matrix, and thus, the extremal points are along the eigenvectors of the covariance matrix. Hadamard whitening has the extremal points at|x1|=|x2|=…=|xC|subscript𝑥1subscript𝑥2…subscript𝑥𝐶\\left|x_{1}\\right|=\\left|x_{2}\\right|=...=\\left|x_{C}\\right|| italic_x start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT | = | italic_x start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT | = … = | italic_x start_POSTSUBSCRIPT italic_C end_POSTSUBSCRIPT |. Global Standardization and PHI-S are both isotropic, which means that there’s an infinite number of extremal points, so we instead show the points as they relate to the distribution itself. Similar to ZCA, for Global Standardization these points are along the principal axes. And similar to HCA, the aligned points for PHI-S are when|x1|=|x2|=…=|xC|subscript𝑥1subscript𝑥2…subscript𝑥𝐶\\left|x_{1}\\right|=\\left|x_{2}\\right|=...=\\left|x_{C}\\right|| italic_x start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT | = | italic_x start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT | = … = | italic_x start_POSTSUBSCRIPT italic_C end_POSTSUBSCRIPT |.",
+                "position": 877
+            },
+            {
+                "img": "https://arxiv.org/html/2410.01680/x6.png",
+                "caption": "Figure 6:Related to figure5and equation31, we visualize what happens to the one-hot error vectors when projecting back to the original space for HCA. We retain the original|x|=|y|𝑥𝑦|x|=|y|| italic_x | = | italic_y |dots, and add the one-hot dots demonstrating how their mapping remains equidistant from the origin relative to each other. In particular, sinceδ=1𝛿1\\delta=1italic_δ = 1, then∥(𝐔⁢𝚲12⁢𝐇⊺)⁢𝚫r∥=1C⁢∑cλc≈1.400892delimited-∥∥𝐔superscript𝚲12superscript𝐇⊺subscript𝚫𝑟1𝐶subscript𝑐subscript𝜆𝑐1.400892\\left\\lVert\\left(\\mathbf{U\\Lambda}^{\\frac{1}{2}}\\mathbf{H}^{\\intercal}\\right)%\n\\mathbf{\\Delta}_{r}\\right\\rVert=\\sqrt{\\frac{1}{C}\\sum_{c}\\lambda_{c}}\\approx 1%\n.400892∥ ( bold_U bold_Λ start_POSTSUPERSCRIPT divide start_ARG 1 end_ARG start_ARG 2 end_ARG end_POSTSUPERSCRIPT bold_H start_POSTSUPERSCRIPT ⊺ end_POSTSUPERSCRIPT ) bold_Δ start_POSTSUBSCRIPT italic_r end_POSTSUBSCRIPT ∥ = square-root start_ARG divide start_ARG 1 end_ARG start_ARG italic_C end_ARG ∑ start_POSTSUBSCRIPT italic_c end_POSTSUBSCRIPT italic_λ start_POSTSUBSCRIPT italic_c end_POSTSUBSCRIPT end_ARG ≈ 1.400892for any choice ofr𝑟ritalic_r. For reference,𝚲≈[3.8356,0.0894]𝚲3.83560.0894\\mathbf{\\Lambda}\\approx\\left[3.8356,0.0894\\right]bold_Λ ≈ [ 3.8356 , 0.0894 ].",
+                "position": 884
+            },
+            {
+                "img": "https://arxiv.org/html/2410.01680/x7.png",
+                "caption": "",
+                "position": 885
+            },
+            {
+                "img": "https://arxiv.org/html/2410.01680/x8.png",
+                "caption": "Figure 7:Similar to figure6and figure5, we visualize PHI-S in the normalized and denormalized spaces. This visualizes how equation27maintains errors along a circle in both spaces, owing to the isotropic nature of the transform. It also can be seen how the|x|=|y|𝑥𝑦|x|=|y|| italic_x | = | italic_y |error dots in normalized space map to the principal directions of the distribution, and also how the one-hot dots capture identical probability density.",
+                "position": 895
+            },
+            {
+                "img": "https://arxiv.org/html/2410.01680/x9.png",
+                "caption": "",
+                "position": 896
+            },
+            {
+                "img": "https://arxiv.org/html/2410.01680/x10.png",
+                "caption": "Figure 8:Following from figure5, we visualize the radius of the denormalized error circle at every angle between 0 and2⁢π2𝜋2\\pi2 italic_π. Because Global Standardization and PHI-S are isotropic, and because the distribution is mean centered (sectionA.5.2), they scale the error circle uniformly by the same amount. As predicted, forθ=z⁢π2𝜃𝑧𝜋2\\theta=z\\frac{\\pi}{2}italic_θ = italic_z divide start_ARG italic_π end_ARG start_ARG 2 end_ARGwithz∈ℤ𝑧ℤz\\in\\mathbb{Z}italic_z ∈ blackboard_Z(e.g. wheny=0𝑦0y=0italic_y = 0orx=0𝑥0x=0italic_x = 0) we have the same error magnitude for HCA, and also where PHI-S and HCA have identical magnitude. HCA has extremal values atθhcaex=z⁢π2+π4superscriptsubscript𝜃hcaex𝑧𝜋2𝜋4\\theta_{\\text{hca}}^{\\text{ex}}=z\\frac{\\pi}{2}+\\frac{\\pi}{4}italic_θ start_POSTSUBSCRIPT hca end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ex end_POSTSUPERSCRIPT = italic_z divide start_ARG italic_π end_ARG start_ARG 2 end_ARG + divide start_ARG italic_π end_ARG start_ARG 4 end_ARG. PCA-W has extremal values atθpca-wex=z⁢π2superscriptsubscript𝜃pca-wex𝑧𝜋2\\theta_{\\text{pca-w}}^{\\text{ex}}=z\\frac{\\pi}{2}italic_θ start_POSTSUBSCRIPT pca-w end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ex end_POSTSUPERSCRIPT = italic_z divide start_ARG italic_π end_ARG start_ARG 2 end_ARG. We also have that ZCA will have extremal valuesθpca-wex⁢(z)≤θzcaex⁢(z)≤θhcaex⁢(z)superscriptsubscript𝜃pca-wex𝑧superscriptsubscript𝜃zcaex𝑧superscriptsubscript𝜃hcaex𝑧\\theta_{\\text{pca-w}}^{\\text{ex}}(z)\\leq\\theta_{\\text{zca}}^{\\text{ex}}(z)\\leq%\n\\theta_{\\text{hca}}^{\\text{ex}}(z)italic_θ start_POSTSUBSCRIPT pca-w end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ex end_POSTSUPERSCRIPT ( italic_z ) ≤ italic_θ start_POSTSUBSCRIPT zca end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ex end_POSTSUPERSCRIPT ( italic_z ) ≤ italic_θ start_POSTSUBSCRIPT hca end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ex end_POSTSUPERSCRIPT ( italic_z ).",
+                "position": 902
+            }
+        ]
+    },
+    {
+        "header": "3Implementation Details",
+        "images": []
+    },
+    {
+        "header": "4Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2410.01680/x11.png",
+                "caption": "Figure 9:Loss distributions for various normalization methods. The x-axis range is based on the minimum and maximum losses seen for each method over the course of 1,000 samples after training for 100k iterations. The “Largest Max Loss Channel” shows the distribution for the channel that had the highest loss value. It helps us understand how vulnerable our learning process is to outliers. The “Global” curve shows the distribution by combining all of the channels.",
+                "position": 1157
+            }
+        ]
+    },
+    {
+        "header": "5Related Work",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]

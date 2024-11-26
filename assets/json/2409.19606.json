@@ -1,0 +1,402 @@
+{
+    "paper_title": "Hyper-Connections",
+    "authors": [
+        "Defa Zhu",
+        "Hongzhi Huang",
+        "Zihao Huang",
+        "Yutao Zeng",
+        "Yunyao Mao",
+        "Banggu Wu",
+        "Qiyang Min",
+        "Xun Zhou"
+    ],
+    "sections": [
+        {
+            "title": "Abstract",
+            "content": "We present hyper-connections, a simple yet effective method that can serve as an alternative to residual connections. This approach specifically addresses common drawbacks observed in residual connection variants, such as the seesaw effect between gradient vanishing and representation collapse. Theoretically, hyper-connections allow the network to adjust the strength of connections between features at different depths and dynamically rearrange layers. We conduct experiments focusing on the pre-training of large language models, including dense and sparse models, where hyper-connections show significant performance improvements over residual connections. Additional experiments conducted on vision tasks also demonstrate similar improvements. We anticipate that this method will be broadly applicable and beneficial across a wide range of AI problems."
+        },
+        {
+            "title": "Start",
+            "content": "4 2 0 2 9 2 ] . [ 1 6 0 6 9 1 . 9 0 4 2 : r a"
+        },
+        {
+            "title": "Preprint",
+            "content": "HYPER-CONNECTIONS Defa Zhu, Hongzhi Huang, Zihao Huang, Yutao Zeng, Yunyao Mao, Banggu Wu, Qiyang Min, Xun Zhou Seed-Foundation-Model Team, ByteDance {zhudefa,huanghongzhi.51,huangzihao.notabot,yutao.zeng, maoyunyao.myy,wubanggu,minqiyang,zhouxun}@bytedance.com"
+        },
+        {
+            "title": "ABSTRACT",
+            "content": "We present hyper-connections, simple yet effective method that can serve as an alternative to residual connections. This approach specifically addresses common drawbacks observed in residual connection variants, such as the seesaw effect between gradient vanishing and representation collapse. Theoretically, hyperconnections allow the network to adjust the strength of connections between features at different depths and dynamically rearrange layers. We conduct experiments focusing on the pre-training of large language models, including dense and sparse models, where hyper-connections show significant performance improvements over residual connections. Additional experiments conducted on vision tasks also demonstrate similar improvements. We anticipate that this method will be broadly applicable and beneficial across wide range of AI problems."
+        },
+        {
+            "title": "INTRODUCTION",
+            "content": "Figure 1: The performance of the baseline model OLMoE-1B-7B and the model with hyperconnections, OLMoE-1B-7B-DHC4. (1) and (2) show the training loss (0.99 EMA smoothed) and the C4-en validation loss, respectively. Our method converges 1.8 times faster compared to the baseline and maintains significant advantage at the 500B tokens. (3) and (4) show the accuracy curves on HellaSwag and ARC-Challenge, demonstrating the superior performance of the OLMoE-1B-7B-DHC4 model. Deep learning has achieved tremendous success across various domains, where residual connections (He et al., 2016) have been instrumental in contemporary neural network architectures, including transformers and CNNs. Residual connections help mitigate the problem of gradient vanishing, enabling the effective training of very deep networks. However, it is important to acknowledge that residual connections are not infallible solutions and still present limitations that remain unresolved. The two main variants of residual connections, Pre-Norm and Post-Norm, each make distinct trade-offs between gradient vanishing and representation collapse. Pre-Norm applies normalization operations to the input before each residual block, effectively addressing the problem of gradient vanishing (Bengio et al., 1994; Glorot & Bengio, 2010). However, it can also lead to the issue of collapse in deep representations (Liu et al., 2020), where hidden features in deeper layers become highly similar, diminishing the contribution of additional layers as their number increases. In contrast, Post-Norm applies normalization operations after the output of each residual block, weakening the \"strength\" of residuals. This approach can alleviate the issue of representation collapse but also"
+        },
+        {
+            "title": "Preprint",
+            "content": "Figure 2: Hyper-connections with expansion rate = 2. (a) The highlighted green and blue connections compose depth-connections between the output of the layer and the blue hidden vector. (b) The highlighted blue and yellow connections represent part of width-connections between the hidden vectors h1 (blue) and h2 (yellow). (c) The matrix representation of hyper-connections. reintroduces the problem of vanishing gradients. The vanishing gradient and the representation collapse are like two ends of seesaw, with these two variants making respective trade-offs between these issues. The key issue is that residual connections, including both Pre-Norm and Post-Norm variants, predefine the strength of connections between the output and input within layer. Driven by the limitations of residual connections, an important question arises: Can neural networks autonomously learn the optimal strength of connections to improve performance? To address this, we propose hyper-connections (HC), which lead to significantly improved performance with negligible increase in computation and parameters. We will show that both Post-Norm and Pre-Norm variants can be expressed as specific non-trainable forms of hyper-connections, as discussed in 3.1. ) 1 + 0 , i0 ( c"
+        },
+        {
+            "title": "Layer Index i",
+            "content": "The core idea of hyper-connections is to propose learnable depth-connections and width-connections, as depicted in Fig. 2. Depth-connections can be considered as generalized form of residual connections, assigning weights to the connections between the inputs and outputs of each layer. To enable the network to model different depthconnections simultaneously, we expand the networks input into copies, each having its own depth connection, as shown in Fig. 2 (a). Moreover, we establish width connections between the hidden vectors, allowing information exchange between hidden vectors within the same layer, as shown in Fig. 2 (b). Finally, we can formalize the hyperconnections into matrix, as shown in Fig. 2 (c). We find that hyper-connections can not only learn to adjust the strength of residuals but also learn to rearrange the layers (sequential or parallel), as discussed in 3.2. Furthermore, we introduce dynamic hyper-connections (DHC), enabling the network to adjust connection weights according to the input. Notably, although hyper-connections seem to increase the networks width by times, the additional parameters and computational cost are almost negligible. Figure 3: Cosine similarity between the input of the current layer and the previous layers for the OLMo-1B Model (Groeneveld et al., 2024). The curve represents the median of similarity, while the shaded area indicates the range between the 5th and 95th percentiles. The red curve shows the model with PreNorm, and the blue curve shows that with hyper-connections. Our research, primarily centered on large language models (LLMs) pre-training, also extends to visual generation and classification tasks. Using Pre-Norm as baseline, we demonstrate the significant benefits of hyper-connections, including their effectiveness in 1B and 7B dense models as well as MoE models with 7B parameters, as detailed in 4. The benefits are particularly prominent for OLMoE (Muennighoff et al., 2024) as presented in Fig.1. The model utilizing DHC converges 1.8 times faster and shows an improvement of approximately 6 points on ARC-Challenge compared to the baseline trained with 500 tokens. According to our visual analysis, as shown in Fig.3, the baseline model tends toward representation collapse, characterized by high similarity between"
+        },
+        {
+            "title": "Preprint",
+            "content": "features of adjacent layers. In contrast, models with hyper-connections exhibit significantly lower similarity between features across adjacent layers and wider range of similarities. This suggests that hyper-connections enhance the impact of each layer. Further discussion is provided in 4.5 and in Appendix D. These compelling pieces of evidence demonstrate the generality of the hyper-connections principle, and we anticipate their applicability in numerous other AI challenges."
+        },
+        {
+            "title": "2.1 STATIC HYPER-CONNECTIONS",
+            "content": "Consider the hidden vector hk1 Rd (or hk1 Rd1) as the input to the k-th layer, with the initial input h0 to the network. Initially, h0 Rd is replicated times to form the initial hyper hidden matrix H0 = (cid:0)h0 h0 Rnd. Here, is called the expansion rate. For the k-th layer, the input consists of the hyper hidden matrix from the previous layer Hk1 = (cid:0)hk1 Rnd. Finally, we sum the last hyper hidden matrix row-wise to obtain the required hidden vector, which is then passed through final projector to produce the final output of the network (i.e., normalization layer and an unembedding layer in transformers). To simplify the notation in subsequent analysis, we omit the layer index and simply denote the . . . hn) hyper-hidden matrix as = (h1 h2 . . . h0(cid:1) . . . hk1 hk1 2 (cid:1) 1 . The hyper-connections can be represented by matrix HC, where each element defines the connection weight. The matrix is structured as follows: HC = (cid:18)011 Am Ar (cid:19) = 0 β1 β2 α1,0 α1,1 α1,2 α2,0 α2,1 α2,2 ... ... ... αn,0 αn,1 αn,2 βn α1,n α2,n ... . . . αn,n R(n+1)(n+1). (1) Consider network layer, denoted by , it integrates self-attention layers and feed-forward networks within transformers. The output of the hyper-connections, denoted by ˆH, can be simply formulated as follows: ˆH = HC(T , H) = BT (HAm) + Ar H. (2) . . . hn) to obtain We use Am as weights to perform weighted sum on the input = (h1 h2 the input h0 of the current layer , which is given by: While Ar is used to connect and map it into residual hyper hidden matrix H. It is represented as follows: 0 = Am H, (3) Subsequently, the output is given by: = Ar H. ˆH = B(T h0) + H. The depth-connections can be decoupled as the following matrix, which is shown at Fig 2 (a): DC = (cid:18) diag(Ar) (cid:19) (cid:18) β1 β2 α1,1 α2,2 = (cid:19) βn αn,n R2n, (4) (5) (6) where the first row represents the weights of the output of the current layer , and the last row diag(Ar) represents the weights of the input. We use diag(Ar) to represent the flatten vector of the diagonal entries of Ar."
+        },
+        {
+            "title": "Preprint",
+            "content": "The width-connections matrix can be defined as follows, which is shown at Fig 2 (b): WC = (Am Ar) Rn(n+1). (7) The algorithm that employs hyper-connections is presented in Algorithm 1."
+        },
+        {
+            "title": "2.2 DYNAMIC HYPER-CONNECTIONS",
+            "content": "The entries of HC can dynamically depend on the input H, which the matrix representation of dynamic hyper-connections (DHC) is defined as follows: HC(H) = (cid:18) 011 B(H) Am(H) Ar(H) (cid:19) Similarly, given layer and input H, we obtain the output of the DHC as follows: ˆH = HC(H)(T , H). (8) (9) In practice, we combine the dynamic and static matrices to achieve DHC. The dynamic parameters are obtained through linear transformation. To stabilize the training process, we introduce normalization before the linear transformation and apply the tanh activation function after it, scaling it by small initial learnable factor. The following equations detail how these dynamic parameters are computed: = norm(H) B(H) = sβ tanh(HWβ) + R1n Am(H) = sα tanh(HWm) + Am Rn1 Ar(H) = sα tanh(HWr) + Ar Rnn (10) (11) (12) (13) Our experiments in 4 demonstrate that dynamic hyper-connections outperform static hyperconnections in language modeling tasks. The PyTorch implementations for both the static and dynamic variants of hyper-connections are detailed in Algorithm 2. 2."
+        },
+        {
+            "title": "INITIALIZATION",
+            "content": "In order to make the initialization of the hyper-connections equivalent to the Pre-Norm residual connections, we adopt the following initialization strategy. The dynamic parameters Wβ, Wm, and Wr in Eqs. 11, 12, and 13 are initialized to 0, while the static matrices are initialized as follows: (cid:18)011 Bk Ar Am (cid:19) (cid:18) 011 11n ek mod enn (cid:19) , = (14) where is the index of the layer. mod denotes the modulo operation."
+        },
+        {
+            "title": "3 WHY HYPER-CONNECTIONS",
+            "content": "In this section, we elucidate the rationale behind hyper-connections. We explore how variants of residual connections, namely Pre-Norm and Post-Norm, can be viewed as non-trainable hyperconnections, and introduce the concept of sequential-parallel duality, demonstrating how hyperconnections can dynamically optimize layer arrangements to enhance network performance. visulize analysis of hyper-connections through an unfolded view is discussed in 4.5."
+        },
+        {
+            "title": "3.1 RESIDUAL CONNECTIONS AS NON-TRAINABLE HYPER-CONNECTIONS",
+            "content": "The Pre-Norm and Post-Norm residual connections can be represented as the following hyperconnections matrices with an expansion rate = 1:"
+        },
+        {
+            "title": "Preprint",
+            "content": "HCP reN orm = (cid:18)0 1 (cid:19) 1 1 , (15) HCP ostN orm = 0 1 1 σ2 +σ2 1 σ2 +σ2 o+2σio o+2σio , (16) where σi and σo denote the standard deviations of the input and output of the neural network layer, respectively, and σio is the covariance between them. For Pre-Norm, its hyper-connection matrix is 2 2 matrix where the bottom right triangular part is filled with 1 and the rest is placeholder 0. For Post-Norm, the weights depend on the variances and covariance of the input and output, forming 2 2 matrix. Therefore, their hyper-connection matrices are non-trainable. In this work, we propose hyper-connections that can be (n + 1) (n + 1) matrices, with weights that are trainable or even predicted based on the input. The complete derivation is provided in Appendix E."
+        },
+        {
+            "title": "3.2 SEQUENTIAL-PARALLEL DUALITY",
+            "content": "Given series of neural network modules, we have the option to arrange them either sequentially or in parallel. However, hyper-connections offer an approach that learns to rearrange these layers in configuration blending both sequential and parallel arrangements. Figure 4: Sequential and parallel arrangements of hyper-connections with = 2. Without loss of generality, we set the expansion rate to = 2. If the hyper-connections are learned as the following matrix, the neural network will be arranged sequentially: HC = (cid:32)0 1 0 1 1 (cid:33) . 1 0 1 (17) In this case, the depth connection degenerates into residual connection, as shown in Fig. 4 (a). When the hyper-connections for odd and even layers (with layer numbering starting from 1) are defined by the following matrices, the neural network will be arranged in parallel every two consecutive layers, similar to the arrangement of parallel transformer blocks in transformers (Wang, 2021), as shown in Fig. 4 (b). The general and complete derivation is provided in Appendix F. HCodd = (cid:32)0 1 1 1 1 1 (cid:33) , 0 1 1 (18) HCeven = (cid:32)0 0 1 0 1 0 (cid:33) 1 0 1 . (19) Thus, learning the hyper-connection matrix in various forms can create layer arrangements that surpass traditional sequential and parallel configurations, resulting in soft-mixture or even dynamic"
+        },
+        {
+            "title": "Preprint",
+            "content": "arrangement. For static hyper-connections, the layer arrangement within the network remains fixed after training. In contrast, dynamic hyper-connections allow the arrangement to adapt dynamically for each token."
+        },
+        {
+            "title": "4 RESULTS",
+            "content": "Figure 5: Comparison of training loss curves for different expansion rate. The left subfigure includes models with dynamic hyper-connections (DHC) at various expansion rates, while the right subfigure shows the effect of omitting the tanh function. Both subfigures illustrate how increasing the expansion rate leads to improved training loss performance over 500B tokens. Results are smoothed using an exponential moving average with coefficient of 0.99."
+        },
+        {
+            "title": "Methods",
+            "content": "OLMo-1B OLMo-1B-DHC1 W/O tanh OLMo-1B-DHC2 W/O tanh OLMo-1B-DHC4 W/O tanh OLMo-1B-DHC8 W/O tanh OLMo-1B-DHC1 OLMo-1B-DHC2 OLMo-1B-DHC4 OLMo-1B-DHC8 V2 Eval Loss V2 Eval PPL V3 Eval Loss V3 Eval PPL Down Stream Avg, Acc. 2.811 2.822 2.792 2.779 2.777 2.819 2.802 2.781 2.778 18.023 18.270 17.663 17.451 17.425 18.125 17.950 17.509 17.445 2.544 2.556 2.537 2.516 2. 2.556 2.534 2.514 2.516 14.229 14.428 14.033 13.844 13.819 14.418 14.114 13.826 13.843 62.5 62.3 63.8 64.4 63.8 62.3 63.0 63.8 62.8 Table 1: Performance comparison of different expansion rates on 500 tokens. We primarily conduct experiments on pre-training of large language model, including dense and Mixture-of-Experts (MoE) (Shazeer et al., 2017) models, and extend to visual generation and classification tasks. Due to space constraints, we include the vision experiments in the Appendix C. Experiment Settings. We employ the experimental setup outlined by OLMo (Groeneveld et al., 2024) for dense models and by OLMoE (Muennighoff et al., 2024) for MoE models. For dense models, we use dolmap-v1.5-sample (Soldaini et al., 2024) as our training dataset. We conduct ablation studies on 1B models and assess the effectiveness of our method at the 7B model scale. For MoE models, we train the OLMoE-1B-7B model, both with and without hyper-connections, on the OLMOE-MIX dataset. These models activate 1.3B out of total of 7B parameters. All experiments are trained on 500B tokens. Implementation. We maintain the training configuration of the baseline model, replacing the residual connections with hyper-connections. The static component in Eqs. 1, 11, 12, 13 does not utilize weight decay, whereas the dynamic component does. Since the hyper hidden vectors of the final transformer block are ultimately summed, we ensure that the standard deviation (std) of the output (before the final layernorm and unembedding layers) remains consistent with the original. At initialization, we scale the std of the weights of the output module at all layers, including those of the second linear layer of the feedforward network and the output projector of the attention module, by factor of n, where represents the expansion rate."
+        },
+        {
+            "title": "Preprint",
+            "content": "Metrics. In accordance with the methodology of OLMo (Groeneveld et al., 2024), we report the average perplexities (PPL) and losses on both the V2 and V3 validation sets, along with the average metrics for zero-shot evaluation on downstream benchmarks (refer to Table 10). We observe significant volatility in the zero-shot performance indicators for the datasets (highlighted in grey in Table 10), with fluctuations exceeding 20% across neighboring checkpoints. For more reliable and consistent results, we excludes these volatile datasets from our analysis. For the MoE models, in line with OLMoE, we also present losses on V3 validation sets, and accuracies on downstream benchmarks (refer to Table 11)."
+        },
+        {
+            "title": "4.1 ABLATION STUDY",
+            "content": "We use the dynamic hyperconnections with an expansion rate of = 4 and include the tanh function as the default method, marked with the suffix -DHC, while -SHC denotes static hyper-connections. The evaluation results are presented in Table 1, and the training loss curves are depicted in Fig. 5. We observe that with an expansion rate of = 1, the performance of DHC is inferior to the baseline. However, for > 1, DHC significantly outperforms the baseline, achieving superior results at = 4, with the increase to = 8 providing minimal additional benefits. Notably, OLMo-1B-DHC8 W/O tanh excels on both V2 and V3 validation sets, with reduction in V2 Eval Loss by 0.034 and V3 Eval Loss by 0.029 compared to the baseline. Furthermore, the decline rate of training losses for DHC (n 2) is steeper than that of the baseline, and DHC demonstrates greater stability, with no spikes observed in any DHC experiments. Staitc and dynamic hyper-connections. Table 2 presents an ablation study comparing SHC and DHC. All hyper-connection (HC) variants significantly outperform the baseline. At an expansion rate of 2, the improvements of DHC and SHC are similar. However, at an expansion rate of 4, DHC performs notably better than SHC."
+        },
+        {
+            "title": "Methods",
+            "content": "V2 Eval Loss V2 Eval PPL V3 Eval Loss V3 Eval PPL Down Stream Avg, Acc. OLMo-1B OLMo-1B-SHC2 OLMo-1B-DHC2 OLMo-1B-DHC2 W/O tanh OLMo-1B-SHC4 OLMo-1B-DHC4 OLMo-1B-DHC4 W/O tanh 2.811 2.799 2.802 2.792 2.791 2.781 2.779 18.023 17.778 17.950 17.663 17.671 17.509 17.451 2.544 2.538 2.534 2. 2.528 2.515 2.516 14.229 14.152 14.114 14.033 14.025 13.826 13.844 62.5 63.4 63.0 63.8 63.6 63.8 64.4 Table 2: Ablation Study on Static and Dynamic Hyper-Connections with Training on 500 Tokens The importance of and WC. As shown in Table 3, not training WC leads to significant performance declines, with the V2 loss increasing by 0.021 and the V3 loss by 0.017, as seen when comparing the 4th and 6th lines of Table 3. In contrast, the impact is less pronounced when is not trained. Therefore, ensuring the trainability of both WC and is crucial."
+        },
+        {
+            "title": "WC B Tanh",
+            "content": "V2 Eval Loss V2 Eval PPL V3 Eval Loss V3 Eval PPL Down Stream Avg, Acc. 2.804 2.781 2. 2.802 2.783 2.781 17.912 17.493 17.773 17.914 17.504 17.835 2.537 2.518 2.516 2.532 2.520 2.515 14.145 13.874 13. 14.072 13.906 13.807 62.5 63.6 64.4 63.4 63.4 63.8 Table 3: Ablation study on OLMo-1B-DHC4. In the or WC column, the symbol \"\" denotes parameters that are not trainable from initialization."
+        },
+        {
+            "title": "Methods",
+            "content": "OLMo-1B OLMo-1B-ResiDual OLMo-1B-Altup2 OLMo-1B-DHC2 OLMo-1B-DHC2 W/O tanh V2 Eval Loss V2 Eval PPL V3 Eval Loss V3 Eval PPL Down Stream Avg, Acc. 2.811 2.825 2.827 2.802 2.792 18.023 18.375 18.268 17.950 17.663 2.544 2.551 2. 2.534 2.529 14.229 14.346 14.454 14.114 14.033 62.5 62.0 62.4 63.0 63.8 Table 4: Performance of Related Methods on OLMo-1B. We implemented the Altup (Baykal et al., 2024) and ResiDual (Xie et al., 2023) methods in OLMo. Altup is motivated to widen the hidden dimension while maintaining low computation cost by passing only part of hidden state to transformer blocks. By contrast, ResiDual is proposed to combine both Preand Post-Norm in two-stream style. Both methods expand the hidden size by times with negligible computational overhead, with ResiDual expanding it exactly 2 times. For fair comparison, we set = 2 in our experiments. Unfortunately, these methods show gains in the early stages of training but are gradually surpassed by the baseline, as shown in Table 4. 4.3 7B MODELS Figure 6: (1) and (2) Training loss (0.99 EMA smoothed) and C4-en validation loss for OLMo-7B and OLMo-7B-DHC4 models. (3) and (4) Accuracy curves on hellaswag and sciq, demonstrating the superior performance of the OLMo-7B-DHC4 model. We evaluate the effectiveness of hyper-connections on the 7B model, training model with DHCs with an expansion rate of 4, denoted as OLMo-7B-DHC4. According to Table 5, OLMo-7B-DHC4 significantly outperforms the baseline OLMo-7B model in all average metrics. In the V2 evaluation, OLMo-7B-DHC4 shows improvements of 0.022 for loss and 0.293 for PPL. Furthermore, the average score of downstream benchmarks 0.710 surpasses the baseline 0.701, with the results of specific tasks are shown in Fig. 9."
+        },
+        {
+            "title": "Methods",
+            "content": "V2 Eval Loss V2 Eval PPL V3 Eval Loss V3 Eval PPL Down Stream Avg, Acc. OLMo-7B OLMo-7B-DHC 2.581 2.559 14.316 14.023 2.322 2.304 11.324 11.120 70.1 71.0 Table 5: Evaluation Metrics for 7B Models Based on Fig 6, the OLMo-7B-DHC4 model consistently shows better metrics compared to baseline, including training and validation loss and accuracy in downstream benchmarks. Notably, after 400 tokens, the model maintains its improvement without the gains diminishing. This indicates that the OLMo-7B-DHC4 model continues to provide consistent benefits in reducing loss, even at higher token counts. Furthermore, according to Fig. 6, the baseline model exhibits frequent spikes, while our model with DHCs shows no spikes throughout the training. This shows that our approach not only achieves better loss but also ensures more stable training."
+        },
+        {
+            "title": "4.4 MOE MODELS",
+            "content": "We evaluate the effectiveness of hyper-connections on the Mixture-of-Experts (MoE) model. We retrain the original OLMoE-1B-7B model as the baseline and train model that applies Dynamic Hyper-Connections (DHC) with = 4, replacing the residual connections. The full results are shown in Fig. 8, which illustrates that hyper-connections outperform residual connections in almost all metrics. In many metrics, our method requires only half of the training tokens to achieve the same performance as the baseline. Fig. 1 and Table 6 highlight some of the results, such as reduction in training loss of approximately 0.027, reduction in loss on the C4-en validation set of 0.028, an improvement of 6 points on the ARC-Challengeand an improvement of 1.2 points on MMLU Var."
+        },
+        {
+            "title": "MMLU\nVar",
+            "content": "HellaSwag ARC-C ARC-E PIQA WinoGrande"
+        },
+        {
+            "title": "BoolQ",
+            "content": "OLMoE-1B-7B OLMoE-1B-7B-DHC4 38.5 39.7 69.5 70.2 41.8 47.8 72.8 76.7 77.6 78. 64.4 64.6 65.4 68.5 Table 6: Downstream evaluations for MoE models training with 500B tokens under the OLMoE evaluation setting. ARC-C stands for ARC-Challenge, and ARC-E for ARC-Easy. MMLU Var is modified version of MMLU that includes varying few-shot examples, providing stable feedback during early training, as outlined in the OLMoE setting (Muennighoff et al., 2024)."
+        },
+        {
+            "title": "4.5 VISUALIZATION ANALYSIS",
+            "content": "(cid:45) PTB Figure 7: Visualization of connection matrices for hyper-connections and various related baseline methods. The attention layers, which have odd ids, are marked with green tick marks. In this section, we investigate the learned hyper-connection weights and show how the output of the former layer contributes to the latter ones. To this end, we convert hyper-connections to dense connections cross layers. Consider the input hidden vectors hk 0 in k-th layer, it can be unfolded as weighted summation over previous layer outputs: hk 0 = k1 (cid:88) j=0 c(0) kj j(hj 0), (20) kj describes how much layer-j (T j) contributes to layer-ks input hk where c(0) 0. Then, C(0) denotes dense connection weight matrix. In particular, let layer-0 be the word embedding and 0 be an identity mapping, layer-L+1 be the hidden state before the unembedding layer, which is summation over the last hidden vectors, i.e., hL+1 hL . OLMo-1B-DHC4 model is adopted for visualization. We take the checkpoint at 500B tokens and forward random validation text to obtain dynamic hyper-connection weights. In addition, we show connection patterns for some related baseline methods. Finally, the visualization is illustrated in Fig. 10. We present the following findings, with more detailed discussions provided in Appendix D. 0 = (cid:80) Connection patterns for baseline methods. For Pre-Norm baseline, the connection matrix is simply lower triangular matrix with diagonal elements erased, because each transformer layer joins the residual equally. In the Pre-Norm parallel transformer block (PTB) baseline, the connection matrix appears jagged because the input to the FFN layer does not depend on the output of the previous attention layer. For Post-Norm baseline, the connection only holds for adjacent layers, as the weight"
+        },
+        {
+            "title": "Preprint",
+            "content": "for bottom layers decays every time the residual passes post-norm layer. For the two-hop residual baseline (Ma et al., 2024), the outputs of attention layers are not added to residual and only contributes to the next one FFN layer, resulting in vertical strip pattern in the connection matrix. Λ-shaped connection pattern. In the connection matrix for hyper-connections, long-term decay pattern can be observed, where layers are generally preferred to rely on few adjacent layer outputs. Moreover, the bottom layers (e.g. layer 0,2) are observed frequently used in most of subsequent layers. Therefore, the two patterns together form Λ-shaped connection pattern. Note that the long-term decay pattern is Post-Norm style pattern, while the frequently accessed pattern is Pre-Norm style, indicating that the hyper-connection introduces free mixture of Preand Post-Norm architecture. Input word embedding is eliminated from model output. As per the first column in the connection matrix for layer inputs, the input word embedding contributes to most of the layers except for the final one. This last layer, which products the models output, is used for next token prediction. In most cases, keeping component of input embedding in model output is harmful to next token prediction, especially when using tied word embedding such as that employed by OLMo-1B. Similar results are found in previous works (Ma et al., 2023). Parallel transformer blocks are observed. As discussed in 3.2, parallel transformer block, which performs attention and FFN in parallel, is special case for hyper-connection. In practice, PTB-like patterns, which can be identified by the local jagged pattern, are surprisingly observed to be learned by hyper-connections. For instance, layer 11 has minimal contribution to the input of layer 12 (refer to row 12 in the hyper-connection connection matrix). This suggests that layers 11 and 12 can operate in parallel, thereby forming PTB module. Attention layers tend to have fewer long-term connections. It is observed that attention layers at the bottom barely have long-term contribution, trend that persists until layer 17. Upon examining the connection matrix for hyper hiddens (refer to Fig. 10 in the appendix), its evident that the outputs of the FFN layers have significantly greater magnitudes than those of the attention layers. This pattern resembles two-hop residual connection design, wherein the attention output contributes to the input of the following FFN layer, but doesnt join the main residual path."
+        },
+        {
+            "title": "5 RELATED WORK",
+            "content": "Transformers (Vaswani et al., 2017) have revolutionized various fields, particularly natural language processing and computer vision. They rely heavily on residual connections to facilitate the training of deep models. Our hyper-connections approach can replace residual connections, providing stable training and consistent improvements in both natural language processing and computer vision. The issues of gradient vanishing and representation collapse (Bengio et al., 1994; Glorot & Bengio, 2010; Liu et al., 2020) have been extensively studied. The combinations of normalization techniques (Ioffe & Szegedy, 2015; Ba et al., 2016) and residual connections (He et al., 2016), like Pre-Norm and Post-Norm, actually reflects different emphases in solving these two issues. However, despite these advancements, the fundamental trade-off between gradient vanishing and representation collapse in deep networks remains critical challenge. Building on these findings, our work introduces novel approach that enables neural networks to autonomously learn the optimal strength of connections, potentially improving both gradient stability and representation quality."
+        },
+        {
+            "title": "6 CONCLUSION",
+            "content": "In conclusion, we have introduced hyper-connections as an effective alternative to residual connections in transformers. Our analysis reveals that hyper-connections not only overcome the limitations of residuals but also enable dynamic adjustments in network architecture. Experimental results confirm their promising benefits across various tasks, including pre-training of large language model, image generation, and image classification."
+        },
+        {
+            "title": "ACKNOWLEDGEMENTS",
+            "content": "This research was conducted at ByteDance Inc. We are grateful for the suggestions and assistance provided by Yaowei Zheng, Yuyu Zhang, Yunshui Li, Xiang Li, and Bairen Yi."
+        },
+        {
+            "title": "REFERENCES",
+            "content": "Jimmy Lei Ba, Jamie Ryan Kiros, and Geoffrey Hinton. Layer normalization. In arXiv preprint arXiv:1607.06450, 2016. Cenk Baykal, Dylan Cutler, Nishanth Dikkala, Nikhil Ghosh, Rina Panigrahy, and Xin Wang. Alternating updates for efficient transformers. Advances in Neural Information Processing Systems, 36, 2024. Yoshua Bengio, Patrice Simard, and Paolo Frasconi. Learning long-term dependencies with gradient descent is difficult. IEEE transactions on neural networks, 5(2), 1994. Yonatan Bisk, Rowan Zellers, Jianfeng Gao, Yejin Choi, et al. Piqa: Reasoning about physical commonsense in natural language. In Proceedings of the AAAI conference on artificial intelligence, volume 34, 2020. Christopher Clark, Kenton Lee, Ming-Wei Chang, Tom Kwiatkowski, Michael Collins, and Kristina Toutanova. Boolq: Exploring the surprising difficulty of natural yes/no questions. arXiv preprint arXiv:1905.10044, 2019. Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot, Ashish Sabharwal, Carissa Schoenick, and Oyvind Tafjord. Think you have solved question answering? try arc, the ai2 reasoning challenge. arXiv:1803.05457v1, 2018. Ido Dagan, Oren Glickman, and Bernardo Magnini. The pascal recognising textual entailment challenge. In Machine learning challenges workshop. Springer, 2005. Marie-Catherine De Marneffe, Mandy Simons, and Judith Tonhauser. The commitmentbank: Investigating projection in naturally occurring discourse. In proceedings of Sinn und Bedeutung, volume 23, 2019. Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: large-scale hierarchical image database. In 2009 IEEE conference on computer vision and pattern recognition. Ieee, 2009. Bill Dolan and Chris Brockett. Automatically constructing corpus of sentential paraphrases. In Third international workshop on paraphrasing (IWP2005), 2005. Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, et al. An image is worth 16x16 words: Transformers for image recognition at scale. arXiv preprint arXiv:2010.11929, 2020. Xavier Glorot and Yoshua Bengio. Understanding the difficulty of training deep feedforward neural networks. In Proceedings of the thirteenth international conference on artificial intelligence and statistics. JMLR Workshop and Conference Proceedings, 2010. Dirk Groeneveld, Iz Beltagy, Pete Walsh, Akshita Bhagia, Rodney Kinney, Oyvind Tafjord, Ananya Harsh Jha, Hamish Ivison, Ian Magnusson, Yizhong Wang, et al. Olmo: Accelerating the science of language models. arXiv preprint arXiv:2402.00838, 2024. Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition, 2016. Dan Hendrycks, Collin Burns, Steven Basart, Andy Zou, Mantas Mazeika, Dawn Song, and Jacob Steinhardt. Measuring massive multitask language understanding. Proceedings of the International Conference on Learning Representations (ICLR), 2021."
+        },
+        {
+            "title": "Preprint",
+            "content": "Sergey Ioffe and Christian Szegedy. Batch normalization: Accelerating deep network training by reducing internal covariate shift. In International conference on machine learning. PMLR, 2015. Matt Gardner Johannes Welbl, Nelson F. Liu. Crowdsourcing multiple choice science questions. 2017. Liyuan Liu, Xiaodong Liu, Jianfeng Gao, Weizhu Chen, and Jiawei Han. Understanding the difficulty of training transformers. arXiv preprint arXiv:2004.08249, 2020. Haoyan Ma, Xiang Li, Xia Yuan, and Chunxia Zhao. Denseformer: dense transformer framework for person re-identification. IET Computer Vision, 17(5), 2023. Xuezhe Ma, Xiaomeng Yang, Wenhan Xiong, Beidi Chen, Lili Yu, Hao Zhang, Jonathan May, Luke Zettlemoyer, Omer Levy, and Chunting Zhou. Megalodon: Efficient llm pretraining and inference with unlimited context length. arXiv preprint arXiv:2404.08801, 2024. Todor Mihaylov, Peter Clark, Tushar Khot, and Ashish Sabharwal. Can suit of armor conduct electricity? new dataset for open book question answering. In EMNLP, 2018. Niklas Muennighoff, Luca Soldaini, Dirk Groeneveld, Kyle Lo, Jacob Morrison, Sewon Min, Weijia Shi, Pete Walsh, Oyvind Tafjord, Nathan Lambert, Yuling Gu, Shane Arora, Akshita Bhagia, Dustin Schwenk, David Wadden, Alexander Wettig, Binyuan Hui, Tim Dettmers, Douwe Kiela, Ali Farhadi, Noah A. Smith, Pang Wei Koh, Amanpreet Singh, and Hannaneh Hajishirzi. Olmoe: Open mixture-of-experts language models, 2024. URL https://arxiv.org/abs/2409.02060. William Peebles and Saining Xie. Scalable diffusion models with transformers. arXiv preprint arXiv:2212.09748, 2022. Melissa Roemmele, Cosmin Adrian Bejan, and Andrew Gordon. Choice of plausible alternatives: An evaluation of commonsense causal reasoning. In 2011 AAAI spring symposium series, 2011. Keisuke Sakaguchi, Ronan Le Bras, Chandra Bhagavatula, and Yejin Choi. Winogrande: An adversarial winograd schema challenge at scale. Communications of the ACM, 64(9), 2021. Maarten Sap, Hannah Rashkin, Derek Chen, Ronan LeBras, and Yejin Choi. Socialiqa: Commonsense reasoning about social interactions. arXiv preprint arXiv:1904.09728, 2019. Shazeer, Mirhoseini, Maziarz, Davis, Le, Hinton, and Dean. The sparsely-gated mixture-of-experts layer. Outrageously large neural networks, 2017. Richard Socher, Alex Perelygin, Jean Wu, Jason Chuang, Christopher Manning, Andrew Ng, and Christopher Potts. Recursive deep models for semantic compositionality over sentiment treebank. In Proceedings of the 2013 conference on empirical methods in natural language processing, 2013. Luca Soldaini, Rodney Kinney, Akshita Bhagia, Dustin Schwenk, David Atkinson, Russell Authur, Ben Bogin, Khyathi Chandu, Jennifer Dumas, Yanai Elazar, et al. Dolma: An open corpus of three trillion tokens for language model pretraining research. arXiv preprint arXiv:2402.00159, 2024. Alon Talmor, Jonathan Herzig, Nicholas Lourie, and Jonathan Berant. Commonsenseqa: question answering challenge targeting commonsense knowledge. arXiv preprint arXiv:1811.00937, 2018. Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan Gomez, Łukasz In Advances in neural information Kaiser, and Illia Polosukhin. Attention is all you need. processing systems, 2017. Ben Wang. Mesh-Transformer-JAX: Model-Parallel Implementation of Transformer Language Model with JAX. https://github.com/kingoflolz/mesh-transformer-jax, May 2021. Mitchell Wortsman, Peter Liu, Lechao Xiao, Katie Everett, Alex Alemi, Ben Adlam, John Co-Reyes, Izzeddin Gur, Abhishek Kumar, Roman Novak, et al. Small-scale proxies for large-scale transformer training instabilities. arXiv preprint arXiv:2309.14322, 2023."
+        },
+        {
+            "title": "Preprint",
+            "content": "Shufang Xie, Huishuai Zhang, Junliang Guo, Xu Tan, Jiang Bian, Hany Hassan Awadalla, Arul Menezes, Tao Qin, and Rui Yan. Residual: Transformer with dual residual connections. arXiv preprint arXiv:2304.14802, 2023. Rowan Zellers, Ari Holtzman, Yonatan Bisk, Ali Farhadi, and Yejin Choi. Hellaswag: Can machine really finish your sentence? arXiv preprint arXiv:1905.07830, 2019. Biao Zhang and Rico Sennrich. Root mean square layer normalization. Advances in Neural Information Processing Systems, 32, 2019."
+        },
+        {
+            "title": "Preprint",
+            "content": "A MOE 1B/7B MODEL EXPERIMENTS Figure 8: Loss curves in V3 validation set and accuracy curves on downstream tasks for OLMoE-1B7B and OLMoE-1B7B-DHC4 models."
+        },
+        {
+            "title": "Preprint",
+            "content": "B 7B MODEL EXPERIMENTS Figure 9: Loss curves in V3 validation set and accuracy curves on downstream tasks for OLMo-7B and OLMo-7B-DHC4 models."
+        },
+        {
+            "title": "C VISION EXPERIMENTS",
+            "content": "Datasets. We use the ILSVRC-2012 ImageNet dataset (Deng et al., 2009) with 1k classes and 1.3M images (see ImageNet in the following) for image generation and classification. C."
+        },
+        {
+            "title": "IMAGE GENERATION",
+            "content": "To investigate the generalizability of hyper-connections in image generation, our experiments are conducted using the DiT framework (Peebles & Xie, 2022) training the models for 1400 epochs. In order to save experimental costs, we use FP16 precision, introduce flash-attention to speed up training, and introduce QK-Norm (Wortsman et al., 2023) to stabilize training."
+        },
+        {
+            "title": "Method",
+            "content": "DiT-XL/2 DiT-XL/2 DiT-1B/2 NP QK-Norm Size (M) FID sFID IS FP32 FP16 FP16 675 983 675 2.27 2.36 2.13 2.18 4. 4.54 4.50 4.52 278.24 269.46 288.69 287.24 0.83 0.83 0.82 0.82 0.57 0.58 0. 0.60 DiT-XL/2-SHC2 FP16 Table 7: Benchmarking class-conditional image generation on ImageNet 256256, with cfg=1.50. NP, P, and are short for Numerical Precision, Precision, and Recall, respectively. Our experimental results demonstrate that DiT models incorporating hyper-connections exhibit comparable performance metrics to DiT models with 50% more parameters. This finding underscores the efficiency and efficacy of hyper-connections in enhancing model performance without increasing model size. C."
+        },
+        {
+            "title": "IMAGE CLASSIFICATION",
+            "content": "For the image classification experiments, we train ViT/16-Base and ViT/16-Large models with images at resolution of 224 224 for 300 epochs, following the experimental setup used by (Dosovitskiy et al., 2020).To speed up the training process, we use bfloat16 numerical precision. The training configuration is detailed in Table 9. Within this configuration, we replace the residual connections with static and dynamic hyper-connections, referred to as SHC and DHC, respectively, using an expansion rate of = 2. The top-1 accuracy results are presented in Table 8. For the Base model (85M), our re-implemented ViT/16 achieves 76.38% accuracy on 224 224 images. The SHC and DHC enhance performance to 77.60% and 77.26%, respectively. representing relative increases of 1.22% and 0.88%. For the Large model (307M parameters), ViT/16 achieves 77.25% accuracy. The SHC and DHC configurations further enhance accuracy to 78.38% and 79.94%, respectively. This corresponds to relative improvements of 1.13% and 2.69%, with DHC showing the highest performance. These results demonstrate that hyper-connections (SHC and DHC) significantly improve accuracy, especially in the Large model scale. Model Scales Params (M) ViT*/16 ViT/16 ViT/16-SHC2 ViT/16-DHC"
+        },
+        {
+            "title": "Base\nLarge",
+            "content": "85 307 384 384 77.91 76.53 224 224 76.38 77.25 77.60 78.38 77.26 79. Table 8: Accuracy on ImageNet. ViT*/16 refers to the results reported by (Dosovitskiy et al., 2020), whereas ViT/16 denotes our re-implemented baseline. SHC and DHC indicate that residual connections are replaced with static and dynamic hyper-connections, respectively."
+        },
+        {
+            "title": "Value",
+            "content": "0.003 4096 Cosine Annealing with Linear Warmup (10k steps) Learning Rate (lr) Batch Size Scheduler Data Augmentation Mixup (α = 0.2) Epochs Optimizer Gradient Clipping Weight Decay Dropout Precision"
+        },
+        {
+            "title": "300\nAdamW (β1 = 0.9, β2 = 0.999, ϵ = 1e − 8)\n1.0\n0.3\n0.1\nbf16",
+            "content": "Table 9: Training hyperparameters for ViT."
+        },
+        {
+            "title": "Preprint",
+            "content": "C(0) C(1) C(2) C(3) C(4) (a) Connection matrix for DHC model. C(0) C(1) C(2) C(3) C(4) (b) Connection matrix for SHC model. Figure 10: Visualization of unfolded connection matrix. Matrices from left to right are C(0)(Connections for {hj }L+1 j=0 ) for {1, 2, 3, 4}. The attention layers, which have odd ids, are marked with green tick marks. j=0 ), C(i) (Connections for {hj 0}L+"
+        },
+        {
+            "title": "D MORE VISUALIZATION AND ANALYSIS",
+            "content": "Unfolding hyper-connections. We first introduce how to determine the connection matrix C(0) for hyper-connections. To simplify writing, the layer output k(hk 0) is denoted by for short. The recurrent form of hyper connection in Eq. 2 is expanded as follows: h0 =Hk k1 (cid:88) = Am = (T k1Bk1 + Hk1 Ar k1)Am jBj(Ar j+1Ar j+2...Ar k1)Am j=0 k1 (cid:88) j=0 = k1 (cid:89) jBj( t=j+1 Ar t)Am k. (21) kj = Bj((cid:81)k1 Therefore, we obtain connection matrix c(0) k. Similarly, the connection matrix C(i) for the i-th hyper hidden from k-th layer can be computed by substituting the last Am with Ar in Eq. 21, i.e., t=j+1 Ar t)Am Hk = Ar Hk = Ar t)Bj"
+        },
+        {
+            "title": "T j",
+            "content": "j=0 (cid:89) k1 (cid:88) ( t=j+1 t) Ar (cid:89) t=j+ Bj . c(i) kj = ( (22) (23) Visualization for hyper hidden. We visualize connection matrices for hyper hiddens in Fig. 10 to reveal how hyper-connection maintains intermediate layer outputs. First of all, the four hyper hiddens are dissimilar and show completely different connection patterns. Then, we can see outputs from FFN layers are preserved long-termly in hyper hiddens, while attention layers are reserved less. It is also observed that the long-term connections are usually stored in pairs of hyper hiddens, where the connection is positive in one hyper hidden but negative in the other, for example, column 0 and 2 in C(1), C(3). With such strategy, these connections can be easily eliminated in the sum-pooling operation before the unembedding layer. SHC shares similar connection pattern with DHC. We show the connection matrices for OLMo-1B-SHC4 model in Fig. 10b. Comparing to DHC, as shown in Fig. 10a, SHC shares"
+        },
+        {
+            "title": "Preprint",
+            "content": "exactly the same connection patterns. Moreover, we observe many more PTB-like blocks in SHC, e.g., layers from 13 to 18. Note that the connection relation for SHC is token independent, and such PTB-like blocks can be physically reorganized to be parallelly computed."
+        },
+        {
+            "title": "Preprint",
+            "content": "E DERIVATION OF NON-TRAINABLE HYPER-CONNECTION MATRIX FOR"
+        },
+        {
+            "title": "RESIDUAL CONNECTIONS",
+            "content": "E.1 PRE-NORM RESIDUAL CONNECTION In the Pre-Norm residual connection, the input to layer is first normalized before being passed through the layer. The output of the layer is then added to the original input. This can be represented as: ˆh = (Norm(h)) + h. (24) By incorporating the normalization operator into the layer, := Norm, we can express the entire process as: ˆh = (h) + h. To express this using hyper-connections, the matrix for Pre-Norm can be structured as follows: HCP reN orm = (cid:18)0 1 (cid:19) 1 1 Given hyper hidden matrix = h, we prove that the output of HCPreNorm ˆH = ˆh. Proof. ˆH = HC(T , H) = BT (HAm) + Ar = (h) + = ˆh. (25) (26) (27) E.2 POST-NORM RESIDUAL CONNECTION In the Post-Norm residual connection, the input to layer is passed through the layer first, and then the output is normalized after being added to the original input. In matrix form, this can be represented as: The summation of the input and the normalized output of the layer is: = (h) ˆh = Norm(h + h) (28) (29) We consider Norm to be LayerNorm (Zhang & Sennrich, 2019). The analysis process for RMSNorm is almost identical. In fact, the affine transformation can be incorporated into the subsequent layer, while the mean subtraction operation can be integrated into the current layer. = A, (30) where is the affine transformation, and is the re-centering operator. Thus, the mean of the output of is 0. To express this using hyper-connections with an expansion rate = 1, we need hyper-connection matrix HC that encapsulates this operation: HCP ostN orm = 0 1 1 h+σ2 σ2 +2σhh 1 h+σ2 σ2 +2σhh = (cid:18)"
+        },
+        {
+            "title": "B\nAm Ar",
+            "content": "(cid:19) . (31)"
+        },
+        {
+            "title": "Preprint",
+            "content": "Similar to the previous proof, we prove that the output of HCPostNorm is equivalent to the transpose of the output of the Post-Norm residual connection: Proof. Note that ˆH = ˆh. (cid:113) σh+h = + σ2 σ + 2σhh. Given this fact, we can derive the Post-Norm: ˆh = Norm(h + h) = = = + µh+h σh+h 1 σh+h (h + h) 1 + σ2 + 2σhh (cid:112)σ2 (h + h) For hyper-connections side, we have: ˆH = Bh + = Bh + ArH = Bh + Arh = 1 + σ2 + 2σhh (cid:112)σ + 1 + σ2 + 2σhh (cid:112)σ2 = ˆh. (32) (33) (34) (35)"
+        },
+        {
+            "title": "Preprint",
+            "content": "F SEQUENTIAL-PARALLEL DUALITY F.1 HYPER-CONNECTION MATRIX OF SEQUENTIAL ARRANGEMENT In this section, we demonstrate that the following hyper-connection matrix will produce identical networks arranged sequentially with residual connections between them: HC = (cid:18)011 11n enn (cid:19) , (36) where enn denotes an identity matrix, ei Rn1 represents the i-th column of enn, and 11n signifies 1 matrix of ones. We will use mathematical induction to prove that hk {0, 1, . . . , n}, {0, 1, . . . , L}, where is the number of layers. = hk and hk+1 = k(hk ) + hk , i, Proof. BASE CASE For = 0, we have the initial condition h0 (cid:0)h0 h0 . . . h0(cid:1) Rnd. = h0 , i, {0, 1, . . . , n}, as we define H0 ="
+        },
+        {
+            "title": "INDUCTION HYPOTHESIS",
+            "content": "Assume that for some {1, . . . , 1}, we have hk i, {0, 1, . . . , n}. = hk and hk = k(hk1 ) + hk ,"
+        },
+        {
+            "title": "We have",
+            "content": "0 ) + Hk Hk + Ar Hk+1 = HC(T k, Hk) = B(hk Hk = BAm = 1n1T k(e 1 Hk) + ennHk = (cid:0)T k(hk 1) k(hk 1) = (cid:0)T k(hk k(hk 1) + hk 1 = (cid:0)hk+1 hk+1 2 . . . hk+1 1 . . . k(hk 1) + hk 2 (cid:1) 1)(cid:1) + (cid:0)hk . . . k(hk 1 hk 2 1) + hk . . . hk (cid:1) (37) (38) (39) (40) (41) (42) (43) (cid:1)"
+        },
+        {
+            "title": "Since hk",
+            "content": "i = hk , i, {0, 1, . . . , n}, it follows that k(hk 1) + hk = k(hk 1) + hk . Thus, we have hk+1 = hk+1 (44)"
+        },
+        {
+            "title": "Since hk",
+            "content": "i = hk , i, {0, 1, . . . , n}, it follows that hk 1 = hk , {0, 1, . . . , n}. Thus, we have hk+1 = k(hk = k(hk 1) + hk ) + hk (45) (46)"
+        },
+        {
+            "title": "Preprint",
+            "content": "F.2 HYPER-CONNECTION MATRIX OF PARALLEL ARRANGEMENT In this section, we demonstrate that the following hyper-connection matrix will produce network where every adjacent layers are arranged in parallel, with each layer incorporating residual connections. We define parallel-arranged network such that adjacent layers form group, with layers within group being parallel and groups arranged sequentially. The output of k-th group is given by: hk+1 = (cid:88) (T kn+i(hk) + hk). i= (47) It can be proved that this arrangement can be described by the following hyper-connection matrices. First, for where 1 0 (mod n): HC{kk10 (mod n)} = (cid:18)011 1n1 1nn, 1 (cid:19) (48) where the HC matrix can be decomposed into two operations: 1) sum up all the outputs of the previous group and use it as the input of the current layer and as the residual of the subsequent layers; 2) sum up the output and input saving to the first hidden vector slot. Next, for where 1 (mod n) and = 0: HC{kk1i (mod n),i=0} = (cid:18)011 ei (cid:19) enn, . (49) where the HC matrix selects the i-th hidden vector as the input of the current layer, and sums up the output and input, saving to the i-th hidden vector slot. This means: hk+1 =HC(k+1)n(T (k+1)n, HC(k+1)n1(T (k+1)n1, HCkn+1(T kn+1, hk))) (50) (51) (52) (53) This can also be proved by mathematical induction; however, the conclusion is quite obvious through drawing, and the proof process is very tedious. Therefore, we dont repeat the similar proof here."
+        },
+        {
+            "title": "Preprint",
+            "content": "G PSEUDOCODE OF HYPER-CONNECTIONS Rnd . . . h0(cid:1) Algorithm 1 Network with Hyper-Connections Require: Initial hidden vector h0 Rd Require: Expansion rate Ensure: Final output 1: Initialize: 2: H0 (cid:0)h0 h0 3: for = 1 to do 4: 5: 6: 7: 8: 9: end for 10: Final Output: 11: hL sum rows of HL 12: hL Normalization Layer(hL) 13: Output Layer(hL) 14: return Hk1 (h0 H) WCkH 0 k(h0) ˆH Bkh Hk ˆH 0 + For each layer Width Connections Layer Computation Depth Connections"
+        },
+        {
+            "title": "Preprint",
+            "content": "H PYTORCH IMPLEMENTATION OF HYPER-CONNECTIONS Algorithm 2 Pseudocode of Hyper-connections in PyTorch-like style. # h: hyper hidden matrix (BxLxNxD) class HyperConnection(nn.Module): def __init__(self, dim, rate, layer_id, dynamic, device=None): super(HyperConnection, self).__init__() self.rate = rate self.layer_id = layer_id self.dynamic = dynamic self.static_beta = nn.Parameter(torch.ones((rate,), device=device)) init_alpha0 = torch.zeros((rate, 1), device=device) init_alpha0[layer_id % rate, 0] = 1. self.static_alpha = nn.Parameter(torch.cat([init_alpha0, torch.eye((rate), device= device)], dim=1)) if self.dynamic: self.dynamic_alpha_fn = nn.Parameter(torch.zeros((dim, rate+1), device=device)) self.dynamic_alpha_scale = nn.Parameter(torch.ones(1, device=device) * 0.01) self.dynamic_beta_fn = nn.Parameter(torch.zeros((dim, ), device=device)) self.dynamic_beta_scale = nn.Parameter(torch.ones(1, device=device) * 0.01) self.layer_norm = LayerNorm(dim) def width_connection(self, h): # get alpha and beta if self.dynamic: norm_h = self.layer_norm(h) if self.dynamic: wc_weight = norm_h @ self.dynamic_alpha_fn wc_weight = F.tanh(wc_weight) dynamic_alpha = wc_weight * self.dynamic_alpha_scale alpha = dynamic_alpha + self.static_alpha[None, None, ...] alpha = self.static_alpha[None, None, ...] if self.dynamic: dc_weight = norm_h @ self.dynamic_beta_fn dc_weight = F.tanh(dc_weight) dynamic_beta = dc_weight * self.dynamic_beta_scale beta = dynamic_beta + self.static_beta[None, None, ...] else: else: beta = self.static_beta[None, None, ...] # width connection mix_h = alpha.transpose(-1, -2) @ return mix_h, beta def depth_connection(self, mix_h, h_o, beta): = torch.einsum(\"blh,bln->blnh\", h_o, beta) + mix_h[..., 1:, :] return"
+        },
+        {
+            "title": "I VALIDATION SETS AND DOWNSTREAM TASKS",
+            "content": "V2 Validation Sets v2-small-4chan-validation v2-small-c4_100_domains-validation v2-small-c4_en-validation v2-small-gab-validation v2-small-ice-validation v2-small-m2d2_s2orc-validation v2-small-m2d2_wiki-validation v2-small-manosphere-validation v2-small-mc4_en-validation v2-small-pile-validation v2-small-ptb-validation v2-small-twitterAEE-validation v2-small-wikitext_103-validation V3 Validation Sets v3-small-c4_en-validation v3-small-dolma_books-validation v3-small-dolma_common-crawl-validation v3-small-dolma_pes2o-validation v3-small-dolma_reddit-validation v3-small-dolma_stack-validation v3-small-dolma_wiki-validation v3-small-ice-validation v3-small-m2d2_s2orc-validation v3-small-pile-validation v3-small-wikitext_103-validation"
+        },
+        {
+            "title": "Downstream Benchmarks",
+            "content": "piqa (Bisk et al., 2020) hellaswag (Zellers et al., 2019) winogrande (Sakaguchi et al., 2021) openbook_qa (Mihaylov et al., 2018) sciq (Johannes Welbl, 2017) arc_easy (Clark et al., 2018) copa (Roemmele et al., 2011) commitment_bank (De Marneffe et al., 2019) mrpc (Dolan & Brockett, 2005) rte (Dagan et al., 2005) sst2 (Socher et al., 2013) Table 10: OLMos default configuration was evaluated using multiple metrics. Perplexity (PPL) and loss were used for the V2 and V3 Validation Sets, while zero-shot testing was applied to the Downstream Benchmarks. However, the grey benchmarks were excluded from our analysis due to the instability of their performance indicators."
+        },
+        {
+            "title": "Preprint",
+            "content": "Downstream Benchmarks for OLMoE piqa (Bisk et al., 2020) hellaswag (Zellers et al., 2019) winogrande (Sakaguchi et al., 2021) openbook_qa (Mihaylov et al., 2018) sciq (Johannes Welbl, 2017) arc_easy (Clark et al., 2018) arc_challenage (Clark et al., 2018) copa (Roemmele et al., 2011) boolq (Clark et al., 2019) commonsense_qa (Talmor et al., 2018) social_iqa (Sap et al., 2019) mmlu (Hendrycks et al., 2021) Table 11: Downstream Benchmarks for OLMoE. 1B MODEL EXPERIMENTS"
+        },
+        {
+            "title": "Method",
+            "content": "OLMo-1B arc_easy copa hellaswag openbook_qa piqa sciq winogrande 56.8 76.0 56.1 33.8 74. 85.1 55.6 OLMo-1B-DHCx1 W/O tanh OLMo-1B-DHCx2 W/O tanh OLMo-1B-DHCx4 W/O tanh OLMo-1B-DHCx8 W/O tanh OLMo-1B-DHCx1 OLMo-1B-DHCx2 OLMo-1B-DHCx4 OLMo-1B-DHCx8 OLMo-1B-SHCx2 OLMo-1B-SHCx4 OLMo-1B-DHCx4 OLMo-1B-DHCx4 W/O tanh OLMo-1B-DHCx4 OLMo-1B-DHCx4 W/O tanh 56.8 63.0 61.2 61.1 59.7 59.7 59.8 56.8 59.1 59.3 60.5 59.1 59.5 60. Scaling in DHC W/O tanh 75.0 74.0 80.0 75.0 74.0 73.0 79.0 75.0 77.0 77.0 78.0 72.0 77.0 74. 55.3 57.1 57.5 57."
+        },
+        {
+            "title": "Scaling n in DHC",
+            "content": "55.5 56.7 58.1 58."
+        },
+        {
+            "title": "Scaling n in SHC",
+            "content": "56.6 56.7 Non-trainable WC 56.2 56.8 Non-trainable 57.9 57.6 33.4 34.6 33.6 35. 33.6 34.0 32.4 34.4 35.4 34.0 34.0 35.0 33.8 34.0 72.9 73.5 75.5 73.8 73.5 74.7 74.3 73. 85.4 86.0 85.8 85.2 85.4 85.2 86.1 84.2 74.2 74.3 85.3 86.6 73.5 73.3 86.0 86. 73.3 74.9 85.6 86.7 57.1 58.2 56.9 58.5 54.5 57.9 57.1 57.3 56.4 57.1 55.8 55. 56.6 57.5 avg 62.5 62.3 63.8 64.4 63.8 62.3 63.0 63.8 62.8 63.4 63. 63.4 62.5 63.4 63.6 Table 12: Results on Downstream Benchmarks for 1B Model."
+        },
+        {
+            "title": "Preprint",
+            "content": "- o - 1 C 4 / o - 1 C 4 - o - 1 C - o - 1 - x 4 o - 1 - x 2 o - 1 C 8 - o - 1 C - o - 1 C 2 - o - 1 C 1 - - M - 1 C 4 / - o - 1 C 8 / - M - 1 C 4 / - o - 1 C 2 / - M - 1 C 1 /"
+        },
+        {
+            "title": "T\na\nb\nl\ne",
+            "content": "1 3 :"
+        },
+        {
+            "title": "L\no\ns\ns\ne\ns",
+            "content": "o 2 i i e o r"
+        },
+        {
+            "title": "1\nB\nM\no\nd\ne\nl\n.",
+            "content": "t 2 . 2 9 5 2 . 2 9 6 h 2 . 3 0 8 2 . 3 1 n n n n 2 . 3 0 0 2 . 3 0 2 . 2 9 5 2 . 2 9 0 2 . 3 0 9 2 . 3 2 3 2 . 2 9 2 2 . 2 9 2 . 3 1 1 2 . 3 2 0 2 . 5 9 2 2 . 5 9 4 2 . 6 0 9 2 . 6 0 2 . 6 0 3 2 . 6 1 0 2 . 5 9 1 2 . 5 9 1 2 . 6 0 8 2 . 6 2 2 . 5 8 9 2 . 5 9 1 2 . 6 0 0 2 . 6 2 6 . 2 7 3 . 2 7 4 2 . 3 3 4 7 . 3 3 4 . 2 6 8 9 . 2 6 8 4 . 3 0 6 . 3 0 5 1 . 2 5 6 7 . 2 5 6 n - i l t . 2 7 5 5 . 2 7 5 2 . 3 3 5 7 . 3 3 5 7 . 2 7 1 0 . 2 7 0 0 . 3 1 0 0 . 3 0 7 7 . 2 5 8 5 . 2 5 8 3 . 2 7 5 1 . 2 7 5 7 . 3 3 5 7 . 3 3 6 0 . 2 6 9 2 . 2 7 0 3 . 3 0 6 2 . 3 0 6 3 . 2 5 8 0 . 2 5 8 7 - i l e"
+        },
+        {
+            "title": "W\nC",
+            "content": ". 2 7 3 9 . 2 7 3 8 . 2 7 5 . 2 7 7 5 . 2 7 3 4 . 2 7 3 . 2 7 4 9 . 2 7 7 3 . 3 3 5 . 3 3 5 4 . 3 3 6 7 . 3 3 7 . 3 3 5 0 . 3 3 4 4 . 3 3 6 . 3 3 7 9 . 2 6 8 4 . 2 6 8 . 2 7 0 3 . 2 7 2 8 . 2 6 8 . 2 6 8 6 . 2 7 0 0 . 2 7"
+        },
+        {
+            "title": "S\nc\na\nl\ni\nn\ng\nn",
+            "content": "i C . 3 0 5 4 . 3 0 6 4 . 3 0 6 1 . 3 0 9 0 . 2 5 6 7 . 2 5 6 4 . 2 5 8 7 . 2 6"
+        },
+        {
+            "title": "S\nc\na\nl\ni\nn\ng\nn",
+            "content": "i C . 3 0 6 0 . 3 0 5 6 . 3 0 6 9 . 3 1 0 2 . 2 5 6 2 . 2 5 6 2 . 2 5 8 3 . 2 6"
+        },
+        {
+            "title": "S\nc\na\nl\ni\nn\ng\nn",
+            "content": "i C / h . 3 0 0 5 . 3 0 0 8 . 3 0 2 5 . 3 0 2 4 . 3 0 1 8 . 3 0 2 3 . 3 0 0 8 . 3 0 0 5 . 3 0 2 2 . 3 0 3 7 . 3 0 0 6 . 3 0 0 5 . 3 0 1 5 . 3 0 3 6 . 2 4 9 6 . 2 4 9 7 2 . 2 2 2 . 2 2 1 2 . 8 8 7 2 . 9 1 7 . 2 5 1 0 . 2 5 0 8 2 . 2 4 0 2 . 2 3 8 2 . 9 4 5 2 . 9 5 9 . 2 5 0 4 . 2 5 1 1 2 . 2 3 2 2 . 2 3 8 2 . 8 9 2 . 9 3 3 . 2 4 9 3 . 2 4 9 2 . 2 5 0 9 . 2 5 3 3 . 2 4 9 2 . 2 4 9 2 . 2 5 0 3 . 2 5 3 1 2 . 2 1 2 . 2 1 8 2 . 2 3 7 2 . 2 6 2 2 . 2 1 8 2 . 2 2 1 2 . 2 3 2 . 2 6 4 2 . 8 7 6 2 . 8 9 0 2 . 9 3 0 2 . 9 6 1 2 . 8 7 2 . 8 9 8 2 . 9 0 8 2 . 9 4 8 3 . 6 3 8 3 . 6 2 7 3 . 6 6 3 . 6 7 8 3 . 6 5 3 3 . 6 4 3 3 . 6 3 1 3 . 6 4 1 3 . 7 0 3 . 6 5 2 3 . 6 2 8 3 . 6 3 2 3 . 6 3 5 3 . 7 0 3 2 . 6 0 2 . 6 2 2 2 . 6 4 4 2 . 6 3 6 2 . 6 2 7 2 . 6 4 3 2 . 6 0 2 . 6 1 1 2 . 6 3 6 2 . 6 7 8 2 . 6 0 9 2 . 6 1 0 2 . 6 2 2 . 6 7 2 2 . 7 8 1 2 . 7 8 3 2 . 8 0 4 2 . 8 0 2 2 . 7 9 2 . 7 9 9 2 . 7 7 8 2 . 7 8 1 2 . 8 0 2 2 . 8 1 9 2 . 7 7 2 . 7 7 9 2 . 7 9 2 2 . 8 2 2 28 h O - 1 2 . 3 1 9 2 . 6 1 5 . 2 7 6 2 . 3 3 6 4 . 2 7 1 9 . 3 0 8 5 . 2 5 9 4 . 3 0 2 8 . 2 5 2 2 2 . 2 5 2 . 9 5 3 3 . 6 7 2 2 . 6 5 7 2 . 8 1 1 4 n 4 _ 1 0 0 _ a s 4 _ a e 2 2 _ 2 m 2 2 _ i o e m 4 _ i t i r E k x _ 1 0 3 g"
+        },
+        {
+            "title": "Preprint",
+            "content": "M o M - 1 1 0 . 1 6 7 1 3 . 6 6 6 . 1 5 8 2 9 . 2 8 9 0 1 . 1 5 1 6 6 . 2 1 8 6 0 . 1 3 3 7 7 . 2 0 6 5 1 . 1 2 4 5 3 9 . 4 8 8 1 9 . 1 6 1 3 9 . 3 2 8 1 4 . 2 5 1 1 8 . 0 2 4 n 4 _ 1 0 0 _ a c 4 _ a e 2 2 _ 2 c 2 2 _ i o e c 4 _ i t w e E i t _ 1 0 3 - o - 1 C 4 / o - 1 C 4 - - o - 1 C 4 / M - 1 C 4 - o - 1 - x 4 o - 1 - x 2 o - 1 C 8 - M - 1 C 4 - o - 1 C 2 - o - 1 C 1 - - o - 1 C 8 / - o - 1 C 4 / - o - 1 C 2 / - o - 1 C 1 / n 9 . 9 3 2 9 . 9 2 7 h 1 0 . 0 9 2 1 0 . 0 5 n n n n 9 . 9 7 7 1 0 . 0 4 9 . 9 2 2 9 . 8 7 7 1 0 . 0 6 1 1 0 . 2 1 0 9 . 8 9 7 1 0 . 0 8 9 . 9 2 0 1 0 . 1 7 4 1 3 . 3 8 6 1 3 . 3 5 4 1 3 . 5 6 6 1 3 . 5 8 1 3 . 5 0 7 1 3 . 6 0 1 1 3 . 3 4 6 1 3 . 3 4 4 1 3 . 5 6 8 1 3 . 8 1 1 3 . 3 1 3 1 3 . 4 7 0 1 3 . 3 4 0 1 3 . 8"
+        },
+        {
+            "title": "T\na\nb\nl\ne",
+            "content": "1 4 :"
+        },
+        {
+            "title": "P\ne\nr\np\nl\ne\nx\ni\nt\ni\ne\ns",
+            "content": "o 2 i i e o 1 d . - i l t . 1 5 5 1 0 . 1 5 4 7 5 . 2 8 4 3 . 2 8 4 1 7 . 1 4 6 4 1 . 1 4 7 2 . 2 1 1 3 0 . 2 1 4 5 4 . 1 3 0 5 . 1 3 0 2 1 . 2 0 2 5 3 . 2 0 1 8 . 1 2 1 4 2 . 1 2 1 3 5 9 . 2 2 0 9 . 2 2 1 8 . 4 7 8 1 7 . 9 3 2 3 7 . 6 1 0 3 8 . 0 0 5 1 3 . 7 6 6 1 3 . 5 5 1 7 . 5 0 4 1 7 . 4 9 3 . 1 5 6 6 6 . 1 5 7 2 . 2 8 7 0 4 . 2 8 6 8 9 . 1 4 8 7 . 1 5 0 2 3 . 2 1 6 9 6 . 2 2 1 8 . 1 3 2 4 2 . 1 3 2 6 3 . 2 0 5 7 . 2 0 5 9 4 . 1 2 2 7 6 . 1 2 3 1 9 . 3 7 7 9 . 3 9 0 1 9 . 2 7 2 1 9 . 0 1 6 3 9 . 5 7 0 3 8 . 9 5 1 3 . 9 6 3 1 4 . 0 7 0 1 7 . 9 1 4 1 7 . 9 1 2 - i l e"
+        },
+        {
+            "title": "W\nC",
+            "content": ". 1 5 6 5 5 . 1 5 7 5 3 . 2 8 6 9 . 2 8 7 8 2 . 1 4 7 6 6 . 1 4 9 3 . 2 1 3 7 2 . 2 1 3 9 1 . 1 3 1 9 . 1 3 2 9 4 . 2 0 4 5 7 . 2 0 5 6 . 1 2 2 3 4 . 1 2 3 1 9 9 . 3 1 5 9 . 3 7 1 8 . 1 4 9 1 8 . 7 9 1 3 8 . 5 6 9 3 8 . 2 1 2 1 3 . 8 3 6 1 4 . 0 6 1 7 . 6 7 1 1 7 . 7 7 8 . 1 5 4 6 7 . 1 5 4 3 . 1 5 7 1 0 . 1 6 0 3 1 . 1 5 3 8 . 1 5 6 2 5 . 1 5 4 1 2 . 1 6 0 0 . 2 8 5 9 1 . 2 8 6 2 4 . 2 9 0 0 . 2 9 2 6 5 . 2 8 4 8 8 . 2 8 8 4 . 2 8 3 4 0 . 2 9 3 2 8 . 1 4 6 4 . 1 4 6 3 3 . 1 4 9 2 5 . 1 5 3 0 . 1 4 6 5 8 . 1 4 8 8 2 . 1 4 6 7 . 1 5 2"
+        },
+        {
+            "title": "S\nc\na\nl\ni\nn\ng\nn",
+            "content": "i C . 2 1 1 9 8 . 2 1 4 1 0 . 2 1 3 4 9 . 2 1 9 8 6 . 1 3 0 2 5 . 1 3 0 0 6 . 1 3 2 8 4 . 1 3 5"
+        },
+        {
+            "title": "S\nc\na\nl\ni\nn\ng\nn",
+            "content": "i C . 2 1 3 3 7 . 2 1 5 2 1 . 2 1 2 4 3 . 2 2 2 3 1 . 1 2 9 6 0 . 1 3 2 3 4 . 1 2 9 6 5 . 1 3 5"
+        },
+        {
+            "title": "S\nc\na\nl\ni\nn\ng\nn",
+            "content": "i C / h . 2 0 2 4 0 . 2 0 1 8 6 . 2 0 5 2 4 . 2 0 8 4 7 . 2 0 2 0 0 . 2 0 3 9 2 . 2 0 1 8 1 . 2 0 8 2 3 . 1 2 0 9 7 . 1 2 0 8 0 . 1 2 2 9 4 . 1 2 5 8 4 . 1 2 0 8 4 . 1 2 2 1 7 . 1 2 0 7 9 . 1 2 5 6 2 9 . 1 9 9 . 1 8 9 9 . 3 6 2 9 . 6 0 6 9 . 1 8 5 9 . 3 1 2 9 . 2 1 9 . 6 2 0 1 7 . 7 4 9 1 8 . 1 0 2 1 8 . 7 2 7 1 9 . 3 2 6 1 7 . 7 8 1 8 . 3 2 1 1 8 . 1 2 9 1 9 . 0 7 1 3 7 . 7 4 3 3 8 . 1 3 6 4 0 . 5 9 3 8 . 5 6 4 3 7 . 6 5 0 3 7 . 9 0 5 3 7 . 7 6 8 4 0 . 5 8 0 1 3 . 5 7 1 3 . 6 0 6 1 3 . 9 5 7 1 4 . 5 5 5 1 3 . 5 9 2 1 3 . 8 0 6 1 3 . 5 9 1 4 . 4 6 2 1 7 . 4 4 5 1 7 . 5 0 9 1 7 . 9 5 0 1 8 . 1 2 5 1 7 . 4 2 1 7 . 6 6 3 1 7 . 4 5 1 1 8 . 2 7"
+        },
+        {
+            "title": "Preprint",
+            "content": "- o - 1 C 4 / o - 1 C 4 - o - 1 C - o - 1 - x 4 o - 1 - x 2 o - 1 C 8 - o - 1 C - o - 1 C 2 - o - 1 C 1 - - M - 1 C 4 / - o - 1 C 8 / - M - 1 C 4 / - o - 1 C 2 / e d o - 1 - o - 1 C 1 / h 2 . 6 8 1 2 . 6 7 9 h 2 . 6 9 2 2 . 6 9 5 h n n n 2 . 6 8 9 2 . 6 9 8 2 . 6 7 2 . 6 7 5 2 . 6 9 4 2 . 7 1 4 2 . 6 7 4 2 . 6 8 9 2 . 6 7 2 . 7 1 2 2 . 8 8 6 2 . 8 8 0 2 . 8 9 9 2 . 9 0 3 2 . 8 9 2 . 9 0 7 2 . 8 8 0 2 . 8 7 6 2 . 9 0 1 2 . 9 2 7 2 . 8 7 2 . 8 9 0 2 . 8 8 0 2 . 9 2 8 2 . 7 0 2 2 . 9"
+        },
+        {
+            "title": "T\na\nb\nl\ne",
+            "content": "1 5 :"
+        },
+        {
+            "title": "L\no\ns\ns\ne\ns",
+            "content": "o 3 i i e o r"
+        },
+        {
+            "title": "1\nB\nM\no\nd\ne\nl\n.",
+            "content": ". 2 7 0 2 . 2 6 9 7 . 2 7 1 . 2 7 1 6 . 2 7 1 1 . 2 7 1 . 2 7 0 1 . 2 6 9 7 . 2 7 1 . 2 7 3 2 . 2 6 9 5 . 2 7 0 . 2 6 9 8 . 2 7 3 2 . 2 7 2 . 2 3 0 6 . 2 3 0 6 . 2 3 2 . 2 3 2 4 . 2 3 1 5 . 2 3 2 . 2 3 0 4 . 2 3 0 1 . 2 3 2 . 2 3 4 6 . 2 3 0 3 . 2 3 1 . 2 3 0 6 . 2 3 4 9 - i l t n - i l e"
+        },
+        {
+            "title": "S\nc\na\nl\ni\nn\ng\nn",
+            "content": "i C . 2 9 7 3 . 2 9 8 0 . 2 9 7 6 . 2 9 7 8 . 2 9 6 6 . 2 9"
+        },
+        {
+            "title": "S\nc\na\nl\ni\nn\ng\nn",
+            "content": "i C . 2 9 6 0 . 2 9 6 9 . 2 9 6 1 . 2 9 9 1 . 2 9 6 4 . 2 9 6 2 . 2 9 7 6 . 2 9"
+        },
+        {
+            "title": "S\nc\na\nl\ni\nn\ng\nn",
+            "content": "i C / h . 1 0 2 4 . 1 0 2 5 . 1 0 3 2 . 1 0 3 5 . 1 0 2 8 . 1 0 3 2 . 1 0 2 2 . 1 0 2 1 . 1 0 3 2 . 1 0 4 5 . 1 0 2 2 . 1 0 3 0 . 1 0 2 4 . 1 0 4 5 . 2 4 6 2 . 2 4 5 8 . 2 4 7 4 . 2 4 7 7 . 2 4 7 2 . 2 4 7 9 . 2 4 5 6 . 2 4 5 5 . 2 4 7 8 . 2 4 9 9 . 2 4 5 4 . 2 4 7 1 . 2 4 5 6 . 2 4 9 9 2 . 6 8 2 . 6 8 4 2 . 6 9 5 2 . 7 0 5 2 . 6 8 8 2 . 7 0 0 2 . 6 8 2 . 6 7 9 2 . 6 9 9 2 . 7 2 3 2 . 6 8 0 2 . 6 9 7 2 . 6 8 2 . 7 2 1 3 . 1 8 3 3 . 1 8 8 3 . 1 8 9 3 . 2 0 1 3 . 1 9 3 . 1 9 8 3 . 1 7 7 3 . 1 7 6 3 . 2 0 2 3 . 2 1 1 3 . 1 7 3 . 2 0 0 3 . 1 7 4 3 . 2 1 9 2 . 2 0 4 2 . 2 0 4 2 . 2 1 2 . 2 2 1 2 . 2 1 4 2 . 2 2 1 2 . 2 0 1 2 . 2 0 0 2 . 2 1 2 . 2 4 5 2 . 2 0 0 2 . 2 1 3 2 . 2 0 4 2 . 2 4 6 2 . 6 2 2 . 6 1 2 2 . 6 4 1 2 . 6 4 9 2 . 6 3 3 2 . 6 5 0 2 . 6 1 2 . 6 1 7 2 . 6 4 2 2 . 6 8 3 2 . 6 1 6 2 . 6 3 3 2 . 6 1 2 . 6 7 7 2 . 5 2 0 2 . 5 1 8 2 . 5 3 2 2 . 5 3 7 2 . 5 2 2 . 5 3 7 2 . 5 1 6 2 . 5 1 5 2 . 5 3 4 2 . 5 5 6 2 . 5 1 2 . 5 2 9 2 . 5 1 6 2 . 5 5 6 . 2 3 3 3 . 2 9 8 0 . 1 0 4 1 . 2 4 8 7 2 . 7 1 3 . 1 9 9 2 . 2 3 2 2 . 6 6 3 2 . 5 4 4 4 _ o _ k d a _ m - w l _ 2 l _ d o _ c l _ i e 2 2 _ 2 p w t _ 1 0 3 v"
+        },
+        {
+            "title": "Preprint",
+            "content": "O - 1 C 4 - - o - 1 C 4 / o - 1 C - - o - 1 C 4 / h 1 4 . 5 9 1 4 . 5 7 4 1 7 . 9 2 6 1 7 . 8 2 0 h 1 4 . 7 5 6 1 4 . 8 1 1 8 . 1 6 0 1 8 . 2 2 4 o - 1 - x 4 o - 1 - x 2 1 4 . 7 1 7 1 4 . 8 5 1 8 . 0 2 8 1 8 . 2 9 3 o - 1 C 8 - o - 1 C 4 - M - 1 C 2 - o - 1 C 1 - - o - 1 C 8 / - o - 1 C 4 / - o - 1 C 2 / - o - 1 C 1 / h h n n 1 4 . 5 4 6 1 4 . 5 1 4 1 4 . 7 9 4 1 5 . 0 9 1 4 . 4 9 4 1 4 . 7 1 1 1 4 . 5 3 1 1 5 . 0 6 4 1 7 . 8 0 7 1 7 . 7 4 1 8 . 1 9 0 1 8 . 6 7 5 1 7 . 7 4 9 1 7 . 9 9 6 1 7 . 8 1 7 1 8 . 6"
+        },
+        {
+            "title": "T\na\nb\nl\ne",
+            "content": "1 6 :"
+        },
+        {
+            "title": "P\nP\nL\no\nf",
+            "content": "V 3 i i e o r"
+        },
+        {
+            "title": "1\nB\nM\no\nd\ne\nl\n.",
+            "content": ". 1 4 9 0 4 . 1 4 8 4 0 . 1 5 0 9 . 1 5 1 2 0 . 1 5 0 4 9 . 1 5 1 5 . 1 4 8 8 9 . 1 4 8 2 9 . 1 5 0 6 . 1 5 3 6 0 . 1 4 8 1 3 . 1 4 9 7 . 1 4 8 5 7 . 1 5 3 5 6 . 1 0 0 3 . 1 0 0 3 8 . 1 0 1 9 1 . 1 0 2 1 . 1 0 1 2 1 . 1 0 2 3 0 . 1 0 0 1 . 9 9 8 9 . 1 0 1 9 1 . 1 0 4 4 . 1 0 0 0 0 . 1 0 1 4 6 . 1 0 0 3 . 1 0 4 7 3 - i l t n - i l e"
+        },
+        {
+            "title": "S\nc\na\nl\ni\nn\ng\nn",
+            "content": "i C . 1 9 5 5 0 . 1 9 6 8 9 . 1 9 6 1 3 . 1 9 6 5 0 . 1 9 4 0 5 . 1 9 3"
+        },
+        {
+            "title": "S\nc\na\nl\ni\nn\ng\nn",
+            "content": "i C . 1 9 3 0 6 . 1 9 4 7 9 . 1 9 3 2 3 . 1 9 9 0 9 . 1 9 3 6 6 . 1 9 3 4 3 . 1 9 6 1 2 . 1 9 9"
+        },
+        {
+            "title": "S\nc\na\nl\ni\nn\ng\nn",
+            "content": "i C / h . 2 7 8 5 . 2 7 8 7 . 2 8 0 6 . 2 8 1 6 . 2 7 9 6 . 2 8 0 7 . 2 7 7 9 . 2 7 7 6 . 2 8 0 6 . 2 8 4 5 . 2 7 7 9 . 2 8 0 0 . 2 7 8 3 . 2 8 4 3 . 1 1 7 2 4 . 1 1 6 7 7 1 4 . 5 8 1 4 . 6 4 7 2 4 . 1 0 8 2 4 . 2 3 3 . 1 1 8 6 8 . 1 1 9 0 2 1 4 . 8 0 7 1 4 . 9 5 4 2 4 . 2 7 3 2 4 . 5 5 2 . 1 1 8 4 6 . 1 1 9 3 4 1 4 . 6 9 9 1 4 . 8 7 6 2 4 . 4 0 2 4 . 4 7 8 . 1 1 6 5 3 . 1 1 6 5 0 . 1 1 9 1 5 . 1 2 1 7 4 . 1 1 6 3 0 . 1 1 8 3 0 . 1 1 6 6 2 . 1 2 1 6 7 1 4 . 5 7 1 4 . 5 7 3 1 4 . 8 7 0 1 5 . 2 2 5 1 4 . 5 8 7 1 4 . 8 3 9 1 4 . 6 0 1 5 . 1 9 1 2 3 . 9 6 4 2 3 . 9 4 8 2 4 . 5 8 9 2 4 . 8 1 0 2 3 . 9 4 2 4 . 5 2 4 2 3 . 9 0 6 2 5 . 0 1 3 9 . 0 6 0 9 . 0 5 9 9 . 2 0 9 . 2 2 0 9 . 1 5 5 9 . 2 1 4 9 . 0 3 0 9 . 0 2 8 9 . 1 8 9 . 4 3 6 9 . 0 2 1 9 . 1 4 6 9 . 0 6 1 9 . 4 5 1 1 3 . 8 3 1 3 . 6 2 1 1 3 . 9 0 6 1 3 . 8 7 4 1 4 . 0 2 1 1 4 . 1 3 5 1 4 . 0 7 1 4 . 1 4 5 1 3 . 9 1 2 1 4 . 1 5 0 1 4 . 0 2 5 1 4 . 1 5 2 1 3 . 6 5 1 3 . 6 8 9 1 4 . 0 4 3 1 4 . 6 3 2 1 3 . 6 8 4 1 3 . 9 1 7 1 3 . 6 9 1 4 . 5 4 0 1 3 . 8 4 3 1 3 . 8 2 6 1 4 . 1 1 4 1 4 . 4 1 8 1 3 . 8 1 1 4 . 0 3 3 1 3 . 8 4 4 1 4 . 4 2 8 31 h O - 1 1 4 . 9 0 8 1 8 . 2 8 9 . 1 5 2 1 6 . 1 0 3 0 5 . 1 9 6 8 6 . 2 8 3 2 . 1 2 0 2 6 1 5 . 0 9 8 2 4 . 5 0 3 9 . 3 1 9 1 4 . 3 3 4 1 4 . 2 2 4 _ o _ k l _ m - w l _ 2 l _ d d a _ c l _ i m 2 2 _ 2 p w t _ 1 0 g"
+        }
+    ],
+    "affiliations": [
+        "Seed-Foundation-Model Team, ByteDance"
+    ]
+}

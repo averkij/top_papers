@@ -1,0 +1,161 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.20537/x1.png",
+                "caption": "Figure 1:TheHeterogeneous Pre-trainingconcept. It maps different embodiments, each with its ownproprioceptionandvisionsensors, onto asharedlatent space by embodiment-specific tokenizers (“stems\").\nThisalignsthe heterogeneous data from different embodiments into a joint representation space.\nThis allows us to train a shared Transformer trunk on the union of all heterogeneous datasets.\nThe pre-trained Transformer can be transferred to a new embodiment, with a small, new tokenizer learned at transferring time.",
+                "position": 139
+            },
+            {
+                "img": "https://arxiv.org/html/2409.20537/x2.png",
+                "caption": "Figure 2:HPT architecture.HPT is modularized into stems, trunk, and heads. The stem, consisting of aproprioceptiontokenizer and avisiontokenizer, maps the vision and proprioception observations of different embodiments to a fixed number (e.g. 16) of tokens. Thesharedtrunk, which is a Transformer, maps the concatenated tokens into shared representations. The head then maps the processed tokens to actions in different downstream tasks. For a specific embodiment, one stem/head pair is activated (denoted by the switch). The trunk is shared and pre-trained on action-labeled data with supervised learning and then transferred to new embodiments. This procedure scales up to 52 datasets and 1B parameters.",
+                "position": 169
+            }
+        ]
+    },
+    {
+        "header": "2Related Works",
+        "images": []
+    },
+    {
+        "header": "3Heterogenoues Pre-trained Transformers (HPT)",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.20537/x3.png",
+                "caption": "Figure 3:Stem Architecture in HPT.In the HPT stem, the proprioceptive tokenizer uses an MLP to map proprioceptive information to a feature which is then attended by 16 learnable tokens. The vision tokenizer uses pre-trained encoders and similarly uses an attention mechanism to map vision features into 16 fixed tokens. The architecture flexibly handles sequences of inputs without increasing the size of tokens.",
+                "position": 214
+            },
+            {
+                "img": "https://arxiv.org/html/2409.20537/x4.png",
+                "caption": "Figure 4:Dataset Heterogeneity in Robotics.We show illustrations of dataset mixtures (each color is a distinct embodiment) from different domains including real robot teleop[14], deployed robots[38], simulations, and human videos[15]. See Appendix SectionAfor dataset mixture details.",
+                "position": 257
+            },
+            {
+                "img": "https://arxiv.org/html/2409.20537/x4.png",
+                "caption": "Figure 4:Dataset Heterogeneity in Robotics.We show illustrations of dataset mixtures (each color is a distinct embodiment) from different domains including real robot teleop[14], deployed robots[38], simulations, and human videos[15]. See Appendix SectionAfor dataset mixture details.",
+                "position": 260
+            }
+        ]
+    },
+    {
+        "header": "4Experiments on Pre-training",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.20537/x5.png",
+                "caption": "Figure 5:Data Scaling. We run scaling HPT experiments along dataset sizes and the number of datasets. Each point is the validation loss of a full training run. (a) We evaluate the losses on 27 datasets with the number of total trajectories ranging from a maximum of 10 trajectories per dataset (270 in total) to a maximum of 100000 trajectories per dataset (170k in total). We compare two model sizes, HPT-S/L, where HPT-L is a bigger model trained with 4 times more tokens than HPT-S. (b) We compute the validation losses for a fixed subset of 10 datasets with a fixed number of epochs (2). We compute mean and standard deviations for 4 runs across model sizes from HPT-S to HPT-XL and across dataset counts from 10 to 52.",
+                "position": 431
+            },
+            {
+                "img": "https://arxiv.org/html/2409.20537/x6.png",
+                "caption": "Figure 6:Epoch Scaling. We run scaling HPT experiments along the number of total samples. Each point is the validation loss of a full pre-training run. Setting: HPT-S, 27 datasets with a maximum of 1000 trajectories for each dataset. Left) We scale up the number of batch sizes and measure the changes in validation losses. Right) Derived from the left figure, we multiply the batches seen by the number of samples in each batch.",
+                "position": 434
+            },
+            {
+                "img": "https://arxiv.org/html/2409.20537/x7.png",
+                "caption": "Figure 7:Model Scaling. We run scaling HPT experiments along model sizes. Each point is a full training run. Setting: 27 datasets with a maximum of 1000 trajectories for each dataset. We scale along model size (from 1M to 1B) for both the blue and red lines. The red line is trained with increasing data and epochs to reach convergence. Specifically, we gradually increase the batch sizes from 256 to 2048 (doubles every order of model size increase) and use 170k trajectories.",
+                "position": 444
+            },
+            {
+                "img": "https://arxiv.org/html/2409.20537/x8.png",
+                "caption": "Figure 8:Joint Pre-training with Simulation and Human Videos.The baseline denotes the default setting without simulation and human datasets. Setting: We run the experiments with a training corpus of datasets with 1000 trajectories maximum.",
+                "position": 467
+            }
+        ]
+    },
+    {
+        "header": "5Experiments on Transfer Learning",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.20537/x9.png",
+                "caption": "Figure 9:Simulation Evaluation Tasks.We evaluate HPT across several simulation benchmarks and show policy rollout visualizations of the experiments. Experiment details can be found in Section5.1andA.4.",
+                "position": 481
+            },
+            {
+                "img": "https://arxiv.org/html/2409.20537/x10.png",
+                "caption": "Figure 10:Success Rates in Simulation Experiments.(a) We evaluate transfer learning performance of models from HPT-B to HPT-XL on tasks across 4 different simulator benchmarks. (b) We compare with several generalist models in the recent Simpler[42]benchmark with Google GDR embodiment. The pre-trained trunks are trained from the Scaled Settings. The success rates are computed over 150 rollouts per approach.",
+                "position": 505
+            },
+            {
+                "img": "https://arxiv.org/html/2409.20537/x11.png",
+                "caption": "Figure 11:Real World Qualitative Results. Pre-trained HPT policies can perform dynamic and long-horizon contact-rich precision tasks in pet care and assembly. The policies show robust and generalized behaviors under scene changes and disturbances.",
+                "position": 508
+            },
+            {
+                "img": "https://arxiv.org/html/2409.20537/extracted/5880036/figures/realworld_results.png",
+                "caption": "Figure 12:Transfer Learning in the Real World.We evaluate the pre-trained HPTs on four tasks / two embodiments. The average success rate with standard deviations is computed for 45 trials per approach. We use the default pre-training setup with HPT-Base for this experiment. See Section5.2for detailed descriptions.",
+                "position": 514
+            },
+            {
+                "img": "https://arxiv.org/html/2409.20537/extracted/5880036/figures/realworld_results.png",
+                "caption": "Figure 12:Transfer Learning in the Real World.We evaluate the pre-trained HPTs on four tasks / two embodiments. The average success rate with standard deviations is computed for 45 trials per approach. We use the default pre-training setup with HPT-Base for this experiment. See Section5.2for detailed descriptions.",
+                "position": 517
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AImplementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.20537/x12.png",
+                "caption": "Figure 13:Large-scale Dataset Heterogeneity in Robotics.We show different dataset mixtures at increasing scales (top row) across trajectory counts, dataset sample counts, and sampling weights (bottom row). We also show illustrations of the different embodiments including real robots, simulations, and human videos. By default, during training, we use a uniform distribution to sample from each of the embodiment datasets.",
+                "position": 1849
+            },
+            {
+                "img": "https://arxiv.org/html/2409.20537/extracted/5880036/figures/head_arch.png",
+                "caption": "Figure 14:Flexible Head Architectures in HPT.We highlight that our HPT architecture is a meta-level architecture for policy learning, and it can work with various head architectures. The important takeaway is the scalable transformer architecture in the middle of the policy to absorb the diverse data and provide tokens for these policy heads to regress on the action outputs.",
+                "position": 2281
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAdditional Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2409.20537/x13.png",
+                "caption": "Figure 15:Additional Architectural Ablation.(a) We found that architecture changes on HPT-Base such as adding previous actions as inputs, multiview as inputs, and language input can help with HPT pre-training performance. (b,c) We ablate other policy head architectures such as discrete classification heads as well as action token heads by scaling along the number of trajectories. The experiment is conducted under the default setting with HPT-Base, fixed 27 datasets with 1000 max trajectories in each dataset.",
+                "position": 2395
+            },
+            {
+                "img": "https://arxiv.org/html/2409.20537/x14.png",
+                "caption": "Figure 16:Transfer Learning Objective.We run transfer learning across several simulator benchmarks[81,49,89]. We compare the validation loss curves of several baselines with and without pre-trained HPT trunks. The pre-trained trunks are trained from the Default Settings.",
+                "position": 2398
+            },
+            {
+                "img": "https://arxiv.org/html/2409.20537/x15.png",
+                "caption": "Figure 17:Simulation Task Performance compared with Single-Task Policy in LeRobot Implementation.We do evaluation in a different implementation in unseen simulation benchmarks. Left) we show that an improvement in performance can be achieved with pre-trained HPT trunks and outperforms single-task state-of-the-art architectures. We note that HPT trunks have not been pre-trained with diffusion heads and transformer decoder heads. Middle) we show the sample efficiency ablation study for HPT-Base. Right) We show model size ablation study in loss curves.",
+                "position": 2410
+            },
+            {
+                "img": "https://arxiv.org/html/2409.20537/x16.png",
+                "caption": "Figure 18:Ablation Study on HPT Stem.We ablate the pre-training performance for (a) proprioception, (b) vision stems, and (c) vision encoders. Setting: HPT-S, batch 256, iterations 80000, 27 datasets with a maximum of 1000 trajectories for each dataset.",
+                "position": 2429
+            },
+            {
+                "img": "https://arxiv.org/html/2409.20537/x17.png",
+                "caption": "Figure 19:(a) Initial Condition Overlay.We visualize different rollout initial conditions during test times.(b) Failure Cases of the Learned Policy in the Real World.The robot sometimes has issues executing very precise manipulation.",
+                "position": 2442
+            }
+        ]
+    },
+    {
+        "header": "Appendix CFailure Cases",
+        "images": []
+    },
+    {
+        "header": "Appendix DDiscussion and Future Directions",
+        "images": []
+    }
+]
