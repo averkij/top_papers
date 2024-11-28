@@ -1,0 +1,557 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.14974/x1.png",
+                "caption": "Figure 1:3D Convex Splatting for Novel View Synthesis.We introduce a novel primitive-based pipeline for novel view synthesis with 3D smooth convexes.\nOur 3D smooth convexes share the rendering speed of 3D Gaussians[25]and the flexible representation of smooth convexes[9].\nAs a result, 3D Convex Splatting better reconstructs scenes with fewer primitives.",
+                "position": 79
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.14974/x2.png",
+                "caption": "Figure 2:Toy Experiment of Modeling a Chair.For the chair input image, we use Gaussians and smooth 6-point convexes to fit the chair with an increasing number of primitives.\nNote how the convexes efficiently represent the chair with fewer parameters.",
+                "position": 114
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/x3.png",
+                "caption": "Figure 3:Convex Splatting Pipeline.The 3D smooth convex is represented with a point set that is projected in the 2D camera plane.\nWe extract the line-delimited convex hull of the projected points and define the signed distance function for each line.\nThe lines are combined to define an indicator function for each pixel based on smoothnessδ𝛿\\deltaitalic_δand sharpnessσ𝜎\\sigmaitalic_σof the 3D convex.\nThe pipeline is differentiable end-to-end, which allows the parameters of the smooth convex primitives to be optimized based on the rendered images.",
+                "position": 127
+            }
+        ]
+    },
+    {
+        "header": "2Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.14974/x4.png",
+                "caption": "Figure 4:Effects ofδ𝛿\\deltaitalic_δandσ𝜎\\sigmaitalic_σon Splatting.The smoothnessδ𝛿\\deltaitalic_δcharacterizes vertices and edges, from soft to hard, while the sharpnessσ𝜎\\sigmaitalic_σcharacterizes radiance field transitions, from diffuse to dense.",
+                "position": 228
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/x5.png",
+                "caption": "",
+                "position": 228
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/x6.png",
+                "caption": "",
+                "position": 228
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/x7.png",
+                "caption": "",
+                "position": 228
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/x8.png",
+                "caption": "",
+                "position": 228
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/x9.png",
+                "caption": "",
+                "position": 228
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/x10.png",
+                "caption": "",
+                "position": 228
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/x11.png",
+                "caption": "",
+                "position": 228
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/x12.png",
+                "caption": "",
+                "position": 228
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/x13.png",
+                "caption": "Figure 5:Adaptive Convex Densification Scheme.We divide each convex, here exemplified withK=8𝐾8K=8italic_K = 8points, into as many scaled-down occurrences of the convex, centered at the initial points, each with reduced opacity.",
+                "position": 322
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/triangle.png",
+                "caption": "Figure 6:Reconstruction of Simple Shapes with Primitives.Smooth convex primitives reconstruct simple shapes better than Gaussians, as they can create sharper geometric boundaries. For 3DCS, the red lines describe the convex hull, whereas the black dots represent the point set.\nFor 3DGS, the black dots represent the Gaussian centers.",
+                "position": 340
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/triangle_3dgs_1_points.png",
+                "caption": "",
+                "position": 364
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/triangle_3dgs_8_points.png",
+                "caption": "",
+                "position": 365
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/triangle_cvx3_points.png",
+                "caption": "",
+                "position": 366
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/triangle_cvx6_points.png",
+                "caption": "",
+                "position": 367
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/rectangle.png",
+                "caption": "",
+                "position": 370
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/rectangle_3dgs_1_points.png",
+                "caption": "",
+                "position": 371
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/rectangle_3dgs_8_points.png",
+                "caption": "",
+                "position": 372
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/rectangle_cvx3_points.png",
+                "caption": "",
+                "position": 373
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/rectangle_cvx6_points.png",
+                "caption": "",
+                "position": 374
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/circle.png",
+                "caption": "",
+                "position": 377
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/circle_3dgs_1_points.png",
+                "caption": "",
+                "position": 378
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/circle_3dgs_8_points.png",
+                "caption": "",
+                "position": 379
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/circle_cvx3_points.png",
+                "caption": "",
+                "position": 380
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/circle_cvx6_points.png",
+                "caption": "",
+                "position": 381
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/gaussian_round.png",
+                "caption": "",
+                "position": 384
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/gaussian_round_3dgs_1_points.png",
+                "caption": "",
+                "position": 385
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/gaussian_round_3dgs_8_points.png",
+                "caption": "",
+                "position": 386
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/gaussian_round_cvx3_points.png",
+                "caption": "",
+                "position": 387
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/gaussian_round_cvx6_points.png",
+                "caption": "",
+                "position": 388
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/gaussian_flat.png",
+                "caption": "",
+                "position": 391
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/gaussian_flat_3dgs_1_points.png",
+                "caption": "",
+                "position": 392
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/gaussian_flat_3dgs_8_points.png",
+                "caption": "",
+                "position": 393
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/gaussian_flat_cvx3_points.png",
+                "caption": "",
+                "position": 394
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure6/gaussian_flat_cvx6_points.png",
+                "caption": "",
+                "position": 395
+            }
+        ]
+    },
+    {
+        "header": "3Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/flowers_gt.png",
+                "caption": "Figure 7:Qualitative Comparison between 3DCS, 3DGS and 2DGS.Our 3DCS captures finer details and provides a more accurate approximation of real-world scenes compared to Gaussian splatting methods, which often produce blurrier results.",
+                "position": 635
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/flowers_cvx.png",
+                "caption": "",
+                "position": 651
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/flowers_gaus.png",
+                "caption": "",
+                "position": 653
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/flowers_2d.png",
+                "caption": "",
+                "position": 655
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/bicycle2_gt.png",
+                "caption": "",
+                "position": 663
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/bicycle2_cvx.png",
+                "caption": "",
+                "position": 665
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/bicycle2_gauss.png",
+                "caption": "",
+                "position": 667
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/bicycle2_2dgs.png",
+                "caption": "",
+                "position": 669
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/train_gt.png",
+                "caption": "",
+                "position": 677
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/train_best.png",
+                "caption": "",
+                "position": 679
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/train_gauss.png",
+                "caption": "",
+                "position": 681
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/train_2dgs.png",
+                "caption": "",
+                "position": 683
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/truck2_gt.png",
+                "caption": "",
+                "position": 691
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/truck2cvx.png.png",
+                "caption": "",
+                "position": 693
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/truck2_gauss.png",
+                "caption": "",
+                "position": 695
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure7/truck2_2dgs.png",
+                "caption": "",
+                "position": 697
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure8/playroom_gauss.png",
+                "caption": "Figure 8:Visual Comparison Between our Light Model and 3DGS.The light model (right) shows high visual quality compared to 3DGS (left), using less than 15% of the memory.",
+                "position": 804
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure8/playroom_light.png",
+                "caption": "",
+                "position": 808
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure9/zoomsplit2.png",
+                "caption": "Figure 9:Ablation of densification strategy.From left to right, we split each convex into 2, 3, or 6 new convexes.",
+                "position": 836
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure9/zoomsplit3.png",
+                "caption": "",
+                "position": 840
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure9/zoomsplit6.png",
+                "caption": "",
+                "position": 842
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/x14.png",
+                "caption": "Figure 10:# Parametersvs.L⁢P⁢I⁢P⁢S↓𝐿𝑃𝐼𝑃superscript𝑆↓LPIPS^{\\downarrow}italic_L italic_P italic_I italic_P italic_S start_POSTSUPERSCRIPT ↓ end_POSTSUPERSCRIPT(Truckscene).The number of primitives is indicated for each point.\n3DCS achieves a better regime than 3DGS for a comparable number of parameters.",
+                "position": 914
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure11/stump_light.png",
+                "caption": "Figure 11:3DCSvs.3DGS with fewer shapes.Convex splatting (left) can decompose objects into meaningful convex shapes, enabling a realistic and compact 3D representation of the world.",
+                "position": 932
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure11/stump_gauss.png",
+                "caption": "",
+                "position": 936
+            }
+        ]
+    },
+    {
+        "header": "4Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "5Initialization & Hyperparameters",
+        "images": []
+    },
+    {
+        "header": "6Methodology Details",
+        "images": []
+    },
+    {
+        "header": "7Ablation Study",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/rectangle/0001.png",
+                "caption": "Figure 12:Smooth convexes can represent a wide variety of shapes, whether hard or soft, dense or diffuse. They effectively approximate diverse geometries, including both polyhedra and Gaussians, while requiring fewer primitives for accurate representation. The red lines describe the convex hull, whereas the black dots represent the point set.",
+                "position": 1919
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/rectangle/0003.png",
+                "caption": "",
+                "position": 1930
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/rectangle/0090.png",
+                "caption": "",
+                "position": 1931
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/rectangle/0500.png",
+                "caption": "",
+                "position": 1932
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/circle/0001.png",
+                "caption": "",
+                "position": 1940
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/circle/0030.png",
+                "caption": "",
+                "position": 1942
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/circle/0070.png",
+                "caption": "",
+                "position": 1943
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/circle/0500.png",
+                "caption": "",
+                "position": 1944
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/gaussian_round/0001.png",
+                "caption": "",
+                "position": 1952
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/gaussian_round/0010.png",
+                "caption": "",
+                "position": 1954
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/gaussian_round/0020.png",
+                "caption": "",
+                "position": 1955
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/gaussian_round/0500.png",
+                "caption": "",
+                "position": 1956
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/gaussian_flat/0001.png",
+                "caption": "",
+                "position": 1964
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/gaussian_flat/0020.png",
+                "caption": "",
+                "position": 1966
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/gaussian_flat/0066.png",
+                "caption": "",
+                "position": 1967
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure12/gaussian_flat/0500.png",
+                "caption": "",
+                "position": 1968
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/bicycle_gt.png",
+                "caption": "Figure 13:Qualitative Comparison between 3DCS, 3DGS and 2DGS.3D Convex Splatting achieves high-quality novel view synthesis and fast rendering by representing scenes with 3D smooth convexes. In contrast, the softness of Gaussian primitives often results in blurring and loss of detail, while 3D Convex Splatting effectively captures sharp edges and fine details.",
+                "position": 2548
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/bicycle_cvx.png",
+                "caption": "",
+                "position": 2566
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/bicycle_gauss.png",
+                "caption": "",
+                "position": 2569
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/bicycle_2dgs.png",
+                "caption": "",
+                "position": 2572
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/stump_gt.png",
+                "caption": "",
+                "position": 2581
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/stump_cvx.png",
+                "caption": "",
+                "position": 2584
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/stump_gauss.png",
+                "caption": "",
+                "position": 2587
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/stump_2dgs.png",
+                "caption": "",
+                "position": 2590
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/flowers_gt.png",
+                "caption": "",
+                "position": 2599
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/flowers_cvx.png",
+                "caption": "",
+                "position": 2602
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/flowers_gauss.png",
+                "caption": "",
+                "position": 2605
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/flowers_2dgs.png",
+                "caption": "",
+                "position": 2608
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/train_gt.png",
+                "caption": "",
+                "position": 2617
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/train_cvx.png",
+                "caption": "",
+                "position": 2620
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/train_gauss.png",
+                "caption": "",
+                "position": 2623
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/train_2dgs.png",
+                "caption": "",
+                "position": 2626
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/counter_gt.png",
+                "caption": "",
+                "position": 2635
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/counter_cvx.png",
+                "caption": "",
+                "position": 2638
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/counter_gauss.png",
+                "caption": "",
+                "position": 2641
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/counter_2dgs.png",
+                "caption": "",
+                "position": 2644
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/truck_gt.png",
+                "caption": "",
+                "position": 2653
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/truck_cvx.png",
+                "caption": "",
+                "position": 2656
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/truck_gauss.png",
+                "caption": "",
+                "position": 2659
+            },
+            {
+                "img": "https://arxiv.org/html/2411.14974/extracted/6025532/Images/figure13/truck_2dgs.png",
+                "caption": "",
+                "position": 2662
+            }
+        ]
+    },
+    {
+        "header": "8More Results",
+        "images": []
+    }
+]
