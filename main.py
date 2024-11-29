@@ -74,6 +74,9 @@ for article in tqdm(articles):
         }
     )
 
+if len(papers) == 0:
+    log("No papers found. Exiting.")
+    exit()
 
 log(f"Downloading and parsing papers (pdf, html). Total: {len(papers)}.")
 def do_extra_parsing(url, delete_pdf=True, recalculate_pdf=False, recalculate_html=False):
