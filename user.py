@@ -290,9 +290,11 @@ for d in user_requested_data:
     name_dict[d["id"]] = d["title"]
     
 #%%
-# import constants as con
-# from helper import log
-# from arxiv import Client, Search
+import constants as con
+from helper import log
+from arxiv import Client, Search
+
+name_dict = {}
 
 log(f"Making index file for {con.USER_DIR} folder.")
 try:
@@ -306,7 +308,7 @@ try:
         id = file.replace('.html','')
         if id in name_dict:
             log(f"Found {id} in name_dict.")
-            html += f'<span>{name_dict[file]} — </span><a href="{file}">{file}</a><br>'
+            html += f'<span>{name_dict[id]} — </span><a href="{file}">{file}</a><br>'
         else:
             log(f"Getting {id} from arxiv.")
             client = Client()
