@@ -78,6 +78,24 @@ if len(papers) == 0:
     log("No papers found. Exiting.")
     exit()
 
+log("Obtaining deleted papers (sometimes HF Daily Papers move some articles from today to past days).")
+today_paper_ids = [x["id"] for x in papers]
+deleted_papers, acc = [], []
+try:
+    deleted_papers = json.load(open(con.DELETED_DATA_FILE, 'r', encoding='utf8'))
+except:
+    pass
+if _prev_papers and "papers" in _prev_papers:
+    for x in _prev_papers["papers"]:
+        if x["id"] not in today_paper_ids:
+            acc.append(x)
+    if acc and not len(acc) == len(_prev_papers["papers"]):
+        log(f'Detected {len(acc)} deleted papers. Writing to {con.DELETED_DATA_FILE}')
+        deleted_papers.extend(acc)
+        json.dump(deleted_papers, open(con.DELETED_DATA_FILE, 'w', encoding='utf8'), ensure_ascii=False, indent=4)
+if not acc:
+    log("No deleted papers detected.")
+
 log(f"Downloading and parsing papers (pdf, html). Total: {len(papers)}.")
 def do_extra_parsing(url, delete_pdf=True, recalculate_pdf=False, recalculate_html=False):
     parser = ArxivParser(url, delete_pdf=delete_pdf, recalculate_pdf=recalculate_pdf, recalculate_html=recalculate_html)
