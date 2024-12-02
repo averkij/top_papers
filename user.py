@@ -317,12 +317,12 @@ try:
     log("Writing index file.")
     with open(os.path.join(con.USER_DIR, "index.html"), "w", encoding="utf-8") as f:
         f.write(html)
-
-    log("Clean user file.")
-    with open(con.USER_FILE, "w") as f:
-        f.write("")
 except Exception as e:
     log(f"Error making index file: {e}")
+
+log("Clean user file.")
+with open(con.USER_FILE, "w") as f:
+    f.write("")
 
 log("Done.")
 # %%
