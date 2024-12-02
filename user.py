@@ -298,7 +298,7 @@ for d in user_requested_data:
 log(f"Making index file for {con.USER_DIR} folder.")
 try:
     files = [f for f in os.listdir(con.USER_DIR) if f.endswith(".html")]
-    files = [f for f in files if f != "index.html"][:1]
+    files = [f for f in files if f != "index.html"]
     log(f"Found {len(files)} files.")
 
     # Add CSS styles and make it a table
