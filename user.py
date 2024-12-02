@@ -1,20 +1,19 @@
 # %%
 import json
 import os
+from copy import deepcopy
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from arxiv import Client, Search
 from babel.dates import format_date
 from tqdm import tqdm
-from arxiv import Client, Search
 
 import api
 import constants as con
 import helper
 from extra import ArxivParser, get_arxiv_id
-
-from copy import deepcopy
-
+from helper import log
 
 urls, papers = [], []
 if os.path.exists(con.USER_FILE):
@@ -290,7 +289,6 @@ for feed_paper in feed["papers"]:
 #%%
 import constants as con
 from helper import log
-
 
 log(f"Making index file for {con.USER_DIR} folder.")
 try:
