@@ -413,6 +413,9 @@ json.dump(
 # with open(con.DATA_FILE, "r", encoding="utf-8") as f:
 #     feed = json.load(f)
 
+# import importlib
+# importlib.reload(helper)
+
 log("Generating page.")
 html_index = helper.make_html(feed, bg_images=False)
 

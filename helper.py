@@ -461,7 +461,6 @@ def make_html(data, bg_images=True, format="daily"):
         .container {
             max-width: 1500px;
             margin: 0 auto;
-            padding: 0 20px;
             flex: 1 0 auto;
             width: 100%
         }
@@ -523,7 +522,7 @@ def make_html(data, bg_images=True, format="daily"):
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 1.5em;
-            padding: 10px 0 20px 0;
+            padding: 10px 20px 20px 20px;
         }
         body.dark-tmeme>header {
             background-color: background-color: #333333;
@@ -723,6 +722,7 @@ def make_html(data, bg_images=True, format="daily"):
             flex-wrap: wrap;
             gap: 15px;
             margin-top: 7px;
+            padding: 0 20px;
         }
         .sub-header-container-2 {
             display: flex;
@@ -731,6 +731,7 @@ def make_html(data, bg_images=True, format="daily"):
             flex-wrap: wrap;
             gap: 15px;
             margin: 0 auto;
+            padding: 0 20px;
         }
         .update-info-container {
             margin-top: 15px;
@@ -1004,7 +1005,6 @@ def make_html(data, bg_images=True, format="daily"):
                 grid-template-columns: repeat(auto-fit);
                 gap: 0em;
                 padding: 10px 0 20px 0;
-                margin: 0 -20px;
             }
             footer {
                 margin-top: -20px;
