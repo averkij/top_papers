@@ -299,6 +299,8 @@ log(f"Making index file for {con.USER_DIR} folder.")
 try:
     files = [f for f in os.listdir(con.USER_DIR) if f.endswith(".html")]
     files = [f for f in files if f != "index.html"]
+    files.sort(key=lambda x: os.path.getmtime(f"./u/{x}"), reverse=True)
+
     log(f"Found {len(files)} files.")
 
     # Add CSS styles and make it a table
@@ -319,10 +321,10 @@ try:
     <body>
         <h1>User Papers</h1>
         <table>
-            <tr><th>Title</th><th>Link</th></tr>
+            <tr><th>#</th><th>Title</th><th>Link</th></tr>
     """
     
-    for file in files:
+    for i, file in enumerate(files, 1):
         id = file.replace('.html','')
         if id in name_dict:
             title = name_dict[id]
@@ -332,7 +334,7 @@ try:
             paper = next(client.results(search))
             title = paper.title
             
-        html += f'<tr><td>{title}</td><td><a href="{file}">{file}</a></td></tr>'
+        html += f'<tr><td>{i}</td><td>{title}</td><td><a href="{file}">{file}</a></td></tr>'
     
     html += "</table></body></html>"
 
@@ -347,3 +349,5 @@ with open(con.USER_FILE, "w") as f:
     f.write("")
 
 log("Done.")
+
+# %%
