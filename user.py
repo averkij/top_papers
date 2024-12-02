@@ -254,7 +254,7 @@ log("Saving user requested file.")
 user_requested_data = []
 if os.path.exists(con.USER_REQUESTED_DATA):
     try:
-        json.load(open(con.USER_REQUESTED_DATA, "r", encoding="utf-8"))
+        user_requested_data = json.load(open(con.USER_REQUESTED_DATA, "r", encoding="utf-8"))
     except:
         pass
 user_requested_data.extend(feed["papers"])
@@ -271,7 +271,6 @@ json.dump(
 # importlib.reload(helper)
 
 log("Generating page.")
-name_dict = {}
 for feed_paper in feed["papers"]:
     simple_feed = deepcopy(feed)
     simple_feed["papers"] = [feed_paper]
@@ -280,12 +279,16 @@ for feed_paper in feed["papers"]:
 
     log("Writing result.")
     fname = f"{feed_paper['id']}.html"
-    name_dict[fname] = feed_paper["title"]
     paper_page = f"{con.USER_DIR}/{fname}"
     Path(con.USER_DIR).mkdir(parents=True, exist_ok=True)
     with open(paper_page, "w", encoding="utf-8") as f:
         f.write(html_index)
 
+#%%
+name_dict = {}
+for d in user_requested_data:
+    name_dict[d["id"]] = d["title"]
+    
 #%%
 import constants as con
 from helper import log
@@ -299,8 +302,16 @@ try:
     html = "<html><head><title>Doomgrad user papers</title></head><body>"
     for file in files:
         print("file", file)
-        file = file.replace('./','')
-        html += f'<span>{name_dict[file]} — </span><a href="{file}">{file}</a><br>'
+        id = file.replace('.html','')
+        if id in name_dict:
+            log(f"Found {id} in name_dict.")
+            html += f'<span>{name_dict[file]} — </span><a href="{file}">{file}</a><br>'
+        else:
+            log(f"Getting {id} from arxiv.")
+            client = Client()
+            search = Search(id_list=[arxiv_id])
+            paper = next(client.results(search))
+            html += f'<span>{paper.title} — </span><a href="{file}">{file}</a><br>'
     html += "</body></html>"
 
     log("Writing index file.")
