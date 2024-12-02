@@ -299,23 +299,43 @@ name_dict = {}
 log(f"Making index file for {con.USER_DIR} folder.")
 try:
     files = [f for f in os.listdir(con.USER_DIR) if f.endswith(".html")]
-    files = [f for f in files if f != "index.html"]
+    files = [f for f in files if f != "index.html"][:1]
     log(f"Found {len(files)} files.")
 
-    html = "<html><head><title>Doomgrad user papers</title></head><body>"
+    # Add CSS styles and make it a table
+    html = """
+    <html>
+    <head>
+        <title>Doomgrad user papers</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+            tr:hover { background-color: #f5f5f5; }
+            a { color: #2196F3; text-decoration: none; }
+            a:hover { text-decoration: underline; }
+            th { background-color: #2196F3; color: white; }
+        </style>
+    </head>
+    <body>
+        <h1>User Papers</h1>
+        <table>
+            <tr><th>Title</th><th>Link</th></tr>
+    """
+    
     for file in files:
-        print("file", file)
         id = file.replace('.html','')
         if id in name_dict:
-            log(f"Found {id} in name_dict.")
-            html += f'<span>{name_dict[id]} — </span><a href="{file}">{file}</a><br>'
+            title = name_dict[id]
         else:
-            log(f"Getting {id} from arxiv.")
             client = Client()
             search = Search(id_list=[id])
             paper = next(client.results(search))
-            html += f'<span>{paper.title} — </span><a href="{file}">{file}</a><br>'
-    html += "</body></html>"
+            title = paper.title
+            
+        html += f'<tr><td>{title}</td><td><a href="{file}">{file}</a></td></tr>'
+    
+    html += "</table></body></html>"
 
     log("Writing index file.")
     with open(os.path.join(con.USER_DIR, "index.html"), "w", encoding="utf-8") as f:
