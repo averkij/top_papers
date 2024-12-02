@@ -869,7 +869,6 @@ def make_html(data, bg_images=True, format="daily"):
         .nav-container {
             max-width: 1500px;
             margin: 0 auto;
-            padding: 0 20px;
             display: flex;
             justify-content: left;
             gap: 3em;
@@ -882,6 +881,9 @@ def make_html(data, bg_images=True, format="daily"):
             padding: 3px 0px;
             cursor: pointer;
             font-weight: 400;
+        }         
+        .nav-prev {
+            padding-left: 20px !important;
         }        
         .nav-item:hover {
             background-color: rgba(255, 255, 255, 0.1);
@@ -890,7 +892,7 @@ def make_html(data, bg_images=True, format="daily"):
         .language-flags {
             display: flex;
             gap: 7px;
-            padding: 5px 0px;
+            padding: 5px 20px 0 0;
             margin-left: auto;
         }
         .flag-svg {
@@ -1172,7 +1174,7 @@ def make_html(data, bg_images=True, format="daily"):
     </header>
     <div class="nav-menu">
         <div class="nav-container">
-            <span class="nav-item" id="nav-prev"><a href="/{link_folder}/{data['link_prev']}">⬅️ <span id="prev-date">{data['short_date_prev']['ru']}</span></a></span>
+            <span class="nav-item nav-prev" id="nav-prev"><a href="/{link_folder}/{data['link_prev']}">⬅️ <span id="prev-date">{data['short_date_prev']['ru']}</span></a></span>
             <span class="nav-item" id="nav-next"><a href="/{link_folder}/{data['link_next']}">➡️ <span id="next-date">{data['short_date_next']['ru']}</span></a></span>
             {nav_month_item}
             <div class="language-flags">
