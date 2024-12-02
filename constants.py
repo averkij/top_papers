@@ -7,12 +7,16 @@ TITLE_DARK = "hf nightly"
 TITLE_DARK_MONTHLY = "hf moonly"
 
 DATA_FILE = "hf_papers.json"
+DELETED_DATA_FILE = "hf_deleted.json"
+USER_FILE = "user.txt"
+USER_REQUESTED_DATA = "user.json"
 PAGE_FILE = "index.html"
 LOG_FILE = "log.txt"
 
 LOG_DIR = "./logs"
 IMG_DIR = "./img"
 DATA_DIR = "./d"
+USER_DIR = "./u"
 
 ASSETS_DIR = "./assets"
 PAPER_PDF_DIR = os.path.join(ASSETS_DIR, "pdf")

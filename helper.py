@@ -463,6 +463,7 @@ def make_html(data, bg_images=True, format="daily"):
             margin: 0 auto;
             padding: 0 20px;
             flex: 1 0 auto;
+            width: 100%
         }
         .a-clean {
             color: var(--secondary-color);
@@ -551,15 +552,15 @@ def make_html(data, bg_images=True, format="daily"):
             color: white;
         }
         article {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
+        .article-content {
             border-radius: 5px;
             border: 1px solid #ddd;
             overflow: hidden;
             transition: background-color 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-        .article-content {
             padding: 1.3em;
             flex-grow: 1;
             display: flex;
@@ -567,18 +568,20 @@ def make_html(data, bg_images=True, format="daily"):
             position: relative;
             z-index: 1;
             cursor: pointer;
+            max-width: 800px;
+            position: relative;
         }
-        body.dark-theme>div>main>article {
+        body.dark-theme>div>main>article>div.article-content {
             background-color: #444;
             border: none;
         }
-        body.light-theme>div>main>article {
+        body.light-theme>div>main>article>div.article-content {
             background-color: #fff;
         }
-        body.dark-theme>div>main>article:hover {
+        body.dark-theme>div>main>article>div.article-content:hover {
             background-color: #414141;
         }
-        body.light-theme>div>main>article:hover {
+        body.light-theme>div>main>article>div.article-content:hover {
             background-color: #fafafa;
         }
         .meta {
@@ -1006,7 +1009,7 @@ def make_html(data, bg_images=True, format="daily"):
             footer {
                 margin-top: -20px;
             }
-            article {
+            article>div.article-content {
                 border-radius: 0px;
             }
         }
@@ -1505,8 +1508,8 @@ def make_html(data, bg_images=True, format="daily"):
 
                 const articleHTML = `
                     <article class='x${{item["hash"]}}'>
-                        <div class="background-digit">${{index + 1}}</div>
                         <div class="article-content" onclick="toggleAbstract(${{index}})">
+                            <div class="background-digit">${{index + 1}}</div>
                             <div class="article-title-cont">
                                 <div style="display:table-cell; vertical-align: middle;">
                                     <div class="article-title"><h2>${{item['data']['emoji']}} ${{title}}</h2></div>
