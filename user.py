@@ -289,19 +289,25 @@ for feed_paper in feed["papers"]:
 
 #%%
 log(f"Making index file for {con.USER_DIR} folder.")
-files = [f for f in os.listdir(con.USER_DIR) if f.endswith(".html")]
-files = [f for f in files if f != "index.html"]
-html = "<html><head><title>HF Daily</title></head><body>"
-for file in files:
-    html += f'<span>{name_dict[file]} — </span><a href="{file}">{file}</a><br>'
-html += "</body></html>"
+try:
+    files = [f for f in os.listdir(con.USER_DIR) if f.endswith(".html")]
+    files = [f for f in files if f != "index.html"]
+    log(f"Found {len(files)} files.")
 
-with open(os.path.join(con.USER_DIR, "index.html"), "w", encoding="utf-8") as f:
-    f.write(html)
+    html = "<html><head><title>Doomgrad user papers</title></head><body>"
+    for file in files:
+        html += f'<span>{name_dict[file]} — </span><a href="{file}">{file}</a><br>'
+    html += "</body></html>"
 
-log("Clean user file.")
-with open(con.USER_FILE, "w") as f:
-    f.write("")
+    log("Writing index file.")
+    with open(os.path.join(con.USER_DIR, "index.html"), "w", encoding="utf-8") as f:
+        f.write(html)
+
+    log("Clean user file.")
+    with open(con.USER_FILE, "w") as f:
+        f.write("")
+except Exception as e:
+    log(f"Error making index file: {e}")
 
 log("Done.")
 # %%
