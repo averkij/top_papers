@@ -309,7 +309,7 @@ try:
         else:
             log(f"Getting {id} from arxiv.")
             client = Client()
-            search = Search(id_list=[arxiv_id])
+            search = Search(id_list=[file])
             paper = next(client.results(search))
             html += f'<span>{paper.title} — </span><a href="{file}">{file}</a><br>'
     html += "</body></html>"
