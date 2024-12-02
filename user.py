@@ -290,8 +290,9 @@ for d in user_requested_data:
     name_dict[d["id"]] = d["title"]
     
 #%%
-import constants as con
-from helper import log
+# import constants as con
+# from helper import log
+# from arxiv import Client, Search
 
 log(f"Making index file for {con.USER_DIR} folder.")
 try:
@@ -309,7 +310,7 @@ try:
         else:
             log(f"Getting {id} from arxiv.")
             client = Client()
-            search = Search(id_list=[file])
+            search = Search(id_list=[id])
             paper = next(client.results(search))
             html += f'<span>{paper.title} — </span><a href="{file}">{file}</a><br>'
     html += "</body></html>"
@@ -325,4 +326,3 @@ with open(con.USER_FILE, "w") as f:
     f.write("")
 
 log("Done.")
-# %%
