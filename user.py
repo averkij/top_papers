@@ -290,11 +290,10 @@ for d in user_requested_data:
     name_dict[d["id"]] = d["title"]
     
 #%%
-import constants as con
-from helper import log
-from arxiv import Client, Search
-
-name_dict = {}
+# import constants as con
+# from helper import log
+# from arxiv import Client, Search
+# name_dict = {}
 
 log(f"Making index file for {con.USER_DIR} folder.")
 try:
