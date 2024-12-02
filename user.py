@@ -1,7 +1,7 @@
 # %%
 import json
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from babel.dates import format_date
@@ -12,7 +12,7 @@ import api
 import constants as con
 import helper
 from extra import ArxivParser, get_arxiv_id
-from helper import log
+
 from copy import deepcopy
 
 
@@ -288,6 +288,10 @@ for feed_paper in feed["papers"]:
         f.write(html_index)
 
 #%%
+import constants as con
+from helper import log
+
+
 log(f"Making index file for {con.USER_DIR} folder.")
 try:
     files = [f for f in os.listdir(con.USER_DIR) if f.endswith(".html")]
@@ -296,6 +300,8 @@ try:
 
     html = "<html><head><title>Doomgrad user papers</title></head><body>"
     for file in files:
+        print("file", file)
+        file = file.replace('./','')
         html += f'<span>{name_dict[file]} — </span><a href="{file}">{file}</a><br>'
     html += "</body></html>"
 
