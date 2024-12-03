@@ -883,7 +883,7 @@ def make_html(data, bg_images=True, format="daily"):
             font-weight: 400;
         }         
         .nav-prev {
-            padding-left: 20px !important;
+            margin-left: 20px;
         }        
         .nav-item:hover {
             background-color: rgba(255, 255, 255, 0.1);
