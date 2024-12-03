@@ -299,7 +299,7 @@ log(f"Making index file for {con.USER_DIR} folder.")
 try:
     files = [f for f in os.listdir(con.USER_DIR) if f.endswith(".html")]
     files = [f for f in files if f != "index.html"]
-    files.sort(key=lambda x: os.path.getmtime(f"./u/{x}"), reverse=True)
+    files.sort(key=lambda x: os.path.getctime(f"./u/{x}"), reverse=True)
 
     log(f"Found {len(files)} files.")
 
