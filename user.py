@@ -307,6 +307,13 @@ try:
     html = """
     <html>
     <head>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-C1CRWDNJ1J"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-C1CRWDNJ1J');
+        </script>
         <title>Doomgrad user papers</title>
         <style>
             body { font-family: Arial, sans-serif; margin: 40px; }
