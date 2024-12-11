@@ -213,6 +213,22 @@ class ArxivParser:
             log('No Start section detected to extract affiliations.')
             parsed_data['affiliations'] = []
 
+        #Search deeper for affiliations
+        aff_limit = 10000
+        if not parsed_data['affiliations'] or "error" in parsed_data['affiliations']:
+            acc = ""
+            rest_len = aff_limit
+            for section in sections[1:]:
+                if rest_len >= 0:
+                    take_text = section["content"][:rest_len]
+                    acc += take_text
+                    rest_len -= len(acc)
+                else:
+                    break
+            affiliations = get_affiliations(acc[:6500], api='mistral', model='mistral-large-latest')
+            if affiliations and not "error" in affiliations:
+                parsed_data['affiliations'] = affiliations
+
         with open(f"{json_path}", "w", encoding="utf-8") as f:
             json.dump(parsed_data, f, indent=4, ensure_ascii=False)
 
@@ -369,7 +385,7 @@ def get_pdf_image(pdf_path, output_path, zoom=2, crop_percent=30, threshold=250)
     
 def get_affiliations(text, api='mistral', model='open-mistral-nemo'):
     log("Extracting affiliations from text.")
-    prompt = f"I give you a contaminated text with start of ML paper. Extract all authors affiliations as a single institute, firm, company, etc. Return items as a Python plain list only with affiliations. If there are no affiliations return empty list.\n\nText:\"{text}\""
+    prompt = f"I give you a contaminated text with start of ML paper. Extract all authors affiliations as a single institute, firm, company, etc. Return items as a Python plain list only with affiliations. Do not provide commentaries. If there are no affiliations return empty list.\n\nText:\"{text}\""
 
     res = api_helper.get_json(
         prompt, api=api, model=model, temperature=0.0
