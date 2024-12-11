@@ -34,6 +34,8 @@ class Article(BaseModel):
     desc: str
     title: str
 
+class List(BaseModel):
+    items: list[str]
 
 class ArticleFull(BaseModel):
     desc: str

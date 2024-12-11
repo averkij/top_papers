@@ -24,11 +24,6 @@ Path(con.PAPER_IMG_DATA_DIR).mkdir(parents=True, exist_ok=True)
 Path(con.PAPER_PDF_TITLE_IMG).mkdir(parents=True, exist_ok=True)
 
 
-def get_arxiv_id(url):
-    arxiv_id = url.strip("/").split("/")[-1]
-    arxiv_id_no_version = arxiv_id.lower().split("v")[0]
-    return arxiv_id_no_version
-
 class ArxivParser:
     def __init__(self, url, delete_pdf=False, recalculate_pdf=False, recalculate_html=False):
         self.section_patterns = [

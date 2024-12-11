@@ -12,8 +12,8 @@ from tqdm import tqdm
 import api
 import constants as con
 import helper
-from extra import ArxivParser, get_arxiv_id
-from helper import log
+from extra import ArxivParser
+from helper import log, get_arxiv_id
 
 _prev_papers, _issue_id = helper.init()
 

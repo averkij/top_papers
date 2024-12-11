@@ -17,6 +17,12 @@ CURRENT_YEAR = datetime.now(timezone.utc).year
 CURRENT_DATE = datetime.now(timezone.utc)
 
 
+def get_arxiv_id(url):
+    arxiv_id = url.strip("/").split("/")[-1]
+    arxiv_id_no_version = arxiv_id.lower().split("v")[0]
+    return arxiv_id_no_version
+
+
 def init(data_file=con.DATA_FILE):
     Path(con.LOG_DIR).mkdir(exist_ok=True)
     Path(con.DATA_DIR).mkdir(exist_ok=True)
@@ -90,9 +96,13 @@ def parse_and_format_date(date_str, year=CURRENT_YEAR):
 def try_get_prev_paper(paper, prev_papers):
     prev_data = None
     if "papers" in prev_papers:
-        prev_ids = [x["id"] for x in prev_papers["papers"]]
-        if paper["id"] in prev_ids:
-            prev_paper = [x for x in prev_papers["papers"] if x["id"] == paper["id"]][0]
+        prev_ids = [get_arxiv_id(x["url"]) for x in prev_papers["papers"]]
+        if get_arxiv_id(paper["url"]) in prev_ids:
+            prev_paper = [
+                x
+                for x in prev_papers["papers"]
+                if get_arxiv_id(x["url"]) == get_arxiv_id(paper["url"])
+            ][0]
             if "data" in prev_paper and not "error" in prev_paper["data"]:
                 prev_data = prev_paper
     return prev_data, bool(prev_data)
@@ -216,8 +226,10 @@ def process_with_timeout(func, timeout_seconds, *args, **kwargs):
             return result
         except TimeoutError:
             future.cancel()
-            raise TimeoutError(f"Function execution timed out after {timeout_seconds} seconds.")
-        
+            raise TimeoutError(
+                f"Function execution timed out after {timeout_seconds} seconds."
+            )
+
 
 def make_html_zh(data):
     html_content = ""
@@ -366,7 +378,7 @@ def make_html_zh(data):
     return html_content
 
 
-def make_html(data, bg_images=True, format="daily"):
+def make_html(data, bg_images=True, format="daily", is_full=False, img_data=None):
     data["papers"] = [x for x in data["papers"] if "error" not in x["data"]]
 
     if format == "monthly":
@@ -401,6 +413,34 @@ def make_html(data, bg_images=True, format="daily"):
             if k in con.CATEGORIES.keys()
         ]
     )
+
+    abstract_class = "abstract"
+    summaries_html = ""
+    # generating full review page only for one section
+    if is_full and data["papers"][0]["clean_sections"]:
+        for section in data["papers"][0]["clean_sections"]:
+            summary_html = section["summary"]
+            summaries_html += f"""
+            <div class="summaries">
+                <div class="summary_title">{section['title']}</div>
+                <div class="summary_text">{summary_html}</div>
+                <div class="images">"""
+
+            imgs = [
+                x for x in img_data if section["title"].lower() in x["header"].lower()
+            ]
+            if imgs:
+                for x in imgs[0]["images"]:
+                    print("Add image", section["title"])
+                    summaries_html += (
+                        f"""<img class="summary_image" src='{x["img"]}'/>"""
+                    )
+                    break
+
+            summaries_html += """</div>
+            </div>"""
+
+        abstract_class = ""
 
     html = """
 <!DOCTYPE html>
@@ -791,6 +831,22 @@ def make_html(data, bg_images=True, format="daily"):
         .title-text {
             display: inline;
             padding-left: 10px;
+        }
+        .summary_title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 5px;
+        }
+        .summary_text {
+
+        }
+        .summary_image {
+            max-height: 500px;
+            max-width: 100%;
+            align: center;
+            margin-top: 40px;        
+            margin-bottom: 60px;        
         }
         .category-filters {
             margin-top: 20px;
@@ -1523,10 +1579,12 @@ def make_html(data, bg_images=True, format="daily"):
                             
                             <div class="article-pdf-title-img-cont"><img class="article-pdf-title-img" src="${{pdfImg}}"/></div>
                             
-                            <div id="abstract-${{index}}" class="abstract">
+                            <div id="abstract-${{index}}" class="{abstract_class}">
                                 <p>${{explanation}}</p>
                                 <div id="toggle-${{index}}" class="abstract-toggle">...</div>
                             </div>
+
+                            {summaries_html}
 
                             <div class="links">
                                 <a href="${{item['url']}}" target="_blank">${{paperLabel[currentLang]}}</a>

@@ -10,11 +10,11 @@ from tqdm import tqdm
 
 import constants as con
 import helper
-from helper import log
+from helper import log, get_arxiv_id
 from glob import glob
 
 import api
-from extra import ArxivParser, get_arxiv_id
+from extra import ArxivParser
 
 
 def generate_for_day(day_str):
