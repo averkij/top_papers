@@ -40,7 +40,7 @@ def generate_for_day(day_str):
         title = a.text
         link = a["href"]
         url = f"https://huggingface.co{link}"
-        prev_data, ok = helper.try_get_prev_paper({"id": url}, _prev_papers)
+        prev_data, ok = helper.try_get_prev_paper({"id": url, "url": url}, _prev_papers)
         issue_id = _issue_id + 1
         try:
             if ok:
