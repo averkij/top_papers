@@ -1,0 +1,134 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.07721/x1.png",
+                "caption": "Figure 1:ObjCtrl-2.5D enables versatile object motion control for image-to-video generation. It accepts 2D trajectories, 3D trajectories, or camera poses as control guidance (all transformed to camera poses) and achieves precise motion control by utilizing an existing camera motion control modulewithout additional training.Unlike existing methods based on 2D trajectories, ObjCtrl-2.5D supports complex motion control beyond planar movement, such as object rotation, as demonstrated in the last row.We strongly recommend viewing theproject pagefor dynamic results.",
+                "position": 81
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.07721/x2.png",
+                "caption": "Figure 2:Object control results using 2D and 3D trajectories.On the right, theredline represents the 2D trajectory, theblueline indicates the 3D trajectory extracted from real-world video in DAVIS[31], and thegreenpoint marks the starting point of the trajectory. The training-based method DragAnything[58], which controls objects using a 2D trajectory, closely follows the specified path; however, it results in the car appearing to move horizontally toward the grass, which is atypical in real-world settings. By incorporating depth information from a 3D trajectory, our proposed method generates videos that not only follow the spatial trajectory but also achieve more realistic movement.",
+                "position": 103
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.07721/x3.png",
+                "caption": "Figure 3:Framework of ObjCtrl-2.5D.ObjCtrl-2.5D first extends the provided 2D trajectory𝒯2⁢dsubscript𝒯2𝑑\\mathcal{T}_{2d}caligraphic_T start_POSTSUBSCRIPT 2 italic_d end_POSTSUBSCRIPTto a 3D trajectory𝒯3⁢dsubscript𝒯3𝑑\\mathcal{T}_{3d}caligraphic_T start_POSTSUBSCRIPT 3 italic_d end_POSTSUBSCRIPTusing depth information from the conditioning image. This 3D trajectory is then transformed into a camera pose𝐄𝐨subscript𝐄𝐨\\mathbf{E_{o}}bold_E start_POSTSUBSCRIPT bold_o end_POSTSUBSCRIPTvia Algrithm1. To achieve object motion control within a frozen camera motion control module, ObjCtrl-2.5D integrates a Layer Control Module (LCM) that separates the object and background with distinct camera poses (𝐄𝐨subscript𝐄𝐨\\mathbf{E_{o}}bold_E start_POSTSUBSCRIPT bold_o end_POSTSUBSCRIPTand𝐄𝐛𝐠subscript𝐄𝐛𝐠\\mathbf{E_{bg}}bold_E start_POSTSUBSCRIPT bold_bg end_POSTSUBSCRIPT). After extracting camera pose features via a Camera Encoder, LCM spatially combines these features using a series of scale-wise masks. Additionally, ObjCtrl-2.5D introduces a Shared Warping Latent (SWL) technique, which enhances control by sharing low-frequency initialized noise across frames within the warped areas of the object.",
+                "position": 111
+            }
+        ]
+    },
+    {
+        "header": "3Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.07721/x4.png",
+                "caption": "Figure 4:3D Trajectory to Camera Poses.We model the object movement in a video, indicated by a 3D trajectory, as the camera’s location translation in 3D space. Details refer to Sec.3.2.1and Algorithm.1.",
+                "position": 174
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.07721/x5.png",
+                "caption": "Figure 5:Qualitative Comparison with Training-free Methods.While PEEKABOO[19]and FreeTraj[32]can move the object coarsely within the bounding boxes generated from the trajectory, they lack control precision. In contrast, ObjCtrl-2.5D achieves higher trajectory alignment by extending the 2D trajectory to 3D and accurately transforming it into camera poses through a geometric projection algorithm (triangulation[38,39]).",
+                "position": 369
+            },
+            {
+                "img": "https://arxiv.org/html/2412.07721/x6.png",
+                "caption": "Figure 6:Qualitative Comparison with Training-based Methods.Due to their training strategy, DragAnything[58]tends to apply global movement to objects (both potted plants shift downward, despite only the right plant being specified to move), and DragNUWA[64]often moves only part of the target object. In contrast, our proposed ObjCtrl-2.5D achieves precise, targeted object control thanks to its Layer Control Module. Additionally, ObjCtrl-2.5D is capable of performing more versatile object control when given a trajectory with a fixed spatial position (thegreenpoint in the second sample), such as front-to-back-to-front movement, while DragAnything[58]generates a relatively static video.",
+                "position": 372
+            },
+            {
+                "img": "https://arxiv.org/html/2412.07721/x7.png",
+                "caption": "Figure 7:Qualitative Results of Ablation Studies on LCM, Scale-wise Mask, and SWL.Without the Layer Control Module (LCM), ObjCtrl-2.5D applies motion control to the entire scene (a) rather than isolating the specific object (d). Removing the Shared Warping Latent (SWL) reduces controllability (c), while omitting the scale-wise mask may eliminate controllability (b).",
+                "position": 477
+            },
+            {
+                "img": "https://arxiv.org/html/2412.07721/extracted/6059641/figures/user_study.png",
+                "caption": "Figure 8:User Study.The majority of participants preferred the results obtained with ObjCtrl-2.5D over both training-free and training-based methods, attributing this preference to its better trajectory alignment and more natural motion generation.",
+                "position": 480
+            },
+            {
+                "img": "https://arxiv.org/html/2412.07721/x8.png",
+                "caption": "Figure 9:Qualitative Results of Ablation Studies on SWL and Copy-pasting Shared Latent.The Shared Warping Latent (SWL) in ObjCtrl-2.5D restricts the shared latent specifically within the object’s warping areas, effectively avoiding unintended effects on the background while controlling the target object. In contrast, the copy-pasting mechanism used in FreeTraj[32]coarsely applies the shared latent within bounding boxes, resulting in pronounced artifacts in the generated video.",
+                "position": 502
+            },
+            {
+                "img": "https://arxiv.org/html/2412.07721/x9.png",
+                "caption": "Figure 10:Additional Results with User-Defined Camera Poses.ObjCtrl-2.5D allows both the object and background to be manipulated using user-defined camera poses, enabling effects like zooming in, as shown in these examples. More results can be found in the supplementary materials.",
+                "position": 517
+            },
+            {
+                "img": "https://arxiv.org/html/2412.07721/x10.png",
+                "caption": "Figure 11:Failure Cases.Due to the limitations of SVD[3]in handling large motions, ObjCtrl-2.5D withhigh-speedcamera poses results in the object fading out of the scene, leaving only the background. Interestingly, this outcome reveals potential forimage inpaintingapplications, as seen in the last frames of the generated videos.",
+                "position": 520
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "AMore Details about 2D Trajectories to 3D",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.07721/x11.png",
+                "caption": "Figure 12:Guidelines for Drawing Trajectories.Drawing 2D trajectories directly on the depth image is recommended, as it ensures smoother depth transitions and avoids abrupt changes (refer to (a)) with the intrinsic depth information. Furthermore, trajectories can be drawn anywhere on the depth image to achieve appropriate depth values without affecting the movement of the target object.",
+                "position": 1469
+            }
+        ]
+    },
+    {
+        "header": "BMore Extensions",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.07721/x12.png",
+                "caption": "Figure 13:Additional Results with User-Defined Camera Poses.ObjCtrl-2.5D can drive the same sample differently with different camera poses.We strongly recommend viewing theproject pagefor dynamic results.",
+                "position": 1480
+            }
+        ]
+    },
+    {
+        "header": "CMore Compared Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.07721/x13.png",
+                "caption": "Figure 14:More Compared Results with Previous Methods.ObjCtrl-2.5D outperforms training-free methods (PEEKABOO[19]and FreeTraj[32]) in trajectory alignment and achieves more precise target object movement compared to training-based methods (DragNUWA[64]and DragAnything[58]), which often result in either global scene movement or partial object movement.We strongly recommend viewing theproject pagefor dynamic results.",
+                "position": 1490
+            },
+            {
+                "img": "https://arxiv.org/html/2412.07721/x14.png",
+                "caption": "Figure 15:More Results of ObjCtrl-2.5D.ObjCtrl-2.5D supports a wide range of trajectories and camera poses, showcasing its versatility in object motion control.We strongly recommend viewing theproject pagefor dynamic results.",
+                "position": 1500
+            },
+            {
+                "img": "https://arxiv.org/html/2412.07721/x15.png",
+                "caption": "",
+                "position": 1510
+            }
+        ]
+    },
+    {
+        "header": "DMore Results of ObjCtrl-2.5D",
+        "images": []
+    }
+]
