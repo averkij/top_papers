@@ -1,0 +1,189 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.09586/x1.png",
+                "caption": "Figure 1:Prior approaches for gaze target estimation carefully fuse features from a separate head encoder, scene encoder, and auxiliary models for multimodal cues like depth and pose. We propose Gaze-LLE, a novel, streamlined approach that uses a single feature representation from a frozen image encoder and injects a person-specific positional prompt to decode gaze targets.",
+                "position": 143
+            }
+        ]
+    },
+    {
+        "header": "2Related work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.09586/x2.png",
+                "caption": "Figure 2:We introduce Gaze-LLE, a new framework for gaze estimation that learns a small gaze decoder on top of a frozen DINOv2 backbone. Using this backbone, we first extract scene tokens from an RGB image and project them todmodelsubscript𝑑modeld_{\\text{model}}italic_d start_POSTSUBSCRIPT model end_POSTSUBSCRIPTwith a linear layer. We then performhead promptingby adding a learned head position embeddingpheadsubscript𝑝headp_{\\text{head}}italic_p start_POSTSUBSCRIPT head end_POSTSUBSCRIPTto the scene tokens at a given person’s head location. Next, we update the scene tokens and an optional learnable auxiliary in/out prediction task tokentin/outsubscript𝑡in/outt_{\\text{in/out}}italic_t start_POSTSUBSCRIPT in/out end_POSTSUBSCRIPTwith 3 transformer layers. Finally, we upsample and decode the scene tokens into a heatmap and use the in/out task token to predict if the gaze target is in or out of frame.",
+                "position": 282
+            }
+        ]
+    },
+    {
+        "header": "3Gaze-LLE",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.09586/x3.png",
+                "caption": "Table 2:We investigate design choices across 3 axes: (1) early vs. late head integration, (2) convolutional vs. transformer decoder, and (3) using a head & scene branch (H+S) vs. a scene branch alone (S). Rowais the setting most similar to prior work. Conversely, we develop our final Gaze-LLE design from rowf.",
+                "position": 374
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09586/x3.png",
+                "caption": "",
+                "position": 375
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.09586/x4.png",
+                "caption": "Figure 3:Qualitative results of our GazeFollow-trained ViT-B model on GazeFollow and appliedwithout finetuningto VideoAttentionTarget, ChildPlay, and GOO-Real. We show ground truth on the left and the predicted heatmap & maximal point on the right.",
+                "position": 888
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09586/extracted/6063027/figs/convergence.png",
+                "caption": "Figure 4:Training convergence: our method achieves strong results in fewer GPU hours than prior approaches.",
+                "position": 1017
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09586/extracted/6063027/figs/prompt_types.png",
+                "caption": "Table 7:As an alternative to adding the head position embeddingpheadsubscript𝑝headp_{\\text{head}}italic_p start_POSTSUBSCRIPT head end_POSTSUBSCRIPTto the scene tokens, we explore representing the head’s center position as an additional token,tpossubscript𝑡post_{\\text{pos}}italic_t start_POSTSUBSCRIPT pos end_POSTSUBSCRIPT. We consider self attention vs. cross attention across the token list, and different ways to decode the heatmap from the scene tokens andtpossubscript𝑡post_{\\text{pos}}italic_t start_POSTSUBSCRIPT pos end_POSTSUBSCRIPT.",
+                "position": 1088
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09586/extracted/6063027/figs/prompt_types.png",
+                "caption": "",
+                "position": 1089
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09586/x5.png",
+                "caption": "Figure 5:Without head prompting, our model succeeds on single-person cases, but cannot effectively condition gaze target estimation on the correct person in multi-person scenarios.",
+                "position": 1192
+            }
+        ]
+    },
+    {
+        "header": "5Discussion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Table of Contents",
+        "images": []
+    },
+    {
+        "header": "6Integration of DINOv2 into Existing Methods",
+        "images": []
+    },
+    {
+        "header": "7Experiment Details for Section 3.2",
+        "images": []
+    },
+    {
+        "header": "8Comparison to Detection Methods",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.09586/x6.png",
+                "caption": "Figure 6:We show the output gaze instances (predicted head bounding box & gaze heatmap) from Tonini et al.’s model[63]for 3 examples. We identify the instances selected by Tonini et al.’s matching cost (which uses the ground truth gaze) and our altered matching cost (which excludes ground truth gaze and instead performs matching based on bounding box overlap). Tonini et al.’s matching algorithm selects the instance with the closest gaze prediction to the ground truth, but the bounding box prediction does not always correspond to the correct person (Rows 1-2). Additionally, we observeoverdetection, where the algorithm predicts multiple instances for the same person with different gaze heatmaps (Row 3). Without the use of ground truth gaze information, the model cannot determine which of these instances is best.",
+                "position": 3063
+            }
+        ]
+    },
+    {
+        "header": "9Runtime Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.09586/extracted/6063027/figs_supp/runtime.png",
+                "caption": "(a)Runtime vs. Performance",
+                "position": 3077
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09586/extracted/6063027/figs_supp/runtime.png",
+                "caption": "(a)Runtime vs. Performance",
+                "position": 3080
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09586/extracted/6063027/figs_supp/scale.png",
+                "caption": "(b)Runtime scaling for multi-person inference",
+                "position": 3086
+            }
+        ]
+    },
+    {
+        "header": "10Performance with Estimated Head Bounding Boxes",
+        "images": []
+    },
+    {
+        "header": "11Reimplementation of Horanyi et al.",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.09586/x7.png",
+                "caption": "Figure 8:Architecture details for our reimplementation of Horanyi et al.’s model[25]. The model consists of a FoV Map Generator (shown on right), which uses an auxiliary 3D gaze angle estimator and an auxiliary depth model to produce an FoV map for a given person. The FoV map, estimated depth, and image are passed to a ResNet50-based encoder and convolutional decoder to produce a gaze prediction. In our experiments, we consider both freezing vs. training the 3D gaze angle estimator as part of the model.",
+                "position": 3164
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09586/x7.png",
+                "caption": "",
+                "position": 3167
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09586/x8.png",
+                "caption": "",
+                "position": 3171
+            }
+        ]
+    },
+    {
+        "header": "12Additional Ablation Studies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.09586/x9.png",
+                "caption": "(a)GazeFollow",
+                "position": 3384
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09586/x9.png",
+                "caption": "(a)GazeFollow",
+                "position": 3387
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09586/x10.png",
+                "caption": "(b)VideoAttentionTarget",
+                "position": 3393
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09586/x11.png",
+                "caption": "(c)ChildPlay",
+                "position": 3399
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09586/x12.png",
+                "caption": "(d)GOO-Real",
+                "position": 3405
+            }
+        ]
+    },
+    {
+        "header": "13LoRA Backbones",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.09586/x13.png",
+                "caption": "Figure 10:Lower performing cases: we observe errors in some cases where the head is facing away from the camera (examples 1-2), the head is occluded (examples 3), or the face is blurred (examples 4-5).",
+                "position": 3484
+            }
+        ]
+    },
+    {
+        "header": "14Additional Visualizations & Failure Modes",
+        "images": []
+    }
+]
