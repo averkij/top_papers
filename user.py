@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import gigadoom as gd
+import google.generativeai as genai
 import markdown
 from arxiv import Client, Search
 from babel.dates import format_date
@@ -25,6 +26,30 @@ if os.path.exists(con.USER_FILE):
         urls = fin.read().splitlines()
 else:
     log("No user file. Exit.")
+
+
+#----------------
+
+
+import google.generativeai as genai
+
+def get_text_gemini(prompt):
+    genai.configure(api_key="")
+    generation_config = {
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 40,
+    "max_output_tokens": 8192,
+    "response_mime_type": "text/plain",
+    }
+    model = genai.GenerativeModel(
+    model_name="gemini-2.0-flash-exp",
+    generation_config=generation_config,
+    )
+    chat_session = model.start_chat(history=[])
+    response = chat_session.send_message(prompt)
+    return response.text
+#---------------------
 
 
 if urls:
@@ -85,7 +110,7 @@ for paper in tqdm(papers):
             do_extra_parsing,
             timeout_seconds=con.PDF_PARSING_TIMEOUT,
             url=url,
-            delete_pdf=True,  # debug
+            delete_pdf=False,  # debug
             recalculate_pdf=False,
             recalculate_html=False,
         )
@@ -183,9 +208,6 @@ feed = {
 for i, paper in enumerate(feed["papers"]):
     log("*" * 80)
     log(f'Abstract {i}. {paper["abstract"][:300]}...')
-
-
-log("Generating reviews via LLM API.")
 
 
 # %%
@@ -464,6 +486,13 @@ def make_summary(text, limit=5000):
     return answer
 
 
+def make_summary_gemini(text, limit=10000):
+    prompt = f"Ты ассистент, который объясняет статьи на тему машинного обучения. Ты отвечаешь на русском языке.\n\nПрочитай текст и напиши его понятное и подробное изложение. Не пиши лишние комментарии (можешь добавлять только комментарии по сути статьи). Это должно выглядеть как изложение одного из разделов статьи, а не как начало отдельной статьи. Пиши на русском.\n\n{text[:limit]}"
+    res = get_text_gemini(prompt)
+    res = markdown.markdown(res)
+    return res
+
+
 SECRET_KEY = "ZWFiNjNjMTEtYWUzMC00MGI1LTkyZjYtNzhmNzlmOWFkYTA3OjBlNDQ5MjFmLWFkZWUtNDgyNi1hODZlLWRmZjUyNjE5YWQ0NQ=="
 GIGA_TOKEN, _ = gd.chat.get_access_token(SECRET_KEY, scope="GIGACHAT_API_CORP")
 
@@ -480,7 +509,8 @@ for paper in tqdm(feed["papers"]):
 
     log("Generating summaries")
     for section in tqdm(paper["clean_sections"]):
-        section["summary"] = make_summary(section["content"])
+        # section["summary"] = make_summary(section["content"])
+        section["summary"] = make_summary_gemini(section["content"])
 
 
 # %%
@@ -509,9 +539,13 @@ json.dump(
 )
 
 # %%
-# import importlib
+import importlib
 
-# importlib.reload(helper)
+importlib.reload(helper)
+
+#load from file for editing
+user_requested_data = json.load(open(con.USER_REQUESTED_DATA, "r", encoding="utf-8"))
+
 
 log("Generating page.")
 for feed_paper in feed["papers"]:
@@ -521,9 +555,19 @@ for feed_paper in feed["papers"]:
         print('Found img data')
         img_data = json.load(open(img_data_path, "r", encoding="utf-8"))
 
+    edited_paper = [x for x in user_requested_data if x["id"] == feed_paper['id']]
+    if edited_paper:
+        print("Found edited paper")
+        feed_paper = edited_paper[0]
+        # for s in feed_paper["clean_sections"]:
+        #     s["summary"] = markdown.markdown(s["summary"])
+    else:
+        print("Not found edited paper")
+
     simple_feed = deepcopy(feed)
     simple_feed["papers"] = [feed_paper]
     simple_feed["categories"] = helper.counted_cats(simple_feed["papers"])
+
     html_index = helper.make_html(simple_feed, bg_images=False, is_full=True, img_data=img_data)
 
     log("Writing result.")
