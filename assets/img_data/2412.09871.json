@@ -1,0 +1,139 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.09871/x1.png",
+                "caption": "Figure 1:Scaling trends for fixed inferenceflopmodels (fully) trained with varying training budgets.\nIn token-based models, a fixed inference budget determines the model size.\nIn contrast, the BLT architecture provides a new scaling axis allowing simultaneous increases in model and patch size while keeping the same training and inference budget.BLT patch-size (ps) 6 and 8 models quickly overtake scaling trends ofbpeLlama 2 and 3. Moving to the larger inference budget makes the larger patch size 8 model more desirable sooner. Both BPE compute-optimal point and crossover point are indicated with vertical lines.",
+                "position": 205
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09871/x2.png",
+                "caption": "",
+                "position": 214
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09871/x3.png",
+                "caption": "Figure 2:BLT comprises three modules, a lightweightLocal Encoderthat encodes input bytes into patch representations, a computationally expensive Latent Transformer over patch representations, and a lightweightLocal Decoderto decode the next patch of bytes.BLT incorporates byten𝑛nitalic_n-gram embeddings and a cross-attention mechanism to maximize information flow between the Latent Transformer and the byte-level modules (Figure 5). Unlike fixed-vocabulary tokenization,BLT dynamically groups bytes into patches preserving access to the byte-level information.",
+                "position": 225
+            }
+        ]
+    },
+    {
+        "header": "2Patching: From Individual Bytes to Groups of Bytes",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.09871/extracted/6066458/assets/patching_types.png",
+                "caption": "Figure 3:Patching schemes group bytes in different ways, each leading to a different number of resulting patches.\nSince each patch is processed using a large transformer step, the number of patches directly determines the bulk of the compute expended in terms offlops.\nThese schemes group bytes into patches by (a) striding every four bytes (§2.1) as in MegaByte(Yu et al.,2023), (b) tokenizing with Byte-Pair Encoding (bpe), in this case the Llama-3(Dubey et al.,2024)tokenizer, (c & d) entropy-based patching as in this work (§2.3), (e) patching on space-bytes(Slagle,2024), (f) and patching on entropy using a small CNN byte-level model with 2-byte context.",
+                "position": 268
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09871/x4.png",
+                "caption": "Figure 4:This figure plots the entropyH⁢(xi)𝐻subscript𝑥𝑖H(x_{i})italic_H ( italic_x start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT )of each byte in “Daenerys Targeryen is in Game of Thrones, a fantasy epic by George R.R. Martin.” with spaces shown as underscores.\nPatches end whenH⁢(xi)𝐻subscript𝑥𝑖H(x_{i})italic_H ( italic_x start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT )exceeds the global thresholdθgsubscript𝜃𝑔\\theta_{g}italic_θ start_POSTSUBSCRIPT italic_g end_POSTSUBSCRIPT, shown as a red horizontal line.\nThe start of new patches are shown with vertical gray lines.\nFor example, the entropies of “G” and “e” in “George R.R. Martin” exceedθgsubscript𝜃𝑔\\theta_{g}italic_θ start_POSTSUBSCRIPT italic_g end_POSTSUBSCRIPT, so “G” is the start of a single byte patch and “e” of a larger patch extending to the end of the named entity as the entropyH⁢(xi)𝐻subscript𝑥𝑖H(x_{i})italic_H ( italic_x start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT )stays low, resulting in no additional patches.",
+                "position": 329
+            }
+        ]
+    },
+    {
+        "header": "3BLT Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.09871/x5.png",
+                "caption": "Figure 5:The local encoder uses a cross-attention block with patch representations as queries, and byte representations as keys/values to encode byte representations into patch representations. The local decoder uses a similar block but with the roles reversed i.e. byte representations are now the queries and patch representations are the keys/values. Here we use Cross-Attnk=2𝑘2k=2italic_k = 2.",
+                "position": 449
+            }
+        ]
+    },
+    {
+        "header": "4Experimental Setup",
+        "images": []
+    },
+    {
+        "header": "5Scaling Trends",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.09871/x6.png",
+                "caption": "Figure 6:Scaling trends forBLT models with different architectural choices, as well as for baseline BPE token-based models. We train models at multiple scales from 1B up to 8B parameters for the optimal number of tokens as computed byDubey et al. (2024)and report bits-per-byte on a sample from the training distribution.BLT models perform on par with state-of-the-art tokenizer-based models such as Llama 3, at scale. PS denotes patch size. We illustrate separate architecture improvements on space-patching (left) and combine them with dynamic patching (right).",
+                "position": 708
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09871/x6.png",
+                "caption": "",
+                "position": 711
+            },
+            {
+                "img": "https://arxiv.org/html/2412.09871/x7.png",
+                "caption": "",
+                "position": 715
+            }
+        ]
+    },
+    {
+        "header": "6Byte Modeling Improves Robustness",
+        "images": []
+    },
+    {
+        "header": "7Ablations and Discussion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.09871/x8.png",
+                "caption": "Figure 8:Variation of language modeling performance in bits-per-byte (bpb) with trainingflops for 400m and 1bBLT models patched with entropy models of different sizes and context windows. Both dimensions improve scaling performance, with diminishing returns beyond 50m parameter entropy models with a context of 512 bytes.",
+                "position": 1684
+            }
+        ]
+    },
+    {
+        "header": "8Related Work",
+        "images": []
+    },
+    {
+        "header": "9Limitations and Future Work",
+        "images": []
+    },
+    {
+        "header": "10Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "Contributors",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "11Model Hyper Parameters",
+        "images": []
+    },
+    {
+        "header": "12FLOPs Equations",
+        "images": []
+    },
+    {
+        "header": "13Rolling Polynomial Hashing",
+        "images": []
+    },
+    {
+        "header": "14Frequency-based n-gram Embedddings",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.09871/extracted/6066458/assets/patching.png",
+                "caption": "Figure 9:An example of default entropy-based patching with global threshold during inference onmmlu. Green denotes the prompt, Blue denotes the few-shot examples, and red denotes the question to be answered. Note that the size of the patches for the repeated phrases in the answer choices is much larger, which means that the global model is invoked significantly fewer times than its tokenizer-based counterpart, with this inference patching scheme.",
+                "position": 3277
+            }
+        ]
+    },
+    {
+        "header": "15Entropy Patching Example from MMLU",
+        "images": []
+    }
+]
