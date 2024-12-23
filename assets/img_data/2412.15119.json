@@ -1,0 +1,125 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.15119/x1.png",
+                "caption": "Figure 1:Comparison of different parallel generation strategies.Both strategies generate initial tokens [1,2,3,4] sequentially then generate multiple tokens in parallel per step, following the order [5a-5d] to [6a-6d] to [7a-7d], etc. (a) Our approach generates weakly dependent tokens across non-local regions in parallel, preserving coherent patterns and local details. (b) The naive method generates strongly dependent tokens within local regions simultaneously, while independent sampling for strongly correlated tokens can cause inconsistent generation and disrupted patterns, such as distorted tiger faces and fragmented zebra stripes.",
+                "position": 129
+            },
+            {
+                "img": "https://arxiv.org/html/2412.15119/x2.png",
+                "caption": "Figure 2:Visualization comparison of our parallel generation and traditional autoregressive generation (LlamaGen[47]). Our approach (PAR) achieves3.6-9.5×\\times×speedup over LlamaGen with comparable quality, reducing the generation time from 12.41s to 3.46s (PAR-4×\\times×) and 1.31s (PAR-16×\\times×) per image. Time measurements are conducted with a batch size of 1 on a single A100 GPU.",
+                "position": 132
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.15119/x3.png",
+                "caption": "Figure 3:Illustration of our non-local parallel generation process.Stage 1: sequential generation of initial tokens (1-4) for each region (separated by dotted lines) to establish global structure. Stage 2: parallel generation at aligned positions across different regions (e.g., 5a-5d), then moving to next aligned positions (6a-6d, 7a-7d, etc.) for parallel generation. Same numbers indicate tokens generated in the same step, and letter suffix (a,b,c,d) denotes different regions .",
+                "position": 172
+            },
+            {
+                "img": "https://arxiv.org/html/2412.15119/x4.png",
+                "caption": "Figure 4:Overview of our parallel autoregressive generation framework.(a) Model implementation.The model first generates initial tokens sequentially [1,2,3,4], then uses learnable tokens [M1,M2,M3] to help transition into parallel prediction mode.(b) Comparison of visible context between our parallel prediction approach(left)and traditional single-token prediction(right). The colored cells indicate available context during generation. In traditional AR, when predicting token6⁢d6𝑑6d6 italic_d, the model can access all previous tokens including6⁢a−6⁢c6𝑎6𝑐6a-6c6 italic_a - 6 italic_c. Without full attention, our parallel approach would limit each token (e.g.,6⁢b6𝑏6b6 italic_b) to only see tokens up to the same position in the previous group (e.g., up to5⁢b5𝑏5b5 italic_b). We enable group-wise full attention to allow access to the entire previous group.",
+                "position": 194
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.15119/x5.png",
+                "caption": "Figure 5:Qualitative comparison of parallel generation strategies.Top:Our method with sequential initial tokens followed by parallel distant token prediction produces high-quality and coherent images.Middle:Direct parallel prediction without sequential initial tokens leads to inconsistent global structures.Bottom:Parallel prediction of adjacent tokens results in distorted local patterns and broken details.",
+                "position": 317
+            },
+            {
+                "img": "https://arxiv.org/html/2412.15119/x6.png",
+                "caption": "Table 2:Class-conditional image generation on ImageNet 256×\\times×256 benchmark.\n“↓↓\\downarrow↓” or “↑↑\\uparrow↑” indicate lower or higher values are better.\n“-re” means using rejection sampling. PAR-4×\\times×and PAR-16×\\times×means generating 4 and 16 tokens per step in parallel, respectively.",
+                "position": 320
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "AImplementation details for PAR",
+        "images": []
+    },
+    {
+        "header": "BMore Visualization Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.15119/x6.png",
+                "caption": "Figure 6:Additional image generation results of PAR-4×\\times×across different ImageNet[9]categories.",
+                "position": 2408
+            },
+            {
+                "img": "https://arxiv.org/html/2412.15119/x7.png",
+                "caption": "Figure 7:Additional image generation results of PAR-16×\\times×across different ImageNet[9]categories.",
+                "position": 2412
+            },
+            {
+                "img": "https://arxiv.org/html/2412.15119/x8.png",
+                "caption": "Figure 8:Video generation results on UCF-101[44].Each row shows sampled frames from a 17-frame sequence at 128×128 resolution, generated by PAR-1×\\times×, PAR-4×\\times×, and PAR-16×\\times×respectively across different action categories.",
+                "position": 2416
+            },
+            {
+                "img": "https://arxiv.org/html/2412.15119/x9.png",
+                "caption": "Figure 9:Visualization of token conditional entropy maps. Each map shows the conditional entropy of all tokens when conditioned on a reference token (blue square). Darker red indicates lower conditional entropy and thus stronger dependency with the reference token. The visualization shows thattokens exhibit strong dependencies with their spatial neighbors and weak dependencies with distant regions.",
+                "position": 2473
+            },
+            {
+                "img": "https://arxiv.org/html/2412.15119/x9.png",
+                "caption": "",
+                "position": 2476
+            },
+            {
+                "img": "https://arxiv.org/html/2412.15119/x10.png",
+                "caption": "",
+                "position": 2480
+            },
+            {
+                "img": "https://arxiv.org/html/2412.15119/x11.png",
+                "caption": "",
+                "position": 2485
+            },
+            {
+                "img": "https://arxiv.org/html/2412.15119/x12.png",
+                "caption": "",
+                "position": 2489
+            },
+            {
+                "img": "https://arxiv.org/html/2412.15119/x13.png",
+                "caption": "Figure 10:Conditional entropy differences between parallel and sequential generation in different orders.(a)(d) show parallel (4 tokens) generation strategies and (b)(e) show sequential generation strategies for our proposed order and raster scan order respectively. Numbers indicate generation step in each order. (c)(f) visualize the conditional entropy increase when switching from sequential to parallel generation for each order, where darker red indicates larger entropy increase and thus higher prediction difficulty. Both orders generate the first four tokens sequentially (shown as white regions in entropy maps). Our proposed order that generates tokens from different spatial blocks in parallel shows smaller entropy increases compared to raster scan order that generates consecutive tokens simultaneously, indicating parallel generation across spatial blocks introduces less prediction difficulty than generating adjacent tokens simultaneously.",
+                "position": 2587
+            }
+        ]
+    },
+    {
+        "header": "CAnalysis of Visual Token Dependencies",
+        "images": []
+    }
+]
