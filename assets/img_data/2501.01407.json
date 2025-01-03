@@ -1,0 +1,1540 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.01407/x1.png",
+                "caption": "",
+                "position": 125
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.01407/x2.png",
+                "caption": "Figure 2:Method overview. The input image is passed through an encoder that produces multiple tokens to represent it. These tokens are projected to form the keys and values of the nested attention layers. The result of each nested attention layer is a new set of per-query values,Vq∗superscriptsubscript𝑉𝑞V_{q}^{*}italic_V start_POSTSUBSCRIPT italic_q end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ∗ end_POSTSUPERSCRIPT, which then replace the cross-attention values of the tokens∗superscript𝑠s^{*}italic_s start_POSTSUPERSCRIPT ∗ end_POSTSUPERSCRIPTrepresenting the subject. One nested attention layer is added to each of the cross-attention layers of the model.",
+                "position": 188
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/x3.png",
+                "caption": "Figure 3:The nested attention mechanism. We replace the value of the tokens∗superscript𝑠s^{*}italic_s start_POSTSUPERSCRIPT ∗ end_POSTSUPERSCRIPTwith the result of an attention operation between the query and the nested keys and values produced by the encoder, resulting in a query-dependent value.",
+                "position": 201
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/v_q/woman_input.jpg",
+                "caption": "Figure 4:We visualize the valuesVq⁢[s∗]subscript𝑉𝑞delimited-[]superscript𝑠V_{q}[s^{*}]italic_V start_POSTSUBSCRIPT italic_q end_POSTSUBSCRIPT [ italic_s start_POSTSUPERSCRIPT ∗ end_POSTSUPERSCRIPT ]generated for a subject in two different layers, with a vanilla cross-attention, and with our nested approach. Vanilla layers use the same value to represent the subject throughout the entire image (column 3). Nested attention assigns a different subject-value per query (columns 4 and 5), encoding fine-grained semantic information.",
+                "position": 232
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/v_q/woman_pencil.jpg",
+                "caption": "",
+                "position": 251
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/v_q/v_q_ca.jpg",
+                "caption": "",
+                "position": 252
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/v_q/woman_nested_hidden_states_up_blocks.0.attentions.0.transformer_blocks.5.attn2.processor.jpg",
+                "caption": "",
+                "position": 253
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/v_q/woman_nested_hidden_states_up_blocks.1.attentions.2.transformer_blocks.1.attn2.processor.jpg",
+                "caption": "",
+                "position": 254
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/v_q/woman_coffee.jpg",
+                "caption": "",
+                "position": 261
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/v_q/woman_coffe_nested_hidden_states_up_blocks.0.attentions.0.transformer_blocks.7.attn2.processor.jpg",
+                "caption": "",
+                "position": 263
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/v_q/woman_coffee_nested_hidden_states_up_blocks.1.attentions.2.transformer_blocks.1.attn2.processor.jpg",
+                "caption": "",
+                "position": 264
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/points_attn/man_input.jpg",
+                "caption": "Figure 5:Analyzing the query-dependent values (Vq⁢[s∗]subscript𝑉𝑞delimited-[]superscript𝑠V_{q}[s^{*}]italic_V start_POSTSUBSCRIPT italic_q end_POSTSUBSCRIPT [ italic_s start_POSTSUPERSCRIPT ∗ end_POSTSUPERSCRIPT ]) from a nested attention layer. For three queries of the generated image (purple, orange, blue points), we first show their attention maps in a nested attention layer (graph). There, each point corresponds to a token produced by the encoder. In each graph, 1-2 tokens dominate the attention. To analyze the information encoded in the most dominant token, we show the Q-Former attention map of its corresponding learned query. These show the semantic alignment between the probed query, and the source of values assigned to it.",
+                "position": 288
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/points_attn/man_paints_graphs2.jpg",
+                "caption": "",
+                "position": 293
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/points_attn/man_paints_points.jpg",
+                "caption": "",
+                "position": 313
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/points_attn/eye_man.jpg",
+                "caption": "",
+                "position": 315
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/points_attn/nose_man.jpg",
+                "caption": "",
+                "position": 316
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/points_attn/arm_man.jpg",
+                "caption": "",
+                "position": 317
+            }
+        ]
+    },
+    {
+        "header": "4Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/learned_q_attn/18420_woman_10_26.jpg",
+                "caption": "Figure 6:Attention maps between Q-Former learned queries and input image features. Each column shows a distinct query’s attention map, illustrating how queries capture different facial features.",
+                "position": 389
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/learned_q_attn/18420_woman_14_27.jpg",
+                "caption": "",
+                "position": 393
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/learned_q_attn/18420_woman_13_5.jpg",
+                "caption": "",
+                "position": 394
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/learned_q_attn/18420_woman_15_31.jpg",
+                "caption": "",
+                "position": 395
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/learned_q_attn/18420_woman_31_22.jpg",
+                "caption": "",
+                "position": 396
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/learned_q_attn/21844_man_10_26.jpg",
+                "caption": "",
+                "position": 399
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/learned_q_attn/21844_man_14_27.jpg",
+                "caption": "",
+                "position": 400
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/learned_q_attn/21844_man_13_5.jpg",
+                "caption": "",
+                "position": 401
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/learned_q_attn/21844_man_15_31.jpg",
+                "caption": "",
+                "position": 402
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/learned_q_attn/21844_man_31_22.jpg",
+                "caption": "",
+                "position": 403
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/faces/man/input.jpg",
+                "caption": "Figure 7:Qualitative results of our method trained on human faces (left) and pets (right). The sampled noise is fixed across each column.",
+                "position": 440
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/faces/man/man_firefighter.jpg",
+                "caption": "",
+                "position": 446
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/faces/man/watercolor2.jpg",
+                "caption": "",
+                "position": 447
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/faces/man/man_laugh.jpg",
+                "caption": "",
+                "position": 448
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/faces/baruli/input.jpg",
+                "caption": "",
+                "position": 451
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/faces/baruli/baruli_firefighter.jpg",
+                "caption": "",
+                "position": 452
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/faces/baruli/watercolor2.jpg",
+                "caption": "",
+                "position": 453
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/faces/baruli/baruli_laugh.jpg",
+                "caption": "",
+                "position": 454
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/faces/child/input.jpg",
+                "caption": "",
+                "position": 457
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/faces/child/child_firefighter.jpg",
+                "caption": "",
+                "position": 458
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/faces/child/watercolor2.jpg",
+                "caption": "",
+                "position": 459
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/faces/child/child_laugh.jpg",
+                "caption": "",
+                "position": 460
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/pets/dog1_input.jpg",
+                "caption": "",
+                "position": 480
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/pets/dog1_supermarket.jpg",
+                "caption": "",
+                "position": 481
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/pets/dog1_oil_paint.jpg",
+                "caption": "",
+                "position": 482
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/pets/dog1_car.jpg",
+                "caption": "",
+                "position": 483
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/pets/jessy_input.jpg",
+                "caption": "",
+                "position": 486
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/pets/jessy_supermarket.jpg",
+                "caption": "",
+                "position": 487
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/pets/jessy_oil_paint.jpg",
+                "caption": "",
+                "position": 488
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/pets/jessy_car.jpg",
+                "caption": "",
+                "position": 489
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/pets/cat1_input.jpg",
+                "caption": "",
+                "position": 492
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/pets/cat1_supermarket.jpg",
+                "caption": "",
+                "position": 493
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/pets/cat1_oil_paint.jpg",
+                "caption": "",
+                "position": 494
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/qualitative/pets/cat1_car.jpg",
+                "caption": "",
+                "position": 495
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/adjust_attn/man_input.jpg",
+                "caption": "Figure 8:By manipulating the attention given to the personalized token, we control the identity-editability tradeoff.λ𝜆\\lambdaitalic_λdenotes the factor in which we increase the attention to the special token.",
+                "position": 533
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/adjust_attn/man_cubism_1.jpg",
+                "caption": "",
+                "position": 544
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/adjust_attn/man_cubism_2.jpg",
+                "caption": "",
+                "position": 545
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/adjust_attn/man_cubism_3.jpg",
+                "caption": "",
+                "position": 546
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/adjust_attn/man_cubism_4.jpg",
+                "caption": "",
+                "position": 547
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/adjust_attn/dog_input.jpg",
+                "caption": "",
+                "position": 555
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/adjust_attn/dog_chef_1.jpg",
+                "caption": "",
+                "position": 556
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/adjust_attn/dog_chef_2.jpg",
+                "caption": "",
+                "position": 557
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/adjust_attn/dog_chef_3.jpg",
+                "caption": "",
+                "position": 558
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/adjust_attn/dog_chef_4.jpg",
+                "caption": "",
+                "position": 559
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/32007.jpg",
+                "caption": "Figure 9:Comparing nested attention with decoupled cross attention.λ𝜆\\lambdaitalic_λbalances between identity preservation and prompt alignment.\nWe use the followingλ𝜆\\lambdaitalic_λvalues from left to right (top two rows). Decoupled CA: 0.5, 0.6, 1.0, nested attention: 1.0, 2.0, 4.0.\nOur method achieves better identity preservation while being aligned with the text prompt.",
+                "position": 571
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/girl_decoupled_ink_0.5.jpg",
+                "caption": "",
+                "position": 590
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/girl_decoupled_ink_0.6.jpg",
+                "caption": "",
+                "position": 591
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/girl_decoupled_ink_1.0.jpg",
+                "caption": "",
+                "position": 592
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_input.jpg",
+                "caption": "",
+                "position": 593
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_decoupled_forest_0.5.jpg",
+                "caption": "",
+                "position": 594
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_decoupled_forest_0.6.jpg",
+                "caption": "",
+                "position": 595
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_decoupled_forest_1.0.jpg",
+                "caption": "",
+                "position": 596
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/girl_nested_ink_attn_1.jpg",
+                "caption": "",
+                "position": 604
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/girl_nested_ink_attn_2.jpg",
+                "caption": "",
+                "position": 605
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/girl_nested_ink_attn_4.jpg",
+                "caption": "",
+                "position": 606
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_nested_forest_1.jpg",
+                "caption": "",
+                "position": 608
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_nested_forest_2.jpg",
+                "caption": "",
+                "position": 609
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_nested_forest_4.jpg",
+                "caption": "",
+                "position": 610
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/37512.jpg",
+                "caption": "",
+                "position": 626
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/woman_decoupled_astronaut_0.5.jpg",
+                "caption": "",
+                "position": 627
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/woman_decoupled_astronaut_0.6.jpg",
+                "caption": "",
+                "position": 628
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/woman_decoupled_astronaut_1.0.jpg",
+                "caption": "",
+                "position": 629
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_watercolor_decoupled_0.5.jpg",
+                "caption": "",
+                "position": 631
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_watercolor_decoupled_0.6.jpg",
+                "caption": "",
+                "position": 632
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_watercolor_decoupled_1.0.jpg",
+                "caption": "",
+                "position": 633
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/woman_nested_astronaut_1.0.jpg",
+                "caption": "",
+                "position": 641
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/woman_nested_astronaut_2.0.jpg",
+                "caption": "",
+                "position": 642
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/woman_nested_astronaut_4.0.jpg",
+                "caption": "",
+                "position": 643
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_watercolor_nested_1.0.jpg",
+                "caption": "",
+                "position": 645
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_watercolor_nested_2.0.jpg",
+                "caption": "",
+                "position": 646
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_watercolor_nested_4.0.jpg",
+                "caption": "",
+                "position": 647
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/method_comparison_fixed.jpg",
+                "caption": "Figure 10:Quantitative comparison of various personalization injection mechanisms. All models were trained from scratch under the same setting, with a resolution of512×512512512512\\times 512512 × 512.",
+                "position": 666
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/feifei_licensed_instant.jpg",
+                "caption": "Figure 11:Left: qualitative comparison of human faces personalization methods. Our method successfully changes expressions and pose while preserving the identity. Right: quantitative comparison. Methods that use CLIP as their backbone encoder are marked with filled markers, while methods that build on face recognition models as their backbone encoder are marked with unfilled markers.",
+                "position": 669
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/feifei_ipa.jpg",
+                "caption": "",
+                "position": 693
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/feifei_instant_id.jpg",
+                "caption": "",
+                "position": 694
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/feifei_photomaker.jpg",
+                "caption": "",
+                "position": 695
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/feifei_lcm.jpg",
+                "caption": "",
+                "position": 696
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/feifei_pulid.jpg",
+                "caption": "",
+                "position": 697
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/feifei_nested2.jpg",
+                "caption": "",
+                "position": 698
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/models_comparison_with_exp.jpg",
+                "caption": "",
+                "position": 699
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/musk_instant_input.jpg",
+                "caption": "",
+                "position": 710
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/musk_ipa.jpg",
+                "caption": "",
+                "position": 711
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/musk_instant.jpg",
+                "caption": "",
+                "position": 712
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/musk_photomaker.jpg",
+                "caption": "",
+                "position": 713
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/musk_lcm.jpg",
+                "caption": "",
+                "position": 714
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/musk_sideview_pulid.jpg",
+                "caption": "",
+                "position": 715
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/musk_sideview.jpg",
+                "caption": "",
+                "position": 716
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/danny.jpeg",
+                "caption": "",
+                "position": 723
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/danny_points_ipa.jpg",
+                "caption": "",
+                "position": 724
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/danny_points_instant.jpg",
+                "caption": "",
+                "position": 725
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/danny_points_photomaker.jpg",
+                "caption": "",
+                "position": 726
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/danny_points_lcm.jpg",
+                "caption": "",
+                "position": 727
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/danny_points_pulid3.jpg",
+                "caption": "",
+                "position": 728
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/danny_points.jpg",
+                "caption": "",
+                "position": 729
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/man_instant_input.jpg",
+                "caption": "",
+                "position": 740
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/man_ipa.jpg",
+                "caption": "",
+                "position": 741
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/man_instant.jpg",
+                "caption": "",
+                "position": 742
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/man_photomaker.jpg",
+                "caption": "",
+                "position": 743
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/man_lcm.jpg",
+                "caption": "",
+                "position": 744
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/man_pulid2.jpg",
+                "caption": "",
+                "position": 745
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/face_comparison/man_sticker_nested.jpg",
+                "caption": "",
+                "position": 746
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/person_pet_comparison/man.jpg",
+                "caption": "Figure 12:Multi-subject generation comparison.",
+                "position": 845
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/person_pet_comparison/dog_cd_white.jpg",
+                "caption": "",
+                "position": 853
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/person_pet_comparison/points.jpg",
+                "caption": "",
+                "position": 854
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/person_pet_comparison/points_ipa.jpg",
+                "caption": "",
+                "position": 855
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/person_pet_comparison/woman.jpg",
+                "caption": "",
+                "position": 862
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/person_pet_comparison/bissli_white.jpg",
+                "caption": "",
+                "position": 863
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/person_pet_comparison/digital_art.jpg",
+                "caption": "",
+                "position": 864
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/person_pet_comparison/digital_art_ipa.jpg",
+                "caption": "",
+                "position": 865
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/multiple_images/corgi/corgi1.jpg",
+                "caption": "Figure 13:Using multiple images of the same concept increases the subject’s fidelity in the generated image.",
+                "position": 879
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/multiple_images/corgi/corgi2.jpg",
+                "caption": "",
+                "position": 887
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/multiple_images/corgi/corgi4.jpg",
+                "caption": "",
+                "position": 888
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/multiple_images/corgi/corgi_input_all.jpg",
+                "caption": "",
+                "position": 889
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/multiple_images/corgi/corgi1_living_room.jpg",
+                "caption": "",
+                "position": 896
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/multiple_images/corgi/corgi2_living_room.jpg",
+                "caption": "",
+                "position": 897
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/multiple_images/corgi/corgi4_living_room.jpg",
+                "caption": "",
+                "position": 898
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/multiple_images/corgi/corgi_all.jpg",
+                "caption": "",
+                "position": 899
+            }
+        ]
+    },
+    {
+        "header": "6Conclusions",
+        "images": []
+    },
+    {
+        "header": "Acknowledgment",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BAdditional Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mixing/jolie.jpg",
+                "caption": "Figure 14:Our method allows mixing two identities by encoding them separately, and pass the concatenated representations to the nested attention layer.",
+                "position": 1669
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mixing/pitt.jpg",
+                "caption": "",
+                "position": 1673
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mixing/branjelina_person.jpg",
+                "caption": "",
+                "position": 1674
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mixing/branjelina_child.jpg",
+                "caption": "",
+                "position": 1675
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mixing/aniston.jpg",
+                "caption": "",
+                "position": 1684
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mixing/ross.jpg",
+                "caption": "",
+                "position": 1685
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mixing/ross_rachel_person.jpg",
+                "caption": "",
+                "position": 1686
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mixing/ross_rachel_girl.jpg",
+                "caption": "",
+                "position": 1687
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/edits/yann2_input.jpg",
+                "caption": "Figure 15:By simply changing at inference time the token to which we inject the personalized concept (e.g., “person” to “woman”) we can have various semantic variations.",
+                "position": 1700
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/edits/yann2_person2.png",
+                "caption": "",
+                "position": 1704
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/edits/yann2_woman2.jpg",
+                "caption": "",
+                "position": 1705
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/edits/yann2_child2.jpg",
+                "caption": "",
+                "position": 1706
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/edits/woman_input.jpg",
+                "caption": "",
+                "position": 1715
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/edits/woman_person.jpg",
+                "caption": "",
+                "position": 1716
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/edits/woman_man.jpg",
+                "caption": "",
+                "position": 1717
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/edits/woman_girl.jpg",
+                "caption": "",
+                "position": 1718
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_watercolor_input.jpg",
+                "caption": "Figure 16:Qualitative comparison of injection mechanism.λ𝜆\\lambdaitalic_λbalances between identity preservation and prompt alignment.\nWe use the followingλ𝜆\\lambdaitalic_λvalues from left to right. Decoupled CA: 0.5, 0.6, 1.0, globalV𝑉Vitalic_V, multiple tokens and nested attention: 1.0, 2.0, 4.0.",
+                "position": 1731
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_watercolor_simple.jpg",
+                "caption": "",
+                "position": 1750
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/woman_simple.jpg",
+                "caption": "",
+                "position": 1754
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_watercolor_multiple_1.0.jpg",
+                "caption": "",
+                "position": 1764
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_watercolor_multiple_2.0.jpg",
+                "caption": "",
+                "position": 1765
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_watercolor_multiple_4.0.jpg",
+                "caption": "",
+                "position": 1766
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/woman_multiple_tokens_1.0.jpg",
+                "caption": "",
+                "position": 1768
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/woman_multiple_tokens_2.0.jpg",
+                "caption": "",
+                "position": 1769
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/woman_multiple_tokens_4.0.jpg",
+                "caption": "",
+                "position": 1770
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_watercolor_global_v_1.0.jpg",
+                "caption": "",
+                "position": 1792
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_watercolor_global_v_2.0.jpg",
+                "caption": "",
+                "position": 1793
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/man_watercolor_global_v_4.0.jpg",
+                "caption": "",
+                "position": 1794
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/woman_global_v_astronaut_1.0.jpg",
+                "caption": "",
+                "position": 1796
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/woman_global_v_astronaut_2.0.jpg",
+                "caption": "",
+                "position": 1797
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/mechanism_comparison/woman_global_v_astronaut_4.0.jpg",
+                "caption": "",
+                "position": 1798
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/normalize_vq/man_input.jpg",
+                "caption": "Figure 17:Ablating the regularization performed onVq⁢[s∗]subscript𝑉𝑞delimited-[]superscript𝑠V_{q}[s^{*}]italic_V start_POSTSUBSCRIPT italic_q end_POSTSUBSCRIPT [ italic_s start_POSTSUPERSCRIPT ∗ end_POSTSUPERSCRIPT ]. Without normalization, the image looks red and contains artifacts. Settingα=2𝛼2\\alpha=2italic_α = 2provides a good balance between identity preservation and prior preservation.",
+                "position": 1874
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/normalize_vq/man_no_norm.jpg",
+                "caption": "",
+                "position": 1885
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/normalize_vq/man_norm1.jpg",
+                "caption": "",
+                "position": 1886
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/normalize_vq/man_norm2.jpg",
+                "caption": "",
+                "position": 1887
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/normalize_vq/man_norm3.jpg",
+                "caption": "",
+                "position": 1888
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/normalize_vq/man2_input.jpg",
+                "caption": "",
+                "position": 1894
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/normalize_vq/man2_no_norm.jpg",
+                "caption": "",
+                "position": 1895
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/normalize_vq/man2_norm1.jpg",
+                "caption": "",
+                "position": 1896
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/normalize_vq/man2_norm2.jpg",
+                "caption": "",
+                "position": 1897
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/normalize_vq/man2_norm3.jpg",
+                "caption": "",
+                "position": 1898
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/number_of_q/woman_input.jpg",
+                "caption": "Figure 18:Results of models trained with varying number of learned queries. Increasing the number of learned queries improves identity preservation. All models used in this figure underwent only the first phase of training.",
+                "position": 1908
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/number_of_q/woman_hike_16.jpg",
+                "caption": "",
+                "position": 1919
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/number_of_q/woman_hike_64.jpg",
+                "caption": "",
+                "position": 1920
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/number_of_q/woman_hike_256.jpg",
+                "caption": "",
+                "position": 1921
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/number_of_q/woman_hike_1024.jpg",
+                "caption": "",
+                "position": 1922
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/number_of_q/man_input.jpg",
+                "caption": "",
+                "position": 1928
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/number_of_q/man_book_16.jpg",
+                "caption": "",
+                "position": 1929
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/number_of_q/man_book_64.jpg",
+                "caption": "",
+                "position": 1930
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/number_of_q/man_book_512.jpg",
+                "caption": "",
+                "position": 1931
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/number_of_q/man_book_1024.jpg",
+                "caption": "",
+                "position": 1932
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/input_5.jpg",
+                "caption": "Figure 19:Additional results on human faces. The initial noise is fixed across each column.",
+                "position": 1949
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/bar_5.jpg",
+                "caption": "",
+                "position": 1953
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/cyborg_5.jpg",
+                "caption": "",
+                "position": 1954
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/graffity_3.jpg",
+                "caption": "",
+                "position": 1955
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/pop_3.jpg",
+                "caption": "",
+                "position": 1956
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/suit_5.jpg",
+                "caption": "",
+                "position": 1957
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/neon_5.jpg",
+                "caption": "",
+                "position": 1958
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/input_3.jpg",
+                "caption": "",
+                "position": 1961
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/bar_3.jpg",
+                "caption": "",
+                "position": 1962
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/cyborg_3.jpg",
+                "caption": "",
+                "position": 1963
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/graffity_9.jpg",
+                "caption": "",
+                "position": 1964
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/pop_10.jpg",
+                "caption": "",
+                "position": 1965
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/suit_3.jpg",
+                "caption": "",
+                "position": 1966
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/neon_3.jpg",
+                "caption": "",
+                "position": 1967
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/input_4.jpg",
+                "caption": "",
+                "position": 1970
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/bar_4.jpg",
+                "caption": "",
+                "position": 1971
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/cyborg_4.jpg",
+                "caption": "",
+                "position": 1972
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/graffity_1.jpg",
+                "caption": "",
+                "position": 1973
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/pop_1.jpg",
+                "caption": "",
+                "position": 1974
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/suit_4.jpg",
+                "caption": "",
+                "position": 1975
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/neon_4.jpg",
+                "caption": "",
+                "position": 1976
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/input_6.jpg",
+                "caption": "",
+                "position": 1979
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/bar_6.jpg",
+                "caption": "",
+                "position": 1980
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/cyborg_6.jpg",
+                "caption": "",
+                "position": 1981
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/graffity_8.jpg",
+                "caption": "",
+                "position": 1982
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/pop_9.jpg",
+                "caption": "",
+                "position": 1983
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/suit_6.jpg",
+                "caption": "",
+                "position": 1984
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/neon_6.jpg",
+                "caption": "",
+                "position": 1985
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/input_7.jpg",
+                "caption": "",
+                "position": 1988
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/bar_7.jpg",
+                "caption": "",
+                "position": 1989
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/cyborg_7.jpg",
+                "caption": "",
+                "position": 1990
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/graffity_2.jpg",
+                "caption": "",
+                "position": 1991
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/pop_2.jpg",
+                "caption": "",
+                "position": 1992
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/suit_7.jpg",
+                "caption": "",
+                "position": 1993
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/neon_7.jpg",
+                "caption": "",
+                "position": 1994
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/input_1.jpg",
+                "caption": "",
+                "position": 1997
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/bar_1.jpg",
+                "caption": "",
+                "position": 1998
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/cyborg_1.jpg",
+                "caption": "",
+                "position": 1999
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/graffity_6.jpg",
+                "caption": "",
+                "position": 2000
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/pop_7.jpg",
+                "caption": "",
+                "position": 2001
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/suit_1.jpg",
+                "caption": "",
+                "position": 2002
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/neon_1.jpg",
+                "caption": "",
+                "position": 2003
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/input_8.jpg",
+                "caption": "",
+                "position": 2006
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/bar_8.jpg",
+                "caption": "",
+                "position": 2007
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/cyborg_8.jpg",
+                "caption": "",
+                "position": 2008
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/graffity_4.jpg",
+                "caption": "",
+                "position": 2009
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/pop_4.jpg",
+                "caption": "",
+                "position": 2010
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/suit_8.jpg",
+                "caption": "",
+                "position": 2011
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/neon_8.jpg",
+                "caption": "",
+                "position": 2012
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/input_9.jpg",
+                "caption": "",
+                "position": 2015
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/bar_9.jpg",
+                "caption": "",
+                "position": 2016
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/cyborg_9.jpg",
+                "caption": "",
+                "position": 2017
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/graffity_5.jpg",
+                "caption": "",
+                "position": 2018
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/pop_6.jpg",
+                "caption": "",
+                "position": 2019
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/suit_9.jpg",
+                "caption": "",
+                "position": 2020
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/faces_grid/neon_9.jpg",
+                "caption": "",
+                "position": 2021
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/input_5.jpg",
+                "caption": "Figure 20:Additional results on pets. The initial noise is fixed across each column.",
+                "position": 2037
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/pencil_3.jpg",
+                "caption": "",
+                "position": 2041
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/bike_5.jpg",
+                "caption": "",
+                "position": 2042
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/dig_3.jpg",
+                "caption": "",
+                "position": 2043
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/forest_5.jpg",
+                "caption": "",
+                "position": 2044
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/garden_5.jpg",
+                "caption": "",
+                "position": 2045
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/helli_5.jpg",
+                "caption": "",
+                "position": 2046
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/input_3.jpg",
+                "caption": "",
+                "position": 2049
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/pencil_5.jpg",
+                "caption": "",
+                "position": 2050
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/bike_3.jpg",
+                "caption": "",
+                "position": 2051
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/dig_5.jpg",
+                "caption": "",
+                "position": 2052
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/forest_3.jpg",
+                "caption": "",
+                "position": 2053
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/garden_3.jpg",
+                "caption": "",
+                "position": 2054
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/helli_3.jpg",
+                "caption": "",
+                "position": 2055
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/input_4.jpg",
+                "caption": "",
+                "position": 2058
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/pencil_7.jpg",
+                "caption": "",
+                "position": 2059
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/bike_4.jpg",
+                "caption": "",
+                "position": 2060
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/dig_7.jpg",
+                "caption": "",
+                "position": 2061
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/forest_4.jpg",
+                "caption": "",
+                "position": 2062
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/garden_4.jpg",
+                "caption": "",
+                "position": 2063
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/helli_4.jpg",
+                "caption": "",
+                "position": 2064
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/input_6.jpg",
+                "caption": "",
+                "position": 2067
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/pencil_1.jpg",
+                "caption": "",
+                "position": 2068
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/bike_6.jpg",
+                "caption": "",
+                "position": 2069
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/dig_1.jpg",
+                "caption": "",
+                "position": 2070
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/forest_6.jpg",
+                "caption": "",
+                "position": 2071
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/garden_6.jpg",
+                "caption": "",
+                "position": 2072
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/helli_6.jpg",
+                "caption": "",
+                "position": 2073
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/input_7.jpg",
+                "caption": "",
+                "position": 2076
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/pencil_4.jpg",
+                "caption": "",
+                "position": 2077
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/bike_7.jpg",
+                "caption": "",
+                "position": 2078
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/dig_4.jpg",
+                "caption": "",
+                "position": 2079
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/forest_7.jpg",
+                "caption": "",
+                "position": 2080
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/garden_7.jpg",
+                "caption": "",
+                "position": 2081
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/helli_7.jpg",
+                "caption": "",
+                "position": 2082
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/input_1.jpg",
+                "caption": "",
+                "position": 2085
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/pencil_2.jpg",
+                "caption": "",
+                "position": 2086
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/bike_1.jpg",
+                "caption": "",
+                "position": 2087
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/dig_2.jpg",
+                "caption": "",
+                "position": 2088
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/forest_1.jpg",
+                "caption": "",
+                "position": 2089
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/garden_1.jpg",
+                "caption": "",
+                "position": 2090
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/helli_1.jpg",
+                "caption": "",
+                "position": 2091
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/input_2.jpg",
+                "caption": "",
+                "position": 2094
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/pencil_6.jpg",
+                "caption": "",
+                "position": 2095
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/bike_2.jpg",
+                "caption": "",
+                "position": 2096
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/dig_6.jpg",
+                "caption": "",
+                "position": 2097
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/forest_2.jpg",
+                "caption": "",
+                "position": 2098
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/garden_2.jpg",
+                "caption": "",
+                "position": 2099
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/helli_2.jpg",
+                "caption": "",
+                "position": 2100
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/input_9.jpg",
+                "caption": "",
+                "position": 2103
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/pencil_9.jpg",
+                "caption": "",
+                "position": 2104
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/bike_9.jpg",
+                "caption": "",
+                "position": 2105
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/dig_9.jpg",
+                "caption": "",
+                "position": 2106
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/forest_9.jpg",
+                "caption": "",
+                "position": 2107
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/garden_9.jpg",
+                "caption": "",
+                "position": 2108
+            },
+            {
+                "img": "https://arxiv.org/html/2501.01407/extracted/6106957/images/pets_grids/heli_9.jpg",
+                "caption": "",
+                "position": 2109
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAblation Studies",
+        "images": []
+    }
+]
