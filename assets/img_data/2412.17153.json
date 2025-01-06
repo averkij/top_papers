@@ -1,0 +1,316 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/teaser_1step.png",
+                "caption": "Figure 1:Qualitative comparisons between DD and vanilla LlamaGenSun et al. (2024)on ImageNet 256×\\times×256.We show that the generated images ofDDhave small quality loss compared to the pre-trained AR model, while achieving≥\\geq≥200×\\times×speedup. More examples are inApp.F.",
+                "position": 104
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/teaser_2step.png",
+                "caption": "",
+                "position": 114
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/teaser_42step_samenoise.png",
+                "caption": "",
+                "position": 120
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/teaser_256step.png",
+                "caption": "",
+                "position": 126
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_10.png",
+                "caption": "Figure 2:Qualitative results ofDD-2step on text-to-image task.The model is distilled from LlamaGen model with prompts from LAION-COCO dataset. The speedup is around93×\\times×compared to the teacher model. More examples are inApp.F.",
+                "position": 133
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_12.png",
+                "caption": "",
+                "position": 143
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_17.png",
+                "caption": "",
+                "position": 149
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_18.png",
+                "caption": "",
+                "position": 155
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/x1.png",
+                "caption": "Figure 3:Comparison ofDDmodels, pre-trained models, and other acceleration methods for pre-trained models.DDachieves significant speedup compared to pre-trained models with comparable performance. In contrast, other methods’ performance degrades quickly as inference time decreases.",
+                "position": 163
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/x2.png",
+                "caption": "Figure 4:High-level comparison between ourDistilled Decoding(DD) and prior work. To generate a sequence of tokensqisubscript𝑞𝑖q_{i}italic_q start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT: (a) the vanilla AR model generates token-by-token, thus being slow; (b) parallel decoding generates multiple tokens in parallel (Sec.4.1), which fundamentally cannot match the generated distribution of the original AR model with one-step generation (seeSec.3.1); (c) ourDDmaps noise tokensϵisubscriptitalic-ϵ𝑖\\epsilon_{i}italic_ϵ start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPTfrom Gaussian distribution to the whole sequence of generated tokens directlyin one stepand it is guaranteed that (in the optimal case) the distribution of generated tokens matches that of the original AR model.",
+                "position": 166
+            }
+        ]
+    },
+    {
+        "header": "2Preliminaries",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.17153/x3.png",
+                "caption": "Figure 5:AR flow matching. Given all previous tokens, the teacher AR model gives a probability vector for the next token, which defines a mixture of Dirac delta distributions over all tokens in the codebook. We then construct a deterministic mapping between the Gaussian distribution and the Dirac delta distribution with flow matching. The next noise tokenϵ4subscriptitalic-ϵ4\\epsilon_{4}italic_ϵ start_POSTSUBSCRIPT 4 end_POSTSUBSCRIPTis sampled from the Gaussian distribution, and its corresponding token in the codebook becomes the next tokenq4subscript𝑞4q_{4}italic_q start_POSTSUBSCRIPT 4 end_POSTSUBSCRIPT.",
+                "position": 303
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/x4.png",
+                "caption": "Figure 6:The training and generation workflow ofDD. GivenX1subscript𝑋1X_{1}italic_X start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPTwith noise tokensϵisubscriptitalic-ϵ𝑖\\epsilon_{i}italic_ϵ start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT, the whole trajectoryX1,⋯,X5subscript𝑋1⋯subscript𝑋5X_{1},\\cdots,X_{5}italic_X start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT , ⋯ , italic_X start_POSTSUBSCRIPT 5 end_POSTSUBSCRIPTconsists of data tokensqisubscript𝑞𝑖q_{i}italic_q start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPTand noise tokensϵisubscriptitalic-ϵ𝑖\\epsilon_{i}italic_ϵ start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPTisuniquelydetermined (Sec.3.2). Assuming the timesteps are set to{t1=1,t2=3}formulae-sequencesubscript𝑡11subscript𝑡23\\{t_{1}=1,t_{2}=3\\}{ italic_t start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT = 1 , italic_t start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT = 3 }. During training (Sec.3.3), we trainDDmodel to reconstructX5subscript𝑋5X_{5}italic_X start_POSTSUBSCRIPT 5 end_POSTSUBSCRIPTgivenX1subscript𝑋1X_{1}italic_X start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPTorX3subscript𝑋3X_{3}italic_X start_POSTSUBSCRIPT 3 end_POSTSUBSCRIPTas input. TheDDwill then have the capability of jumping fromX1subscript𝑋1X_{1}italic_X start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPTandX3subscript𝑋3X_{3}italic_X start_POSTSUBSCRIPT 3 end_POSTSUBSCRIPTtoany point in the later trajectory(e.g.,X1subscript𝑋1X_{1}italic_X start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPTto any of{X2,⋯,X5}subscript𝑋2⋯subscript𝑋5\\{X_{2},\\cdots,X_{5}\\}{ italic_X start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT , ⋯ , italic_X start_POSTSUBSCRIPT 5 end_POSTSUBSCRIPT }).\nDuring generation (Sec.3.3), we can either do 1-step (X1→X5→subscript𝑋1subscript𝑋5X_{1}\\rightarrow X_{5}italic_X start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT → italic_X start_POSTSUBSCRIPT 5 end_POSTSUBSCRIPT) or 2-step generation (X1→X3→X5→subscript𝑋1subscript𝑋3→subscript𝑋5X_{1}\\rightarrow X_{3}\\rightarrow X_{5}italic_X start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT → italic_X start_POSTSUBSCRIPT 3 end_POSTSUBSCRIPT → italic_X start_POSTSUBSCRIPT 5 end_POSTSUBSCRIPT). Additionally, we can do generation with more steps by incorporating the teacher AR model in part of the generation process, such as 3-step generationX1→X2→X3→X5→subscript𝑋1subscript𝑋2→subscript𝑋3→subscript𝑋5X_{1}\\rightarrow X_{2}\\rightarrow X_{3}\\rightarrow X_{5}italic_X start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT → italic_X start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT → italic_X start_POSTSUBSCRIPT 3 end_POSTSUBSCRIPT → italic_X start_POSTSUBSCRIPT 5 end_POSTSUBSCRIPTwhereX2→X3→subscript𝑋2subscript𝑋3X_{2}\\rightarrow X_{3}italic_X start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT → italic_X start_POSTSUBSCRIPT 3 end_POSTSUBSCRIPTutilizes the AR model and other steps use theDDmodel.",
+                "position": 387
+            }
+        ]
+    },
+    {
+        "header": "4Related Work",
+        "images": []
+    },
+    {
+        "header": "5Experiments",
+        "images": []
+    },
+    {
+        "header": "6Limitations and Future Work",
+        "images": []
+    },
+    {
+        "header": "Acknowledgement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AProof ofProp.3.1",
+        "images": []
+    },
+    {
+        "header": "Appendix BModel Architecture Design",
+        "images": []
+    },
+    {
+        "header": "Appendix CExperimental Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DAdditional Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.17153/x5.png",
+                "caption": "Figure 7:The training curve of FID vs. epoch or iteration for different intermediate timesteps. FIDs are calculated with 5k generated sample.",
+                "position": 2167
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/x6.png",
+                "caption": "Figure 8:The training curve of FID vs. epoch for different dataset sizes. FIDs are calculated with 5k generated sample.",
+                "position": 2170
+            }
+        ]
+    },
+    {
+        "header": "Appendix EMore Related Work Discussions",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/var1_update_samenoise.png",
+                "caption": "Figure 9:Generation results with VAR model(Tian et al.,2024). From left to right: one-stepDDmodel, two-stepDDmodel,DD-pre-trained-4-6, and the pre-trained VAR model.",
+                "position": 2197
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/var2_update_samenoise.png",
+                "caption": "Figure 10:Generation results with VAR model(Tian et al.,2024). From left to right: one-stepDDmodel, two-stepDDmodel,DD-pre-trained-4-6, and the pre-trained VAR model.",
+                "position": 2200
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/llamagen1_update_samenoise.png",
+                "caption": "Figure 11:Generation results with LlamaGen model(Sun et al.,2024). From left to right: one-stepDDmodel, two-stepDDmodel,DD-pre-trained-41-81, and the pre-trained LlamaGen model.",
+                "position": 2203
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/llamagen2_update_samenoise.png",
+                "caption": "Figure 12:Generation results with LlamaGen model(Sun et al.,2024). From left to right: one-stepDDmodel, two-stepDDmodel,DD-pre-trained-41-81, and the pre-trained LlamaGen model.",
+                "position": 2206
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_1.png",
+                "caption": "Figure 13:Comparisons of text-to-image results between DD and the pre-trained LlamaGen model(Sun et al.,2024). Prompts without*are taken from the LAION-COCO dataset.",
+                "position": 2209
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_1.png",
+                "caption": "",
+                "position": 2223
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_2.png",
+                "caption": "",
+                "position": 2230
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_2.png",
+                "caption": "",
+                "position": 2230
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_4.png",
+                "caption": "",
+                "position": 2236
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_4.png",
+                "caption": "",
+                "position": 2236
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_5.png",
+                "caption": "",
+                "position": 2244
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_5.png",
+                "caption": "",
+                "position": 2244
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_6.png",
+                "caption": "",
+                "position": 2250
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_6.png",
+                "caption": "",
+                "position": 2250
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_7.png",
+                "caption": "",
+                "position": 2257
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_7.png",
+                "caption": "",
+                "position": 2257
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_3.png",
+                "caption": "Figure 14:Comparisons of text-to-image results between DD and the pre-trained LlamaGen modelSun et al. (2024). Prompts without*are taken from the LAION-COCO dataset.",
+                "position": 2263
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_3.png",
+                "caption": "",
+                "position": 2279
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_8.png",
+                "caption": "",
+                "position": 2286
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_8.png",
+                "caption": "",
+                "position": 2286
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_9.png",
+                "caption": "",
+                "position": 2294
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_9.png",
+                "caption": "",
+                "position": 2294
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_10.png",
+                "caption": "",
+                "position": 2300
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_11.png",
+                "caption": "",
+                "position": 2308
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_11.png",
+                "caption": "",
+                "position": 2308
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_17.png",
+                "caption": "",
+                "position": 2314
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_12.png",
+                "caption": "Figure 15:Comparisons of text-to-image results between DD and the pre-trained LlamaGen modelSun et al. (2024). Prompts without*are taken from the LAION-COCO dataset.",
+                "position": 2320
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_13.png",
+                "caption": "",
+                "position": 2339
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_13.png",
+                "caption": "",
+                "position": 2339
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_14.png",
+                "caption": "",
+                "position": 2345
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_14.png",
+                "caption": "",
+                "position": 2345
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_15.png",
+                "caption": "",
+                "position": 2353
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_15.png",
+                "caption": "",
+                "position": 2353
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_16.png",
+                "caption": "",
+                "position": 2359
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/dd_16.png",
+                "caption": "",
+                "position": 2359
+            },
+            {
+                "img": "https://arxiv.org/html/2412.17153/extracted/6089291/fig/t2i/teacher_18.png",
+                "caption": "",
+                "position": 2365
+            }
+        ]
+    },
+    {
+        "header": "Appendix FVisualization",
+        "images": []
+    }
+]
