@@ -28,13 +28,13 @@ else:
     log("No user file. Exit.")
 
 
-#----------------
-
+# GEMINI
+GEMINI_KEY = os.getenv("GEMINI_KEY")
 
 import google.generativeai as genai
 
 def get_text_gemini(prompt):
-    genai.configure(api_key="")
+    genai.configure(api_key=GEMINI_KEY)
     generation_config = {
     "temperature": 0.6,
     "top_p": 0.95,
@@ -49,7 +49,6 @@ def get_text_gemini(prompt):
     chat_session = model.start_chat(history=[])
     response = chat_session.send_message(prompt)
     return response.text
-#---------------------
 
 
 if urls:
@@ -470,31 +469,12 @@ def fix_titles(title, sections):
     )
 
 
-def make_summary(text, limit=5000):
-    system = "Ты ассистент, который объясняет статьи на тему машинного обучения. Ты используешь корректные термины: 'мультимодальный', 'мультиагентный', 'LLM', 'длинный контекст' и т.д. Ты отвечаешь на русском языке."
-
-    prompt = "Прочитай текст и напиши его понятное и подробное изложение. Не пиши лишние комментарии, нужен только сам обзор. Это должно выглядеть как изложение одного из разделов статьи, а не как начало отдельной статьи. Пиши на русском.\n\n%TEXT%"
-
-    first_history = [{"content": system, "role": "system"}]
-    query = prompt.replace("%TEXT%", text[:limit])
-    answer, _, _ = gd.chat.get_completion(
-        query, GIGA_TOKEN, history=first_history, model="GigaChat-Max"
-    )
-
-    answer = markdown.markdown(answer)
-
-    return answer
-
-
 def make_summary_gemini(text, limit=10000):
     prompt = f"Ты ассистент, который объясняет статьи на тему машинного обучения. Ты отвечаешь на русском языке.\n\nПрочитай текст и напиши его понятное и подробное изложение. Не пиши лишние комментарии (можешь добавлять только комментарии по сути статьи). Это должно выглядеть как изложение одного из разделов статьи, а не как начало отдельной статьи. Пиши на русском.\n\n{text[:limit]}"
     res = get_text_gemini(prompt)
     res = markdown.markdown(res)
     return res
 
-
-SECRET_KEY = "ZWFiNjNjMTEtYWUzMC00MGI1LTkyZjYtNzhmNzlmOWFkYTA3OjBlNDQ5MjFmLWFkZWUtNDgyNi1hODZlLWRmZjUyNjE5YWQ0NQ=="
-GIGA_TOKEN, _ = gd.chat.get_access_token(SECRET_KEY, scope="GIGACHAT_API_CORP")
 
 for paper in tqdm(feed["papers"]):
     paper["clean_sections"] = check_doc(paper)
