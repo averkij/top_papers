@@ -1,0 +1,104 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.02393/x1.png",
+                "caption": "",
+                "position": 75
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.02393/x2.png",
+                "caption": "Figure 1:Decoder-only transformer architecture (panel A), adapted here by using a GNN-based self-attention mechanism with a graph neural network (Figure3shows how GNN-Attention is constructed for the specific case of GIN-Attention). TherebyQ𝑄Qitalic_QandK𝐾Kitalic_Kvalues are used to construct a per-head adjacency matrix, which is then used to define a causal graph. Whereas in standard transformer models the multiplication withV𝑉Vitalic_Vcorresponds to a summation aggregation via a single linear layer, in GNN-Attenion we conduct more complex graph operations, including the designation of a GIN and PNA variant. As another variant (panel B) suitable for fine-tuning a pre-trained model akin to a LoRA model, we introduce another option where we retain the adjacency matrix predicted by the pretrained model but instead use it to construct a sparse adjacency matrix. A Sparse GIN is defined based on this and the signal from the original attention mechanism and the GIN output is added, whereas the GIN signal is scaled by a trainable scale parameter. In this variant, the pre-trained Transformer architecture is kept intact except for the addition of the Sparse GIN block.",
+                "position": 118
+            },
+            {
+                "img": "https://arxiv.org/html/2501.02393/x3.png",
+                "caption": "Figure 2:Visualization of adjacency matrices and interpretation of corresponding causal graphs. Panel A: Visual representation of an adjacency matrix for one specific layer and one head, extracted from a pretrained model. Panel B, left shows a large-scale adjacency matrix, where interaction strengths are color-coded, with annotations highlighting specific points of interest. Panel B, right displays the corresponding causal graph, illustrating directional relationships between nodes based on the adjacency matrix. These visualizations provide insights into the structural and causal relationships encoded in the adjacency matrices.",
+                "position": 134
+            }
+        ]
+    },
+    {
+        "header": "2Results and Discussion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.02393/x4.png",
+                "caption": "Figure 4:Training and validation performance of the regular transformer model (identified as “Reference” model)) and the GIN model. A, Training loss comparing the regular transformer and GIN model, over training epochs. B, Validation perplexity comparing the regular transformer and GIN model, over training epochs. C, Minimum validation loss measured across all epochs. The minimum validation loss is found in epoch 5 for the regular transformer model, and in epoch 8 for the GIN model.",
+                "position": 499
+            },
+            {
+                "img": "https://arxiv.org/html/2501.02393/x5.png",
+                "caption": "Figure 5:The distribution of the sharpening parameterαisubscript𝛼𝑖\\alpha_{i}italic_α start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPTacross all layersi𝑖iitalic_iin the GIN model at the end of training. The sharpening parameterαisubscript𝛼𝑖\\alpha_{i}italic_α start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPTcontrols the focus of the attention mechanism by scaling the logits before applying the softmax function. A value ofαi=1.0subscript𝛼𝑖1.0\\alpha_{i}=1.0italic_α start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT = 1.0corresponds to the standard softmax behavior, where no additional sharpening or smoothing is applied. The variation ofαisubscript𝛼𝑖\\alpha_{i}italic_α start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPTindicates how different layers adjust their focus during training. Layers withαi>1.0subscript𝛼𝑖1.0\\alpha_{i}>1.0italic_α start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT > 1.0exhibit sharper attention distributions, focusing more strongly on specific tokens, while layers withαi<1.0subscript𝛼𝑖1.0\\alpha_{i}<1.0italic_α start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT < 1.0produce smoother attention distributions, allowing a more even consideration of all tokens. This behavior reflects the adaptive nature of the GIN model in optimizing attention mechanisms for different layers to improve overall performance. All models are constructed to have approximately the same number of parameters, 25M.",
+                "position": 505
+            },
+            {
+                "img": "https://arxiv.org/html/2501.02393/x6.png",
+                "caption": "Figure 6:Minimum training loss and minimum validation perplexity measured, across a variety of cases. The case identified as “Reference” is a regular transformer architecture. Cases considered include PNA attention, GIN attention, and variations within each scenario. The best performing model with lowest validation perplexity is GIN attention with softmax and a MLP multiplierγ𝛾\\gammaitalic_γof 0.5, with trainable sharpening parameter. Except for one case, all GIN model architectures perform better than the reference standard attention. None of the PNA architectures improves upon the reference case, suggesting that this architectural concept is not viable.",
+                "position": 516
+            },
+            {
+                "img": "https://arxiv.org/html/2501.02393/x7.png",
+                "caption": "Figure 7:Further training dynamics analysis. Panel A: Generalization gap for selected cases that perform well overall, measured after 9 training epochs. The reference model shows the highest generalization gap, indicating overfitting. Models using GIN (Graph Isomorphism Network) with Softmax and varying MLP multipliers demonstrate reduced generalization gaps, with the GIN configuration using a multiplierγ𝛾\\gammaitalic_γof 0.5 and sharpening achieving without o_proj one of the lowest gaps. The PNA configuration with SharpSoftplus activation and a fixed threshold also exhibits improved generalization compared to the reference. This comparison highlights the effect of architectural choices on model generalization. Panel B: Ratio of lowest training loss to lowest validation loss achieved. The lowest ratio is also found for the GIN model using a multiplierγ𝛾\\gammaitalic_γof 0.5 and sharpening achieving without o_proj.",
+                "position": 522
+            },
+            {
+                "img": "https://arxiv.org/html/2501.02393/x8.png",
+                "caption": "Figure 8:Minimum validation perplexity as a function of the GIN MLP multiplier ratioγ𝛾\\gammaitalic_γ. The plot demonstrates the relationship between the GIN MLP multipliedγ𝛾\\gammaitalic_γand validation perplexity for various configurations:MLP_mult=0.5, sharpening,MLP_mult=0.5,MLP_mult=1, andMLP_mult=4. The data points are fitted with a power law trend line, indicating an increase in validation perplexity as the GIN MLP multiplier ratio grows. Configurations with lower MLP ratios (e.g.,MLP_mult=0.5) exhibit better validation perplexity, suggesting a trade-off between multiplier ratio and generalization.",
+                "position": 528
+            },
+            {
+                "img": "https://arxiv.org/html/2501.02393/x9.png",
+                "caption": "Figure 9:Performance of LoRA fine-tuning (panel A) and sparse GIN fine-tuning. In sparse GIN fine-tuning, we interpret the attention matrix computed by the pre-trained model as an adjacency matrix. Here, we sum attention matrices across all heads and clamp at 1.0, and then use it as an input to a GIN model. Only adjancy matrix values above a threshold of 0.2 are considered, introducing a sparseness and computational efficiency. Both LoRA and sparse GIN feature the same number of trainable parameters. Panel A: Training loss over epochs for LoRA and sparse GIN. Sparse GIN demonstrates faster convergence and lower final training loss compared to LoRA, indicating improved optimization efficiency. Panel B: Validation perplexity over epochs for LoRA and sparse GIN. Sparse GIN achieves lower perplexity across all epochs, suggesting better generalization to unseen data.",
+                "position": 678
+            },
+            {
+                "img": "https://arxiv.org/html/2501.02393/x10.png",
+                "caption": "Figure 10:Trainable scale parameterλ𝜆\\lambdaitalic_λover all layers in the model, plotted over all epochs. The trainable scale parameter delineates the relative importance of the sparse GIN as it is added to the original signal. The plot illustrates how the scale parameter evolves over both the layer index and the epoch fraction. Early in training, higher layers exhibit stronger scaling values, indicating a higher reliance on sparse GIN adjustments. As training progresses, the scaling values stabilize, suggesting convergence in the relative importance of the sparse GIN contributions across layers. The color gradient reflects the magnitude of the scale parameter, with warmer colors (red) indicating higher values and cooler colors (blue) indicating lower values. This visualization provides insights into the adaptive behavior of the trainable scale parameter over the course of training.",
+                "position": 684
+            },
+            {
+                "img": "https://arxiv.org/html/2501.02393/x11.png",
+                "caption": "Figure 11:Global dynamics of the trainable scale parameterλ𝜆\\lambdaitalic_λduring training and across model layers.\nPanel A visualizes the average trainable scale parameter over training steps. The plot illustrates a rapid decline in the average scale parameter during the initial stages of training, indicating early adaptation of the sparse GIN contributions. After the initial drop, the scale stabilizes and gradually increases slightly, suggesting the model fine-tunes the integration of sparse GIN as training progresses. Panel B displays the trainable scale parameter for each layer at the last epoch. The scale parameter exhibits an increasing trend from lower to higher layers, reflecting the progressively stronger reliance on sparse GIN in deeper layers of the model. This layer-wise scaling suggests that deeper layers benefit more from the structural adjustments provided by sparse GIN.",
+                "position": 691
+            }
+        ]
+    },
+    {
+        "header": "3Conclusion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.02393/x12.png",
+                "caption": "Figure 13:Exploration of future alternative graph-based attention and Transformer models that engage heavily with coarse-grained representations. Panel A: Tokens are mapped into different levels of coarser representations, in which then graph operations are conducted. For decoding, one can either find suitable methods to decode coarse tokens (in a way that respects causality) or decode tokens at the fine level during inference and task solution as done in[58]. Panel B: Scaled coarse-grained attention, where we simplify the computation of adjacency matrices by conducting their construction in a coarse representation space. For computing graph operations, these coarse adjacency are upscaled (using bilinear, nearest cubic, etc. algorithms) to the full-scale resolution, where they are used to conduct graph operations. The advantage of the latter approach is that it remains fully causal.",
+                "position": 1058
+            }
+        ]
+    },
+    {
+        "header": "4Materials and Methods",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.02393/x13.png",
+                "caption": "Figure 14:Sharpening and thresholding techniques implemented to sparsify the attention matrix for use as fine-tuning algorithm. This plot shows the results of sharpening (τ𝜏\\tauitalic_τandα𝛼\\alphaitalic_α) and thresholding (ε𝜀\\varepsilonitalic_ε). As one can see, sharpening yields sharper distributions, which are then sparsified using the discrete threshold to yield close to binary adjacancy matrices. As reference, for the Sparse GIN fine-tuning model, we useτ=0.1𝜏0.1\\tau=0.1italic_τ = 0.1, a sharpening value ofα=10.0𝛼10.0\\alpha=10.0italic_α = 10.0, and a sparsification threshold ofε=0.6𝜀0.6\\varepsilon=0.6italic_ε = 0.6.",
+                "position": 1238
+            }
+        ]
+    },
+    {
+        "header": "Code and data",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
