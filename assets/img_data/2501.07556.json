@@ -1,0 +1,77 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.07556/x1.png",
+                "caption": "Figure 1:Capabilities of the image matching model pre-trained by our framework.Green lines indicate the identified corresponding pixel localizations between images.\nUsingthe same network weight, the detector-free matcher[78]with Transformer exhibits impressive generalization abilities across extensive unseen real-world single- and cross-modality matching tasks, benefiting diverse applications in disciplines such as (a) medical image analysis, (b) histopathology, (c) remote sensing, autonomous systems including (d) UAV positioning, (e) autonomous driving, and more.The figure is best viewed in color and with zoom-in for clarity.",
+                "position": 154
+            },
+            {
+                "img": "https://arxiv.org/html/2501.07556/x2.png",
+                "caption": "Figure 2:Comparisons on cross-modality tomography image registration datasets.Our trained models are compared with four representative baselines.Parts aandbare the results of the Harvard Brain dataset and Liver CT-MR dataset respectively.\nThe curve of the success rate (SR) metric under different thresholds is shown on the left-up side of each part, where the detailed comparisons with relative improvements on SR@10 pixels metric are shown on the left-down side.\nQualitative comparisons of predicted matches and aligned images are shown on the right side of each section.\nThe matches are colored by the match error, where the green color means that the match error is less than 5 pixels.\nFor a full table of quantitative comparisons with baselines, see the Extended Data Tab.2.",
+                "position": 204
+            }
+        ]
+    },
+    {
+        "header": "2Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.07556/x3.png",
+                "caption": "Figure 3:Results on cross-modality histology registration and retina image registration tasks.Parts a, bshow the results of the histology registration task evaluated on the ANHIR dataset and the results of the retina image registration task using the FIRE dataset.\nFor each part, the upper table shows the quantitative comparisons with state-of-the-art baselines, whereas the lower figure shows the matching and registration results of our trained models.",
+                "position": 246
+            },
+            {
+                "img": "https://arxiv.org/html/2501.07556/x4.png",
+                "caption": "Figure 4:Results on visible-thermal registration tasks.Our trained models are compared with four representative baselines.Parts a, b, cshow the results on remote sensing, aerial view, and ground view scenes respectively.\nThe left column of each part shows the quantitative comparisons with baselines using success rates (SR) with a range of thresholds, as well as the detailed comparisons with relative improvements using SR@10 pixels for Part a, and SR@10°°\\degree°forParts b, c.\nThe right column shows the qualitative comparisons with baselines in terms of matching quality and registration error.\nThe green matches mean the match errors are less than 5 pixels for Part a and epipolar error is less than3×10−33superscript1033\\times 10^{-3}3 × 10 start_POSTSUPERSCRIPT - 3 end_POSTSUPERSCRIPTforParts b, c.\nThe aligned images and warping errors are shown in Part a and the pose estimation errors are shown inPart b, c.\nFor a full table of quantitative comparisons with baselines, see Extended Data Tab.2.",
+                "position": 270
+            },
+            {
+                "img": "https://arxiv.org/html/2501.07556/x5.png",
+                "caption": "Figure 5:Results on visible-SAR and visible-vectorized map registration tasksare shown inParts a, brespectively.\nOur trained models are compared with four representative baselines.\nThe left column shows the quantitative comparisons with baselines using success rate (SR) metrics at a range of thresholds, as well as the detailed comparisons using SR@10 pixels with the relative improvements of our methods over baselines.\nThe right column compares the matching quality and images aligned by the transformations recovered from matches.\nForPart b, the matches are colored by the match errors, where the green means the error is within 5 pixels.\nFor a full table of quantitative comparisons with baselines, see Extended Data Tab.2.",
+                "position": 315
+            }
+        ]
+    },
+    {
+        "header": "3Discussion",
+        "images": []
+    },
+    {
+        "header": "4Methods",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.07556/x6.png",
+                "caption": "Figure 6:Method Overview.a.We first introduce two types of transformer-based detector-free matching architectures, including dense and semi-dense, serving as base models for our pre-training framework.b.The proposed large-scale universal cross-modality pre-training framework consists of(1)a multi-resource dataset mixture engine designed to generate image pairs with ground truth matches by integrating the strengths of various data types. This engine is composed of (i) multi-view images with known geometry datasets that obtain ground truth matches by warping pixels using depth maps to other images; (ii) video sequences by leveraging the continuity inherent in video frames to construct point trajectories in a coarse-to-fine manner, and then build training pairs with pseudo ground truth matches between distant frames;\n(iii) image warping that sample transformations to construct synthetic image pairs with perspective changes for large-scale single image datasets.(2)Subsequently, cross-modality training pairs are generated to train matching models in learning fundamental image structure and geometric information, which is achieved by using image generation models to obtain pixel-aligned images in other modalities, and then substituted for the original image in the training pairs.",
+                "position": 382
+            }
+        ]
+    },
+    {
+        "header": "Supplementary Material",
+        "images": []
+    },
+    {
+        "header": "Appendix ADetails about training data generation",
+        "images": []
+    },
+    {
+        "header": "Appendix BExperimental details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.07556/x7.png",
+                "caption": "Figure 7:Extended Data Figure 1:Construct training pairs with ground truth matches for unlabelled video sequences.For training with large-scale unlabelled video sequence datasets, we propose a coarse-to-fine framework to construct ground truth matches between distant image frames with challenging perspective changes by leveraging the continuity of video sequences.\n(1). Given a set of consecutive framesIi,j,k,lsubscriptI𝑖𝑗𝑘𝑙\\textbf{I}_{i,j,k,l}I start_POSTSUBSCRIPT italic_i , italic_j , italic_k , italic_l end_POSTSUBSCRIPT, we perform image matching using a state-of-the-art detector-free matcher[20]between near frames, which is relatively easy matching task due to the small perspective changes between adjacent frames.\nThe confidence scores associated with each match are visually represented by color shades.\nThese near-frame matches are used to construct point trajectories, which are crucial for establishing matches between distant frames.\nHowever, the detector-free matchers are dependent on each image pair, where applying them to multiple images will lead to inconsistencies, resulting in fragmentary trajectories, as highlighted by the red circle in step (2).\nThe proposed coarse-to-fine framework addresses this problem by first aggregating all matches and their corresponding confidence scores across frames for each image. For instance, in step (2), we demonstrate the aggregated matches forIjsubscriptI𝑗\\textbf{I}_{j}I start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPT.\n(3) Next, we apply a non-maximum suppression process over the frame using a window size of7×7777\\times 77 × 7with matching confidence as a criterion.\nThis process can merge the fragmented matches into a single localization with the highest confidence within their local neighborhood, resulting in continuous trajectories.\nDespite obtaining continuous trajectories, the merging process can reduce their accuracy due to point movements.\nTo correct this, we perform (4) multi-view refinement of the entire trajectory using a transformer-based approach[25], achieving precise trajectories.\nThese refined trajectories allow us to establish accurate matches between distant framesIisubscriptI𝑖\\textbf{I}_{i}I start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPTandIlsubscriptI𝑙\\textbf{I}_{l}I start_POSTSUBSCRIPT italic_l end_POSTSUBSCRIPT, which serve as ground truths for training.",
+                "position": 2202
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
