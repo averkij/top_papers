@@ -1,0 +1,290 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.09755/x1.png",
+                "caption": "Figure 1:Our learnings from scaling ViTok.We showcase our ViTok architecture (left) and key findings (right) from scaling auto-encoders for image and video reconstruction and generation. We enhance traditional CNN-based auto-encoders by integrating Vision Transformers (ViTs) with an upgraded Llama architecture into an asymmetric auto-encoder framework formingVision Transformer Tokenizeror ViTok. Visual inputs are embedded as patches or tubelets, processed by a compact Llama Encoder, and bottlenecked to create a latent code. The encoded representation is then upsampled and handled by a larger Llama Decoder to reconstruct the input. Color-coded text boxes highlight the effects of scaling the encoder, adjusting the bottleneck size, and expanding the decoder. Additionally, we discuss trade-offs in loss optimization and the model’s adaptability to video data. Our best performing ViTok variant achieves competitive performance with prior state-of-the-art tokenizers while reducing computational burden.",
+                "position": 195
+            }
+        ]
+    },
+    {
+        "header": "2Background",
+        "images": []
+    },
+    {
+        "header": "3Bottlenecks, Scaling, and Trade-offs in Visual Tokenization",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.09755/x2.png",
+                "caption": "Figure 2:256p image reconstruction sweep over floating pointsE𝐸Eitalic_E.We evaluate ViTok S-B trained with stage 1 (Section2.3) using combinations of patch sizesp∈8,16,32𝑝81632p\\in{8,16,32}italic_p ∈ 8 , 16 , 32and channel widthsc∈4,8,16,32,64𝑐48163264c\\in{4,8,16,32,64}italic_c ∈ 4 , 8 , 16 , 32 , 64to investigate how the total floating pointsE=2562p2⋅c𝐸⋅superscript2562superscript𝑝2𝑐E=\\frac{256^{2}}{p^{2}}\\cdot citalic_E = divide start_ARG 256 start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT end_ARG start_ARG italic_p start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT end_ARG ⋅ italic_cinfluences FID, IS, SSIM, and PSNR in reconstruction tasks. Our findings reveal a strong correlation betweenlog⁡(E)𝐸\\log(E)roman_log ( italic_E )andlog⁡(rFID)rFID\\log(\\text{rFID})roman_log ( rFID ),log⁡(E)𝐸\\log(E)roman_log ( italic_E )andrIS,log⁡(E)𝐸\\log(E)roman_log ( italic_E )andrSSIM, as well aslog⁡(E)𝐸\\log(E)roman_log ( italic_E )andrPSNR, independent of the number of FLOPs utilized by the auto-encoder. This indicates thatE𝐸Eitalic_Eis the primary bottleneck for reconstruction, irrespective of the code shape or FLOPs expended. Additionally, similar trends are observed across the ImageNet-1K and COCO datasets, indicating that these patterns are consistent regardless of the dataset used.",
+                "position": 378
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/0_truth.png",
+                "caption": "Figure 3:256p image reconstruction visualization over floating pointsE𝐸Eitalic_E.Example reconstructions for varying the number of floating pointsE𝐸Eitalic_Evalues on ViTok S-B/16, achieved by adjusting the channel sizec=64,32,16,8,4𝑐64321684c={64,32,16,8,4}italic_c = 64 , 32 , 16 , 8 , 4for each image across the row. AsE𝐸Eitalic_Edecreases, high-frequency details diminish, with small colors and fine details gradually lost. WhenE<4096𝐸4096E<4096italic_E < 4096, textures merge, and significant detail loss becomes apparent.",
+                "position": 396
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/0_cw64.png",
+                "caption": "",
+                "position": 412
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/0_cw32.png",
+                "caption": "",
+                "position": 413
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/0_cw16.png",
+                "caption": "",
+                "position": 414
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/0_cw8.png",
+                "caption": "",
+                "position": 415
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/0_cw4.png",
+                "caption": "",
+                "position": 416
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/2_truth.png",
+                "caption": "",
+                "position": 419
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/2_cw64.png",
+                "caption": "",
+                "position": 420
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/2_cw32.png",
+                "caption": "",
+                "position": 421
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/2_cw16.png",
+                "caption": "",
+                "position": 422
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/2_cw8.png",
+                "caption": "",
+                "position": 423
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/2_cw4.png",
+                "caption": "",
+                "position": 424
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/3_truth.png",
+                "caption": "",
+                "position": 427
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/3_cw64.png",
+                "caption": "",
+                "position": 428
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/3_cw32.png",
+                "caption": "",
+                "position": 429
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/3_cw16.png",
+                "caption": "",
+                "position": 430
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/3_cw8.png",
+                "caption": "",
+                "position": 431
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/recon_processed/3_cw4.png",
+                "caption": "",
+                "position": 432
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/x3.png",
+                "caption": "Figure 4:512p Image reconstruction overE𝐸Eitalic_E.We evaluate ViTok S-B trained with stage 1 (Section2.3) across all combinations of patch sizesp∈8,16,32𝑝81632p\\in{8,16,32}italic_p ∈ 8 , 16 , 32and a fixed channel widthc=16𝑐16c=16italic_c = 16, analyzing how the total floating-point operations, calculated asE=5122p2⋅c𝐸⋅superscript5122superscript𝑝2𝑐E=\\frac{512^{2}}{p^{2}}\\cdot citalic_E = divide start_ARG 512 start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT end_ARG start_ARG italic_p start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT end_ARG ⋅ italic_c, influence reconstruction metrics such as FID, IS, SSIM, and PSNR.E𝐸Eitalic_Eshows trends similar to 256p results (Figure2). However, achieving comparable rPSNR/rSSIM to 256p requires4×E4𝐸4\\times E4 × italic_Efor 512p reconstruction, which indicates that compression ratio of pixels to channels should be fixed to maintain performance.",
+                "position": 478
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/x4.png",
+                "caption": "Figure 5:256p image generation overE𝐸Eitalic_E.We evaluate each tokenizer from Figure2on DiT following Section2.3. Results for CFG scales of 1.5 and 3.0 are on the left two and right two plots respectively. Our results show no strong linear correlation betweenlog⁡(E)𝐸\\log(E)roman_log ( italic_E )and generation performance. Instead, a second-order trend reveals an optimalE𝐸Eitalic_Efor each patch sizep𝑝pitalic_p, indicating a complex interplay betweenE𝐸Eitalic_Eandc𝑐citalic_c. This highlights the necessity of optimizing both parameters to balance reconstruction quality with generative capabilities.",
+                "position": 498
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/x5.png",
+                "caption": "Figure 6:Encoder scaling on 256p image reconstruction.We evaluate reconstruction metrics of ViTok trained with stage 1 (Section2.3) over model sizes S-S, B-S, S-B, B-B, B-L, L-L with fixedp=16,c=16,L=256,E=4096formulae-sequence𝑝16formulae-sequence𝑐16formulae-sequence𝐿256𝐸4096p=16,c=16,L=256,E=4096italic_p = 16 , italic_c = 16 , italic_L = 256 , italic_E = 4096. There is no correlation between encoder size and reconstruction performance indicating that scaling the encoder is unhelpful in improving reconstruction capabilities. This argues that visual encoding does not require much computation.",
+                "position": 517
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/x6.png",
+                "caption": "Figure 7:Decoder scaling on 256p image reconstruction.Using the results from Figure6, we plot various decoder sizes (S, B, L) over reconstruction performance. There is a strong correlation between decoder size and reconstruction performance, which indicates scaling the decoder improves reconstruction. Although, increasing the decoder size from Base to Large does not provide the same boost of performance as doublingE𝐸Eitalic_Eto8192819281928192from4096409640964096.",
+                "position": 523
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/x7.png",
+                "caption": "Figure 8:Encoder scaling on 256p image generation.We evaluate each tokenizer from Figure6on DiT following Section2.3. We plot encoder size over generation metric results for CFG scales of 1.5 and 3.0 on the left two and right two plots respectively. There is a weak negative correlation between encoder size and final performance indicating that scaling the encoder is harmful for generation results. This is coupled by the fact that increased encoder sizes make training slower due to increased computational overhead.",
+                "position": 535
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/x8.png",
+                "caption": "Figure 9:Decoder scaling on 256p image generation.Using the results from Figure6, we plot various decoder sizes (S, B, L) over generation performance. We plot decoder size over generation metric results for CFG scales of 1.5 and 3.0 on the left two and right two plots respectively. Unlike reconstruction, there is no clear correlation between decoder size and generation performance. This indicates that scaling the decoder has minimal benefits overall for auto-encoding.",
+                "position": 541
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/x9.png",
+                "caption": "Figure 10:Metric trade-offs in 256p image reconstruction.We train ViTok S-B/16 with stage 1 (Section2.3), varying the LPIPS (LP in figure) weightλ∈{0.0,0.5,1.0}𝜆0.00.51.0\\lambda\\in\\{0.0,0.5,1.0\\}italic_λ ∈ { 0.0 , 0.5 , 1.0 }and using either L1 or L2 MSE reconstruction loss (Equation1). Additionally, we finetune ViTok S-B/16 with stage 2 and include the result as L2+LP+GAN. The results indicate that enhancing rFID/rIS scores through increased perceptual and visual losses requires a trade-off with rSSIM/rPSNR, resulting in loss of information from the original image. This indicates the decoder’s role as a generative component.",
+                "position": 575
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/x10.png",
+                "caption": "Figure 11:256p video reconstruction results overE𝐸Eitalic_E.We train ViTok S-B with stage 1 (Section2.3) on 16×\\times×256×\\times×256 videos at 8 fps, varying tubelet patch sizesp∈{8,16,32}𝑝81632p\\in\\{8,16,32\\}italic_p ∈ { 8 , 16 , 32 }and temporal stridesq∈{1,2,4,8}𝑞1248q\\in\\{1,2,4,8\\}italic_q ∈ { 1 , 2 , 4 , 8 }with a channel sizec=16𝑐16c=16italic_c = 16. Reconstruction performance is evaluated using rFID per frame, rFVD, rSSIM, and rPSNR on the Kinetics-700 validation, UCF101 training, and Shutterstock validation datasets. The results exhibit a similar trend to image reconstruction in Figure2, demonstrating a strong correlation betweenE𝐸Eitalic_Eand reconstruction performance. Expectantly, videos are more compressible than a direct scaling from images would suggest; instead of requiring 16×\\times×E𝐸Eitalic_E, achieving comparable rFID, rSSIM, and rPSNR to 256p image reconstruction only necessitates 4–8×\\times×E𝐸Eitalic_E.",
+                "position": 614
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/x11.png",
+                "caption": "Figure 12:56p video reconstruction results detailed overE𝐸Eitalic_E.We label patch and tubelet sizes from tokenizers trained in Figure11, we focus on just UCF-101 dataset due to its higher motion. For equivalentE𝐸Eitalic_E, lower temporal strides are slightly more effective for better results but overall there is little benefit in trading off temporal stride for patch size in ViTok for videos.E𝐸Eitalic_Eis still the dominating factor in predicted reconstruction performance.",
+                "position": 617
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/x12.png",
+                "caption": "Figure 13:Multi-frame 256p video reconstruction.We train ViTok S-B/4x16 with stage 1 (Section2.3) on 16-, 32-, and 64-frame 256p videos and evaluate reconstruction metrics on the UCF-101 dataset. The results indicate that increasing the number of frames generally improves performance, demonstrating that ViTok leverages higher redundancy in videos to achieve more efficient relative compression with same compression ratio or pixels per channelT×H×W×3E𝑇𝐻𝑊3𝐸\\frac{T\\times H\\times W\\times 3}{E}divide start_ARG italic_T × italic_H × italic_W × 3 end_ARG start_ARG italic_E end_ARG.",
+                "position": 620
+            }
+        ]
+    },
+    {
+        "header": "4Experimental Comparison",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/gen_viz_processed/cfg_main_256p.png",
+                "caption": "Figure 14:256p image generation examples.We show randomly selected 256p image generation examples from our DiT-XL trained using the ViTok S-B/16 variant for 4 million steps at a batch size of 256. Images were sampled with 250 steps using the DDIM sampler and a CFG weight of 4.0.",
+                "position": 664
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/gen_viz_processed/cfg_main_512p.png",
+                "caption": "Figure 15:512p image generation examples.We show randomly selected 512p image generation examples from our DiT-XL trained using the ViTok S-B/16 variant for 4 million steps at a batch size of 256. Images were sampled with 250 steps using the DDIM sampler and a CFG weight of 4.0.",
+                "position": 667
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/figs/gen_figure_videos_1024.png",
+                "caption": "Figure 16:128p video generation examples.We show randomly selected 16×\\times×128×\\times×128 video generation examples from our DiT-L trained with ViTok S-B/4x8 variant. Videos are sampled with 250 steps and a CFG weight of 2.0.",
+                "position": 670
+            }
+        ]
+    },
+    {
+        "header": "5Related Work",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "7Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "8Extra Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.09755/x13.png",
+                "caption": "Figure 17:256p Detailed Image Reconstruction Results with Fixed Architecture Size.We provide more details for the sweep in Figure2on the just the ImageNet-1K validation set. For1024≤E≤163841024𝐸163841024\\leq E\\leq 163841024 ≤ italic_E ≤ 16384, where intersections ofE𝐸Eitalic_Eexist across patch sizes, we see very little variation in performance for fixedE𝐸Eitalic_E. This indicates thatE𝐸Eitalic_Eis the main bottleneck for visual auto-encoding and is not influence by increasing FLOPs.",
+                "position": 2077
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/x14.png",
+                "caption": "Figure 18:Finetuning the Decoder with a GAN.We study the effects of finetuning the decoder in ViTok S-B/16 on 256p images. We compare: (1) no GAN finetuning, (2) different discriminator learning rates, (3) an increased GAN loss weight (0.1), and (4) a full finetuning of all model parameters (including the encoder). The best results occur with a discriminator learning rate of2×10−52superscript1052\\times 10^{-5}2 × 10 start_POSTSUPERSCRIPT - 5 end_POSTSUPERSCRIPT, while higher rates cause instabilities. We also observe a clear shift toward more generative behavior: as the decoder gains better IS/FID, it sacrifices some SSIM/PSNR, reflecting its transition into a stronger generative component.",
+                "position": 2090
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/x15.png",
+                "caption": "Figure 19:256p Simple vs Latent ViTok Results.We implement a latent variant of ViTok S-B/16, withp=16𝑝16p=16italic_p = 16andL∈{64,128,256,512,1024}𝐿641282565121024L\\in\\{64,128,256,512,1024\\}italic_L ∈ { 64 , 128 , 256 , 512 , 1024 }latent tokens appended to the original patch embedding, then processed using full self-attention, and subsequently bottlenecked toc=16𝑐16c=16italic_c = 16. Although this latent variant slightly underperforms the simpler version in rFID/rIS, it remains comparable overall and follows the same rules asE𝐸Eitalic_E. Consequently, it provides an alternative to Simple ViTok with greater control over the latent space.",
+                "position": 2148
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/x16.png",
+                "caption": "Figure 20:256p Adaptive Masking ViTok Results.We investigate variations of ViTok S-B/16 that apply token masking after encoding. We consider two approaches:Mask Simple, which masks the patch tokens following encoding, andMask Latent, which introduces latent tokens (like the architecture used for Figure19) and masks them. At stage 1 training time we randomly selected token lengths{32,64,128,256}3264128256\\{32,64,128,256\\}{ 32 , 64 , 128 , 256 }withc=16𝑐16c=16italic_c = 16, then at inference evaluate each model on every token length and compare to the simple ViTok baseline at similarE𝐸Eitalic_E. While the masking variations underperform the simple variant, they still perform strongly.Mask Simpletends to perform better at higherE𝐸Eitalic_E, whileMask Latentachieves better results at lowerE𝐸Eitalic_E.",
+                "position": 2166
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/figs/gen_figures_videos_512.png",
+                "caption": "Figure 21:512 Token Video Generation Examples.We show randomly selected 16×\\times×128×\\times×128 video generation examples from our DiT-L trained at 512 tokens using the B-B/4x8 variant auto-encoder. Videos are sampled with 250 steps and a CFG weight of 2.0.",
+                "position": 2195
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/figs/gen_figures_videos_256.png",
+                "caption": "Figure 22:256 Token Video Generation Examples.We show randomly selected 16×\\times×128×\\times×128 video generation examples from our DiT-L trained at 256 tokens using the B-B/4x8 variant auto-encoder. Videos are sampled with 250 steps and a CFG weight of 2.0.",
+                "position": 2198
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/gen_viz_processed/gen_8_cw4.png",
+                "caption": "Figure 23:Channel size generation visualization 256p forp=8𝑝8p=8italic_p = 8.We show example generations for various compression ratios on ViTok S-B/8 from Figure22. Herec=4𝑐4c=4italic_c = 4has the best visuals that look close to good images, whilec=16𝑐16c=16italic_c = 16generally looks good as well but not as good.c=64𝑐64c=64italic_c = 64looks very poor and the images do not look realistic.",
+                "position": 2208
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/gen_viz_processed/gen_8_cw16.png",
+                "caption": "",
+                "position": 2220
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/gen_viz_processed/gen_8_cw64.png",
+                "caption": "",
+                "position": 2226
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/gen_viz_processed/gen_16_cw4.png",
+                "caption": "Figure 24:Channel size generation visualization 256p forp=16𝑝16p=16italic_p = 16.We show example generations for various compression ratios on ViTok S-B/16 from Figure22. Herec=16𝑐16c=16italic_c = 16has the best visuals that look close to good images, whilec=64𝑐64c=64italic_c = 64suffers artifacts that worsen image quality.c=4𝑐4c=4italic_c = 4suffers from poor reconstruction quality from the auto-encoder.",
+                "position": 2232
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/gen_viz_processed/gen_16_cw16.png",
+                "caption": "",
+                "position": 2244
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/gen_viz_processed/gen_16_cw64.png",
+                "caption": "",
+                "position": 2250
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/gen_viz_processed/gen_32_cw4.png",
+                "caption": "Figure 25:Channel size generation visualization 256p forp=32𝑝32p=32italic_p = 32.We show example generations for various compression ratios on ViTok S-B/32 from Figure22. Herec=64𝑐64c=64italic_c = 64has the best visuals overall but the high channel sizes make the image quality look poor and jumbled. Bothc−16𝑐16c-16italic_c - 16andc=4𝑐4c=4italic_c = 4suffers from poor reconstruction quality from the auto-encoder.",
+                "position": 2256
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/gen_viz_processed/gen_32_cw16.png",
+                "caption": "",
+                "position": 2268
+            },
+            {
+                "img": "https://arxiv.org/html/2501.09755/extracted/6134830/gen_viz_processed/gen_32_cw64.png",
+                "caption": "",
+                "position": 2274
+            }
+        ]
+    },
+    {
+        "header": "9Visualizations",
+        "images": []
+    }
+]
