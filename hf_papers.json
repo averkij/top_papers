@@ -4,9 +4,9 @@
         "en": "January 22",
         "zh": "1月22日"
     },
-    "time_utc": "2025-01-22 21:07",
+    "time_utc": "2025-01-22 22:09",
     "weekday": 2,
-    "issue_id": 1813,
+    "issue_id": 1814,
     "home_page_url": "https://huggingface.co/papers",
     "papers": [
         {
@@ -14,7 +14,7 @@
             "title": "Agent-R: Training Language Model Agents to Reflect via Iterative Self-Training",
             "url": "https://huggingface.co/papers/2501.11425",
             "abstract": "Large Language Models (LLMs) agents are increasingly pivotal for addressing complex tasks in interactive environments. Existing work mainly focuses on enhancing performance through behavior cloning from stronger experts, yet such approaches often falter in real-world applications, mainly due to the inability to recover from errors. However, step-level critique data is difficult and expensive to collect. Automating and dynamically constructing self-critique datasets is thus crucial to empowering models with intelligent agent capabilities. In this work, we propose an iterative self-training framework, Agent-R, that enables language Agent to Reflect on the fly. Unlike traditional methods that reward or penalize actions based on correctness, Agent-R leverages MCTS to construct training data that recover correct trajectories from erroneous ones. A key challenge of agent reflection lies in the necessity for timely revision rather than waiting until the end of a rollout. To address this, we introduce a model-guided critique construction mechanism: the actor model identifies the first error step (within its current capability) in a failed trajectory. Starting from it, we splice it with the adjacent correct path, which shares the same parent node in the tree. This strategy enables the model to learn reflection based on its current policy, therefore yielding better learning efficiency. To further explore the scalability of this self-improvement paradigm, we investigate iterative refinement of both error correction capabilities and dataset construction. Our findings demonstrate that Agent-R continuously improves the model's ability to recover from errors and enables timely error correction. Experiments on three interactive environments show that Agent-R effectively equips agents to correct erroneous actions while avoiding loops, achieving superior performance compared to baseline methods (+5.59%).",
-            "score": 53,
+            "score": 54,
             "issue_id": 1798,
             "pub_date": "2025-01-20",
             "pub_date_card": {
@@ -56,6 +56,59 @@
                 "zh": {
                     "title": "Agent-R：实时反思，提升学习效率",
                     "desc": "大型语言模型（LLMs）在复杂任务的交互环境中变得越来越重要。现有研究主要通过模仿更强专家的行为来提升性能，但这种方法在实际应用中常常失败，主要是因为无法从错误中恢复。为了解决这个问题，我们提出了一种迭代自我训练框架Agent-R，使语言代理能够实时反思。Agent-R通过构建训练数据来纠正错误轨迹，从而提高模型的学习效率和错误恢复能力。"
+                }
+            }
+        },
+        {
+            "id": "https://huggingface.co/papers/2501.11873",
+            "title": "Demons in the Detail: On Implementing Load Balancing Loss for Training Specialized Mixture-of-Expert Models",
+            "url": "https://huggingface.co/papers/2501.11873",
+            "abstract": "This paper revisits the implementation of Load-balancing Loss (LBL) when training Mixture-of-Experts (MoEs) models. Specifically, LBL for MoEs is defined as N_E sum_{i=1}^{N_E} f_i p_i, where N_E is the total number of experts, f_i represents the frequency of expert i being selected, and p_i denotes the average gating score of the expert i. Existing MoE training frameworks usually employ the parallel training strategy so that f_i and the LBL are calculated within a micro-batch and then averaged across parallel groups. In essence, a micro-batch for training billion-scale LLMs normally contains very few sequences. So, the micro-batch LBL is almost at the sequence level, and the router is pushed to distribute the token evenly within each sequence. Under this strict constraint, even tokens from a domain-specific sequence (e.g., code) are uniformly routed to all experts, thereby inhibiting expert specialization. In this work, we propose calculating LBL using a global-batch to loose this constraint. Because a global-batch contains much more diverse sequences than a micro-batch, which will encourage load balance at the corpus level. Specifically, we introduce an extra communication step to synchronize f_i across micro-batches and then use it to calculate the LBL. Through experiments on training MoEs-based LLMs (up to 42.8B total parameters and 400B tokens), we surprisingly find that the global-batch LBL strategy yields excellent performance gains in both pre-training perplexity and downstream tasks. Our analysis reveals that the global-batch LBL also greatly improves the domain specialization of MoE experts.",
+            "score": 48,
+            "issue_id": 1797,
+            "pub_date": "2025-01-21",
+            "pub_date_card": {
+                "ru": "21 января",
+                "en": "January 21",
+                "zh": "1月21日"
+            },
+            "hash": "370d057fec504963",
+            "authors": [
+                "Zihan Qiu",
+                "Zeyu Huang",
+                "Bo Zheng",
+                "Kaiyue Wen",
+                "Zekun Wang",
+                "Rui Men",
+                "Ivan Titov",
+                "Dayiheng Liu",
+                "Jingren Zhou",
+                "Junyang Lin"
+            ],
+            "affiliations": [
+                "Qwen Team, Alibaba Group",
+                "Stanford University",
+                "University of Edinburgh"
+            ],
+            "pdf_title_img": "assets/pdf/title_img/2501.11873.jpg",
+            "data": {
+                "categories": [
+                    "#optimization",
+                    "#architecture",
+                    "#training"
+                ],
+                "emoji": "⚖️",
+                "ru": {
+                    "title": "Глобальный подход к балансировке нагрузки экспертов в MoE моделях",
+                    "desc": "Статья предлагает новый подход к реализации функции потерь балансировки нагрузки (LBL) при обучении моделей Mixture-of-Experts (MoE). Авторы предлагают вычислять LBL на уровне глобального батча, а не микро-батча, что позволяет ослабить ограничения на распределение токенов между экспертами. Эксперименты на крупномасштабных языковых моделях показывают, что этот метод улучшает перплексию при предобучении и результаты на задачах downstream. Анализ также демонстрирует улучшение специализации экспертов по доменам."
+                },
+                "en": {
+                    "title": "Enhancing Expert Specialization with Global-Batch Load-Balancing",
+                    "desc": "This paper focuses on improving the Load-balancing Loss (LBL) in training Mixture-of-Experts (MoEs) models. The authors highlight that traditional methods use micro-batches, which limit the diversity of sequences and hinder expert specialization. They propose a new approach that utilizes global-batches, allowing for a broader range of sequences and better load balancing across the entire dataset. Experimental results show that this global-batch LBL method significantly enhances model performance and expert specialization in large language models."
+                },
+                "zh": {
+                    "title": "全局批次提升混合专家模型的负载均衡与专业化",
+                    "desc": "本文重新审视了在训练混合专家模型（MoEs）时的负载均衡损失（LBL）实现。我们提出使用全局批次来计算LBL，以打破微批次的严格约束，从而在语料库层面上促进负载均衡。通过在训练中引入额外的通信步骤来同步专家选择频率，实验结果显示全局批次LBL策略在预训练困惑度和下游任务中均显著提升了性能。我们的分析表明，全局批次LBL还大大改善了MoE专家的领域专业化。"
                 }
             }
         },
@@ -123,59 +176,6 @@
             }
         },
         {
-            "id": "https://huggingface.co/papers/2501.11873",
-            "title": "Demons in the Detail: On Implementing Load Balancing Loss for Training Specialized Mixture-of-Expert Models",
-            "url": "https://huggingface.co/papers/2501.11873",
-            "abstract": "This paper revisits the implementation of Load-balancing Loss (LBL) when training Mixture-of-Experts (MoEs) models. Specifically, LBL for MoEs is defined as N_E sum_{i=1}^{N_E} f_i p_i, where N_E is the total number of experts, f_i represents the frequency of expert i being selected, and p_i denotes the average gating score of the expert i. Existing MoE training frameworks usually employ the parallel training strategy so that f_i and the LBL are calculated within a micro-batch and then averaged across parallel groups. In essence, a micro-batch for training billion-scale LLMs normally contains very few sequences. So, the micro-batch LBL is almost at the sequence level, and the router is pushed to distribute the token evenly within each sequence. Under this strict constraint, even tokens from a domain-specific sequence (e.g., code) are uniformly routed to all experts, thereby inhibiting expert specialization. In this work, we propose calculating LBL using a global-batch to loose this constraint. Because a global-batch contains much more diverse sequences than a micro-batch, which will encourage load balance at the corpus level. Specifically, we introduce an extra communication step to synchronize f_i across micro-batches and then use it to calculate the LBL. Through experiments on training MoEs-based LLMs (up to 42.8B total parameters and 400B tokens), we surprisingly find that the global-batch LBL strategy yields excellent performance gains in both pre-training perplexity and downstream tasks. Our analysis reveals that the global-batch LBL also greatly improves the domain specialization of MoE experts.",
-            "score": 47,
-            "issue_id": 1797,
-            "pub_date": "2025-01-21",
-            "pub_date_card": {
-                "ru": "21 января",
-                "en": "January 21",
-                "zh": "1月21日"
-            },
-            "hash": "370d057fec504963",
-            "authors": [
-                "Zihan Qiu",
-                "Zeyu Huang",
-                "Bo Zheng",
-                "Kaiyue Wen",
-                "Zekun Wang",
-                "Rui Men",
-                "Ivan Titov",
-                "Dayiheng Liu",
-                "Jingren Zhou",
-                "Junyang Lin"
-            ],
-            "affiliations": [
-                "Qwen Team, Alibaba Group",
-                "Stanford University",
-                "University of Edinburgh"
-            ],
-            "pdf_title_img": "assets/pdf/title_img/2501.11873.jpg",
-            "data": {
-                "categories": [
-                    "#optimization",
-                    "#architecture",
-                    "#training"
-                ],
-                "emoji": "⚖️",
-                "ru": {
-                    "title": "Глобальный подход к балансировке нагрузки экспертов в MoE моделях",
-                    "desc": "Статья предлагает новый подход к реализации функции потерь балансировки нагрузки (LBL) при обучении моделей Mixture-of-Experts (MoE). Авторы предлагают вычислять LBL на уровне глобального батча, а не микро-батча, что позволяет ослабить ограничения на распределение токенов между экспертами. Эксперименты на крупномасштабных языковых моделях показывают, что этот метод улучшает перплексию при предобучении и результаты на задачах downstream. Анализ также демонстрирует улучшение специализации экспертов по доменам."
-                },
-                "en": {
-                    "title": "Enhancing Expert Specialization with Global-Batch Load-Balancing",
-                    "desc": "This paper focuses on improving the Load-balancing Loss (LBL) in training Mixture-of-Experts (MoEs) models. The authors highlight that traditional methods use micro-batches, which limit the diversity of sequences and hinder expert specialization. They propose a new approach that utilizes global-batches, allowing for a broader range of sequences and better load balancing across the entire dataset. Experimental results show that this global-batch LBL method significantly enhances model performance and expert specialization in large language models."
-                },
-                "zh": {
-                    "title": "全局批次提升混合专家模型的负载均衡与专业化",
-                    "desc": "本文重新审视了在训练混合专家模型（MoEs）时的负载均衡损失（LBL）实现。我们提出使用全局批次来计算LBL，以打破微批次的严格约束，从而在语料库层面上促进负载均衡。通过在训练中引入额外的通信步骤来同步专家选择频率，实验结果显示全局批次LBL策略在预训练困惑度和下游任务中均显著提升了性能。我们的分析表明，全局批次LBL还大大改善了MoE专家的领域专业化。"
-                }
-            }
-        },
-        {
             "id": "https://huggingface.co/papers/2501.12224",
             "title": "TokenVerse: Versatile Multi-concept Personalization in Token Modulation Space",
             "url": "https://huggingface.co/papers/2501.12224",
@@ -234,7 +234,7 @@
             "title": "UI-TARS: Pioneering Automated GUI Interaction with Native Agents",
             "url": "https://huggingface.co/papers/2501.12326",
             "abstract": "This paper introduces UI-TARS, a native GUI agent model that solely perceives the screenshots as input and performs human-like interactions (e.g., keyboard and mouse operations). Unlike prevailing agent frameworks that depend on heavily wrapped commercial models (e.g., GPT-4o) with expert-crafted prompts and workflows, UI-TARS is an end-to-end model that outperforms these sophisticated frameworks. Experiments demonstrate its superior performance: UI-TARS achieves SOTA performance in 10+ GUI agent benchmarks evaluating perception, grounding, and GUI task execution. Notably, in the OSWorld benchmark, UI-TARS achieves scores of 24.6 with 50 steps and 22.7 with 15 steps, outperforming Claude (22.0 and 14.9 respectively). In AndroidWorld, UI-TARS achieves 46.6, surpassing GPT-4o (34.5). UI-TARS incorporates several key innovations: (1) Enhanced Perception: leveraging a large-scale dataset of GUI screenshots for context-aware understanding of UI elements and precise captioning; (2) Unified Action Modeling, which standardizes actions into a unified space across platforms and achieves precise grounding and interaction through large-scale action traces; (3) System-2 Reasoning, which incorporates deliberate reasoning into multi-step decision making, involving multiple reasoning patterns such as task decomposition, reflection thinking, milestone recognition, etc. (4) Iterative Training with Reflective Online Traces, which addresses the data bottleneck by automatically collecting, filtering, and reflectively refining new interaction traces on hundreds of virtual machines. Through iterative training and reflection tuning, UI-TARS continuously learns from its mistakes and adapts to unforeseen situations with minimal human intervention. We also analyze the evolution path of GUI agents to guide the further development of this domain.",
-            "score": 25,
+            "score": 27,
             "issue_id": 1797,
             "pub_date": "2025-01-21",
             "pub_date_card": {
@@ -916,7 +916,7 @@
             "title": "MSTS: A Multimodal Safety Test Suite for Vision-Language Models",
             "url": "https://huggingface.co/papers/2501.10057",
             "abstract": "Vision-language models (VLMs), which process image and text inputs, are increasingly integrated into chat assistants and other consumer AI applications. Without proper safeguards, however, VLMs may give harmful advice (e.g. how to self-harm) or encourage unsafe behaviours (e.g. to consume drugs). Despite these clear hazards, little work so far has evaluated VLM safety and the novel risks created by multimodal inputs. To address this gap, we introduce MSTS, a Multimodal Safety Test Suite for VLMs. MSTS comprises 400 test prompts across 40 fine-grained hazard categories. Each test prompt consists of a text and an image that only in combination reveal their full unsafe meaning. With MSTS, we find clear safety issues in several open VLMs. We also find some VLMs to be safe by accident, meaning that they are safe because they fail to understand even simple test prompts. We translate MSTS into ten languages, showing non-English prompts to increase the rate of unsafe model responses. We also show models to be safer when tested with text only rather than multimodal prompts. Finally, we explore the automation of VLM safety assessments, finding even the best safety classifiers to be lacking.",
-            "score": 6,
+            "score": 7,
             "issue_id": 1802,
             "pub_date": "2025-01-17",
             "pub_date_card": {
