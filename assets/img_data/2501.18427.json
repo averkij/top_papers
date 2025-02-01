@@ -1,0 +1,175 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.18427/x1.png",
+                "caption": "Figure 1:The overall framework of SANA-1.5.(a) Model Growth: We initialize the large model with a pre-trained small model, and train the large model with 8-bit CAME, which largely accelerates the training convergence and reduces VRAM requirements. (b) Model Pruning: After training the large model, smaller models of different sizes are pruned and fine-tuned for different situations. (c-d) Inference Scaling: We repeat generating many samples with SANA and use VLM as a verifier to select the best-of-N samples, which largely boosts the quality.",
+                "position": 167
+            }
+        ]
+    },
+    {
+        "header": "2Methods",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.18427/x2.png",
+                "caption": "Figure 2:Training efficiency comparison of different initialization strategies.Training curves on GenEval benchmark for SANA-1.5 4.8B using model growth strategyvstraining from scratch. Our model growth approach achieves the same performance (0.70 GenEval) with 60% fewer training steps, significantly improving training efficiency.",
+                "position": 196
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/x3.png",
+                "caption": "Figure 3:Comparing Scaling Between Denoising Steps and Samples with VLM Judgment Visualization. (a) Scaling denoising steps show only minor improvements and often fail to self-correct artifacts, making it a poor option for scaling up. (b) In contrast, scaling sampling noise proves more effective, with VLM specialists helping to verify and select images that match the prompts. (c) VLM evaluates and ranks the best images in a tournament format.",
+                "position": 344
+            }
+        ]
+    },
+    {
+        "header": "3Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.18427/x4.png",
+                "caption": "Figure 4:Visual comparison of SANA-1.5 models with different pruned configurations.Our adaptive depth pruning enables efficient compression to various model sizes (from 1.6B to 4.8B). While aggressive pruning may slightly affect fine-grained details, the semantic content is well preserved, and the overall image quality can be easily recovered after brief fine-tuning (100 steps on 1 GPU), demonstrating the effectiveness of our pruning strategy.",
+                "position": 680
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/extracted/6166825/figures/D20-BI.png",
+                "caption": "(a)SANA 1.6B trained from scratch.",
+                "position": 683
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/extracted/6166825/figures/D20-BI.png",
+                "caption": "(a)SANA 1.6B trained from scratch.",
+                "position": 686
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/extracted/6166825/figures/D60-scratch.png",
+                "caption": "(b)SANA-4.8B trained from scratch.",
+                "position": 691
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/extracted/6166825/figures/D60-anno.png",
+                "caption": "(c)SANA 4.8B with model growth.",
+                "position": 696
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/extracted/6166825/figures/optimizer_loss_comparison_with_ema.png",
+                "caption": "Figure 6:Training loss curvesfor different optimizers on a 1.6B parameter diffusion model. The CAME-8bit reduces memory consumption by 25% compared to AdamW while maintaining the convergence speed.",
+                "position": 730
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/extracted/6166825/figures/optimizer_loss_comparison_with_ema.png",
+                "caption": "Figure 6:Training loss curvesfor different optimizers on a 1.6B parameter diffusion model. The CAME-8bit reduces memory consumption by 25% compared to AdamW while maintaining the convergence speed.",
+                "position": 733
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/extracted/6166825/figures/8_growth_strategy.png",
+                "caption": "Figure 7:Comparison of different initialization strategies.Partial Preservation Init shows stable training behavior while Cyclic and Block Replication strategies suffer from training instability (NaN losses).",
+                "position": 738
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/x5.png",
+                "caption": "Figure 8:Inference-time Scaling Results. Scaling up inference time compute consistently yields better GenEval scores, and helps the small model to achieve comparable or better performance with larger ones.",
+                "position": 743
+            }
+        ]
+    },
+    {
+        "header": "4Related Work",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix AFull Related Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BVLM Finetuning Details for Inference-Time Scaling",
+        "images": []
+    },
+    {
+        "header": "Appendix CMore Implementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.18427/x6.png",
+                "caption": "Figure 9:Architecture design of linear self-attention and cross-attention blocks in SANA.Both attention blocks incorporate RMSNorm on query and key for training large model more stable, where linear self-attention is used for content encoding and vanilla cross-attention for text condition injection.",
+                "position": 937
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/x7.png",
+                "caption": "Figure 10:Illustration of initialization strategies.(a) Partial Preservation Init, which preserves the pre-trained layers and randomly initialize the new layers. (b) Cyclic Replication Init, which repeats the pre-trained layers periodically. (c) Block Replication Init, which extends each pre-trained layer into consecutive layers.",
+                "position": 945
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/x8.png",
+                "caption": "Figure 11:Performance comparison of model growth and training from scratch across FID, CLIP score, and DPGBench metrics.Our model growth strategy demonstrates superior performance over training from scratch, achieving either better results within the same training duration or equivalent performance with approximately 60% less training time.",
+                "position": 948
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/x9.png",
+                "caption": "Figure 12:Illustration of our multi-lingual prompt translation pipeline.We leverage GPT-4 to translate 100k English prompts into four formats: (1) Pure English (2) Pure Chinese (3) English-Chinese mixture (4) Emoji-mixed prompts. Example shows a single English prompt translated into these parallel versions, demonstrating how we construct our multi-lingual training data.",
+                "position": 965
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/x10.png",
+                "caption": "Figure 13:More illustration of the multi-lingual dataset.",
+                "position": 968
+            }
+        ]
+    },
+    {
+        "header": "Appendix DMore Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.18427/extracted/6166825/figures/multiling_sana_vis.png",
+                "caption": "Figure 14:SANA’s multi-lingual capabilities unlocked through efficient fine-tuning.Comparing image generation quality between baseline model (left, English-only training) and our model (right, fine-tuned with 100k multi-lingual samples) on mixed English/Chinese/emoji prompts.",
+                "position": 987
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/x11.png",
+                "caption": "Figure 15:Comparison among different sizes of SANA 1.5 and SANA 1.0.With model scaling and pruning, SANA 1.5 achieves better performance than SANA 1.0 of the same size, while maintaining flexibility in model capacity selection. Larger models demonstrate enhanced capabilities in detail rendering, image quality, and semantic alignment.",
+                "position": 990
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/x12.png",
+                "caption": "(a)Prompt: a photo of a purple suitcase and an orange pizza",
+                "position": 1000
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/x12.png",
+                "caption": "(a)Prompt: a photo of a purple suitcase and an orange pizza",
+                "position": 1003
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/x13.png",
+                "caption": "(b)Prompt: a photo of an orange tennis racket and a yellow sports ball",
+                "position": 1011
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/x14.png",
+                "caption": "Figure 17:High-resolution image generation examples from SANA 1.5, showcasing its capabilities in the accurate prompt following, spatial reasoning, text rendering, and aesthetics across different styles and aspect ratios.",
+                "position": 1026
+            },
+            {
+                "img": "https://arxiv.org/html/2501.18427/x15.png",
+                "caption": "Figure 18:Visual comparison of image generation results before and after prompt enhancement.For each example, the left shows the result from the original simple prompt, while the right demonstrates the output with enhanced prompt, showing improved visual quality and richer details.",
+                "position": 1035
+            }
+        ]
+    },
+    {
+        "header": "Appendix EDiscussion of Potential Misuse of SANA-1.5",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
