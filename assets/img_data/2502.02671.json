@@ -1,0 +1,145 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.02671/x1.png",
+                "caption": "Figure 1:Overview of our controlled experimental setup.Usually, the teacher model is trained on expert data before being distilled into the student LM. In the controlled setup of this paper, the teacher is itself distilled from an additional oracle model. This oracle model allows us to measure the quality of the distillation process into the student, and to reveal“teacher hacking”.",
+                "position": 153
+            }
+        ]
+    },
+    {
+        "header": "2Preliminaries",
+        "images": []
+    },
+    {
+        "header": "3Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.02671/x2.png",
+                "caption": "Figure 2:Overview of the training pipeline.Two stages: (1) promptsx𝑥xitalic_xfrom a task-specific real dataset are used by the oracle model to generate the oracle pairs(x,y)𝑥𝑦(x,y)( italic_x , italic_y ), and afterwards, this dataset is used to get initial SFT checkpoints for both teacher and student model; (2) prompts from the same distribution are used to perform knowledge distillation, where the teacher model serves as a proxy to train the student model.",
+                "position": 317
+            },
+            {
+                "img": "https://arxiv.org/html/2502.02671/x3.png",
+                "caption": "Figure 3:Overview of the evaluation pipeline.We use the validation prompt dataset to measure the golden metric (the distance between the oracle and the student models) and the proxy metric (the distance between the teacher and the student models).",
+                "position": 354
+            }
+        ]
+    },
+    {
+        "header": "4Experimental results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.02671/x4.png",
+                "caption": "Figure 4:Proxy-Golden plot (offline data source).We distill a T5-large teacher into a T5-base student on the XSUM dataset. The token-level training loss is the forward KL, the proxy metric is the distance to the teacher distribution and the golden metric is the distance to the ground-truth (oracle) distribution (available thanks to our semi-synthetic controlled experimental setup).\nIn this plot, thex𝑥xitalic_x-axis (proxy metric) indicates optimization progress, and they𝑦yitalic_y-axis shows the ground-truth performance (golden metric): lower is better. Teacher hacking occurs in the case of offline data source: the orange curve has a U-type shape, indicating that during optimization, the orange metric starts increasing, whereas the proxy metric continues to decrease.",
+                "position": 383
+            },
+            {
+                "img": "https://arxiv.org/html/2502.02671/x5.png",
+                "caption": "Figure 5:Impact of using offline vs. online data sources.When using a fixed offline dataset, though the proxy metric continues to decrease, this is not visible in the golden metric, which continues to increase, a phenomenon we call teacher hacking. However, when using online response sampling, both from the teacher model or from the student model, this phenomenon does not occur.",
+                "position": 389
+            },
+            {
+                "img": "https://arxiv.org/html/2502.02671/x6.png",
+                "caption": "Figure 6:Impact of diversity of offline data sources.We regulate the diversity of the dataset by decreasing the number of prompts in2/5252/52 / 5times and providing2/5252/52 / 5-times more generations for each existing prompt, while preserving the size of the dataset.\nWhereas the dynamics of the train loss and proxy metric are almost the same, the effect of teacher hacking becomes more evident with a less diverse dataset.",
+                "position": 399
+            },
+            {
+                "img": "https://arxiv.org/html/2502.02671/x7.png",
+                "caption": "Figure 7:Impact of generation budget for offline data sources.As the number of generations per prompt increases, both proxy and golden metrics improve, suggesting that the effect of teacher hacking is decreasing.",
+                "position": 482
+            }
+        ]
+    },
+    {
+        "header": "5Related work",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Impact statement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.02671/x8.png",
+                "caption": "Figure 8:Impact of the dataset choice: offline vs. online data sources.We verify our claims on the presence of teacher hacking in the case of offline data sources for two different tasks: the translation task on WMT-14 en-de (top row) and the instruction following task on Natural Instruction (bottom row). In general, the behavior of the curves is the same across all the datasets: for online data sources, both proxy and golden metrics are decreasing. At the same time, for offline data sources, the proxy metric is decreasing or stagnating, whereas the golden metric is clearly increasing.",
+                "position": 1133
+            },
+            {
+                "img": "https://arxiv.org/html/2502.02671/x9.png",
+                "caption": "",
+                "position": 1137
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAdditional experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.02671/x10.png",
+                "caption": "Figure 9:Impact of the dataset choice: dataset diversity.Across other datasets, we can notice that the impact of diversity is still present for the instruction-following task but not for the translation task. It can be explained by the initially small diversity of the WMT-14 dataset.",
+                "position": 1149
+            },
+            {
+                "img": "https://arxiv.org/html/2502.02671/x11.png",
+                "caption": "",
+                "position": 1153
+            },
+            {
+                "img": "https://arxiv.org/html/2502.02671/x12.png",
+                "caption": "Figure 10:Impact of the dataset choice: generation budget.We additionally confirm the claim on the positive impact of a larger number of generations per prompt across two other datasets.",
+                "position": 1178
+            },
+            {
+                "img": "https://arxiv.org/html/2502.02671/x13.png",
+                "caption": "",
+                "position": 1182
+            },
+            {
+                "img": "https://arxiv.org/html/2502.02671/x14.png",
+                "caption": "Figure 11:Impact of the model sizes: offline vs. online data sources.We examine the train loss and proxy/golden metrics for two model size pairs: T5-base as the teacher and T5-small as the student (top), and T5-large as the teacher and T5-small as the student (bottom). For both pairs, no teacher hacking occurs with online data generation. However, teacher hacking is observed during distillation from T5-base to T5-small, as the proxy metric stagnates while the golden metric decreases. In contrast, distillation from T5-large to T5-small shows behavior consistent with standard overfitting as the proxy metric slightly increases. This may be attributed to the larger difference in model sizes.",
+                "position": 1210
+            },
+            {
+                "img": "https://arxiv.org/html/2502.02671/x15.png",
+                "caption": "",
+                "position": 1214
+            },
+            {
+                "img": "https://arxiv.org/html/2502.02671/x16.png",
+                "caption": "Figure 12:Impact of the loss type: offline vs. online data sources.We can observe that the effect of teacher hacking appears regardless of the choice of loss function.",
+                "position": 1225
+            },
+            {
+                "img": "https://arxiv.org/html/2502.02671/x17.png",
+                "caption": "",
+                "position": 1229
+            },
+            {
+                "img": "https://arxiv.org/html/2502.02671/x18.png",
+                "caption": "Figure 13:Mixture of offline and online data.This plot compares strategies for combining offline and online data during the distillation process. The results show that incorporating just 10% online student data significantly reduces the effect of teacher hacking, causing the golden metric to stabilize rather than increase. At the same time, the usage of at least 50% of the online generated data allows to avoid the effect of teacher hacking completely.",
+                "position": 1268
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAdditional details",
+        "images": []
+    },
+    {
+        "header": "Appendix CHyperparameters",
+        "images": []
+    }
+]
