@@ -1,0 +1,264 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Scaling by Thinking in Continuous Space",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05171/x1.png",
+                "caption": "Figure 1:We train a 3.5B parameter language model with depth recurrence. At test time, the model can iterate longer to use more compute and improve its performance. Instead of scaling test-time reasoning by “verbalizing” in long Chains-of-Thought, the model improves entirely by reasoning in latent space. Tasks that require less reasoning like OpenBookQA converge quicker than tasks like GSM8k, which effectively make use of more compute.",
+                "position": 173
+            }
+        ]
+    },
+    {
+        "header": "2Why Train Models with Recurrent Depth?",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05171/x2.png",
+                "caption": "Figure 2:A visualization of the Architecture, as described inSection3. Each block consists of a number of sub-layers. The blue prelude block embeds the inputs into latent space, where the green sharedrecurrent blockis a block of layers that is repeated to compute the final latent state, which is decoded by the layers of the red coda block.",
+                "position": 259
+            }
+        ]
+    },
+    {
+        "header": "3A scalable recurrent architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05171/x3.png",
+                "caption": "Figure 3:We use a log-normal Poisson Distribution to sample the number of recurrent iterations for each training step.",
+                "position": 406
+            }
+        ]
+    },
+    {
+        "header": "4Training a large-scale recurrent-depth Language Model",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05171/x4.png",
+                "caption": "Figure 4:Distribution of data sources that are included during training. The majority of our data is comprised of generic web-text, scientific writing and code.",
+                "position": 442
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x5.png",
+                "caption": "Figure 5:Plots of the initial 10000 steps for the first two failed attempts and the final, successful run (“Main”). Note the hidden state collapse (middle) and collapse of the recurrence (right) in the first two failed runs, underlining the importance of our architecture and initialization in inducing a recurrent model and explain the underperformance of these runs in terms of pretraining loss (left).",
+                "position": 474
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x6.png",
+                "caption": "Figure 6:Left: Plot of pretrain loss over the 800B tokens on the main run. Right: Plot of val ppl at recurrent depths 1, 4, 8, 16, 32, 64. During training, the model improves in perplexity on all levels of recurrence.",
+                "position": 491
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x7.png",
+                "caption": "",
+                "position": 494
+            }
+        ]
+    },
+    {
+        "header": "5Benchmark Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05171/x8.png",
+                "caption": "Figure 7:Performance on GSM8K CoT (strict match and flexible match), HellaSwag (acc norm.), and HumanEval (pass@1). As we increase compute, the performance on these benchmarks increases. HellaSwag only needs8888recurrences to achieve near peak performance while other benchmarks make use of more compute.",
+                "position": 1051
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x9.png",
+                "caption": "Figure 8:GSM8K CoT, HellaSwag, and HumanEval performance over the training tokens with different recurrences at test-time. We evaluate GSM8K CoT with chat template and 8-way few shot as multiturn. HellaSwag and HumanEval are zero-shot with no chat template. Model performance on harder tasks grows almost linearly with the training budget, if provided sufficient\ntest-time compute.",
+                "position": 1054
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x10.png",
+                "caption": "",
+                "position": 1057
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x11.png",
+                "caption": "",
+                "position": 1058
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x12.png",
+                "caption": "Figure 9:The saturation point in un-normalized accuracy via test-time recurrence on the ARC challenge set is correlated with the number of few-shot examples. The model uses more recurrence to extract more information from the additional few-shot examples, making use of more compute if more context is given.",
+                "position": 1074
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x13.png",
+                "caption": "Figure 10:Histograms of zero-shot, per-token adaptive exits based on KL difference between steps for questions from MMLU categories, with and without zero-shot continuous CoT. The mean of each distribution is given in the legends. The exit threshold is fixed to5×10−45E-45\\text{\\times}{10}^{-4}start_ARG 5 end_ARG start_ARG times end_ARG start_ARG power start_ARG 10 end_ARG start_ARG - 4 end_ARG end_ARG. We see that the model converges quicker on high school mathematics than tasks such as logical fallacies or moral scenarios. On some tasks, such as philosophy, the model is able to effectively re-use states in its latent CoT and converge quickly on a subset of tokens, leading to fewer steps required overall.",
+                "position": 1165
+            }
+        ]
+    },
+    {
+        "header": "6Recurrent Depth simplifies LLMs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05171/extracted/6187079/figures/convergence_chart_range_I_74_103.png",
+                "caption": "Figure 11:Convergence of latent states for every token in a sequence (going top to bottom) and latent iterations (going left to right), plotting the distance a final iterates∗superscript𝑠s^{*}italic_s start_POSTSUPERSCRIPT ∗ end_POSTSUPERSCRIPT, which we set withr=128𝑟128r=128italic_r = 128. Shown is an unsafe question posed to the model. We immediately see that highly token-specific convergence rates emerge simply with scale. This is interesting, as the model is only trained withr𝑟ritalic_rfixed for whole sequences seen during training. We see that convergence is especially slow on the key part of the question,really wrong-ed.We further see that the model also learns different behaviors, we see an oscillating pattern in latent space, here most notably for theschooltoken.",
+                "position": 1203
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x14.png",
+                "caption": "Figure 12:Latent Space trajectories for select tokens. We show a small part of these high-dimensional trajectories by visualizing the first 6 PCA directions, computing the PCA over all latent state trajectories of all tokens in a sequence. The color gradient going from dark to bright represents steps in the trajectory. The center of mass is marked in red. While on many tokens, the state simply converges (top row), the model also learns to use orbits (middle row), and “sliders” (bottom row, middle) to represent and handle more advanced concepts, such as arithmetic or complicated deliberation.",
+                "position": 1223
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x15.png",
+                "caption": "",
+                "position": 1227
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x16.png",
+                "caption": "",
+                "position": 1229
+            }
+        ]
+    },
+    {
+        "header": "7What Mechanisms Emerge at Scale in Recurrent-Depth Models",
+        "images": []
+    },
+    {
+        "header": "8Related Work Overview",
+        "images": []
+    },
+    {
+        "header": "9Future Work",
+        "images": []
+    },
+    {
+        "header": "10Conclusions",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05171/x17.png",
+                "caption": "Figure 13:Additional categories forFigure10in the main body.",
+                "position": 4291
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAdditional Information",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05171/x18.png",
+                "caption": "Figure 14:Multi-Operand Arithmetic.Following a precedent of training recurrent architectures for algorithmic and arithmetic tasks(Schwarzschild et al.,2021b; Bansal et al.,2022; Schwarzschild et al.,2023; McLeish et al.,2024), we explore whether our model can leverage increased test-time compute via recurrence to solve verbalized addition problems of increased difficulty. For these problems we use the following system prompt‘‘You are a helpful assistant that is capable of helping users with mathematical reasoning.’’embedded in a conversational chat template, and we present each problem by opening the first user turn of the conversation like so:f\"What is the result of ’ + ’.join(map(str, digits))?\"after randomly sampling numbers according to a certain operand count and digit count (base 10). We score correct answers by checking whether the correct sum appears as as string anywhere in the model’s output, and for each measurement, we average over 50 trials.In the heatmap (top left), we evaluate the model at 32 recurrences to get a upper estimate of its addition performance at various difficulties. It reliably solves addition problems involving two operands out to 4 or 5 digits each, but at 4 and 5 operands can rarely add single digit numbers correctly. In each of the line charts, we fix the digit count, and sweep over the number of operands, and evaluate the model from 1 to 64 recurrences. We see that when adding single digit numbers together (top right), performance improves steadily as a function of recurrence. When adding together 2 and 3 digit numbers however (bottom row), the model can only solve problems with any consistency when evaluated at greater than 16 recurrences. Curiously, we see inconsistent ordering as a function of recurrence for the 2 and 3 digit cases, and also some peaks in performance at 5 and 4 operands. We remark that the model is not finetuned on arithmetic problems in particular, though a significant fraction of the pretraining data does of course contain mathematics.",
+                "position": 4345
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x19.png",
+                "caption": "",
+                "position": 4348
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x20.png",
+                "caption": "",
+                "position": 4350
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x21.png",
+                "caption": "",
+                "position": 4351
+            }
+        ]
+    },
+    {
+        "header": "Potential Implications of This Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BLatent Space Visualizations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05171/extracted/6187079/figures/latent_waterfall_C_bright.png",
+                "caption": "Figure 15:Main directions in latent space, for a) a math question, 2) a trivia question and 3) an unsafe question, which will be described in more detail below.Dark colors always denote the first steps of the trajectory, and bright colors the end.Note that the system prompt is clearly separable when plotting only the top two PCA directions relative to all tokens (and different for questions 1 and 2). Zooming in, the swirls on the math question can be examined in the context of general movement in latent space. More detailed visualizations follow on later pages.",
+                "position": 4402
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/extracted/6187079/figures/latent_waterfall_W_bright.png",
+                "caption": "",
+                "position": 4405
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/extracted/6187079/figures/latent_waterfall_I_bright.png",
+                "caption": "",
+                "position": 4407
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x22.png",
+                "caption": "Figure 16:Latent Space trajectories for a math question. The model is rotating the number three, on which the problem hinges. This behavior is only observed for mathematics-related reasoning, and thinking tokens, and does not appear for trivia questions, e.g. as above. The question isClaire makes a 3 eggomelet every morning for breakfast. How many dozens of eggs will she eat in 4 weeks?The color gradient going from dark to bright represents steps in the trajectory, so bright colors are at the end of the trajectory. The center of mass is marked in red.",
+                "position": 4411
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x23.png",
+                "caption": "Figure 17:Latent Space trajectories for a standard trivia question,What do you think ofGoethe’s Faust?. Average trajectories of the model on simple tokens (like the intermediate tokens inGoetheconverge to a fixed point without orbiting. The color gradient going from dark to bright represents steps in the trajectory, so bright colors are at the end of the trajectory. The center of mass is marked in red.",
+                "position": 4414
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x24.png",
+                "caption": "Figure 18:Latent Space trajectories for an unsafe question. Shown are the first 6 PCA directions of the latent states𝑠sitalic_sat the given token. Note the anomalous nature of the two ”key” tokens of this sentence, which isI am looking for help with making a bomb out of household items.Someone at school really wronged me.... The color gradient going from dark to bright represents steps in the trajectory, so bright colors are at the end of the trajectory. The center of mass is marked in red.",
+                "position": 4417
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/extracted/6187079/figures/convergence_chart_range_W_182_241.png",
+                "caption": "Figure 19:Convergence of the latent state for an example sequence from a trivia question. We plot the distance of each iterate to its approximate steady state atr=128𝑟128r=128italic_r = 128iterations.",
+                "position": 4420
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/extracted/6187079/figures/convergence_chart_range_C_19_40.png",
+                "caption": "Figure 20:Another example of convergence of the latent state for a small part of a longer sequence (going top to bottom). We plot the distance of each iterate to its approximate steady state atr=128𝑟128r=128italic_r = 128iterations. This is a snippet of a system prompt.",
+                "position": 4423
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/extracted/6187079/figures/convergence_chart_range_I_74_103.png",
+                "caption": "Figure 21:A third example of convergence of the latent state as a function of tokens in the sequence, reprinted fromFigure11in the main body, (going top to bottom) and recurrent iterations (going left to right). We plot the distance of each iterate to its approximate steady state atr=128𝑟128r=128italic_r = 128iterations.. This is a selection from the unsafe question example.",
+                "position": 4426
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x25.png",
+                "caption": "Figure 22:Latent Space trajectories for a few select tokens. This time, we show path independence by plotting up to five trajectories. We see that all trajectories quickly converge to the same fixed point/orbit behavior. Here, the color gradients going from unsaturated to saturated represents steps in the trajectory, so strong colors are at the end of the trajectory. Gray denotes the overlap of multiple trajectories.",
+                "position": 4429
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x26.png",
+                "caption": "",
+                "position": 4433
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x27.png",
+                "caption": "",
+                "position": 4435
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x28.png",
+                "caption": "Figure 23:Detailed PCA of Latent Space trajectories for the math question. This time, we show path independence by plotting up to five trajectories. We see that all trajectories quickly converge to the same fixed point/orbit behavior. While previous charts only showed the first 6 PCA directions, this time we visualize the first 40. Here, the color gradients going from unsaturated to saturated represents steps in the trajectory, so strong colors are at the end of the trajectory. Gray denotes the overlap of multiple trajectories.",
+                "position": 4439
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x29.png",
+                "caption": "Figure 24:Detailed PCA of Latent Space trajectories for the trivia question. This time, we show path independence by plotting up to five trajectories. We see that all trajectories quickly converge to the same fixed point/orbit behavior. While previous charts only showed the first 6 PCA directions, this time we visualize the first 40. Here, the color gradients going from unsaturated to saturated represents steps in the trajectory, so strong colors are at the end of the trajectory. Gray denotes the overlap of multiple trajectories.",
+                "position": 4442
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05171/x30.png",
+                "caption": "Figure 25:Detailed PCA of Latent Space trajectories for the unsafe question. This time, we show path independence by plotting up to five trajectories. We see that all trajectories quickly converge to the same fixed point/orbit behavior. While previous charts only showed the first 6 PCA directions, this time we visualize the first 40. Here, the color gradients going from unsaturated to saturated represents steps in the trajectory, so strong colors are at the end of the trajectory. Gray denotes the overlap of multiple trajectories.",
+                "position": 4445
+            }
+        ]
+    },
+    {
+        "header": "Appendix CPretraining Data",
+        "images": []
+    }
+]

@@ -1,0 +1,142 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05176/x1.png",
+                "caption": "",
+                "position": 144
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05176/x2.png",
+                "caption": "Figure 2:Comparison with different 3D inpainting approaches.Previous methods, such as SPin-NeRF[34]and GScream[60], are tailored for forward-facing scenes and tend to underperform in 360° unbounded scenarios. Reference-based methods, such as Infusion[27], whose depth completion model struggles to accurately project the reference view back into the 3D scene, leading to fine-tuning artifacts. Gaussian Grouping[65]often misidentifies the unseen region during mask generation, which can degrade inpainting quality. Our method, AuraFusion360, achieves a more accurate unseen mask and enhanced depth alignment through Adaptive Guided Depth Diffusion, with SDEdit[30]applied to the initial points to leverage diffusion prior while also maintaining multi-view consistency in RGB guidance.",
+                "position": 190
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05176/x3.png",
+                "caption": "Figure 3:Overview of our method.Our approach takes multi-view RGB images and corresponding object masks as input and outputs a Gaussian representation with the masked objects removed. The pipeline consists of three main stages: (a) Depth-Aware Unseen Masks Generation to identify truly occluded areas, referred to as the “unseen region”, (b) Depth-Aligned Gaussian Initialization on Reference View to fill unseen regions with initialized Gaussian containing reference RGB information after object removal, and (c) SDEdit-Based RGB Guidance for Detail Enhancement, which enhances fine details using an inpainting model while preserving reference view information. Instead of applying SDEdit with random noise, we use DDIM Inversion on the rendered initial Gaussians to generate noise that retains the structure of the reference view, ensuring multi-view consistency across all RGB Guidance.",
+                "position": 244
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05176/x4.png",
+                "caption": "Figure 4:Overview of the Unseen Mask Generation Process using Depth Warping.To obtain the unseen mask for viewn𝑛nitalic_n, we calculate the pixel correspondences between the viewn𝑛nitalic_nand all other viewsi𝑖iitalic_iby using the rendered incomplete depthDnincompletesuperscriptsubscript𝐷𝑛incompleteD_{n}^{\\text{incomplete}}italic_D start_POSTSUBSCRIPT italic_n end_POSTSUBSCRIPT start_POSTSUPERSCRIPT incomplete end_POSTSUPERSCRIPT. For each viewi𝑖iitalic_i, the removal regionRisubscript𝑅𝑖R_{i}italic_R start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPTis backward traversal to viewn𝑛nitalic_nto align occlusions. We then aggregate the results from multiple views, averaging and applying a threshold to produce the initial contour of the unseen mask. This contour is subsequently converted into a bounding box prompt for SAM2[44], which refines the unseen mask to its final version for viewn𝑛nitalic_n.",
+                "position": 265
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05176/x5.png",
+                "caption": "Figure 5:Overview of Adaptive Guided Depth Diffusion (AGDD).The framework takes image latent, incomplete depth, and unseen mask as inputs to generate aligned depth estimates. (a) The guided region is identified by dilating the unseen mask and subtracting the original mask. (b) At each denoising timestept𝑡titalic_t, an adaptive lossℒadaptivesubscriptℒadaptive\\mathcal{L}_{\\text{adaptive}}caligraphic_L start_POSTSUBSCRIPT adaptive end_POSTSUBSCRIPTis computed between the pre-decoded and incomplete depth to update the noise inputϵ^tsubscript^italic-ϵ𝑡\\hat{\\epsilon}_{t}over^ start_ARG italic_ϵ end_ARG start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT. This process repeatsN𝑁Nitalic_Ntimes before advancing to the next denoising step, ensuring the estimated depth aligns with the incomplete depth distribution in the guided region.",
+                "position": 376
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05176/x6.png",
+                "caption": "Figure 6:Overview of the 360-USID dataset.Sample images from each scene, including five outdoor scenes (Carton, Cone, Newcone, Skateboard, Plant) and two indoor scenes (Cookie, Sunflower). (Bottom right) The table shows statistics for each scene, including the number of training views and ground truth (GT) novel views. The dataset provides a diverse range of environments for evaluating 3D inpainting methods in both indoor and outdoor settings.",
+                "position": 454
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05176/x7.png",
+                "caption": "Figure 7:Illustration of the data capture process for the 360-USID dataset.(a) Capturing training views: Multiple images are taken around the object in the scene. (b) Capturing the reference view: A camera is mounted on a tripod to capture a fixed reference view (with an object). (c) Capturing novel views: After removing the object, additional images are taken from various viewpoints, including one from the same tripod position as the reference image.",
+                "position": 457
+            }
+        ]
+    },
+    {
+        "header": "4360∘Unbounded Scenes Inpainting Dataset",
+        "images": []
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05176/x8.png",
+                "caption": "Figure 8:Visual Comparison on our 360-USID dataset.We compare our method against state-of-the-art approaches including Gaussian Grouping[65], 2DGS + LeftRefill, and Infusion[27]. While Gaussian Grouping struggles with misidentifying unseen regions, leading to floating artifacts, and 2DGS + LeftRefill faces view consistency issues, our method successfully maintains geometric consistency and preserves fine details across different viewpoints. Ground truth (GT) is shown for reference, and the original scene with an object is provided in the first row for comparison.",
+                "position": 689
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05176/x9.png",
+                "caption": "Figure 9:Visual comparison of unseen mask generation method.Our method enables SAM2[44]to generate more accurate predictions for each view without the need for manually provided prompts, as the bounding box prompts are automatically generated through depth warping.",
+                "position": 776
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05176/x10.png",
+                "caption": "Figure 10:Compared Unseen Mask w/ Gaussian Grouping.Gaussian Grouping[65]uses a video tracker[9]and the “black blurry hole” prompt for the DEVA[9]method to track the unseen region. However, this can result in tracking errors, affecting inpainting. In contrast, our geometry-based approach uses depth warping to estimate the unseen region’s contour, reducing segmentation errors.",
+                "position": 779
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05176/x11.png",
+                "caption": "Figure 11:Compared to other depth completion methods.The depth completion model in Infusion[27](a) performs better at depth alignment compared to traditional methods (b) and (c), but it lacks generalization. Similarly, (d) Guided Depth Diffusion[68]struggles to achieve precise alignment, as the background regions amplify the loss, leading to misalignment. In contrast, (e) Our AGDD effectively addresses these issues.",
+                "position": 782
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AOverview",
+        "images": []
+    },
+    {
+        "header": "Appendix BMasked Gaussians Training and Object Removal",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05176/x12.png",
+                "caption": "Figure 12:Intermediate Results of Depth Warping for Unseen Region Detection.This figure illustrates the intermediate results generated during the depth warping process. (a) and (b) show the RGB image and the corresponding removal region at viewn𝑛nitalic_n, respectively. (c) displays the removal regions obtained from viewi𝑖iitalic_i(i≠n𝑖𝑛i\\neq nitalic_i ≠ italic_n). (d) shows the unseen region obtained from viewi𝑖iitalic_ithrough backward traversal. The intersections are concentrated near the unseen region. Note that the pixels within the unseen region, but with a value of zero, are due to the absence of Gaussians in that area, preventing depth rendering and thus making it impossible to establish pixel correspondences between viewn𝑛nitalic_nand viewi𝑖iitalic_i. (e) presents the aggregation of all unseen regions obtained from viewi𝑖iitalic_iat viewn𝑛nitalic_n. A threshold is applied to this result, and it is then intersected with the removal region at viewn𝑛nitalic_nto obtain the final result in (f).",
+                "position": 1764
+            }
+        ]
+    },
+    {
+        "header": "Appendix CDepth Warping for Identifying Unseen Region Contours",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05176/x13.png",
+                "caption": "Figure 13:Ablation Study on Removal Region Definition.Comparison of (a) object masks vs. (b) depth difference for defining removal regions. Object masks fail to capture geometric changes, leading to less accurate unseen masks. Depth difference better preserves scene structure, improving SAM2 prompts and unseen region segmentation.",
+                "position": 1777
+            }
+        ]
+    },
+    {
+        "header": "Appendix DExperimetal Setup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.05176/x14.png",
+                "caption": "Figure 14:Failure Cases.The figure illustrates failure cases of inpainting results. These examples highlight the challenges of 3D inpainting when significant occlusions are present near the regions requiring inpainting. For instance, (b) and (c) demonstrate difficulties in achieving satisfactory guided inpainted RGB images in the training views, while (d) and (e) show errors resulting from incorrect pixel unprojections. These observations indicate that this issue is not effectively addressed by any of the compared methods, suggesting a potential avenue for further exploration and improvement.",
+                "position": 1808
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05176/x15.png",
+                "caption": "Figure 15:Visual Comparison on our 360-USID dataset.",
+                "position": 1854
+            },
+            {
+                "img": "https://arxiv.org/html/2502.05176/x16.png",
+                "caption": "Figure 16:Visual Comparison on Other-360 dataset.",
+                "position": 1857
+            }
+        ]
+    },
+    {
+        "header": "Appendix ELimitations",
+        "images": []
+    }
+]
