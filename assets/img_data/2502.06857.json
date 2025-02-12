@@ -1,0 +1,198 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.06857/x1.png",
+                "caption": "Figure 1:The meaning of width and depth.We visualize a standard transformer architecture, highlighting the “width” as the size of the hidden dimension and the “depth” as the number of transformer blocks. These are the quantities we’re interested in providing a prescription for with our new scaling laws.",
+                "position": 217
+            }
+        ]
+    },
+    {
+        "header": "3Designing Our Scaling Laws",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.06857/x2.png",
+                "caption": "Figure 2:Distribution of prior scaling law models, industry models, and our models in terms of width and depth.Prior work (purple and green) and industry models (blue and orange) mostly lie on a fixed width-depth line.\nIf we want to prescribe the optimal width-depth ratio, we need to select models with different widths and depths (our models, black).",
+                "position": 289
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x3.png",
+                "caption": "Figure 3:Learning rate scaling is necessary for width-depth transfer.Left: Preliminary training runs with initialization rules active, but no learning rate scaling. Right: Same data, but with x-axis rescaled to simulate the application of learning rate scaling withl⁢rbase=l⁢reff×(width×depth)𝑙subscript𝑟base𝑙subscript𝑟effwidthdepthlr_{\\text{base}}=lr_{\\text{eff}}\\times(\\text{width}\\times\\sqrt{\\text{depth}})italic_l italic_r start_POSTSUBSCRIPT base end_POSTSUBSCRIPT = italic_l italic_r start_POSTSUBSCRIPT eff end_POSTSUBSCRIPT × ( width × square-root start_ARG depth end_ARG ).",
+                "position": 336
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x4.png",
+                "caption": "Figure 4:Approach 1 prescriptions.Row one: Validation loss over FLOPs (left) and GPU hours (right). We use Approach 1 to find the optimal points on the convex hull in each setting, marked withblack crosses. Row two: We fit a line to the tokens per parameter of empirically optimal models and find a slightly higher, but still constant, tokens per parameter prescription thanHoffmann et al. (2022).Hoffmann et al. (2022)’s Approach 1 creates250250250250logarithmically-spaced FLOPs bins per order of magnitude, and inredwe plot the minimizers over these bins, and the scaling law fitted to these minimizers (binning). Clearly, their Approach 1 is not well-suited for our data, and our convex hull approach is better when we select fewer models to fit our law on.\nExtended plot inFigure9.",
+                "position": 339
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x5.png",
+                "caption": "Figure 5:Approach 3 laws with the parametrization shown inEquation2.We see the prescribed optimal width-depth ratio increases with the FLOPs (left) budget and the optimal tokens per parameter decreases as the FLOPs budget increases (right).\nWe see slight bumpiness in the lines due to the integer constraints we enforce on the attention heads, we also plot with this constraint removed inFigure16.",
+                "position": 376
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.06857/x6.png",
+                "caption": "Figure 6:We demonstrate the variability in fitting scaling laws by resampling our data many different ways.We label prescriptions found using Approach 1 with “Approach1111” in the legend, otherwise approach3333is used.\nAll tokens counts available are used to fit the laws unless stated otherwise in the legend, for example≤100⁢Babsent100𝐵\\leq 100B≤ 100 italic_Bmeans that only token counts less than or equal to100⁢B100𝐵100B100 italic_Bare used in fitting.No Embeds: Embedding parameters are not counted when fitting these laws.Cooldown: Only data from the cooldown ablation is used to fit this law.LR Ablation: Only data from the learning rate ablation training runs, where the learning rate is halved, is used to fit these laws.width=512512512512Only: Only models with width512512512512are used to fit these laws.Chinchilla Reduced Sampling: We subsample our data to be as close as possible to the token counts and model sizes thatHoffmann et al. (2022)use to fit their scaling laws and also fit new scaling laws on this subset ofHoffmann et al. (2022)data. Details inSection4.2.",
+                "position": 424
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x7.png",
+                "caption": "Figure 7:The inefficiency of training models with suboptimal widths and depths.We plot the FLOPs (left) and GPU Hours (right)overspendafter training our Gemstones for300300300300billion tokens.\nWe define the overspend as how many resources (FLOPs or GPU hours) are required for a model with a given width-depth configuration to reach some target loss, relative to the models that achieve that target loss the fastest (the “points on (pareto)-frontier”). We can see that the skinny models (top-left, dark points) use many more FLOPs or GPU hours to reach a target loss than the wide models. We note that these inefficiencies exist in our training setup because we only use tensor parallelism and not pipeline parallelism.",
+                "position": 497
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x8.png",
+                "caption": "Figure 8:Quantifying the cost of overtraining.We simulate deviations from our prescriptions to assess their impact on model performance by increasing the optimal token count prescribed byEquation2by an overtraining factor. We then optimize the model shape to achieve the lowest loss possible at each FLOP budget and overtraining factor. Note that100superscript10010^{0}10 start_POSTSUPERSCRIPT 0 end_POSTSUPERSCRIPT, or1×1\\times1 ×, is the prescribed optimal point. We take four FLOP budgets (title of each plot) and plot the loss as a function of overtraining factor and see that under or overtraining increases predicted loss but by only a small amount. We plot the losses of selected open source models on our validation set to help ground the y-axis ranges.",
+                "position": 517
+            }
+        ]
+    },
+    {
+        "header": "5Limitations and Conclusions",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "Impact Statement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ASoftware and Data",
+        "images": []
+    },
+    {
+        "header": "Appendix BExtended Related Works",
+        "images": []
+    },
+    {
+        "header": "Appendix CAblations for Approach 1",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.06857/x9.png",
+                "caption": "Figure 9:Extended Approach 1 plot fromFigure4, including tokens and parameters axes. As inFigure4, we present an analysis over FLOPs on the left and over GPU hours take to train on the right.",
+                "position": 1383
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x10.png",
+                "caption": "Figure 10:Approach 1 fitted on the learning rate ablation dataset. As inFigure4, we present an analysis over FLOPs on the left and over GPU hours take to train on the right.",
+                "position": 1393
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x11.png",
+                "caption": "Figure 11:Approach 1 fitted on the cooldown ablation dataset. As inFigure4, we present an analysis over FLOPs on the left and over GPU hours take to train on the right.",
+                "position": 1403
+            }
+        ]
+    },
+    {
+        "header": "Appendix DAblations for Approach 3",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.06857/x12.png",
+                "caption": "Figure 12:Extended Approach 3 plot fromFigure5, including tokens, parameters, width and depth axes. This also includes a comparison of equation 4 thatHoffmann et al. (2022)propose and a brute force plotting method which includes our FLOPs counting for laws of the form seen inEquation1. We show these are blue and red lines respectively in the right column seeing only a minor difference in the outcome. We remark that industry models fall systematically below our parameter per FLOPs prescriptions, or equivalently above our token per FLOPs prescriptions.",
+                "position": 1417
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x13.png",
+                "caption": "Figure 13:Approach 3 fitted on the learning rate ablation dataset. As inFigure12, we present an analysis over laws of the from shown inEquation2on the left and laws of the form shown inEquation1on the right.",
+                "position": 1429
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x14.png",
+                "caption": "Figure 14:Approach 3 fitted on the cooldown ablation dataset. As inFigure12, we present an analysis over laws of the from shown inEquation2on the left and laws of the form shown inEquation1on the right.",
+                "position": 1439
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x15.png",
+                "caption": "Figure 15:Approach 3 fitted on a dataset where all token counts less than120120120120billion are removed. As inFigure12, we present an analysis over laws of the from shown inEquation2on the left and laws of the form shown inEquation1on the right.",
+                "position": 1449
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x16.png",
+                "caption": "Figure 16:Following fromFigure5, this plot removes the integer constraints when optimizing. As inFigure12, we present an analysis over laws of the from shown inEquation2on the left and laws of the form shown inEquation1on the right.",
+                "position": 1464
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x17.png",
+                "caption": "Figure 17:Approach 3 fitted on our main dataset usingδ=10−3𝛿superscript103\\delta=10^{-3}italic_δ = 10 start_POSTSUPERSCRIPT - 3 end_POSTSUPERSCRIPTin the Huber loss. Corresponds toFigure16. As inFigure12, we present an analysis over laws of the from shown inEquation2on the left and laws of the form shown inEquation1on the right.",
+                "position": 1477
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x18.png",
+                "caption": "Figure 18:Approach 3 fitted on the learning rate ablation dataset usingδ=10−3𝛿superscript103\\delta=10^{-3}italic_δ = 10 start_POSTSUPERSCRIPT - 3 end_POSTSUPERSCRIPTin the Huber loss. Corresponds toFigure13. As inFigure12, we present an analysis over laws of the from shown inEquation2on the left and laws of the form shown inEquation1on the right.",
+                "position": 1480
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x19.png",
+                "caption": "Figure 19:Approach 3 fitted on the cooldown ablation dataset usingδ=10−3𝛿superscript103\\delta=10^{-3}italic_δ = 10 start_POSTSUPERSCRIPT - 3 end_POSTSUPERSCRIPTin the Huber loss. Corresponds toFigure19. As inFigure12, we present an analysis over laws of the from shown inEquation2on the left and laws of the form shown inEquation1on the right.",
+                "position": 1483
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x20.png",
+                "caption": "Figure 20:We plot the size of the grid search as the x axis and the gradient of the prescribed tokens as the y axis. We vary delta and see that a delta of10−5superscript10510^{-5}10 start_POSTSUPERSCRIPT - 5 end_POSTSUPERSCRIPTis highly unstable when fitting on smaller grid sizes. On the left, we plot only fitting on data less than100100100100billion tokens. On the right, we plot fitting on all data up to350350350350billion tokens. We see that including more data increases the stability of the exponents found for smaller grid sizes for deltas10−4,10−5superscript104superscript10510^{-4},10^{-5}10 start_POSTSUPERSCRIPT - 4 end_POSTSUPERSCRIPT , 10 start_POSTSUPERSCRIPT - 5 end_POSTSUPERSCRIPT.",
+                "position": 1486
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x21.png",
+                "caption": "",
+                "position": 1489
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x22.png",
+                "caption": "Figure 21:Approach 3 fitted on our main dataset using an ansatz of the form shown inEquation3.",
+                "position": 1512
+            }
+        ]
+    },
+    {
+        "header": "Appendix EData Sampling",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.06857/x23.png",
+                "caption": "Figure 22:All possible model shapes we could have chosen based on our architecture within±5%plus-or-minuspercent5\\pm 5\\%± 5 %are shown as circles. The points we selected are highlighted as stars, including the two extra points we select to have four models of width512512512512.",
+                "position": 1523
+            }
+        ]
+    },
+    {
+        "header": "Appendix FTraining",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.06857/x24.png",
+                "caption": "Figure 23:Loss curves for the main22222222training runs.",
+                "position": 1538
+            },
+            {
+                "img": "https://arxiv.org/html/2502.06857/x25.png",
+                "caption": "Figure 24:We color the points based on the ratio of our calculated FLOPs per token which is shown in the code below and using6×p⁢a⁢r⁢a⁢m⁢e⁢t⁢e⁢r⁢s6𝑝𝑎𝑟𝑎𝑚𝑒𝑡𝑒𝑟𝑠6\\times parameters6 × italic_p italic_a italic_r italic_a italic_m italic_e italic_t italic_e italic_r italic_s. We see counting the FLOPs properly becomes more important for aspect ratios off outside of the standard regime.",
+                "position": 1574
+            }
+        ]
+    },
+    {
+        "header": "Appendix GFLOP counting matters",
+        "images": []
+    }
+]
