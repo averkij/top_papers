@@ -1,0 +1,1033 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/teaser/mask.jpg",
+                "caption": "Figure 1:Results of GHOST 2.0 model on the task of head swap. Head from source image is animated in correspondence with the target motion and blended into target background.",
+                "position": 127
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/teaser/ron.jpg",
+                "caption": "",
+                "position": 139
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/teaser/msk-ron.jpg",
+                "caption": "",
+                "position": 140
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/teaser/emma.jpg",
+                "caption": "",
+                "position": 143
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/teaser/ter.jpg",
+                "caption": "",
+                "position": 144
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/teaser/em_ter.jpg",
+                "caption": "",
+                "position": 145
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/teaser/photo_2025-02-21_16-00-50.jpg",
+                "caption": "",
+                "position": 148
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/teaser/bodrov.jpg",
+                "caption": "",
+                "position": 149
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/teaser/mk_bdr.jpg",
+                "caption": "",
+                "position": 150
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/teaser/photo_2025-02-21_16-00-52.jpg",
+                "caption": "",
+                "position": 153
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/teaser/dr.jpg",
+                "caption": "",
+                "position": 154
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/teaser/res.jpg",
+                "caption": "",
+                "position": 155
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Approach",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_final.drawio.jpg",
+                "caption": "Figure 2:Aligner architecture. Two appearance encodersEp⁢o⁢rsubscript𝐸𝑝𝑜𝑟E_{por}italic_E start_POSTSUBSCRIPT italic_p italic_o italic_r end_POSTSUBSCRIPTandEi⁢dsubscript𝐸𝑖𝑑E_{id}italic_E start_POSTSUBSCRIPT italic_i italic_d end_POSTSUBSCRIPTtake images of source headISsubscript𝐼𝑆I_{S}italic_I start_POSTSUBSCRIPT italic_S end_POSTSUBSCRIPTand faceC⁢r⁢o⁢p⁢(IS)𝐶𝑟𝑜𝑝subscript𝐼𝑆Crop(I_{S})italic_C italic_r italic_o italic_p ( italic_I start_POSTSUBSCRIPT italic_S end_POSTSUBSCRIPT )and produce embeddingsfp⁢o⁢rsubscript𝑓𝑝𝑜𝑟f_{por}italic_f start_POSTSUBSCRIPT italic_p italic_o italic_r end_POSTSUBSCRIPTandfi⁢dsubscript𝑓𝑖𝑑f_{id}italic_f start_POSTSUBSCRIPT italic_i italic_d end_POSTSUBSCRIPT. Motion encoderEm⁢o⁢t⁢i⁢o⁢nsubscript𝐸𝑚𝑜𝑡𝑖𝑜𝑛E_{motion}italic_E start_POSTSUBSCRIPT italic_m italic_o italic_t italic_i italic_o italic_n end_POSTSUBSCRIPTis used to obtain respective embeddingfm⁢t⁢nsubscript𝑓𝑚𝑡𝑛f_{mtn}italic_f start_POSTSUBSCRIPT italic_m italic_t italic_n end_POSTSUBSCRIPTfrom the target imageITsubscript𝐼𝑇I_{T}italic_I start_POSTSUBSCRIPT italic_T end_POSTSUBSCRIPT. The embeddingsfp⁢o⁢rsubscript𝑓𝑝𝑜𝑟f_{por}italic_f start_POSTSUBSCRIPT italic_p italic_o italic_r end_POSTSUBSCRIPT,fi⁢dsubscript𝑓𝑖𝑑f_{id}italic_f start_POSTSUBSCRIPT italic_i italic_d end_POSTSUBSCRIPTandfm⁢t⁢nsubscript𝑓𝑚𝑡𝑛f_{mtn}italic_f start_POSTSUBSCRIPT italic_m italic_t italic_n end_POSTSUBSCRIPTare concatenated and used to condition generatorG𝐺Gitalic_Gvia AdaIN(Huang & Belongie,2017)layers. The generator takes a learnable tensorT𝑇Titalic_Tas input and outputs reenacted headIAsubscript𝐼𝐴I_{A}italic_I start_POSTSUBSCRIPT italic_A end_POSTSUBSCRIPTand binary maskMr⁢e⁢e⁢n⁢a⁢c⁢tsubscript𝑀𝑟𝑒𝑒𝑛𝑎𝑐𝑡M_{reenact}italic_M start_POSTSUBSCRIPT italic_r italic_e italic_e italic_n italic_a italic_c italic_t end_POSTSUBSCRIPT.",
+                "position": 234
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/encoder_ablation/abs_source.jpg",
+                "caption": "Figure 3:Ablation results on representations learned by poseEp⁢o⁢s⁢esubscript𝐸𝑝𝑜𝑠𝑒E_{pose}italic_E start_POSTSUBSCRIPT italic_p italic_o italic_s italic_e end_POSTSUBSCRIPTand expressionEe⁢x⁢psubscript𝐸𝑒𝑥𝑝E_{exp}italic_E start_POSTSUBSCRIPT italic_e italic_x italic_p end_POSTSUBSCRIPTencoders",
+                "position": 255
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/encoder_ablation/driver.jpg",
+                "caption": "",
+                "position": 269
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/encoder_ablation/null_exp.jpg",
+                "caption": "",
+                "position": 270
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/encoder_ablation/null_pose.jpg",
+                "caption": "",
+                "position": 271
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/encoder_ablation/abs_final.jpg",
+                "caption": "",
+                "position": 272
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/blender_fig.drawio.jpg",
+                "caption": "Figure 4:Blender architecture. ReenactedIAsubscript𝐼𝐴I_{A}italic_I start_POSTSUBSCRIPT italic_A end_POSTSUBSCRIPTand targetITsubscript𝐼𝑇I_{T}italic_I start_POSTSUBSCRIPT italic_T end_POSTSUBSCRIPTimages are preprocessed to obtain grayscale animated headIAG⁢Hsuperscriptsubscript𝐼𝐴𝐺𝐻I_{A}^{GH}italic_I start_POSTSUBSCRIPT italic_A end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_G italic_H end_POSTSUPERSCRIPT, target backgroundITB⁢Gsuperscriptsubscript𝐼𝑇𝐵𝐺I_{T}^{BG}italic_I start_POSTSUBSCRIPT italic_T end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_B italic_G end_POSTSUPERSCRIPTand masksMAHsuperscriptsubscript𝑀𝐴𝐻M_{A}^{H}italic_M start_POSTSUBSCRIPT italic_A end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_H end_POSTSUPERSCRIPTandMAIsuperscriptsubscript𝑀𝐴𝐼M_{A}^{I}italic_M start_POSTSUBSCRIPT italic_A end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_I end_POSTSUPERSCRIPTdefining head and background inpainting regions. Also,IAsubscript𝐼𝐴I_{A}italic_I start_POSTSUBSCRIPT italic_A end_POSTSUBSCRIPTandITsubscript𝐼𝑇I_{T}italic_I start_POSTSUBSCRIPT italic_T end_POSTSUBSCRIPTare passed to Reference Creation module to obtain head color referenceIT→AH⁢Rsuperscriptsubscript𝐼→𝑇𝐴𝐻𝑅I_{T\\rightarrow A}^{HR}italic_I start_POSTSUBSCRIPT italic_T → italic_A end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_H italic_R end_POSTSUPERSCRIPTfor color transfer. The background referenceIT→AI⁢Rsuperscriptsubscript𝐼→𝑇𝐴𝐼𝑅I_{T\\rightarrow A}^{IR}italic_I start_POSTSUBSCRIPT italic_T → italic_A end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_I italic_R end_POSTSUPERSCRIPTis obtained via External Inpainting module(Suvorov et al.,2021). These inputs are passed to Blending UNet to achieve final resultIBsubscript𝐼𝐵I_{B}italic_I start_POSTSUBSCRIPT italic_B end_POSTSUBSCRIPT.",
+                "position": 307
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/masks_processing.drawio.jpg",
+                "caption": "Figure 5:Masks obtained in data preprocessing stage",
+                "position": 323
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/augmented_masks.jpg",
+                "caption": "Figure 6:Examples of inpainting maskMAIsuperscriptsubscript𝑀𝐴𝐼M_{A}^{I}italic_M start_POSTSUBSCRIPT italic_A end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_I end_POSTSUPERSCRIPTaugmentations",
+                "position": 338
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/blending/old_source.jpg",
+                "caption": "Figure 7:Improved blending of hair.IB^^subscript𝐼𝐵\\widehat{I_{B}}over^ start_ARG italic_I start_POSTSUBSCRIPT italic_B end_POSTSUBSCRIPT end_ARGandIBsubscript𝐼𝐵I_{B}italic_I start_POSTSUBSCRIPT italic_B end_POSTSUBSCRIPTare final results with and without background extrapolation",
+                "position": 461
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/blending/pseudo_norm_target.jpg",
+                "caption": "",
+                "position": 475
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/blending/new_source.jpg",
+                "caption": "",
+                "position": 476
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/blending/result_crop_no_blending.jpg",
+                "caption": "",
+                "position": 477
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/blending/result_crop.jpg",
+                "caption": "",
+                "position": 478
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/inpainting.drawio.jpg",
+                "caption": "Figure 8:Post-processing of blended image. Given targetITsubscript𝐼𝑇I_{T}italic_I start_POSTSUBSCRIPT italic_T end_POSTSUBSCRIPTand reenactedIAsubscript𝐼𝐴I_{A}italic_I start_POSTSUBSCRIPT italic_A end_POSTSUBSCRIPTimages, we obtain masks of reenacted headMAh⁢e⁢a⁢dsuperscriptsubscript𝑀𝐴ℎ𝑒𝑎𝑑M_{A}^{head}italic_M start_POSTSUBSCRIPT italic_A end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_h italic_e italic_a italic_d end_POSTSUPERSCRIPTand target hairMTh⁢a⁢i⁢rsuperscriptsubscript𝑀𝑇ℎ𝑎𝑖𝑟M_{T}^{hair}italic_M start_POSTSUBSCRIPT italic_T end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_h italic_a italic_i italic_r end_POSTSUPERSCRIPT. We substract the first mask from the second one to obtain area for inpantingMi⁢n⁢p⁢a⁢i⁢n⁢t⁢i⁢n⁢gsubscript𝑀𝑖𝑛𝑝𝑎𝑖𝑛𝑡𝑖𝑛𝑔M_{inpainting}italic_M start_POSTSUBSCRIPT italic_i italic_n italic_p italic_a italic_i italic_n italic_t italic_i italic_n italic_g end_POSTSUBSCRIPT, which is filled by Kandinsky model(Shakhmatov et al.,2023)",
+                "position": 493
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/segmentation/segmentation11.jpg",
+                "caption": "Figure 9:Qualitative comparison of segmentation models",
+                "position": 500
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/segmentation/segmentation12.jpg",
+                "caption": "",
+                "position": 512
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/segmentation/segmentation13.jpg",
+                "caption": "",
+                "position": 513
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/segmentation/segmentation21.jpg",
+                "caption": "",
+                "position": 516
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/segmentation/segmentation22.jpg",
+                "caption": "",
+                "position": 517
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/segmentation/segmentation23.jpg",
+                "caption": "",
+                "position": 518
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/segmentation/segmentation31.jpg",
+                "caption": "",
+                "position": 521
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/segmentation/segmentation32.jpg",
+                "caption": "",
+                "position": 522
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/segmentation/segmentation33.jpg",
+                "caption": "",
+                "position": 523
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/segmentation/segmentation41.jpg",
+                "caption": "",
+                "position": 526
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/segmentation/segmentation42.jpg",
+                "caption": "",
+                "position": 527
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/segmentation/segmentation43.jpg",
+                "caption": "",
+                "position": 528
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/source_0.jpg",
+                "caption": "Figure 10:Cross-reenactment results at512×512512512512\\times 512512 × 512resolution",
+                "position": 952
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/driver_0.jpg",
+                "caption": "",
+                "position": 966
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/our_0.jpg",
+                "caption": "",
+                "position": 967
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/heser_0.jpg",
+                "caption": "",
+                "position": 968
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/styleheat_0.jpg",
+                "caption": "",
+                "position": 969
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/source_1.jpg",
+                "caption": "",
+                "position": 972
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/driver_1.jpg",
+                "caption": "",
+                "position": 973
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/our_1.jpg",
+                "caption": "",
+                "position": 974
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/heser_1.jpg",
+                "caption": "",
+                "position": 975
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/styleheat_1.jpg",
+                "caption": "",
+                "position": 976
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/source_2.jpg",
+                "caption": "",
+                "position": 979
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/driver_2.jpg",
+                "caption": "",
+                "position": 980
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/our_2.jpg",
+                "caption": "",
+                "position": 981
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/heser_2.jpg",
+                "caption": "",
+                "position": 982
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/styleheat_2.jpg",
+                "caption": "",
+                "position": 983
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/source_3.jpg",
+                "caption": "",
+                "position": 986
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/driver_3.jpg",
+                "caption": "",
+                "position": 987
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/our_3.jpg",
+                "caption": "",
+                "position": 988
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/heser_3.jpg",
+                "caption": "",
+                "position": 989
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/styleheat_3.jpg",
+                "caption": "",
+                "position": 990
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/source_4.jpg",
+                "caption": "",
+                "position": 993
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/driver_4.jpg",
+                "caption": "",
+                "position": 994
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/our_4.jpg",
+                "caption": "",
+                "position": 995
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/heser_4.jpg",
+                "caption": "",
+                "position": 996
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/styleheat_4.jpg",
+                "caption": "",
+                "position": 997
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/source_5.jpg",
+                "caption": "",
+                "position": 1000
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/driver_5.jpg",
+                "caption": "",
+                "position": 1001
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/our_5.jpg",
+                "caption": "",
+                "position": 1002
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/heser_5.jpg",
+                "caption": "",
+                "position": 1003
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/results_aligner/styleheat_5.jpg",
+                "caption": "",
+                "position": 1004
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row1/source.png",
+                "caption": "Figure 11:GHOST 2.0 results on the task of head swap. Our method achieves natural blending of the reenacted head into target background, corresponding in skin color, lighting and contrast to the rest of the image.",
+                "position": 1019
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row1/target.png",
+                "caption": "",
+                "position": 1031
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row1/result.png",
+                "caption": "",
+                "position": 1032
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row2/source.png",
+                "caption": "",
+                "position": 1035
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row2/target.png",
+                "caption": "",
+                "position": 1036
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row2/result.png",
+                "caption": "",
+                "position": 1037
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row3/source.png",
+                "caption": "",
+                "position": 1040
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row3/target.png",
+                "caption": "",
+                "position": 1041
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row3/result.png",
+                "caption": "",
+                "position": 1042
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row4/source_extra.png",
+                "caption": "",
+                "position": 1045
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row4/target.png",
+                "caption": "",
+                "position": 1046
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row4/result.png",
+                "caption": "",
+                "position": 1047
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row5/source.png",
+                "caption": "",
+                "position": 1050
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row5/target.png",
+                "caption": "",
+                "position": 1051
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row5/result.png",
+                "caption": "",
+                "position": 1052
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row6/source.png",
+                "caption": "",
+                "position": 1055
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row6/target.png",
+                "caption": "",
+                "position": 1056
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row6/result.png",
+                "caption": "",
+                "position": 1057
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row7/source.png",
+                "caption": "",
+                "position": 1060
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row7/target.png",
+                "caption": "",
+                "position": 1061
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/blender_paper_images/row7/result.png",
+                "caption": "",
+                "position": 1062
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "6Impact Statement",
+        "images": []
+    },
+    {
+        "header": "7Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADetails on losses",
+        "images": []
+    },
+    {
+        "header": "Appendix BTraining details",
+        "images": []
+    },
+    {
+        "header": "Appendix CDetailed architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/source_0.png",
+                "caption": "Figure 12:Cross-reenactment results on512×512512512512\\times 512512 × 512",
+                "position": 2458
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/driver_0.png",
+                "caption": "",
+                "position": 2475
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/our_0.png",
+                "caption": "",
+                "position": 2476
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/heser_0.png",
+                "caption": "",
+                "position": 2477
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/styleheat_0.png",
+                "caption": "",
+                "position": 2478
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/source_1.png",
+                "caption": "",
+                "position": 2481
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/driver_1.png",
+                "caption": "",
+                "position": 2482
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/our_1.png",
+                "caption": "",
+                "position": 2483
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/heser_1.png",
+                "caption": "",
+                "position": 2484
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/styleheat_1.png",
+                "caption": "",
+                "position": 2485
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/source_2.png",
+                "caption": "",
+                "position": 2488
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/driver_2.png",
+                "caption": "",
+                "position": 2489
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/our_2.png",
+                "caption": "",
+                "position": 2490
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/heser_2.png",
+                "caption": "",
+                "position": 2491
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/styleheat_2.png",
+                "caption": "",
+                "position": 2492
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/source_3.png",
+                "caption": "",
+                "position": 2495
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/driver_3.png",
+                "caption": "",
+                "position": 2496
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/our_3.png",
+                "caption": "",
+                "position": 2497
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/heser_3.png",
+                "caption": "",
+                "position": 2498
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/styleheat_3.png",
+                "caption": "",
+                "position": 2499
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/source_4.png",
+                "caption": "",
+                "position": 2502
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/driver_4.png",
+                "caption": "",
+                "position": 2503
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/our_4.png",
+                "caption": "",
+                "position": 2504
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/heser_4.png",
+                "caption": "",
+                "position": 2505
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/styleheat_4.png",
+                "caption": "",
+                "position": 2506
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/source_5.png",
+                "caption": "",
+                "position": 2509
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/driver_5.png",
+                "caption": "",
+                "position": 2510
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/our_5.png",
+                "caption": "",
+                "position": 2511
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/heser_5.png",
+                "caption": "",
+                "position": 2512
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_512/styleheat_5.png",
+                "caption": "",
+                "position": 2513
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/source_0.png",
+                "caption": "Figure 13:Self-reenactment results on512×512512512512\\times 512512 × 512",
+                "position": 2525
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/driver_0.png",
+                "caption": "",
+                "position": 2542
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/our_0.png",
+                "caption": "",
+                "position": 2543
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/heser_0.png",
+                "caption": "",
+                "position": 2544
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/styleheat_0.png",
+                "caption": "",
+                "position": 2545
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/source_1.png",
+                "caption": "",
+                "position": 2548
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/driver_1.png",
+                "caption": "",
+                "position": 2549
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/our_1.png",
+                "caption": "",
+                "position": 2550
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/heser_1.png",
+                "caption": "",
+                "position": 2551
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/styleheat_1.png",
+                "caption": "",
+                "position": 2552
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/source_2.png",
+                "caption": "",
+                "position": 2555
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/driver_2.png",
+                "caption": "",
+                "position": 2556
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/our_2.png",
+                "caption": "",
+                "position": 2557
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/heser_2.png",
+                "caption": "",
+                "position": 2558
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/styleheat_2.png",
+                "caption": "",
+                "position": 2559
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/source_3.png",
+                "caption": "",
+                "position": 2562
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/driver_3.png",
+                "caption": "",
+                "position": 2563
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/our_3.png",
+                "caption": "",
+                "position": 2564
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/heser_3.png",
+                "caption": "",
+                "position": 2565
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/styleheat_3.png",
+                "caption": "",
+                "position": 2566
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/source_4.png",
+                "caption": "",
+                "position": 2569
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/driver_4.png",
+                "caption": "",
+                "position": 2570
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/our_4.png",
+                "caption": "",
+                "position": 2571
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/heser_4.png",
+                "caption": "",
+                "position": 2572
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/styleheat_4.png",
+                "caption": "",
+                "position": 2573
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/source_5.png",
+                "caption": "",
+                "position": 2576
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/driver_5.png",
+                "caption": "",
+                "position": 2577
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/our_5.png",
+                "caption": "",
+                "position": 2578
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/heser_5.png",
+                "caption": "",
+                "position": 2579
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/self_512/styleheat_5.png",
+                "caption": "",
+                "position": 2580
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/source_1.png",
+                "caption": "",
+                "position": 2592
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/driver_1.png",
+                "caption": "",
+                "position": 2608
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/our_1.png",
+                "caption": "",
+                "position": 2609
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/dpe_1.png",
+                "caption": "",
+                "position": 2610
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/dagan_1.png",
+                "caption": "",
+                "position": 2611
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/lia_1.png",
+                "caption": "",
+                "position": 2612
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/thin_1.png",
+                "caption": "",
+                "position": 2613
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/source_3.png",
+                "caption": "",
+                "position": 2616
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/driver_3.png",
+                "caption": "",
+                "position": 2617
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/our_3.png",
+                "caption": "",
+                "position": 2618
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/dpe_3.png",
+                "caption": "",
+                "position": 2619
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/dagan_3.png",
+                "caption": "",
+                "position": 2620
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/lia_3.png",
+                "caption": "",
+                "position": 2621
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/thin_3.png",
+                "caption": "",
+                "position": 2622
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/source_4.png",
+                "caption": "",
+                "position": 2625
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/driver_4.png",
+                "caption": "",
+                "position": 2626
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/our_4.png",
+                "caption": "",
+                "position": 2627
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/dpe_4.png",
+                "caption": "",
+                "position": 2628
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/dagan_4.png",
+                "caption": "",
+                "position": 2629
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/lia_4.png",
+                "caption": "",
+                "position": 2630
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/thin_4.png",
+                "caption": "",
+                "position": 2631
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/source_2.png",
+                "caption": "",
+                "position": 2634
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/driver_2.png",
+                "caption": "",
+                "position": 2635
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/our_2.png",
+                "caption": "",
+                "position": 2636
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/dpe_2.png",
+                "caption": "",
+                "position": 2637
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/dagan_2.png",
+                "caption": "",
+                "position": 2638
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/lia_2.png",
+                "caption": "",
+                "position": 2639
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/thin_2.png",
+                "caption": "",
+                "position": 2640
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/source_1.png",
+                "caption": "Figure 14:Cross-reenactment results on256×256256256256\\times 256256 × 256",
+                "position": 2645
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/x2face_1.png",
+                "caption": "",
+                "position": 2665
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/fomm_1.png",
+                "caption": "",
+                "position": 2666
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/bilayer_1.png",
+                "caption": "",
+                "position": 2667
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/pirender_1.png",
+                "caption": "",
+                "position": 2668
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/x2face_3.png",
+                "caption": "",
+                "position": 2674
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/fomm_3.png",
+                "caption": "",
+                "position": 2675
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/bilayer_3.png",
+                "caption": "",
+                "position": 2676
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/pirender_3.png",
+                "caption": "",
+                "position": 2677
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/x2face_4.png",
+                "caption": "",
+                "position": 2683
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/fomm_4.png",
+                "caption": "",
+                "position": 2684
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/bilayer_4.png",
+                "caption": "",
+                "position": 2685
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/pirender_4.png",
+                "caption": "",
+                "position": 2686
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/x2face_2.png",
+                "caption": "",
+                "position": 2692
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/fomm_2.png",
+                "caption": "",
+                "position": 2693
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/bilayer_2.png",
+                "caption": "",
+                "position": 2694
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18417/extracted/6235111/images/aligner_supp/cross_256_1/pirender_2.png",
+                "caption": "",
+                "position": 2695
+            }
+        ]
+    },
+    {
+        "header": "Appendix DFurther ablations on Aligner",
+        "images": []
+    }
+]
