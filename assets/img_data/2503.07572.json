@@ -1,0 +1,196 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.07572/x1.png",
+                "caption": "Figure 1:Standard outcome-reward reinforcement fine-tuning vs. our meta reinforcement fine-tuning (MRT).Standard techniques for fine-tuning LLMs to use test-time compute optimize outcome reward at the end of a long trace. This does not incentivize the model to make use of intermediate tokens to make progress (i.e., probability of eventual success) and leads to1)unnecessarily long output traces and2)inability to make steady progress on new, hard problems as shown in(a).MRT, shown in(b), trains the LLM to minimize cumulative regret over the entire output stream (red, shaded area) by optimizing a dense reward function in addition to sparse 0/1 reward and thus alleviates both challenges in(a).",
+                "position": 143
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/teaser_horizontal.png",
+                "caption": "Figure 2:MRTuses dense rewards based on progress throughout the thinking trace (segmented into “episodes”) to improve final performance and test-time efficiency. Standard fine-tuning only trains models with outcome rewards at the end, thus reinforcing several traces that make subpar progress but somehow succeed (Figure1(a)).",
+                "position": 158
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/x2.png",
+                "caption": "Figure 3:R1 scaling curve on Omni-MATH subset.We compare scaling up test-time compute withdirectpass@k for k = 1,⋯⋯\\cdots⋯, 32 and[maj@p]jsubscriptdelimited-[]maj@p𝑗[\\textbf{maj@p}]_{j}[ maj@p ] start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPTfor p = 1, 2, 4, 8. Each blue point combines 5 episodes together.",
+                "position": 308
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/x3.png",
+                "caption": "Figure 4:Explore/exploit spectrum.Final reward RL does not reward intermediate episodes encouraging unstructured exploration, whereas SCoRe[23,33]constrains each episode based on its outcome reward making it too exploitative.MRTstrikes a balance by assigning an information gain based reward which aims to make progress in a budget-agnostic setting.",
+                "position": 342
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/mrt_settings.png",
+                "caption": "Figure 5:The two settings we study.Left:open-ended parametrization. The model uses explicit thinking markers (<think> and </think>) to work through a problem with multiple strategies.Right:backtracking search. The model directly solves the problem with a step-by-step solution. In each episode, the model identifies errors at specific steps and backtracks to correct them (returning to step 3, then later to step 7) until reaching the correct answer.",
+                "position": 447
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/MRT-overview.png",
+                "caption": "Figure 6:MRTimplementation.Left:TheSTaRvariant begins by generating a complete rollout for each query𝐱𝐱\\mathbf{x}bold_xsampled from dataset𝒟trainsubscript𝒟train\\mathcal{D}_{\\mathrm{train}}caligraphic_D start_POSTSUBSCRIPT roman_train end_POSTSUBSCRIPT. Then,MRTsegments thinking traces into distinct episodes𝐳jsubscript𝐳𝑗\\mathbf{z}_{j}bold_z start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPTakin to our analysis in Section5. For each prefix𝐳0:jsubscript𝐳:0𝑗\\mathbf{z}_{0:j}bold_z start_POSTSUBSCRIPT 0 : italic_j end_POSTSUBSCRIPT, we estimate rewardJr(μ(⋅|𝐳0:j,𝐱))J_{r}(\\mu(\\cdot|\\mathbf{z}_{0:j},\\mathbf{x}))italic_J start_POSTSUBSCRIPT italic_r end_POSTSUBSCRIPT ( italic_μ ( ⋅ | bold_z start_POSTSUBSCRIPT 0 : italic_j end_POSTSUBSCRIPT , bold_x ) )by evaluating the average accuracy of solutions produced after terminating the thought block at this prefix. After computing rewards across all prefixes, we calculate progressrprgμ⁢(𝐳0:j;x)subscriptsuperscript𝑟𝜇prgsubscript𝐳:0𝑗𝑥r^{\\mu}_{\\mathrm{prg}}(\\mathbf{z}_{0:j};x)italic_r start_POSTSUPERSCRIPT italic_μ end_POSTSUPERSCRIPT start_POSTSUBSCRIPT roman_prg end_POSTSUBSCRIPT ( bold_z start_POSTSUBSCRIPT 0 : italic_j end_POSTSUBSCRIPT ; italic_x )using Definition6.1. The STaR variant selectively retains only reasoning traces that maximize progress and are also followed by correct solutions once thinking terminates.Right:TheRLvariant initiates by generating a partial rollout for each query𝐱𝐱\\mathbf{x}bold_xsampled from𝒟trainsubscript𝒟train\\mathcal{D}_{\\mathrm{train}}caligraphic_D start_POSTSUBSCRIPT roman_train end_POSTSUBSCRIPT, terminating after a random number of episodes. Then it generatesm𝑚mitalic_mon-policy rollouts that terminate reasoning at the prefix and immediately produce final solutions as well as rollouts that continue reasoning. Normalizing rewards across this set of traces allows us to implicitly compute the progress bonus. Finally, we update the policy with an aggregation of this dense reward and the final 0/1 outcome reward.",
+                "position": 460
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/AIME_ds_1.5_maj_k.png",
+                "caption": "Figure 7:MRT(RL and STaR) results on DeepSeek-R1-Distill-Qwen-1.5B. We plot maj@k performance of models for k = 1, 2, …, 10 on AIME 2024 (left) and MATH500 (right). The orange lines correspond toMRTand the green lines correspond to outcome-reward training, with★★\\bigstar★denoting RL and∙∙\\bullet∙denoting STaR / SFT training.",
+                "position": 647
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/MATH500_ds_1.5_maj_k.png",
+                "caption": "",
+                "position": 650
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/AIME_ds_1.5_STaR_maj_k.png",
+                "caption": "Figure 8:Left:MRT(STaR) with 8B base. We plot maj@K performance of models on AIME for K∈[1,10]absent110\\in[1,10]∈ [ 1 , 10 ]against the total tokens spent. We also run linearized search (dashed line) for MRT (rest are parallel).Right:MRT(RL) with 3B base. Similarly to the left plot, we report maj@K against the total tokens spent.",
+                "position": 670
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/AIME_ds_1.5_RL_maj_k.png",
+                "caption": "",
+                "position": 673
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/regret_mrt_star.png",
+                "caption": "Figure 9:Normalized regret of different algorithms at different deployment @token budgetsC0subscriptC0C_{0}italic_C start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT. The first four points are at budgets 4096, 8192, 12288, and 16384. The next four points in dashed lines are extrapolations toC0=subscript𝐶0absentC_{0}=italic_C start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT =20480, 24576, 28672, and 32768, which correspond to 2, 4, 6, and 8 extensions of the output trace, following the budget forcing technique in s1[30]. In the left plot, we run the STaR variant ofMRTand the right plot corresponds to the DeepScaleR-1.5B-Preview base model where we run the RL variant. In both cases, we conduct this study on AIME 2025. Observe thatMRTleads to the smallest normalized regret, both when evaluating within the maximal budget and when extrapolating to larger budgets, even when outcome-reward training (e.g., Qwen-7B STaR) starts to plateau and collapse to the base model.",
+                "position": 709
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/regret_mrt_rl.png",
+                "caption": "",
+                "position": 712
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/training_completion_length_deepscale.png",
+                "caption": "Figure 10:Evolution of length during RL training. Length largely oscillates around similar values for the most part of training, after an initial increase from the initialization length.",
+                "position": 739
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/deepscaler_length_performance.png",
+                "caption": "Figure 11:(Source:[27])DeepScaleR’s average response length and training rewards as training progresses.",
+                "position": 745
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/8k16k.png",
+                "caption": "",
+                "position": 750
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/x4.png",
+                "caption": "Figure 13:On-policy rolloutgeneration forMRTin the backtracking search setting.MRTallows the model to learn to backtrack (𝐳1subscript𝐳1\\mathbf{z}_{1}bold_z start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT) and generate the corrected attempt (𝐳2subscript𝐳2\\mathbf{z}_{2}bold_z start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT) with a progress-adjusted reward.",
+                "position": 1639
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/x4.png",
+                "caption": "Figure 13:On-policy rolloutgeneration forMRTin the backtracking search setting.MRTallows the model to learn to backtrack (𝐳1subscript𝐳1\\mathbf{z}_{1}bold_z start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT) and generate the corrected attempt (𝐳2subscript𝐳2\\mathbf{z}_{2}bold_z start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT) with a progress-adjusted reward.",
+                "position": 1642
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/x5.png",
+                "caption": "Figure 14:Different data construction schemesfor obtaining warmstart SFT data for the backtracking search setting.MRTtraverses two paths with the shared prefix, making use of backtracking, which RISE style approaches.",
+                "position": 1647
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/loss.png",
+                "caption": "Figure 15:Training lossfor warmstart SFT on multiple data configurations: random stitching (“RISE”[33]), STaR (“rejection sampling”), and our warmstart SFT data (“Backtrack”). A lower loss implies ease of fitting this data.",
+                "position": 1666
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/delta.png",
+                "caption": "Figure 16:Progress histograms in the backtracking search settingover the backtracking episode for RISE andMRT(STaR) on the left and GRPO andMRT(RL) on right, computed on the evaluation set. In each case, using reward values prescribed byMRTamplifies information gain on the test-time trace, enabling it to make consistent progress.",
+                "position": 1680
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/AIME_ds_1.5_pass_k.png",
+                "caption": "Figure 17:MRTpass@k performance of R1-Distill-Qwen-1.5B with RLon (Left) AIME; (Right) MATH500.",
+                "position": 2080
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/MATH500_ds_1.5_pass_k.png",
+                "caption": "",
+                "position": 2083
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/AIME_ds_7_pass_k.png",
+                "caption": "Figure 18:MRTpass@k performance of R1-Distill-Qwen-7B with STaR, on (Left) AIME; (Right) MATH500.",
+                "position": 2087
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/MATH500_ds_7_pass_k.png",
+                "caption": "",
+                "position": 2090
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/AIME_ds_7_maj_k.png",
+                "caption": "Figure 19:MRTmaj@k performance of R1-Distill-Qwen-7B with STaRon (Left) AIME; (Right) MATH500.",
+                "position": 2094
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/MATH500_ds_7_maj_k.png",
+                "caption": "",
+                "position": 2097
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/AIME_ds_1.5_STaR_pass_k.png",
+                "caption": "Figure 20:MRTpass@k performance of R1-Distill-Qwen-1.5Bfor k = 1, 2, …, 10 on AIME (Left) STaR; (Right) RL. Observe thatMRTattains the best performance as more tokens are sampled.",
+                "position": 2105
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/AIME_ds_1.5_RL_pass_k.png",
+                "caption": "",
+                "position": 2108
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/r1_episodes.png",
+                "caption": "Figure 23:Distribution of the number of episodes generated by R1 responses on AIME and Omni-MATH.",
+                "position": 2163
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/r1_scaling_curve_omnimath.png",
+                "caption": "Figure 24:DeepSeek-R1-Distill-Qwen-32B scaling curve on Omni-MATH subset across different episodes. We compare scaling up the test-time compute for the R1-32B distilled model withdirectpass@k for k = 1, 2, 8, 16, 32 against[maj@p]jsubscriptdelimited-[]maj@p𝑗[\\textbf{maj@p}]_{j}[ maj@p ] start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPTfor p = 1, 2, 4, 8 and varying levels ofj𝑗jitalic_j. Note that the total episodes matches the length of the blue curve. It is a range rather than a single number due to the concatenation of episodes into groups of 5 as mentioned in the full analysis.",
+                "position": 2166
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/r1_scaling_curve_aime.png",
+                "caption": "Figure 25:DeepSeek-R1-Distill-Qwen-32B scaling curve on AIME 2024 across different episodes. We compare scaling up R1 compute withdirectpass@k for k = 1, 2, 8, 16, 32 against[maj@p]jsubscriptdelimited-[]maj@p𝑗[\\textbf{maj@p}]_{j}[ maj@p ] start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPTfor p = 1, 2, 4, 8 and varying levels ofj𝑗jitalic_j. It is a range rather than a single number due to the concatenation of episodes into groups of 3 as mentioned in the full analysis.",
+                "position": 2169
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/mrt_star_oa.png",
+                "caption": "Figure 26:Normalized regret of different algorithms at different episode budgets.Left:MRT(STaR) on DeepSeek-R1-Distill-Qwen-7B has a lower curve than STaR and Base models, indicating better progress in more sequential episodes compared to maj@k on fewer episodes.Right:MRT(RL) on DeepScaleR-1.5B-Preview also shows a lower curve compared to Base and GRPO, again demonstrating better progress in more sequential episodes.",
+                "position": 2186
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/mrt_rl_oa.png",
+                "caption": "",
+                "position": 2189
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/mrt_star_scaling_curve_omnimath.png",
+                "caption": "Figure 27:MRT STaR (on DeepSeek-R1-Distill-Qwen-7B) scaling curve on Omni-MATH subset across different episodes. We compare scaling up compute with thedirectbase model Qwen2.5-Math-7B-Instruct (orange curve) pass@k for k = 1, 2, 8, 16, 32 against[maj@p]jsubscriptdelimited-[]maj@p𝑗[\\textbf{maj@p}]_{j}[ maj@p ] start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPTfor p = 1, 2, 4, 8 and varying levels ofj𝑗jitalic_j(blue curve and green curves).",
+                "position": 2193
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/star_scaling_curve_omnimath.png",
+                "caption": "Figure 28:STaR (on DeepSeek-R1-Distill-Qwen-7B) scaling curve on Omni-MATH subset across different episodes. We compare scaling up compute with thedirectbase model Qwen2.5-Math-7B-Instruct (orange curve) pass@k for k = 1, 2, 8, 16, 32 against[maj@p]jsubscriptdelimited-[]maj@p𝑗[\\textbf{maj@p}]_{j}[ maj@p ] start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPTfor p = 1, 2, 4, 8 and varying levels ofj𝑗jitalic_j(blue curve and green curves).",
+                "position": 2196
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/extrapolate_mrt_star.png",
+                "caption": "Figure 29:Extrapolation by pushing the model to think more with \"Wait\".Left:MRT(STaR).MRT(STaR) on DeepSeek-R1-Distill-Qwen-7B extrapolates better than the other two approaches when budget forcing 2/4/6 times, but the performance dips at 8 times, that said the performance of STaR decreases throughout.Right:MRT(RL) on DeepScaleR-1.5B-Preview without any extrapolation begins at a higher accuracy, but all approaches extrapolate similarly.",
+                "position": 2207
+            },
+            {
+                "img": "https://arxiv.org/html/2503.07572/extracted/6256816/figures/extrapolate_mrt_rl.png",
+                "caption": "",
+                "position": 2210
+            }
+        ]
+    },
+    {
+        "header": "Appendices",
+        "images": []
+    }
+]
