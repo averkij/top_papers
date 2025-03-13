@@ -1,135 +1,42 @@
-[13.03.2025 03:24] Read previous papers.
-[13.03.2025 03:24] Generating top page (month).
-[13.03.2025 03:24] Writing top page (month).
 [13.03.2025 04:13] Read previous papers.
-[13.03.2025 04:13] Get feed.
-[13.03.2025 04:13] Extract page data from URL. URL: https://huggingface.co/papers/2503.09573
-[13.03.2025 04:13] Get page data from previous paper. URL: https://huggingface.co/papers/2503.09427
-[13.03.2025 04:13] Obtaining deleted papers (sometimes HF Daily Papers move some articles from today to past days).
-[13.03.2025 04:13] No deleted papers detected.
-[13.03.2025 04:13] Downloading and parsing papers (pdf, html). Total: 2.
-[13.03.2025 04:13] Downloading and parsing paper https://huggingface.co/papers/2503.09573.
-[13.03.2025 04:13] Downloading paper 2503.09573 from http://arxiv.org/pdf/2503.09573v1...
-[13.03.2025 04:13] Extracting affiliations from text.
-[13.03.2025 04:13] OpenAI request. Model: gpt-4o-mini. Prompt: I give you a contaminated text with start of ML paper. Extract all authors affiliations as a single institute, firm, company, etc. Return items as a Python plain list only with affiliations. Do not provide commentaries. If there are no affiliations return empty list.
-
-Text:"Published as conference paper at ICLR 2025 BLOCK DIFFUSION: INTERPOLATING BETWEEN AUTOREGRESSIVE AND DIFFUSION LANGUAGE MODELS Marianne Arriola Aaron Kareem Gokaslan Justin Chiu Zhihan Yang Zhixuan Qi Jiaqi Han Subham Sekhar Sahoo Volodymyr Kuleshov "
-[13.03.2025 04:13] Response: []
-[13.03.2025 04:13] Extracting affiliations from text.
-[13.03.2025 04:13] Mistral request. Model: mistral-large-latest. Prompt: I give you a contaminated text with start of ML paper. Extract all authors affiliations as a single institute, firm, company, etc. Return items as a Python plain list only with affiliations. Do not provide commentaries. If there are no affiliations return empty list.
-
-Text:"Published as conference paper at ICLR 2025 BLOCK DIFFUSION: INTERPOLATING BETWEEN AUTOREGRESSIVE AND DIFFUSION LANGUAGE MODELS Marianne Arriola Aaron Kareem Gokaslan Justin Chiu Zhihan Yang Zhixuan Qi Jiaqi Han Subham Sekhar Sahoo Volodymyr KuleshovDiffusion language models offer unique benefits over autoregressive models due to their potential for parallelized generation and controllability, yet they lag in likelihood modeling and are limited to fixed-length generation. In this work, we introduce class of block diffusion language models that interpolate between discrete denoising diffusion and autoregressive models. Block diffusion overcomes key limitations of both approaches by supporting flexible-length generation and improving inference efficiency with KV caching and parallel token sampling. We propose recipe for building effective block diffusion models that includes an efficient training algorithm, estimators of gradient variance, and data-driven noise schedules to minimize the variance. Block diffusion sets new state-of-the-art performance among diffusion models on language modeling benchmarks and enables generation of arbitrary-length sequences. We provide the code1, along with the model weights and blog post on the project page: https://m-arriola.com/bd3lmsDiffusion models are widely used to generate images (Ho et al., 2020; Dhariwal & Nichol, 2021; Sahoo et al., 2024b) and videos (Ho et al., 2022; Gupta et al., 2023), and are becoming increasingly effective at generating discrete data such as text (Lou et al., 2024; Sahoo et al., 2024a) or biological sequences (Avdeyev et al., 2023; Goel et al., 2024). Compared to autoregressive models, diffusion models have the potential to accelerate generation and improve the controllability of model outputs (Schiff et al., 2024; Nisonoff et al., 2024; Li et al., 2024; Sahoo et al., 2024c). Discrete diffusion models currently face at least three limitations. First, in applications such as chat systems, models must generate output sequences of arbitrary length (e.g., response to users question). However, most recent diffusion architectures only generate fixed-length vectors (Austin et al., 2021; Lou et al., 2024). Second, discrete diffusion uses bidirectional context during generation and therefore cannot reuse previous computations with KV caching, which makes inference less efficient (Israel et al., 2025). Third, the quality of discrete diffusion models, as measured by standard metrics such as perplexity, lags behind autoregressive approaches and further limits their applicability (Gulrajani & Hashimoto, 2024; Sahoo et al., 2024a). This paper makes progress towards addressing these limitations by introducing Block Discrete Denoising Diffusion Language Models (BD3-LMs), which interpolate between discrete diffusion and autoregressive models. Specifically, block diffusion models (also known as semi-autoregressive models) define an autoregressive probability distribution over blocks of discrete random variables (Si et al., 2022; 2023); the conditional probability of block given previous blocks is specified by discrete denoising diffusion model (Austin et al., 2021; Sahoo et al., 2024a). Developing effective BD3-LMs involves two challenges. First, efficiently computing the training objective for block diffusion model is not possible using one standard forward pass of neural 5 2 0 2 M 2 1 ] . [ 1 3 7 5 9 0 . 3 0 5 2 : r Correspondence to Marianne Arriola: marriola@cs.cornell.edu Cornell Tech, NY, USA. 1Code: https://github.com/kuleshov-group/bd3lms Stanford University, CA, USA. Cohere, NY, USA. 1 Published as conference paper at ICLR 2025 Figure 1: Block diffusion sequentially generates blocks of tokens by performing diffusion within each block and conditioning on previous blocks. By combining strength from autoregressive and diffusion models, block diffusion overcomes the limitations of both approaches by supporting variable-length, higher-quality generation and improving inference efficiency with KV caching and parallel sampling. network and requires developing specialized algorithms. Second, training is hampered by the high variance of the gradients of the diffusion objective, causing BD3-LMs to under-perform autoregression even with block size of one (when both models should be equivalent). We derive estimators of gradient variance, and demonstrate that it is key contributor to the gap in perplexity between autoregression and diffusion. We then propose custom noise processes that minimize gradient variance and make progress towards closing the perplexity gap. We evaluate BD3-LMs on language modeling benchmarks, and demonstrate that they are able to generate sequences of arbitrary length, including lengths that exceed their training context. In addition, BD3-LMs achieve new state-of-the-art perplexities among discrete diffusion models. Compared to alternative semi-autogressive formulations that perform Gaussian diffusion over embeddings (Han et al., 2022; 2023), our discrete approach features tractable likelihood estimates and yields samples with improved generative perplexity using an order of magnitude fewer generation steps. In summary, our work makes the following contributions: We introduce block discrete diffusion language models, which are autoregressive over blocks of tokens; conditionals over each block are based on discrete diffusion. Unlike prior diffusion models, block diffusion supports variable-length generation and KV caching. We introduce custom training algorithms for block-autoregressive models that enable efficiently leveraging the entire batch of tokens provided to the model. We identify gradient variance as limiting factor of the performance of diffusion models, and we propose custom data-driven noise schedules that reduce gradient variance. Our results establish new state-of-the-art perplexity for discrete diffusion and make progress toward closing the gap to autoregressive models.Notation We consider scalar discrete random variables with categories as one-hot column vectors in the space = {x {0, 1}V : (cid:80) xi = 1} for the simplex . Let the -th category denote special [MASK] token, where is its one-hot vector. We define x1:L as sequence of tokens, where xℓ for all tokens ℓ {1, . . . , L}, and use to denote the set of all such sequences. Throughout the work, we simplify notation and refer to the token sequence as and an individual token as xℓ. Finally, let Cat(; p) be categorical distribution with probability"
-[13.03.2025 04:13] Mistral response. {"id": "81eb10ba471547e3af6da7c9eba7ea55", "object": "chat.completion", "created": 1741839207, "model": "mistral-large-latest", "choices": [{"index": 0, "message": {"role": "assistant", "tool_calls": null, "content": "```python\n[\"Cornell Tech, NY, USA\", \"Stanford University, CA, USA\", \"Cohere, NY, USA\"]\n```"}, "finish_reason": "stop"}], "usage": {"prompt_tokens": 1624, "total_tokens": 1659, "completion_tokens": 35}}
-[13.03.2025 04:13] Response: ```python
-["Cornell Tech, NY, USA", "Stanford University, CA, USA", "Cohere, NY, USA"]
-```
-[13.03.2025 04:13] Deleting PDF ./assets/pdf/2503.09573.pdf.
-[13.03.2025 04:13] Success.
-[13.03.2025 04:13] Downloading and parsing paper https://huggingface.co/papers/2503.09427.
-[13.03.2025 04:13] Extra JSON file exists (./assets/json/2503.09427.json), skip PDF parsing.
-[13.03.2025 04:13] Paper image links file exists (./assets/img_data/2503.09427.json), skip HTML parsing.
-[13.03.2025 04:13] Success.
-[13.03.2025 04:13] Enriching papers with extra data.
-[13.03.2025 04:13] ********************************************************************************
-[13.03.2025 04:13] Abstract 0. Diffusion language models offer unique benefits over autoregressive models due to their potential for parallelized generation and controllability, yet they lag in likelihood modeling and are limited to fixed-length generation. In this work, we introduce a class of block diffusion language models tha...
-[13.03.2025 04:13] ********************************************************************************
-[13.03.2025 04:13] Abstract 1. Pre-trained language models (PLMs) have revolutionized scientific research, yet their application to single-cell analysis remains limited. Text PLMs cannot process single-cell RNA sequencing data, while cell PLMs lack the ability to handle free text, restricting their use in multimodal tasks. Existi...
-[13.03.2025 04:13] Read previous papers.
-[13.03.2025 04:13] Generating reviews via LLM API.
-[13.03.2025 04:13] Querying the API.
-[13.03.2025 04:13] Claude request. Model: claude-3-5-sonnet-20240620. Prompt: Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.
-
-Diffusion language models offer unique benefits over autoregressive models due to their potential for parallelized generation and controllability, yet they lag in likelihood modeling and are limited to fixed-length generation. In this work, we introduce a class of block diffusion language models that interpolate between discrete denoising diffusion and autoregressive models. Block diffusion overcomes key limitations of both approaches by supporting flexible-length generation and improving inference efficiency with KV caching and parallel token sampling. We propose a recipe for building effective block diffusion models that includes an efficient training algorithm, estimators of gradient variance, and data-driven noise schedules to minimize the variance. Block diffusion sets a new state-of-the-art performance among diffusion models on language modeling benchmarks and enables generation of arbitrary-length sequences. We provide the code, along with the model weights and blog post on the project page: https://m-arriola.com/bd3lms/
-[13.03.2025 04:13] Response: {
-  "desc": "Статья представляет новый класс языковых моделей - блочные диффузионные модели. Они объединяют преимущества диффузионных и авторегрессивных моделей, позволяя генерировать тексты произвольной длины и повышая эффективность вывода. Авторы предлагают эффективный алгоритм обучения, оценки дисперсии градиента и расписания шума для минимизации дисперсии. Блочные диффузионные модели достигают нового уровня производительности среди диффузионных моделей в задачах языкового моделирования.",
-  "emoji": "🧩",
-  "title": "Блочные диффузионные модели: лучшее из двух миров в языковом моделировании"
-}
-[13.03.2025 04:13] OpenAI request. Model: gpt-4o-mini. Prompt: Analyze the following research paper text and classify it into one or more relevant topics from the list below. Consider only information from the provided text. Don't add a tag if the topic is not directly related to the article.
-
-Topics:
-
-DATASET: Papers that introduce new datasets or make significant modifications to existing ones
-DATA: Papers focusing on data processing, cleaning, collection, or curation methodologies
-BENCHMARK: Papers proposing or analyzing model evaluation frameworks and benchmarks
-AGENTS: Papers exploring autonomous agents, web agents, or agent-based architectures
-CV: Papers developing computer vision methods or visual processing systems
-RL: Papers investigating reinforcement learning theory or applications
-RLHF: Papers specifically about human feedback in RL (PPO, DPO, etc.)
-RAG: Papers advancing retrieval-augmented generation techniques
-PLP: Papers about Programming Language Processing models or programming benchmarks
-INFERENCE: Papers optimizing model deployment (quantization, pruning, etc.)
-3D: Papers on 3D content generation, processing, or understanding
-AUDIO: Papers advancing speech/audio processing or generation
-VIDEO: Papers on video analysis, generation, or understanding
-MULTIMODAL: Papers combining multiple input/output modalities
-MATH: Papers focused on mathematical theory and algorithms
-MULTILINGUAL: Papers addressing multiple languages or cross-lingual capabilities, including all non English models
-ARCHITECTURE: Papers proposing novel neural architectures or components
-HEALTHCARE: Papers applying ML to medical/healthcare domains
-TRAINING: Papers improving model training or fine-tuning methods
-ROBOTICS: Papers on robotic systems and embodied AI
-SMALL_MODELS: Papers that describe models considering small, below 1 billion parameters or similar 
-
-Return only a Python flat list of topics that match the given text.
-
-Paper text to classify:
-
-"Diffusion language models offer unique benefits over autoregressive models due to their potential for parallelized generation and controllability, yet they lag in likelihood modeling and are limited to fixed-length generation. In this work, we introduce a class of block diffusion language models that interpolate between discrete denoising diffusion and autoregressive models. Block diffusion overcomes key limitations of both approaches by supporting flexible-length generation and improving inference efficiency with KV caching and parallel token sampling. We propose a recipe for building effective block diffusion models that includes an efficient training algorithm, estimators of gradient variance, and data-driven noise schedules to minimize the variance. Block diffusion sets a new state-of-the-art performance among diffusion models on language modeling benchmarks and enables generation of arbitrary-length sequences. We provide the code, along with the model weights and blog post on the project page: https://m-arriola.com/bd3lms/"
-
-[13.03.2025 04:13] Response: ```python
-["ARCHITECTURE", "TRAINING", "BENCHMARK"]
-```
-[13.03.2025 04:13] OpenAI request. Model: gpt-4o-mini. Prompt: Analyze the following research paper text and classify it into one or more relevant topics from the list below. Consider only information from the provided text. Don't add a tag if the topic is not directly related to the article.
-
-Topics:
-
-AGI: Papers discussing artificial general intelligence concepts
-GAMES: Papers applying ML to games or game development
-INTERPRETABILITY: Papers analyzing model behavior and explanations
-REASONING: Papers enhancing logical reasoning capabilities
-TRANSFER_LEARNING: Papers on knowledge transfer between models/domains
-GRAPHS: Papers advancing graph neural networks and applications
-ETHICS: Papers addressing AI ethics, fairness, and bias
-SECURITY: Papers on model security and adversarial robustness
-OPTIMIZATION: Papers advancing training optimization methods
-SURVEY: Papers comprehensively reviewing research areas
-DIFFUSION: Papers on diffusion-based generative models
-ALIGNMENT: Papers about aligning language models with human values, preferences, and intended behavior
-STORY_GENERATION: Papers on story generation, including plot generation and author style adaptation
-HALLUCINATIONS: Papers about the hallucinations, hallucinations analysis and mitigation
-LONG_CONTEXT: Papers about long context handling, including techniques to extend context length
-SYNTHETIC: Papers about using synthetic data for training, including methods for generating and leveraging artificial data
-TRANSLATION: Papers on machine translation, including techniques, data and applications for translating between languages
-LEAKAGE: Papers about data leakage, including issues of unintended data exposure and methods to detect or prevent it
-OPEN_SOURCE: Papers that contribute to open-source projects by releasing models, datasets, or frameworks to the public
-SCIENCE: Papers on scientific applications of LM including understanding of science articles and research automatization
-LOW_RESOURCE: Papers that mention low-resource languages
-
-Return only a Python flat list of topics that match the given text.
-
-Paper text to classify:
-
-"Diffusion language models offer unique benefits over autoregressive models due to their potential for parallelized generation and controllability, yet they lag in likelihood modeling and are limited to fixed-length generation. In this work, we introduce a class of block diffusion language models that interpolate between discrete denoising diffusion and autoregressive models. Block diffusion overcomes key limitations of both approaches by supporting flexible-length generation and improving inference efficiency with KV caching and parallel token sampling. We propose a recipe for building effective block diffusion models that includes an efficient training algorithm, estimators of gradient variance, and data-driven noise schedules to minimize the variance. Block diffusion sets a new state-of-the-art performance among diffusion models on language modeling benchmarks and enables generation of arbitrary-length sequences. We provide the code, along with the model weights and blog post on the project page: https://m-arriola.com/bd3lms/"
-
-[13.03.2025 04:13] Response: ```python
-["DIFFUSION", "OPEN_SOURCE"]
-```
-[13.03.2025 04:13] Response: ParsedChatCompletionMessage[Article](content='{"desc":"This paper presents block diffusion language models, which combine the strengths of diffusion models and autoregressive models. These models allow for flexible-length text generation and improve efficiency during inference by using techniques like KV caching and parallel token sampling. The authors introduce a comprehensive approach for training these models, including methods to reduce gradient variance and optimize noise schedules. As a result, block diffusion models achieve state-of-the-art performance in language modeling tasks and can generate sequences of varying lengths.","title":"Block Diffusion: The Future of Flexible Language Generation"}', refusal=None, role='assistant', annotations=[], audio=None, function_call=None, tool_calls=None, parsed=Article(desc='This paper presents block diffusion language models, which combine the strengths of diffusion models and autoregressive models. These models allow for flexible-length text generation and improve efficiency during inference by using techniques like KV caching and parallel token sampling. The authors introduce a comprehensive approach for training these models, including methods to reduce gradient variance and optimize noise schedules. As a result, block diffusion models achieve state-of-the-art performance in language modeling tasks and can generate sequences of varying lengths.', title='Block Diffusion: The Future of Flexible Language Generation'))
-[13.03.2025 04:13] Response: ParsedChatCompletionMessage[Article](content='{"desc":"扩散语言模型相比自回归模型具有独特的优势，如并行生成和可控性，但在似然建模方面表现较差，并且生成长度固定。本文提出了一类块扩散语言模型，结合了离散去噪扩散和自回归模型的优点。块扩散克服了这两种方法的关键限制，支持灵活长度的生成，并通过KV缓存和并行令牌采样提高推理效率。我们提出了一种构建有效块扩散模型的方案，包括高效的训练算法、梯度方差估计器和数据驱动的噪声调度，以最小化方差。","title":"块扩散模型：灵活生成与高效推理的结合"}', refusal=None, role='assistant', annotations=[], audio=None, function_call=None, tool_calls=None, parsed=Article(desc='扩散语言模型相比自回归模型具有独特的优势，如并行生成和可控性，但在似然建模方面表现较差，并且生成长度固定。本文提出了一类块扩散语言模型，结合了离散去噪扩散和自回归模型的优点。块扩散克服了这两种方法的关键限制，支持灵活长度的生成，并通过KV缓存和并行令牌采样提高推理效率。我们提出了一种构建有效块扩散模型的方案，包括高效的训练算法、梯度方差估计器和数据驱动的噪声调度，以最小化方差。', title='块扩散模型：灵活生成与高效推理的结合'))
-[13.03.2025 04:13] Using data from previous issue: {"categories": ["#plp", "#transfer_learning", "#science", "#multimodal", "#dataset", "#training"], "emoji": "🧬", "ru": {"title": "Единая модель для анализа клеток и текста", "desc": "scMMGPT - это новая языковая модель, объединяющая анализ одиночных клеток и текста. Она решает проблему ограниченност
-[13.03.2025 04:13] Loading Chinese text from previous data.
-[13.03.2025 04:13] Renaming data file.
-[13.03.2025 04:13] Renaming previous data. hf_papers.json to ./d/2025-03-13.json
-[13.03.2025 04:13] Saving new data file.
-[13.03.2025 04:13] Generating page.
-[13.03.2025 04:13] Renaming previous page.
-[13.03.2025 04:13] Renaming previous data. index.html to ./d/2025-03-13.html
-[13.03.2025 04:13] [Experimental] Generating Chinese page for reading.
-[13.03.2025 04:13] Chinese vocab [{'word': '基于', 'pinyin': 'jī yú', 'trans': 'based on'}, {'word': '架构', 'pinyin': 'jià gòu', 'trans': 'architecture'}, {'word': '开放', 'pinyin': 'kāi fàng', 'trans': 'open'}, {'word': '基础', 'pinyin': 'jī chǔ', 'trans': 'foundation'}, {'word': '模型', 'pinyin': 'mó xíng', 'trans': 'model'}, {'word': '生成', 'pinyin': 'shēng chéng', 'trans': 'generate'}, {'word': '保持', 'pinyin': 'bǎo chí', 'trans': 'maintain'}, {'word': '对齐', 'pinyin': 'duì qí', 'trans': 'alignment'}, {'word': '连贯', 'pinyin': 'lián guàn', 'trans': 'coherent'}, {'word': '结构', 'pinyin': 'jié gòu', 'trans': 'structure'}, {'word': '引人入胜', 'pinyin': 'yǐn rén rù shèng', 'trans': 'fascinating'}, {'word': '旋律', 'pinyin': 'xuán lǜ', 'trans': 'melody'}, {'word': '多任务', 'pinyin': 'duō rèn wù', 'trans': 'multi-task'}, {'word': '多阶段', 'pinyin': 'duō jiē duàn', 'trans': 'multi-stage'}, {'word': '预训练', 'pinyin': 'yù xùn liàn', 'trans': 'pre-training'}, {'word': '实现', 'pinyin': 'shí xiàn', 'trans': 'achieve'}, {'word': '风格', 'pinyin': 'fēng gé', 'trans': 'style'}, {'word': '转换', 'pinyin': 'zhuǎn huàn', 'trans': 'conversion'}, {'word': '双向', 'pinyin': 'shuāng xiàng', 'trans': 'bidirectional'}, {'word': '匹敌', 'pinyin': 'pǐ dí', 'trans': 'match'}, {'word': '超越', 'pinyin': 'chāo yuè', 'trans': 'surpass'}, {'word': '专有', 'pinyin': 'zhuān yǒu', 'trans': 'proprietary'}, {'word': '系统', 'pinyin': 'xì tǒng', 'trans': 'system'}, {'word': '灵活性', 'pinyin': 'líng huó xìng', 'trans': 'flexibility'}, {'word': '此外', 'pinyin': 'cǐ wài', 'trans': 'moreover'}, {'word': '理解', 'pinyin': 'lǐ jiě', 'trans': 'understanding'}, {'word': '任务', 'pinyin': 'rèn wù', 'trans': 'task'}, {'word': '表现', 'pinyin': 'biǎo xiàn', 'trans': 'performance'}, {'word': '出色', 'pinyin': 'chū sè', 'trans': 'outstanding'}]
-[13.03.2025 04:13] Renaming previous Chinese page.
-[13.03.2025 04:13] Renaming previous data. zh.html to ./d/2025-03-12_zh_reading_task.html
-[13.03.2025 04:13] Writing Chinese reading task.
-[13.03.2025 04:13] Writing result.
-[13.03.2025 04:13] Renaming log file.
-[13.03.2025 04:13] Renaming previous data. log.txt to ./logs/2025-03-13_last_log.txt
+[13.03.2025 04:13] Generating top page (month).
+[13.03.2025 04:13] Writing top page (month).
+[13.03.2025 05:11] Read previous papers.
+[13.03.2025 05:11] Get feed.
+[13.03.2025 05:11] Get page data from previous paper. URL: https://huggingface.co/papers/2503.09573
+[13.03.2025 05:11] Get page data from previous paper. URL: https://huggingface.co/papers/2503.09427
+[13.03.2025 05:11] Obtaining deleted papers (sometimes HF Daily Papers move some articles from today to past days).
+[13.03.2025 05:11] No deleted papers detected.
+[13.03.2025 05:11] Downloading and parsing papers (pdf, html). Total: 2.
+[13.03.2025 05:11] Downloading and parsing paper https://huggingface.co/papers/2503.09573.
+[13.03.2025 05:11] Extra JSON file exists (./assets/json/2503.09573.json), skip PDF parsing.
+[13.03.2025 05:11] Paper image links file exists (./assets/img_data/2503.09573.json), skip HTML parsing.
+[13.03.2025 05:11] Success.
+[13.03.2025 05:11] Downloading and parsing paper https://huggingface.co/papers/2503.09427.
+[13.03.2025 05:11] Extra JSON file exists (./assets/json/2503.09427.json), skip PDF parsing.
+[13.03.2025 05:11] Paper image links file exists (./assets/img_data/2503.09427.json), skip HTML parsing.
+[13.03.2025 05:11] Success.
+[13.03.2025 05:11] Enriching papers with extra data.
+[13.03.2025 05:11] ********************************************************************************
+[13.03.2025 05:11] Abstract 0. Diffusion language models offer unique benefits over autoregressive models due to their potential for parallelized generation and controllability, yet they lag in likelihood modeling and are limited to fixed-length generation. In this work, we introduce a class of block diffusion language models tha...
+[13.03.2025 05:11] ********************************************************************************
+[13.03.2025 05:11] Abstract 1. Pre-trained language models (PLMs) have revolutionized scientific research, yet their application to single-cell analysis remains limited. Text PLMs cannot process single-cell RNA sequencing data, while cell PLMs lack the ability to handle free text, restricting their use in multimodal tasks. Existi...
+[13.03.2025 05:11] Read previous papers.
+[13.03.2025 05:11] Generating reviews via LLM API.
+[13.03.2025 05:11] Using data from previous issue: {"categories": ["#open_source", "#diffusion", "#benchmark", "#training", "#architecture"], "emoji": "🧩", "ru": {"title": "Блочные диффузионные модели: лучшее из двух миров в языковом моделировании", "desc": "Статья представляет новый класс языковых моделей - блочные диффузионные модели. Они объединя
+[13.03.2025 05:11] Using data from previous issue: {"categories": ["#plp", "#transfer_learning", "#science", "#multimodal", "#dataset", "#training"], "emoji": "🧬", "ru": {"title": "Единая модель для анализа клеток и текста", "desc": "scMMGPT - это новая языковая модель, объединяющая анализ одиночных клеток и текста. Она решает проблему ограниченност
+[13.03.2025 05:11] Loading Chinese text from previous data.
+[13.03.2025 05:11] Renaming data file.
+[13.03.2025 05:11] Renaming previous data. hf_papers.json to ./d/2025-03-13.json
+[13.03.2025 05:11] Saving new data file.
+[13.03.2025 05:11] Generating page.
+[13.03.2025 05:11] Renaming previous page.
+[13.03.2025 05:11] Renaming previous data. index.html to ./d/2025-03-13.html
+[13.03.2025 05:11] [Experimental] Generating Chinese page for reading.
+[13.03.2025 05:11] Chinese vocab [{'word': '基于', 'pinyin': 'jī yú', 'trans': 'based on'}, {'word': '架构', 'pinyin': 'jià gòu', 'trans': 'architecture'}, {'word': '开放', 'pinyin': 'kāi fàng', 'trans': 'open'}, {'word': '基础', 'pinyin': 'jī chǔ', 'trans': 'foundation'}, {'word': '模型', 'pinyin': 'mó xíng', 'trans': 'model'}, {'word': '生成', 'pinyin': 'shēng chéng', 'trans': 'generate'}, {'word': '保持', 'pinyin': 'bǎo chí', 'trans': 'maintain'}, {'word': '对齐', 'pinyin': 'duì qí', 'trans': 'alignment'}, {'word': '连贯', 'pinyin': 'lián guàn', 'trans': 'coherent'}, {'word': '结构', 'pinyin': 'jié gòu', 'trans': 'structure'}, {'word': '引人入胜', 'pinyin': 'yǐn rén rù shèng', 'trans': 'fascinating'}, {'word': '旋律', 'pinyin': 'xuán lǜ', 'trans': 'melody'}, {'word': '多任务', 'pinyin': 'duō rèn wù', 'trans': 'multi-task'}, {'word': '多阶段', 'pinyin': 'duō jiē duàn', 'trans': 'multi-stage'}, {'word': '预训练', 'pinyin': 'yù xùn liàn', 'trans': 'pre-training'}, {'word': '实现', 'pinyin': 'shí xiàn', 'trans': 'achieve'}, {'word': '风格', 'pinyin': 'fēng gé', 'trans': 'style'}, {'word': '转换', 'pinyin': 'zhuǎn huàn', 'trans': 'conversion'}, {'word': '双向', 'pinyin': 'shuāng xiàng', 'trans': 'bidirectional'}, {'word': '匹敌', 'pinyin': 'pǐ dí', 'trans': 'match'}, {'word': '超越', 'pinyin': 'chāo yuè', 'trans': 'surpass'}, {'word': '专有', 'pinyin': 'zhuān yǒu', 'trans': 'proprietary'}, {'word': '系统', 'pinyin': 'xì tǒng', 'trans': 'system'}, {'word': '灵活性', 'pinyin': 'líng huó xìng', 'trans': 'flexibility'}, {'word': '此外', 'pinyin': 'cǐ wài', 'trans': 'moreover'}, {'word': '理解', 'pinyin': 'lǐ jiě', 'trans': 'understanding'}, {'word': '任务', 'pinyin': 'rèn wù', 'trans': 'task'}, {'word': '表现', 'pinyin': 'biǎo xiàn', 'trans': 'performance'}, {'word': '出色', 'pinyin': 'chū sè', 'trans': 'outstanding'}]
+[13.03.2025 05:11] Renaming previous Chinese page.
+[13.03.2025 05:11] Renaming previous data. zh.html to ./d/2025-03-12_zh_reading_task.html
+[13.03.2025 05:11] Writing Chinese reading task.
+[13.03.2025 05:11] Writing result.
+[13.03.2025 05:11] Renaming log file.
+[13.03.2025 05:11] Renaming previous data. log.txt to ./logs/2025-03-13_last_log.txt
