@@ -1,0 +1,77 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Works",
+        "images": []
+    },
+    {
+        "header": "3Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10638/x1.png",
+                "caption": "Figure 1:Classifier guidance decomposition (Eq.(6)) does not always hold.We apply classifier guidance on 1D data from𝒩⁢(±1.0,0.05)𝒩plus-or-minus1.00.05\\mathcal{N}(\\pm 1.0,0.05)caligraphic_N ( ± 1.0 , 0.05 ),𝒩⁢(±0.5,0.05)𝒩plus-or-minus0.50.05\\mathcal{N}(\\pm 0.5,0.05)caligraphic_N ( ± 0.5 , 0.05 ), and𝒩⁢(±0.1,0.05)𝒩plus-or-minus0.10.05\\mathcal{N}(\\pm 0.1,0.05)caligraphic_N ( ± 0.1 , 0.05 )respectively.\nThe denoising diffusion process starts from left to right.\nFor each dataset, we train a vanilla conditional diffusion model and a decomposed version,i.e., an unconditional diffusion model and a classifier. We generate 20k samples (10k for each class) from both sides of Eq.(6) with the same initial noises and compute the absolute differences for each step in the denoising diffusion process.\nThis plot shows the average as well as the standard deviation for the difference.\nApparently, the classifier guidance decomposition doesn’t hold with equality.",
+                "position": 312
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10638/extracted/6273155/figures/gaussian_1d_traj_cfg/cfg_mean_-1.0_1.0_std_0.05_0.05_classifier_none.png",
+                "caption": "Figure 3:Classifier-free guidance distorts denoising diffusion trajectories.We apply denoising diffusion models with classifier-free guidance on a 1D dataset composed of data from𝒩⁢(±1.0,0.05)𝒩plus-or-minus1.00.05\\mathcal{N}(\\pm 1.0,0.05)caligraphic_N ( ± 1.0 , 0.05 ).\nThe denoising diffusion process for all plots starts from the bottom to the top.\nWe use the same trained model as well as the same initial noise for all plots.\nThe trajectory differences are solely caused by different guidance scales.\nSimilar to Fig.2, classifier-free guidance with large guidance scale distorts the trajectories for vanilla conditional models (the first plot) to push them away from the dataset decision boundary,i.e., the origin.\nDifferent scales in Fig.2and this figure arise from classifier guidance and classifier-free guidance’s differing sensitivities. Here, scale=2.5 distorts trajectories significantly, while Fig.2’s scale=4 causes minor changes. We hypothesize that classifier-free guidance’s greater sensitivity stems from its training with conditioning dropout.",
+                "position": 440
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10638/extracted/6273155/figures/fractal_2d_cfg/cfg_overlap_1.0_classifier_none_flat.png",
+                "caption": "Figure 5:Classifier-free guidance with flow-matching based postprocessing (Sec.3.4) on 2D fractal data.The level of entanglement is the same as that in Fig.4(c).\nEach plot with ‘Post.‘ in the title displays generations after applying postprocessing on generations from the corresponding previous plot.\nWe observe that the postprocessing step continuously improves the fidelity of the generations via moving outlier samples back to the real data distribution as the leaf branches become much sharper, regardless of the guidance scale we use.",
+                "position": 538
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AOne-for-All-Scales Postprocessing Model",
+        "images": []
+    },
+    {
+        "header": "Appendix BExperiments on CIFAR-10",
+        "images": []
+    },
+    {
+        "header": "Appendix CImplementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10638/x2.png",
+                "caption": "Figure S6:MLP-based denoising diffusion model.Here we provide details about the network structure for our MLP-based denoising diffusion model, which is used for experiments on 1D Gaussian data in Sec.3and on 2D fractal data in Sec.4.1.\nIn each block, the top row provides the layer’s name. The bottom row illustrates the tensor shape after the corresponding layer’s processing. Here,B𝐵Bitalic_BandD𝐷Ditalic_Dstand for batch size and data channel respectively.\nFor example,D𝐷Ditalic_Dequals 1 and 2 respectively for the data of 1D Gaussian and 2D fractal.\nWe have the following position encoding function applied oneach channelof the input data:{sin⁡(2⁢π⋅u0),…,sin⁡(2⁢π⋅uC−1),cos⁡(2⁢π⋅u0),…,cos⁡(2⁢π⋅uC−1)}⋅2𝜋subscript𝑢0…⋅2𝜋subscript𝑢𝐶1⋅2𝜋subscript𝑢0…⋅2𝜋subscript𝑢𝐶1\\{\\sin(2\\pi\\cdot u_{0}),\\dots,\\sin(2\\pi\\cdot u_{C-1}),\\cos(2\\pi\\cdot u_{0}),%\n\\dots,\\cos(2\\pi\\cdot u_{C-1})\\}{ roman_sin ( 2 italic_π ⋅ italic_u start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT ) , … , roman_sin ( 2 italic_π ⋅ italic_u start_POSTSUBSCRIPT italic_C - 1 end_POSTSUBSCRIPT ) , roman_cos ( 2 italic_π ⋅ italic_u start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT ) , … , roman_cos ( 2 italic_π ⋅ italic_u start_POSTSUBSCRIPT italic_C - 1 end_POSTSUBSCRIPT ) }, whereC=128/2𝐶1282C=128/2italic_C = 128 / 2in our setup.\nWe useui=x⋅exp⁡(i⋅log2⁡(−10000C−1))subscript𝑢𝑖⋅𝑥⋅𝑖subscript210000𝐶1u_{i}=x\\cdot\\exp\\left(i\\cdot\\log_{2}\\left(-\\frac{10000}{C-1}\\right)\\right)italic_u start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT = italic_x ⋅ roman_exp ( italic_i ⋅ roman_log start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT ( - divide start_ARG 10000 end_ARG start_ARG italic_C - 1 end_ARG ) ), wherex𝑥xitalic_xis the value at the corresponding channel the position encoding is applied.\nBlocks with a grey background color are optional.\nConcretely, for classifier guidance, we train anunconditionalmodel, which does not use the conditioning informationc𝑐citalic_c. In contrast, for classifier-free guidance, we enable the embedding layer to train aconditionalmodel.\nThroughout our experiments, we repeat the second to last block four times, namely we haveN=4𝑁4N=4italic_N = 4.",
+                "position": 2297
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10638/extracted/6273155/figures/gaussian_1d_traj_cg/cg_mean_-1.0_1.0_std_0.05_0.05_classifier_bad_50k_per_class.png",
+                "caption": "Figure S8:Classifier guidance with a linear classifier (Fig.2(b)) per-class visualization.",
+                "position": 2553
+            }
+        ]
+    },
+    {
+        "header": "Appendix DLimitations",
+        "images": []
+    },
+    {
+        "header": "Appendix EMore Visualizations",
+        "images": []
+    }
+]
