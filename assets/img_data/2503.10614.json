@@ -1,0 +1,1677 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10614/x1.png",
+                "caption": "",
+                "position": 106
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10614/x2.png",
+                "caption": "Figure 2:Examples of three significant challenges encountered by existing LoRA-based methods: 1) Content inconsistency: the structure of the generated image is inconsistent with that of the content image; 2) Style misalignment: the style of the generated image does not align with that of the style image; 3) Content leakage: content from the style image undesirably leaks into the generated image.",
+                "position": 149
+            }
+        ]
+    },
+    {
+        "header": "3Preliminaries",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10614/x3.png",
+                "caption": "Figure 3:Comparison of the average loss across various timestep intervals for different parameterizations of diffusion models.",
+                "position": 199
+            }
+        ]
+    },
+    {
+        "header": "4Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10614/x4.png",
+                "caption": "Figure 4:Method Overview.We replace the standardϵitalic-ϵ\\epsilonitalic_ϵ-prediction withx0subscript𝑥0x_{0}italic_x start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT-prediction for training both style and content LoRAs. (Bottom-left) For training the content LoRA, we propose a loss transition strategy to capture both the global structure and local details of the content image. (Top) To disentangle the learning of style and content from the style image, we introduce a two-step training strategy: first, learn a content-consistent LoRA using the proposed loss transition, and then, train a style LoRA while keeping the content LoRA fixed.",
+                "position": 207
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/London_eye.jpg",
+                "caption": "Figure 5:Qualitative comparison.We present style transfer results of our method and four baseline methods, including B-LoRA[11], ZipLoRA[41], StyleID[8], and StyleAligned[17]. Our method demonstrates superior performance in preserving the structure of the content image while accurately applying the style from the reference style image.",
+                "position": 265
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/cartoon_line.jpg",
+                "caption": "",
+                "position": 278
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/London_eye-stylized-cartoon_line.jpg",
+                "caption": "",
+                "position": 279
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/blora/London_eye-stylized-cartoon_line.jpg",
+                "caption": "",
+                "position": 280
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ziplora/London_eye-stylized-cartoon_line.jpg",
+                "caption": "",
+                "position": 281
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/styleid/London_eye-stylized-cartoon_line.jpg",
+                "caption": "",
+                "position": 282
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/stylealigned/London_eye-stylized-cartoon_line.jpg",
+                "caption": "",
+                "position": 283
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/landscape.jpg",
+                "caption": "",
+                "position": 287
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/eiffel_tower-stylized-landscape.jpg",
+                "caption": "",
+                "position": 288
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/blora/eiffel_tower-stylized-landscape.jpg",
+                "caption": "",
+                "position": 289
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ziplora/eiffel_tower-stylized-landscape.jpg",
+                "caption": "",
+                "position": 290
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/styleid/eiffel_tower-stylized-landscape.jpg",
+                "caption": "",
+                "position": 291
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/stylealigned/eiffel_tower-stylized-landscape.jpg",
+                "caption": "",
+                "position": 292
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/building.jpg",
+                "caption": "",
+                "position": 295
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/abstract_painting.jpg",
+                "caption": "",
+                "position": 296
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/building-stylized-abstract_painting.jpg",
+                "caption": "",
+                "position": 297
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/blora/building-stylized-abstract_painting.jpg",
+                "caption": "",
+                "position": 298
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ziplora/building-stylized-abstract_painting.jpg",
+                "caption": "",
+                "position": 299
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/styleid/building-stylized-abstract_painting.jpg",
+                "caption": "",
+                "position": 300
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/stylealigned/building-stylized-abstract_painting.jpg",
+                "caption": "",
+                "position": 301
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/sofa-stylized-pig.jpg",
+                "caption": "",
+                "position": 306
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/blora/sofa-stylized-pig.jpg",
+                "caption": "",
+                "position": 307
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ziplora/sofa-stylized-pig.jpg",
+                "caption": "",
+                "position": 308
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/styleid/sofa-stylized-pig.jpg",
+                "caption": "",
+                "position": 309
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/stylealigned/sofa-stylized-pig.jpg",
+                "caption": "",
+                "position": 310
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/eyes.jpg",
+                "caption": "",
+                "position": 314
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/modern-stylized-eyes.jpg",
+                "caption": "",
+                "position": 315
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/blora/modern-stylized-eyes.jpg",
+                "caption": "",
+                "position": 316
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ziplora/modern-stylized-eyes.jpg",
+                "caption": "",
+                "position": 317
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/styleid/modern-stylized-eyes.jpg",
+                "caption": "",
+                "position": 318
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/stylealigned/modern-stylized-eyes.jpg",
+                "caption": "",
+                "position": 319
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/mountain.jpg",
+                "caption": "",
+                "position": 323
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/teddy_bear-stylized-mountain.jpg",
+                "caption": "",
+                "position": 324
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/blora/teddy_bear-stylized-mountain.jpg",
+                "caption": "",
+                "position": 325
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ziplora/teddy_bear-stylized-mountain.jpg",
+                "caption": "",
+                "position": 326
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/styleid/teddy_bear-stylized-mountain.jpg",
+                "caption": "",
+                "position": 327
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/stylealigned/teddy_bear-stylized-mountain.jpg",
+                "caption": "",
+                "position": 328
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/oil_painting.jpg",
+                "caption": "Figure 6:Results generated by ConsisLoRA for three image stylization tasks: (Top) Transferring the style from a reference image to the content of a target image; (Middle) Applying the style described by prompts to a content image; (Bottom) Generating objects described by prompts with the style extracted from a reference image.",
+                "position": 333
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/pirate.jpg",
+                "caption": "",
+                "position": 343
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/orange.jpg",
+                "caption": "",
+                "position": 344
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/house.jpg",
+                "caption": "",
+                "position": 345
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/rain_princess.jpg",
+                "caption": "",
+                "position": 346
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/bedroom.jpg",
+                "caption": "",
+                "position": 350
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/bedroom-stylized-oil_painting.jpg",
+                "caption": "",
+                "position": 351
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/bedroom-stylized-pirate.jpg",
+                "caption": "",
+                "position": 352
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/bedroom-stylized-orange.jpg",
+                "caption": "",
+                "position": 353
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/bedroom-stylized-house.jpg",
+                "caption": "",
+                "position": 354
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/bedroom-stylized-rain_princess.jpg",
+                "caption": "",
+                "position": 355
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/bedroom-stylized-ink_painting.jpg",
+                "caption": "",
+                "position": 356
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/sailboat.jpg",
+                "caption": "",
+                "position": 359
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/sailboat-stylized-oil_painting.jpg",
+                "caption": "",
+                "position": 360
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/sailboat-stylized-pirate.jpg",
+                "caption": "",
+                "position": 361
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/sailboat-stylized-orange.jpg",
+                "caption": "",
+                "position": 362
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/sailboat-stylized-house.jpg",
+                "caption": "",
+                "position": 363
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/sailboat-stylized-rain_princess.jpg",
+                "caption": "",
+                "position": 364
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/sailboat-stylized-ink_painting.jpg",
+                "caption": "",
+                "position": 365
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/cornell.jpg",
+                "caption": "",
+                "position": 377
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/cornell-pixel.jpg",
+                "caption": "",
+                "position": 378
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/cornell-ice.jpg",
+                "caption": "",
+                "position": 379
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/cornell-vintage.jpg",
+                "caption": "",
+                "position": 380
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/cornell-cyberpunk.jpg",
+                "caption": "",
+                "position": 381
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/cornell-sketch.jpg",
+                "caption": "",
+                "position": 382
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/cornell-dark.jpg",
+                "caption": "",
+                "position": 383
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/zebra.jpg",
+                "caption": "",
+                "position": 395
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/dog-zebra.jpg",
+                "caption": "",
+                "position": 396
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/car-zebra.jpg",
+                "caption": "",
+                "position": 397
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/train-zebra.jpg",
+                "caption": "",
+                "position": 398
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/bench-zebra.jpg",
+                "caption": "",
+                "position": 399
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/classroom-zebra.jpg",
+                "caption": "",
+                "position": 400
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/bedroom-zebra.jpg",
+                "caption": "",
+                "position": 401
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10614/x5.png",
+                "caption": "Figure 7:Content and style decomposition.Our method achieves a more accurate and disentangled decomposition of content and style compared to the baseline method.",
+                "position": 738
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/input_guidance1.jpg",
+                "caption": "Figure 8:Inference guidance.Increasing the strengths of content and style guidance correspondingly enhances their impact on the generated images. Zoom in for best view.",
+                "position": 741
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/guidance/building-orignal.jpg",
+                "caption": "",
+                "position": 758
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/guidance/building-content.jpg",
+                "caption": "",
+                "position": 759
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/guidance/building-style.jpg",
+                "caption": "",
+                "position": 760
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/guidance/building-full.jpg",
+                "caption": "",
+                "position": 761
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/input_guidance2.jpg",
+                "caption": "",
+                "position": 764
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/guidance/bedroom-orignal.jpg",
+                "caption": "",
+                "position": 765
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/guidance/bedroom-content.jpg",
+                "caption": "",
+                "position": 766
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/guidance/bedroom-style.jpg",
+                "caption": "",
+                "position": 767
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/guidance/bedroom-full.jpg",
+                "caption": "",
+                "position": 768
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/input_ablation1.jpg",
+                "caption": "Figure 9:Ablation study.We evaluate three variants of our model: 1) replacingx0subscript𝑥0x_{0}italic_x start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT-prediction withϵitalic-ϵ\\epsilonitalic_ϵ-prediction (Var A), 2) removing the two-step training strategy for style LoRA (Var B), and 3) usingx0subscript𝑥0x_{0}italic_x start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT-prediction alone instead of loss transition for content LoRA (Var C). Zoom in for best view.",
+                "position": 788
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/ablation/sofa-stylized-comic_deer-var-a.jpg",
+                "caption": "",
+                "position": 799
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/ablation/sofa-stylized-comic_deer-var-b.jpg",
+                "caption": "",
+                "position": 800
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/ablation/sofa-stylized-comic_deer-var-c.jpg",
+                "caption": "",
+                "position": 801
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/ablation/sofa-stylized-comic_deer.jpg",
+                "caption": "",
+                "position": 802
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/input_ablation2.jpg",
+                "caption": "",
+                "position": 805
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/ablation/two_cat-stylized-landscape-var-a.jpg",
+                "caption": "",
+                "position": 806
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/ablation/two_cat-stylized-landscape-var-b.jpg",
+                "caption": "",
+                "position": 807
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/ablation/two_cat-stylized-landscape-var-c.jpg",
+                "caption": "",
+                "position": 808
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/ours/ablation/two_cat-stylized-landscape.jpg",
+                "caption": "",
+                "position": 809
+            }
+        ]
+    },
+    {
+        "header": "6Conclusions and Limitations",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BAdditional Qualitative Results",
+        "images": []
+    },
+    {
+        "header": "Appendix CContent and Style Decomposition",
+        "images": []
+    },
+    {
+        "header": "Appendix DAdditional Ablation Study",
+        "images": []
+    },
+    {
+        "header": "Appendix EComparingϵitalic-ϵ\\epsilonitalic_ϵ-prediction withx0subscript𝑥0x_{0}italic_x start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT-prediction",
+        "images": []
+    },
+    {
+        "header": "Appendix FInference Guidance",
+        "images": []
+    },
+    {
+        "header": "Appendix GVisualization of Attention Maps",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/teddy_bear.jpg",
+                "caption": "Figure 10:Additional qualitative comparison.We present style transfer results of our method and four baseline methods, including B-LoRA[11], ZipLoRA[41], StyleID[8], and StyleAligned[17]. Our method demonstrates superior performance in both content preservation and style alignment.",
+                "position": 1628
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/comic_deer.jpg",
+                "caption": "",
+                "position": 1641
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/teddy_bear-stylized-comic_deer.jpg",
+                "caption": "",
+                "position": 1642
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/teddy_bear-stylized-comic_deer.jpg",
+                "caption": "",
+                "position": 1643
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ziplora/teddy_bear-stylized-comic_deer.jpg",
+                "caption": "",
+                "position": 1644
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/styleid/teddy_bear-stylized-comic_deer.jpg",
+                "caption": "",
+                "position": 1645
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/stylealigned/teddy_bear-stylized-comic_deer.jpg",
+                "caption": "",
+                "position": 1646
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/toy_bear.jpg",
+                "caption": "",
+                "position": 1649
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/goeritz.jpg",
+                "caption": "",
+                "position": 1650
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/toy_bear-stylized-goeritz.jpg",
+                "caption": "",
+                "position": 1651
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/toy_bear-stylized-goeritz.jpg",
+                "caption": "",
+                "position": 1652
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ziplora/toy_bear-stylized-goeritz.jpg",
+                "caption": "",
+                "position": 1653
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/styleid/toy_bear-stylized-goeritz.jpg",
+                "caption": "",
+                "position": 1654
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/stylealigned/toy_bear-stylized-goeritz.jpg",
+                "caption": "",
+                "position": 1655
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/cat.jpg",
+                "caption": "",
+                "position": 1658
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/cat-stylized-zebra.jpg",
+                "caption": "",
+                "position": 1660
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/cat-stylized-zebra.jpg",
+                "caption": "",
+                "position": 1661
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ziplora/cat-stylized-zebra.jpg",
+                "caption": "",
+                "position": 1662
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/styleid/cat-stylized-zebra.jpg",
+                "caption": "",
+                "position": 1663
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/stylealigned/cat-stylized-zebra.jpg",
+                "caption": "",
+                "position": 1664
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/chicago.jpg",
+                "caption": "",
+                "position": 1667
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/peacock.jpg",
+                "caption": "",
+                "position": 1668
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/chicago-stylized-peacock.jpg",
+                "caption": "",
+                "position": 1669
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/chicago-stylized-peacock.jpg",
+                "caption": "",
+                "position": 1670
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ziplora/chicago-stylized-peacock.jpg",
+                "caption": "",
+                "position": 1671
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/styleid/chicago-stylized-peacock.jpg",
+                "caption": "",
+                "position": 1672
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/stylealigned/chicago-stylized-peacock.jpg",
+                "caption": "",
+                "position": 1673
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/rabbit.jpg",
+                "caption": "",
+                "position": 1677
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/cornell-stylized-rabbit.jpg",
+                "caption": "",
+                "position": 1678
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/cornell-stylized-rabbit.jpg",
+                "caption": "",
+                "position": 1679
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ziplora/cornell-stylized-rabbit.jpg",
+                "caption": "",
+                "position": 1680
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/styleid/cornell-stylized-rabbit.jpg",
+                "caption": "",
+                "position": 1681
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/stylealigned/cornell-stylized-rabbit.jpg",
+                "caption": "",
+                "position": 1682
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/party.jpg",
+                "caption": "",
+                "position": 1685
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/party-stylized-pirate.jpg",
+                "caption": "",
+                "position": 1687
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/party-stylized-pirate.jpg",
+                "caption": "",
+                "position": 1688
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ziplora/party-stylized-pirate.jpg",
+                "caption": "",
+                "position": 1689
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/styleid/party-stylized-pirate.jpg",
+                "caption": "",
+                "position": 1690
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/stylealigned/party-stylized-pirate.jpg",
+                "caption": "",
+                "position": 1691
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/golden_gate.jpg",
+                "caption": "",
+                "position": 1694
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/golden_gate-stylized-pig.jpg",
+                "caption": "",
+                "position": 1696
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/golden_gate-stylized-pig.jpg",
+                "caption": "",
+                "position": 1697
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ziplora/golden_gate-stylized-pig.jpg",
+                "caption": "",
+                "position": 1698
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/styleid/golden_gate-stylized-pig.jpg",
+                "caption": "",
+                "position": 1699
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/stylealigned/golden_gate-stylized-pig.jpg",
+                "caption": "",
+                "position": 1700
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/toilet.jpg",
+                "caption": "",
+                "position": 1703
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/orange2.jpg",
+                "caption": "",
+                "position": 1704
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/toilet-stylized-orange2.jpg",
+                "caption": "",
+                "position": 1705
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/toilet-stylized-orange2.jpg",
+                "caption": "",
+                "position": 1706
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ziplora/toilet-stylized-orange2.jpg",
+                "caption": "",
+                "position": 1707
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/styleid/toilet-stylized-orange2.jpg",
+                "caption": "",
+                "position": 1708
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/stylealigned/toilet-stylized-orange2.jpg",
+                "caption": "",
+                "position": 1709
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/palace.jpg",
+                "caption": "Figure 11:Additional style transfer results by ConsisLoRA.",
+                "position": 1714
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/mirror_painting.jpg",
+                "caption": "",
+                "position": 1728
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/teddy_bear-stylized-palace.jpg",
+                "caption": "",
+                "position": 1732
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/teddy_bear-stylized-rain_princess.jpg",
+                "caption": "",
+                "position": 1733
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/teddy_bear-stylized-abstract_painting.jpg",
+                "caption": "",
+                "position": 1734
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/teddy_bear-stylized-cartoon_line.jpg",
+                "caption": "",
+                "position": 1735
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/teddy_bear-stylized-rabbit.jpg",
+                "caption": "",
+                "position": 1736
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/teddy_bear-stylized-mirrow_painting.jpg",
+                "caption": "",
+                "position": 1737
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/dog.jpg",
+                "caption": "",
+                "position": 1740
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/dog-stylized-palace.jpg",
+                "caption": "",
+                "position": 1741
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/dog-stylized-rain_princess.jpg",
+                "caption": "",
+                "position": 1742
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/dog-stylized-abstract_painting.jpg",
+                "caption": "",
+                "position": 1743
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/dog-stylized-cartoon_line.jpg",
+                "caption": "",
+                "position": 1744
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/dog-stylized-rabbit.jpg",
+                "caption": "",
+                "position": 1745
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/dog-stylized-mirror_painting.jpg",
+                "caption": "",
+                "position": 1746
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/toy_dog.jpg",
+                "caption": "",
+                "position": 1749
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/toy_dog-stylized-palace.jpg",
+                "caption": "",
+                "position": 1750
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/toy_dog-stylized-rain_princess.jpg",
+                "caption": "",
+                "position": 1751
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/toy_dog-stylized-abstract_painting.jpg",
+                "caption": "",
+                "position": 1752
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/toy_dog-stylized-cartoon_line.jpg",
+                "caption": "",
+                "position": 1753
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/toy_dog-stylized-rabbit.jpg",
+                "caption": "",
+                "position": 1754
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/toy_dog-stylized-mirrow_painting.jpg",
+                "caption": "",
+                "position": 1755
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-palace.jpg",
+                "caption": "",
+                "position": 1759
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-rain_princess.jpg",
+                "caption": "",
+                "position": 1760
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-abstract_painting.jpg",
+                "caption": "",
+                "position": 1761
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-cartoon_line.jpg",
+                "caption": "",
+                "position": 1762
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-rabbit.jpg",
+                "caption": "",
+                "position": 1763
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-mirrow_painting.jpg",
+                "caption": "",
+                "position": 1764
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/toilet-stylized-palace.jpg",
+                "caption": "",
+                "position": 1768
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/toilet-stylized-rain_princess.jpg",
+                "caption": "",
+                "position": 1769
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/toilet-stylized-abstract_painting.jpg",
+                "caption": "",
+                "position": 1770
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/toilet-stylized-cartoon_line.jpg",
+                "caption": "",
+                "position": 1771
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/toilet-stylized-rabbit.jpg",
+                "caption": "",
+                "position": 1772
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/toilet-stylized-mirrow_painting.jpg",
+                "caption": "",
+                "position": 1773
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sailboat-stylized-palace.jpg",
+                "caption": "",
+                "position": 1777
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sailboat-stylized-rain_princess.jpg",
+                "caption": "",
+                "position": 1778
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sailboat-stylized-abstract_painting.jpg",
+                "caption": "",
+                "position": 1779
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sailboat-stylized-cartoon_line.jpg",
+                "caption": "",
+                "position": 1780
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sailboat-stylized-rabbit.jpg",
+                "caption": "",
+                "position": 1781
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sailboat-stylized-mirrow_painting.jpg",
+                "caption": "",
+                "position": 1782
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/pig.jpg",
+                "caption": "Figure 12:Additional qualitative results by ConsisLoRA for three image stylization tasks, including style transfer (top), text-based image stylization (middle), and consistent style generation (bottom).",
+                "position": 1787
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/streetscape.jpg",
+                "caption": "",
+                "position": 1797
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/yellow_line.jpg",
+                "caption": "",
+                "position": 1799
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/country.jpg",
+                "caption": "",
+                "position": 1800
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/sea.jpg",
+                "caption": "",
+                "position": 1801
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-pig.jpg",
+                "caption": "",
+                "position": 1805
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-streetscape.jpg",
+                "caption": "",
+                "position": 1806
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-orange.jpg",
+                "caption": "",
+                "position": 1807
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-yellow_line.jpg",
+                "caption": "",
+                "position": 1808
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-country.jpg",
+                "caption": "",
+                "position": 1809
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-sea.jpg",
+                "caption": "",
+                "position": 1810
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/building-stylized-pig.jpg",
+                "caption": "",
+                "position": 1814
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/building-stylized-streetscape.jpg",
+                "caption": "",
+                "position": 1815
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/building-stylized-orange.jpg",
+                "caption": "",
+                "position": 1816
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/building-stylized-yellow_line.jpg",
+                "caption": "",
+                "position": 1817
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/building-stylized-country.jpg",
+                "caption": "",
+                "position": 1818
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/building-stylized-sea.jpg",
+                "caption": "",
+                "position": 1819
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/cornell-stylized-pig.jpg",
+                "caption": "",
+                "position": 1823
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/cornell-stylized-streetscape.jpg",
+                "caption": "",
+                "position": 1824
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/cornell-stylized-orange.jpg",
+                "caption": "",
+                "position": 1825
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/cornell-stylized-yellow_line.jpg",
+                "caption": "",
+                "position": 1826
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/cornell-stylized-country.jpg",
+                "caption": "",
+                "position": 1827
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/cornell-stylized-sea.jpg",
+                "caption": "",
+                "position": 1828
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/square.jpg",
+                "caption": "",
+                "position": 1831
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/square-stylized-pig.jpg",
+                "caption": "",
+                "position": 1832
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/square-stylized-streetscape.jpg",
+                "caption": "",
+                "position": 1833
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/square-stylized-orange.jpg",
+                "caption": "",
+                "position": 1834
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/square-stylized-yellow_line.jpg",
+                "caption": "",
+                "position": 1835
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/square-stylized-country.jpg",
+                "caption": "",
+                "position": 1836
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/square-stylized-sea.jpg",
+                "caption": "",
+                "position": 1837
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/shopping.jpg",
+                "caption": "",
+                "position": 1840
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/shopping-stylized-pig.jpg",
+                "caption": "",
+                "position": 1841
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/shopping-stylized-streetscape.jpg",
+                "caption": "",
+                "position": 1842
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/shopping-stylized-orange.jpg",
+                "caption": "",
+                "position": 1843
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/shopping-stylized-yellow_line.jpg",
+                "caption": "",
+                "position": 1844
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/shopping-stylized-country.jpg",
+                "caption": "",
+                "position": 1845
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/shopping-stylized-sea.jpg",
+                "caption": "",
+                "position": 1846
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/dog-pixel.jpg",
+                "caption": "",
+                "position": 1859
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/dog-ice.jpg",
+                "caption": "",
+                "position": 1860
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/dog-vintage.jpg",
+                "caption": "",
+                "position": 1861
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/dog-sketch.jpg",
+                "caption": "",
+                "position": 1862
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/dog-cyberpunk.jpg",
+                "caption": "",
+                "position": 1863
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/dog-dark.jpg",
+                "caption": "",
+                "position": 1864
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/dog-palace.jpg",
+                "caption": "",
+                "position": 1877
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/car-palace.jpg",
+                "caption": "",
+                "position": 1878
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/train-palace.jpg",
+                "caption": "",
+                "position": 1879
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/bench-palace.jpg",
+                "caption": "",
+                "position": 1880
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/classroom-palace.jpg",
+                "caption": "",
+                "position": 1881
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/bedroom-palace.jpg",
+                "caption": "",
+                "position": 1882
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/x6.png",
+                "caption": "Figure 13:Additional results of content and style decomposition.",
+                "position": 1887
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/eiffel_tower.jpg",
+                "caption": "Figure 14:Additional results of the ablation study.We evaluate three variants of our model: replacingx0subscript𝑥0x_{0}italic_x start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT-prediction withϵitalic-ϵ\\epsilonitalic_ϵ-prediction (w/ox0subscript𝑥0x_{0}italic_x start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT-prediction), 2) removing the two-step training strategy for style LoRA (w/o two-step training), and 3) using x0-prediction alone instead of loss transition for content LoRA (w/o loss transition).",
+                "position": 1890
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/eiffel_tower-stylized-eyes-var-a.jpg",
+                "caption": "",
+                "position": 1905
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/eiffel_tower-stylized-eyes-var-b.jpg",
+                "caption": "",
+                "position": 1906
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/eiffel_tower-stylized-eyes-var-c.jpg",
+                "caption": "",
+                "position": 1907
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/eiffel_tower-stylized-eyes.jpg",
+                "caption": "",
+                "position": 1908
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/bull.jpg",
+                "caption": "",
+                "position": 1911
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/bull-stylized-pig-var-a.jpg",
+                "caption": "",
+                "position": 1913
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/bull-stylized-pig-var-b.jpg",
+                "caption": "",
+                "position": 1914
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/bull-stylized-pig-var-c.jpg",
+                "caption": "",
+                "position": 1915
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/bull-stylized-pig.jpg",
+                "caption": "",
+                "position": 1916
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/vase.jpg",
+                "caption": "",
+                "position": 1919
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/vase-stylized-pirate-var-a.jpg",
+                "caption": "",
+                "position": 1921
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/vase-stylized-pirate-var-b.jpg",
+                "caption": "",
+                "position": 1922
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/vase-stylized-pirate-var-c.jpg",
+                "caption": "",
+                "position": 1923
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/vase-stylized-pirate.jpg",
+                "caption": "",
+                "position": 1924
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/modern.jpg",
+                "caption": "Figure 15:Qualitative comparison between the proposed inference guidance and scaling LoRA weight.",
+                "position": 1930
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit.jpg",
+                "caption": "",
+                "position": 1945
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-cnt-g-1.jpg",
+                "caption": "",
+                "position": 1946
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-cnt-g-2.jpg",
+                "caption": "",
+                "position": 1947
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-cnt-g-3.jpg",
+                "caption": "",
+                "position": 1948
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-cnt-g-4.jpg",
+                "caption": "",
+                "position": 1949
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-cnt-1.1.jpg",
+                "caption": "",
+                "position": 1974
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-cnt-1.2.jpg",
+                "caption": "",
+                "position": 1975
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-cnt-1.3.jpg",
+                "caption": "",
+                "position": 1976
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-cnt-1.4.jpg",
+                "caption": "",
+                "position": 1977
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-sty-g-1.jpg",
+                "caption": "",
+                "position": 2002
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-sty-g-2.jpg",
+                "caption": "",
+                "position": 2003
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-sty-g-3.jpg",
+                "caption": "",
+                "position": 2004
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-sty-g-4.jpg",
+                "caption": "",
+                "position": 2005
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-sty-1.1.jpg",
+                "caption": "",
+                "position": 2030
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-sty-1.2.jpg",
+                "caption": "",
+                "position": 2031
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-sty-1.3.jpg",
+                "caption": "",
+                "position": 2032
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/modern-stylized-rabbit-sty-1.4.jpg",
+                "caption": "",
+                "position": 2033
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/sofa.jpg",
+                "caption": "Figure 16:Qualitative comparison between the proposed inference guidance and scaling LoRA weight.",
+                "position": 2049
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate.jpg",
+                "caption": "",
+                "position": 2064
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-cnt-g-1.jpg",
+                "caption": "",
+                "position": 2065
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-cnt-g-2.jpg",
+                "caption": "",
+                "position": 2066
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-cnt-g-3.jpg",
+                "caption": "",
+                "position": 2067
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-cnt-g-4.jpg",
+                "caption": "",
+                "position": 2068
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-cnt-1.1.jpg",
+                "caption": "",
+                "position": 2093
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-cnt-1.2.jpg",
+                "caption": "",
+                "position": 2094
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-cnt-1.3.jpg",
+                "caption": "",
+                "position": 2095
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-cnt-1.4.jpg",
+                "caption": "",
+                "position": 2096
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-sty-g-1.jpg",
+                "caption": "",
+                "position": 2121
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-sty-g-2.jpg",
+                "caption": "",
+                "position": 2122
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-sty-g-3.jpg",
+                "caption": "",
+                "position": 2123
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-sty-g-4.jpg",
+                "caption": "",
+                "position": 2124
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-sty-1.1.jpg",
+                "caption": "",
+                "position": 2149
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-sty-1.2.jpg",
+                "caption": "",
+                "position": 2150
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-sty-1.3.jpg",
+                "caption": "",
+                "position": 2151
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/sofa-stylized-pirate-sty-1.4.jpg",
+                "caption": "",
+                "position": 2152
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/ink_painting.jpg",
+                "caption": "Figure 17:We visualize the attention maps corresponding to the style token “[v]” and observe that B-LoRA tends to focus more on certain local details compared to our method. This focus contributes to the issues of content leakage and style misalignment.",
+                "position": 2168
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/attention_map/ours-sty-ink_painting.jpg",
+                "caption": "",
+                "position": 2179
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/attention_map/blora-sty-ink_painting.jpg",
+                "caption": "",
+                "position": 2180
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/attention_map/ours-street.jpg",
+                "caption": "",
+                "position": 2181
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/attention_map/blora-street.jpg",
+                "caption": "",
+                "position": 2182
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/camping.jpg",
+                "caption": "",
+                "position": 2190
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/attention_map/ours-sty-camping.jpg",
+                "caption": "",
+                "position": 2191
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/attention_map/blora-sty-camping.jpg",
+                "caption": "",
+                "position": 2192
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/attention_map/ours-bedroom.jpg",
+                "caption": "",
+                "position": 2193
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/attention_map/blora-bedroom.jpg",
+                "caption": "",
+                "position": 2194
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/avril.jpg",
+                "caption": "Figure 18:Qualitative comparison of portrait stylization between our method and B-LoRA.",
+                "position": 2206
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/style/udnie.jpg",
+                "caption": "",
+                "position": 2221
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/avril-stylized-oil_painting.jpg",
+                "caption": "",
+                "position": 2226
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/avril-stylized-cartoon_line.jpg",
+                "caption": "",
+                "position": 2227
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/avril-stylized-rabbit.jpg",
+                "caption": "",
+                "position": 2228
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/avril-stylized-udnie.jpg",
+                "caption": "",
+                "position": 2229
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/avril-stylized-mountain.jpg",
+                "caption": "",
+                "position": 2230
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/avril-stylized-oil_painting.jpg",
+                "caption": "",
+                "position": 2234
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/avril-stylized-cartoon_line.jpg",
+                "caption": "",
+                "position": 2235
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/avril-stylized-rabbit.jpg",
+                "caption": "",
+                "position": 2236
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/avril-stylized-udnie.jpg",
+                "caption": "",
+                "position": 2237
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/avril-stylized-mountain.jpg",
+                "caption": "",
+                "position": 2238
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/cnt-sty/content/lenna.jpg",
+                "caption": "",
+                "position": 2249
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/lenna-stylized-rain_princess.jpg",
+                "caption": "",
+                "position": 2258
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/lenna-stylized-comic_deer.jpg",
+                "caption": "",
+                "position": 2259
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/lenna-stylized-orange2.jpg",
+                "caption": "",
+                "position": 2260
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/lenna-stylized-pig.jpg",
+                "caption": "",
+                "position": 2261
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/ours/lenna-stylized-landscape.jpg",
+                "caption": "",
+                "position": 2262
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/lenna-stylized-rain_princess.jpg",
+                "caption": "",
+                "position": 2266
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/lenna-stylized-comic_deer.jpg",
+                "caption": "",
+                "position": 2267
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/lenna-stylized-orange2.jpg",
+                "caption": "",
+                "position": 2268
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/lenna-stylized-pig.jpg",
+                "caption": "",
+                "position": 2269
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10614/extracted/6277607/images/appendix/blora/lenna-stylized-landscape.jpg",
+                "caption": "",
+                "position": 2270
+            }
+        ]
+    },
+    {
+        "header": "Appendix HPortrait Stylization",
+        "images": []
+    }
+]
