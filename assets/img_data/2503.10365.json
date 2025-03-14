@@ -1,0 +1,2066 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10365/x1.png",
+                "caption": "",
+                "position": 101
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/semantics/intro_images/1234278821556100011_903332_gt.jpg",
+                "caption": "Figure 2:Semantic Manipulation in CLIP Space vs.ℐ⁢𝒫+limit-fromℐ𝒫\\mathcal{IP}+caligraphic_I caligraphic_P +Space.We encode the input image (left) into two different embedding spaces, modify its latent representation by traversing each space, and render the edited image using SDXL[49]. As shown, CLIP struggles to both reconstruct the concept and follow the desired edit, whereas inℐ⁢𝒫+limit-fromℐ𝒫\\mathcal{IP}+caligraphic_I caligraphic_P +space, the rendered images are faithful both to the concept and the desired edit across the entire range.",
+                "position": 144
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/semantics/intro_images/direction_walk_single_images/base_clip_direction/scrawny_to_muscular/1234278821556100011_903332_direction_walk_-1.jpg",
+                "caption": "",
+                "position": 149
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/semantics/intro_images/direction_walk_single_images/base_clip_direction/scrawny_to_muscular/1234278821556100011_903332_direction_walk_-0.5.jpg",
+                "caption": "",
+                "position": 150
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/semantics/intro_images/direction_walk_single_images/base_clip_direction/scrawny_to_muscular/1234278821556100011_903332_direction_walk_0.jpg",
+                "caption": "",
+                "position": 151
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/semantics/intro_images/direction_walk_single_images/base_clip_direction/scrawny_to_muscular/1234278821556100011_903332_direction_walk_0.5.jpg",
+                "caption": "",
+                "position": 152
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/semantics/intro_images/direction_walk_single_images/base_clip_direction/scrawny_to_muscular/1234278821556100011_903332_direction_walk_1.jpg",
+                "caption": "",
+                "position": 153
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/semantics/intro_images/direction_walk_single_images/plus_ip_direction/scrawny_to_muscular/1234278821556100011_903332_direction_walk_-1.jpg",
+                "caption": "",
+                "position": 164
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/semantics/intro_images/direction_walk_single_images/plus_ip_direction/scrawny_to_muscular/1234278821556100011_903332_direction_walk_-0.5.jpg",
+                "caption": "",
+                "position": 165
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/semantics/intro_images/direction_walk_single_images/plus_ip_direction/scrawny_to_muscular/1234278821556100011_903332_direction_walk_0.jpg",
+                "caption": "",
+                "position": 166
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/semantics/intro_images/direction_walk_single_images/plus_ip_direction/scrawny_to_muscular/1234278821556100011_903332_direction_walk_0.5.jpg",
+                "caption": "",
+                "position": 167
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/semantics/intro_images/direction_walk_single_images/plus_ip_direction/scrawny_to_muscular/1234278821556100011_903332_direction_walk_1.jpg",
+                "caption": "",
+                "position": 168
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Preliminaries",
+        "images": []
+    },
+    {
+        "header": "4Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10365/x2.png",
+                "caption": "Figure 3:Piece-it-Together Overview.Given an input image, we extract its semantic components (e.g., using SAM[29]) and encode each image patch into theℐ⁢𝒫+limit-fromℐ𝒫\\mathcal{IP}+caligraphic_I caligraphic_P +space using frozen IP-Adapter+ (IP-A+) blocks (shown inyellow). The resulting set of compact image embeddings are then passed together through our IP-Prior model (green), which also receives a noised image embedding representing our desired complete concept. The IP-Prior model outputs a cleaned image embedding that captures the intended concept, which is subsequently used to generate the final concept image using SDXL[49](blue). At inference time, users can provide a varying number of object-part images to generate a new concept that aligns with the learned distribution.",
+                "position": 280
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/data_grid/images/3070577408908170531_877740.jpg",
+                "caption": "Figure 4:Generated Data Samples.We present sample images generated using FLUX-Schnell[5], which are used to train our IP-Prior model for the “creatures” domain.",
+                "position": 314
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/data_grid/images/6347207807591336514_326460.jpg",
+                "caption": "",
+                "position": 319
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/data_grid/images/3569632895260799419_934706.jpg",
+                "caption": "",
+                "position": 320
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/data_grid/images/6242783387003962670_293856.jpg",
+                "caption": "",
+                "position": 321
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/data_grid/images/5127554021933336129_836677.jpg",
+                "caption": "",
+                "position": 324
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/data_grid/images/473711560380684739_81168.jpg",
+                "caption": "",
+                "position": 325
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/data_grid/images/1581311996258492455_489941.jpg",
+                "caption": "",
+                "position": 326
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/data_grid/images/8748990354279138036_184776.jpg",
+                "caption": "",
+                "position": 327
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/x3.png",
+                "caption": "Figure 5:Recovering the Text Adherence via IP-LoRA.IP-Adapter+ enables rendering generated concepts via SDXL[49]but often struggles with text adherence. To address this, we fine-tune a LoRA adapter over paired examples, where the conditioning image has a clean background and the target image places the object in a scene described using a text prompt. This lightweight training (using just50505050prompts) effectively restores text control while maintaining visual fidelity.",
+                "position": 358
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/dotted_belly_wings/stacked.jpg",
+                "caption": "Figure 6:PiT Results for Different Priors.We show results generated by our approach across three different domains. For each result, we use a varying number of input parts and generate multiple plausible outputs by altering the seed used for learning the representation.",
+                "position": 370
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/dotted_belly_wings/10.jpg",
+                "caption": "",
+                "position": 382
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/dotted_belly_wings/6.jpg",
+                "caption": "",
+                "position": 383
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/dotted_belly_wings/12.jpg",
+                "caption": "",
+                "position": 384
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/glowing_horn/stacked.jpg",
+                "caption": "",
+                "position": 385
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/glowing_horn/2.jpg",
+                "caption": "",
+                "position": 386
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/glowing_horn/3.jpg",
+                "caption": "",
+                "position": 387
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/glowing_horn/8.jpg",
+                "caption": "",
+                "position": 388
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/tentacle_fours/stacked.jpg",
+                "caption": "",
+                "position": 393
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/tentacle_fours/4.jpg",
+                "caption": "",
+                "position": 395
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/tentacle_fours/7.jpg",
+                "caption": "",
+                "position": 396
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/tentacle_fours/8.jpg",
+                "caption": "",
+                "position": 397
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/leg_frog_shell/stacked.jpg",
+                "caption": "",
+                "position": 398
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/leg_frog_shell/5.jpg",
+                "caption": "",
+                "position": 399
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/leg_frog_shell/4.jpg",
+                "caption": "",
+                "position": 400
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/leg_frog_shell/13.jpg",
+                "caption": "",
+                "position": 401
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/fur_usb/stacked.jpg",
+                "caption": "",
+                "position": 411
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/fur_usb/11.jpg",
+                "caption": "",
+                "position": 412
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/fur_usb/6.jpg",
+                "caption": "",
+                "position": 413
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/fur_usb/2.jpg",
+                "caption": "",
+                "position": 414
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/chair_wheel/stacked.jpg",
+                "caption": "",
+                "position": 415
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/chair_wheel/4.jpg",
+                "caption": "",
+                "position": 416
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/chair_wheel/7.jpg",
+                "caption": "",
+                "position": 417
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/chair_wheel/6.jpg",
+                "caption": "",
+                "position": 418
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/purple_hair_coat/stacked.jpg",
+                "caption": "",
+                "position": 428
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/purple_hair_coat/12.jpg",
+                "caption": "",
+                "position": 429
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/purple_hair_coat/10.jpg",
+                "caption": "",
+                "position": 430
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/purple_hair_coat/7.jpg",
+                "caption": "",
+                "position": 431
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/blue_hair_dress/stacked.jpg",
+                "caption": "",
+                "position": 432
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/blue_hair_dress/3.jpg",
+                "caption": "",
+                "position": 433
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/blue_hair_dress/4.jpg",
+                "caption": "",
+                "position": 434
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/blue_hair_dress/9.jpg",
+                "caption": "",
+                "position": 435
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/single_inputs/images/jelly_leg/centered_0.jpg",
+                "caption": "Figure 7:Sampling From a Single Input.We present concepts generated by PiT using a single input part, which encourages greater variation across the generated results.",
+                "position": 465
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/single_inputs/images/jelly_leg/2.jpg",
+                "caption": "",
+                "position": 470
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/single_inputs/images/jelly_leg/7.jpg",
+                "caption": "",
+                "position": 471
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/single_inputs/images/jelly_leg/8.jpg",
+                "caption": "",
+                "position": 472
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/single_inputs/images/jelly_leg/10.jpg",
+                "caption": "",
+                "position": 473
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/single_inputs/images/tentacle/centered_0.jpg",
+                "caption": "",
+                "position": 476
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/single_inputs/images/tentacle/1.jpg",
+                "caption": "",
+                "position": 477
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/single_inputs/images/tentacle/3.jpg",
+                "caption": "",
+                "position": 478
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/single_inputs/images/tentacle/6.jpg",
+                "caption": "",
+                "position": 479
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/single_inputs/images/tentacle/5.jpg",
+                "caption": "",
+                "position": 480
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/single_inputs/images/ice_cream/centered_0.jpg",
+                "caption": "",
+                "position": 483
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/single_inputs/images/ice_cream/2.jpg",
+                "caption": "",
+                "position": 484
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/single_inputs/images/ice_cream/3.jpg",
+                "caption": "",
+                "position": 485
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/single_inputs/images/ice_cream/4.jpg",
+                "caption": "",
+                "position": 486
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/single_inputs/images/ice_cream/6.jpg",
+                "caption": "",
+                "position": 487
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/white_chair/centered_0.jpg",
+                "caption": "",
+                "position": 490
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/white_chair/1.jpg",
+                "caption": "",
+                "position": 491
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/white_chair/6.jpg",
+                "caption": "",
+                "position": 492
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/white_chair/9.jpg",
+                "caption": "",
+                "position": 493
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/white_chair/4.jpg",
+                "caption": "",
+                "position": 494
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/prior_comparison/purple_hair/centered_00_00.jpg",
+                "caption": "Figure 8:Sampling Across Different PriorsGiven a single input part, we generate concepts across different learned IP-Prior models, highlighting how each model naturally interprets and adapts the part according to its learned distribution.",
+                "position": 509
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/prior_comparison/purple_hair/00_5120.jpg",
+                "caption": "",
+                "position": 514
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/prior_comparison/purple_hair/1268_5120.jpg",
+                "caption": "",
+                "position": 515
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/prior_comparison/purple_hair/duck_12.jpg",
+                "caption": "",
+                "position": 516
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/prior_comparison/purple_hair/2536_4096.jpg",
+                "caption": "",
+                "position": 517
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/prior_comparison/spiky/centered_00_00.jpg",
+                "caption": "",
+                "position": 520
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/prior_comparison/spiky/00_3072.jpg",
+                "caption": "",
+                "position": 521
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/prior_comparison/spiky/1268_4096.jpg",
+                "caption": "",
+                "position": 522
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/prior_comparison/spiky/duck_4.jpg",
+                "caption": "",
+                "position": 523
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/prior_comparison/spiky/2536_3072.jpg",
+                "caption": "",
+                "position": 524
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/prior_comparison/dotted/centered_00_00.jpg",
+                "caption": "",
+                "position": 527
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/prior_comparison/dotted/00_6144.jpg",
+                "caption": "",
+                "position": 528
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/prior_comparison/dotted/1268_1024.jpg",
+                "caption": "",
+                "position": 529
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/prior_comparison/dotted/duck_12.jpg",
+                "caption": "",
+                "position": 530
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/prior_comparison/dotted/2536_4096.jpg",
+                "caption": "",
+                "position": 531
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/ip_edits/cute_to_scary/1631900767314286207_926979_direction_walk_-1.jpg",
+                "caption": "Figure 9:Semantic Manipulations inℐ⁢𝒫+limit-fromℐ𝒫\\mathcal{IP}+caligraphic_I caligraphic_P +Space.Using embeddings learned by our IP-Prior, we apply semantic manipulations to edit the concept before rendering the image with SDXL.",
+                "position": 550
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/ip_edits/cute_to_scary/1631900767314286207_926979_direction_walk_-0.5.jpg",
+                "caption": "",
+                "position": 564
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/ip_edits/cute_to_scary/1631900767314286207_926979_direction_walk_0.jpg",
+                "caption": "",
+                "position": 565
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/ip_edits/cute_to_scary/1631900767314286207_926979_direction_walk_0.5.jpg",
+                "caption": "",
+                "position": 566
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/ip_edits/cute_to_scary/1631900767314286207_926979_direction_walk_1.jpg",
+                "caption": "",
+                "position": 567
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/ip_edits/frosty_to_blazing/try3/3130975463880185477_224920_direction_walk_-1.jpg",
+                "caption": "",
+                "position": 579
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/ip_edits/frosty_to_blazing/try3/3130975463880185477_224920_direction_walk_-0.5.jpg",
+                "caption": "",
+                "position": 580
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/ip_edits/frosty_to_blazing/try3/3130975463880185477_224920_direction_walk_0.jpg",
+                "caption": "",
+                "position": 581
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/ip_edits/frosty_to_blazing/try3/3130975463880185477_224920_direction_walk_0.5.jpg",
+                "caption": "",
+                "position": 582
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/ip_edits/frosty_to_blazing/try3/3130975463880185477_224920_direction_walk_1.jpg",
+                "caption": "",
+                "position": 583
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/ip_edits/scrawny_to_muscular/3890482380620582042_915053_direction_walk_-1.jpg",
+                "caption": "",
+                "position": 595
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/ip_edits/scrawny_to_muscular/3890482380620582042_915053_direction_walk_-0.5.jpg",
+                "caption": "",
+                "position": 596
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/ip_edits/scrawny_to_muscular/3890482380620582042_915053_direction_walk_0.jpg",
+                "caption": "",
+                "position": 597
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/ip_edits/scrawny_to_muscular/3890482380620582042_915053_direction_walk_0.5.jpg",
+                "caption": "",
+                "position": 598
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/ip_edits/scrawny_to_muscular/3890482380620582042_915053_direction_walk_1.jpg",
+                "caption": "",
+                "position": 599
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/space/101028_divided_3_scale_0.2_ref.jpg",
+                "caption": "Figure 10:IP-Lora vs. IP-Adapter+.Given a learned representation, we show results of rendering the concept in a new scene.",
+                "position": 612
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/space/101028_divided_3_pred.jpg",
+                "caption": "",
+                "position": 624
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/space/101028_divided_3_scale_0.2_pred.jpg",
+                "caption": "",
+                "position": 625
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/space/101028_divided_3_scale_0.4_pred.jpg",
+                "caption": "",
+                "position": 626
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/space/101028_divided_3_scale_0.6_pred.jpg",
+                "caption": "",
+                "position": 627
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/ice/150545_divided_6_scale_0.2_ref.jpg",
+                "caption": "",
+                "position": 634
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/ice/150545_divided_6_pred.jpg",
+                "caption": "",
+                "position": 635
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/ice/150545_divided_6_scale_0.2_pred.jpg",
+                "caption": "",
+                "position": 636
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/ice/150545_divided_6_scale_0.4_pred.jpg",
+                "caption": "",
+                "position": 637
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/ice/150545_divided_6_scale_0.6_pred.jpg",
+                "caption": "",
+                "position": 638
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/lab/473138_divided_7_ref.jpg",
+                "caption": "",
+                "position": 645
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/lab/473138_divided_7_pred.jpg",
+                "caption": "",
+                "position": 646
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/lab/473138_divided_7_scale_0.2_pred.jpg",
+                "caption": "",
+                "position": 647
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/lab/473138_divided_7_scale_0.4_pred.jpg",
+                "caption": "",
+                "position": 648
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/lab/473138_divided_7_scale_0.6_pred.jpg",
+                "caption": "",
+                "position": 649
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/bowling/176539_divided_7_ref.jpg",
+                "caption": "",
+                "position": 656
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/bowling/176539_divided_7_pred.jpg",
+                "caption": "",
+                "position": 657
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/bowling/176539_divided_7_scale_0.2_pred.jpg",
+                "caption": "",
+                "position": 658
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/bowling/176539_divided_7_scale_0.4_pred.jpg",
+                "caption": "",
+                "position": 659
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/lora_vs_baseline/bowling/176539_divided_7_scale_0.6_pred.jpg",
+                "caption": "",
+                "position": 660
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/red_hair_frog_leg/final_stacked_horizontal.jpg",
+                "caption": "Figure 11:Qualitative Comparisons. We provide visual comparisons with alternative methods across various domains.",
+                "position": 671
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/leg_wings/final_stacked_horizontal.jpg",
+                "caption": "",
+                "position": 677
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/screen_thingie/stacked_horizontal_batch_0.jpg",
+                "caption": "",
+                "position": 678
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/blue_camera/final_stacked_horizontal.jpg",
+                "caption": "",
+                "position": 679
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/teddy_bow/final_stacked_horizontal.jpg",
+                "caption": "",
+                "position": 680
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/teddy_skirt/final_stacked_horizontal.jpg",
+                "caption": "",
+                "position": 681
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/duck_hair_hoodie/stacked_horizontal_batch_0.jpg",
+                "caption": "",
+                "position": 682
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/duck_brown_glasses/stacked_horizontal_batch_0.jpg",
+                "caption": "",
+                "position": 683
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/red_hair_frog_leg/4.jpg",
+                "caption": "",
+                "position": 693
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/leg_wings/6.jpg",
+                "caption": "",
+                "position": 694
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/screen_thingie/12.jpg",
+                "caption": "",
+                "position": 695
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/blue_camera/4.jpg",
+                "caption": "",
+                "position": 696
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/teddy_bow/13.jpg",
+                "caption": "",
+                "position": 697
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/teddy_skirt/12.jpg",
+                "caption": "",
+                "position": 698
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/duck_hair_hoodie/2.jpg",
+                "caption": "",
+                "position": 699
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/duck_brown_glasses/11.jpg",
+                "caption": "",
+                "position": 700
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/red_hair_frog_leg/ip_result_1_4.jpg",
+                "caption": "",
+                "position": 710
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/leg_wings/ip_result_2_2.jpg",
+                "caption": "",
+                "position": 711
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/screen_thingie/ip_result_3_1.jpg",
+                "caption": "",
+                "position": 712
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/blue_camera/ip_result_4_1.jpg",
+                "caption": "",
+                "position": 713
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/teddy_bow/ip_result_5_1.jpg",
+                "caption": "",
+                "position": 714
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/teddy_skirt/ip_result_6_2.jpg",
+                "caption": "",
+                "position": 715
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/duck_hair_hoodie/ip_result_8_1.jpg",
+                "caption": "",
+                "position": 716
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/duck_brown_glasses/ip_result_7_2.jpg",
+                "caption": "",
+                "position": 717
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/red_hair_frog_leg/eclipse_result_1_1.png",
+                "caption": "",
+                "position": 727
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/leg_wings/eclipse_result_2_1.png",
+                "caption": "",
+                "position": 728
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/screen_thingie/eclipse_3_1.jpg",
+                "caption": "",
+                "position": 729
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/blue_camera/eclipse_4_1.jpg",
+                "caption": "",
+                "position": 730
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/teddy_bow/eclipse_5_1.jpg",
+                "caption": "",
+                "position": 731
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/teddy_skirt/eclipse_6_1.jpg",
+                "caption": "",
+                "position": 732
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/duck_hair_hoodie/eclipse_8_1.jpg",
+                "caption": "",
+                "position": 733
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/duck_brown_glasses/eclipse_7_1.jpg",
+                "caption": "",
+                "position": 734
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/red_hair_frog_leg/omnigen_result_1_4.jpg",
+                "caption": "",
+                "position": 744
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/leg_wings/omnigen_result_2_1.jpg",
+                "caption": "",
+                "position": 745
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/screen_thingie/omnigen_result_3_1.jpg",
+                "caption": "",
+                "position": 746
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/blue_camera/omnigen_result_4_2.jpg",
+                "caption": "",
+                "position": 747
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/teddy_bow/omnigen_result_5_1.jpg",
+                "caption": "",
+                "position": 748
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/teddy_skirt/omnigen_result_6_1.jpg",
+                "caption": "",
+                "position": 749
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/duck_hair_hoodie/omnigen_result_8_1.jpg",
+                "caption": "",
+                "position": 750
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/baseline_comparisons/images/duck_brown_glasses/omnigen_result_7_1.jpg",
+                "caption": "",
+                "position": 751
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/32934_divided_3_ref.jpg",
+                "caption": "Figure 12:Style Generation.We train a LoRA to generate character reference sheets when given a concept embedding.",
+                "position": 758
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/32934_divided_3_pred.jpg",
+                "caption": "",
+                "position": 763
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/48846_divided_used_3_ref.jpg",
+                "caption": "",
+                "position": 764
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/48846_divided_used_3_pred.jpg",
+                "caption": "",
+                "position": 765
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/91473_divided_11_ref.jpg",
+                "caption": "",
+                "position": 768
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/91473_divided_11_pred.jpg",
+                "caption": "",
+                "position": 769
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/947676_divided_4_ref.jpg",
+                "caption": "",
+                "position": 770
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/947676_divided_4_pred.jpg",
+                "caption": "",
+                "position": 771
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_ref/horn_colorful/stacked_vertical_batch_0.jpg",
+                "caption": "Figure 13:PiT results with reference conditioning.The model is conditioned on both image parts as well as a grid representing a target look.",
+                "position": 866
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_ref/horn_colorful/original_0.jpg",
+                "caption": "",
+                "position": 871
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_ref/horn_colorful/6.jpg",
+                "caption": "",
+                "position": 872
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_ref/horn_colorful/9.jpg",
+                "caption": "",
+                "position": 873
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_ref/spiky_hand/stacked_vertical_batch_0.jpg",
+                "caption": "",
+                "position": 876
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_ref/spiky_hand/original_0.jpg",
+                "caption": "",
+                "position": 877
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_ref/spiky_hand/10.jpg",
+                "caption": "",
+                "position": 878
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_ref/spiky_hand/13.jpg",
+                "caption": "",
+                "position": 879
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_ref/spiky_stripes/stacked_vertical_batch_0.jpg",
+                "caption": "",
+                "position": 882
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_ref/spiky_stripes/11.jpg",
+                "caption": "",
+                "position": 884
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_ref/spiky_stripes/5.jpg",
+                "caption": "",
+                "position": 885
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_ref/icy_beak/stacked_vertical_batch_0.jpg",
+                "caption": "",
+                "position": 888
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_ref/icy_beak/original_0.jpg",
+                "caption": "",
+                "position": 889
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_ref/icy_beak/7.jpg",
+                "caption": "",
+                "position": 890
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_ref/icy_beak/13.jpg",
+                "caption": "",
+                "position": 891
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/icecream_wing/stacked_vertical_batch_0.jpg",
+                "caption": "Figure 14:PiT results for sketch conditioning.The model is conditioned on sketch images, allowing one to specify rough shapes without color.",
+                "position": 902
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/icecream_wing/14.jpg",
+                "caption": "",
+                "position": 907
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/icecream_wing/3.jpg",
+                "caption": "",
+                "position": 908
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/icecream_wing/8.jpg",
+                "caption": "",
+                "position": 909
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/tentacles_hair/stacked_vertical_batch_0.jpg",
+                "caption": "",
+                "position": 912
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/tentacles_hair/12.jpg",
+                "caption": "",
+                "position": 913
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/tentacles_hair/5.jpg",
+                "caption": "",
+                "position": 914
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/tentacles_hair/9.jpg",
+                "caption": "",
+                "position": 915
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/tentacles_bird/stacked_vertical_batch_0.jpg",
+                "caption": "",
+                "position": 918
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/tentacles_bird/3.jpg",
+                "caption": "",
+                "position": 919
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/tentacles_bird/4.jpg",
+                "caption": "",
+                "position": 920
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/tentacles_bird/8.jpg",
+                "caption": "",
+                "position": 921
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/wing_frog/stacked_vertical_batch_0.jpg",
+                "caption": "",
+                "position": 924
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/wing_frog/7.jpg",
+                "caption": "",
+                "position": 925
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/wing_frog/8.jpg",
+                "caption": "",
+                "position": 926
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_sketches/wing_frog/12.jpg",
+                "caption": "",
+                "position": 927
+            }
+        ]
+    },
+    {
+        "header": "6Conclusions",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/belly_feathers/stacked.jpg",
+                "caption": "Figure 15:Additional PiT results for character ideation",
+                "position": 2077
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/belly_feathers/2.jpg",
+                "caption": "",
+                "position": 2082
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/belly_feathers/3.jpg",
+                "caption": "",
+                "position": 2083
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/belly_feathers/6.jpg",
+                "caption": "",
+                "position": 2084
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/frog_fours/stacked.jpg",
+                "caption": "",
+                "position": 2085
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/frog_fours/6.jpg",
+                "caption": "",
+                "position": 2086
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/frog_fours/7.jpg",
+                "caption": "",
+                "position": 2087
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/frog_fours/8.jpg",
+                "caption": "",
+                "position": 2088
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/frog_leg_hair/stacked.jpg",
+                "caption": "",
+                "position": 2091
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/frog_leg_hair/5.jpg",
+                "caption": "",
+                "position": 2092
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/frog_leg_hair/6.jpg",
+                "caption": "",
+                "position": 2093
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/frog_leg_hair/7.jpg",
+                "caption": "",
+                "position": 2094
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/red_arm_four/stacked.jpg",
+                "caption": "",
+                "position": 2095
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/red_arm_four/4.jpg",
+                "caption": "",
+                "position": 2096
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/red_arm_four/7.jpg",
+                "caption": "",
+                "position": 2097
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/red_arm_four/8.jpg",
+                "caption": "",
+                "position": 2098
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/red_hair_wings/stacked.jpg",
+                "caption": "",
+                "position": 2101
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/red_hair_wings/2.jpg",
+                "caption": "",
+                "position": 2102
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/red_hair_wings/5.jpg",
+                "caption": "",
+                "position": 2103
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/red_hair_wings/7.jpg",
+                "caption": "",
+                "position": 2104
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/monkey_icecream/stacked.jpg",
+                "caption": "",
+                "position": 2105
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/monkey_icecream/6.jpg",
+                "caption": "",
+                "position": 2106
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/monkey_icecream/7.jpg",
+                "caption": "",
+                "position": 2107
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/monkey_icecream/8.jpg",
+                "caption": "",
+                "position": 2108
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/horn_jelly_leg/stacked.jpg",
+                "caption": "",
+                "position": 2111
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/horn_jelly_leg/8.jpg",
+                "caption": "",
+                "position": 2112
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/horn_jelly_leg/2.jpg",
+                "caption": "",
+                "position": 2113
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/horn_jelly_leg/4.jpg",
+                "caption": "",
+                "position": 2114
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/wings_jelly_leg/stacked.jpg",
+                "caption": "",
+                "position": 2115
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/wings_jelly_leg/11.jpg",
+                "caption": "",
+                "position": 2116
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/wings_jelly_leg/8.jpg",
+                "caption": "",
+                "position": 2117
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/wings_jelly_leg/4.jpg",
+                "caption": "",
+                "position": 2118
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hair_frog_leg/stacked.jpg",
+                "caption": "",
+                "position": 2121
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hair_frog_leg/9.jpg",
+                "caption": "",
+                "position": 2122
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hair_frog_leg/4.jpg",
+                "caption": "",
+                "position": 2123
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hair_frog_leg/3.jpg",
+                "caption": "",
+                "position": 2124
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/scary_head_wings_legs/stacked.jpg",
+                "caption": "",
+                "position": 2125
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/scary_head_wings_legs/10.jpg",
+                "caption": "",
+                "position": 2126
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/scary_head_wings_legs/14.jpg",
+                "caption": "",
+                "position": 2127
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/scary_head_wings_legs/4.jpg",
+                "caption": "",
+                "position": 2128
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/full_body_fire_wings/stacked.jpg",
+                "caption": "",
+                "position": 2131
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/full_body_fire_wings/10.jpg",
+                "caption": "",
+                "position": 2132
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/full_body_fire_wings/15.jpg",
+                "caption": "",
+                "position": 2133
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/full_body_fire_wings/4.jpg",
+                "caption": "",
+                "position": 2134
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/tentacle_leg/stacked.jpg",
+                "caption": "",
+                "position": 2135
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/tentacle_leg/13.jpg",
+                "caption": "",
+                "position": 2136
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/tentacle_leg/11.jpg",
+                "caption": "",
+                "position": 2137
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/tentacle_leg/3.jpg",
+                "caption": "",
+                "position": 2138
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/feathers_wings/stacked.jpg",
+                "caption": "",
+                "position": 2141
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/feathers_wings/5.jpg",
+                "caption": "",
+                "position": 2142
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/feathers_wings/3.jpg",
+                "caption": "",
+                "position": 2143
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/feathers_wings/2.jpg",
+                "caption": "",
+                "position": 2144
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/spikes_feathers_wings/stacked.jpg",
+                "caption": "",
+                "position": 2145
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/spikes_feathers_wings/4.jpg",
+                "caption": "",
+                "position": 2146
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/spikes_feathers_wings/5.jpg",
+                "caption": "",
+                "position": 2147
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/spikes_feathers_wings/7.jpg",
+                "caption": "",
+                "position": 2148
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/tentacle_body/stacked.jpg",
+                "caption": "",
+                "position": 2151
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/tentacle_body/7.jpg",
+                "caption": "",
+                "position": 2152
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/tentacle_body/6.jpg",
+                "caption": "",
+                "position": 2153
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/tentacle_body/4.jpg",
+                "caption": "",
+                "position": 2154
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/horns_feathers_body/stacked.jpg",
+                "caption": "",
+                "position": 2155
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/horns_feathers_body/2.jpg",
+                "caption": "",
+                "position": 2156
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/horns_feathers_body/3.jpg",
+                "caption": "",
+                "position": 2157
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/horns_feathers_body/5.jpg",
+                "caption": "",
+                "position": 2158
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/glowing_spiky/stacked.jpg",
+                "caption": "",
+                "position": 2161
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/glowing_spiky/3.jpg",
+                "caption": "",
+                "position": 2162
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/glowing_spiky/7.jpg",
+                "caption": "",
+                "position": 2163
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/glowing_spiky/14.jpg",
+                "caption": "",
+                "position": 2164
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hat_belly/stacked.jpg",
+                "caption": "",
+                "position": 2165
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hat_belly/6.jpg",
+                "caption": "",
+                "position": 2166
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hat_belly/3.jpg",
+                "caption": "",
+                "position": 2167
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hat_belly/7.jpg",
+                "caption": "",
+                "position": 2168
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hat_tentacle/stacked.jpg",
+                "caption": "Figure 16:Additional PiT results for character ideation",
+                "position": 2181
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hat_tentacle/3.jpg",
+                "caption": "",
+                "position": 2186
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hat_tentacle/6.jpg",
+                "caption": "",
+                "position": 2187
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hat_tentacle/7.jpg",
+                "caption": "",
+                "position": 2188
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/wing_jelly_leg/stacked.jpg",
+                "caption": "",
+                "position": 2191
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/wing_jelly_leg/2.jpg",
+                "caption": "",
+                "position": 2192
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/wing_jelly_leg/3.jpg",
+                "caption": "",
+                "position": 2193
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/wing_jelly_leg/6.jpg",
+                "caption": "",
+                "position": 2194
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hair_feathers_body/stacked.jpg",
+                "caption": "",
+                "position": 2197
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hair_feathers_body/7.jpg",
+                "caption": "",
+                "position": 2198
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hair_feathers_body/2.jpg",
+                "caption": "",
+                "position": 2199
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/hair_feathers_body/6.jpg",
+                "caption": "",
+                "position": 2200
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/armor_wings/stacked.jpg",
+                "caption": "",
+                "position": 2203
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/armor_wings/4.jpg",
+                "caption": "",
+                "position": 2204
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/armor_wings/5.jpg",
+                "caption": "",
+                "position": 2205
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/armor_wings/13.jpg",
+                "caption": "",
+                "position": 2206
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/frog_legs_ears/stacked.jpg",
+                "caption": "",
+                "position": 2209
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/frog_legs_ears/6.jpg",
+                "caption": "",
+                "position": 2210
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/frog_legs_ears/8.jpg",
+                "caption": "",
+                "position": 2211
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/frog_legs_ears/11.jpg",
+                "caption": "",
+                "position": 2212
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/horns_hair/stacked.jpg",
+                "caption": "",
+                "position": 2215
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/horns_hair/10.jpg",
+                "caption": "",
+                "position": 2216
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/horns_hair/8.jpg",
+                "caption": "",
+                "position": 2217
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/results_large/horns_hair/2.jpg",
+                "caption": "",
+                "position": 2218
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/screen/stacked.jpg",
+                "caption": "Figure 17:Additional PiT results for product design",
+                "position": 2228
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/screen/4.jpg",
+                "caption": "",
+                "position": 2233
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/screen/8.jpg",
+                "caption": "",
+                "position": 2234
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/screen/11.jpg",
+                "caption": "",
+                "position": 2235
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/screen_wheel/stacked.jpg",
+                "caption": "",
+                "position": 2238
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/screen_wheel/3.jpg",
+                "caption": "",
+                "position": 2239
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/screen_wheel/9.jpg",
+                "caption": "",
+                "position": 2240
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/screen_wheel/12.jpg",
+                "caption": "",
+                "position": 2241
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/tap_wheel/stacked.jpg",
+                "caption": "",
+                "position": 2244
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/tap_wheel/2.jpg",
+                "caption": "",
+                "position": 2245
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/tap_wheel/11.jpg",
+                "caption": "",
+                "position": 2246
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/tap_wheel/9.jpg",
+                "caption": "",
+                "position": 2247
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/brocoli_wheel/stacked.jpg",
+                "caption": "",
+                "position": 2250
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/brocoli_wheel/9.jpg",
+                "caption": "",
+                "position": 2251
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/brocoli_wheel/7.jpg",
+                "caption": "",
+                "position": 2252
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/brocoli_wheel/3.jpg",
+                "caption": "",
+                "position": 2253
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/blue_camera/stacked.jpg",
+                "caption": "",
+                "position": 2256
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/blue_camera/10.jpg",
+                "caption": "",
+                "position": 2257
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/blue_camera/3.jpg",
+                "caption": "",
+                "position": 2258
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/blue_camera/8.jpg",
+                "caption": "",
+                "position": 2259
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/knob_coffee/stacked.jpg",
+                "caption": "",
+                "position": 2262
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/knob_coffee/11.jpg",
+                "caption": "",
+                "position": 2263
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/knob_coffee/7.jpg",
+                "caption": "",
+                "position": 2264
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/knob_coffee/3.jpg",
+                "caption": "",
+                "position": 2265
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/phone_tap/stacked.jpg",
+                "caption": "",
+                "position": 2268
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/phone_tap/10.jpg",
+                "caption": "",
+                "position": 2269
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/phone_tap/13.jpg",
+                "caption": "",
+                "position": 2270
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/phone_tap/6.jpg",
+                "caption": "",
+                "position": 2271
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/chair_back/stacked.jpg",
+                "caption": "",
+                "position": 2274
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/chair_back/3.jpg",
+                "caption": "",
+                "position": 2275
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/chair_back/7.jpg",
+                "caption": "",
+                "position": 2276
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/product_results/chair_back/6.jpg",
+                "caption": "",
+                "position": 2277
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/pants_bowtie/stacked.jpg",
+                "caption": "Figure 18:Additional PiT results for toy concepting",
+                "position": 2288
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/pants_bowtie/6.jpg",
+                "caption": "",
+                "position": 2293
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/pants_bowtie/13.jpg",
+                "caption": "",
+                "position": 2294
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/pants_bowtie/12.jpg",
+                "caption": "",
+                "position": 2295
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/yellow_hat_glasses/stacked.jpg",
+                "caption": "",
+                "position": 2298
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/yellow_hat_glasses/10.jpg",
+                "caption": "",
+                "position": 2299
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/yellow_hat_glasses/12.jpg",
+                "caption": "",
+                "position": 2300
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/yellow_hat_glasses/9.jpg",
+                "caption": "",
+                "position": 2301
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/wizard_hat_pants/stacked.jpg",
+                "caption": "",
+                "position": 2304
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/wizard_hat_pants/11.jpg",
+                "caption": "",
+                "position": 2305
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/wizard_hat_pants/10.jpg",
+                "caption": "",
+                "position": 2306
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/wizard_hat_pants/8.jpg",
+                "caption": "",
+                "position": 2307
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/color_pants_beanie/stacked.jpg",
+                "caption": "",
+                "position": 2310
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/color_pants_beanie/7.jpg",
+                "caption": "",
+                "position": 2311
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/color_pants_beanie/6.jpg",
+                "caption": "",
+                "position": 2312
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/color_pants_beanie/8.jpg",
+                "caption": "",
+                "position": 2313
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/camera_coat/stacked.jpg",
+                "caption": "",
+                "position": 2316
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/camera_coat/6.jpg",
+                "caption": "",
+                "position": 2317
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/camera_coat/11.jpg",
+                "caption": "",
+                "position": 2318
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/camera_coat/9.jpg",
+                "caption": "",
+                "position": 2319
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/purple_poach/stacked.jpg",
+                "caption": "",
+                "position": 2322
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/purple_poach/14.jpg",
+                "caption": "",
+                "position": 2323
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/purple_poach/3.jpg",
+                "caption": "",
+                "position": 2324
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/purple_poach/4.jpg",
+                "caption": "",
+                "position": 2325
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/kilt_suit/stacked.jpg",
+                "caption": "Figure 19:Additional PiT results for toy concepting",
+                "position": 2335
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/kilt_suit/2.jpg",
+                "caption": "",
+                "position": 2340
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/kilt_suit/3.jpg",
+                "caption": "",
+                "position": 2341
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/kilt_suit/12.jpg",
+                "caption": "",
+                "position": 2342
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/jacket_glasses_hat/stacked.jpg",
+                "caption": "",
+                "position": 2345
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/jacket_glasses_hat/10.jpg",
+                "caption": "",
+                "position": 2346
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/jacket_glasses_hat/12.jpg",
+                "caption": "",
+                "position": 2347
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/jacket_glasses_hat/4.jpg",
+                "caption": "",
+                "position": 2348
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/red_hair_scarf/stacked.jpg",
+                "caption": "",
+                "position": 2351
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/red_hair_scarf/11.jpg",
+                "caption": "",
+                "position": 2352
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/red_hair_scarf/7.jpg",
+                "caption": "",
+                "position": 2353
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/red_hair_scarf/9.jpg",
+                "caption": "",
+                "position": 2354
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/golden_shirt/stacked.jpg",
+                "caption": "",
+                "position": 2357
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/golden_shirt/12.jpg",
+                "caption": "",
+                "position": 2358
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/golden_shirt/2.jpg",
+                "caption": "",
+                "position": 2359
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/golden_shirt/9.jpg",
+                "caption": "",
+                "position": 2360
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/tie_hair/stacked.jpg",
+                "caption": "",
+                "position": 2363
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/tie_hair/3.jpg",
+                "caption": "",
+                "position": 2364
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/tie_hair/7.jpg",
+                "caption": "",
+                "position": 2365
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/plush_results/tie_hair/13.jpg",
+                "caption": "",
+                "position": 2366
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/132004_divided_3_ref.jpg",
+                "caption": "Figure 20:Style Generation.We train a LoRA to generate character reference sheets when given a concept embedding.",
+                "position": 2376
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/132004_divided_3_pred.jpg",
+                "caption": "",
+                "position": 2381
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/136262_divided_12_ref.jpg",
+                "caption": "",
+                "position": 2382
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/136262_divided_12_pred.jpg",
+                "caption": "",
+                "position": 2383
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/136262_divided_6_ref.jpg",
+                "caption": "",
+                "position": 2386
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/136262_divided_6_pred.jpg",
+                "caption": "",
+                "position": 2387
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/153187_divided_3_ref.jpg",
+                "caption": "",
+                "position": 2388
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/153187_divided_3_pred.jpg",
+                "caption": "",
+                "position": 2389
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/260445_divided_13_ref.jpg",
+                "caption": "",
+                "position": 2392
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/260445_divided_13_pred.jpg",
+                "caption": "",
+                "position": 2393
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/303196_divided_3_ref.jpg",
+                "caption": "",
+                "position": 2394
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/303196_divided_3_pred.jpg",
+                "caption": "",
+                "position": 2395
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/453142_divided_2_ref.jpg",
+                "caption": "",
+                "position": 2398
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/453142_divided_2_pred.jpg",
+                "caption": "",
+                "position": 2399
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/469687_divided_1_ref.jpg",
+                "caption": "",
+                "position": 2400
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/469687_divided_1_pred.jpg",
+                "caption": "",
+                "position": 2401
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/585690_divided_10_ref.jpg",
+                "caption": "",
+                "position": 2404
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/585690_divided_10_pred.jpg",
+                "caption": "",
+                "position": 2405
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/608066_divided_dotted_belly_2_ref.jpg",
+                "caption": "",
+                "position": 2406
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/608066_divided_dotted_belly_2_pred.jpg",
+                "caption": "",
+                "position": 2407
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/611564_divided_4_ref.jpg",
+                "caption": "",
+                "position": 2410
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/611564_divided_4_pred.jpg",
+                "caption": "",
+                "position": 2411
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/623085_divided_3_ref.jpg",
+                "caption": "",
+                "position": 2412
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/623085_divided_3_pred.jpg",
+                "caption": "",
+                "position": 2413
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/91050_divided_2_ref.jpg",
+                "caption": "",
+                "position": 2416
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/91050_divided_2_pred.jpg",
+                "caption": "",
+                "position": 2417
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/721277_divided_12_ref.jpg",
+                "caption": "",
+                "position": 2418
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10365/extracted/6277629/figures/creature_sheets/candidate_images/candidate_single_images/721277_divided_12_pred.jpg",
+                "caption": "",
+                "position": 2419
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAdditional Results and Comparisons",
+        "images": []
+    }
+]
