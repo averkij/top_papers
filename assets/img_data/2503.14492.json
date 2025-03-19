@@ -1,0 +1,125 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Preliminary",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.14492/x1.png",
+                "caption": "Figure 1:(a)Base modelis the base DiT-based diffusion model. It consists of a sequence of transformer blocks and learns to predict the added noise in the input noisy tokens. (b)ControlNetextends the base model to a conditional diffusion model. The main addition is the control branch, which contains a few transformer blocks. The outputs of the transformer blocks are passed to zero-initialized linear layers before added back to the main branch. During the ControlNet training, the base model weights are frozen.",
+                "position": 86
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.14492/x2.png",
+                "caption": "Figure 2:Cosmos-Transfer1is a world generator with adaptive multimodal control. It contains multiple control branches to extract control information from different modality inputs such as segmentation, depth, and edge. We apply spatiotemporal control maps𝐰={𝐰1,𝐰2,…,𝐰N}𝐰subscript𝐰1subscript𝐰2…subscript𝐰𝑁\\mathbf{w}=\\{\\mathbf{w}_{1},\\mathbf{w}_{2},...,\\mathbf{w}_{N}\\}bold_w = { bold_w start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT , bold_w start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT , … , bold_w start_POSTSUBSCRIPT italic_N end_POSTSUBSCRIPT }to weight the outputs computed by different control branches before channeling them back to the main generation branch. The spatiotemporal control map allows the model to leverage the most relevant modalities in different regions for optimal output quality.",
+                "position": 116
+            }
+        ]
+    },
+    {
+        "header": "4Modality and Training",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.14492/x3.png",
+                "caption": "Figure 3:Input and generated videos from Cosmos-Transfer1-7B operating on individual modality settings using the same prompt.In particular, Cosmos-Transfer1-7B [Vis] preserves the colors and overall composition while altering texture details. On the other hand, Cosmos-Transfer1-7B [Edge] maintains the object boundaries while changing colors. Similarly, Cosmos-Transfer1-7B [Depth] preserves the scene geometry, while Cosmos-Transfer1-7B [Seg] preserves the scene semantics.",
+                "position": 145
+            },
+            {
+                "img": "https://arxiv.org/html/2503.14492/x4.png",
+                "caption": "Figure 4:Input and generated videos from Cosmos-Transfer1-7B-Sample-AV operating on individual modality settings.Cosmos-Transfer1-7B-Sample-AV [HDMap] preserves the original road layout of a driving scene while Cosmos-Transfer1-7B-Sample-AV [LiDAR] preserves the input semantic details.",
+                "position": 198
+            },
+            {
+                "img": "https://arxiv.org/html/2503.14492/x5.png",
+                "caption": "Figure 5:Cosmos-Transfer1-7B-4KUpscaler upscales videos from 720p to 4k resolution.The input video in the first row is a generated video, while the second row is a real video. Note how the model adds realistic reflections and sharpens the textures in the input.",
+                "position": 204
+            }
+        ]
+    },
+    {
+        "header": "5Evaluations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.14492/x6.png",
+                "caption": "Figure 6:Diagram of spatiotemporal control weighting by different modalities(Vis, Edge, Depth and Segmentation). The control weight maps are0.00.00.00.0in black pixel areas, and0.50.50.50.5in white areas. We note that while the caption broadly specifies a bicycle repair shop scene, the blue shirt with a white logo and the skin color of the man are maintained, due to these pixels being controlled by Vis and Edge. On the other hand, for the background controlled by Depth and Segmentation, the objects are positioned in the scene consistently but have their colors and textures randomized (e.g. red toolbox, yellow tripod, white repair stand). A new tool rack on the wall on the right is also added by the model.",
+                "position": 494
+            },
+            {
+                "img": "https://arxiv.org/html/2503.14492/x7.png",
+                "caption": "Figure 7:Correlations of modality weights on foreground (FG) region (for Vis and Edge) or background (BG) region (for Depth and Segmentation) with ground truth modality.",
+                "position": 507
+            },
+            {
+                "img": "https://arxiv.org/html/2503.14492/x8.png",
+                "caption": "Figure 8:Example results of Cosmos-Transfer1 for robotic data generation.The left column displays input videos generated by NVIDIA Isaac Lab, while the right three columns show results from Cosmos-Transfer1-7B with different condition modalities and spatiotemporal control maps. For each example, the top row (single) uses Segmentation as the condition modality with an overall constraint weight of 1. The bottom row combines Segmentation, Edge, and Vis as conditions, applying a spatiotemporal control map scheme. Specifically, a combination of Edge, Segmentation and Vis are used with a customized control weight on the foreground (robot region), while only segmentation with a control weight of 1 is applied to the background. These results demonstrate that Cosmos-Transfer1-7B with the spatiotemporal control map enhances the fidelity of the foreground robot.",
+                "position": 899
+            },
+            {
+                "img": "https://arxiv.org/html/2503.14492/x9.png",
+                "caption": "Figure 9:Comparison of the generation results conditioned on depth and segmentation of Cosmos-Transfer1-7B. In each example, the highlighted regions illustrate the enhancements achieved by incorporating multiple control signals over relying on a single one.",
+                "position": 906
+            },
+            {
+                "img": "https://arxiv.org/html/2503.14492/x10.png",
+                "caption": "Figure 10:Comparison of the generation results conditioned on HDMap and LiDAR of Cosmos-Transfer1-7B-Sample-AV.The highlighted regions illustrate the enhancements achieved by incorporating multiple control signals compared to relying on a single one.1st row: HDMap condition.2nd row: LiDAR condition.3rd row: Video generated using only HDMap.4th row: Video generated using only LiDAR, where traffic cones are introduced by LiDAR, but lane markings are incorrect.5th row: Video generated using both HDMap and LiDAR, where the lane layout is improved and more detailed objects are synthesized.",
+                "position": 909
+            },
+            {
+                "img": "https://arxiv.org/html/2503.14492/x11.png",
+                "caption": "Figure 11:1st row: Control signals (left: HDMap + 3DBbox, right: LiDAR) to Cosmos-Transfer1-7B-Sample-AV.2nd-5th rows: Video generated by different text prompts listed as following:The scene unfolds on a foggy morning, with a thick layer of mist reducing visibility…;The scene is bathed in the warm, golden hues of the late afternoon sun, casting long shadows on the road…;The street is blanketed in heavy snowfall, with large snowflakes continuously falling, partially obscuring visibility…;The scene unfolds in a chaotic and intense environment as a fire engulfs the houses on either side of the street…",
+                "position": 928
+            },
+            {
+                "img": "https://arxiv.org/html/2503.14492/x12.png",
+                "caption": "Figure 12:1st row: LiDAR simulated by NVIDIA Omniverse as the control signal to Cosmos-Transfer1-7B.2nd-5th rows: Videos generated by different text prompts listed as following:The video showcases an urban driving scene during the golden hour…;The video portrays a nighttime driving scene in an urban environment…;The video captures an urban driving scene under heavy rainfall…;The video depicts a thrilling driving scene in a jungle-style urban environment…",
+                "position": 938
+            }
+        ]
+    },
+    {
+        "header": "6Real-time Inference",
+        "images": []
+    },
+    {
+        "header": "7Related Work",
+        "images": []
+    },
+    {
+        "header": "8Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix APrompt Upsampler",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.14492/extracted/6287791/images/A_appendix/seg_upsampler_example.png",
+                "caption": "",
+                "position": 1100
+            },
+            {
+                "img": "https://arxiv.org/html/2503.14492/extracted/6287791/images/A_appendix/depth_upsampler_example.png",
+                "caption": "",
+                "position": 1118
+            }
+        ]
+    },
+    {
+        "header": "Appendix BContributors and Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
