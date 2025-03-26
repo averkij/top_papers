@@ -1,0 +1,196 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.19903/x1.png",
+                "caption": "Figure 1:Left:Regular vision models such as SigLIP processes images at a low resolution (e.g., 378×\\times×378 pixels), which is not enough for many daily tasks such as spotting the stop sign while driving. In contrast,\\modelis able to both encode low-res features and efficiently process high-res information of 4K-resolution images via top-down patch selection,i.e., selectively processing relevant patches based on any text prompt.Top Right:SigLIP is pre-trained by contrasting global vision features and global captions, which is costly for high-resolution images.\\modelis pre-trained with additional contrast between local high-res features with local captions, enabling pre-training at 4K resolution with 79×\\times×less cost than SigLIP.Bottom Right:VILA-HD with\\modelas the vision encoder is able to select high-res regions to process based on the user prompt. VILA-HD outperforms state-of-the-art MLLMs such as Qwen2-VL[93]on the proposed 4KPro benchmark while achieving 2.96×\\times×speedup.",
+                "position": 124
+            }
+        ]
+    },
+    {
+        "header": "2\\model: Vision Pre-Training at 4K Resolution",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.19903/x2.png",
+                "caption": "Figure 2:Curation of bounding boxes and captions of salient regions in the pre-training data.For each high-resolution image, we segment all the masks, detect salient regions with small or dense masks, and use an MLLM to generate captions about the local regions.",
+                "position": 156
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19903/x2.png",
+                "caption": "Figure 2:Curation of bounding boxes and captions of salient regions in the pre-training data.For each high-resolution image, we segment all the masks, detect salient regions with small or dense masks, and use an MLLM to generate captions about the local regions.",
+                "position": 159
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19903/x3.png",
+                "caption": "Figure 3:Pre-training data example.Each instance contains an image with resolution up to 4K, bounding boxes of the salient regions in the image, and captions about details in the regions such as text or small objects.",
+                "position": 164
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19903/x4.png",
+                "caption": "Figure 4:Model architecture of\\model.The model consists of 3 stages. In Stage 1, the model encodes global low-resolution features. In Stage 2, based on the low-resolution features as well as auxiliary high-resolution features extracted by a light-weight encoder, the model selects local regions that are either relevant to a text prompt (top-down selection) or salient by themselves (bottom-up selection). In Stage 3, the model processes multi-scale high-res patches from the selected regions with the same encoder from Stage 1. KV cache from the low-res tokens in Stage 1 is added to the self-attention layers to provide a global context for local high-res encoding.",
+                "position": 188
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19903/x5.png",
+                "caption": "Figure 5:Pre-training algorithm of\\model.(a)During training,\\modelextracts the high-res features from the labeled local regions and contrasts them with embeddings of the local captions. To maintain the low-res feature quality, we also mix pairs of low-res features and global caption embedding in each batch. Both high-res and low-res features are extracted in the same way as Figure4.(b)The top-down patch selection score is supervised by ground-truth score map generated from the bounding box corresponding to the local caption.(c)The supervision for bottom-up selection is similar to top-down selection, except that the ground-truth selection score is generated from all the labeled bounding boxes of the image.",
+                "position": 214
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19903/x6.png",
+                "caption": "Figure 6:Qualitative examples of patch selection.Left:\\modelis pre-trained to perform bottom-up selection based on image saliency (denoted by∅\\varnothing∅) or top-down selection based on local captions. The selection process is detailed in Figure4and Section2.2.Middle&Right: We fine-tune\\modelwith MLLM to select patches based on questions about local regions (Figure7and Section3.1).",
+                "position": 217
+            }
+        ]
+    },
+    {
+        "header": "3\\vilamodel: Enabling High-Resolution MLLM with\\model",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.19903/x7.png",
+                "caption": "Figure 7:Model design of\\vilamodel.For any input image and text prompt,\\vilamodelfirst extracts the low-res image features using\\modeland sends them along with the text tokens to the LLM. The last-layer embedding of the last token is used to select high-res patches in\\model, whose features are then extracted by\\model, added with additional positional embedding, and sent to the LLM. Although\\modelonly processes at most 2560 high-res patches at a time, one can run the patch selection and high-res feature extraction for N times (N can be an arbitrary number) to encode up to 2560×\\times×N high-res patches.",
+                "position": 246
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19903/x8.png",
+                "caption": "Figure 8:Additional fine-tuning data for MLLMs with\\model.Left:To fine-tune top-down patch selection, we generate data with pairs of high-res image, question about a local region, and the bounding box of the region. This is generated by taking the\\modelpre-training data and retargeting the local captions into questions using LLaMA-3.1.Right:To align the\\modelhigh-res features to the LLM text space, it requires fine-tuning data that contains QA pairs on high-res images. We generate this by taking regular low-res image QA data and pasting the image onto a large-size background to get the new high-res image while the question and answer are inherited.",
+                "position": 258
+            }
+        ]
+    },
+    {
+        "header": "4Scaling Properties of PS3",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.19903/x9.png",
+                "caption": "Figure 9:Scaling properties of\\modelon\\vilamodel.(Left)Overall results. We report average performance of the MLLM on seven benchmarks under different maximum input resolution. The size of each data point indicates the number of high-res vision tokens input to the LLM.(a)When selecting all high-res patches for MLLM, the performance of\\modelscales better with the resolution than the baselines without high-resolution pre-training.(b)\\modelis able to process higher resolution and improve performance while selecting a fixed number of high-res patches for MLLM.(c)Within the same resolution,\\modelis able to trade compute for performance by selecting more high-res patches.(d)\\modelcan select more high-res patches at test time even if its selects a fixed number of high-res patches during MLLM training.",
+                "position": 281
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19903/x10.png",
+                "caption": "Figure 10:Image resolution and MRR of different benchmarks.Existing benchmarks contain high-res images but the resolution required to answer the questions (MRR) is mostly under 1K. In contrast, 4KPro contains questions only solvable at 4K resolution.",
+                "position": 845
+            }
+        ]
+    },
+    {
+        "header": "54KPro: Benchmarking\\modelat 4K Resolution",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.19903/x11.png",
+                "caption": "Figure 11:Examples from 4KPro and comparison of different models. Each example corresponds to one out of four categories (Autonomous Vehicle, Household, Gaming, and UI Understanding) and each question can only be answered without ambiguity under 4K resolution. VILA-\\modelimproves the accuracy over the state-of-the-art MLLMs such as GPT-4o and Qwen2-VL.",
+                "position": 866
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19903/x12.png",
+                "caption": "Figure 12:Scaling properties of\\modelon 4KPro.\\modelshows consistently improved performance by scaling to 4K resolution and greatly outperforms the baselines.",
+                "position": 869
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19903/x12.png",
+                "caption": "Figure 12:Scaling properties of\\modelon 4KPro.\\modelshows consistently improved performance by scaling to 4K resolution and greatly outperforms the baselines.",
+                "position": 872
+            }
+        ]
+    },
+    {
+        "header": "6Comparing\\modeland\\vilamodelto State of the Arts",
+        "images": []
+    },
+    {
+        "header": "7Ablations and Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.19903/x13.png",
+                "caption": "Figure 13:Trade-off between image scales for different benchmarks.Select @ 756/1512are the percentage of selected patches at 756 and 1512 scales at test time, respectively.\\modelcan flexibly adjust token selection ratios at different image scales to achieve the best performance for different downstream tasks.",
+                "position": 2617
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19903/x14.png",
+                "caption": "Figure 14:PCA visualization of visual features.The baselines,\\stwoand AnyRes, have either noisy or blurry features at 4K resolution, while\\modelshows extremely fine-grained features that highlight details such as small texts on the banners.",
+                "position": 2768
+            }
+        ]
+    },
+    {
+        "header": "8Related Work",
+        "images": []
+    },
+    {
+        "header": "9Current Limitations and Future Directions",
+        "images": []
+    },
+    {
+        "header": "10Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADetails of\\modelPre-Training Data Curation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.19903/x15.png",
+                "caption": "Figure 15:Examples of pre-training data with natural images.Here each image is labeled with bounding boxes of four salient regions (highlighted by different colors), together with the local captions of each region. The local captions, generated by Qwen2-VL, contains details in the crops although there are still occasional hallucinations.",
+                "position": 4596
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19903/x16.png",
+                "caption": "Figure 16:Examples of pre-training data with document images.Here each image is labeled with four bounding boxes (highlighted by different colors), together with the OCR results as the captions of each region.",
+                "position": 4599
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAdditional Details of\\modelPre-Training Algorithm",
+        "images": []
+    },
+    {
+        "header": "Appendix CAdditional Details of Training and Evaluation for\\vilamodel",
+        "images": []
+    },
+    {
+        "header": "Appendix DAdditional Comments on Training\\vilamodel",
+        "images": []
+    },
+    {
+        "header": "Appendix EQualitative Examples of Patch Selection Fine-tuned with MLLMs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.19903/x17.png",
+                "caption": "Figure 17:Qualitative examples of patch selection on natural images.\\modelis able to locate different parts of the image that are relevant to the question.",
+                "position": 4680
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19903/x18.png",
+                "caption": "Figure 18:Qualitative examples of patch selection on document images.\\modelis able to locate different parts of the text in the document based on the question. For example, in the second example, when asked about the alternative approach of examination or the extent to which the confounding is examined,\\modelis able to locate the texts that discuss these topics.",
+                "position": 4683
+            }
+        ]
+    },
+    {
+        "header": "Appendix F4KPro Data Curation",
+        "images": []
+    },
+    {
+        "header": "Appendix GAdditional Qualitative Results on 4KPro",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.19903/x19.png",
+                "caption": "Figure 19:Qualitative examples on 4KPro.The four rows show examples from categories of autonomous vehicle, household, gaming, and UI understanding, respectively. For each instance, the local crop is shown under the resolutions of 756, 1512, and 3780.",
+                "position": 4700
+            }
+        ]
+    },
+    {
+        "header": "Appendix HFull Results of Scaling Properties on 4KPro",
+        "images": []
+    }
+]
