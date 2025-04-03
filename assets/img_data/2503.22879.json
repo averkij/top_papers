@@ -1,0 +1,126 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.22879/extracted/6315467/figs/memory_throughput.png",
+                "caption": "Figure 1:(Quamba2-8B memory and throughput.)The head-to-toe (H2T) quantization enables the deployment of Mamba2-8B on edge platforms. Quamba2 delivers3×3\\times3 ×throughput on Nvidia A5000 and 13 tokens-per-second (TPS) on Nvidia Nano 8G.",
+                "position": 317
+            },
+            {
+                "img": "https://arxiv.org/html/2503.22879/extracted/6315467/figs/overview.png",
+                "caption": "Figure 2:(SSD flows with sorted heads and the activation persistence.)We sort the head channels prior to applying quantization scaling factors. The orange blocks on the right indicate the activated channels with higher values in the input and output SSD heads. The SSD performschannel-wisecalculation thereby retaining the channel order between inputx𝑥xitalic_xand outputy𝑦yitalic_y, which we callchannel order preserving. The blue and green blocks represent the activated states of input-dependent parametersB𝐵Bitalic_BandC𝐶Citalic_C. Our study shows that activated channels and states remainconsistentacross time steps and input samples, a property we denote aschannel persistenceandstate persistence.",
+                "position": 331
+            },
+            {
+                "img": "https://arxiv.org/html/2503.22879/extracted/6315467/figs/persistent.png",
+                "caption": "Figure 3:(Channel order preserving and activation persistence.)We show the activations in the last block of Mamba2-8B. For an input witht𝑡titalic_ttokens, we demonstrate that thex𝑥xitalic_xremains sorted by the maximum of the calibrated channel (a). The SSD calculation ischannel-wise, so the output channel ordery𝑦yitalic_ymatches the input orderx𝑥xitalic_x(b). ForB𝐵Bitalic_BandC𝐶Citalic_C, the activated states remain consistent over time stepst𝑡titalic_t(c-d) and input samples (e-f). We leverage the observations and design our techniques,sort-and-clusterandper-state-group quantization, to increase the quantization precisions forx𝑥xitalic_x(a),B𝐵Bitalic_B, andC𝐶Citalic_C(c-f).",
+                "position": 334
+            }
+        ]
+    },
+    {
+        "header": "3Background",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.22879/extracted/6315467/figs/clustering_tsne.png",
+                "caption": "Figure 4:(Sort-and-cluster.)We leverage thechannel-persistentproperty in SSMs to sort the channel with the calibrated maximum (a-c). The sorted heads disentangle the embedding, as shown in (c-1) and (c-2), enabling the clustering on the heads.\nWe cluster the sorted heads intom𝑚mitalic_mgroups (m=8𝑚8m=8italic_m = 8in (d)), and reorder the weights offline to match the clustering results. Then, we apply the clustering again in each head group to cluster the channels inton𝑛nitalic_ngroups (n=4𝑛4n=4italic_n = 4in (e)). For each group, a scaling factor is calculated, resulting inm×n𝑚𝑛m\\times nitalic_m × italic_nfactors used to quantizextsubscript𝑥𝑡x_{t}italic_x start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPTto 8-bit.",
+                "position": 382
+            },
+            {
+                "img": "https://arxiv.org/html/2503.22879/extracted/6315467/figs/mamba2_precision.png",
+                "caption": "Figure 5:(Quamba2 precision.)The detailed precision mapping of W4A8 and W8A8 Quamba2. We reorder the weightsofflineto match the sorting and clustering indices ofx¯tssubscriptsuperscript¯𝑥𝑠𝑡\\bar{x}^{s}_{t}over¯ start_ARG italic_x end_ARG start_POSTSUPERSCRIPT italic_s end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT, and apply per-state-group quantization onB¯tgsubscriptsuperscript¯𝐵𝑔𝑡\\bar{B}^{g}_{t}over¯ start_ARG italic_B end_ARG start_POSTSUPERSCRIPT italic_g end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPTandC¯tgsubscriptsuperscript¯𝐶𝑔𝑡\\bar{C}^{g}_{t}over¯ start_ARG italic_C end_ARG start_POSTSUPERSCRIPT italic_g end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT.",
+                "position": 449
+            }
+        ]
+    },
+    {
+        "header": "4Proposed Method: Quamba2",
+        "images": []
+    },
+    {
+        "header": "5Experiments",
+        "images": []
+    },
+    {
+        "header": "6Ablation Studies",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "Appendix AFull Results for Six Zero-shot Downstream Tasks",
+        "images": []
+    },
+    {
+        "header": "Appendix BEvaluation Results on Generation Tasks",
+        "images": []
+    },
+    {
+        "header": "Appendix CImplementation and Evaluation Details of Quamba2 Framework",
+        "images": []
+    },
+    {
+        "header": "Appendix DDetails for Mixed Precision Quamba2",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.22879/x1.png",
+                "caption": "Figure 6:(The layer-wise bit-width for Quamba2-8B-W4AX𝑋Xitalic_X.)We search the bit-width for Quamba2-8B-W4AX𝑋Xitalic_X(the last row in red), which outperforms the handcraft counterparts shown in the first (HC_first) and the second (HC_last) rows.",
+                "position": 1692
+            }
+        ]
+    },
+    {
+        "header": "Appendix EInvestigating Memory and Latency with Large Batch Sizes",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.22879/x2.png",
+                "caption": "Figure 7:(Large batch inputs.) The cached states grow linearly with respect to the input batch size. For a batch size of 128, half-precision cached states use most of the memory (a), making state loading and updating the bottleneck during generation. Our framework (W4A8) compresses the states to 8-bit, thereby reducing the total memory and generation latency (b) with large batch size inputs for cloud-based applications.",
+                "position": 1705
+            },
+            {
+                "img": "https://arxiv.org/html/2503.22879/x3.png",
+                "caption": "Figure 8:(SSM states.) The states are quantized before cached in memory. We apply the samem𝑚mitalic_mhead andn𝑛nitalic_nchannel groups from the SSM inputx𝑥xitalic_xeach SSM.",
+                "position": 1717
+            },
+            {
+                "img": "https://arxiv.org/html/2503.22879/x4.png",
+                "caption": "Figure 9:(Roofline model of A5000.)",
+                "position": 1731
+            },
+            {
+                "img": "https://arxiv.org/html/2503.22879/x4.png",
+                "caption": "Figure 9:(Roofline model of A5000.)",
+                "position": 1734
+            },
+            {
+                "img": "https://arxiv.org/html/2503.22879/extracted/6315467/figs/8b_batch_vs_ttlt.png",
+                "caption": "Figure 11:(Batch sizevs.time-to-last-token.) W4A8 is suited for most applications serving with general batch sizes among all supported bit-widths.",
+                "position": 1788
+            },
+            {
+                "img": "https://arxiv.org/html/2503.22879/extracted/6315467/figs/pareto_ttft_ttlt.png",
+                "caption": "Figure 12:(Accuracy-latency trade-off.)Quamba2 models (green) are on the Pareto frontier over other low bit-width SSM (red) and Transformer (purple) baselines, while also featuring lower memory footprints as evidenced in the size of the circle.",
+                "position": 1818
+            }
+        ]
+    },
+    {
+        "header": "Appendix FAccuracy-latency Trade-off",
+        "images": []
+    }
+]
