@@ -1,0 +1,883 @@
+{
+    "paper_title": "How Instruction and Reasoning Data shape Post-Training: Data Quality through the Lens of Layer-wise Gradients",
+    "authors": [
+        "Ming Li",
+        "Yanhong Li",
+        "Ziyue Li",
+        "Tianyi Zhou"
+    ],
+    "sections": [
+        {
+            "title": "Abstract",
+            "content": "As the post-training of large language models (LLMs) advances from instruction-following to complex reasoning tasks, understanding how different data affect finetuning dynamics remains largely unexplored. In this paper, we present a spectral analysis of layer-wise gradients induced by low/high-quality instruction and reasoning data for LLM post-training. Our analysis reveals that widely-studied metrics for data evaluation, e.g., IFD, InsTag, Difficulty, and Reward, can be explained and unified by spectral properties computed from gradients' singular value decomposition (SVD). Specifically, higher-quality data are usually associated with lower nuclear norms and higher effective ranks. Notably, effective rank exhibits better robustness and resolution than nuclear norm in capturing subtle quality differences. For example, reasoning data achieves substantially higher effective ranks than instruction data, implying richer gradient structures on more complex tasks. Our experiments also highlight that models within the same family share similar gradient patterns regardless of their sizes, whereas different model families diverge significantly. Providing a unified view on the effects of data quality across instruction and reasoning data, this work illuminates the interplay between data quality and training stability, shedding novel insights into developing better data exploration strategies for post-training."
+        },
+        {
+            "title": "Start",
+            "content": "5 2 0 2 4 1 ] . [ 1 6 6 7 0 1 . 4 0 5 2 : r Preprint. Under review. How Instruction and Reasoning Data shape Post-Training: Data Quality through the Lens of Layer-wise Gradients Ming Li1, Yanhong Li2, Ziyue Li1, Tianyi Zhou1 1University of Maryland; 2University of Chicago {minglii, tianyi}@umd.edu Project: https://github.com/MingLiiii/Gradient_Unified"
+        },
+        {
+            "title": "Abstract",
+            "content": "As the post-training of large language models (LLMs) advances from instructionfollowing to complex reasoning tasks, understanding how different data affect finetuning dynamics remains largely unexplored. In this paper, we present spectral analysis of layer-wise gradients induced by low/high-quality instruction and reasoning data for LLM post-training. Our analysis reveals that widely-studied metrics for data evaluation, e.g., IFD, InsTag, Difficulty, and Reward, can be explained and unified by spectral properties computed from gradients singular value decomposition (SVD). Specifically, higher-quality data are usually associated with lower nuclear norms and higher effective ranks. Notably, effective rank exhibits better robustness and resolution than nuclear norm in capturing subtle quality differences. For example, reasoning data achieves substantially higher effective ranks than instruction data, implying richer gradient structures on more complex tasks. Our experiments also highlight that models within the same family share similar gradient patterns regardless of their sizes, whereas different model families diverge significantly. Providing unified view on the effects of data quality across instruction and reasoning data, this work illuminates the interplay between data quality and training stability, shedding novel insights into developing better data exploration strategies for post-training."
+        },
+        {
+            "title": "Introduction",
+            "content": "Large language models (LLMs) have shown remarkable potential for various complex tasks (Zhao et al., 2023; Xu et al., 2024a), yet their success in real-world applications hinges not just on model size but also on the quality of data used for training (Brown et al., 2020; Wang et al., 2023; Zhou et al., 2023). It is widely recognized that high-quality, diverse, and complex instruction-following examples during post-training (Xu et al., 2023; Ding et al., 2023; Li et al., 2023a; Liu et al., 2023; Wu et al., 2024; Li et al., 2024b; 2025b), such as supervised fine-tuning (SFT), is crucial for eliciting generalization performance and reliability. There is growing recent interest in automated metrics that can evaluate data quality and select data for more efficient and effective post-training (Chen et al., 2023; Li et al., 2024e;d). Moreover, beyond instruction-following, the reasoning capability of LLMs (OpenAI et al., 2024b; DeepSeek-AI et al., 2025a) has also been proven to be largely dependent on data quality. For instance, s1.1 (Muennighoff et al., 2025) utilizes only 1k difficult math problems and DeepSeek-R1 generated responses to elicit LLMs strong reasoning capability. Despite the verified importance of data quality to post-training, how the quality of instruction/reasoning data affect the gradients during post-training still remains largely unexplored. In addition, can we unify different data quality metrics? Prior work has mostly treated data quality filtering as preprocessing step, evaluating its benefits in terms of end-task performance. But systematic study is lacking to reveal the mechanism of how data quality affects the training dynamics. Meanwhile, there does not exist work that compares the learning dynamics induced by reasoning data and general instruction-following data or compares different data quality metrics effects on post-training with data selection. recent study of LLM post-training (Li et al., 2024c) on fast vs. slow thinking (Kahneman, 2011) for the first time analyzes the training dynamics on different data through the lens of layer-wise gradients. It discovers that learning detailed intermediate reasoning steps leads to smaller and more stable gradient updates than learning final answers only. Yet, this study 1 Preprint. Under review. focuses only on comparing fast thinking (a few answer tokens) vs. slow thinking (CoT paths) but does not extend to more challenging problems requiring more complex reasoning. The metric used to measure gradients is limited to magnitude instead of more sophisticated spectral properties. We address these gaps by conducting layer-wise, gradient-based spectral analysis of LLM post-training when using instruction/reasoning data of low/high quality. Our study spans multiple diverse LLM families, including Qwen2.5 (Qwen et al., 2025), Llama3.1, Llama3.2 (Dubey et al., 2024), Gemma2 (Team et al., 2024)), and different sizes (1.5B - 14B), to ensure the generality of our findings. Inspired by s1 (Muennighoff et al., 2025), which selects data by difficulty, for reasoning data, we compare the s1.1 data and GSM8K (Cobbe et al., 2021) data (response generated by DeepSeek-R1) as low/high-quality data, respectively. For general instruction-following data, we adopt WizardLM (Xu et al., 2023), Magpie (Xu et al., 2024b), and OpenHermes 2.5 (Teknium, 2023) for our experiments and leverage automatic metrics for data quality, such as IFD (Li et al., 2024e), InsTag (Lu et al., 2023), Difficulty, and Reward to partition these datasets into low/high-quality subsets. While the first three evaluate the instructions, the reward directly measures the response quality. We developed several novel metrics measuring the spectral properties of gradients revealed by Singular Value Decomposition (SVD) (SVD-based Metrics) and Gradient Similarity-based Metrics, which are applied to the projection layers for Query, Key, Value, and Output in transformer architectures (Vaswani et al., 2017): (1) Nuclear Norm measures the magnitude of the gradient, indicating the amount of changes and efforts required for post-training. (2) Effective Rank (Roy & Vetterli, 2007) captures the dimensionality of the gradient, indicating the diversity of the gradient directions. (3) Samelayer Similarity measures the alignment between gradients of different projections within the same layer. (4) Adjacent-layer Similarity measures the alignment of gradients between consecutive layers. Main Contributions: 1 In this study, we present spectral analysis of layer-wise gradients in modern LLMs when finetuned on datasets of varying quality, namely high-quality, low-quality, instruction-following, and reasoning data. For the broad applicability of our conclusions, we conduct empirical investigations across diverse pretrained LLMs from multiple model families and on different datasets. Various automatic data evaluation metrics are used to split the data into low/high-quality partitions, and advanced reasoning data are also included for comparison. Notably, we are the first to unify the effects of different data quality metrics and compare the instruction vs. reasoning data through the lens of layer-wise gradients. Unlike existing work that focuses primarily on the gradient magnitude, we incorporate both SVD-based and similarity-based metrics, offering more comprehensive analysis. These findings reveal previously overlooked gradient patterns and provide insights into enhancing the stability and efficiency of data synthesis and LLM training. Our key findings: 1. Existing data quality metrics, e.g., IFD, InsTag, Difficulty, and Reward, can be unified due to consistent spectral properties of gradients, i.e., lower nuclear norms and higher effective ranks on high-quality data. This finding extends to both instruction and reasoning data, providing unified view of the data quality effects. 2. Effective rank outperforms nuclear norm to distinguish lowvs. high-quality data. For reasoning data, s1.1 data yields the largest effective ranks across all experiments, suggesting high correlations between reasoning complexity and gradient diversity. 3. Within the same model family, layer-wise gradients spectral properties remain consistent across different model sizes. In contrast, the gradient patterns diverge significantly across distinct model families, reflecting the unique learning dynamics of each model family. 4. Cosine similarities between gradients from the same layer and adjacent layers remain nearly zero for different types of data, so they cannot reflect data quality. 1All the gradient statistics within our experimental scope will be released in our GitHub repository. At the sample level, the instruction-response pair and the corresponding loss value are included. For SVD-based metrics, the mean, maximum, and minimum values, the Frobenius norm, and Complete Singular Values of each gradient matrix are included. For Similarity-based metrics the similarities of each gradient matrix of adjacent layers and same layers are included. We hope these gradient statistics can contribute to the communitys understanding of the gradient behaviors for different settings. 2 Preprint. Under review."
+        },
+        {
+            "title": "2.1 Preliminaries",
+            "content": "We investigate gradient behaviors under the most widely adopted SFT approach. Each data point in an SFT dataset consists of pair (x, y), where is the instruction and is the corresponding response. For the reasoning data, concatenates both thinking tokens and response tokens. Let pθ be large language model with parameters θ. Under the SFT paradigm, pθ is finetuned on each pair (x, y) by minimizing the following loss, where yj denotes the j-th token of y, y<j denotes the preceding tokens, and is the total length of y: Lθ = 1 j=1 log(cid:0)pθ(yj x, y<j)(cid:1). (1) In this paper, we focus on the gradients of the layers associated with the attention mechanism (Vaswani et al., 2017), namely the Query (Q), Key (K), Value (V) projection layers and the final Output (O) projection layer. For simplicity, we denote the gradients of these projection layers by GQ,i, GK,i, GV,i, and GO,i for each layer {0, 1, . . . , 1} in the LLM."
+        },
+        {
+            "title": "2.2 Gradient Metrics from Spectral Analysis",
+            "content": "To quantitatively analyze these gradients, we employ two categories of metrics: (1) SVD-based Metrics (the Nuclear Norm and the Effective Rank) and (2) Similarity-based Metrics (the Samelayer Similarity and the Adjacent-layer Similarity). While the SVD-based metrics describe properties of an individual gradient matrix, the similarity-based metrics reveal how gradients compare across different projections or layers."
+        },
+        {
+            "title": "2.2.1 SVD-based Metrics",
+            "content": "Consider gradient matrix GX,i Rmn, where {Q, K, V, O} indicates the projection (Query, Key, Value, or Output), and represents the index the Transformer layer. We can write its Singular Value Decomposition as GX,i = Σ VT, where Rmm and Rnn are orthogonal matrices, and Σ Rmn is diagonal matrix containing the singular values σ1, . . . , σmin(m,n), sorted in decreasing order. For simplicity, we omit all the subscripts (X and i) for SVD matrices and singular values. Nuclear Norm. We measure the overall magnitude of the gradient matrix GX,i by its nuclear norm NX,i, which is formulated as NX,i = GX,i = min(m,n) j=1 σj. (2) higher nuclear norm indicates larger overall gradient scale, implying that the model parameters at that layer are being updated more significantly, further indicating potential distribution shift between the response and the model to be trained. Effective Rank. We measure how uniformly the singular values of GX,i are distributed by the effective rank RX,i. We normalize the singular values and formulate the effective rank as RX,i = exp (cid:16) min(m,n) j=1 (cid:17) σj ln( σj) and σj = σj min(m,n) k= σk If only few singular values are large (i.e., the gradient is concentrated in just few directions), the effective rank is small. If many singular values all contribute significantly, the effective rank is relatively larger. It measures how diverse the directions of the gradient are. higher effective rank indicates the gradient is spread out over more directions, suggesting richer updates, whereas smaller value means that only few directions dominate the gradient directions. 3 Preprint. Under review."
+        },
+        {
+            "title": "2.2.2 Similarity-based Metrics",
+            "content": "While the SVD-based metrics above characterize individual gradient matrices in isolation, it can be equally insightful to analyze how gradients relate across projections or layers. To this end, we introduce cosine similarity measures at two levels: within the same layer and across adjacent layers. Same-layer Similarity. Within single layer i, we quantify the similarity between two projection gradients by computing the cosine similarity of their vectorizations. For projections and in layer i, we denote the same-layer similarity by SX,Y,i: SX,Y,i = (cid:10)vec(GX,i), vec(GY,i)(cid:11) (cid:13)vec(GY,i)(cid:13) (cid:13) (cid:13)vec(GX,i)(cid:13) (cid:13) (cid:13)2 (cid:13)2 . (3) Specifically, we only compute SQ,O,i (comparing Query vs. Output) or SK,V,i (comparing Key vs. Value) due to their dimensional alignment. higher same-layer similarity means those two projections share more alignment in how their parameters are being updated at that layer. Adjacent-layer Similarity. To evaluate how each projections gradient evolves from one layer to the next, we define the adjacent-layer similarity AX,i for projection between layers and + 1: AX,i = (cid:10)vec(GX,i), vec(GX,i+1)(cid:11) (cid:13)vec(GX,i+1)(cid:13) (cid:13) (cid:13)2 (cid:13)vec(GX,i)(cid:13) (cid:13) (cid:13)2 . (4) higher value of AX,i indicates stronger similarity of projection Xs gradients across consecutive layers, whereas lower value suggests larger variation."
+        },
+        {
+            "title": "3.1 Models",
+            "content": "We evaluate our method on several pretrained LLMs across multiple families, covering range of parameter scales. Specifically, we use Qwen2.5 (Qwen et al., 2025) in four configurations (1.5B, 3B, 7B, and 14B parameters), Llama3.1 (Dubey et al., 2024) with 8B parameters, Llama3.2 in 1B and 3B configurations, and Gemma2 (Team et al., 2024) in 2B and 9B configurations."
+        },
+        {
+            "title": "3.2 Datasets",
+            "content": "Instruction-following data: WizardLM (Xu et al., 2023) is an instruction-following dataset created via an LLM-based evolution strategy that iteratively rewrites set of initial prompts into more complex multi-step instructions, automatically generating high-complexity queries beyond what human annotators typically produce. Magpie (Xu et al., 2024b) is fully synthetic alignment dataset obtained by prompting an aligned language model, and we utilize the 300k high-quality subset selected by the authors for our source data. OpenHermes 2.5 is large-scale curated compilation of roughly one million instructionresponse samples drawn from diverse range of open-source and GPT-4-generated datasets, designed to maximize diversity and task coverage for robust fine-tuning. Reasoning data: We employ two sources of reasoning data, each paired with step-by-step traces and final solutions generated by DeepSeek-R1 (DeepSeek-AI et al., 2025a): s1.1K data is provided by s1, which contains difficult math problems with responses generated by DeepSeek-R1. This data can be viewed as high-quality reasoning data since it succeeds in eliciting LLMs reasoning capability with only 1, 000 samples. To curate the relatively low-quality reasoning data, motivated by s1s success in utilizing difficulty as the metric, we utilize the relatively easy math problems from GSM8K (Cobbe et al., 2021) with DeepSeek-R1 generated responses."
+        },
+        {
+            "title": "3.3 Data Quality Metrics to Partition Low/High-Quality Data",
+            "content": "We adopt four automated data evaluation metrics to analyze instruction-following data quality: Instruction-Following Difficulty (IFD), InsTag, Reward Score, and GPT-4o Difficulty Score. We 4 Preprint. Under review."
+        },
+        {
+            "title": "Reward",
+            "content": "k k 1.3 2.5 1.9 3. 1.9 3.1 1.2 2.1 6.1 10.9 4.1 7.6 3.5 6.8 4.3 7. -4.8 -8.4 -2.2 -4.5 -1.6 -3.7 -3.1 -5.7 o q 1.4 2.7 1.9 3.3 1.9 3.3 1.2 2. 4.6 8.3 3.2 5.9 2.7 5.2 3.6 6.5 -3.2 -5.6 -1.3 -2. -0.8 -1.9 -2.4 -4.2 v v 88.5 110.9 95.6 120.7 91.5 114.9 91.5 113.2 14.2 13.6 19.9 20. 18.5 19.1 35.6 36.9 74.3 97.3 75.7 99.9 73.0 95.8 55.9 76. q q 131.9 165.2 141.2 180. 133.2 167.8 131.4 166.8 12.7 12.5 21.5 22.3 20.0 20.7 38.6 41. 119.2 152.7 119.7 158.2 113.2 147.1 92.8 125.4 Table 1: Nuclear norms and effective ranks of gradients calculated from highor low-quality data selected by different metrics. High represents the high-quality subset, while Low represents the low-quality subset. Gap is calculated by High Low. All data quality metrics consistently identify the high-quality data, which show similar spectral properties of gradients: lower nuclear norms and higher effective ranks. Hence, the gradient properties can unify all metrics. focus on data evaluation metrics that do not rely on additional evaluation sets or training, which might lead to customized shifting, while we aim at the effects of original properties of the data instances. IFD (Li et al., 2024e) quantifies the instruction-following difficulty of sample by computing the ratio between the models perplexity when predicting the response without the instruction and with the instruction. higher IFD indicates that the model fails to benefit from the instruction, suggesting that the instruction is either ambiguous or unhelpful. Following Li et al. (2024d), we use small GPT2 model to efficiently compute IFD scores over large datasets. InsTag (Lu et al., 2023) performs open-set multi-label tagging over instructions, capturing semantic attributes such as domain, task type, and intent. We use two derived metrics: (1) instruction complexity, defined by the number of tags per sample, and (2) instruction diversity, defined by tag vocabulary coverage across the dataset. Higher complexity scores typically correspond to more elaborate, multifaceted instructions. We use the per-sample complexity score as the filtering signal. Reward Model Score uses sfairXC/FsfairX-LLaMA3-RM-v0.1, reward model fine-tuned via preference modeling to predict human-aligned helpfulness (Xiong et al., 2024). Given data pair, the model outputs reward score reflecting predicted alignment with human preferences. GPT-4o Difficulty Rating prompts the GPT-4o model to assign difficulty score ( rom1to10) to each instruction based on the perceived complexity, ambiguity, and reasoning depth required. This method approximates human-aligned evaluation of instruction difficulty. For each instruction-following dataset described above, and for each metric, we select 200 samples with the highest scores and 200 samples with the lowest scores for calculating the gradients. This allows us to isolate what each metric considers good-quality and low-quality data and to conduct gradient-based analysis across these contrasting subsets."
+        },
+        {
+            "title": "4 Empirical Analysis",
+            "content": "4.1 Instruction-Following Data"
+        },
+        {
+            "title": "4.1.1 Unifying Different Data Quality Metrics",
+            "content": "In this section, we compare the effects of different data filtering metrics for general instructionfollowing data toward the gradient properties, including the averaged nuclear norms and effective ranks, as shown in Table 1. The nuclear norms in the table are calculated across the layers, NX = N1 i=0 NX,i, and the effective ranks are similar. Specifically, we use the WizardLM (Xu et al., 2023) data as the source data and calculate gradients on the Qwen2.5-7B model, and the data filtering metrics include IFD (Li et al., 2024e) (calculated on the Qwen2.5-7B model), InsTag (Lu et al., 2023), Difficulty, and Reward. As shown in the table, across all metrics, the high-quality subsets exhibit substantially smaller averaged nuclear norms in the layer-wise gradients, represented by the consistent negative values (in red) for the Gap columns. Since the nuclear norm measures the overall magnitude of gradient updates; thus, smaller value suggests the model requires less energy to adapt to high-quality data. It further indicates that high-quality data should be aligned with the learned knowledge of pretrained 5 Preprint. Under review. Figure 1: Low/high-quality data (measured by Reward) and their gradient properties (nuclear norms and effective ranks) across layers on diverse datasets including WizardLM, OpenHermes 2.5, and Magpie. The y-axis scales are kept the same for nuclear norms, while different for effective ranks, due to the large discrepancy. For each specific model, the shapes of the gradient curves derived from different data sources are almost the same. The nuclear norm fails to reflect the quality discrepancies between datasets, while the effective ranks still works promisingly, e.g., Magpie has higher rank than others. LLMs. At the same time, high-quality subsets also yield consistently larger effective ranks in their gradients represented by the large positive values (in green) for the Gap columns. higher value suggests that more update directions are activated, which means high-quality data leads to richer, more multi-dimensional parameter updates, which likely improves the models ability to generalize and capture nuanced features of the instructionresponse pairs. Our finding illustrates that multiple different definitions of data quality can converge to overarching gradient properties, revealing unified view by gradient-based spectral analysis."
+        },
+        {
+            "title": "4.1.2 Effects of Original Dataset Qualities",
+            "content": "In this section, we aim to investigate the potential ineffectiveness of gradient properties for distinguishing highor low-quality data. Similar to the previous settings, we split the data from different sources, WizardLM (Xu et al., 2023), OpenHermes 2.5 (Teknium, 2023), and Magpie (Xu et al., 2024b), into highand low-quality subsets, calculating their effects on gradients based on Qwen2.5-7B. The nuclear norm and effective rank changes with layer indexes are shown in Figure 1. The shapes of gradient curves are almost kept the same for one specific model, whatever the data quality. Moreover, we find that when an entire dataset is already composed of fairly clean and coherent instructionresponse samples, e.g., the Magpie dataset shown in the third row, nuclear norms offer limited discriminative power in distinguishing it further, represented by the similar scales for both types of data. We hypothesize that once instructions and responses cross certain threshold of clarity and consistency (i.e., minimal noise or confusion), the gradient magnitudes needed to adapt to these subsets no longer diverge sharply. In other words, the nuclear norm may effectively saturate and stop registering small but meaningful differences among these relatively high-quality groups. On the contrary, effective ranks remain sensitive to smaller quality disparities, even within dataset already recognized for solid instructionresponse fidelity. Consequently, effective rank acts as finer-grained lens, revealing that while both subsets are indeed good enough to produce stable gradients, the higher-quality examples still manage to activate broader range of update directions. 6 Preprint. Under review. Figure 2: Model size scaling law for gradient properties. Within the same model family, the layer-wise gradient statistics and dynamics are relatively consistent. Gradients on larger models exhibit better capabilities to distinguish data quality, revealed by the increasing y-axis scales from the 1.5B model to 14B model."
+        },
+        {
+            "title": "Reasoning Difficulty",
+            "content": "k 1.7 3.0 1.0 1.9 1.7 3.1 1.3 2. 0.0 -0.1 -0.3 -0.5 o 1.8 3.3 1.3 2. 1.8 3.3 1.5 2.8 0.0 0.0 -0.2 -0.3 v 95.9 118.0 138.8 170.4 83.8 102.7 106.1 126."
+        },
+        {
+            "title": "Gap",
+            "content": "12.1 15.3 32.7 43."
+        },
+        {
+            "title": "Low",
+            "content": "q 153.3 195.1 361.2 509.9 124.4 151.7 203.3 263."
+        },
+        {
+            "title": "Gap",
+            "content": "28.9 43.4 157.9 246.8 Table 2: Comparing the gradient properties between instruction data vs. reasoning-augmented data. For the reasoning data, High denotes data sampled from s1.1, and Low denotes data sampled from GSM8K with DeepSeek-R1 responses. Reasoning data shows lower nuclear norms and higher effective ranks compared with instruction data. Our spectral analysis of gradients unifies the quality evaluation for reasoning and instruction data on both higher effective ranks reflecting higher quality. Moreover, the metric distinguishes low-/highquality data by large gaps."
+        },
+        {
+            "title": "4.2.1 Unifying Quality Evaluation of Instruction and Reasoning Data",
+            "content": "Beyond analyzing general instruction-following data, the recent surge in reasoning models encourages us to further explore the effects of reasoning data on LLM gradients. Motivated by recent success on eliciting models reasoning capabilities by distilling from stronger reasoning models through simple SFT, e.g., s1 (Muennighoff et al., 2025), LIMO (Ye et al., 2025), DeepSeek-R1 Distilled Qwen (DeepSeek-AI et al., 2025a), we formulate the exploration on reasoning data in the same structure as on instruction-following data. Compared with general instruction-following data, key difference of advanced reasoning data is the utilization of dynamic long CoTs and the accordance with the test-time scaling law. To distinguish this data from general instruction-following data, we notate them as reasoning data. As illustrated by s1, 1, 000 difficult math problems are sufficient to elicit LLMs reasoning capabilities; thus, we ask: Does reasoning data have similar effects to 7 Preprint. Under review. Figure 3: Gradient properties across different model families. The gradient dynamics of the same data on different model families are largely different. This might be caused by their distinct model structures or training recipes and may reflect their different capabilities. gradients with previous general instruction data? Can the quality of advanced reasoning data be further distinguished by gradient properties like nuclear norm and effective rank? To formulate our experiments, we utilize the s1.1 data as the high-quality subset and GSM8K (Cobbe et al., 2021) (responses also generated by DeepSeek-R1 (DeepSeek-AI et al., 2025a)) as the lowquality subset for our reasoning data experiments. The results are shown in Table 2, in which the gradients are calculated based on Qwen2.5-7B, comparing the general instruction-following data with the reasoning data. Surprisingly, our experiments demonstrate that the same gradient-derived metrics, nuclear norms and effective ranks, remain applicable for the advanced reasoning data: (i) Reasoning vs. Instruction data: Reasoning data, even the lower-quality subset, leads to lower nuclear norms and higher effective ranks compared with previous high-quality instruction data, suggesting the much higher data quality of recent reasoning data. (ii) Highervs. Lower-quality reasoning data: Even for the reasoning data with supreme data quality, there still exists consistent and unified trend with the previous instruction data, i.e., smaller nuclear norms and larger effective ranks for higher-quality data. Moreover, the gaps in effective ranks between highand low-quality subsets are more pronounced for reasoning data than for general instruction data, which might provide potential explanation on why s1.1 can reach such promising performance with only 1000 data. We are the first to investigate and compare the effects of general instruction-following and reasoning data toward LLM gradients in the training process. We reveal that both data types can be unified into consistent pattern of gradient-based signals regarding quality, providing unified view for understanding the data quality effects."
+        },
+        {
+            "title": "4.2.2 Effects of Model Sizes",
+            "content": "Figure 2 presents the gradient curves of LLMs with different sizes in the Qwen2.5 family on our reasoning data. The shapes of the gradient curves for reasoning data are almost the same as the instruction-following data, which further verifies our unified view on both types of data. Moreover, consistent observation is that the overall shape of these layer-wise curves remains relatively (not strictly) stable as we move from smaller to larger models. For instance, GSM8K-based fine-tuning triggers peak in nuclear norm at the mid layers for Qwen2.5-1.5B, qualitatively similar, albeit scaled, peak in Qwen2.5-14B also can be identified. Moreover, another interesting finding is that larger models tend to amplify the distinction between highand low-quality subsets. Specifically, the gaps in effective rank between s1.1 and GSM8K grow 8 Preprint. Under review."
+        },
+        {
+            "title": "Slow Fast Gap",
+            "content": "GSM8K Correct 1.0 1.8 46.6 78.5 -45.6 -76.7 1.0 1.8 36.3 64.9 -35.3 -63.1 67.8 82.5 23.2 21. 44.6 61.2 91.9 111.7 23.1 22.6 68.8 89.1 Table 3: Differences between responses of fast vs. slow thinking. Fast thinking uses response with the groundtruth answer digits only, while slow thinking uses responses with detailed reasoning paths. As shown in the table, slow thinking responses elicit much smaller nuclear norms and larger effective ranks as expected."
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - -0.7e-3 -0.7e-3 - 0.0e-3 0.0e-"
+        },
+        {
+            "title": "Reasoning Difficulty",
+            "content": "k - 0.0e-3 0.0e-3 - 0.1e-3 -0.9ek -0.1e-3 0.3e-3 -2.0e-3 1.0e-3 -0.1e-3 0.1e-3 -2.0e-3 2.0eq 0.1e-3 0.4e-3 0.0e-3 1.0e-3 -0.1e-3 0.3e-3 0.2e-3 2.0eTable 4: Gradient similarity metrics remain excessively small and cannot reflect the differences between instruction/reasoning data of low/high-quality. It shows that layer-wise gradients in LLM post-training are nearly orthogonal, indicating that the similarity of gradients is not an effective indicator of data quality. accordingly when moving to bigger models. In other words, the larger model is more sensitive to whether the provided reasoning path is coherent and informative."
+        },
+        {
+            "title": "4.2.3 Effects of Model Families",
+            "content": "In this section, we broaden the scope to compare entirely different model families, including Qwen2.53B, Llama3.2-3B, and gemma2-2B, each possessing distinct pretraining recipes and architectural configurations. The first notable observation is that the layer-by-layer shape of the gradients can vary significantly among families. For instance, Llama3.2-3B might exhibit consistently higher nuclear norms in its early layers compared to Qwen2.5-3B, reflecting differences in embedding or attention initialization. Despite these baseline discrepancies, the relative gap between highand low-quality reasoning data persists across all families. In other words, regardless of how each model is architected or pre-trained, high-quality data still yields smaller nuclear norms and larger effective ranks. This cross-family analysis suggests that reasoning data can be valuable resource regardless of the specific LLM architectures. At the same time, our analysis shows the existence of familyspecific fingerprints for nuclear norms and effective ranks, reflecting architectural and pretraining differences, which might potentially be useful for better understanding of the LLM architectures."
+        },
+        {
+            "title": "5.1 Fast vs. Slow Thinking",
+            "content": "A growing line of work has investigated the notion of fast versus slow thinking (Kahneman, 2011) in LLMs, following Li et al. (2024c), we further evaluate the effects of fast and slow-thinking response affects the gradient effective ranks. Fast thinking provides only concise final answers without intermediate steps, whereas slow thinking explicitly includes CoT reasoning before revealing the final solution. The experiments are conducted on the GSM8K dataset, based on Qwen2.5-7B as shown in Table 3. For fast thinking, the response is the groundtruth answer digits without any additional CoT paths. For slow thinking, we utilize the responses with detailed reasoning paths. As expected, slow thinking consistently yields much lower nuclear norms and larger effective ranks, suggesting that explicit reasoning aligns more naturally with the LLMs existing parameters, resulting in smaller, more stable, and diverse updates."
+        },
+        {
+            "title": "5.2 Similarity-based Metrics",
+            "content": "While our SVD-based metrics are proved consistently effective at capturing data-quality differences, similarity-based metrics, namely, same-layer similarity and adjacent-layer similarity, do not appear to yield meaningful signals in our experiments, as shown in Table 4. We keep the values in the same magnitude for easier comparison. In the table, we compare similarity measures for both instruction 9 Preprint. Under review. and reasoning data across highand low-quality subsets. Regardless of dataset type or quality level, the reported cosine similarities remain extremely close to zero, with minimal observable variation. These low similarities suggest that the gradients for LLM SFT are nearly orthogonal, indicating that similarity on gradients is not an effective indicator of data quality."
+        },
+        {
+            "title": "6 Conclusion",
+            "content": "We introduce unified gradient-based framework for analyzing how varying data quality, ranging from general instruction-following to reasoning data, shapes the finetuning of LLMs. By examining the layer-wise gradients, we show that different quality metrics converge on remarkably similar gradient signatures, specifically, smaller gradient magnitudes and broader gradient directions for high-quality data. Notably, this pattern holds across multiple model families and parameter scales and, for the first time, reveals how reasoning data induce even higher effective ranks and thus richer parameter updates."
+        },
+        {
+            "title": "References",
+            "content": "Janice Ahn, Rishu Verma, Renze Lou, Di Liu, Rui Zhang, and Wenpeng Yin. Large language models for mathematical reasoning: Progresses and challenges. In Neele Falk, Sara Papi, and Mike Zhang (eds.), Proceedings of the 18th Conference of the European Chapter of the Association for Computational Linguistics: Student Research Workshop, pp. 225237, St. Julians, Malta, March 2024. Association for Computational Linguistics. URL https://aclanthology. org/2024.eacl-srw.17/. Maciej Besta, Julia Barth, Eric Schreiber, Ales Kubicek, Afonso Catarino, Robert Gerstenberger, Piotr Nyczyk, Patrick Iff, Yueling Li, Sam Houliston, Tomasz Sternal, Marcin Copik, Grzegorz Kwasniewski, Jürgen Müller, Łukasz Flis, Hannes Eberhard, Hubert Niewiadomski, and Torsten Hoefler. Reasoning language models: blueprint, 2025. URL https://arxiv.org/abs/ 2501.11223. Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu, Clemens Winter, Chris Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. Language models are few-shot In H. Larochelle, M. Ranzato, R. Hadsell, M.F. Balcan, and H. Lin (eds.), Adlearners. vances in Neural Information Processing Systems, volume 33, pp. 18771901. Curran Associates, Inc., 2020. URL https://proceedings.neurips.cc/paper_files/paper/ 2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf. Alexander Bukharin and Tuo Zhao. Data diversity matters for robust instruction tuning, 2023. Yihan Cao, Yanbin Kang, Chi Wang, and Lichao Sun. Instruction mining: Instruction data selection for tuning large language models. In First Conference on Language Modeling. Lichang Chen, Shiyang Li, Jun Yan, Hai Wang, Kalpa Gunaratna, Vikas Yadav, Zheng Tang, Vijay Srinivasan, Tianyi Zhou, Heng Huang, and Hongxia Jin. Alpagasus: Training better alpaca with fewer data, 2023. Qiguang Chen, Libo Qin, Jinhao Liu, Dengyun Peng, Jiannan Guan, Peng Wang, Mengkang Hu, Yuhang Zhou, Te Gao, and Wanxiang Che. Towards reasoning era: survey of long chain-ofthought for reasoning large language models, 2025a. URL https://arxiv.org/abs/2503. 09567. Xingyu Chen, Jiahao Xu, Tian Liang, Zhiwei He, Jianhui Pang, Dian Yu, Linfeng Song, Qiuzhi Liu, Mengfei Zhou, Zhuosheng Zhang, Rui Wang, Zhaopeng Tu, Haitao Mi, and Dong Yu. Do not think that much for 2+3=? on the overthinking of o1-like llms, 2025b. URL https: //arxiv.org/abs/2412.21187. 10 Preprint. Under review. Zhao Chen, Vijay Badrinarayanan, Chen-Yu Lee, and Andrew Rabinovich. Gradnorm: Gradient normalization for adaptive loss balancing in deep multitask networks, 2018. URL https: //arxiv.org/abs/1711.02257. Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, Christopher Hesse, and John Schulman. Training verifiers to solve math word problems, 2021. URL https://arxiv.org/ abs/2110.14168. Ganqu Cui, Lifan Yuan, Zefan Wang, Hanbin Wang, Wendi Li, Bingxiang He, Yuchen Fan, Tianyu Yu, Qixin Xu, Weize Chen, Jiarui Yuan, Huayu Chen, Kaiyan Zhang, Xingtai Lv, Shuo Wang, Yuan Yao, Xu Han, Hao Peng, Yu Cheng, Zhiyuan Liu, Maosong Sun, Bowen Zhou, and Ning Ding. Process reinforcement through implicit rewards, 2025. URL https://arxiv.org/ abs/2502.01456. DeepSeek-AI, Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Ruoyu Zhang, Runxin Xu, Qihao Zhu, Shirong Ma, Peiyi Wang, Xiao Bi, Xiaokang Zhang, Xingkai Yu, Yu Wu, Z. F. Wu, Zhibin Gou, Zhihong Shao, Zhuoshu Li, Ziyi Gao, Aixin Liu, Bing Xue, Bingxuan Wang, Bochao Wu, Bei Feng, Chengda Lu, Chenggang Zhao, Chengqi Deng, Chenyu Zhang, Chong Ruan, Damai Dai, Deli Chen, Dongjie Ji, Erhang Li, Fangyun Lin, Fucong Dai, Fuli Luo, Guangbo Hao, Guanting Chen, Guowei Li, H. Zhang, Han Bao, Hanwei Xu, Haocheng Wang, Honghui Ding, Huajian Xin, Huazuo Gao, Hui Qu, Hui Li, Jianzhong Guo, Jiashi Li, Jiawei Wang, Jingchang Chen, Jingyang Yuan, Junjie Qiu, Junlong Li, J. L. Cai, Jiaqi Ni, Jian Liang, Jin Chen, Kai Dong, Kai Hu, Kaige Gao, Kang Guan, Kexin Huang, Kuai Yu, Lean Wang, Lecong Zhang, Liang Zhao, Litong Wang, Liyue Zhang, Lei Xu, Leyi Xia, Mingchuan Zhang, Minghua Zhang, Minghui Tang, Meng Li, Miaojun Wang, Mingming Li, Ning Tian, Panpan Huang, Peng Zhang, Qiancheng Wang, Qinyu Chen, Qiushi Du, Ruiqi Ge, Ruisong Zhang, Ruizhe Pan, Runji Wang, R. J. Chen, R. L. Jin, Ruyi Chen, Shanghao Lu, Shangyan Zhou, Shanhuang Chen, Shengfeng Ye, Shiyu Wang, Shuiping Yu, Shunfeng Zhou, Shuting Pan, S. S. Li, Shuang Zhou, Shaoqing Wu, Shengfeng Ye, Tao Yun, Tian Pei, Tianyu Sun, T. Wang, Wangding Zeng, Wanjia Zhao, Wen Liu, Wenfeng Liang, Wenjun Gao, Wenqin Yu, Wentao Zhang, W. L. Xiao, Wei An, Xiaodong Liu, Xiaohan Wang, Xiaokang Chen, Xiaotao Nie, Xin Cheng, Xin Liu, Xin Xie, Xingchao Liu, Xinyu Yang, Xinyuan Li, Xuecheng Su, Xuheng Lin, X. Q. Li, Xiangyue Jin, Xiaojin Shen, Xiaosha Chen, Xiaowen Sun, Xiaoxiang Wang, Xinnan Song, Xinyi Zhou, Xianzu Wang, Xinxia Shan, Y. K. Li, Y. Q. Wang, Y. X. Wei, Yang Zhang, Yanhong Xu, Yao Li, Yao Zhao, Yaofeng Sun, Yaohui Wang, Yi Yu, Yichao Zhang, Yifan Shi, Yiliang Xiong, Ying He, Yishi Piao, Yisong Wang, Yixuan Tan, Yiyang Ma, Yiyuan Liu, Yongqiang Guo, Yuan Ou, Yuduan Wang, Yue Gong, Yuheng Zou, Yujia He, Yunfan Xiong, Yuxiang Luo, Yuxiang You, Yuxuan Liu, Yuyang Zhou, Y. X. Zhu, Yanhong Xu, Yanping Huang, Yaohui Li, Yi Zheng, Yuchen Zhu, Yunxian Ma, Ying Tang, Yukun Zha, Yuting Yan, Z. Z. Ren, Zehui Ren, Zhangli Sha, Zhe Fu, Zhean Xu, Zhenda Xie, Zhengyan Zhang, Zhewen Hao, Zhicheng Ma, Zhigang Yan, Zhiyu Wu, Zihui Gu, Zijia Zhu, Zijun Liu, Zilin Li, Ziwei Xie, Ziyang Song, Zizheng Pan, Zhen Huang, Zhipeng Xu, Zhongyu Zhang, and Zhen Zhang. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning, 2025a. URL https://arxiv.org/abs/2501.12948. DeepSeek-AI, Aixin Liu, Bei Feng, Bing Xue, Bingxuan Wang, Bochao Wu, Chengda Lu, Chenggang Zhao, Chengqi Deng, Chenyu Zhang, Chong Ruan, Damai Dai, Daya Guo, Dejian Yang, Deli Chen, Dongjie Ji, Erhang Li, Fangyun Lin, Fucong Dai, Fuli Luo, Guangbo Hao, Guanting Chen, Guowei Li, H. Zhang, Han Bao, Hanwei Xu, Haocheng Wang, Haowei Zhang, Honghui Ding, Huajian Xin, Huazuo Gao, Hui Li, Hui Qu, J. L. Cai, Jian Liang, Jianzhong Guo, Jiaqi Ni, Jiashi Li, Jiawei Wang, Jin Chen, Jingchang Chen, Jingyang Yuan, Junjie Qiu, Junlong Li, Junxiao Song, Kai Dong, Kai Hu, Kaige Gao, Kang Guan, Kexin Huang, Kuai Yu, Lean Wang, Lecong Zhang, Lei Xu, Leyi Xia, Liang Zhao, Litong Wang, Liyue Zhang, Meng Li, Miaojun Wang, Mingchuan Zhang, Minghua Zhang, Minghui Tang, Mingming Li, Ning Tian, Panpan Huang, Peiyi Wang, Peng Zhang, Qiancheng Wang, Qihao Zhu, Qinyu Chen, Qiushi Du, R. J. Chen, R. L. Jin, Ruiqi Ge, Ruisong Zhang, Ruizhe Pan, Runji Wang, Runxin Xu, Ruoyu Zhang, Ruyi Chen, S. S. Li, Shanghao Lu, Shangyan Zhou, Shanhuang Chen, Shaoqing Wu, Shengfeng Ye, Shengfeng Ye, Shirong Ma, Shiyu Wang, Shuang Zhou, Shuiping Yu, Shunfeng Zhou, Shuting Pan, T. Wang, Tao Yun, Tian Pei, Tianyu Sun, W. L. Xiao, Wangding Zeng, Wanjia Zhao, Wei An, Wen Liu, Wenfeng Liang, Wenjun Gao, Wenqin Yu, Wentao Zhang, X. Q. Li, Xiangyue Jin, Xianzu Wang, 11 Preprint. Under review. Xiao Bi, Xiaodong Liu, Xiaohan Wang, Xiaojin Shen, Xiaokang Chen, Xiaokang Zhang, Xiaosha Chen, Xiaotao Nie, Xiaowen Sun, Xiaoxiang Wang, Xin Cheng, Xin Liu, Xin Xie, Xingchao Liu, Xingkai Yu, Xinnan Song, Xinxia Shan, Xinyi Zhou, Xinyu Yang, Xinyuan Li, Xuecheng Su, Xuheng Lin, Y. K. Li, Y. Q. Wang, Y. X. Wei, Y. X. Zhu, Yang Zhang, Yanhong Xu, Yanhong Xu, Yanping Huang, Yao Li, Yao Zhao, Yaofeng Sun, Yaohui Li, Yaohui Wang, Yi Yu, Yi Zheng, Yichao Zhang, Yifan Shi, Yiliang Xiong, Ying He, Ying Tang, Yishi Piao, Yisong Wang, Yixuan Tan, Yiyang Ma, Yiyuan Liu, Yongqiang Guo, Yu Wu, Yuan Ou, Yuchen Zhu, Yuduan Wang, Yue Gong, Yuheng Zou, Yujia He, Yukun Zha, Yunfan Xiong, Yunxian Ma, Yuting Yan, Yuxiang Luo, Yuxiang You, Yuxuan Liu, Yuyang Zhou, Z. F. Wu, Z. Z. Ren, Zehui Ren, Zhangli Sha, Zhe Fu, Zhean Xu, Zhen Huang, Zhen Zhang, Zhenda Xie, Zhengyan Zhang, Zhewen Hao, Zhibin Gou, Zhicheng Ma, Zhigang Yan, Zhihong Shao, Zhipeng Xu, Zhiyu Wu, Zhongyu Zhang, Zhuoshu Li, Zihui Gu, Zijia Zhu, Zijun Liu, Zilin Li, Ziwei Xie, Ziyang Song, Ziyi Gao, and Zizheng Pan. Deepseek-v3 technical report, 2025b. URL https://arxiv.org/abs/2412.19437. Ning Ding, Yulin Chen, Bokai Xu, Yujia Qin, Zhi Zheng, Shengding Hu, Zhiyuan Liu, Maosong Sun, and Bowen Zhou. Enhancing chat language models by scaling high-quality instructional conversations. arXiv preprint arXiv:2305.14233, 2023. Qianlong Du, Chengqing Zong, and Jiajun Zhang. Mods: Model-oriented data selection for instruction tuning, 2023. Zhengxiao Du, Yujie Qian, Xiao Liu, Ming Ding, Jiezhong Qiu, Zhilin Yang, and Jie Tang. GLM: General language model pretraining with autoregressive blank infilling. In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pp. 320335, Dublin, Ireland, May 2022. Association for Computational Linguistics. doi: 10.18653/ v1/2022.acl-long.26. URL https://aclanthology.org/2022.acl-long.26. Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, Abhishek Kadian, Ahmad Al-Dahle, Aiesha Letman, Akhil Mathur, Alan Schelten, Amy Yang, Angela Fan, Anirudh Goyal, Anthony Hartshorn, Aobo Yang, Archi Mitra, Archie Sravankumar, Artem Korenev, Arthur Hinsvark, Arun Rao, Aston Zhang, Aurelien Rodriguez, Austen Gregerson, Ava Spataru, Baptiste Roziere, Bethany Biron, Binh Tang, Bobbie Chern, Charlotte Caucheteux, Chaya Nayak, Chloe Bi, Chris Marra, Chris McConnell, Christian Keller, Christophe Touret, Chunyang Wu, Corinne Wong, Cristian Canton Ferrer, Cyrus Nikolaidis, Damien Allonsius, Daniel Song, Danielle Pintz, Danny Livshits, David Esiobu, Dhruv Choudhary, Yuchen Hao, Yundi Qian, Yuzi He, Zach Rait, Zachary DeVito, Zef Rosnbrick, Zhaoduo Wen, Zhenyu Yang, and Zhiwei Zhao. The llama 3 herd of models, 2024. URL https://arxiv.org/abs/2407.21783. Chenrui Fan, Ming Li, Lichao Sun, and Tianyi Zhou. Missing premise exacerbates overthinking: Are reasoning models losing critical thinking skill?, 2025. URL https://arxiv.org/abs/ 2504.06514. Behrooz Ghorbani, Shankar Krishnan, and Ying Xiao. An investigation into neural net optimization via hessian eigenvalue density, 2019. URL https://arxiv.org/abs/1901.10159. Guy Hacohen and Daphna Weinshall. On the power of curriculum learning in training deep networks, 2019. URL https://arxiv.org/abs/1904.03626. Alex Havrilla, Andrew Dai, Laura OMahony, Koen Oostermeijer, Vera Zisler, Alon Albalak, Fabrizio Milo, Sharath Chandra Raparthy, Kanishk Gandhi, Baber Abbasi, Duy Phung, Maia Iyer, Dakota Mahan, Chase Blagden, Srishti Gureja, Mohammed Hamdy, Wen-Ding Li, Giovanni Paolini, Pawan Sasanka Ammanamanchi, and Elliot Meyerson. Surveying the effects of quality, diversity, and complexity in synthetic data from large language models, 2024. URL https://arxiv. org/abs/2412.02980. Mingyu Jin, Qinkai Yu, Dong Shu, Haiyan Zhao, Wenyue Hua, Yanda Meng, Yongfeng Zhang, and Mengnan Du. The impact of reasoning step length on large language models, 2024. URL https://arxiv.org/abs/2401.04925. Daniel Kahneman. Thinking, fast and slow. Farrar, Straus and Giroux, 2011. 12 Preprint. Under review. Daniel Khashabi, Sewon Min, Tushar Khot, Ashish Sabharwal, Oyvind Tafjord, Peter Clark, and Hannaneh Hajishirzi. UNIFIEDQA: Crossing format boundaries with single QA system. In Findings of the Association for Computational Linguistics: EMNLP 2020, pp. 18961907, Online, November 2020. Association for Computational Linguistics. doi: 10.18653/v1/2020.findings-emnlp.171. URL https://aclanthology.org/2020.findings-emnlp.171. Pang Wei Koh and Percy Liang. Understanding black-box predictions via influence functions, 2020. URL https://arxiv.org/abs/1703.04730. Chunyuan Li, Heerad Farkhoor, Rosanne Liu, and Jason Yosinski. Measuring the intrinsic dimension of objective landscapes, 2018. URL https://arxiv.org/abs/1804.08838. Haoling Li, Xin Zhang, Xiao Liu, Yeyun Gong, Yifan Wang, Qi Chen, and Peng Cheng. Enhancing large language model performance with gradient-based parameter selection, 2025a. URL https: //arxiv.org/abs/2406.15330. Ming Li, Lichang Chen, Jiuhai Chen, Shwai He, and Tianyi Zhou. Reflection-tuning: Recycling data for better instruction-tuning. In NeurIPS 2023 Workshop on Instruction Tuning and Instruction Following, 2023a. URL https://openreview.net/forum?id=xaqoZZqkPU. Ming Li, Lichang Chen, Jiuhai Chen, Shwai He, Jiuxiang Gu, and Tianyi Zhou. Selective reflectiontuning: Student-selected data recycling for LLM instruction-tuning. In Lun-Wei Ku, Andre Martins, and Vivek Srikumar (eds.), Findings of the Association for Computational Linguistics ACL 2024, pp. 1618916211, Bangkok, Thailand and virtual meeting, August 2024a. Association for Computational Linguistics. URL https://aclanthology.org/2024.findings-acl. 958. Ming Li, Pei Chen, Chenguang Wang, Hongyu Zhao, Yijun Liang, Yupeng Hou, Fuxiao Liu, and Tianyi Zhou. Mosaic-it: Free compositional data augmentation improves instruction tuning, 2024b. URL https://arxiv.org/abs/2405.13326. Ming Li, Yanhong Li, and Tianyi Zhou. What happened in llms layers when trained for fast vs. slow thinking: gradient perspective, 2024c. URL https://arxiv.org/abs/2410.23743. Ming Li, Yong Zhang, Shwai He, Zhitao Li, Hongyu Zhao, Jianzong Wang, Ning Cheng, and Tianyi Zhou. Superfiltering: Weak-to-strong data filtering for fast instruction-tuning. In LunWei Ku, Andre Martins, and Vivek Srikumar (eds.), Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pp. 1425514273, Bangkok, Thailand, August 2024d. Association for Computational Linguistics. URL https: //aclanthology.org/2024.acl-long.769. Ming Li, Yong Zhang, Zhitao Li, Jiuhai Chen, Lichang Chen, Ning Cheng, Jianzong Wang, Tianyi Zhou, and Jing Xiao. From quantity to quality: Boosting LLM performance with self-guided data selection for instruction tuning. In Kevin Duh, Helena Gomez, and Steven Bethard (eds.), Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers), pp. 7595 7628, Mexico City, Mexico, June 2024e. Association for Computational Linguistics. URL https://aclanthology.org/2024.naacl-long.421. Ming Li, Han Chen, Chenguang Wang, Dang Nguyen, Dianqi Li, and Tianyi Zhou. Ruler: Improving llm controllability by rule-based data recycling, 2025b. URL https://arxiv.org/abs/ 2406.15938. Xian Li, Ping Yu, Chunting Zhou, Timo Schick, Luke Zettlemoyer, Omer Levy, Jason Weston, and Mike Lewis. Self-alignment with instruction backtranslation. arXiv preprint arXiv:2308.06259, 2023b. Zhong-Zhi Li, Duzhen Zhang, Ming-Liang Zhang, Jiaxin Zhang, Zengyan Liu, Yuxuan Yao, Haotian Xu, Junhao Zheng, Pei-Jie Wang, Xiuyi Chen, Yingying Zhang, Fei Yin, Jiahua Dong, Zhijiang Guo, Le Song, and Cheng-Lin Liu. From system 1 to system 2: survey of reasoning large language models, 2025c. URL https://arxiv.org/abs/2502.17419. 13 Preprint. Under review. Liangxin Liu, Xuebo Liu, Derek Wong, Dongfang Li, Ziyi Wang, Baotian Hu, and Min Zhang. Selectit: Selective instruction tuning for llms via uncertainty-aware self-reflection. Advances in Neural Information Processing Systems, 37:9780097825, 2024. Wei Liu, Weihao Zeng, Keqing He, Yong Jiang, and Junxian He. What makes good data for alignment? comprehensive study of automatic data selection in instruction tuning. arXiv preprint arXiv:2312.15685, 2023. Yue Liu, Jiaying Wu, Yufei He, Hongcheng Gao, Hongyu Chen, Baolong Bi, Jiaheng Zhang, Zhiqi Huang, and Bryan Hooi. Efficient inference for large reasoning models: survey, 2025. URL https://arxiv.org/abs/2503.23077. Keming Lu, Hongyi Yuan, Zheng Yuan, Runji Lin, Junyang Lin, Chuanqi Tan, Chang Zhou, and Jingren Zhou. #instag: Instruction tagging for analyzing supervised fine-tuning of large language models, 2023. Niklas Muennighoff, Zitong Yang, Weijia Shi, Xiang Lisa Li, Li Fei-Fei, Hannaneh Hajishirzi, Luke Zettlemoyer, Percy Liang, Emmanuel Candès, and Tatsunori Hashimoto. s1: Simple test-time scaling, 2025. URL https://arxiv.org/abs/2501.19393. OpenAI, :, Aaron Hurst, Adam Lerer, Adam P. Goucher, Adam Perelman, Aditya Ramesh, Aidan Clark, AJ Ostrow, Akila Welihinda, Alan Hayes, Alec Radford, Aleksander adry, Alex BakerWhitcomb, Alex Beutel, Alex Borzunov, Alex Carney, Alex Chow, Alex Kirillov, Alex Nichol, Alex Paino, Alex Renzin, Alex Tachard Passos, Alexander Kirillov, Alexi Christakis, Alexis Conneau, Ali Kamali, Allan Jabri, Allison Moyer, Allison Tam, Amadou Crookes, Amin Tootoochian, Amin Tootoonchian, Ananya Kumar, Andrea Vallone, Andrej Karpathy, Andrew Braunstein, Andrew Cann, Andrew Codispoti, Andrew Galu, Andrew Kondrich, Andrew Tulloch, Andrey Mishchenko, Angela Baek, Angela Jiang, Antoine Pelisse, Antonia Woodford, Anuj Gosalia, Arka Dhar, Ashley Pantuliano, Avi Nayak, Avital Oliver, Barret Zoph, Behrooz Ghorbani, Ben Leimberger, Ben Rossen, Ben Sokolowsky, Ben Wang, Benjamin Zweig, Beth Hoover, Blake Samic, Bob McGrew, Bobby Spero, Bogo Giertler, Bowen Cheng, Brad Lightcap, Brandon Walkin, Brendan Quinn, Brian Guarraci, Brian Hsu, Bright Kellogg, Brydon Eastman, Camillo Lugaresi, Carroll Wainwright, Cary Bassin, Cary Hudson, Casey Chu, Chad Nelson, Chak Li, Chan Jun Shern, Channing Conger, Charlotte Barette, Chelsea Voss, Chen Ding, Cheng Lu, Chong Zhang, Chris Beaumont, Chris Hallacy, Chris Koch, Christian Gibson, Christina Kim, Christine Choi, Christine McLeavey, Christopher Hesse, Claudia Fischer, Clemens Winter, Coley Czarnecki, Colin Jarvis, Colin Wei, Constantin Koumouzelis, Dane Sherburn, Daniel Kappler, Daniel Levin, Daniel Levy, David Carr, David Farhi, David Mely, David Robinson, David Sasaki, Denny Jin, Dev Valladares, Dimitris Tsipras, Doug Li, Duc Phong Nguyen, Duncan Findlay, Edede Oiwoh, Edmund Wong, Ehsan Asdar, Elizabeth Proehl, Elizabeth Yang, Eric Antonow, Eric Kramer, Eric Peterson, Eric Sigler, Eric Wallace, Eugene Brevdo, Evan Mays, Farzad Khorasani, Felipe Petroski Such, Filippo Raso, Francis Zhang, Fred von Lohmann, Freddie Sulit, Gabriel Goh, Gene Oden, Geoff Salmon, Giulio Starace, Greg Brockman, Hadi Salman, Haiming Bao, Haitang Hu, Hannah Wong, Haoyu Wang, Heather Schmidt, Heather Whitney, Heewoo Jun, Hendrik Kirchner, Henrique Ponde de Oliveira Pinto, Hongyu Ren, Huiwen Chang, Hyung Won Chung, Ian Kivlichan, Ian OConnell, Ian OConnell, Ian Osband, Ian Silber, Ian Sohl, Ibrahim Okuyucu, Ikai Lan, Ilya Kostrikov, Ilya Sutskever, Ingmar Kanitscheider, Ishaan Gulrajani, Jacob Coxon, Jacob Menick, Jakub Pachocki, James Aung, James Betker, James Crooks, James Lennon, Jamie Kiros, Jan Leike, Jane Park, Jason Kwon, Jason Phang, Jason Teplitz, Jason Wei, Jason Wolfe, Jay Chen, Jeff Harris, Jenia Varavva, Jessica Gan Lee, Jessica Shieh, Ji Lin, Jiahui Yu, Jiayi Weng, Jie Tang, Jieqi Yu, Joanne Jang, Joaquin Quinonero Candela, Joe Beutler, Joe Landers, Joel Parish, Johannes Heidecke, John Schulman, Jonathan Lachman, Jonathan McKay, Jonathan Uesato, Jonathan Ward, Jong Wook Kim, Joost Huizinga, Jordan Sitkin, Jos Kraaijeveld, Josh Gross, Josh Kaplan, Josh Snyder, Joshua Achiam, Joy Jiao, Joyce Lee, Juntang Zhuang, Justyn Harriman, Kai Fricke, Kai Hayashi, Karan Singhal, Katy Shi, Kavin Karthik, Kayla Wood, Kendra Rimbach, Kenny Hsu, Kenny Nguyen, Keren Gu-Lemberg, Kevin Button, Kevin Liu, Kiel Howe, Krithika Muthukumar, Kyle Luther, Lama Ahmad, Larry Kai, Lauren Itow, Lauren Workman, Leher Pathak, Leo Chen, Li Jing, Lia Guy, Liam Fedus, Liang Zhou, Lien Mamitsuka, Lilian Weng, Lindsay McCallum, Lindsey Held, Long Ouyang, Louis Feuvrier, Lu Zhang, Lukas Kondraciuk, Lukasz Kaiser, Luke Hewitt, Luke Metz, Lyric Doshi, Mada Aflak, Maddie Simens, Madelaine 14 Preprint. Under review. Boyd, Madeleine Thompson, Marat Dukhan, Mark Chen, Mark Gray, Mark Hudnall, Marvin Zhang, Marwan Aljubeh, Mateusz Litwin, Matthew Zeng, Max Johnson, Maya Shetty, Mayank Gupta, Meghan Shah, Mehmet Yatbaz, Meng Jia Yang, Mengchao Zhong, Mia Glaese, Mianna Chen, Michael Janner, Michael Lampe, Michael Petrov, Michael Wu, Michele Wang, Michelle Fradin, Michelle Pokrass, Miguel Castro, Miguel Oom Temudo de Castro, Mikhail Pavlov, Miles Brundage, Miles Wang, Minal Khan, Mira Murati, Mo Bavarian, Molly Lin, Murat Yesildal, Nacho Soto, Natalia Gimelshein, Natalie Cone, Natalie Staudacher, Natalie Summers, Natan LaFontaine, Neil Chowdhury, Nick Ryder, Nick Stathas, Nick Turley, Nik Tezak, Niko Felix, Nithanth Kudige, Nitish Keskar, Noah Deutsch, Noel Bundick, Nora Puckett, Ofir Nachum, Ola Okelola, Oleg Boiko, Oleg Murk, Oliver Jaffe, Olivia Watkins, Olivier Godement, Owen Campbell-Moore, Patrick Chao, Paul McMillan, Pavel Belov, Peng Su, Peter Bak, Peter Bakkum, Peter Deng, Peter Dolan, Peter Hoeschele, Peter Welinder, Phil Tillet, Philip Pronin, Philippe Tillet, Prafulla Dhariwal, Qiming Yuan, Rachel Dias, Rachel Lim, Rahul Arora, Rajan Troll, Randall Lin, Rapha Gontijo Lopes, Raul Puri, Reah Miyara, Reimar Leike, Renaud Gaubert, Reza Zamani, Ricky Wang, Rob Donnelly, Rob Honsby, Rocky Smith, Rohan Sahai, Rohit Ramchandani, Romain Huet, Rory Carmichael, Rowan Zellers, Roy Chen, Ruby Chen, Ruslan Nigmatullin, Ryan Cheu, Saachi Jain, Sam Altman, Sam Schoenholz, Sam Toizer, Samuel Miserendino, Sandhini Agarwal, Sara Culver, Scott Ethersmith, Scott Gray, Sean Grove, Sean Metzger, Shamez Hermani, Shantanu Jain, Shengjia Zhao, Sherwin Wu, Shino Jomoto, Shirong Wu, Shuaiqi, Xia, Sonia Phene, Spencer Papay, Srinivas Narayanan, Steve Coffey, Steve Lee, Stewart Hall, Suchir Balaji, Tal Broda, Tal Stramer, Tao Xu, Tarun Gogineni, Taya Christianson, Ted Sanders, Tejal Patwardhan, Thomas Cunninghman, Thomas Degry, Thomas Dimson, Thomas Raoux, Thomas Shadwell, Tianhao Zheng, Todd Underwood, Todor Markov, Toki Sherbakov, Tom Rubin, Tom Stasi, Tomer Kaftan, Tristan Heywood, Troy Peterson, Tyce Walters, Tyna Eloundou, Valerie Qi, Veit Moeller, Vinnie Monaco, Vishal Kuo, Vlad Fomenko, Wayne Chang, Weiyi Zheng, Wenda Zhou, Wesam Manassra, Will Sheu, Wojciech Zaremba, Yash Patil, Yilei Qian, Yongjik Kim, Youlong Cheng, Yu Zhang, Yuchen He, Yuchen Zhang, Yujia Jin, Yunxing Dai, and Yury Malkov. Gpt-4o system card, 2024a. URL https://arxiv.org/abs/2410.21276. OpenAI, :, Aaron Jaech, Adam Kalai, Adam Lerer, Adam Richardson, Ahmed El-Kishky, Aiden Low, Alec Helyar, Aleksander Madry, Alex Beutel, Alex Carney, Alex Iftimie, Alex Karpenko, Alex Tachard Passos, Alexander Neitz, Alexander Prokofiev, Alexander Wei, Allison Tam, Ally Bennett, Ananya Kumar, Andre Saraiva, Andrea Vallone, Andrew Duberstein, Andrew Kondrich, Andrey Mishchenko, Andy Applebaum, Angela Jiang, Ashvin Nair, Barret Zoph, Behrooz Ghorbani, Ben Rossen, Benjamin Sokolowsky, Boaz Barak, Bob McGrew, Borys Minaiev, Botao Hao, Bowen Baker, Brandon Houghton, Brandon McKinzie, Brydon Eastman, Camillo Lugaresi, Cary Bassin, Cary Hudson, Chak Ming Li, Charles de Bourcy, Chelsea Voss, Chen Shen, Chong Zhang, Chris Koch, Chris Orsinger, Christopher Hesse, Claudia Fischer, Clive Chan, Dan Roberts, Daniel Kappler, Daniel Levy, Daniel Selsam, David Dohan, David Farhi, David Mely, David Robinson, Dimitris Tsipras, Doug Li, Dragos Oprica, Eben Freeman, Eddie Zhang, Edmund Wong, Elizabeth Proehl, Enoch Cheung, Eric Mitchell, Eric Wallace, Erik Ritter, Evan Mays, Fan Wang, Felipe Petroski Such, Filippo Raso, Florencia Leoni, Foivos Tsimpourlas, Francis Song, Fred von Lohmann, Freddie Sulit, Geoff Salmon, Giambattista Parascandolo, Gildas Chabot, Grace Zhao, Greg Brockman, Guillaume Leclerc, Hadi Salman, Haiming Bao, Hao Sheng, Hart Andrin, Hessam Bagherinezhad, Hongyu Ren, Hunter Lightman, Hyung Won Chung, Ian Kivlichan, Ian OConnell, Ian Osband, Ignasi Clavera Gilaberte, Ilge Akkaya, Ilya Kostrikov, Ilya Sutskever, Irina Kofman, Jakub Pachocki, James Lennon, Jason Wei, Jean Harb, Jerry Twore, Jiacheng Feng, Jiahui Yu, Jiayi Weng, Jie Tang, Jieqi Yu, Joaquin Quiñonero Candela, Joe Palermo, Joel Parish, Johannes Heidecke, John Hallman, John Rizzo, Jonathan Gordon, Jonathan Uesato, Jonathan Ward, Joost Huizinga, Julie Wang, Kai Chen, Kai Xiao, Karan Singhal, Karina Nguyen, Karl Cobbe, Katy Shi, Kayla Wood, Kendra Rimbach, Keren Gu-Lemberg, Kevin Liu, Kevin Lu, Kevin Stone, Kevin Yu, Lama Ahmad, Lauren Yang, Leo Liu, Leon Maksin, Leyton Ho, Liam Fedus, Lilian Weng, Linden Li, Lindsay McCallum, Lindsey Held, Lorenz Kuhn, Lukas Kondraciuk, Lukasz Kaiser, Luke Metz, Madelaine Boyd, Maja Trebacz, Manas Joglekar, Mark Chen, Marko Tintor, Mason Meyer, Matt Jones, Matt Kaufer, Max Schwarzer, Meghan Shah, Mehmet Yatbaz, Melody Y. Guan, Mengyuan Xu, Mengyuan Yan, Mia Glaese, Mianna Chen, Michael Lampe, Michael Malek, Michele Wang, Michelle Fradin, Mike McClay, Mikhail Pavlov, Miles Wang, Mingxuan Wang, Mira Murati, Mo Bavarian, Mostafa Rohaninejad, Nat McAleese, Neil Chowdhury, Neil Chowdhury, Nick Ryder, Nikolas Tezak, Noam Brown, Ofir Nachum, Oleg Boiko, Oleg 15 Preprint. Under review. Murk, Olivia Watkins, Patrick Chao, Paul Ashbourne, Pavel Izmailov, Peter Zhokhov, Rachel Dias, Rahul Arora, Randall Lin, Rapha Gontijo Lopes, Raz Gaon, Reah Miyara, Reimar Leike, Renny Hwang, Rhythm Garg, Robin Brown, Roshan James, Rui Shu, Ryan Cheu, Ryan Greene, Saachi Jain, Sam Altman, Sam Toizer, Sam Toyer, Samuel Miserendino, Sandhini Agarwal, Santiago Hernandez, Sasha Baker, Scott McKinney, Scottie Yan, Shengjia Zhao, Shengli Hu, Shibani Santurkar, Shraman Ray Chaudhuri, Shuyuan Zhang, Siyuan Fu, Spencer Papay, Steph Lin, Suchir Balaji, Suvansh Sanjeev, Szymon Sidor, Tal Broda, Aidan Clark, Tao Wang, Taylor Gordon, Ted Sanders, Tejal Patwardhan, Thibault Sottiaux, Thomas Degry, Thomas Dimson, Tianhao Zheng, Timur Garipov, Tom Stasi, Trapit Bansal, Trevor Creech, Troy Peterson, Tyna Eloundou, Valerie Qi, Vineet Kosaraju, Vinnie Monaco, Vitchyr Pong, Vlad Fomenko, Weiyi Zheng, Wenda Zhou, Wes McCabe, Wojciech Zaremba, Yann Dubois, Yinghai Lu, Yining Chen, Young Cha, Yu Bai, Yuchen He, Yuchen Zhang, Yunyun Wang, Zheng Shao, and Zhuohan Li. Openai o1 system card, 2024b. URL https://arxiv.org/abs/2412.16720. Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Gray, et al. Training language models to follow instructions with human feedback. In Advances in Neural Information Processing Systems, 2022. Garima Pruthi, Frederick Liu, Mukund Sundararajan, and Satyen Kale. Estimating training data influence by tracing gradient descent, 2020. URL https://arxiv.org/abs/2002.08484. Xiaoye Qu, Yafu Li, Zhaochen Su, Weigao Sun, Jianhao Yan, Dongrui Liu, Ganqu Cui, Daizong Liu, Shuxian Liang, Junxian He, Peng Li, Wei Wei, Jing Shao, Chaochao Lu, Yue Zhang, XianSheng Hua, Bowen Zhou, and Yu Cheng. survey of efficient reasoning for large reasoning models: Language, multimodality, and beyond, 2025. URL https://arxiv.org/abs/ 2503.21614. Qwen, :, An Yang, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chengyuan Li, Dayiheng Liu, Fei Huang, Haoran Wei, Huan Lin, Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Yang, Jiaxi Yang, Jingren Zhou, Junyang Lin, Kai Dang, Keming Lu, Keqin Bao, Kexin Yang, Le Yu, Mei Li, Mingfeng Xue, Pei Zhang, Qin Zhu, Rui Men, Runji Lin, Tianhao Li, Tianyi Tang, Tingyu Xia, Xingzhang Ren, Xuancheng Ren, Yang Fan, Yang Su, Yichang Zhang, Yu Wan, Yuqiong Liu, Zeyu Cui, Zhenru Zhang, and Zihan Qiu. Qwen2.5 technical report, 2025. URL https://arxiv.org/abs/2412.15115. Olivier Roy and Martin Vetterli. The effective rank: measure of effective dimensionality. In 2007 15th European signal processing conference, pp. 606610. IEEE, 2007. Levent Sagun, Utku Evci, V. Ugur Guney, Yann Dauphin, and Leon Bottou. Empirical analysis of the hessian of over-parametrized neural networks, 2018. URL https://arxiv.org/abs/ 1706.04454. Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, Y. K. Li, Y. Wu, and Daya Guo. Deepseekmath: Pushing the limits of mathematical reasoning in open language models, 2024. URL https://arxiv.org/abs/ 2402.03300. Weixi Song, Zuchao Li, Lefei Zhang, Hai Zhao, and Bo Du. Sparse is enough in fine-tuning pre-trained large language models, 2024. URL https://arxiv.org/abs/2312.11875. Rohan Taori, Ishaan Gulrajani, Tianyi Zhang, Yann Dubois, Xuechen Li, Carlos Guestrin, Percy Liang, and Tatsunori B. Hashimoto. Stanford alpaca: An instruction-following llama model. https://github.com/tatsu-lab/stanford_alpaca, 2023. Gemma Team, Morgane Riviere, Shreya Pathak, Pier Giuseppe Sessa, Cassidy Hardin, Surya Bhupatiraju, Léonard Hussenot, Thomas Mesnard, Bobak Shahriari, Alexandre Ramé, Johan Ferret, Peter Liu, Pouya Tafti, Abe Friesen, Michelle Casbon, Sabela Ramos, Ravin Kumar, Charline Le Lan, Sammy Jerome, Anton Tsitsulin, Nino Vieillard, Piotr Stanczyk, Sertan Girgin, Nikola Momchev, Matt Hoffman, Shantanu Thakoor, Jean-Bastien Grill, Behnam Neyshabur, Olivier Bachem, Alanna Walton, Aliaksei Severyn, Alicia Parrish, Aliya Ahmad, Allen Hutchison, Alvin Abdagic, Amanda Carl, Amy Shen, Andy Brock, Andy Coenen, Anthony Laforge, Antonia Paterson, Ben Bastian, Bilal Piot, Noah Fiedel, Armand Joulin, Kathleen Kenealy, Robert Dadashi, 16 Preprint. Under review. and Alek Andreev. Gemma 2: Improving open language models at practical size, 2024. URL https://arxiv.org/abs/2408.00118. Teknium. Openhermes 2.5: An open dataset of synthetic data for generalist llm assistants, 2023. URL https://huggingface.co/datasets/teknium/OpenHermes-2.5. Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, Dan Bikel, Lukas Blecher, Cristian Canton Ferrer, Moya Chen, Guillem Cucurull, David Esiobu, Jude Fernandes, Jeremy Fu, Wenyin Fu, Brian Fuller, Cynthia Gao, Vedanuj Goswami, Naman Goyal, Anthony Hartshorn, Saghar Hosseini, Rui Hou, Hakan Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa, Isabel Kloumann, Artem Korenev, Punit Singh Koura, Marie-Anne Lachaux, Thibaut Lavril, Jenya Lee, Diana Liskovich, Yinghai Lu, Yuning Mao, Xavier Martinet, Todor Mihaylov, Pushkar Mishra, Igor Molybog, Yixin Nie, Andrew Poulton, Jeremy Reizenstein, Rashi Rungta, Kalyan Saladi, Alan Schelten, Ruan Silva, Eric Michael Smith, Ranjan Subramanian, Xiaoqing Ellen Tan, Binh Tang, Ross Taylor, Adina Williams, Jian Xiang Kuan, Puxin Xu, Zheng Yan, Iliyan Zarov, Yuchen Zhang, Angela Fan, Melanie Kambadur, Sharan Narang, Aurelien Rodriguez, Robert Stojnic, Sergey Edunov, and Thomas Scialom. Llama 2: Open foundation and fine-tuned chat models, 2023. Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan Gomez, Ł ukasz Kaiser, and Illia Polosukhin. Attention is all you need. In I. Guyon, U. Von Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett (eds.), Advances in Neural Information Processing Systems, volume 30. Curran Associates, Inc., URL https://proceedings.neurips.cc/paper_files/paper/2017/ 2017. file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf. Yizhong Wang, Swaroop Mishra, Pegah Alipoormolabashi, Yeganeh Kordi, Amirreza Mirzaei, Atharva Naik, Arjun Ashok, Arut Selvan Dhanasekaran, Anjana Arunkumar, David Stap, Eshaan Pathak, Giannis Karamanolakis, Haizhi Lai, Ishan Purohit, Ishani Mondal, Jacob Anderson, Kirby Kuznia, Krima Doshi, Kuntal Kumar Pal, Maitreya Patel, Mehrad Moradshahi, Mihir Parmar, Mirali Purohit, Neeraj Varshney, Phani Rohitha Kaza, Pulkit Verma, Ravsehaj Singh Puri, Rushang Karia, Savan Doshi, Shailaja Keyur Sampat, Siddhartha Mishra, Sujan Reddy A, Sumanta Patro, Tanay Dixit, and Xudong Shen. Super-NaturalInstructions: Generalization via declarative instructions on 1600+ NLP tasks. In Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing, pp. 50855109, Abu Dhabi, United Arab Emirates, December 2022. Association for Computational Linguistics. URL https://aclanthology. org/2022.emnlp-main.340. Yufei Wang, Wanjun Zhong, Liangyou Li, Fei Mi, Xingshan Zeng, Wenyong Huang, Lifeng Shang, Xin Jiang, and Qun Liu. Aligning large language models with human: survey, 2023. Jason Wei, Maarten Bosma, Vincent Zhao, Kelvin Guu, Adams Wei Yu, Brian Lester, Nan Du, Andrew M. Dai, and Quoc Le. Finetuned language models are zero-shot learners. In International Conference on Learning Representations, 2022. URL https://openreview.net/forum? id=gEZrGCozdqR. Minghao Wu, Abdul Waheed, Chiyu Zhang, Muhammad Abdul-Mageed, and Alham Fikri Aji. Lamini-lm: diverse herd of distilled models from large-scale instructions, 2024. Mengzhou Xia, Sadhika Malladi, Suchin Gururangan, Sanjeev Arora, and Danqi Chen. Less: Selecting influential data for targeted instruction tuning. In International Conference on Machine Learning, pp. 5410454132. PMLR, 2024. Wei Xiong, Hanze Dong, Chenlu Ye, Ziqi Wang, Han Zhong, Heng Ji, Nan Jiang, and Tong Zhang. Iterative preference learning from human feedback: Bridging theory and practice for rlhf under kl-constraint, 2024. Can Xu, Qingfeng Sun, Kai Zheng, Xiubo Geng, Pu Zhao, Jiazhan Feng, Chongyang Tao, and Daxin Jiang. Wizardlm: Empowering large language models to follow complex instructions, 2023. 17 Preprint. Under review. Xiaohan Xu, Ming Li, Chongyang Tao, Tao Shen, Reynold Cheng, Jinyang Li, Can Xu, Dacheng Tao, and Tianyi Zhou. survey on knowledge distillation of large language models. arXiv preprint arXiv:2402.13116, 2024a. Zhangchen Xu, Fengqing Jiang, Luyao Niu, Yuntian Deng, Radha Poovendran, Yejin Choi, and Bill Yuchen Lin. Magpie: Alignment data synthesis from scratch by prompting aligned llms with nothing, 2024b. URL https://arxiv.org/abs/2406.08464. Qinyuan Ye, Bill Yuchen Lin, and Xiang Ren. CrossFit: few-shot learning challenge for cross-task generalization in NLP. In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing, pp. 71637189, Online and Punta Cana, Dominican Republic, November 2021. Association for Computational Linguistics. doi: 10.18653/v1/2021.emnlp-main.572. URL https://aclanthology.org/2021.emnlp-main.572. Yixin Ye, Zhen Huang, Yang Xiao, Ethan Chern, Shijie Xia, and Pengfei Liu. Limo: Less is more for reasoning. arXiv preprint arXiv:2502.03387, 2025. Tianhe Yu, Saurabh Kumar, Abhishek Gupta, Sergey Levine, Karol Hausman, and Chelsea Finn. Gradient surgery for multi-task learning, 2020. URL https://arxiv.org/abs/2001. 06782. Wayne Xin Zhao, Kun Zhou, Junyi Li, Tianyi Tang, Xiaolei Wang, Yupeng Hou, Yingqian Min, Beichen Zhang, Junjie Zhang, Zican Dong, Yifan Du, Chen Yang, Yushuo Chen, Zhipeng Chen, Jinhao Jiang, Ruiyang Ren, Yifan Li, Xinyu Tang, Zikang Liu, Peiyu Liu, Jian-Yun Nie, and Ji-Rong Wen. survey of large language models, 2023. Chunting Zhou, Pengfei Liu, Puxin Xu, Srini Iyer, Jiao Sun, Yuning Mao, Xuezhe Ma, Avia Efrat, Ping Yu, Lili Yu, Susan Zhang, Gargi Ghosh, Mike Lewis, Luke Zettlemoyer, and Omer Levy. Lima: Less is more for alignment, 2023. 18 Preprint. Under review."
+        },
+        {
+            "title": "A Related Work",
+            "content": "A.1 Gradient Analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . A.2 SFT and Data Selection . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . A.3 Reasoning Capability . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ."
+        },
+        {
+            "title": "C Gradient Curves for Different Models and Metrics",
+            "content": "C.1 Qwen2.5 1.5B . C.2 Qwen2.5 3B . C.3 Qwen2.5 7B . . . C.4 Llama 3.1 8B . C.5 Llama 3.2 1B . C.6 Llama 3.2 3B . C.7 Gemma 2 2B . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20 20 21 22 23 23 27 35 39 43 47 19 Preprint. Under review."
+        },
+        {
+            "title": "A Related Work",
+            "content": "A.1 Gradient Analysis Empirical analyses of gradient dynamics have provided deep insights into how large language models (LLMs) learn during both pretraining and fine-tuning. recurring observation is that LLM training tends to concentrate updates in low-dimensional subspace, where only small fraction of parameters account for the majority of the gradient magnitude (Song et al., 2024). This sparsity in meaningful directions underlies the effectiveness of methods like parameter-efficient fine-tuning and low-rank adaptation. For example, Li et al. (2025a) propose gradient masking to zero out low-impact updates and concentrate learning on parameters with high gradient magnitude. These observations are consistent with findings from spectral studies of the Hessian (Sagun et al., 2018; Ghorbani et al., 2019), which reveal that deep networksincluding transformerstend to learn in space governed by few dominant gradient directions. This low effective dimensionality has been linked to both generalization and the robustness of optimization trajectories (Li et al., 2018). Gradient-based perspectives have also proven valuable in understanding how different types of training data influence learning. In curriculum learning, for instance, it has been observed that ordering data from easy to hard helps align gradients in earlier phases of training, resulting in smoother convergence and better generalization (Hacohen & Weinshall, 2019). In multi-task and continual learning, techniques like GradNorm (Chen et al., 2018) and PCGrad (Yu et al., 2020) explicitly manipulate gradient magnitudes and directions to resolve conflicts between tasks. Furthermore, gradient-based influence functions (Koh & Liang, 2020; Pruthi et al., 2020) have been used to trace how individual data points affect model updates and predictions, enabling researchers to detect noisy or highly influential examples. In the context of instruction tuning and alignment, such analyses can reveal how instruction-following or reasoning-rich data differentially steer the models behavior. closely related work by Li et al. (2024c) studies how cognitive styles (fast vs. slow thinking) impact LLM gradient dynamics, showing that reasoning-rich (slow thinking) data yields smaller, stable gradients compared to direct-answer (fast thinking) data. Extending this, we introduce new metrics: effective rank for gradient complexity, and two similarity metrics (Same-layer Similarityl, Adjacentlayer Similarity) to analyze gradient alignment within and between layers. These metrics provide deeper insights into how instruction-following and reasoning-rich data influence LLM training. A.2 SFT and Data Selection Supervised fine-tuning (SFT) is the subsequent step where an LLM is further trained on labeled examples to specialize it for specific tasks or to align it with human instructions. This process updates the models weights using task-specific inputoutput pairs (e.g., prompts and desired responses) (Wang et al., 2023) InstructGPT (Ouyang et al., 2022) demonstrated that fine-tuning GPT-3 on human-curated instruction datasets yields models that more effectively follow user instructions compared to the base models. This approach, referred to as instruction tuning, enhances performance and exhibits robust generalizability. In the instruction tuning, the concept quality is all you need is widely accepted (Zhou et al., 2023; Touvron et al., 2023; Havrilla et al., 2024). Earlier research focused on curating high-quality datasets through human experts or powerful LLMs (Khashabi et al., 2020; Ye et al., 2021; Wei et al., 2022; Wang et al., 2022; Du et al., 2022; Taori et al., 2023). Although these approaches yield high-quality datasets, they are time-consuming, expensive, and offer limited diversity. However, LIMA (Zhou et al., 2023) demonstrates that as few as 1,000 high-quality, human-curated training instances can substantially enhance instruction-following performance. Building on this work, data selection has emerged as an increasingly critical stage in instruction tuning. InsTag (Lu et al., 2023) uses powerful proprietary model to tag samples within SFT datasets based on semantics and intentions, subsequently selecting data that meet predefined criteria for complexity and diversity in their tags. Alpagasus (Chen et al., 2023) utilizes proprietary LLMs chatGPT and Claude2 to automatically identify and filter out low-quality data within the dataset. Cherry LLM (Li et al., 2024e) introduces Instruction-Following Difficulty (IFD) scoresa self-guided metric for evaluating instruction difficulty without relying on additional LLMsand uses these scores to select datasets. Motivated by Humpback (Li et al., 2023b), Selective Reflection-Tuning (Li et al., 2024a) introduces teacher-student collaborative pipeline that is guided by the IFD score and its reverse version to select 20 Preprint. Under review. the data based on the evaluation feasibility. Du et al. (2023) and Bukharin & Zhao (2023) utilize reward models as the metric for measuring data quality and subsequently select the data. DEITA (Liu et al., 2023) employs ChatGPT to diversify datasets, then applies various data selection metrics to construct high-quality dataset. Superfiltering (Li et al., 2024d) demonstrates that both weak and strong language models consistently assess instruction difficulty, thereby streamlining the filtering process. Instruct Mining (Cao et al.) presents method for automatically selecting high-quality instruction-following data using natural language quality indicators. SelectIT (Liu et al., 2024) proposes an uncertainty-aware self-filtering approach that leverages an LLMs intrinsic uncertainty to select high-quality instruction-tuning data LESS (Xia et al., 2024) constructs low-dimensional gradient datastore for candidate data, subsequently selecting examples whose gradient influence closely matches that of limited set of target demonstration examples. Collectively, these studies focus on distinguishing high-quality data samples from lower-quality ones for effective instruction tuning. A.3 Reasoning Capability Recent advancements in large language model architectures and training objectives have led to paradigm shift from fast, heuristic (System-1) response generation to deliberate, multi-step (System2) reasoning processes (Ahn et al., 2024; Li et al., 2024c; Jin et al., 2024; Besta et al., 2025; Li et al., 2025c; Chen et al., 2025a), marked by advanced reasoning models such as OpenAIs o1/o3 (OpenAI et al., 2024b), QwQ (Qwen et al., 2025), and DeepSeek-R1 (DeepSeek-AI et al., 2025a). System 1 models (e.g., GPT-4o (OpenAI et al., 2024a), LLaMA-3 (Dubey et al., 2024), DeepSeek-V3 (DeepSeek-AI et al., 2025b)) generate intuitive, rapid responses but often struggle with more intricate tasks. In contrast, System 2 models adopt methodical analysis and iterative self-critique, which strengthens their performance on complex reasoning benchmarks. Various post-training methods have been introduced to further enhance these capabilities. number of studies employ reinforcement learning strategies to guide models toward superior reasoning approaches (Shao et al., 2024; Cui et al., 2025). Moreover, researchers have demonstrated that instruction tuning on meticulously curated, high-quality datasets can greatly boost models reasoning performance (Ye et al., 2025; Muennighoff et al., 2025). However, despite the advancement in reasoning capability, the issue of overthinking (Chen et al., 2025b; Fan et al., 2025; Qu et al., 2025; Liu et al., 2025) brings further challenges to the area. 21 Preprint. Under review."
+        },
+        {
+            "title": "B Prompts for Data Evaluation",
+            "content": "For our selected data quality evaluation metrics, InsTag and Difficulty are the prompt-based methods. We use GPT4o for the evaluation and the prompts are provided in Figure 4 and Figure 5."
+        },
+        {
+            "title": "Prompt for InsTag",
+            "content": "System Prompt You are helpful assistant. User Prompt You are tagging system that provides useful tags for instruction intentions to distinguish instructions for helpful AI assistant. Below is an instruction: [begin] {instruction} [end] Please provide coarse-grained tags, such as \"Spelling and Grammar Check\" and \"Costo identify the main intentions of the above instruction. Your answer should be play\", list that includes the titles of tags and brief explanation of each tag. You can provide several tags as you wish. Your response has to strictly follow this JSON format: [{\"tag\": str, \"explanation\": str},{\"tag\": str, \"explanation\": str},...]. Please respond in English. Figure 4: The prompt for InsTag."
+        },
+        {
+            "title": "Prompt for Difficulty",
+            "content": "System Prompt You are helpful assistant. User Prompt You are difficulty estimation system that can rate the difficulty level of instruction intentions. Below is an instruction: [begin] {instruction} [end] The instruction can be tagged with difficulty level from 1 to 10, where 1 is the easiest and 10 is the hardest. Please rate the difficulty level of the instruction. Please first output single line containing the difficulty score. Then, provide brief explanation of why you rated the instruction with that difficulty score. Figure 5: The prompt for Difficulty. 22 Preprint. Under review."
+        },
+        {
+            "title": "C Gradient Curves for Different Models and Metrics",
+            "content": "C.1 Qwen2.5 1.5B"
+        },
+        {
+            "title": "WizardLM",
+            "content": "IFD (GPT2)"
+        },
+        {
+            "title": "Gap",
+            "content": "k k 1.6 2.7 1.8 3. 1.6 2.7 1.1 1.9 4.2 7.9 4.7 7.9 5.0 9.1 4.4 7. -2.6 -5.2 -3.0 -4.7 -3.4 -6.4 -3.3 -5.8 o q 1.6 3.2 1.8 3.6 1.7 3.2 1.2 2. 3.4 6.5 3.6 6.7 4.0 7.6 3.8 7.1 -1.7 -3.3 -1.8 -3. -2.4 -4.3 -2.6 -4.7 v v 56.2 81.2 44.4 62.9 57.9 83.5 56.8 80.7 14.0 16.9 15.7 18. 15.0 18.5 24.7 30.3 42.2 64.4 28.7 44.3 42.8 65.0 32.1 50. q q 104.5 142.3 74.7 96. 108.9 148.8 103.9 140.4 16.4 18.3 17.3 19.9 17.8 20.1 30.1 35. 88.1 124.0 57.5 76.8 91.1 128.7 73.8 105.2 Table 5: Qwen2.5-1.5B - WizardLM - SVD-based Metrics"
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - -6.9e-04 -1.3e-03 - 1.8e-06 7.1e-"
+        },
+        {
+            "title": "WizardLM",
+            "content": "IFD (GPT2) - -7.0e-04 -9.9e-04 - -4.3e3.6e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - -1.2e-03 -6.4e-04 - 1.1e-05 1.1e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - -4.7e-04 -6.6e-04 - -9.3e-06 -7.0ek k 6.0e-04 3.9e-04 2.5e-04 3.8e1.1e-03 2.9e-04 7.5e-04 3.7e-04 6.1e-04 -8.1e-04 3.6e-04 -9.5e-05 2.4e-04 -3.0e-05 1.1e-03 -1.9eq q -1.6e-04 -7.3e-04 1.3e-04 -5.5e2.3e-04 -8.6e-04 7.5e-05 -1.4e-04 4.9e-04 2.2e-03 5.9e-04 3.5e-03 6.9e-04 3.7e-03 -7.6e-05 1.6eTable 6: Qwen2.5-1.5B - WizardLM - Similarity-based Metrics"
+        },
+        {
+            "title": "Difficulty",
+            "content": "OpenHermes 2.5 IFD (GPT2)"
+        },
+        {
+            "title": "Gap",
+            "content": "k k 2.0 3.4 1.6 3. 1.6 2.8 1.2 2.2 4.2 7.3 11.0 18.8 4.1 7.1 8.7 15. -2.2 -4.0 -9.4 -15.8 -2.5 -4.4 -7.5 -13.2 o q 2.0 3.8 1.7 3.5 1.7 3.3 1.4 2. 3.4 6.6 8.7 16.3 3.4 6.5 6.9 13.4 -1.5 -2.8 -7.0 -12. -1.7 -3.2 -5.6 -10.6 v v 55.2 79.4 49.0 69.3 57.6 82.5 58.6 84.2 21.1 26.6 21.0 25. 20.3 25.8 24.0 29.5 34.1 52.9 28.0 44.1 37.4 56.8 34.6 54. q q 101.2 136.5 85.7 110. 107.6 145.2 108.5 147.1 26.6 30.5 24.3 28.9 25.7 29.9 30.6 36. 74.6 106.0 61.4 81.8 81.9 115.3 77.9 110.9 Table 7: Qwen2.5-1.5B - OpenHermes 2.5 - SVD-based Metrics Preprint. Under review."
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - -4.1e-04 -5.2e-04 - 8.9e-06 1.1eOpenHermes 2.5 IFD (GPT2) - -1.1e-03 6.3e-04 - -1.0e-05 5.2e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - -7.8e-04 -1.5e-04 - 1.2e-06 2.2e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - -3.0e-04 -5.8e-04 - -4.1e-07 -3.8ek k 6.8e-04 4.4e-04 1.5e-04 6.5e1.7e-03 -3.1e-04 6.1e-04 2.2e-06 -3.4e-04 1.1e-04 6.4e-04 -4.0e-05 -2.0e-04 2.0e-04 1.1e-03 -1.8eq q 7.3e-05 -4.8e-04 -1.3e-04 -5.4e1.4e-04 -6.1e-04 -3.0e-04 -1.2e-03 5.5e-05 1.7e-03 7.9e-05 2.3e-03 4.0e-04 2.0e-03 -2.1e-04 3.0eTable 8: Qwen2.5-1.5B - OpenHermes 2.5 - Similarity-based Metrics"
+        },
+        {
+            "title": "Magpie",
+            "content": "IFD (GPT2)"
+        },
+        {
+            "title": "Low",
+            "content": "k k 1.5 2.6 1.4 2. 1.5 2.6 1.4 2.5 1.5 2.8 1.2 2.1 1.5 2.7 1.4 2. -0.0 -0.1 0.2 0.5 0.0 -0.0 -0.0 -0.1 o q 1.6 3.2 1.6 3.3 1.6 3.2 1.6 3. 1.6 3.3 1.2 2.5 1.6 3.2 1.5 2.9 -0.0 -0.1 0.3 0. 0.1 0.0 0.1 0.3 v v 55.8 78.6 58.5 83.6 61.6 86.8 58.1 84.4 51.7 73.2 55.7 77. 52.1 73.9 48.8 67.5 4.1 5.4 2.8 6.3 9.5 13.0 9.3 16. q q 110.0 149.2 117.5 158. 124.1 170.5 118.7 164.2 92.3 121.8 99.1 135.4 96.7 128.9 94.9 128."
+        },
+        {
+            "title": "Gap",
+            "content": "17.7 27.4 18.4 23.3 27.5 41.6 23.8 35.9 Table 9: Qwen2.5-1.5B - Magpie - SVD-based Metrics"
+        },
+        {
+            "title": "Dataset Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - -2.4e-03 -1.5e-03 - -1.1e-05 7.9e-"
+        },
+        {
+            "title": "Magpie",
+            "content": "IFD (GPT2) - -1.6e-03 -1.6e-03 - 1.2e- -1.2e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - -1.3e-03 -1.5e-03 - -4.0e-06 1.0e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - -1.5e-03 -3.3e-03 - -1.5e-05 7.8ek k -2.7e-04 1.5e-03 -6.7e-04 3.1e1.5e-03 -4.2e-05 6.1e-04 6.0e-04 3.6e-04 3.3e-04 1.4e-03 2.2e-04 -2.2e-04 1.1e-03 -6.4e-04 2.0eq q -2.0e-04 1.4e-05 -1.4e-04 -9.4e- -6.5e-05 -2.7e-04 -3.0e-04 -2.1e-03 -6.8e-05 -1.1e-03 -6.0e-05 -1.1e-04 3.0e-04 -1.5e-03 -6.0e-04 -1.2eTable 10: Qwen2.5-1.5B - Magpie - Similarity-based Metrics"
+        },
+        {
+            "title": "Reasoning Reasoning",
+            "content": "k 0.8 1.4 1.1 2.0 -0.3 -0.6 1.0 2. 1.2 2.5 -0.3 -0.5 72.1 98.7 59.5 82.6 12.6 16. 223.8 311.7 141.7 194.2 82.1 117.5 Table 11: Qwen2.5-1.5B - Reasoning - SVD-based Metrics"
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Reasoning Reasoning",
+            "content": "k - 4.8e-04 6.6e-04 - -4.2e-06 -1.2ek 1.6e-03 9.1e-04 3.6e-04 4.2e-03 5.3e-04 5.2e-04 -1.2e-04 -9.7eTable 12: Qwen2.5-1.5B - Reasoning - Similarity-based Metrics Figure 6: Qwen2.5 1.5B - Reasoning Data 24 Preprint. Under review. Figure 7: Qwen2.5 1.5B - WizardLM with Difficulty Metric Figure 8: Qwen2.5 1.5B - WizardLM with IFD (GPT-2) Metric Figure 9: Qwen2.5 1.5B - WizardLM with InsTag Metric Figure 10: Qwen2.5 1.5B - WizardLM with Reward Model Metric Figure 11: Qwen2.5 1.5B - Magpie with Difficulty Metric Figure 12: Qwen2.5 1.5B - Magpie with IFD (GPT-2) Metric 25 Preprint. Under review. Figure 13: Qwen2.5 1.5B - Magpie with InsTag Metric Figure 14: Qwen2.5 1.5B - Magpie with Reward Model Metric Figure 15: Qwen2.5 1.5B - OpenHermes with Difficulty Metric Figure 16: Qwen2.5 1.5B - OpenHermes with IFD (GPT-2) Metric Figure 17: Qwen2.5 1.5B - OpenHermes with InsTag Metric Figure 18: Qwen2.5 1.5B - OpenHermes with Reward Model Metric 26 Preprint. Under review. C.2 Qwen2.5 3B"
+        },
+        {
+            "title": "WizardLM",
+            "content": "IFD (GPT2)"
+        },
+        {
+            "title": "Gap",
+            "content": "k k 1.2 2.1 1.3 2. 1.2 2.1 0.8 1.5 2.9 5.7 3.2 5.7 3.6 6.8 3.2 6. -1.7 -3.6 -2.0 -3.3 -2.4 -4.8 -2.4 -4.6 o q 1.3 2.5 1.4 2.7 1.3 2.5 0.9 1. 2.5 4.9 2.8 5.0 3.2 6.0 3.0 5.5 -1.2 -2.4 -1.4 -2. -1.9 -3.5 -2.1 -3.8 v v 65.6 87.3 51.9 68.6 67.2 89.5 66.0 86.9 15.9 18.3 18.2 20. 17.1 19.7 28.8 33.2 49.7 69.1 33.8 48.3 50.2 69.8 37.1 53. q q 118.7 160.4 84.0 106. 123.8 168.2 119.3 161.7 18.0 19.8 19.5 22.0 19.5 21.5 34.0 38. 100.7 140.7 64.5 84.3 104.3 146.7 85.3 123.1 Table 13: Qwen2.5-3B - WizardLM - SVD-based Metrics"
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - -5.6e-04 -5.4e-04 - 9.1e-06 -3.9e-"
+        },
+        {
+            "title": "WizardLM",
+            "content": "IFD (GPT2) - -2.7e-04 -8.4e-04 - 1.9e- -1.2e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - -6.3e-04 -8.8e-05 - 4.0e-06 1.3e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - -1.1e-04 -1.2e-04 - 7.9e-06 4.6ek k -1.3e-03 -5.1e-04 -1.3e-03 3.9e- -1.2e-03 -5.1e-04 -6.5e-04 -1.7e-04 -7.8e-04 -6.4e-04 -1.1e-03 3.4e-04 -7.4e-04 6.8e-06 -1.1e-03 -8.0eq q 2.5e-05 1.4e-03 -2.3e-04 1.9e3.0e-05 1.5e-03 -2.5e-04 9.4e-04 1.0e-04 2.1e-03 2.7e-05 2.4e-03 -1.5e-05 1.7e-03 -1.2e-04 1.4eTable 14: Qwen2.5-3B - WizardLM - Similarity-based Metrics"
+        },
+        {
+            "title": "Difficulty",
+            "content": "OpenHermes 2.5 IFD (GPT2)"
+        },
+        {
+            "title": "Gap",
+            "content": "k k 1.3 2.2 1.2 2. 1.2 2.1 0.9 1.7 3.0 5.6 7.5 13.2 3.0 5.4 6.5 12. -1.8 -3.4 -6.3 -10.9 -1.8 -3.3 -5.6 -10.3 o q 1.4 2.7 1.4 2.7 1.4 2.6 1.1 2. 2.8 5.2 6.6 11.8 2.7 5.0 5.7 10.7 -1.3 -2.5 -5.2 -9. -1.3 -2.4 -4.6 -8.5 v v 64.7 85.8 57.0 74.9 67.7 89.0 67.8 90.4 24.1 28.7 25.0 28. 22.9 27.4 28.2 32.5 40.6 57.1 32.0 46.6 44.8 61.7 39.6 57. q q 115.5 153.7 95.4 121. 124.6 167.0 122.5 163.5 29.2 32.7 28.5 33.2 27.9 31.7 35.2 40. 86.3 121.0 67.0 87.7 96.7 135.3 87.2 122.8 Table 15: Qwen2.5-3B - OpenHermes 2.5 - SVD-based Metrics Preprint. Under review."
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - 2.5e-04 -1.2e-04 - 2.2e-08 -6.8eOpenHermes 2.5 IFD (GPT2) - -9.5e-05 -5.5e-04 - 2.9e-06 -6.5e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - -7.0e-04 8.5e-05 - -4.5e-06 -3.6e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - -2.2e-04 2.8e-05 - 5.4e-06 -4.2ek k -1.7e-03 9.3e-05 -1.3e-03 -2.0e- -1.7e-03 -1.1e-04 -1.7e-03 5.4e-04 -1.5e-03 -2.7e-04 2.7e-05 -9.0e-04 -1.5e-03 -4.9e-04 -1.5e-03 -1.6eq q -2.0e-04 8.0e-05 -2.3e-04 1.6e1.6e-04 9.8e-04 -9.2e-05 1.5e-03 -5.9e-04 2.1e-03 2.3e-04 1.7e-03 -2.1e-04 -3.6e-05 -4.3e-04 1.2eTable 16: Qwen2.5-3B - OpenHermes 2.5 - Similarity-based Metrics"
+        },
+        {
+            "title": "Magpie",
+            "content": "IFD (GPT2)"
+        },
+        {
+            "title": "Low",
+            "content": "k k 1.1 2.1 1.1 2. 1.2 2.1 1.1 2.0 1.2 2.2 0.9 1.7 1.1 2.1 1.1 2. -0.0 -0.1 0.1 0.3 0.0 0.0 -0.0 -0.0 o q 1.3 2.5 1.3 2.6 1.4 2.6 1.3 2. 1.3 2.6 1.1 2.0 1.3 2.5 1.2 2.3 -0.0 -0.1 0.3 0. 0.1 0.1 0.1 0.2 v v 63.7 82.3 68.0 90.0 70.6 91.3 67.3 90.5 59.6 78.5 63.9 81. 59.8 78.5 55.2 69.6 4.1 3.9 4.1 9.1 10.9 12.9 12.1 21. q q 122.4 165.4 131.9 175. 140.0 192.1 133.2 181.8 101.8 131.6 111.7 153.0 106.6 139.8 104.0 140."
+        },
+        {
+            "title": "Gap",
+            "content": "20.6 33.9 20.2 22.3 33.4 52.3 29.3 41.7 Table 17: Qwen2.5-3B - Magpie - SVD-based Metrics"
+        },
+        {
+            "title": "Dataset Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - -1.8e-04 -4.3e-04 - -1.1e-05 4.3e-"
+        },
+        {
+            "title": "Magpie",
+            "content": "IFD (GPT2) - -2.8e-04 -7.9e-05 - -7.6e1.5e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - -3.9e-04 -2.8e-04 - 1.1e-06 -1.0e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - -1.3e-03 3.4e-05 - -2.1e-06 -1.0ek k -6.9e-04 -1.3e-04 -2.1e-03 -4.4e- -1.8e-03 1.7e-04 -1.2e-03 4.8e-05 -1.6e-03 1.5e-04 -1.7e-03 3.8e-05 -1.6e-03 2.2e-04 1.8e-04 1.7eq q -8.0e-04 5.2e-04 -2.7e-04 1.3e- -5.0e-04 5.0e-04 -3.5e-04 1.8e-03 -5.8e-04 1.7e-03 -4.9e-04 -9.8e-05 -5.7e-04 1.1e-03 -1.7e-03 1.5eTable 18: Qwen2.5-3B - Magpie - Similarity-based Metrics"
+        },
+        {
+            "title": "Reasoning Reasoning",
+            "content": "k 0.7 1.3 0.9 1.6 -0.1 -0.3 1.0 1. 1.1 2.1 -0.1 -0.2 81.4 101.2 69.3 87.5 12.1 13. 243.4 344.6 158.6 217.6 84.8 127.0 Table 19: Qwen2.5-3B - Reasoning - SVD-based Metrics"
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Reasoning Reasoning",
+            "content": "k - -3.0e-04 1.7e-04 - 8.3e-07 5.4ek -2.7e-03 5.8e-04 -3.1e-03 -2.3e-03 -6.9e-04 -3.0e-03 5.4e-05 -1.9eTable 20: Qwen2.5-3B - Reasoning - Similarity-based Metrics Figure 19: Qwen2.5 3B - Reasoning Data 28 Preprint. Under review. Figure 20: Qwen2.5 3B - WizardLM with Difficulty Metric Figure 21: Qwen2.5 3B - WizardLM with IFD (GPT-2) Metric Figure 22: Qwen2.5 3B - WizardLM with InsTag Metric Figure 23: Qwen2.5 3B - WizardLM with Reward Model Metric Figure 24: Qwen2.5 3B - Magpie with Difficulty Metric Figure 25: Qwen2.5 3B - Magpie with IFD (GPT-2) Metric 29 Preprint. Under review. Figure 26: Qwen2.5 3B - Magpie with InsTag Metric Figure 27: Qwen2.5 3B - Magpie with Reward Model Metric Figure 28: Qwen2.5 3B - OpenHermes with Difficulty Metric Figure 29: Qwen2.5 3B - OpenHermes with IFD (GPT-2) Metric Figure 30: Qwen2.5 3B - OpenHermes with InsTag Metric Figure 31: Qwen2.5 3B - OpenHermes with Reward Model Metric 30 Preprint. Under review. C.3 Qwen2.5 7B"
+        },
+        {
+            "title": "WizardLM",
+            "content": "IFD (GPT2)"
+        },
+        {
+            "title": "Gap",
+            "content": "k k 1.9 3.2 1.9 3. 1.9 3.2 1.3 2.2 3.5 6.9 4.4 7.6 4.1 7.6 4.3 7. -1.6 -3.7 -2.5 -4.2 -2.2 -4.5 -3.1 -5.7 o q 1.9 3.4 1.9 3.5 1.9 3.4 1.3 2. 2.8 5.2 3.3 5.9 3.3 6.0 3.7 6.5 -0.9 -1.9 -1.4 -2. -1.4 -2.6 -2.4 -4.2 v v 91.6 114.9 68.6 84.2 95.6 120.7 91.5 113.3 18.6 19.2 22.0 22. 20.0 20.8 35.6 36.9 73.0 95.7 46.6 62.0 75.6 99.9 55.9 76. q q 133.2 167.9 97.8 116. 141.2 180.6 131.5 166.9 20.1 20.7 21.7 23.1 21.6 22.4 38.6 41. 113.2 147.2 76.1 93.3 119.6 158.2 92.9 125.4 Table 21: Qwen2.5-7B - WizardLM - SVD-based Metrics"
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - -7.1e-04 -1.4e-04 - -3.9e-06 7.7e-"
+        },
+        {
+            "title": "WizardLM",
+            "content": "IFD (GPT2) - -5.1e-04 -1.8e-04 - -4.3e- -5.9e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - -1.1e-03 -5.0e-05 - 8.8e-07 1.5e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - -6.2e-04 -3.8e-04 - 2.3e-06 1.3ek k -5.0e-04 -3.2e-04 -1.3e-03 1.0e- -5.2e-04 1.3e-04 -5.8e-04 1.7e-04 -2.4e-04 2.4e-04 -6.0e-04 -2.3e-05 -7.3e-04 4.6e-04 -7.5e-04 9.3eq q -8.7e-05 1.1e-03 -9.1e-06 7.7e- -4.4e-05 1.2e-03 -1.3e-04 5.5e-04 -2.3e-04 -7.8e-05 2.5e-04 -7.3e-04 1.6e-04 -1.6e-04 1.9e-04 -4.5eTable 22: Qwen2.5-7B - WizardLM - Similarity-based Metrics Dataset Metrics Difficulty OpenHermes 2.5 IFD (GPT2) InsTag Reward Nuclear Norm Effective Rank Proj High Low Gap Proj High Low Gap Proj High Low Gap Proj High Low Gap k k 2.0 3.4 1.8 3.3 1.8 3. 1.5 2.6 4.0 7.2 8.5 14.8 4.1 7.2 9.5 17.2 -2.0 -3. -6.7 -11.5 -2.3 -4.1 -8.1 -14.6 o q 2.0 3.6 1.9 3.5 1.9 3.3 1.6 2.9 3.3 5. 6.5 11.8 3.3 6.0 7.4 13.6 -1.2 -2.3 -4.7 -8.3 -1.5 -2. -5.8 -10.6 v v 92.1 115. 78.5 96.6 98.4 123.1 98.0 123.4 29.0 31.1 32.7 32.5 27.4 29. 34.4 36.3 63.1 84.6 45.8 64.0 70.9 93.5 63.5 87.1 q q 135.7 170.8 114.0 136.6 145.9 183. 143.9 182.6 33.3 35.1 33.7 36.5 31.5 33.7 38.5 41.9 102.4 135. 80.3 100.1 114.4 150.1 105.4 140.7 Table 23: Qwen2.5-7B - OpenHermes 2.5 - SVD-based Metrics 31 Preprint. Under review."
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - -8.8e-04 -2.7e-04 - 2.0e-06 -1.6eOpenHermes 2.5 IFD (GPT2) - -4.0e-04 -3.0e-04 - -2.4e-06 7.5e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - -1.1e-03 -3.1e-04 - -2.7e-06 -3.0e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - -5.4e-04 7.9e-05 - -2.1e-06 2.9ek k -6.2e-04 -2.3e-04 -5.3e-04 -2.9e- -7.9e-04 1.5e-05 -5.9e-04 2.2e-04 -5.6e-04 2.6e-04 -5.9e-04 4.4e-04 -3.7e-04 3.0e-04 -3.3e-04 -5.2eq q -8.3e-05 7.1e-04 -1.5e-04 3.6e- -3.2e-05 1.1e-03 -2.3e-04 -3.6e-05 7.2e-05 -1.0e-04 -1.8e-05 -1.6e-03 2.1e-04 -6.0e-04 -1.2e-04 -9.4eTable 24: Qwen2.5-7B - OpenHermes 2.5 - Similarity-based Metrics"
+        },
+        {
+            "title": "Magpie",
+            "content": "IFD (GPT2)"
+        },
+        {
+            "title": "Low",
+            "content": "k k 1.8 3.1 1.8 3. 2.0 3.5 1.8 3.0 1.8 3.1 1.6 2.8 1.7 3.0 1.8 3. 0.0 -0.1 0.2 0.3 0.3 0.4 0.0 -0.0 o q 1.9 3.4 1.9 3.5 2.2 3.8 1.9 3. 1.9 3.4 1.6 2.8 1.8 3.3 1.8 3.2 0.0 -0.0 0.3 0. 0.3 0.5 0.1 0.2 v v 95.9 118.1 100.6 125.8 108.4 133.8 99.4 126.6 83.9 102.8 93.5 110. 86.0 105.7 83.9 101."
+        },
+        {
+            "title": "Gap",
+            "content": "12.1 15.3 7.1 14.9 22.4 28.1 15.5 25."
+        },
+        {
+            "title": "Low",
+            "content": "q q 153.3 195.2 163.7 207. 174.1 225.0 163.5 212.0 124.4 151.8 133.3 170.2 132.0 163.3 131.2 164."
+        },
+        {
+            "title": "Gap",
+            "content": "28.9 43.4 30.4 37.0 42.1 61.7 32.3 47.9 Table 25: Qwen2.5-7B - Magpie - SVD-based Metrics"
+        },
+        {
+            "title": "Dataset Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - -7.2e-04 -6.9e-04 - -1.6e-06 7.9e-"
+        },
+        {
+            "title": "Magpie",
+            "content": "IFD (GPT2) - -5.9e-04 -8.9e-04 - 4.6e6.9e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - -1.1e-03 -8.3e-04 - 4.1e-06 2.1e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - -1.5e-03 -1.2e-03 - 4.1e-06 3.9ek k -1.2e-04 3.1e-04 -7.9e-06 -1.1e- -3.3e-04 5.3e-04 -6.9e-04 -2.9e-04 -7.1e-05 -1.0e-04 -7.9e-04 -1.8e-04 -1.6e-04 -2.7e-04 -2.8e-04 6.5eq q 1.0e-04 4.1e-04 -2.7e-04 8.6e- -9.4e-05 1.5e-03 -1.8e-04 1.3e-03 -1.0e-04 2.5e-04 9.7e-05 1.1e-03 1.2e-05 2.7e-04 2.0e-05 -1.6eTable 26: Qwen2.5-7B - Magpie - Similarity-based Metrics"
+        },
+        {
+            "title": "Reasoning Reasoning",
+            "content": "k 1.1 1.9 1.3 2.5 -0.3 -0.6 1.4 2. 1.5 2.8 -0.2 -0.3 138.8 170.5 106.2 126."
+        },
+        {
+            "title": "Gap",
+            "content": "32.7 43."
+        },
+        {
+            "title": "Gap",
+            "content": "q 361.3 509.9 203.4 263.1 157.9 246.8 Table 27: Qwen2.5-7B - Reasoning - SVD-based Metrics"
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Reasoning Reasoning",
+            "content": "k - -8.9e-04 8.6e-05 - -2.4e-06 -1.1ek -2.4e-03 9.7e-04 -2.7e-03 2.2e-03 4.4e-05 1.6e-03 1.7e-04 2.5eTable 28: Qwen2.5-7B - Reasoning - Similarity-based Metrics Figure 32: Qwen2.5 7B - Reasoning Data 32 Preprint. Under review. Figure 33: Qwen2.5 7B - WizardLM with Difficulty Metric Figure 34: Qwen2.5 7B - WizardLM with IFD (GPT-2) Metric Figure 35: Qwen2.5 7B - WizardLM with InsTag Metric Figure 36: Qwen2.5 7B - WizardLM with Reward Model Metric Figure 37: Qwen2.5 7B - Magpie with Difficulty Metric Figure 38: Qwen2.5 7B - Magpie with IFD (GPT-2) Metric 33 Preprint. Under review. Figure 39: Qwen2.5 7B - Magpie with InsTag Metric Figure 40: Qwen2.5 7B - Magpie with Reward Model Metric Figure 41: Qwen2.5 7B - OpenHermes with Difficulty Metric Figure 42: Qwen2.5 7B - OpenHermes with IFD (GPT-2) Metric Figure 43: Qwen2.5 7B - OpenHermes with InsTag Metric Figure 44: Qwen2.5 7B - OpenHermes with Reward Model Metric 34 Preprint. Under review. C.4 Llama 3.1 8B"
+        },
+        {
+            "title": "WizardLM",
+            "content": "IFD (GPT2)"
+        },
+        {
+            "title": "Gap",
+            "content": "k k 1.3 6.5 1.5 7. 1.4 7.0 1.2 6.3 2.8 15.5 3.7 20.0 3.3 17.8 3.2 17. -1.5 -9.0 -2.3 -12.3 -1.9 -10.8 -2.0 -11.2 o q 2.5 6.3 2.9 7.2 2.6 6.7 2.2 5. 4.9 11.4 6.1 14.5 5.7 13.3 5.7 13.7 -2.4 -5.0 -3.2 -7. -3.1 -6.6 -3.5 -8.0 v v 105.3 112.1 75.0 78.0 107.8 115.7 100.7 105.0 19.6 17.6 23.3 20. 21.3 19.0 37.6 32.8 85.6 94.5 51.7 57.7 86.5 96.6 63.1 72. q q 109.2 151.8 78.0 102. 111.7 156.7 104.2 143.5 17.4 19.1 18.3 20.5 18.8 20.5 32.2 36. 91.9 132.6 59.6 81.8 92.8 136.2 72.0 107.1 Table 29: Llama-3.1-8B - WizardLM - SVD-based Metrics"
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - -2.7e-04 5.0e-06 - -2.9e-06 7.0e-"
+        },
+        {
+            "title": "WizardLM",
+            "content": "IFD (GPT2) - 5.0e-05 -2.6e-04 - 1.3e2.3e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - -2.0e-04 3.3e-04 - -3.8e-06 1.1e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - -2.0e-05 -1.1e-04 - 1.1e-06 -1.8ek k -2.5e-04 4.5e-04 3.8e-04 2.9e- -2.9e-04 6.2e-04 -1.0e-03 4.9e-04 7.3e-04 2.8e-04 2.9e-04 -9.1e-05 4.4e-04 -3.3e-04 2.2e-04 -5.0eq q -1.6e-04 3.8e-05 -3.2e-05 9.4e- -4.0e-04 8.2e-05 -3.0e-04 2.1e-04 -1.3e-05 9.6e-04 1.5e-04 1.0e-03 -4.7e-05 1.2e-03 -2.4e-04 4.0eTable 30: Llama-3.1-8B - WizardLM - Similarity-based Metrics Dataset Metrics Difficulty OpenHermes 2.5 IFD (GPT2) InsTag Reward Nuclear Norm Effective Rank Proj High Low Gap Proj High Low Gap Proj High Low Gap Proj High Low Gap k k 1.5 7.9 1.4 7.4 1.4 7. 1.1 5.7 3.5 18.9 8.8 48.9 2.8 15.4 5.8 32.2 -1.9 -11. -7.4 -41.4 -1.4 -8.1 -4.7 -26.5 o q 2.9 7.4 2.8 7.2 2.7 7.0 2.2 5.8 5.8 14. 13.5 33.8 4.9 11.8 9.2 23.5 -3.0 -7.0 -10.7 -26.6 -2.2 -4. -7.0 -17.7 v v 102.0 107. 85.2 89.3 109.1 114.6 109.3 115.9 29.9 27.4 29.1 24.8 31.1 28. 37.7 33.6 72.1 79.6 56.1 64.5 78.0 85.8 71.6 82.3 q q 106.6 143.8 89.5 117.3 113.1 153. 114.6 157.0 27.5 31.0 20.8 24.2 28.7 33.4 33.2 38.2 79.1 112. 68.7 93.1 84.4 120.5 81.4 118.9 Table 31: Llama-3.1-8B - OpenHermes 2.5 - SVD-based Metrics 35 Preprint. Under review."
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - -3.8e-04 4.2e-04 - 3.1e-06 1.4eOpenHermes 2.5 IFD (GPT2) - 4.2e-04 1.1e-04 - -1.3e-07 -2.7e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - 4.7e-05 1.6e-04 - 1.8e-06 1.1e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - -6.5e-04 7.0e-05 - 1.2e-06 4.3ek k -8.7e-05 2.5e-04 2.6e-04 1.7e- -3.8e-04 3.0e-04 -2.0e-04 3.8e-04 3.1e-04 4.1e-04 -5.0e-04 1.8e-04 3.3e-04 -1.4e-04 8.0e-05 3.1eq q -3.3e-04 4.3e-04 5.1e-05 2.9e- -1.7e-04 4.3e-05 -2.4e-04 9.2e-04 -1.1e-04 5.9e-04 -2.2e-04 2.0e-03 -6.4e-05 6.8e-04 -4.8e-06 5.6eTable 32: Llama-3.1-8B - OpenHermes 2.5 - Similarity-based Metrics"
+        },
+        {
+            "title": "Magpie",
+            "content": "IFD (GPT2)"
+        },
+        {
+            "title": "Low",
+            "content": "k k 1.3 6.6 1.2 6. 1.3 6.6 1.2 6.0 1.2 6.4 1.1 5.6 1.2 6.4 0.8 4. 0.0 0.2 0.1 0.4 0.1 0.2 0.4 1.9 o q 2.4 6.6 2.3 6.3 2.5 6.5 2.3 6. 2.4 6.4 2.0 5.2 2.4 6.4 1.5 4.1 0.0 0.2 0.4 1. 0.0 0.1 0.8 2.2 v v 123.6 129.6 119.5 128.1 131.1 138.7 119.3 130.4 96.7 100.1 111.5 114. 104.4 109.0 127.4 135."
+        },
+        {
+            "title": "Gap",
+            "content": "26.9 29.6 8.0 14.1 26.7 29.7 -8.1 -5."
+        },
+        {
+            "title": "Low",
+            "content": "q q 132.5 178.5 128.7 176. 136.3 190.2 130.7 184.8 100.7 132.6 108.6 147.8 112.1 147.6 149.4 204."
+        },
+        {
+            "title": "Gap",
+            "content": "31.9 45.9 20.1 28.8 24.3 42.5 -18.7 -20.1 Table 33: Llama-3.1-8B - Magpie - SVD-based Metrics"
+        },
+        {
+            "title": "Dataset Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - -2.2e-04 -2.2e-04 - 6.1e-06 1.5e-"
+        },
+        {
+            "title": "Magpie",
+            "content": "IFD (GPT2) - -4.9e-04 -2.8e-04 - -2.1e3.6e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - -7.3e-04 -1.8e-04 - -3.1e-06 2.0e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - -5.5e-04 -9.9e-04 - -2.8e-06 4.3ek k 5.9e-04 -3.6e-04 5.0e-04 -5.9e2.7e-04 2.5e-04 5.2e-04 2.3e-04 4.3e-04 2.0e-04 2.5e-04 2.6e-04 4.6e-04 -5.4e-05 9.0e-04 -1.6eq q -3.3e-04 1.3e-03 3.1e-05 2.4e- -2.4e-04 6.3e-04 -9.8e-06 2.7e-04 2.6e-05 5.5e-04 1.6e-05 1.0e-03 -8.9e-06 1.0e-03 -4.0e-04 1.7eTable 34: Llama-3.1-8B - Magpie - Similarity-based Metrics"
+        },
+        {
+            "title": "Reasoning Reasoning",
+            "content": "k 0.9 4.6 1.0 5.5 -0.2 -0.9 1.8 5. 2.0 5.7 -0.2 -0.4 216.0 248.4 150.1 159."
+        },
+        {
+            "title": "Gap",
+            "content": "65.9 88."
+        },
+        {
+            "title": "Gap",
+            "content": "q 343.5 480.5 184.2 238.5 159.4 241.9 Table 35: Llama-3.1-8B - Reasoning - SVD-based Metrics"
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Reasoning Reasoning",
+            "content": "k - 8.4e-05 -4.7e-05 - -1.2e-05 1.8ek -3.8e-05 -5.2e-05 -2.1e-04 -9.6e-04 5.7e-04 2.0e-03 2.8e-06 1.6eTable 36: Llama-3.1-8B - Reasoning - Similarity-based Metrics Figure 45: Llama 3.1 8B - Reasoning Data 36 Preprint. Under review. Figure 46: Llama 3.1 8B - WizardLM with Difficulty Metric Figure 47: Llama 3.1 8B - WizardLM with IFD (GPT-2) Metric Figure 48: Llama 3.1 8B - WizardLM with InsTag Metric Figure 49: Llama 3.1 8B - WizardLM with Reward Model Metric Figure 50: Llama 3.1 8B - Magpie with Difficulty Metric Figure 51: Llama 3.1 8B - Magpie with IFD (GPT-2) Metric 37 Preprint. Under review. Figure 52: Llama 3.1 8B - Magpie with InsTag Metric Figure 53: Llama 3.1 8B - Magpie with Reward Model Metric Figure 54: Llama 3.1 8B - OpenHermes with Difficulty Metric Figure 55: Llama 3.1 8B - OpenHermes with IFD (GPT-2) Metric Figure 56: Llama 3.1 8B - OpenHermes with InsTag Metric Figure 57: Llama 3.1 8B - OpenHermes with Reward Model Metric 38 Preprint. Under review. C.5 Llama 3.2 1B"
+        },
+        {
+            "title": "WizardLM",
+            "content": "IFD (GPT2)"
+        },
+        {
+            "title": "Gap",
+            "content": "k k 2.2 8.9 2.6 10. 2.2 9.1 1.7 7.4 5.3 22.0 6.3 23.9 6.2 24.8 5.4 22. -3.1 -13.0 -3.7 -13.2 -4.0 -15.8 -3.6 -14.9 o q 4.1 10.6 4.8 12.3 4.2 10.7 3.2 8. 8.4 19.6 9.2 21.1 9.7 22.3 8.6 20.7 -4.3 -9.1 -4.4 -8. -5.5 -11.6 -5.3 -12.1 v v 85.8 110.6 63.9 79.5 88.3 114.9 86.9 110.7 18.9 18.7 21.6 21. 20.5 20.5 33.8 34.0 67.0 91.9 42.3 58.4 67.8 94.4 53.0 76. q q 110.6 157.4 78.6 105. 114.0 164.9 110.0 157.5 18.3 20.1 19.1 21.6 20.0 22.1 32.8 37. 92.4 137.3 59.4 83.9 94.0 142.7 77.2 119.7 Table 37: Llama-3.2-1B - WizardLM - SVD-based Metrics"
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - -4.9e-04 1.6e-04 - 9.9e-06 -2.5e-"
+        },
+        {
+            "title": "WizardLM",
+            "content": "IFD (GPT2) - -1.1e-04 4.4e-04 - 1.2e- -9.2e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - -9.1e-04 -7.3e-05 - 1.5e-05 -5.8e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - -2.6e-04 -4.5e-04 - 1.1e-06 5.3ek k 2.5e-03 -3.7e-04 1.5e-03 8.9e2.7e-03 -1.1e-03 1.3e-03 8.8e-04 2.0e-03 1.5e-03 1.8e-03 1.4e-03 1.2e-03 8.2e-04 1.8e-03 -6.8eq q 3.0e-04 1.0e-03 3.3e-04 -2.3e3.9e-04 2.7e-04 -1.8e-04 2.3e-04 3.0e-04 -1.9e-03 1.6e-04 -1.3e-03 -7.3e-05 -1.3e-03 1.1e-04 -5.2eTable 38: Llama-3.2-1B - WizardLM - Similarity-based Metrics Dataset Metrics Difficulty OpenHermes 2.5 IFD (GPT2) InsTag Reward Nuclear Norm Effective Rank Proj High Low Gap Proj High Low Gap Proj High Low Gap Proj High Low Gap k k 2.5 10.3 2.3 10.0 2.3 9. 1.7 7.6 6.0 23.9 14.1 53.7 5.1 20.0 9.5 38.6 -3.5 -13. -11.8 -43.8 -2.8 -10.5 -7.7 -31.0 o q 4.5 11.7 4.4 11.6 4.3 11.2 3.4 9.3 9.1 21. 19.3 45.4 8.0 18.9 13.6 33.7 -4.6 -10.1 -14.9 -33.8 -3.7 -7. -10.2 -24.4 v v 84.0 107. 72.0 90.6 89.0 113.8 90.2 116.4 28.6 29.8 26.5 26.3 28.7 30. 32.9 33.8 55.4 77.4 45.5 64.3 60.3 83.3 57.3 82.6 q q 107.8 150.1 90.1 121.4 114.0 160. 116.0 163.2 29.1 33.3 22.1 26.3 29.7 34.9 33.0 38.8 78.6 116. 68.0 95.1 84.3 126.0 83.1 124.4 Table 39: Llama-3.2-1B - OpenHermes 2.5 - SVD-based Metrics 39 Preprint. Under review."
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - -7.0e-04 -3.5e-05 - -2.6e-06 1.1eOpenHermes 2.5 IFD (GPT2) - -6.6e-04 1.5e-03 - -9.8e-06 3.4e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - -9.9e-04 -3.4e-04 - -1.2e-05 -8.6e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - -7.9e-04 -3.3e-04 - -1.6e-05 2.8ek k 1.8e-03 3.8e-04 1.8e-03 -9.4e2.1e-03 3.2e-04 1.8e-03 -2.5e-04 1.9e-03 -2.3e-04 2.0e-03 5.1e-04 2.4e-03 -2.2e-04 2.1e-03 -3.4eq q 2.5e-04 8.8e-04 1.0e-04 -1.4e- -8.8e-05 4.3e-04 -3.6e-07 8.4e-04 1.1e-04 -1.0e-03 -3.2e-04 2.0e-03 1.8e-04 -1.1e-03 1.0e-04 -1.8eTable 40: Llama-3.2-1B - OpenHermes 2.5 - Similarity-based Metrics"
+        },
+        {
+            "title": "Magpie",
+            "content": "IFD (GPT2)"
+        },
+        {
+            "title": "Low",
+            "content": "k k 1.9 8.0 1.9 8. 2.0 8.4 1.8 7.8 2.0 8.7 1.7 6.9 1.9 8.2 1.6 6. -0.1 -0.7 0.2 1.4 0.1 0.1 0.2 1.2 o q 3.5 9.5 3.8 10.3 3.8 10.1 3.7 10. 3.9 10.4 3.0 7.9 3.7 10.0 3.0 7.9 -0.3 -0.9 0.8 2. 0.1 0.1 0.7 2.0 v v 91.6 116.4 94.2 122.8 99.2 128.6 95.5 126.6 80.2 100.9 87.9 110. 83.9 106.5 86.3 110."
+        },
+        {
+            "title": "Gap",
+            "content": "11.4 15.5 6.4 12.7 15.3 22.1 9.2 15."
+        },
+        {
+            "title": "Low",
+            "content": "q q 123.7 174.4 126.6 179. 133.0 192.5 129.5 188.9 100.3 137.3 107.3 152.7 109.0 150.8 120.9 174."
+        },
+        {
+            "title": "Gap",
+            "content": "23.4 37.0 19.3 27.0 24.0 41.7 8.6 14.8 Table 41: Llama-3.2-1B - Magpie - SVD-based Metrics"
+        },
+        {
+            "title": "Dataset Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - -5.1e-04 -8.4e-04 - -9.5e-06 1.6e-"
+        },
+        {
+            "title": "Magpie",
+            "content": "IFD (GPT2) - -8.4e-04 -1.3e-03 - -1.9e- -1.2e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - -5.7e-04 -7.5e-04 - -1.0e-05 -9.2e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - -9.7e-04 -7.8e-04 - 8.4e-06 1.3ek k 1.6e-03 -6.2e-04 1.9e-03 5.6e1.6e-03 4.0e-04 1.8e-03 5.5e-04 1.6e-03 9.4e-05 1.6e-03 7.6e-04 1.8e-03 3.4e-04 1.4e-03 -3.6eq q 2.5e-04 1.0e-03 4.9e-04 7.9e6.9e-05 6.6e-04 3.6e-04 2.8e-04 4.7e-04 2.8e-04 -1.6e-04 7.7e-04 5.1e-04 1.4e-03 4.5e-05 8.4eTable 42: Llama-3.2-1B - Magpie - Similarity-based Metrics"
+        },
+        {
+            "title": "Reasoning Reasoning",
+            "content": "k 1.0 4.2 1.5 6.4 -0.5 -2.2 2.1 6. 3.0 8.3 -1.0 -2.3 123.2 172.7 103.2 138."
+        },
+        {
+            "title": "Gap",
+            "content": "20.0 33."
+        },
+        {
+            "title": "Gap",
+            "content": "q 270.6 414.9 164.9 240.8 105.8 174.1 Table 43: Llama-3.2-1B - Reasoning - SVD-based Metrics"
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Reasoning Reasoning",
+            "content": "k - -1.2e-03 -3.9e-04 - 1.9e-05 7.5ek -1.0e-04 -2.8e-03 1.3e-03 -2.5e-03 -2.7e-04 -2.1e-03 7.8e-04 1.2eTable 44: Llama-3.2-1B - Reasoning - Similarity-based Metrics Figure 58: Llama 3.2 1B - Reasoning Data 40 Preprint. Under review. Figure 59: Llama 3.2 1B - WizardLM with Difficulty Metric Figure 60: Llama 3.2 1B - WizardLM with IFD (GPT-2) Metric Figure 61: Llama 3.2 1B - WizardLM with InsTag Metric Figure 62: Llama 3.2 1B - WizardLM with Reward Model Metric Figure 63: Llama 3.2 1B - Magpie with Difficulty Metric Figure 64: Llama 3.2 1B - Magpie with IFD (GPT-2) Metric 41 Preprint. Under review. Figure 65: Llama 3.2 1B - Magpie with InsTag Metric Figure 66: Llama 3.2 1B - Magpie with Reward Model Metric Figure 67: Llama 3.2 1B - OpenHermes with Difficulty Metric Figure 68: Llama 3.2 1B - OpenHermes with IFD (GPT-2) Metric Figure 69: Llama 3.2 1B - OpenHermes with InsTag Metric Figure 70: Llama 3.2 1B - OpenHermes with Reward Model Metric 42 Preprint. Under review. C.6 Llama 3.2 3B"
+        },
+        {
+            "title": "WizardLM",
+            "content": "IFD (GPT2)"
+        },
+        {
+            "title": "Gap",
+            "content": "k k 1.5 5.5 1.7 6. 1.5 5.7 1.3 4.8 3.1 12.0 4.1 15.2 3.6 13.8 3.4 13. -1.6 -6.5 -2.5 -8.9 -2.1 -8.2 -2.2 -8.2 o q 2.3 5.7 2.6 6.4 2.4 5.8 1.9 4. 4.4 9.8 5.4 12.2 5.1 11.4 4.8 11.2 -2.1 -4.2 -2.8 -5. -2.7 -5.6 -2.9 -6.4 v v 107.6 124.5 75.4 85.4 110.5 128.4 106.6 121.8 19.6 18.7 23.1 21. 21.4 20.3 37.0 34.9 88.0 105.8 52.3 64.1 89.1 108.0 69.6 86. q q 113.8 159.1 79.4 106. 117.0 165.2 111.2 155.1 17.8 19.9 18.9 21.3 19.4 21.5 32.9 37. 96.0 139.2 60.5 84.9 97.7 143.6 78.3 117.2 Table 45: Llama-3.2-3B - WizardLM - SVD-based Metrics"
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - 5.1e-04 -3.3e-04 - -6.3e-06 -6.8e-"
+        },
+        {
+            "title": "WizardLM",
+            "content": "IFD (GPT2) - 4.7e-04 -5.0e-04 - 6.9e- -5.8e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - 6.5e-04 -2.1e-04 - -7.2e-06 1.5e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - 4.1e-04 3.8e-05 - 3.1e-06 -3.8ek k -1.5e-03 5.1e-04 -7.5e-04 -1.3e- -1.7e-03 5.2e-04 -1.0e-03 1.4e-04 -6.5e-04 -3.6e-04 -4.6e-04 -3.8e-05 -3.1e-04 -4.1e-04 -4.1e-04 -3.6eq q -3.2e-04 5.6e-04 -7.0e-05 8.8e- -3.6e-04 5.0e-04 -4.7e-04 1.4e-04 -6.3e-04 7.3e-04 -5.5e-04 6.1e-04 -3.3e-04 1.0e-03 3.9e-05 6.5eTable 46: Llama-3.2-3B - WizardLM - Similarity-based Metrics Dataset Metrics Difficulty OpenHermes 2.5 IFD (GPT2) InsTag Reward Nuclear Norm Effective Rank Proj High Low Gap Proj High Low Gap Proj High Low Gap Proj High Low Gap k k 1.8 6.5 1.6 6.0 1.6 6. 1.2 4.6 3.8 14.6 9.8 36.5 3.3 12.2 6.1 23.4 -2.1 -8. -8.2 -30.5 -1.6 -6.2 -4.9 -18.8 o q 2.6 6.5 2.5 6.2 2.5 6.2 1.9 4.9 5.2 12. 12.1 28.6 4.6 10.4 7.8 18.9 -2.6 -5.6 -9.6 -22.4 -2.1 -4. -5.9 -13.9 v v 104.5 119. 86.1 97.9 112.0 128.0 112.2 129.8 30.1 29.5 29.0 26.4 30.3 30. 37.0 35.5 74.4 89.7 57.0 71.5 81.7 98.0 75.3 94.3 q q 110.8 151.1 91.2 121.9 117.9 162. 118.8 164.5 28.2 32.5 21.9 25.9 28.4 33.3 33.6 39.3 82.6 118. 69.3 96.0 89.5 129.4 85.3 125.2 Table 47: Llama-3.2-3B - OpenHermes 2.5 - SVD-based Metrics 43 Preprint. Under review."
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - 5.8e-04 3.5e-04 - 2.9e-06 -3.7eOpenHermes 2.5 IFD (GPT2) - 5.2e-04 -4.3e-04 - -3.7e-06 -4.0e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - 5.4e-04 1.8e-04 - 5.5e-06 2.7e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - 3.4e-04 8.5e-05 - -1.9e-06 1.2ek k -8.6e-04 1.4e-05 -4.7e-04 -1.2e- -7.7e-04 2.0e-04 -9.4e-04 2.6e-05 -3.3e-04 -2.5e-04 -5.5e-04 8.1e-05 -4.8e-04 3.1e-04 -1.0e-04 2.1eq q -3.4e-04 1.1e-03 -3.2e-04 7.6e- -2.6e-05 5.0e-04 -3.5e-04 1.5e-03 -4.4e-04 7.1e-04 -2.1e-04 -6.6e-05 -4.7e-04 9.2e-04 -2.6e-04 3.5eTable 48: Llama-3.2-3B - OpenHermes 2.5 - Similarity-based Metrics"
+        },
+        {
+            "title": "Magpie",
+            "content": "IFD (GPT2)"
+        },
+        {
+            "title": "Low",
+            "content": "k k 1.4 5.2 1.3 5. 1.4 5.4 1.3 4.8 1.4 5.2 1.2 4.3 1.3 5.1 1.2 4. 0.0 -0.0 0.1 0.8 0.1 0.3 0.0 0.2 o q 2.1 5.5 2.2 5.5 2.2 5.6 2.1 5. 2.2 5.5 1.7 4.4 2.2 5.5 1.9 4.9 -0.1 -0.0 0.4 1. 0.1 0.2 0.2 0.4 v v 123.0 139.7 120.6 140.7 132.5 152.7 122.0 144.6 97.4 110.0 114.3 127. 105.1 119.4 118.7 134."
+        },
+        {
+            "title": "Gap",
+            "content": "25.5 29.7 6.4 13.5 27.4 33.3 3.3 10."
+        },
+        {
+            "title": "Low",
+            "content": "q q 134.0 181.8 131.5 182. 140.4 197.6 134.4 191.4 102.7 138.1 113.3 156.5 113.7 152.5 134.7 179."
+        },
+        {
+            "title": "Gap",
+            "content": "31.3 43.7 18.2 25.9 26.6 45.1 -0.3 12.0 Table 49: Llama-3.2-3B - Magpie - SVD-based Metrics"
+        },
+        {
+            "title": "Dataset Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - 5.7e-04 7.9e-04 - 2.9e-06 -1.1e-"
+        },
+        {
+            "title": "Magpie",
+            "content": "IFD (GPT2) - 4.8e-04 1.5e-04 - -1.2e1.4e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - 6.1e-04 5.2e-04 - 8.1e-06 -3.6e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - 1.1e-03 9.6e-05 - -3.1e-06 1.3ek k -8.0e-04 -6.1e-04 -1.1e-03 6.1e- -1.1e-03 -1.2e-04 -1.0e-03 3.4e-04 -9.7e-04 -2.9e-04 -5.9e-04 -1.7e-04 -8.4e-04 -6.7e-04 -6.3e-04 -1.0eq q -1.1e-04 1.3e-03 1.6e-04 1.0e- -2.0e-05 4.2e-04 -1.9e-04 1.3e-03 -2.6e-04 1.4e-03 -1.7e-05 3.3e-04 -2.1e-04 1.5e-03 5.9e-04 1.3eTable 50: Llama-3.2-3B - Magpie - Similarity-based Metrics"
+        },
+        {
+            "title": "Reasoning Reasoning",
+            "content": "k 0.9 3.5 1.1 4.2 -0.2 -0.7 1.5 4. 1.8 4.7 -0.2 -0.5 208.3 258.3 149.0 173."
+        },
+        {
+            "title": "Gap",
+            "content": "59.3 84."
+        },
+        {
+            "title": "Gap",
+            "content": "q 315.5 445.5 181.7 243.2 133.8 202.3 Table 51: Llama-3.2-3B - Reasoning - SVD-based Metrics"
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Reasoning Reasoning",
+            "content": "k - 1.3e-04 4.0e-05 - -2.6e-06 -2.5ek -6.8e-04 -1.6e-03 -1.2e-03 -1.1e-03 -3.2e-04 9.4e-04 -2.9e-04 -1.2eTable 52: Llama-3.2-3B - Reasoning - Similarity-based Metrics Figure 71: Llama 3.2 3B - Reasoning Data 44 Preprint. Under review. Figure 72: Llama 3.2 3B - WizardLM with Difficulty Metric Figure 73: Llama 3.2 3B - WizardLM with IFD (GPT-2) Metric Figure 74: Llama 3.2 3B - WizardLM with InsTag Metric Figure 75: Llama 3.2 3B - WizardLM with Reward Model Metric Figure 76: Llama 3.2 3B - Magpie with Difficulty Metric Figure 77: Llama 3.2 3B - Magpie with IFD (GPT-2) Metric 45 Preprint. Under review. Figure 78: Llama 3.2 3B - Magpie with InsTag Metric Figure 79: Llama 3.2 3B - Magpie with Reward Model Metric Figure 80: Llama 3.2 3B - OpenHermes with Difficulty Metric Figure 81: Llama 3.2 3B - OpenHermes with IFD (GPT-2) Metric Figure 82: Llama 3.2 3B - OpenHermes with InsTag Metric Figure 83: Llama 3.2 3B - OpenHermes with Reward Model Metric 46 Preprint. Under review. C.7 Gemma 2 2B"
+        },
+        {
+            "title": "WizardLM",
+            "content": "IFD (GPT2)"
+        },
+        {
+            "title": "Gap",
+            "content": "k k 3.6 7.9 4.0 9. 3.6 7.8 2.6 5.7 10.4 23.0 13.8 28.0 11.3 24.3 9.0 20. -6.8 -15.1 -9.8 -18.6 -7.7 -16.4 -6.4 -14.5 o q 3.7 7.6 4.3 8.7 3.7 7.5 2.7 5. 9.6 17.6 12.2 21.8 10.4 18.9 8.5 16.5 -5.8 -10.1 -7.9 -13. -6.7 -11.4 -5.8 -10.8 v v 105.4 91.2 74.3 65.3 111.0 96.2 114.8 99.6 19.2 15.3 23.0 17. 21.0 16.7 36.0 26.8 86.1 75.9 51.3 48.0 90.0 79.4 78.8 72. q q 103.4 140.1 72.5 95. 108.8 147.5 111.7 149.1 16.1 19.1 17.9 21.2 17.6 21.0 30.0 35. 87.3 121.0 54.6 74.4 91.2 126.5 81.7 113.7 Table 53: Gemma 2 2B - WizardLM - SVD-based Metrics"
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - 5.7e-04 3.0e-04 - 2.1e-07 2.9e-"
+        },
+        {
+            "title": "WizardLM",
+            "content": "IFD (GPT2) - 5.2e-04 7.2e-05 - -5.4e7.4e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - 5.0e-04 3.8e-05 - -1.2e-05 -3.6e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - 1.7e-04 7.8e-05 - -1.6e-06 2.2ek k -1.2e-03 1.2e-04 -5.0e-04 -2.4e- -1.2e-03 3.9e-04 -1.4e-03 -6.1e-04 -8.6e-04 2.0e-04 -8.9e-04 3.0e-04 -8.3e-04 -6.5e-05 -7.8e-04 1.6eq q 1.0e-04 1.6e-03 -5.4e-04 1.4e4.5e-05 1.4e-03 9.4e-05 6.7e-05 -1.9e-04 8.9e-04 -5.7e-05 -1.3e-04 -7.2e-05 6.1e-04 -6.1e-05 1.1eTable 54: Gemma 2 2B - WizardLM - Similarity-based Metrics Dataset Metrics Difficulty OpenHermes 2.5 IFD (GPT2) InsTag Reward Nuclear Norm Effective Rank Proj High Low Gap Proj High Low Gap Proj High Low Gap Proj High Low Gap k k 4.1 9.2 3.7 8.7 3.7 8. 2.9 6.6 11.9 25.5 28.5 56.3 8.0 17.5 18.2 41.6 -7.8 -16. -24.8 -47.6 -4.3 -9.3 -15.3 -35.1 o q 4.2 8.5 4.0 8.3 3.8 7.9 3.1 6.6 10.8 20. 23.7 43.6 7.6 14.3 16.0 32.0 -6.6 -11.7 -19.7 -35.3 -3.7 -6. -12.9 -25.4 v v 104.7 90. 86.5 74.9 115.5 98.0 112.9 100.0 30.0 23.9 27.2 19.9 30.5 24. 36.8 27.6 74.7 66.6 59.2 55.0 85.0 73.5 76.1 72.4 q q 102.6 136.7 84.8 110.0 112.6 148. 110.7 148.3 26.1 31.2 19.4 23.6 26.7 32.4 31.2 37.0 76.4 105. 65.5 86.4 86.0 116.2 79.5 111.4 Table 55: Gemma 2 2B - OpenHermes 2.5 - SVD-based Metrics 47 Preprint. Under review."
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - 3.2e-04 7.3e-05 - 9.7e-06 2.2eOpenHermes 2.5 IFD (GPT2) - 3.4e-04 -8.0e-05 - 2.6e-06 2.9e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - 2.3e-04 3.9e-04 - 2.5e-06 -2.9e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - 2.7e-04 4.5e-05 - -3.9e-06 1.2ek k -1.4e-03 3.0e-04 -2.5e-05 -4.8e- -1.4e-03 7.8e-04 -1.1e-03 -3.0e-04 -5.3e-05 5.6e-05 -9.9e-04 5.4e-04 -2.7e-04 2.5e-04 -2.7e-04 1.8eq q -2.5e-04 1.0e-03 -7.0e-05 -2.6e1.5e-04 5.5e-04 3.6e-05 6.3e-05 4.2e-04 6.6e-04 3.4e-04 3.0e-04 -2.8e-04 4.1e-04 -6.9e-05 3.8eTable 56: Gemma 2 2B - OpenHermes 2.5 - Similarity-based Metrics"
+        },
+        {
+            "title": "Magpie",
+            "content": "IFD (GPT2)"
+        },
+        {
+            "title": "Proj High",
+            "content": "k k 3.3 7.3 3.0 7. 3.3 7.2 3.0 7.0 3.2 7.3 2.7 5.7 3.1 7.1 2.8 6. 0.1 -0.0 0.4 1.4 0.2 0.2 0.2 1.0 o q 3.5 7.3 3.4 7.2 3.4 7.2 3.3 7. 3.4 7.2 2.7 5.6 3.3 7.0 2.9 6.0 0.0 0.0 0.6 1. 0.1 0.1 0.3 1.0 v v 123.1 102.9 120.8 105.5 137.3 115.5 121.2 106."
+        },
+        {
+            "title": "Low",
+            "content": "96.2 83.2 120.6 99.1 104.5 89.3 120.1 99."
+        },
+        {
+            "title": "Gap",
+            "content": "26.9 19.7 0.3 6.4 32.8 26.2 1.1 7."
+        },
+        {
+            "title": "Low",
+            "content": "q q 122.9 160.4 121.5 161. 135.6 178.6 122.5 166.4 94.4 123.6 113.2 147.9 104.0 136.0 123.3 160."
+        },
+        {
+            "title": "Gap",
+            "content": "28.5 36.9 8.3 13.5 31.5 42.6 -0.8 5.5 Table 57: Gemma 2 2B - Magpie - SVD-based Metrics"
+        },
+        {
+            "title": "Dataset Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Difficulty",
+            "content": "k - 4.8e-04 5.9e-04 - -5.4e-06 -5.1e-"
+        },
+        {
+            "title": "Magpie",
+            "content": "IFD (GPT2) - 3.8e-04 1.7e-04 - -3.3e- -3.1e-"
+        },
+        {
+            "title": "InsTag",
+            "content": "k - 5.5e-04 2.1e-04 - -3.3e-06 2.6e-"
+        },
+        {
+            "title": "Reward",
+            "content": "k - 6.4e-04 -2.5e-04 - -1.1e-05 3.9ek k -1.1e-03 -8.3e-05 -6.5e-04 -5.9e- -1.4e-03 4.4e-04 -8.0e-04 9.5e-05 -6.1e-04 -5.2e-05 -1.5e-03 -2.4e-04 -9.4e-05 2.6e-04 -8.1e-04 1.1eq q -2.2e-04 4.3e-04 -2.7e-04 2.2e- -4.5e-06 -4.5e-05 -5.1e-04 4.6e-04 -4.7e-04 4.4e-04 -5.4e-04 -5.7e-04 -6.7e-04 3.5e-04 6.7e-05 3.2eTable 58: Gemma 2 2B - Magpie - Similarity-based Metrics"
+        },
+        {
+            "title": "Reasoning Reasoning",
+            "content": "k 2.5 5.4 2.5 5.6 -0.1 -0.2 2.8 5. 2.8 5.8 -0.0 0.0 194.3 167.4 149.7 124."
+        },
+        {
+            "title": "Gap",
+            "content": "44.6 43."
+        },
+        {
+            "title": "Low",
+            "content": "q 233.8 301.0 162.8 208."
+        },
+        {
+            "title": "Gap",
+            "content": "71.0 92.2 Table 59: Gemma 2 2B - Reasoning - SVD-based Metrics"
+        },
+        {
+            "title": "Metric",
+            "content": "Same-layer Similarity Adjacent-layer Similarity"
+        },
+        {
+            "title": "Reasoning Reasoning",
+            "content": "k - 7.5e-04 4.0e-04 - -2.0e-05 -5.3ek -8.5e-04 1.0e-03 -7.4e-04 5.0e-04 7.1e-04 -9.7e-04 1.0e-04 -8.6eTable 60: Gemma 2 2B - Reasoning - Similarity-based Metrics Figure 84: Gemma 2 2B - Reasoning Data 48 Preprint. Under review. Figure 85: Gemma 2 2B - WizardLM with Difficulty Metric Figure 86: Gemma 2 2B - WizardLM with IFD (GPT-2) Metric Figure 87: Gemma 2 2B - WizardLM with InsTag Metric Figure 88: Gemma 2 2B - WizardLM with Reward Model Metric Figure 89: Gemma 2 2B - Magpie with Difficulty Metric Figure 90: Gemma 2 2B - Magpie with IFD (GPT-2) Metric 49 Preprint. Under review. Figure 91: Gemma 2 2B - Magpie with InsTag Metric Figure 92: Gemma 2 2B - Magpie with Reward Model Metric Figure 93: Gemma 2 2B - OpenHermes with Difficulty Metric Figure 94: Gemma 2 2B - OpenHermes with IFD (GPT-2) Metric Figure 95: Gemma 2 2B - OpenHermes with InsTag Metric Figure 96: Gemma 2 2B - OpenHermes with Reward Model Metric"
+        }
+    ],
+    "affiliations": [
+        "University of Chicago",
+        "University of Maryland"
+    ]
+}
