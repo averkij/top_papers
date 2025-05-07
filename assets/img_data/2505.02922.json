@@ -1,0 +1,136 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1.Introduction",
+        "images": []
+    },
+    {
+        "header": "2.Background and Motivation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.02922/x1.png",
+                "caption": "Figure 1.Transformer Architecture (with KV Cache).\nIn attention computation of (c), a deeper color indicates a higher attention weight,\ncorresponding to more important tokens.\n“I love systems” are the input tokens (i.e., three tokens).",
+                "position": 193
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x2.png",
+                "caption": "Figure 2.Dynamic Sparsity in Attention.\nThe distribution of top-100 attention weights in a 128K context varies across decoding steps.",
+                "position": 309
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x3.png",
+                "caption": "Figure 3.Variety of Attention Sparsity.\n(a) model layers and attention heads on fwe(hsieh2024ruler,); (b) decoding steps and tasks.",
+                "position": 314
+            }
+        ]
+    },
+    {
+        "header": "3.When ANNS Meets Sparse Attention",
+        "images": []
+    },
+    {
+        "header": "4.RetroInfer",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.02922/x4.png",
+                "caption": "Figure 4.Architecture ofRetroInfer.Circles with numbers represent the steps of attention computation, while steps with the same number occur in parallel.\nColored circles indicate vectors.\nCentroids (bold-edged circles) are stored in the meta index.",
+                "position": 448
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x5.png",
+                "caption": "Figure 5.Attention-aware Design of Wave Index.Wave index divides the context into segments (dotted boxes). Each\nvertical bar represents a token at one position. In the first row,\ntokens with the same color belong to the same cluster, and similar colors\n(e.g., yellow and orange) indicate token similarity, which is based on key vector similarity.\nIn the second row, the\ndarker the bar, the more important the token to the query.\nFor example, a query of purple could be close to a red vector (1st segment) and a blue vector (2nd segment).",
+                "position": 512
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x6.png",
+                "caption": "Figure 6.Illustration of Computation Cost for Three Zones.In the steady zone, attention is computed precisely, so the computation cost\nis linear in the number of tokens (red line’s slope).\nIn the retrieval zone, we calculate\nattention for the retrieved vectors (whose number is significantly reduced\ndue to sparsity). The computation cost is linear in the number of retrieved\nvectors (black line), while the overall cost is amortized over the total number of\nvectors (red line). In the estimation zone, the\nattention is estimated based on centroids, which incurs a much lower\ncomputation cost (red line).",
+                "position": 623
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x7.png",
+                "caption": "Figure 7.Centroid Representativeness and Estimation Accuracy.The x-axis represents the ranking of centroids during index traversal. The ground truth (blue) shows that top-ranked centroids have higher cumulative attention scores, demonstrating the effectiveness of clustering.\nAttention estimation (green) follows the same trend of ground truth with a tight bound.",
+                "position": 712
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x8.png",
+                "caption": "Figure 8.Design of Wave Buffer.The black arrows indicate the pointer relationship between the data structures.\nThe red arrows indicates the possible three source of data copy to ensemble the execution buffer.\nMissed data is admitted into the block cache by copying from the execution buffer (blue arrow).",
+                "position": 782
+            }
+        ]
+    },
+    {
+        "header": "5.Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.02922/x9.png",
+                "caption": "Figure 9.Average Model Accuracy (RULER, 8K to 128K Context).RetroInferalways approaches full attention accuracy.",
+                "position": 2739
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x9.png",
+                "caption": "Figure 9.Average Model Accuracy (RULER, 8K to 128K Context).RetroInferalways approaches full attention accuracy.",
+                "position": 2742
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x10.png",
+                "caption": "Figure 10.Needle-in-a-hay-stack (Llama3-8B-1048K).RetroInferhandles all context length and depth.",
+                "position": 2750
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x11.png",
+                "caption": "Figure 11.Accuracy vs. Retrieval Budgets.RetroInfermaintains almost the same accuracy as full attention even with a small retrieval budget. Quest suffers from inaccurate token selection so\nit requires a larger retrieval budget to achieve similar accuracy.",
+                "position": 2758
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x12.png",
+                "caption": "Figure 12.RULER Accuracy and Decoding throughput vs. Context Length and Batch Size (Llama3-8B-1048K).(a)RetroInfermatches full attention accuracy and outperforms baselines across different context lengths. (b)-(e)RetroInferscales well with the batch size and achieves the best throughput on all context lengths.",
+                "position": 2789
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x13.png",
+                "caption": "Figure 13.Decoding Throughput Across Tasks and Models.RetroInferconsistently outperforms other methods.",
+                "position": 2839
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x14.png",
+                "caption": "Figure 14.Prefilling Latency vs. Context Lengths (batch = 1).The prefilling latency ofRetroInferis only slightly higher than full attention, and the overhead becomes negligible as the context length increases.",
+                "position": 2842
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x14.png",
+                "caption": "Figure 14.Prefilling Latency vs. Context Lengths (batch = 1).The prefilling latency ofRetroInferis only slightly higher than full attention, and the overhead becomes negligible as the context length increases.",
+                "position": 2845
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x15.png",
+                "caption": "Figure 15.Effect of Design Choices.“Base” offloads KV to CPU ( no GPU cache), exhibiting low throughput scalability; “W/ GPU cache” greatly improving throughput; “W/ Async cache update” further boosts the speed.",
+                "position": 2850
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x16.png",
+                "caption": "Figure 16.Cache Hit Ratio vs. Cache Sizes.Increasing cache size from1%percent11\\%1 %to5%percent55\\%5 %yields a substantial improvement in hit ratio; however, further increases beyond5%percent55\\%5 %result in marginal gains.",
+                "position": 2862
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02922/x17.png",
+                "caption": "Figure 17.(a) Effect of Attention Estimation on Accuracy.Estimation helps improve the model accuracy.(b) Index Build Time vs. Accuracy (128K context).The number next to the circle indicates the segment size. Segment size = 8K strikes a optimal balance between index building time and clustering accuracy.",
+                "position": 2865
+            }
+        ]
+    },
+    {
+        "header": "6.Related Work",
+        "images": []
+    },
+    {
+        "header": "7.Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
