@@ -1,0 +1,88 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.06176/x1.png",
+                "caption": "Figure 1.We present MonetGPT, an image operation-aware multimodal large language model (MLLM), that provides automatic suggestions for image retouching. Given a photograph (left), MonetGPT analyzes it to identify a set of issues and possible adjustments to fix them. The solution steps are then translated to a set of procedural operations, along with respective parameter settings, drawing from a given library of operations, which occurs in three stages. (Visual puzzles, on which we train the MLLM, are not shown here.)",
+                "position": 114
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.06176/extracted/6423088/figures/png_figs/motivation.png",
+                "caption": "Figure 2.Generative tools, for example instructPix2Pix(Brooks et al.,2023)or MGIE(Fu et al.,2024), produce impressive image enhancements but can result in identity loss (e.g., faces, hands, objects) and are harder to override by users.\nProcedural approaches are more controllable as they restrict operations to a given set of user-prescribed operation library, and can be overridden or applied in parts.\nCurrent MLLMs (bottom-left: e.g., GPT o1 applied using a library of operations, presented as doc-strings), do not have a good internal model of image operations, and perform worse than our operation-aware variant (bottom-right). SeeSection5for evaluation.",
+                "position": 134
+            }
+        ]
+    },
+    {
+        "header": "2.Related Work",
+        "images": []
+    },
+    {
+        "header": "3.Design Considerations",
+        "images": []
+    },
+    {
+        "header": "4.Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.06176/extracted/6423088/figures/png_figs/puzzle_one.png",
+                "caption": "Figure 3.Puzzle A. This puzzle intends to teach what any single operation𝒪𝒪\\mathcal{O}caligraphic_O∈\\in∈ℒℒ\\mathcal{L}caligraphic_L, along with its valueV𝑉Vitalic_V, does to a source imageISsubscript𝐼𝑆I_{S}italic_I start_POSTSUBSCRIPT italic_S end_POSTSUBSCRIPTto produce an edited imageIEsubscript𝐼𝐸I_{E}italic_I start_POSTSUBSCRIPT italic_E end_POSTSUBSCRIPT. The visual puzzle being, given an ordered pair(IS,IE)subscript𝐼𝑆subscript𝐼𝐸(I_{S},I_{E})( italic_I start_POSTSUBSCRIPT italic_S end_POSTSUBSCRIPT , italic_I start_POSTSUBSCRIPT italic_E end_POSTSUBSCRIPT ), one has to predict(𝒪,V)𝒪𝑉(\\mathcal{O},V)( caligraphic_O , italic_V ). Using(IS,IE)subscript𝐼𝑆subscript𝐼𝐸(I_{S},I_{E})( italic_I start_POSTSUBSCRIPT italic_S end_POSTSUBSCRIPT , italic_I start_POSTSUBSCRIPT italic_E end_POSTSUBSCRIPT ), we also generate corresponding reasoningR𝑅Ritalic_R.",
+                "position": 246
+            },
+            {
+                "img": "https://arxiv.org/html/2505.06176/extracted/6423088/figures/png_figs/puzzle_two.png",
+                "caption": "Figure 4.Puzzle B. This puzzle intends to teach about image aesthetics under any single operation𝒪𝒪\\mathcal{O}caligraphic_O∈\\in∈ℒℒ\\mathcal{L}caligraphic_L. The visual puzzle being, given a set of randomly ordered images(IE,IV1,IV2,IV3,IV4)subscript𝐼𝐸subscript𝐼subscript𝑉1subscript𝐼subscript𝑉2subscript𝐼subscript𝑉3subscript𝐼subscript𝑉4(I_{E},I_{V_{1}},I_{V_{2}},I_{V_{3}},I_{V_{4}})( italic_I start_POSTSUBSCRIPT italic_E end_POSTSUBSCRIPT , italic_I start_POSTSUBSCRIPT italic_V start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT end_POSTSUBSCRIPT , italic_I start_POSTSUBSCRIPT italic_V start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT end_POSTSUBSCRIPT , italic_I start_POSTSUBSCRIPT italic_V start_POSTSUBSCRIPT 3 end_POSTSUBSCRIPT end_POSTSUBSCRIPT , italic_I start_POSTSUBSCRIPT italic_V start_POSTSUBSCRIPT 4 end_POSTSUBSCRIPT end_POSTSUBSCRIPT ), generated from an expert-edited final imageIXsubscript𝐼𝑋I_{X}italic_I start_POSTSUBSCRIPT italic_X end_POSTSUBSCRIPTby applying operation𝒪𝒪\\mathcal{O}caligraphic_Owith perturbed values{Vi}subscript𝑉𝑖\\{V_{i}\\}{ italic_V start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT }, one has to\norder the set of images, based on low to high valuesVisubscript𝑉𝑖V_{i}italic_V start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT, as well as identify the optimal imageIXsubscript𝐼𝑋I_{X}italic_I start_POSTSUBSCRIPT italic_X end_POSTSUBSCRIPTalong with the perturbations values to go back toIXsubscript𝐼𝑋I_{X}italic_I start_POSTSUBSCRIPT italic_X end_POSTSUBSCRIPTfrom each image. Note that we implicitly assume that any perturbation of an expert-edited image results in a worse image. Using the image set and the operation, we also generate corresponding reasoningR𝑅Ritalic_R.",
+                "position": 257
+            },
+            {
+                "img": "https://arxiv.org/html/2505.06176/extracted/6423088/figures/png_figs/puzzle_three.png",
+                "caption": "Figure 5.Puzzle C. This puzzle intends to teach how to generate a retouching plan. The visual puzzle being,\ngiven an ordered pair(IS,IE)subscript𝐼𝑆subscript𝐼𝐸(I_{S},I_{E})( italic_I start_POSTSUBSCRIPT italic_S end_POSTSUBSCRIPT , italic_I start_POSTSUBSCRIPT italic_E end_POSTSUBSCRIPT ), one has to come up with a retouching plan{(𝒪i,Vi)}subscript𝒪𝑖subscript𝑉𝑖\\{(\\mathcal{O}_{i},V_{i})\\}{ ( caligraphic_O start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT , italic_V start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ) }listing the operations, fromℒℒ\\mathcal{L}caligraphic_L, along with the associated parameter values. Using the image retouching sequence and the operations, we also generate corresponding reasoningR𝑅Ritalic_R, in the form of ¡Adjustment,Issue,Solution¿ for each operation.",
+                "position": 281
+            },
+            {
+                "img": "https://arxiv.org/html/2505.06176/extracted/6423088/figures/png_figs/results_gallery.png",
+                "caption": "Figure 6.Each row depicts an input image and a retouched version produced by each of the baselines. While generative baselines (MGIE) struggle to preserve the identity (last row), Exposure or Gemini sometimes generate too bright or dark results (third row). Direct regression with an MLLM fails to make sufficient enhancements. Our method is capable of providing balanced and aesthetic enhancements.",
+                "position": 317
+            },
+            {
+                "img": "https://arxiv.org/html/2505.06176/x2.png",
+                "caption": "Figure 7.(Left) MonetGPT responds to subtle changes in the input image, producing different edit plans. In contrast, our regression baseline largely misses the subtle variations in the input and proposes almost identical retouching plans.\n(Right) MonetGPT can produce different edit plans based on style tags, here we showretro,balanced, andvibrantproducing different edit plans, resulting different retouched results.",
+                "position": 364
+            }
+        ]
+    },
+    {
+        "header": "5.Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.06176/x3.png",
+                "caption": "Figure 8.User preference study comparing our method against baselines Exposure(Hu et al.,2018)(white-box system) and MGIE(Fu et al.,2024)(instruction-guided MLLM enhancer). We presented participants with a source image alongside a pair of edited images, where our result was randomly paired with one of the baselines. Responses were collected from users experienced in photo retouching (expertusers) and those with varying familiarity (noviceusers). Participants could also selectneitherif both edits failed to improve upon the original image. Both expert and novice groups demonstrated a preference for our results, as shown.",
+                "position": 479
+            },
+            {
+                "img": "https://arxiv.org/html/2505.06176/x4.png",
+                "caption": "Figure 9.Autoregressive editing. The autoregressive nature of MLLMs, combined with our staged editing pipeline, allows the user to edit the plan (𝒫𝒫\\mathcal{P}caligraphic_P) at any stage. The refined plan is used to determine subsequent parameter values. Moreover, the edited plan𝒫′superscript𝒫′\\mathcal{P^{{}^{\\prime}}}caligraphic_P start_POSTSUPERSCRIPT start_FLOATSUPERSCRIPT ′ end_FLOATSUPERSCRIPT end_POSTSUPERSCRIPTenables the MLLM to generate plans for subsequent stages that are consistent with the edits. The bottom image (𝒫∗′′\\mathcal{P^{{}^{\\prime\\prime}*}}caligraphic_P start_POSTSUPERSCRIPT start_FLOATSUPERSCRIPT ′ ′ end_FLOATSUPERSCRIPT ∗ end_POSTSUPERSCRIPT) shows a result following further modifications to the second and third stages, after the first stage was modified to generate𝒫′′superscript𝒫′′\\mathcal{P^{{}^{\\prime\\prime}}}caligraphic_P start_POSTSUPERSCRIPT start_FLOATSUPERSCRIPT ′ ′ end_FLOATSUPERSCRIPT end_POSTSUPERSCRIPT.",
+                "position": 488
+            },
+            {
+                "img": "https://arxiv.org/html/2505.06176/x5.png",
+                "caption": "Figure 10.For each operation in our library, we show a violin plot of the adjustment values proposed by MonetGPT and the baseline which directly regresses the values on 100 images from the PPR10k dataset. While the baseline overfits and predicts the same values, MonetGPT utilizes the full range of values.",
+                "position": 491
+            }
+        ]
+    },
+    {
+        "header": "6.Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
