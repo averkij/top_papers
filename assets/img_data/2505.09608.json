@@ -1,0 +1,1038 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.09608/x1.png",
+                "caption": "Figure 1.Light editing results of LightLab.Our method enables explicit parametric control over light sources in an image, while producing physically plausible shadows and environmental effects (top). The method can manipulate the intensity of light sources, change their color, and adjust ambient illumination (middle). LightLab can be used for intricate sequential editing of lighting in images (bottom from left to right): starting with an input image, turning off even outside light coming from a window, turning off an inside light source, turning on another light source, and changing lights colors. Note how reflections and shadows are plausibly handled in all these cases (please zoom in for better view and examine the tabletop).",
+                "position": 135
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.09608/x2.png",
+                "caption": "Figure 2.Post processing pipeline.Top row.From a pair of real (raw) photograph pairs, we first isolate the target light changeichangesubscriptichange\\textbf{i}_{\\text{change}}i start_POSTSUBSCRIPT change end_POSTSUBSCRIPT.Bottom row.For synthetic data, we render each light component separately. After light disentanglement both domains undergo light arithmetic to create parameterized sequences of imagesirelit⁢(α,γ,ct)subscriptirelit𝛼𝛾subscriptct\\textbf{i}_{\\text{relit}}\\left(\\alpha,\\gamma,\\textbf{c}_{\\text{t}}\\right)i start_POSTSUBSCRIPT relit end_POSTSUBSCRIPT ( italic_α , italic_γ , c start_POSTSUBSCRIPT t end_POSTSUBSCRIPT ), which are later tone mapped to SDR (either together or separately).",
+                "position": 274
+            }
+        ]
+    },
+    {
+        "header": "2.Related Works",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.09608/x3.png",
+                "caption": "Figure 3.Conditioning Signals.Spatial conditions (input image, target light mask and depth map) are embedded to the latent dimensions and concatenated to the input noise. Light intensity and color control are applied by scaling the intensity and color of the target light mask. Global controls (ambient light intensity and tone-mapping value) are projected to text embedding dimension and inserted through cross-attention.",
+                "position": 325
+            }
+        ]
+    },
+    {
+        "header": "3.Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/tonemapping_comparison/real/seperate/0.jpg",
+                "caption": "Figure 4.Tone mapping strategy.A sequence of images of increasing light intensity, tone mapped either separately or together.Top row.The images tone mapped separately, notice how the light source intensity appears constant when lit, while ambient light appears to be dimmed.Bottom row.Tone mapped together.",
+                "position": 421
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/tonemapping_comparison/real/seperate/0.25.jpg",
+                "caption": "",
+                "position": 431
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/tonemapping_comparison/real/seperate/0.5.jpg",
+                "caption": "",
+                "position": 432
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/tonemapping_comparison/real/seperate/1.0.jpg",
+                "caption": "",
+                "position": 433
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/tonemapping_comparison/real/together_0.075/0.jpg",
+                "caption": "",
+                "position": 436
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/tonemapping_comparison/real/together_0.075/0.25.jpg",
+                "caption": "",
+                "position": 437
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/tonemapping_comparison/real/together_0.075/0.5.jpg",
+                "caption": "",
+                "position": 438
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/tonemapping_comparison/real/together_0.075/1.0.jpg",
+                "caption": "",
+                "position": 439
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/fig5/seaside/cond.jpg",
+                "caption": "Figure 5.Intensity control. Fine-grained control over a target light’s intensity using our method. Values represent the relative intensity change with respect to the source image.",
+                "position": 466
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/fig5/seaside/0.25.jpg",
+                "caption": "",
+                "position": 476
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/fig5/seaside/0.50.jpg",
+                "caption": "",
+                "position": 477
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/fig5/seaside/1.00.jpg",
+                "caption": "",
+                "position": 478
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/fig5/kyoto/cond.jpg",
+                "caption": "",
+                "position": 487
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/fig5/kyoto/_0.50.jpg",
+                "caption": "",
+                "position": 488
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/fig5/kyoto/_0.75.jpg",
+                "caption": "",
+                "position": 489
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/fig5/kyoto/_1.00.jpg",
+                "caption": "",
+                "position": 490
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/x4.png",
+                "caption": "Figure 6.Color Control.We turn on the street lamp in the input image (top left) with different colors.Top row.artificial light blackbody temperatures.Bottom rowarbitrary non-natural RGB colors.",
+                "position": 515
+            }
+        ]
+    },
+    {
+        "header": "4.Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/desk_lamp/45_gt_off.jpg",
+                "caption": "Figure 7.Qualitative Comparison: The effect of adding synthetic data to the training dataset.LimeThe specular reflection of the screen is simulated only in the mixed model.RedThe mixed model generates a fine hard shadow for the cable which correlates with its shape and resemble ground truth.",
+                "position": 640
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/desk_lamp/45_synth_only_on.jpg",
+                "caption": "",
+                "position": 652
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/desk_lamp/45_real_only.jpg",
+                "caption": "",
+                "position": 654
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/desk_lamp/45_mixed.jpg",
+                "caption": "",
+                "position": 656
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/desk_lamp/45_gt_on.jpg",
+                "caption": "",
+                "position": 658
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/Figure10/paper_lamp/overlay.jpg",
+                "caption": "Figure 8.Qualitative Comparison.Comparison with other works on images from IIW dataset.Left.the input image wheregreen/redcontours specify which light source(s) should be turnedon/offrespectively. See Figures D.5, D.6 in the supplementary for more examples.",
+                "position": 733
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/Figure10/paper_lamp/omnigen.jpg",
+                "caption": "",
+                "position": 745
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/Figure10/paper_lamp/rgbx.jpg",
+                "caption": "",
+                "position": 746
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/Figure10/paper_lamp/scribble_light.jpg",
+                "caption": "",
+                "position": 747
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/Figure10/paper_lamp/ic_light.jpg",
+                "caption": "",
+                "position": 748
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/Figure10/paper_lamp/ours.jpg",
+                "caption": "",
+                "position": 749
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/Figure10/desk_lamp/overlay.jpg",
+                "caption": "",
+                "position": 752
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/Figure10/desk_lamp/omnigen.jpg",
+                "caption": "",
+                "position": 753
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/Figure10/desk_lamp/rgbx.jpg",
+                "caption": "",
+                "position": 754
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/Figure10/desk_lamp/scribble_light.jpg",
+                "caption": "",
+                "position": 755
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/Figure10/desk_lamp/ic_light.jpg",
+                "caption": "",
+                "position": 756
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/Figure10/desk_lamp/ours.jpg",
+                "caption": "",
+                "position": 757
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/qualitative_results/candles_input.jpg",
+                "caption": "(a)",
+                "position": 781
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/qualitative_results/candles_output.jpg",
+                "caption": "",
+                "position": 800
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/cat_paper_lantern/cond.png",
+                "caption": "",
+                "position": 806
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/cat_paper_lantern/result.png",
+                "caption": "",
+                "position": 812
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/qualitative_results/pans_input.jpg",
+                "caption": "",
+                "position": 818
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/qualitative_results/pans_result.png",
+                "caption": "",
+                "position": 824
+            }
+        ]
+    },
+    {
+        "header": "5.Applications",
+        "images": []
+    },
+    {
+        "header": "6.Limitations",
+        "images": []
+    },
+    {
+        "header": "7.Conclusion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.09608/x5.png",
+                "caption": "Figure 10.Additional results.. Our method can control a target light intensity (third row), light color (second row) and a scene’s ambient light (fourth row)and tone-mapping effects (fifth row)across diverse scenes and image styles.\nThe number above the results indicate the relative light intensity change used for the target light or ambient.\nSee the complete inputs used to generate results in the supplementary.",
+                "position": 908
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/x6.png",
+                "caption": "Figure 11.Virtual Point Lights.By using synthetic renderings of point lights without geometry we can insert an ”invisible” light source into the scene. On the left of each sequence is the input image, red ”X” marks the insertion point. Notice how the localization of the light source.",
+                "position": 914
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/x7.png",
+                "caption": "",
+                "position": 918
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/stop_motion/res/dog_cond_01.jpg",
+                "caption": "Figure 12.Physically Plausible Lighting.Top row.The input sequence was created by capturing photographs of aturned-off lamprotated around the polygon dog.Bottom rows.Inference results of our method,Orangea zoom-in on the dog.\nNote how self occlusions on the different faces, and dog’s shadow match the lamp’s position and angle.",
+                "position": 924
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/stop_motion/res/dog_cond_03.jpg",
+                "caption": "",
+                "position": 929
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/stop_motion/res/dog_04.jpg",
+                "caption": "",
+                "position": 931
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/stop_motion/res/dog_cond_06.jpg",
+                "caption": "",
+                "position": 933
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/stop_motion/res/dog_08.jpg",
+                "caption": "",
+                "position": 935
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/stop_motion/res/dog_cond_09.jpg",
+                "caption": "",
+                "position": 937
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/stop_motion/res/dog_cond_11.jpg",
+                "caption": "",
+                "position": 939
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AGenerating Data for Illumination Control",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/3d_scenes/living_room.jpg",
+                "caption": "Figure A.1.3D scenes.Indoor scene examples used to generate our synthetic dataset.",
+                "position": 1625
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/3d_scenes/office.jpg",
+                "caption": "",
+                "position": 1628
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/3d_scenes/kitchen.jpg",
+                "caption": "",
+                "position": 1630
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/3d_scenes/bar.jpg",
+                "caption": "",
+                "position": 1631
+            }
+        ]
+    },
+    {
+        "header": "Appendix BImage Based Relighting",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/post_example/ls_0_bg_1.jpg",
+                "caption": "Figure B.2.Post-process examples.A parametric sequence of images generated from a single raw photograph pair in the post-processing procedure in Section 3.2",
+                "position": 1674
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/post_example/ls_0.03_bg_1.jpg",
+                "caption": "",
+                "position": 1683
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/post_example/ls_0.07_bg_1.jpg",
+                "caption": "",
+                "position": 1684
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/post_example/ls_1_bg_1.jpg",
+                "caption": "",
+                "position": 1685
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/post_example/ls_0_bg_0.589.jpg",
+                "caption": "",
+                "position": 1689
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/post_example/ls_0.03_bg_0.589.jpg",
+                "caption": "",
+                "position": 1690
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/post_example/ls_0.07_bg_0.589.jpg",
+                "caption": "",
+                "position": 1691
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/post_example/ls_1_bg_0.589.jpg",
+                "caption": "",
+                "position": 1692
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/post_example/ls_0_bg_0.145.jpg",
+                "caption": "",
+                "position": 1696
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/post_example/ls_0.03_bg_0.145.jpg",
+                "caption": "",
+                "position": 1697
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/post_example/ls_0.07_bg_0.145.jpg",
+                "caption": "",
+                "position": 1698
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/post_example/ls_1_bg_0.145.jpg",
+                "caption": "",
+                "position": 1699
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/err_histograms_rcdf.png",
+                "caption": "Figure B.3.Calibration Errors.Error magnitudes in the target light residual𝐢change=𝐢on−𝐢offsubscript𝐢changesubscript𝐢onsubscript𝐢off\\mathbf{i}_{\\text{change}}=\\mathbf{i}_{\\text{on}}-\\mathbf{i}_{\\text{off}}bold_i start_POSTSUBSCRIPT change end_POSTSUBSCRIPT = bold_i start_POSTSUBSCRIPT on end_POSTSUBSCRIPT - bold_i start_POSTSUBSCRIPT off end_POSTSUBSCRIPTfor captured photograph pairs in our dataset.",
+                "position": 1716
+            }
+        ]
+    },
+    {
+        "header": "Appendix CLight Source Control with Diffusion Models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/dinining/180_gt_off.jpg",
+                "caption": "Figure D.4.Qualitative Comparison: the effect of adding synthetic data to the training dataset.\nWe compare the results of the models trained on a mixture of real and synthetic data, and only on real data. The condition image is displayed in column (d), and the ground truth target at column (a).OrangeNote how the model trained on both modalities more accurately predicts the complex shadows of the chair frame.LimeThe mixed model manages\nto recreate the ”X” shadowing pattern, created by the supper-position of the two ceiling lamps.Third rowThis type of light fixture is well represented in our synthetic dataset, producing accurate lighting and shadows. The model trained with captured data only doesn’t predict as well the light fixture type and position.BlueandRedshow two areas where shadows and specular reflections overlap.",
+                "position": 1835
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/dinining/180_synth_only_on.jpg",
+                "caption": "",
+                "position": 1847
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/dinining/180_real_only.jpg",
+                "caption": "",
+                "position": 1849
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/dinining/180_mixed.jpg",
+                "caption": "",
+                "position": 1851
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/dinining/180_gt_lit.jpg",
+                "caption": "",
+                "position": 1853
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/superpos/116_gt_off.jpg",
+                "caption": "",
+                "position": 1857
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/superpos/116_synth_only.jpg",
+                "caption": "",
+                "position": 1859
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/superpos/116_real_only.jpg",
+                "caption": "",
+                "position": 1861
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/superpos/116_mixed.jpg",
+                "caption": "",
+                "position": 1863
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/superpos/116_gt_lit.jpg",
+                "caption": "",
+                "position": 1865
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/bar/gt_dark.png",
+                "caption": "",
+                "position": 1869
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/bar/synth_only.png",
+                "caption": "",
+                "position": 1871
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/bar/real_only.png",
+                "caption": "",
+                "position": 1873
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/bar/mixed_upscaled.png",
+                "caption": "",
+                "position": 1875
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/modality_qualitative/bar/gt_on.png",
+                "caption": "",
+                "position": 1877
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/x8.png",
+                "caption": "Figure D.5.Qualitative Comparisons.Additional comparisons of binary light switch on indoor images from IIW dataset. On the left, the input image wheregreen/redcontours specify which light source(s) should be turnedon/offrespectively.The results were computed with the ”together” tone-mapping condition and without color conditioning.",
+                "position": 1906
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/x9.png",
+                "caption": "Figure D.6.Qualitative Comparisons.Additional comparisons of binary light switch on indoor images from IIW dataset. On the left, the input image wheregreen/redcontours specify which light source(s) should be turnedon/offrespectively.The results were computed with the ”together” tone-mapping condition and without color conditioning.",
+                "position": 1911
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/conds/adamsonj_2_14.jpg",
+                "caption": "Figure D.7.Results on Paired Captured Evaluation Dataset: A sample of inference results on the binary task, used in the quantitative ablation in Table 1 in the main paper.Light Intensity Mask.the target light intensity mask was scaled and translated from the range [-1,1] to the range [0,1] for display purposes. Gray pixels represent zeros, white represent 1 (turn light on) and black represent -1 (turn light off). The results were generated with the tone-map condition ”together”, with no ambient change (0 value) and without color conditions (0 values).",
+                "position": 1916
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/mask/adamsonj_2_14.jpg",
+                "caption": "",
+                "position": 1927
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/depth/adamsonj_2_14.jpg",
+                "caption": "",
+                "position": 1928
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/result/adamsonj_2_14.jpg",
+                "caption": "",
+                "position": 1929
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/target/adamsonj_2_14.jpg",
+                "caption": "",
+                "position": 1930
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/conds/s_31.jpg",
+                "caption": "",
+                "position": 1933
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/mask/s_31.png",
+                "caption": "",
+                "position": 1934
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/depth/s_31.png",
+                "caption": "",
+                "position": 1935
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/result/s_31.jpg",
+                "caption": "",
+                "position": 1936
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/target/s_31.jpg",
+                "caption": "",
+                "position": 1937
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/conds/gitarthag_29.jpg",
+                "caption": "",
+                "position": 1940
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/mask/gitarthag_29.jpg",
+                "caption": "",
+                "position": 1941
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/depth/gitarthag_29.jpg",
+                "caption": "",
+                "position": 1942
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/result/gitarthag_29.jpg",
+                "caption": "",
+                "position": 1943
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/target/gitarthag_29.jpg",
+                "caption": "",
+                "position": 1944
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/conds/pxl_13.jpg",
+                "caption": "",
+                "position": 1947
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/mask/pxl_13.png",
+                "caption": "",
+                "position": 1948
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/depth/pxl_13.png",
+                "caption": "",
+                "position": 1949
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/result/pxl_13.jpg",
+                "caption": "",
+                "position": 1950
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/target/pxl_13.jpg",
+                "caption": "",
+                "position": 1951
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/conds/ballesteros_28.jpg",
+                "caption": "",
+                "position": 1954
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/mask/ballesteros_28.jpg",
+                "caption": "",
+                "position": 1955
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/depth/ballesteros_28.jpg",
+                "caption": "",
+                "position": 1956
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/result/ballesteros_28.jpg",
+                "caption": "",
+                "position": 1957
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/target/ballesteros_28.jpg",
+                "caption": "",
+                "position": 1958
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/conds/bhshantanu_9.jpg",
+                "caption": "Figure D.8.Additional Results on Paired Captured Evaluation Dataset: A sample of inference results on the binary task, used in the quantitative ablation in Table 1 in the main paper.Light Intensity Mask.the target light intensity mask was scaled and translated from the range [-1,1] to the range [0,1] for display purposes. Gray pixels represent zeros, white represent 1 (turn light on) and black represent -1 (turn light off). The results were generated with the tone-map condition ”together”, with no ambient change (0 value) and without color conditions (0 values).",
+                "position": 1964
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/mask/bhshantanu_9.jpg",
+                "caption": "",
+                "position": 1975
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/depth/bhshantanu_9.jpg",
+                "caption": "",
+                "position": 1976
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/result/bhshantanu_9.jpg",
+                "caption": "",
+                "position": 1977
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/target/bhshantanu_9.jpg",
+                "caption": "",
+                "position": 1978
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/conds/n_44.jpg",
+                "caption": "",
+                "position": 1981
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/mask/n_44.png",
+                "caption": "",
+                "position": 1982
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/depth/n_44.png",
+                "caption": "",
+                "position": 1983
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/result/n_44.jpg",
+                "caption": "",
+                "position": 1984
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/target/n_44.jpg",
+                "caption": "",
+                "position": 1985
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/conds/s_2_79.jpg",
+                "caption": "",
+                "position": 1988
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/mask/s_2_79.png",
+                "caption": "",
+                "position": 1989
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/depth/s_2_79.png",
+                "caption": "",
+                "position": 1990
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/result/s_2_79.jpg",
+                "caption": "",
+                "position": 1991
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/target/s_2_79.jpg",
+                "caption": "",
+                "position": 1992
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/conds/s_2_45.jpg",
+                "caption": "",
+                "position": 1995
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/mask/s_2_45.jpg",
+                "caption": "",
+                "position": 1996
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/depth/s_2_45.png",
+                "caption": "",
+                "position": 1997
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/result/s_2_45.jpg",
+                "caption": "",
+                "position": 1998
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/target/s_2_45.jpg",
+                "caption": "",
+                "position": 1999
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/conds/gitarthag_2_0.jpg",
+                "caption": "",
+                "position": 2002
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/mask/gitarthag_2_0.jpg",
+                "caption": "",
+                "position": 2003
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/depth/gitarthag_2_0.png",
+                "caption": "",
+                "position": 2004
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/result/gitarthag_2_0.jpg",
+                "caption": "",
+                "position": 2005
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/eval_results/target/gitarthag_2_0.jpg",
+                "caption": "",
+                "position": 2006
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/snow_streetlamp/overlay.png",
+                "caption": "Figure D.9.Results on Outdoor Scenes: Input images show the contour of the target light source mask. Contour color represents the color condition given to the model.greencontours specify negative intensity changes (turning off a light).\nThe input images were selected to represent of different environmental lighting conditions and different outdoor light sources. The results were generated with the tone-map condition ”together”, with no ambient change (0 value).",
+                "position": 2024
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/snow_streetlamp/result.png",
+                "caption": "",
+                "position": 2034
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/alley_facade/overlay.png",
+                "caption": "",
+                "position": 2035
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/alley_facade/result.png",
+                "caption": "",
+                "position": 2036
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/bmw/overlay.png",
+                "caption": "",
+                "position": 2039
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/bmw/result.png",
+                "caption": "",
+                "position": 2040
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/cable_street_lamp/overlay.png",
+                "caption": "",
+                "position": 2041
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/cable_street_lamp/result.png",
+                "caption": "",
+                "position": 2042
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/venice/overlay.png",
+                "caption": "",
+                "position": 2045
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/venice/result.png",
+                "caption": "",
+                "position": 2046
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/snowy_road/overlay.png",
+                "caption": "",
+                "position": 2047
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/snowy_road/result.png",
+                "caption": "",
+                "position": 2048
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/statue_spot/overlay.png",
+                "caption": "",
+                "position": 2051
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/statue_spot/result.png",
+                "caption": "",
+                "position": 2052
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/night_walk/overlay.png",
+                "caption": "",
+                "position": 2053
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/outdoor/night_walk/result.png",
+                "caption": "",
+                "position": 2054
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/park_sign/overlay.png",
+                "caption": "Figure D.10.Effect of Tone-Mapping Condition: The first row demonstrates gradual dimming of a colored neon light, which is not represented in the training dataset. Note how red light reflected from the adjacent brick-wall is being dimmed as-well. This figure also shows inaccuracies of the model, where red light on the lower section of the wall should not be removed.Bottom Rows.The bottom row shows that the model can extrapolate to intensity change values outside of the interval [-1,1].\nThe results were generated with the tone-map condition ”together”.",
+                "position": 2061
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/park_sign/2.png",
+                "caption": "",
+                "position": 2071
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/park_sign/3.png",
+                "caption": "",
+                "position": 2072
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/park_sign/4.png",
+                "caption": "",
+                "position": 2073
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/living_room/overlay.png",
+                "caption": "",
+                "position": 2082
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/living_room/001.jpg",
+                "caption": "",
+                "position": 2083
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/living_room/002.jpg",
+                "caption": "",
+                "position": 2084
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/living_room/003.jpg",
+                "caption": "",
+                "position": 2085
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/living_room/004.jpg",
+                "caption": "",
+                "position": 2094
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/living_room/005.jpg",
+                "caption": "",
+                "position": 2095
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/living_room/006.jpg",
+                "caption": "",
+                "position": 2096
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity/living_room/007.jpg",
+                "caption": "",
+                "position": 2097
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/thor-alvis-U7eE_LuHpvg-unsplash/thor-alvis-U7eE_LuHpvg-unsplash_cropped.png",
+                "caption": "Figure D.11.Additional Ambient Light Intensity Results: We show ambient light edits in indoor and outdoor scenes.\nIn all the above images the tone-mapping condition was set to ”together”.Fourth row.our method successfully disentangles daylight entering the room through windows from direct illumination emanating from the lamp.Second row.When turning ambient light completely off the sky becomes too dark and no night sky illuminated is generated, this is a limitation arising from not using image pairs where ambient illumination changes, and from indoor bias in the training datasets.\nThe results were generated with the tone-mapping condition ”together”.",
+                "position": 2104
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/thor-alvis-U7eE_LuHpvg-unsplash/0.3.png",
+                "caption": "",
+                "position": 2114
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/thor-alvis-U7eE_LuHpvg-unsplash/0.6.png",
+                "caption": "",
+                "position": 2115
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/thor-alvis-U7eE_LuHpvg-unsplash/1.0.png",
+                "caption": "",
+                "position": 2116
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/naveed-janmohamed-c7hJnphDbuw-unsplash/naveed-janmohamed-c7hJnphDbuw-unsplash_cropped.png",
+                "caption": "",
+                "position": 2125
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/naveed-janmohamed-c7hJnphDbuw-unsplash/0.4.png",
+                "caption": "",
+                "position": 2126
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/naveed-janmohamed-c7hJnphDbuw-unsplash/0.6.png",
+                "caption": "",
+                "position": 2127
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/naveed-janmohamed-c7hJnphDbuw-unsplash/1.0.png",
+                "caption": "",
+                "position": 2128
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/eddie-carolina-stigson-LPWIw9YMl-o-unsplash/eddie-carolina-stigson-LPWIw9YMl-o-unsplash_cropped.png",
+                "caption": "",
+                "position": 2137
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/eddie-carolina-stigson-LPWIw9YMl-o-unsplash/0.3.png",
+                "caption": "",
+                "position": 2138
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/eddie-carolina-stigson-LPWIw9YMl-o-unsplash/0.6.png",
+                "caption": "",
+                "position": 2139
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/eddie-carolina-stigson-LPWIw9YMl-o-unsplash/1.0.png",
+                "caption": "",
+                "position": 2140
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/lotus-design-n-print-0sDzRgrN_pI-unsplash/lotus-design-n-print-0sDzRgrN_pI-unsplash_cropped.png",
+                "caption": "",
+                "position": 2149
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/lotus-design-n-print-0sDzRgrN_pI-unsplash/0.3.png",
+                "caption": "",
+                "position": 2150
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/lotus-design-n-print-0sDzRgrN_pI-unsplash/0.6.png",
+                "caption": "",
+                "position": 2151
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/ambient/lotus-design-n-print-0sDzRgrN_pI-unsplash/1.0.png",
+                "caption": "",
+                "position": 2152
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity_tonemap_control/avechenri-NmqPnM4HJEc-unsplash/cond.png",
+                "caption": "Figure D.12.Effect of Tone-Mapping Condition on Sequences.This figure demonstrates the learned effect of the tone-mapping condition at inference time. It is complementary to Figure 4 in the main paper which shows the application of the two tone-mapping strategies on training data.\nNote that the learned tone-mapping control is not completely not disentangled, which could be seen by the perceptible variance in light intensity for the ”separate” condition.First and third rows.the sequences tone-mapped separately.Second and fourth rows.the sequences tone-mapped together.",
+                "position": 2162
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity_tonemap_control/avechenri-NmqPnM4HJEc-unsplash/seperate/0.33.png",
+                "caption": "",
+                "position": 2174
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity_tonemap_control/avechenri-NmqPnM4HJEc-unsplash/seperate/0.67.png",
+                "caption": "",
+                "position": 2175
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity_tonemap_control/avechenri-NmqPnM4HJEc-unsplash/seperate/1.00.png",
+                "caption": "",
+                "position": 2176
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity_tonemap_control/avechenri-NmqPnM4HJEc-unsplash/together/0.33.png",
+                "caption": "",
+                "position": 2182
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity_tonemap_control/avechenri-NmqPnM4HJEc-unsplash/together/0.67.png",
+                "caption": "",
+                "position": 2183
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity_tonemap_control/avechenri-NmqPnM4HJEc-unsplash/together/1.00.png",
+                "caption": "",
+                "position": 2184
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity_tonemap_control/agata-ciosek-ffWlui8hytA-unsplash_intensity/cond.png",
+                "caption": "",
+                "position": 2188
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity_tonemap_control/agata-ciosek-ffWlui8hytA-unsplash_intensity/seperate/0.33.png",
+                "caption": "",
+                "position": 2190
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity_tonemap_control/agata-ciosek-ffWlui8hytA-unsplash_intensity/seperate/0.67.png",
+                "caption": "",
+                "position": 2191
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity_tonemap_control/agata-ciosek-ffWlui8hytA-unsplash_intensity/seperate/1.00.png",
+                "caption": "",
+                "position": 2192
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity_tonemap_control/agata-ciosek-ffWlui8hytA-unsplash_intensity/together/0.33.png",
+                "caption": "",
+                "position": 2198
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity_tonemap_control/agata-ciosek-ffWlui8hytA-unsplash_intensity/together/0.67.png",
+                "caption": "",
+                "position": 2199
+            },
+            {
+                "img": "https://arxiv.org/html/2505.09608/extracted/6428811/assets/images/intensity_tonemap_control/agata-ciosek-ffWlui8hytA-unsplash_intensity/together/1.00.png",
+                "caption": "",
+                "position": 2200
+            }
+        ]
+    },
+    {
+        "header": "Appendix DExperiments",
+        "images": []
+    }
+]
