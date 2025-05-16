@@ -1,0 +1,79 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.10566/x1.png",
+                "caption": "Figure 1.3D-aware photo editing. Given a source image with user-specified 3D transformations, our model generates a new image that follows the user’s edit while preserving the input identity. The 3D edit is visualized via the transformation between the original mesh (pink) and the edited mesh (cyan).",
+                "position": 135
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": []
+    },
+    {
+        "header": "2.Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.10566/x2.png",
+                "caption": "Figure 2.Inference pipeline.We assume editing instructions (possibly converted from text prompts) are in the form of 3D operations like rotation and translation. Given a mask indicating the object to be edited, we first perform image-to-3D(Xu et al.,2024)to reconstruct the mesh. We then apply the user’s desired 3D edit to obtain the 3D guidance. Here the 3D edit is visualized as the transformation between original mesh (pink wire-frame) and the edited mesh (cyan wire-frame). Finally, the model outputs the 3D aware editing result.",
+                "position": 195
+            },
+            {
+                "img": "https://arxiv.org/html/2505.10566/x3.png",
+                "caption": "Figure 3.Data pipeline: Overview.Given a video, we sample two frames, the source frameIsrcsubscript𝐼srcI_{\\mathrm{src}}italic_I start_POSTSUBSCRIPT roman_src end_POSTSUBSCRIPTand the target frameItgtsubscript𝐼tgtI_{\\mathrm{tgt}}italic_I start_POSTSUBSCRIPT roman_tgt end_POSTSUBSCRIPT, using optical flow as a cue: we discard videos where the flow indicates little motion through the entire clip. Using Image-to-3D methods, we reconstruct a mesh for the desired object for both frames. We then estimate the 3D transformation𝐓𝐓\\mathbf{T}bold_T(see Figure4) between the source frame mesh and the target frame mesh. Availability of the transformation𝐓𝐓\\mathbf{T}bold_Tenables two ways\nto create the training data: (1) in “Transform Source”, we paste the rendering of the transformed source mesh onto the target frame; (2) in “Transform Target”, we paste the rendering of the target mesh onto the source frame. Data examples are shown in Figure5.",
+                "position": 200
+            },
+            {
+                "img": "https://arxiv.org/html/2505.10566/x4.png",
+                "caption": "Figure 4.Data pipeline: Estimation of the 3D transformation𝐓𝐓\\mathbf{T}bold_T.We estimate the 3D transformation𝐓𝐓\\mathbf{T}bold_Tby leveraging correspondences between the source frame and the target frame. Given frames between the source frame and the target frame, we first perform tracking to obtain corresponding points. We then initialize the parameters for the 3D transformation𝐓𝐓\\mathbf{T}bold_Tand use an optimization to improve𝐓𝐓\\mathbf{T}bold_T: (1) We unproject the 2D correspondences on the source frame to 3D pointclouds and apply the current𝐓𝐓\\mathbf{T}bold_Tto transform points to the target image; (2) we project points back to 2D and compare via an L2 loss with the 2D correspondences of the target frame.",
+                "position": 206
+            },
+            {
+                "img": "https://arxiv.org/html/2505.10566/x5.png",
+                "caption": "Figure 5.Examples of the training data.Given a video, we use the steps described in Figure3to obtain the training data, i.e., the source imageIsrcsubscript𝐼srcI_{\\mathrm{src}}italic_I start_POSTSUBSCRIPT roman_src end_POSTSUBSCRIPTand the target imageItgtsubscript𝐼tgtI_{\\mathrm{tgt}}italic_I start_POSTSUBSCRIPT roman_tgt end_POSTSUBSCRIPT. The guidance image is obtained via the developed data pipeline. The mask has three values: 0 indicates the hole created by the coarse edit and the model needs to inpaint by looking at the details of the reference; 0.5 refers to the rendering of the object; and 1.0 denotes the original background.",
+                "position": 210
+            },
+            {
+                "img": "https://arxiv.org/html/2505.10566/x6.png",
+                "caption": "Figure 6.Overview of the training pipeline. We develop a conditional diffusion model for 3D-aware image editing. It consists of two networks:fgensubscript𝑓genf_{\\mathrm{gen}}italic_f start_POSTSUBSCRIPT roman_gen end_POSTSUBSCRIPTandfdetailsubscript𝑓detailf_{\\mathrm{detail}}italic_f start_POSTSUBSCRIPT roman_detail end_POSTSUBSCRIPT. During training, given the inputs—target frameItgtsubscript𝐼tgtI_{\\mathrm{tgt}}italic_I start_POSTSUBSCRIPT roman_tgt end_POSTSUBSCRIPT, 3D guidanceIguidesubscript𝐼guideI_{\\mathrm{guide}}italic_I start_POSTSUBSCRIPT roman_guide end_POSTSUBSCRIPT, maskMguidesubscript𝑀guideM_{\\mathrm{guide}}italic_M start_POSTSUBSCRIPT roman_guide end_POSTSUBSCRIPT, and detail featureFtsubscript𝐹𝑡F_{t}italic_F start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT—fgensubscript𝑓genf_{\\mathrm{gen}}italic_f start_POSTSUBSCRIPT roman_gen end_POSTSUBSCRIPTlearns the reverse diffusion process to predict the noiseϵitalic-ϵ\\epsilonitalic_ϵand reconstructItgtsubscript𝐼tgtI_{\\mathrm{tgt}}italic_I start_POSTSUBSCRIPT roman_tgt end_POSTSUBSCRIPT. To better preserve identity and fine-grained details from the source imageIsrcsubscript𝐼srcI_{\\mathrm{src}}italic_I start_POSTSUBSCRIPT roman_src end_POSTSUBSCRIPT,fdetailsubscript𝑓detailf_{\\mathrm{detail}}italic_f start_POSTSUBSCRIPT roman_detail end_POSTSUBSCRIPTtakes as input the source imageIsrcsubscript𝐼srcI_{\\mathrm{src}}italic_I start_POSTSUBSCRIPT roman_src end_POSTSUBSCRIPT, its noisy counterpartItsubscript𝐼𝑡I_{t}italic_I start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT, and the maskMguidesubscript𝑀guideM_{\\mathrm{guide}}italic_M start_POSTSUBSCRIPT roman_guide end_POSTSUBSCRIPT, and extracts detail featuresFtsubscript𝐹𝑡F_{t}italic_F start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT. We apply cross-attention betweenFtsubscript𝐹𝑡F_{t}italic_F start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPTand the intermediate features offgensubscript𝑓genf_{\\mathrm{gen}}italic_f start_POSTSUBSCRIPT roman_gen end_POSTSUBSCRIPTto incorporate content and details fromIsrcsubscript𝐼srcI_{\\mathrm{src}}italic_I start_POSTSUBSCRIPT roman_src end_POSTSUBSCRIPTduring the reverse diffusion process.",
+                "position": 216
+            }
+        ]
+    },
+    {
+        "header": "3.Approach",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.10566/x7.png",
+                "caption": "Figure 7.Comparison with baselines.We compare several state of the art baselines with different kinds of conditions, such as 3D transforms, drags, inpainting masks, and text prompts. We can see that none of the baselines accurately follow the target 3D transform while preserving identity. Baselines that directly use 3D transforms suffer from a lack of good training data, and using other types of conditions makes it hard to unambiguously specify the 3D transform.",
+                "position": 459
+            }
+        ]
+    },
+    {
+        "header": "4.Experiments",
+        "images": []
+    },
+    {
+        "header": "5.Conclusion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.10566/x8.png",
+                "caption": "Figure 8.3D editing with continuous rotations.We demonstrate that the proposed method can handle extensive 3D edits on common objects. In each scenario, we progressively increase the rotation from 0 to 180 degrees along the y-axis, applying it to the reconstructed mesh to generate the 3D-transformation-based image guidance. The results show that our method can handle large out-of-plane 3D rotations during editing.",
+                "position": 1157
+            },
+            {
+                "img": "https://arxiv.org/html/2505.10566/x9.png",
+                "caption": "Figure 9.Comparison with Magic Fixup.The results demonstrate that the proposed method achieves more realistic outputs by leveraging the 3D-transformation-based guidance. For instance, our method effectively handles pose changes, such as adjusting the camera’s viewing direction for the cakes and jaguar, or modifying the poses of the horse and parrot.",
+                "position": 1162
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
