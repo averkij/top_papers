@@ -1,0 +1,848 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/desserts_ours.png",
+                "caption": "Figure 1.We present a method that incorporates instance-level instructions in image generation, capable of adhering to prompts with variousobject counts (■■\\blacksquare■),instance-level attributes (■■\\blacksquare■),\nandspatial relations (■■\\blacksquare■).\nAbove we compare with several recent diffusion models (Emu(Dai et al.,2023), Flux(Labs,2023), SDXL(Podell et al.,2023)), as well as prior techniques that use bounding boxes to guide the generation (Bounded Attention(Dahary et al.,2025), Attention Refocusing(Phung et al.,2024)). Filled squares represent adherence to the prompt, and empty squares represent a mismatch with the prompt.",
+                "position": 152
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/desserts_emu.png",
+                "caption": "",
+                "position": 167
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/desserts_flux.png",
+                "caption": "",
+                "position": 171
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/desserts_sdxl.png",
+                "caption": "",
+                "position": 175
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/desserts_bounded.png",
+                "caption": "",
+                "position": 179
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/desserts_ar.png",
+                "caption": "",
+                "position": 183
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/costumes_ours.png",
+                "caption": "",
+                "position": 192
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/costumes_emu.png",
+                "caption": "",
+                "position": 196
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/costumes_flux.png",
+                "caption": "",
+                "position": 200
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/costumes_sdxl.png",
+                "caption": "",
+                "position": 204
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/costumes_bounded.png",
+                "caption": "",
+                "position": 208
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/costumes_ar.png",
+                "caption": "",
+                "position": 212
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/fish_ours.png",
+                "caption": "",
+                "position": 219
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/fish_emu.png",
+                "caption": "",
+                "position": 223
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/fish_flux.png",
+                "caption": "",
+                "position": 227
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/fish_sdxl.png",
+                "caption": "",
+                "position": 231
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/fish_bounded.png",
+                "caption": "",
+                "position": 235
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/teaser/teaser_images/fish_ar.png",
+                "caption": "",
+                "position": 239
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/method/method2.png",
+                "caption": "Figure 2.Method Overview.Given a text prompt (possibly) containingobject counts,instance-level attributes,\nandspatial relations, our approach combines image-based and text-based components (visualized in pink and blue boxes above) for generating an output image (illustrated on the right). We first generate an initial image using a pretrained text-to-image diffusion model. Given the image and attention information from the initial diffusion process, we extract an instance segmentation layout, and assign object and instance-level instructions using an LLM. We then use the layout and instructions, as well as the initial image’s latents, to incur losses, mask the attention, and optimize the latent in the assignment conditioned image generation stage which produces the output image. Note that for simplicity attention masking is not displayed in the figure.",
+                "position": 308
+            }
+        ]
+    },
+    {
+        "header": "2.Related Works",
+        "images": []
+    },
+    {
+        "header": "3.Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/figures/layout_figure/initial_fruits.png",
+                "caption": "Figure 3.Instance Layout Generation.(a) The initial image generated by a pretrained text-to-image model. (b) The aggregated cross attention for all foreground words, with anchor points marked by green dots. (c) Initial segmentation after discarding segments without anchor points. (d) Final segmentation after adding segments for each unassigned anchor point.",
+                "position": 388
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/figures/layout_figure/foregroud_attn_with_maximas_fruits.png",
+                "caption": "",
+                "position": 392
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/figures/layout_figure/clustermap_rcnn_fruits.png",
+                "caption": "",
+                "position": 393
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/figures/layout_figure/cluster_map_post_sam_fruits.png",
+                "caption": "",
+                "position": 394
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/figures/layout_figure/initial_image_egg.png",
+                "caption": "",
+                "position": 397
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/figures/layout_figure/foregroud_attn_with_maximas_eggs.png",
+                "caption": "",
+                "position": 398
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/figures/layout_figure/clustermap_rcnn_eggs.png",
+                "caption": "",
+                "position": 399
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/figures/layout_figure/cluster_map_post_sam_eggs.png",
+                "caption": "",
+                "position": 400
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/method/prompt_figure_2.png",
+                "caption": "Figure 4.Instance assignment inputs.The input given to the LLM for instance assignment contains in-context examples, the parsed prompt, and the visual layout of each segment.",
+                "position": 450
+            }
+        ]
+    },
+    {
+        "header": "4.Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/42_a_photo_of_a_man_and_a_woman_having_a_picnic_with_their_two_dogs_ours.png",
+                "caption": "Figure 5.Qualitative results from theCompoundPromptsbenchmark.We present results for two unique prompts from theCompoundPromptsbenchmark, presenting results for all three tiers (A, B and C) for each prompt.",
+                "position": 818
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/42_a_photo_of_a_man_and_a_woman_having_a_picnic_with_their_two_dogs_emu.png",
+                "caption": "",
+                "position": 825
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/42_a_photo_of_a_man_and_a_woman_having_a_picnic_with_their_two_dogs_bounded.png",
+                "caption": "",
+                "position": 828
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/42_a_photo_of_a_man_and_a_woman_having_a_picnic_with_their_two_dogs_reason.png",
+                "caption": "",
+                "position": 831
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/42_a_photo_of_a_man_and_a_woman_having_a_picnic_with_their_two_dogs_sdxl.png",
+                "caption": "",
+                "position": 834
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/43_a_photo_of_a_man_and_a_woman_having_a_picnic_with_their_two_dogs_one_of_the_dogs_is_a_golden_retriever_ours.png",
+                "caption": "",
+                "position": 839
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/43_a_photo_of_a_man_and_a_woman_having_a_picnic_with_their_two_dogs_one_of_the_dogs_is_a_golden_retriever_emu.png",
+                "caption": "",
+                "position": 842
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/43_a_photo_of_a_man_and_a_woman_having_a_picnic_with_their_two_dogs_one_of_the_dogs_is_a_golden_retriever_bounded.png",
+                "caption": "",
+                "position": 845
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/43_a_photo_of_a_man_and_a_woman_having_a_picnic_with_their_two_dogs_one_of_the_dogs_is_a_golden_retriever_reason.png",
+                "caption": "",
+                "position": 848
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/43_a_photo_of_a_man_and_a_woman_having_a_picnic_with_their_two_dogs_one_of_the_dogs_is_a_golden_retriever_sdxl.png",
+                "caption": "",
+                "position": 851
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/44_a_photo_of_a_man_and_a_woman_having_a_picnic_with_their_two_dogs_the_dog_sitting_between_the_man_and_the_woman_is_a_golden_retreiver_ours.png",
+                "caption": "",
+                "position": 856
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/44_a_photo_of_a_man_and_a_woman_having_a_picnic_with_their_two_dogs_the_dog_sitting_between_the_man_and_the_woman_is_a_golden_retreiver_emu.png",
+                "caption": "",
+                "position": 859
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/44_a_photo_of_a_man_and_a_woman_having_a_picnic_with_their_two_dogs_the_dog_sitting_between_the_man_and_the_woman_is_a_golden_retreiver_bounded.png",
+                "caption": "",
+                "position": 862
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/44_a_photo_of_a_man_and_a_woman_having_a_picnic_with_their_two_dogs_the_dog_sitting_between_the_man_and_the_woman_is_a_golden_retreiver_reason.png",
+                "caption": "",
+                "position": 865
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/44_a_photo_of_a_man_and_a_woman_having_a_picnic_with_their_two_dogs_the_dog_sitting_between_the_man_and_the_woman_is_a_golden_retreiver_sdxl.png",
+                "caption": "",
+                "position": 868
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/57_a_photo_of_five_donuts_in_a_box_on_a_kitchen_counter_ours.png",
+                "caption": "",
+                "position": 873
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/57_a_photo_of_five_donuts_in_a_box_on_a_kitchen_counter_emu.png",
+                "caption": "",
+                "position": 876
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/57_a_photo_of_five_donuts_in_a_box_on_a_kitchen_counter_bounded.png",
+                "caption": "",
+                "position": 879
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/57_a_photo_of_five_donuts_in_a_box_on_a_kitchen_counter_reason.png",
+                "caption": "",
+                "position": 882
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/57_a_photo_of_five_donuts_in_a_box_on_a_kitchen_counter_sdxl.png",
+                "caption": "",
+                "position": 885
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/58_ours.png",
+                "caption": "",
+                "position": 890
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/58_emu.png",
+                "caption": "",
+                "position": 893
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/58_a_photo_of_five_donuts_in_a_box_on_a_kitchen_counter_two_of_them_have_a_chocolate_glazing_the_other_three_are_plain_bounded.png",
+                "caption": "",
+                "position": 896
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/58_a_photo_of_five_donuts_in_a_box_on_a_kitchen_counter_two_of_them_have_a_chocolate_glazing_the_other_three_are_plain_reason.png",
+                "caption": "",
+                "position": 899
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/58_a_photo_of_five_donuts_in_a_box_on_a_kitchen_counter_two_of_them_have_a_chocolate_glazing_the_other_three_are_plain_sdxl.png",
+                "caption": "",
+                "position": 902
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/59_a_photo_of_five_donuts_in_a_box_on_a_kitchen_counter_the_donuts_glazed_the_rest_are_plain_ours.png",
+                "caption": "",
+                "position": 907
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/59_a_photo_of_five_donuts_in_a_box_on_a_kitchen_counter_the_donuts_the_rest_are_plain_emu.png",
+                "caption": "",
+                "position": 911
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/59_a_photo_of_five_donuts_in_a_box_on_a_kitchen_counter_the_donuts_the_rest_are_plain_bounded.png",
+                "caption": "",
+                "position": 915
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/59_a_photo_of_five_donuts_in_a_box_on_a_kitchen_counter_the_glazed_the_rest_are_plain_reason.png",
+                "caption": "",
+                "position": 919
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/baseline_comparison/59_a_photo_of_five_donuts_in_a_box_on_a_kitchen_counter_the_donuts_glazed_the_rest_are_plain_sdxl.png",
+                "caption": "",
+                "position": 923
+            }
+        ]
+    },
+    {
+        "header": "5.Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/a_ours.png",
+                "caption": "Figure 6.Extended qualitative comparison.Additional results for prompts sampled fromCompoundPrompts, along with VQA Acc. metric evaluation. For each tier, we consider an imagecorrect(✓✓\\color[rgb]{0,1,0}{\\checkmark}✓) if it receives positive answers from an MLLM (GPT4o) when prompted with all questions below its tier.\nWe compare with Emu(Dai et al.,2023), Flux1-dev(Labs,2023), SDXL(Podell et al.,2023), Bounded Attention (BA)(Dahary et al.,2025), Attention Refocusing (GLIGEN + AR)(Phung et al.,2024), and Reason Your Layout (RYL)(Chen et al.,2023).",
+                "position": 1550
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/a_emu.png",
+                "caption": "",
+                "position": 1570
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/a_flux.png",
+                "caption": "",
+                "position": 1575
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/a_sdxl.png",
+                "caption": "",
+                "position": 1580
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/a_bounded.png",
+                "caption": "",
+                "position": 1585
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/a_ar.png",
+                "caption": "",
+                "position": 1590
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/a_countgen.png",
+                "caption": "",
+                "position": 1595
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/a_reason.png",
+                "caption": "",
+                "position": 1600
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/final_image_meerkats_us_b.png",
+                "caption": "",
+                "position": 1616
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/initial_image_meerkats_emu_b.png",
+                "caption": "",
+                "position": 1621
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/100_six_meerkats_standing_watch_in_the_savannah_only_one_of_them_is_yawning_flux.png",
+                "caption": "",
+                "position": 1626
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/100_six_meerkats_standing_watch_in_the_savannah_only_one_of_them_is_yawning_sdxl.png",
+                "caption": "",
+                "position": 1631
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/100_six_meerkats_standing_watch_in_the_savannah_only_one_of_them_is_yawning_bounded.png",
+                "caption": "",
+                "position": 1636
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/100_0_six_meerkats_standing_watch_in_the_savannah_only_one_of_them_is_yawning.png",
+                "caption": "",
+                "position": 1641
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/100_six_meerkats_standing_watch_in_the_savannah_only_one_of_them_is_yawning_countgen.png",
+                "caption": "",
+                "position": 1646
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/100_six_meerkats_standing_watch_in_the_savannah_only_one_of_them_is_yawning_reason.png",
+                "caption": "",
+                "position": 1651
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/meerkats_us_c.png",
+                "caption": "",
+                "position": 1667
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/meerkats_emu_c.png",
+                "caption": "",
+                "position": 1672
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/101_six_meerkats_standing_watch_in_the_savannah_only_the_second_meerkat_from_the_right_is_yawning_flux.png",
+                "caption": "",
+                "position": 1677
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/101_six_meerkats_standing_watch_in_the_savannah_only_the_second_meerkat_from_the_right_is_yawning_sdxl.png",
+                "caption": "",
+                "position": 1682
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/101_six_meerkats_standing_watch_in_the_savannah_only_the_second_meerkat_from_the_right_is_yawning_bounded.png",
+                "caption": "",
+                "position": 1687
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/101_0_six_meerkats_standing_watch_in_the_savannah_only_the_second_meerkat_from_the_right_is_yawning.png",
+                "caption": "",
+                "position": 1692
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/101_six_meerkats_standing_watch_in_the_savannah_only_the_second_meerkat_from_the_right_is_yawning_countgen.png",
+                "caption": "",
+                "position": 1697
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/101_six_meerkats_standing_watch_in_the_savannah_only_the_second_meerkat_from_the_right_is_yawning_reason.png",
+                "caption": "",
+                "position": 1702
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/66_three_dogs_and_a_cat_in_a_backyard_ours.png",
+                "caption": "",
+                "position": 1718
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/66_three_dogs_and_a_cat_in_a_backyard_emu.png",
+                "caption": "",
+                "position": 1723
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/66_three_dogs_and_a_cat_in_a_backyard_flux.png",
+                "caption": "",
+                "position": 1728
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/66_three_dogs_and_a_cat_in_a_backyard_sdxl.png",
+                "caption": "",
+                "position": 1733
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/66_three_dogs_and_a_cat_in_a_backyard_bounded.png",
+                "caption": "",
+                "position": 1738
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/66_0_three_dogs_and_a_cat_in_a_backyard.png",
+                "caption": "",
+                "position": 1743
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/66_three_dogs_and_a_cat_in_a_backyard_countgen.png",
+                "caption": "",
+                "position": 1748
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/66_three_dogs_and_a_cat_in_a_backyard_reason.png",
+                "caption": "",
+                "position": 1753
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/67_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_the_cat_is_a_siamese_ours.png",
+                "caption": "",
+                "position": 1769
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/67_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_the_cat_is_a_siamese_emu.png",
+                "caption": "",
+                "position": 1774
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/67_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_the_cat_is_a_siamese_flux.png",
+                "caption": "",
+                "position": 1779
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/67_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_the_cat_is_a_siamese_sdxl.png",
+                "caption": "",
+                "position": 1784
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/67_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_the_cat_is_a_siamese_bounded.png",
+                "caption": "",
+                "position": 1789
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/67_0_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_the_cat_is_a_siamese.png",
+                "caption": "",
+                "position": 1794
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/67_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_the_cat_is_a_siamese_countgen.png",
+                "caption": "",
+                "position": 1799
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/67_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_the_cat_is_a_siamese_reason.png",
+                "caption": "",
+                "position": 1804
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/68_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_and_is_on_the_far_right_the_cat_is_on_the_far_left_and_is_a_siamese_ours.png",
+                "caption": "",
+                "position": 1820
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/68_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_and_is_on_the_far_right_the_cat_is_on_the_far_left_and_is_a_siamese_emu.png",
+                "caption": "",
+                "position": 1825
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/68_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_and_is_on_the_far_right_the_cat_is_on_the_far_left_and_is_a_siamese_flux.png",
+                "caption": "",
+                "position": 1830
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/68_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_and_is_on_the_far_right_the_cat_is_on_the_far_left_and_is_a_siamese_sdxl.png",
+                "caption": "",
+                "position": 1835
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/68_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_and_is_on_the_far_right_the_cat_is_on_the_far_left_and_is_a_siamese_bounded.png",
+                "caption": "",
+                "position": 1840
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/68_0_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_and_is_on_the_far_right_the_cat_is_on_the_far_left_and_is_a_siamese.png",
+                "caption": "",
+                "position": 1845
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/68_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_and_is_on_the_far_right_the_cat_is_on_the_far_left_and_is_a_siamese_countgen.png",
+                "caption": "",
+                "position": 1850
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/extended_comparison/68_three_dogs_and_a_cat_in_a_backyard_one_dog_is_a_schnauzer_and_is_on_the_far_right_the_cat_is_on_the_far_left_and_is_a_siamese_reason.png",
+                "caption": "",
+                "position": 1855
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/initial_image_superheros.png",
+                "caption": "Figure 7.Assorted Tier C prompt results:Initial Images shown here are post our robust initialization stage.",
+                "position": 1893
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/layout_w_decisions_superheros.png",
+                "caption": "",
+                "position": 1908
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/final_image_superheros.png",
+                "caption": "",
+                "position": 1909
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/initial_image_dogbeach.png",
+                "caption": "",
+                "position": 1911
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/layout_w_decisions_dogbeach.png",
+                "caption": "",
+                "position": 1912
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/final_image_dogbeach.png",
+                "caption": "",
+                "position": 1913
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/initial_image_ppl_bikes.png",
+                "caption": "",
+                "position": 1941
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/layout_w_decisions_pplbikes.png",
+                "caption": "",
+                "position": 1942
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/final_image_pplbikes.png",
+                "caption": "",
+                "position": 1943
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/initial_image_post_seed_search.png",
+                "caption": "",
+                "position": 1945
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/layout_w_decisions_birds.png",
+                "caption": "",
+                "position": 1946
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/final_image.png",
+                "caption": "",
+                "position": 1947
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/initial_image_pillows2.png",
+                "caption": "",
+                "position": 1971
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/layout_w_decisions_pillows2.png",
+                "caption": "",
+                "position": 1972
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/final_image_pillows2.png",
+                "caption": "",
+                "position": 1973
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/4_two_guitars_and_a_saxophone_at_a_music_store_one_guitar_is_a_white_Fender_Stratocaster_the_other_is_rickenbacker_bass_emu.png",
+                "caption": "",
+                "position": 1975
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/layout_w_decisions_guitars.png",
+                "caption": "",
+                "position": 1976
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/4_two_guitars_and_a_saxophone_at_a_music_store_one_guitar_is_a_white_Fender_Stratocaster_the_other_is_rickenbacker_bass_ours.png",
+                "caption": "",
+                "position": 1977
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/initial_image_beer.png",
+                "caption": "",
+                "position": 1999
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/layout_w_decisions_beer.png",
+                "caption": "",
+                "position": 2000
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/final_image_beer.png",
+                "caption": "",
+                "position": 2001
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/initial_image_post_seed_search_crayons.png",
+                "caption": "",
+                "position": 2003
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/layout_w_decisions_crayons.png",
+                "caption": "",
+                "position": 2004
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/final_image_crayons.png",
+                "caption": "",
+                "position": 2005
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/initial_image_ballet.png",
+                "caption": "",
+                "position": 2029
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/layout_w_decisions_ballet.png",
+                "caption": "",
+                "position": 2030
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/final_image_ballet.png",
+                "caption": "",
+                "position": 2031
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/initial_image_squirrel3.png",
+                "caption": "",
+                "position": 2033
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/layout_w_decisions_squirrel3.png",
+                "caption": "",
+                "position": 2034
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/result_gallery/final_image_squirrel3.png",
+                "caption": "",
+                "position": 2035
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAdditional Results and Information",
+        "images": []
+    },
+    {
+        "header": "Appendix BTechnical Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/ablations/17_two_eclaires_and_one_piece_of_cake_on_it_the_muffin_in_the_top_left_corner_is_blueberry_the_other_muffins_are_chocolate_ours.png",
+                "caption": "Figure 8.Qualitative ablations.We present compare results produced by our method when ablating three different components: cross attention losses (“w/oℒo⁢b⁢jsubscriptℒ𝑜𝑏𝑗\\mathcal{L}_{obj}caligraphic_L start_POSTSUBSCRIPT italic_o italic_b italic_j end_POSTSUBSCRIPT&ℒa⁢t⁢tsubscriptℒ𝑎𝑡𝑡\\mathcal{L}_{att}caligraphic_L start_POSTSUBSCRIPT italic_a italic_t italic_t end_POSTSUBSCRIPT”), attention masking (“w/o Attn. Masking”) and composition preserving regularization (“w/oℒb⁢gsubscriptℒ𝑏𝑔\\mathcal{L}_{bg}caligraphic_L start_POSTSUBSCRIPT italic_b italic_g end_POSTSUBSCRIPT”)",
+                "position": 2361
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/ablations/17_two_eclaires_and_one_piece_of_cake_on_it_the_muffin_in_the_top_left_corner_is_blueberry_the_other_muffins_are_chocolate_emu.png",
+                "caption": "",
+                "position": 2373
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/ablations/17_eclaires_and_one_piece_of_cake_on_it_the_muffin_in_the_top_left_corner_is_blueberry_the_other_muffins_are_chocolate_noloss.png",
+                "caption": "",
+                "position": 2377
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/ablations/17_two_eclaires_and_one_piece_of_cake_on_it_the_muffin_in_the_top_left_corner_is_blueberry_the_other_muffins_are_chocolate_nomasking.png",
+                "caption": "",
+                "position": 2379
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/ablations/17_two_eclaires_and_one_piece_of_cake_on_it_the_muffin_in_the_top_left_corner_is_blueberry_the_other_muffins_are_chocolate_ours_nobg.png",
+                "caption": "",
+                "position": 2381
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/ablations/73_five_birds_on_a_tree_branch_in_autumn_one_bird_is_a_blue_jay_another_is_a_cardinal_the_rest_are_ravens_ours.png",
+                "caption": "",
+                "position": 2385
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/ablations/73_five_birds_on_a_tree_branch_in_autumn_one_bird_is_a_blue_jay_another_is_a_cardinal_the_rest_are_ravens_emu.png",
+                "caption": "",
+                "position": 2388
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/ablations/73_five_birds_on_a_tree_branch_in_autumn_one_bird_is_a_blue_jay_another_is_a_cardinal_the_rest_are_ravens_noloss.png",
+                "caption": "",
+                "position": 2392
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/ablations/73_five_birds_on_a_tree_branch_in_autumn_one_bird_is_a_blue_jay_another_is_a_cardinal_the_rest_are_ravens_nomask.png",
+                "caption": "",
+                "position": 2394
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/ablations/73_five_birds_on_a_tree_branch_in_autumn_one_bird_is_a_blue_jay_another_is_a_cardinal_the_rest_are_ravens_nobg.png",
+                "caption": "",
+                "position": 2396
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/ablations/83_four_cupcakes_and_two_pies_on_a_kitchen_counter_the_cupcake_with_rainbow_sprinkles_is_in_the_center_ours.png",
+                "caption": "",
+                "position": 2400
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/ablations/83_four_cupcakes_and_two_pies_on_a_kitchen_counter_the_cupcake_with_rainbow_sprinkles_is_in_the_center_emu.png",
+                "caption": "",
+                "position": 2403
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/ablations/83_four_cupcakes_and_two_pies_on_a_kitchen_counter_the_cupcake_with_rainbow_sprinkles_is_in_the_center_noloss.png",
+                "caption": "",
+                "position": 2407
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/ablations/83_four_cupcakes_and_two_pies_on_a_kitchen_counter_the_cupcake_with_rainbow_sprinkles_is_in_the_center_nomask.png",
+                "caption": "",
+                "position": 2409
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/ablations/83_four_cupcakes_and_two_pies_on_a_kitchen_counter_the_cupcake_with_rainbow_sprinkles_is_in_the_center_nobg.png",
+                "caption": "",
+                "position": 2411
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/limitations/initial_image_pillows.png",
+                "caption": "Figure 9.Limitations.We present three failure cases of our method. In the first example (top row) our method wrongfully creates a gap in the pillow stack. In the second (middle row), two pairs of cats are merged into one. In the final example (bottom row) our wrongfully places the volleyball in the back and the black basketball in the front. See SectionC.5for an additional discussion over these failure cases.",
+                "position": 2492
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/limitations/layout_w_decisions_pillows.png",
+                "caption": "",
+                "position": 2499
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/limitations/final_image_pillows.png",
+                "caption": "",
+                "position": 2502
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/limitations/initial_image_poodle.png",
+                "caption": "",
+                "position": 2506
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/limitations/layout_w_decisions_poodle.png",
+                "caption": "",
+                "position": 2509
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/limitations/final_image_poodle.png",
+                "caption": "",
+                "position": 2512
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/limitations/initial_image_balls.png",
+                "caption": "",
+                "position": 2516
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/limitations/layout_w_decisions_balls.png",
+                "caption": "",
+                "position": 2519
+            },
+            {
+                "img": "https://arxiv.org/html/2505.05678/extracted/6432964/images/limitations/final_image_balls.png",
+                "caption": "",
+                "position": 2522
+            }
+        ]
+    },
+    {
+        "header": "Appendix CFurther Discussion",
+        "images": []
+    }
+]
