@@ -4,9 +4,9 @@
         "en": "June 12",
         "zh": "6月12日"
     },
-    "time_utc": "2025-06-12 19:09",
+    "time_utc": "2025-06-12 20:13",
     "weekday": 3,
-    "issue_id": 4266,
+    "issue_id": 4267,
     "home_page_url": "https://huggingface.co/papers",
     "papers": [
         {
@@ -14,7 +14,7 @@
             "title": "Confidence Is All You Need: Few-Shot RL Fine-Tuning of Language Models",
             "url": "https://huggingface.co/papers/2506.06395",
             "abstract": "Reinforcement Learning via Self-Confidence (RLSC) improves large language model accuracy using the model's confidence as a reward signal, eliminating the need for human labels or reward engineering.  \t\t\t\t\tAI-generated summary \t\t\t\t Large language models (LLMs) excel at reasoning, yet post-training remains critical for aligning their behavior with task goals. Existing reinforcement learning (RL) methods often depend on costly human annotations or external reward models. We propose Reinforcement Learning via Self-Confidence (RLSC), which uses the model's own confidence as reward signals-eliminating the need for labels, preference models, or reward engineering. Applied to Qwen2.5-Math-7B with only 16 samples per question and 10 or 20 training steps, RLSC improves accuracy by +13.4% on AIME2024, +21.2% on MATH500, +21.7% on Minerva Math, +20.8% on Olympiadbench, and +9.7% on AMC23. RLSC provides a simple, scalable post-training method for inference models, requiring only a small number of samples and unlabelled supervision.",
-            "score": 61,
+            "score": 65,
             "issue_id": 4258,
             "pub_date": "2025-06-05",
             "pub_date_card": {
@@ -312,7 +312,7 @@
             "title": "Multiverse: Your Language Models Secretly Decide How to Parallelize and\n  Merge Generation",
             "url": "https://huggingface.co/papers/2506.09991",
             "abstract": "Multiverse, a parallel generative model incorporating a MapReduce paradigm, achieves performance comparable to autoregressive LLMs while offering superior scaling and speed.  \t\t\t\t\tAI-generated summary \t\t\t\t Autoregressive Large Language Models (AR-LLMs) frequently exhibit implicit parallelism in sequential generation. Inspired by this, we introduce Multiverse, a new generative model that enables natively parallel generation. Multiverse internalizes a MapReduce paradigm, generating automatically through three stages: (i) a Map stage for adaptive task decomposition, (ii) a Process stage for parallel subtask execution, and (iii) a Reduce stage for lossless result synthesis. Next, we build a real-world Multiverse reasoning model with co-design of data, algorithm, and system, enabling rapid and seamless transfer from frontier AR-LLMs. Starting from sequential reasoning chains, we create Multiverse 1K by converting them into structured training data using an automated LLM-assisted pipeline, avoiding costly human annotations. Algorithmically, we design Multiverse Attention to separate parallel reasoning steps while keeping compatibility with causal attention for efficient training. Systematically, we implement Multiverse Engine to enable parallel inference. It features a dedicated scheduler that dynamically switches between sequential and parallel generation, triggered directly by the model. After a 3-hour fine-tuning with 1K examples, our Multiverse-32B stands as the only open-sourced non-AR model achieving performance on par with leading AR-LLMs of the same scale, evidenced by AIME24 & 25 scores of 54% and 46%, respectively. Moreover, our budget control experiments show that Multiverse-32B exhibits superior scaling, outperforming AR-LLMs by 1.87% on average using the same context length. Such scaling further leads to practical efficiency gain, achieving up to 2x speedup across varying batch sizes. We have open-sourced the entire Multiverse ecosystem, including data, model weights, engine, supporting tools, as well as complete data curation prompts and detailed training and evaluation recipes.",
-            "score": 20,
+            "score": 21,
             "issue_id": 4261,
             "pub_date": "2025-06-11",
             "pub_date_card": {
@@ -409,7 +409,7 @@
             "title": "SeerAttention-R: Sparse Attention Adaptation for Long Reasoning",
             "url": "https://huggingface.co/papers/2506.08889",
             "abstract": "SeerAttention-R is a sparse attention framework for reasoning models that maintains high accuracy and achieves significant speedups through optimized sparse decoding kernels.  \t\t\t\t\tAI-generated summary \t\t\t\t We introduce SeerAttention-R, a sparse attention framework specifically tailored for the long decoding of reasoning models. Extended from SeerAttention, SeerAttention-R retains the design of learning attention sparsity through a self-distilled gating mechanism, while removing query pooling to accommodate auto-regressive decoding. With a lightweight plug-in gating, SeerAttention-R is flexible and can be easily integrated into existing pretrained model without modifying the original parameters. We demonstrate that SeerAttention-R, trained on just 0.4B tokens, maintains near-lossless reasoning accuracy with 4K token budget in AIME benchmark under large sparse attention block sizes (64/128). Using TileLang, we develop a highly optimized sparse decoding kernel that achieves near-theoretical speedups of up to 9x over FlashAttention-3 on H100 GPU at 90% sparsity. Code is available at: https://github.com/microsoft/SeerAttention.",
-            "score": 17,
+            "score": 18,
             "issue_id": 4251,
             "pub_date": "2025-06-10",
             "pub_date_card": {
@@ -575,11 +575,65 @@
             }
         },
         {
+            "id": "https://huggingface.co/papers/2506.09501",
+            "title": "Give Me FP32 or Give Me Death? Challenges and Solutions for Reproducible\n  Reasoning",
+            "url": "https://huggingface.co/papers/2506.09501",
+            "abstract": "The study investigates reproducibility issues in Large Language Models (LLMs) arising from hardware and precision variations, proposing a lightweight inference pipeline to enhance numerical stability while maintaining memory efficiency.  \t\t\t\t\tAI-generated summary \t\t\t\t Large Language Models (LLMs) are now integral across various domains and have demonstrated impressive performance. Progress, however, rests on the premise that benchmark scores are both accurate and reproducible. We demonstrate that the reproducibility of LLM performance is fragile: changing system configuration such as evaluation batch size, GPU count, and GPU version can introduce significant difference in the generated responses. This issue is especially pronounced in reasoning models, where minor rounding differences in early tokens can cascade into divergent chains of thought, ultimately affecting accuracy. For instance, under bfloat16 precision with greedy decoding, a reasoning model like DeepSeek-R1-Distill-Qwen-7B can exhibit up to 9% variation in accuracy and 9,000 tokens difference in response length due to differences in GPU count, type, and evaluation batch size. We trace the root cause of this variability to the non-associative nature of floating-point arithmetic under limited numerical precision. This work presents the first systematic investigation into how numerical precision affects reproducibility in LLM inference. Through carefully controlled experiments across various hardware, software, and precision settings, we quantify when and how model outputs diverge. Our analysis reveals that floating-point precision -- while critical for reproducibility -- is often neglected in evaluation practices. Inspired by this, we develop a lightweight inference pipeline, dubbed LayerCast, that stores weights in 16-bit precision but performs all computations in FP32, balancing memory efficiency with numerical stability. Code is available at https://github.com/nanomaoli/llm_reproducibility.",
+            "score": 9,
+            "issue_id": 4264,
+            "pub_date": "2025-06-11",
+            "pub_date_card": {
+                "ru": "11 июня",
+                "en": "June 11",
+                "zh": "6月11日"
+            },
+            "hash": "b14433f51b294499",
+            "authors": [
+                "Jiayi Yuan",
+                "Hao Li",
+                "Xinheng Ding",
+                "Wenya Xie",
+                "Yu-Jhe Li",
+                "Wentian Zhao",
+                "Kun Wan",
+                "Jing Shi",
+                "Xia Hu",
+                "Zirui Liu"
+            ],
+            "affiliations": [
+                "Adobe Inc.",
+                "Rice University",
+                "University of Minnesota Twin Cities"
+            ],
+            "pdf_title_img": "assets/pdf/title_img/2506.09501.jpg",
+            "data": {
+                "categories": [
+                    "#optimization",
+                    "#reasoning",
+                    "#inference",
+                    "#benchmark"
+                ],
+                "emoji": "🔬",
+                "ru": {
+                    "title": "Стабильность в нестабильном мире: повышение воспроизводимости LLM",
+                    "desc": "Исследование посвящено проблемам воспроизводимости результатов больших языковых моделей (LLM) из-за вариаций в аппаратном обеспечении и точности вычислений. Авторы демонстрируют, что изменение конфигурации системы, такой как размер пакета при оценке, количество и версия GPU, может значительно влиять на генерируемые ответы, особенно в моделях для рассуждений. Основной причиной этой вариативности названа неассоциативность арифметики с плавающей запятой при ограниченной числовой точности. Для решения проблемы предложен легковесный конвейер вывода LayerCast, который хранит веса в 16-битной точности, но выполняет все вычисления в FP32, балансируя между эффективностью памяти и числовой стабильностью."
+                },
+                "en": {
+                    "title": "Enhancing Reproducibility in LLMs with LayerCast",
+                    "desc": "This paper explores the challenges of reproducibility in Large Language Models (LLMs) caused by variations in hardware and numerical precision. It highlights how changes in system configurations, such as GPU type and batch size, can lead to significant differences in model outputs, particularly in reasoning tasks. The authors identify that the non-associative nature of floating-point arithmetic contributes to this variability, which can affect accuracy and response length. To address these issues, they propose a new inference pipeline called LayerCast, which optimizes memory usage while ensuring numerical stability by using mixed precision during computations."
+                },
+                "zh": {
+                    "title": "提升大型语言模型的可重复性与稳定性",
+                    "desc": "本研究探讨了大型语言模型（LLMs）在硬件和精度变化下的可重复性问题，并提出了一种轻量级推理管道，以提高数值稳定性，同时保持内存效率。我们发现，LLM性能的可重复性非常脆弱，系统配置的变化（如评估批量大小、GPU数量和版本）会显著影响生成的响应。尤其是在推理模型中，早期标记的微小舍入差异可能导致思维链的分歧，从而影响准确性。为了解决这一问题，我们开发了LayerCast推理管道，使用16位精度存储权重，但在计算时使用FP32，以平衡内存效率和数值稳定性。"
+                }
+            }
+        },
+        {
             "id": "https://huggingface.co/papers/2506.05309",
             "title": "Time to Talk: LLM Agents for Asynchronous Group Communication in Mafia\n  Games",
             "url": "https://huggingface.co/papers/2506.05309",
             "abstract": "An adaptive asynchronous LLM-agent performs similarly to human players in online Mafia games, demonstrating the potential for integrating LLMs into realistic group settings with complex social dynamics.  \t\t\t\t\tAI-generated summary \t\t\t\t LLMs are used predominantly in synchronous communication, where a human user and a model communicate in alternating turns. In contrast, many real-world settings are inherently asynchronous. For example, in group chats, online team meetings, or social games, there is no inherent notion of turns; therefore, the decision of when to speak forms a crucial part of the participant's decision making. In this work, we develop an adaptive asynchronous LLM-agent which, in addition to determining what to say, also decides when to say it. To evaluate our agent, we collect a unique dataset of online Mafia games, including both human participants, as well as our asynchronous agent. Overall, our agent performs on par with human players, both in game performance, as well as in its ability to blend in with the other human players. Our analysis shows that the agent's behavior in deciding when to speak closely mirrors human patterns, although differences emerge in message content. We release all our data and code to support and encourage further research for more realistic asynchronous communication between LLM agents. This work paves the way for integration of LLMs into realistic human group settings, from assistance in team discussions to educational and professional environments where complex social dynamics must be navigated.",
-            "score": 8,
+            "score": 9,
             "issue_id": 4260,
             "pub_date": "2025-06-05",
             "pub_date_card": {
@@ -671,60 +725,6 @@
                 "zh": {
                     "title": "SAFE：智能机器人故障检测的新方法",
                     "desc": "SAFE是一个用于视觉-语言-行动模型的故障检测器，它能够通过学习模型的高层内部特征来推广到未见过的任务。尽管视觉-语言-行动模型在多种操作任务中表现出色，但在新任务上的成功率有限。为了让机器人安全地与环境互动，我们需要一个能够及时发出警报的故障检测器，以便机器人可以停止、回溯或请求帮助。我们提出的SAFE能够从VLA的内部特征中学习，并预测任务失败的可能性，经过广泛测试，显示出优越的故障检测性能。"
-                }
-            }
-        },
-        {
-            "id": "https://huggingface.co/papers/2506.09501",
-            "title": "Give Me FP32 or Give Me Death? Challenges and Solutions for Reproducible\n  Reasoning",
-            "url": "https://huggingface.co/papers/2506.09501",
-            "abstract": "The study investigates reproducibility issues in Large Language Models (LLMs) arising from hardware and precision variations, proposing a lightweight inference pipeline to enhance numerical stability while maintaining memory efficiency.  \t\t\t\t\tAI-generated summary \t\t\t\t Large Language Models (LLMs) are now integral across various domains and have demonstrated impressive performance. Progress, however, rests on the premise that benchmark scores are both accurate and reproducible. We demonstrate that the reproducibility of LLM performance is fragile: changing system configuration such as evaluation batch size, GPU count, and GPU version can introduce significant difference in the generated responses. This issue is especially pronounced in reasoning models, where minor rounding differences in early tokens can cascade into divergent chains of thought, ultimately affecting accuracy. For instance, under bfloat16 precision with greedy decoding, a reasoning model like DeepSeek-R1-Distill-Qwen-7B can exhibit up to 9% variation in accuracy and 9,000 tokens difference in response length due to differences in GPU count, type, and evaluation batch size. We trace the root cause of this variability to the non-associative nature of floating-point arithmetic under limited numerical precision. This work presents the first systematic investigation into how numerical precision affects reproducibility in LLM inference. Through carefully controlled experiments across various hardware, software, and precision settings, we quantify when and how model outputs diverge. Our analysis reveals that floating-point precision -- while critical for reproducibility -- is often neglected in evaluation practices. Inspired by this, we develop a lightweight inference pipeline, dubbed LayerCast, that stores weights in 16-bit precision but performs all computations in FP32, balancing memory efficiency with numerical stability. Code is available at https://github.com/nanomaoli/llm_reproducibility.",
-            "score": 5,
-            "issue_id": 4264,
-            "pub_date": "2025-06-11",
-            "pub_date_card": {
-                "ru": "11 июня",
-                "en": "June 11",
-                "zh": "6月11日"
-            },
-            "hash": "b14433f51b294499",
-            "authors": [
-                "Jiayi Yuan",
-                "Hao Li",
-                "Xinheng Ding",
-                "Wenya Xie",
-                "Yu-Jhe Li",
-                "Wentian Zhao",
-                "Kun Wan",
-                "Jing Shi",
-                "Xia Hu",
-                "Zirui Liu"
-            ],
-            "affiliations": [
-                "Adobe Inc.",
-                "Rice University",
-                "University of Minnesota Twin Cities"
-            ],
-            "pdf_title_img": "assets/pdf/title_img/2506.09501.jpg",
-            "data": {
-                "categories": [
-                    "#optimization",
-                    "#reasoning",
-                    "#inference",
-                    "#benchmark"
-                ],
-                "emoji": "🔬",
-                "ru": {
-                    "title": "Стабильность в нестабильном мире: повышение воспроизводимости LLM",
-                    "desc": "Исследование посвящено проблемам воспроизводимости результатов больших языковых моделей (LLM) из-за вариаций в аппаратном обеспечении и точности вычислений. Авторы демонстрируют, что изменение конфигурации системы, такой как размер пакета при оценке, количество и версия GPU, может значительно влиять на генерируемые ответы, особенно в моделях для рассуждений. Основной причиной этой вариативности названа неассоциативность арифметики с плавающей запятой при ограниченной числовой точности. Для решения проблемы предложен легковесный конвейер вывода LayerCast, который хранит веса в 16-битной точности, но выполняет все вычисления в FP32, балансируя между эффективностью памяти и числовой стабильностью."
-                },
-                "en": {
-                    "title": "Enhancing Reproducibility in LLMs with LayerCast",
-                    "desc": "This paper explores the challenges of reproducibility in Large Language Models (LLMs) caused by variations in hardware and numerical precision. It highlights how changes in system configurations, such as GPU type and batch size, can lead to significant differences in model outputs, particularly in reasoning tasks. The authors identify that the non-associative nature of floating-point arithmetic contributes to this variability, which can affect accuracy and response length. To address these issues, they propose a new inference pipeline called LayerCast, which optimizes memory usage while ensuring numerical stability by using mixed precision during computations."
-                },
-                "zh": {
-                    "title": "提升大型语言模型的可重复性与稳定性",
-                    "desc": "本研究探讨了大型语言模型（LLMs）在硬件和精度变化下的可重复性问题，并提出了一种轻量级推理管道，以提高数值稳定性，同时保持内存效率。我们发现，LLM性能的可重复性非常脆弱，系统配置的变化（如评估批量大小、GPU数量和版本）会显著影响生成的响应。尤其是在推理模型中，早期标记的微小舍入差异可能导致思维链的分歧，从而影响准确性。为了解决这一问题，我们开发了LayerCast推理管道，使用16位精度存储权重，但在计算时使用FP32，以平衡内存效率和数值稳定性。"
                 }
             }
         },
