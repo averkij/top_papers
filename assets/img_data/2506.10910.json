@@ -1,0 +1,143 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.10910/extracted/6535757/images/header.jpeg",
+                "caption": "",
+                "position": 110
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.10910/extracted/6535757/images/magistral-vs-r1.png",
+                "caption": "Figure 1:Performance of Magistral Medium on common reasoning benchmarks.We highlight the strength of our proposed RLVR framework, which yields a 50% increase in AIME-24 (pass@1) over the initial Mistral Medium 3 checkpoint,without any cold-start reasoning traces.\nWe compare against analogous results from[DeepSeek-AI et al.,2025], which show RL improvements from DeepSeek-v3 to DeepSeek-R1 (January 25).\nMagistral Medium reaches 90% accuracy on AIME-24 with majority voting.",
+                "position": 156
+            }
+        ]
+    },
+    {
+        "header": "2Methodology",
+        "images": []
+    },
+    {
+        "header": "3Infrastructure",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.10910/x1.png",
+                "caption": "Figure 3:Online training pipeline.1) Generators continuously output completions to prompts from input data sources. 2) Whenever a completion is finished, it is sent to the appropriate verifier. 3) Each sequence is sent to a different data parallel group using a pre-set permutation until every data parallel group has enough sequences to form a batch. 4) A single gradient step is performed and the trainer and generators are updated. In the generators, weights are replaced mid-generation, which means that in-flight generations continue with a slightly outdated key-value cache, as we do not refresh the cache.\nSince the model resides on GPUs in both the trainer and the generators, the weights are transferred using NCCL for optimal performance. The model weights are dynamically consolidated to accommodate the different sharding topologies between trainers and generators.",
+                "position": 415
+            }
+        ]
+    },
+    {
+        "header": "4Data curation",
+        "images": []
+    },
+    {
+        "header": "5Experiment and results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.10910/x2.png",
+                "caption": "Figure 4:Overview of the filtering, training and RL stages discussed in the paper. We do RL over Mistral Medium 3 to get Magistral Medium. We use this model to generate answers for a large set of diverse prompts. We use these generated traces to finetune Mistral Small 3 and then perform RL to get Magistral Small.",
+                "position": 541
+            }
+        ]
+    },
+    {
+        "header": "6Ablations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.10910/extracted/6535757/images/magistral-small.png",
+                "caption": "Figure 5:Performance of Magistral Small compared with different training setups on various benchmarks.We report the performance of three distinct 24B models: Mistral Small 24B trained from scratch with RL (RL only), Mistral Small 24B fine-tuned on reasoning traces from Magistral Medium, and Mistral Small 24B fine-tuned on Magistral Medium traces and subsequently enhanced with RL, which is the final Magistral Small.\nWe observe that the combination of fine-tuning on reasoning traces with RL leads to the best performance.",
+                "position": 893
+            },
+            {
+                "img": "https://arxiv.org/html/2506.10910/x3.png",
+                "caption": "Figure 6:Impact of batch and minibatch sizes on RL training rewards.(a) Reward during RL training of 3B model on math data for different batch sizes, while keeping minibatch size equal to batch size. Number of concurrently generated sequences is kept constant at 4096.\n(b) Reward during RL training in the same setup for different minibatch sizes at fixed batch size of 8192 sequences. We observe that performance doesn’t depend strongly on batch size, but degrades when there are more than 2 minibatches in a batch.",
+                "position": 910
+            },
+            {
+                "img": "https://arxiv.org/html/2506.10910/extracted/6535757/images/norm-ablation.png",
+                "caption": "Figure 7:Results for training with different advantage normalizations in GRPO.We observe that different normalization methods do not lead to significant difference either in evaluation performance or the length growth during training.",
+                "position": 951
+            }
+        ]
+    },
+    {
+        "header": "7Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.10910/x4.png",
+                "caption": "Figure 8:Reward and length evolution inw⁢(α1,α2)𝑤subscript𝛼1subscript𝛼2w(\\alpha_{1},\\alpha_{2})italic_w ( italic_α start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT , italic_α start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT )hyperplane.Black arrow trajectory is a projection of intermediate checkpoints ofMagistral Small\nRL-onlyrun on the hyperplane. Black points are perturbed checkpoints computed using Equation2. Intermediate values are computed with linear interpolation on the triangular grid.",
+                "position": 992
+            },
+            {
+                "img": "https://arxiv.org/html/2506.10910/x5.png",
+                "caption": "Figure 9:Reward scaling with output length.Each point corresponds to a perturbed checkpoint computed with Equation2. We generate 8192 completions with the checkpoint and evaluate mean output length and raw reward (reward without length penalty). We perform linear regression on checkpoints with mean output length between 1500 and 8000 and observe that reward scales logarithmically with the output length.",
+                "position": 1003
+            },
+            {
+                "img": "https://arxiv.org/html/2506.10910/extracted/6535757/images/multimodal_benchmarks.png",
+                "caption": "Figure 10:Performance on multimodal benchmarks.",
+                "position": 1010
+            },
+            {
+                "img": "https://arxiv.org/html/2506.10910/extracted/6535757/images/partial_reward_ablation.png",
+                "caption": "Figure 11:Binary vs proportional reward for code problems.(a) Accuracy on AIME and LiveCodeBench after 250 steps of training with binary reward and proportional reward. Performance on LiveCodeBench is 2% lower with proportional rewards.\n(b) Length evolution throughout training. Length increases more with binary rewards.",
+                "position": 1082
+            },
+            {
+                "img": "https://arxiv.org/html/2506.10910/extracted/6535757/images/partial_reward_ablation_length.png",
+                "caption": "",
+                "position": 1091
+            },
+            {
+                "img": "https://arxiv.org/html/2506.10910/extracted/6535757/images/entropy_bonus_only_math.png",
+                "caption": "Figure 12:Impact ofεhighsubscript𝜀high\\varepsilon_{\\text{high}}italic_ε start_POSTSUBSCRIPT high end_POSTSUBSCRIPTon the entropy distribution throughout training.(a) Entropy evolution throughout training of a 3B model on amath onlydataset. Entropy drops with entropy bonus, while higherεhighsubscript𝜀high\\varepsilon_{\\text{high}}italic_ε start_POSTSUBSCRIPT high end_POSTSUBSCRIPTmaintains entropy, allowing for better exploration.\n(b) Entropy evolution throughout training of a 3B model on amath and codedataset. Entropy explodes with entropy bonus, even though the coefficient is the same as the math only version. Higherεhighsubscript𝜀high\\varepsilon_{\\text{high}}italic_ε start_POSTSUBSCRIPT high end_POSTSUBSCRIPTbehaves better, allowing entropy to decrease.",
+                "position": 1105
+            },
+            {
+                "img": "https://arxiv.org/html/2506.10910/extracted/6535757/images/entropy_bonus_math_and_code.png",
+                "caption": "",
+                "position": 1114
+            },
+            {
+                "img": "https://arxiv.org/html/2506.10910/extracted/6535757/images/oss_sft_rl_evals.png",
+                "caption": "Figure 13:Benchmark performance of Magistral Medium fine-tuned on open-source traces.All results are reported using pass@1.\nThe shaded region highlights the additional improvement achieved through RL on top of supervised fine-tuning.\nWe find that while fine-tuning on open-source traces yields strong results, applying RL further enhances performance significantly. In particular, the accuracy on AIME’25 increases by more than 12%. Please note that the performance on GPQA Diamond drops after RL from 72.9% to 71.0%.",
+                "position": 1133
+            }
+        ]
+    },
+    {
+        "header": "8RL on model finetuned using OSS reasoning traces",
+        "images": []
+    },
+    {
+        "header": "9Conclusion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.10910/extracted/6535757/images/mm-question-3.png",
+                "caption": "Figure 14:A physics multimodal problem and its solution generated by Magistral Medium.",
+                "position": 1592
+            },
+            {
+                "img": "https://arxiv.org/html/2506.10910/extracted/6535757/images/mm-question-1.png",
+                "caption": "Figure 15:A chemistry multimodal problem and its solution generated by Magistral Medium.",
+                "position": 1631
+            },
+            {
+                "img": "https://arxiv.org/html/2506.10910/extracted/6535757/images/mm-questoin-2.png",
+                "caption": "Figure 16:A biology multimodal problem and its solution generated by Magistral Medium.",
+                "position": 1677
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
