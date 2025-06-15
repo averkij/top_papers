@@ -1,0 +1,240 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Background and Related Work",
+        "images": []
+    },
+    {
+        "header": "3Experimental setup",
+        "images": []
+    },
+    {
+        "header": "4Localization of Attention Layers Responsible for Textual Content Generation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.09935/x1.png",
+                "caption": "Figure 1:Overview of the localization process.Our goal is to edit the image generated from the source promptpSsubscript𝑝𝑆p_{S}italic_p start_POSTSUBSCRIPT italic_S end_POSTSUBSCRIPTusing the target promptpTsubscript𝑝𝑇p_{T}italic_p start_POSTSUBSCRIPT italic_T end_POSTSUBSCRIPT. To find which cross and joint attention layers should be modified, we pass the target promptpTsubscript𝑝𝑇p_{T}italic_p start_POSTSUBSCRIPT italic_T end_POSTSUBSCRIPTthrough the DM, caching the keys and values. Then, while generating the image frompSsubscript𝑝𝑆p_{S}italic_p start_POSTSUBSCRIPT italic_S end_POSTSUBSCRIPTwe substitute the keys and values with the cached ones. We select the layers which yield the highest image and text alignment.\n(A) Localizing by Patching is applied to SD3, and (B) Localizing by Injection is used for SDXL and DeepFloyd IF.",
+                "position": 250
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x2.png",
+                "caption": "Figure 2:Localized attention layers responsible for the content of the generated text.We selectively patch individual cross and joint attention layers with computations for the target prompt and measure the responses with OCR F1 Score. We identify three layers with the highest responses in SDXL (55, 56, and 57), one layer in DeepFloyd IF (17), and one layer in SD3 (10).",
+                "position": 323
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x3.png",
+                "caption": "Figure 3:The localized layers effectively balance the text alignment with the target promptpTsubscript𝑝𝑇p_{T}italic_p start_POSTSUBSCRIPT italic_T end_POSTSUBSCRIPTand the image alignment with the source promptpSsubscript𝑝𝑆p_{S}italic_p start_POSTSUBSCRIPT italic_S end_POSTSUBSCRIPT.For ease of exposition, we measure the text alignment with OCR F1 and the image alignment with SSIM. We observe that injecting the target promptpTsubscript𝑝𝑇p_{T}italic_p start_POSTSUBSCRIPT italic_T end_POSTSUBSCRIPTto too many layers decreases the image alignment and introduces undesirable artifacts,e.g.,the Japanese text on the robot’s chest in 2nd image from the right and the lack of fish in the 1st image from the right. Conversely, injectingpTsubscript𝑝𝑇p_{T}italic_p start_POSTSUBSCRIPT italic_T end_POSTSUBSCRIPTto too few layers does not edit the generated text.\nWe present more details about the experiment inAppendixE.",
+                "position": 330
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x4.png",
+                "caption": "",
+                "position": 340
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x5.png",
+                "caption": "Figure 4:Patching preserves visual components from the source prompt, taking only the textual information from the injected target prompt.In all the combinations of templates and texts that we inject to localized layers of diffusion models (with other layers receiving both source template and source text), the final visual components of the image are always closer to the original template, while the textual content is always aligned with the one from an injected prompt. The source prompt is always defined aspSsubscript𝑝𝑆p_{S}italic_p start_POSTSUBSCRIPT italic_S end_POSTSUBSCRIPT=TemplateS:TextS, while we change the target prompts to TemplateS:TextS, TemplateS:TextT, and TemplateT:TextT(from left to right for the images).",
+                "position": 380
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x6.png",
+                "caption": "",
+                "position": 481
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x7.png",
+                "caption": "",
+                "position": 481
+            }
+        ]
+    },
+    {
+        "header": "5Applications of Our Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.09935/x8.png",
+                "caption": "Figure 5:Fine-tuning LoRA on localized layers improves text generation quality without compromising overall generation capabilities.We apply LoRA fine-tuning to the SDXL model to enhance its text generation capabilities.(top left)The LoRA fine-tuning on the localized layers converges to a higher quality of the generated text (as measured by OCR F1 and CLIP-T metrics).(bottom left)When fine-tuning LoRA on all cross-attention layers (denoted as C-A), the model quickly collapses, losing its ability to generate examples that match the prompt. The diversity is significantly reduced, as indicated by a recall. In contrast, fine-tuning LoRA only on our localized cross-attention layers prevents model overfitting while improving text generation quality. It preserves diversity while achieving higher fidelity measured by precision.(right)We also present this effect on sample generations. Longer LoRA fine-tuning (measured in epochs) on localized layers improves text quality while preserving visual content, however, applying LoRA to all layers results in significant degradation of the image quality and diversity.",
+                "position": 522
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x8.png",
+                "caption": "",
+                "position": 525
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x9.png",
+                "caption": "",
+                "position": 529
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/extracted/6198226/figs/lora_generations5.jpg",
+                "caption": "",
+                "position": 534
+            }
+        ]
+    },
+    {
+        "header": "6Conclusions",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix ARelated work on manipulating diffusion models with cross-attention",
+        "images": []
+    },
+    {
+        "header": "Appendix BSelection of Denoising Timesteps",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.09935/x10.png",
+                "caption": "(a)Image alignment vs Diffusion Patching Timestep SD3.",
+                "position": 1754
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x10.png",
+                "caption": "(a)Image alignment vs Diffusion Patching Timestep SD3.",
+                "position": 1757
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x11.png",
+                "caption": "(b)Text alignment vs Diffusion Patching Timestep SD3.",
+                "position": 1763
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x12.png",
+                "caption": "(c)Image alignment vs Diffusion Patching Timestep DeepFloyd IF.",
+                "position": 1770
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x13.png",
+                "caption": "(d)Text alignment vs Diffusion Patching Timestep DeepFloyd IF.",
+                "position": 1776
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x14.png",
+                "caption": "(e)Image alignment vs Diffusion Patching Timestep SDXL.",
+                "position": 1783
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x15.png",
+                "caption": "(f)Text alignment vs Diffusion Patching Timestep SDXL.",
+                "position": 1789
+            }
+        ]
+    },
+    {
+        "header": "Appendix CLoRA fine-tuning across different setups",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.09935/x16.png",
+                "caption": "Figure 7:LoRA SDXL Fine-Tuning Across Different Setups.We fine-tune LoRA applied to the SDXL model to improve the text generation capabilities of the base model. When we fine-tune LoRA on all cross-attention layers, the model quickly collapses and loses its ability to generate examples that match the prompt. In contrast, when we fine-tune LoRA only on our localized three cross-attention layers, we successfully prevent model overfitting while also improving text generation quality. This trend is not observed when we apply LoRA to other sets of three layers.",
+                "position": 1807
+            }
+        ]
+    },
+    {
+        "header": "Appendix DLoRA Fine-tuning with different training set sizes",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.09935/x17.png",
+                "caption": "Figure 8:Scaling up training size when fine-tuning all cross-attention layers does not prevent model collapse.Increasing the training dataset size fails to mitigate model collapse, as evidenced by the significant drop in Recall and Precision metrics. In contrast, our approach, which fine-tunes only localized cross-attention layers, demonstrates consistent performance regardless of training set size.",
+                "position": 1824
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x18.png",
+                "caption": "Figure 9:LoRA fine-tuning of localized layers outperforms fine-tuning of all cross-attention layers, even with smaller datasets.LoRA fine-tuning of localized layers achieves consistent performance across all evaluated training set sizes, from 20k to 200k samples. While increasing the dataset size slightly improves the performance of the model when all cross-attention layers are fine-tuned, a noticeable performance gap remains compared to localized fine-tuning.",
+                "position": 1828
+            }
+        ]
+    },
+    {
+        "header": "Appendix EStudy on the number of injected layers in SDXL",
+        "images": []
+    },
+    {
+        "header": "Appendix FSafe Diffusion safety concepts",
+        "images": []
+    },
+    {
+        "header": "Appendix GOn preventing toxic generations with prompt substitution",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.09935/x19.png",
+                "caption": "Figure 10:Comparison of facial expression scores (average), extracted from generations of a man holding a sign with toxic texts. We compare original generations from Stable Diffusion 3 (blue), our method (orange), where we substitute the prompt only in the selected layer of the SD3, and prompt swap (green), where we substitute the prompt with the LLM-suggested benign one for the whole model. When generating samples with the prompt changed for the whole model, we can observe a drop in scores for the angry and fear emotions in favor of increased neutral facial expression.",
+                "position": 2036
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x20.png",
+                "caption": "Figure 11:Influence of generated text on the final generation. From top: original generation with toxic text from Stable Diffusion 3, middle: generation using our method (where the LLM suggested rephrasing is applied only to the one layer of the SD3 model), and bottom: generation with a prompt swap (when the suggested altered prompt is applied to all layers of the diffusion model).Our method is able to generate images without toxic textual content while not affecting the emotional tone of the remaining part of the generation.",
+                "position": 2041
+            }
+        ]
+    },
+    {
+        "header": "Appendix HToxic text prevention examples",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.09935/x21.png",
+                "caption": "Figure 12:Example results for methods for preventing toxic text in generated images. Negative Prompt and Safe Diffusion methods are incapable of removing foul words from the images. In Prompt Swap, the background of generated images is highly influenced by the suggested word.We show that our method successfully changes foul words yet ensures minimal changes to the other visual aspects of the image.Orange bounding boxes were added by the authors to cover four words.",
+                "position": 2054
+            }
+        ]
+    },
+    {
+        "header": "Appendix IPseudocode for layer localization",
+        "images": []
+    },
+    {
+        "header": "Appendix JParameter localization for the text style",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.09935/x22.png",
+                "caption": "Figure 13:The text style is not controlled by the same layer as the textual content.We show example generations (left) indicating that the layer we localize for determining the content of the text in generated images is not capable of changing the style of the text in images. Also, we show (right) that control over the style of the text is distributed over multiple cross-attention layers in SD3 by plotting and calculating CLIP-T alignment between generations after patching particular layers with the desired text style.",
+                "position": 2154
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x23.png",
+                "caption": "",
+                "position": 2163
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x24.png",
+                "caption": "Figure 14:The style of the text in Stable Diffusion 3 is influenced by at least 7 layers.We provide results demonstrating performance in editing textual style when patching an increasing number of layers in the diffusion model. Although modifying this feature becomes feasible with 7 layers, it significantly alters the image background as well.",
+                "position": 2169
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x25.png",
+                "caption": "(a)DeepFloyd IF",
+                "position": 2264
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x25.png",
+                "caption": "(a)DeepFloyd IF",
+                "position": 2267
+            },
+            {
+                "img": "https://arxiv.org/html/2502.09935/x26.png",
+                "caption": "(b)Stable Diffusion 3",
+                "position": 2273
+            }
+        ]
+    },
+    {
+        "header": "Appendix KImage edition on longer texts",
+        "images": []
+    }
+]

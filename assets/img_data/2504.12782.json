@@ -1,0 +1,90 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2504.12782/x1.png",
+                "caption": "Figure 1:Geometric perspective on concept erasure in diffusion models.(a) Conventional Denoising Trajectory.A high-dimensional Gaussian sample, starting on a large sphere, converges to the human data manifold via classifier-free guidance (CFG).(b) Anchor-Free Finetuned Trajectory.Finetuning often modifies the orientation of the predicted conditional score functions so that they direct away from the unwanted concept manifold. This results in a condition direction𝜹⁢(𝒄)=ϵ𝜽⁢(𝒛t,t,𝒄)−ϵ𝜽⁢(𝒛t,t)𝜹𝒄subscriptbold-italic-ϵ𝜽subscript𝒛𝑡𝑡𝒄subscriptbold-italic-ϵ𝜽subscript𝒛𝑡𝑡\\bm{\\delta}(\\bm{c})=\\bm{\\epsilon}_{\\bm{\\theta}}(\\bm{z}_{t},t,\\bm{c})-\\bm{%\n\\epsilon}_{\\bm{\\theta}}(\\bm{z}_{t},t)bold_italic_δ ( bold_italic_c ) = bold_italic_ϵ start_POSTSUBSCRIPT bold_italic_θ end_POSTSUBSCRIPT ( bold_italic_z start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT , italic_t , bold_italic_c ) - bold_italic_ϵ start_POSTSUBSCRIPT bold_italic_θ end_POSTSUBSCRIPT ( bold_italic_z start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT , italic_t )nearly opposite to that of the original model, making the trajectory more likely to produce out-of-distribution samples. Note that, in the absence of an unconditional constraint, modifications to the conditional output also affect the unconditional output due to shared model parameters.(c) Anchor-Based Finetuned Trajectory.The model is finetuned so that the predicted score functions (or keys & values) for the unwanted concept align with those of the original model conditioned on a benign anchor, ensuring final samples lie on the anchor manifold, though not necessarily at the highest-probability mode.(d) Our Trajectory (ANT).In the early stage (whent>t′𝑡superscript𝑡′t>t^{\\prime}italic_t > italic_t start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPT), the conditional score functions remain directed toward the natural data mode, keeping the finetuned model aligned with the original. Whent<t′𝑡superscript𝑡′t<t^{\\prime}italic_t < italic_t start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPT, they are finetuned to point away from the unwanted concept manifold. ANT encourages that unconditional score functions remain unchanged throughout all stages.",
+                "position": 87
+            },
+            {
+                "img": "https://arxiv.org/html/2504.12782/x2.png",
+                "caption": "Figure 2:Generation results of different concept erasure methods conditioned on the concept “cat”. The anchor-free method (ESD) often produces images with visual artifacts or content that is out of distribution. The anchor-based method (MACE), which maps “cat” to “forest”, performs reasonably well in simple contexts but results in unnatural or incoherent outputs in more complex scenarios. In contrast, our trajectory-aware method (ANT) effectively removes the target concept while preserving the overall structure and contextual integrity of the generated images.",
+                "position": 134
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2504.12782/x3.png",
+                "caption": "Figure 3:Effect of condition direction reversal at different timesteps. Each column represents a distinct semantic condition, and each row shows generated outputs under varying reversal strategies. (a) displays originally generated images using a diffusion process (timestep 50→1). (b)–(d) show results when the condition direction𝜹⁢(𝒄)=ϵ𝜽⁢(𝒛t,t,𝒄)−ϵ𝜽⁢(𝒛t,t)𝜹𝒄subscriptbold-italic-ϵ𝜽subscript𝒛𝑡𝑡𝒄subscriptbold-italic-ϵ𝜽subscript𝒛𝑡𝑡\\bm{\\delta}(\\bm{c})=\\bm{\\epsilon}_{\\bm{\\theta}}(\\bm{z}_{t},t,\\bm{c})-\\bm{%\n\\epsilon}_{\\bm{\\theta}}(\\bm{z}_{t},t)bold_italic_δ ( bold_italic_c ) = bold_italic_ϵ start_POSTSUBSCRIPT bold_italic_θ end_POSTSUBSCRIPT ( bold_italic_z start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT , italic_t , bold_italic_c ) - bold_italic_ϵ start_POSTSUBSCRIPT bold_italic_θ end_POSTSUBSCRIPT ( bold_italic_z start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT , italic_t )is reversed at different timesteps (25, 35, and 45). With a propert′superscript𝑡′t^{\\prime}italic_t start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPT, specific attributes can be removed while preserving image naturalness. Ift′superscript𝑡′t^{\\prime}italic_t start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPTis too early, structural integrity is lost; if too late, only fine details are affected.",
+                "position": 192
+            },
+            {
+                "img": "https://arxiv.org/html/2504.12782/x4.png",
+                "caption": "Figure 4:Each subplot shows the number of active parameters (y-axis) against the number of intersected saliency maps (x-axis) for four concepts: (a) Nudity, (b) Donald Trump, (c) Van Gogh Style, and (d) Dog. The number of active parameters converges across different concept types with around 100 intersected saliency maps.",
+                "position": 269
+            },
+            {
+                "img": "https://arxiv.org/html/2504.12782/x5.png",
+                "caption": "Figure 5:Generation of the concept-specific saliency map𝑴∗superscript𝑴\\bm{M}^{*}bold_italic_M start_POSTSUPERSCRIPT ∗ end_POSTSUPERSCRIPT. GPT-4 generates prompts𝒞={ci}i=1Nc𝒞superscriptsubscriptsubscript𝑐𝑖𝑖1subscript𝑁𝑐\\mathcal{C}=\\{c_{i}\\}_{i=1}^{N_{c}}caligraphic_C = { italic_c start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT } start_POSTSUBSCRIPT italic_i = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_N start_POSTSUBSCRIPT italic_c end_POSTSUBSCRIPT end_POSTSUPERSCRIPT, each paired with random seeds𝒮={sj}j=1Ns𝒮superscriptsubscriptsubscript𝑠𝑗𝑗1subscript𝑁𝑠\\mathcal{S}=\\{s_{j}\\}_{j=1}^{N_{s}}caligraphic_S = { italic_s start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPT } start_POSTSUBSCRIPT italic_j = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_N start_POSTSUBSCRIPT italic_s end_POSTSUBSCRIPT end_POSTSUPERSCRIPT, which are used to compute gradient maps. After thresholding, saliency maps are obtained, and their intersection across all prompts and seeds yields𝑴∗superscript𝑴\\bm{M}^{*}bold_italic_M start_POSTSUPERSCRIPT ∗ end_POSTSUPERSCRIPT.",
+                "position": 310
+            },
+            {
+                "img": "https://arxiv.org/html/2504.12782/x6.png",
+                "caption": "Figure 6:Multi-LoRA fusion for multi-concept erasure.",
+                "position": 346
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2504.12782/x7.png",
+                "caption": "Figure 7:Qualitative comparison of erasing 100 celebrities from SD v1.4. John Wayne and Tom Hiddleston are in the erasure group for evaluating erasure performance; John Lennon and Gal Gadot are in preservation group for assessing preservation performance. Preserving John Lennon is challenging due to the shared first name with John Wayne.",
+                "position": 886
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional Related Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BHyperparameters Setup",
+        "images": []
+    },
+    {
+        "header": "Appendix CLimitations and Future Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2504.12782/x8.png",
+                "caption": "Figure 8:Qualitative comparison on art style erasure. The images on the same row are generated using the same random seed. Chris Van Allsburg and Claude Monet are in the erasure group, while Adriaen Van Outrecht and Adrian Ghenie are in the retention group.",
+                "position": 2770
+            }
+        ]
+    },
+    {
+        "header": "Appendix DAdditional Qualitative Results",
+        "images": []
+    }
+]

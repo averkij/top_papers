@@ -1,0 +1,150 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.09278/x1.png",
+                "caption": "Figure 1:UFM(Unified Flow & Matching) unifies dense pixel correspondence tasks such as optical flow and wide-baseline matching.\nWe visualize sets of2×2222\\times 22 × 2grids, where the top 2 images are the input, and the bottom 2 are images warped with forward & backward flow. UFM is able to match across a wide range of baselines, including extreme ones with little co-visible overlap.",
+                "position": 183
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Works",
+        "images": []
+    },
+    {
+        "header": "3Unified Flow & Matching Model",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.09278/x2.png",
+                "caption": "Figure 2:The UFM Architecture: Two images are encoded by a shared DINOv2 encoder into patch features, concatenated, and then processed by 12 self-attention transformer layers. Intermediate tokens are decoded by separate DPT heads to regress pixel displacement and covisibility maps, representing correspondence and visibility across views.",
+                "position": 299
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09278/x3.png",
+                "caption": "Figure 3:Refinement of Correspondence by Classification:We compute a per-pixel feature map by combining (1) globally aligned features from the UFM backbone and (2) local fine features encoded by a separate U-Net.\nFor each pixel in the source image, we first use the regression flow target to interpolate features around a local neighborhood.\nWe then compute the attention between the source features and the features from the local neighborhood, and use it to weight-add the coordinates as a refinement value.b𝑏bitalic_bis a constant attention bias.",
+                "position": 356
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09278/x4.png",
+                "caption": "Table 1:Diverse suite of dense correspondence datasets used to train UFM.",
+                "position": 408
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09278/x4.png",
+                "caption": "Table 2:Wide Baseline Dense Correspondence:Zero-shot dense correspondence evaluation at all covisible pixels. We report the AEPE and outlier rates at thresholds of 1, 2, and 5 pixels. UFM outperforms all dense methods by a large margin and matches MASt3R’s performance, despite MASt3R’s advantage in selecting its confident pixels, while being60×60\\times60 ×faster.",
+                "position": 685
+            }
+        ]
+    },
+    {
+        "header": "4Benchmarking Unified Dense Correspondence",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.09278/x4.png",
+                "caption": "Table 4:Optical Flow Estimation:Zero-shot evaluation across covisible ([covis]) and all pixels ([all]) on the Sintel and KITTI training sets. Each method is inferred at different resolutions, and the metrics are computed at the dataset’s original resolution (1K) and on an A6000 Ada GPU.",
+                "position": 1028
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09278/x4.png",
+                "caption": "Figure 4:UFM on Ego-Exo 4D[16]: UFM succeeds in matching out-of-distribution environments, camera models, and challenging viewpoint shifts, showcasing its strong generalization.",
+                "position": 1282
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09278/",
+                "caption": "Figure 5:Architecture Ablation:Validation EPE for various architectures trained on the same224×224224224224\\times 224224 × 224resolution data as UFM. We report performance on different val sets at Data Bound (22.522.522.522.5M pairs) or Compute Bound (at 32 hours on 8 H100 GPU)(a) Validation Set Performance: When trained on more difficult data (such as TartanAir), UFM significantly outperforms alternatives for both bounded data and compute.(b) Training Speed Comparison: We plot the number of pairs seen during training as a function of compute, and label the number of pairs that each architecture can train on at compute bound. UFM is far more efficient than most methods (except SEA-RAFT).",
+                "position": 1392
+            }
+        ]
+    },
+    {
+        "header": "5Limitations",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.09278/x6.png",
+                "caption": "Figure 6:WxBS Benchmarking[39]:We find that UFM: (a) outperforms MASt3R[30], another end-to-end transformer trained on large-scale data for correspondence; (b-f) performs well on images with scale, viewpoint, illumination, and seasonal changes, and (g-i) struggles with pairs showing extreme coupled season, illumination, and scale changes or captured across different imaging spectrums, where RoMA[15]is more robust. We provide further insights inSection5and believe the primary reason to be the preservation of semantic matching capabilities in the pre-trained image encoder.",
+                "position": 1429
+            }
+        ]
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "Appendix AComputing Covisibility Mask",
+        "images": []
+    },
+    {
+        "header": "Appendix BSampling Strategy",
+        "images": []
+    },
+    {
+        "header": "Appendix CTA-WB Training & Testing Dataset",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.09278/x7.png",
+                "caption": "Figure S.1:The Geometric Sampler: (a) From the pointcloud of a scene, we voxelize it and compute the covisibility between all camera centers and all voxels. (b) We randomly select a camera location as the source camera and a target voxel for the source camera to center at. We filter out all candidate camera position that forms a required viewpoint difference when looking at the same target voxel. (c) We filter out candidate cameras by covisibility.",
+                "position": 1801
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09278/x8.png",
+                "caption": "Figure S.2:Example Images from TA-WB Benchmark: The benchmark contains dense correspondence annotation and accurate covisibility for challenging viewpoint shifts.",
+                "position": 1823
+            }
+        ]
+    },
+    {
+        "header": "Appendix DTraining the Refinement",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.09278/x9.png",
+                "caption": "Figure S.3:Refinement Target Weights: Given an inlier ground-truth flow target, we obtain its adjacent pixels and assign a continuous weight based on the sub-pixel location (α,β𝛼𝛽\\alpha,\\betaitalic_α , italic_β) of the target.",
+                "position": 1839
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09278/x10.png",
+                "caption": "Figure S.4:Example of Refinement Features: We visualized the refinement features for a pair of images with PCA. The features exhibit emergent high-frequency and edge-following behavior.",
+                "position": 1845
+            }
+        ]
+    },
+    {
+        "header": "Appendix EEffect of Freezing the Encoder",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.09278/x11.png",
+                "caption": "Figure S.5:Freezing DINOv2 encoder is suboptimal when training UFM on FlyingChairs: We show the validation EPE of FlyingChairs using features from different layers of a frozen pre-trained encoder (left) and finetuning the pre-trained encoder truncated to a specific layer (right).",
+                "position": 1855
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09278/x12.png",
+                "caption": "Figure S.6:Setup for the Probing Experiment: For each layer in a frozen image encoder, we extract patch features for a pair of images and apply a shared linear projection. Softmax attention is computed between source and target features, and the resulting similarity distribution is compared to ground-truth correspondences via cross-entropy loss. The final training loss serves as a proxy for correspondence information encoded at each layer.",
+                "position": 1891
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09278/x13.png",
+                "caption": "Figure S.7:Correlation between probing and val. EPE: We plotted the probing performance (blue) and the EPE of UFM on FlyingChairs when using frozen DINOv2 features from different layers.",
+                "position": 1905
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09278/x14.png",
+                "caption": "Figure S.8:Consistent probing resultson other datasets, resolutions, and encoder sizes showing that the last layer from DINOv2 does not provide the best corresponding features and performance.",
+                "position": 1908
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]

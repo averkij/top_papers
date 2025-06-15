@@ -1,0 +1,204 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introdction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.02281/x1.png",
+                "caption": "Figure 1:Overview of GAIN-RL.GAIN-RL consists of three steps:(1)Angle-based Data Reordering: Before training, the model pre-fills all data and ranks them by the combined angle concentration signals:𝒞inter+𝒞intrasubscript𝒞intersubscript𝒞intra\\mathcal{C}_{\\mathrm{inter}}+\\mathcal{C}_{\\mathrm{intra}}caligraphic_C start_POSTSUBSCRIPT roman_inter end_POSTSUBSCRIPT + caligraphic_C start_POSTSUBSCRIPT roman_intra end_POSTSUBSCRIPT.(2)Gaussian-based Data Sampling: During training, each epoch begins by sampling reordered data using a Gaussian distribution.(3)Dynamic Probability Update: Epoch-wise accuracy and angle concentration are collected to dynamically updateμt+1subscript𝜇𝑡1\\mu_{t+1}italic_μ start_POSTSUBSCRIPT italic_t + 1 end_POSTSUBSCRIPT.\nGAIN-RL guides the model to focus on high-angle, high-loss data, promoting effective gradients and faster convergence.",
+                "position": 107
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x2.png",
+                "caption": "Figure 2:Visualization of models’ responses.We evaluate the first 100 GSM8K questions by having Qwen2.5-0.5B-Instruct and LLaMA3.2-1B-Instruct each generate 10 answers per question, recording the number of correct responses. ChatGPT-4o rates question ease on a 0–10 scale (10 = easiest).",
+                "position": 178
+            }
+        ]
+    },
+    {
+        "header": "2Model-Informed Data Evaluation Signals",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.02281/x3.png",
+                "caption": "Figure 3:Visualization of Layer-wise Concentration Pattern.Experiment is performed on the Qwen2.5-0.5b-Instruct. In each subplot, the pixel at row i, column j represents the cosine similarity of the angle between the i-th and j-th token hidden states of the layer output. Blue, yellow, and gray arrows above the figure represent the tokens of the system prompt, few-shot examples and question, respectively. To better highlight the pattern, values are clipped between the 3rd and 97th percentiles.",
+                "position": 309
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x4.png",
+                "caption": "Figure 4:Visualization of Epoch-wise Concentration Pattern.(Left)𝒞intrasubscript𝒞intra\\mathcal{C}_{\\mathrm{intra}}caligraphic_C start_POSTSUBSCRIPT roman_intra end_POSTSUBSCRIPT; (Mid)𝒞intersubscript𝒞inter\\mathcal{C}_{\\mathrm{inter}}caligraphic_C start_POSTSUBSCRIPT roman_inter end_POSTSUBSCRIPT; (Right)𝒞intra+𝒞intersubscript𝒞intrasubscript𝒞inter\\mathcal{C}_{\\mathrm{intra}}+\\mathcal{C}_{\\mathrm{inter}}caligraphic_C start_POSTSUBSCRIPT roman_intra end_POSTSUBSCRIPT + caligraphic_C start_POSTSUBSCRIPT roman_inter end_POSTSUBSCRIPT.\nWe train Qwen2.5-0.5B-Instruct and LLaMA3.2-1b-Instruct on GSM8K using GRPO for 250 epochs. To accelerate observation, we use a training batch size of 16, generate 4 responses per question, and set the learning rate to 1e-5. After each epoch, we perform pre-filling on the model on the entire dataset and record the angle concentration from the hidden states of the final layer output.",
+                "position": 314
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x5.png",
+                "caption": "",
+                "position": 321
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x6.png",
+                "caption": "",
+                "position": 325
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x7.png",
+                "caption": "Figure 5:Visualization of Data-wise Concentration Pattern.Experiments are conducted on Qwen2.5-0.5b-Instruct.\nWe first performed pre-filling on 1,000 samples of GSM8K using the untrained model to collect𝒞intra+𝒞intersubscript𝒞intrasubscript𝒞inter\\mathcal{C}_{\\mathrm{intra}}+\\mathcal{C}_{\\mathrm{inter}}caligraphic_C start_POSTSUBSCRIPT roman_intra end_POSTSUBSCRIPT + caligraphic_C start_POSTSUBSCRIPT roman_inter end_POSTSUBSCRIPTof samples, and plotted their statistical distributions (the histogram in the figure). Then we monitored the model responses to these samples at various epochs and recorded the average number of correct responses from samples in each angle concentration interval (brighter colors indicate a higher number of correctly answered samples within the interval).",
+                "position": 333
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x8.png",
+                "caption": "Figure 6:Relationship between neuron activation patterns and accuracy over training.At selected epochs, we collect both activation and answers for the first 1000 GSM8K samples. For each question, we identify the most frequently activated 20% of neurons across all tokens in the final layer, and use their indices to construct a binary core-neuron vector. We apply PCA to reduce these vectors to 2D. Each dot represents a sample; brighter colors indicate higher answer accuracy for the sample.",
+                "position": 371
+            }
+        ]
+    },
+    {
+        "header": "3GAIN-RL Framework",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.02281/x9.png",
+                "caption": "Figure 7:Learning Dynamics of Different Methods on (Left) Qwen2.5-Math-1.5b-Instruct and (Right) LLaMA-3.2-3b-Instruct.The y-axis shows average accuracy over GSM8K, Math, AMC 23, AIME 24, OlympiadBench, and Minerva Math. Performance is evaluated every 5 epochs.",
+                "position": 796
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x10.png",
+                "caption": "",
+                "position": 803
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x11.png",
+                "caption": "Figure 8:Data Efficiency Analysis of GAIN-RL.We sampled half of the data from the math dataset using three distinct sampling methods to train the Qwen2.5-0.5b-instruct model using GAIN-RL(GRPO): (1) High Angle Concentration-biased Sampling, (2) Uniform Sampling, and (3) Low Angle Concentration-biased Sampling. The first three figures illustrate the distribution of the sampled data (highlighted in bright colors) within the overall dataset (grey) under each sampling scenario. The rightmost figure presents the performance of models trained on differently distributed data, where GAIN-RL (Full) and GRPO (Full) denote results obtained by training with the complete dataset.",
+                "position": 809
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x12.png",
+                "caption": "",
+                "position": 816
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x13.png",
+                "caption": "",
+                "position": 820
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x14.png",
+                "caption": "",
+                "position": 824
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x15.png",
+                "caption": "Figure 9:Fine-tuning Performance on Single Tasks.(Left)GSM8k. (Mid)Math. (Right)AMC 23. Models are trained on the training sets and evaluated on their validation sets. ADARFT is excluded from GSM8K due to missing difficulty coefficients.",
+                "position": 830
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x16.png",
+                "caption": "",
+                "position": 837
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x17.png",
+                "caption": "",
+                "position": 841
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.02281/x18.png",
+                "caption": "Figure 10:(Left)Ablation Study of Module Components.(Right)Small Batch Scalability Test.Experiments use Qwen2.5-0.5b-Instruct on Math training set, evaluate on the test set every 20 epochs.",
+                "position": 889
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x19.png",
+                "caption": "",
+                "position": 896
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ARelated Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BTheoretical Supplement",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.02281/x20.png",
+                "caption": "Figure 11:Visualization ofWQ⁢@⁢WK.Tformulae-sequencesubscript𝑊𝑄@subscript𝑊𝐾𝑇W_{Q}@W_{K}.Titalic_W start_POSTSUBSCRIPT italic_Q end_POSTSUBSCRIPT @ italic_W start_POSTSUBSCRIPT italic_K end_POSTSUBSCRIPT . italic_Tat different layers in LLaVA-1.5-7b.",
+                "position": 1679
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x21.png",
+                "caption": "Figure 12:Visualization ofWD⁢@⁢WD.Tformulae-sequencesubscript𝑊𝐷@subscript𝑊𝐷𝑇W_{D}@W_{D}.Titalic_W start_POSTSUBSCRIPT italic_D end_POSTSUBSCRIPT @ italic_W start_POSTSUBSCRIPT italic_D end_POSTSUBSCRIPT . italic_Tat different layers in LLaVA-1.5-7b.",
+                "position": 1683
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x22.png",
+                "caption": "Figure 13:Visualization ofWV⁢@⁢WV.Tformulae-sequencesubscript𝑊𝑉@subscript𝑊𝑉𝑇W_{V}@W_{V}.Titalic_W start_POSTSUBSCRIPT italic_V end_POSTSUBSCRIPT @ italic_W start_POSTSUBSCRIPT italic_V end_POSTSUBSCRIPT . italic_Tat different layers in LLaVA-1.5-7b.",
+                "position": 1687
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x23.png",
+                "caption": "Figure 14:Visualization ofc⁢o⁢s⁢(∠⁢(Ai,AM))𝑐𝑜𝑠∠subscript𝐴𝑖subscript𝐴𝑀cos(\\angle(A_{i},A_{M}))italic_c italic_o italic_s ( ∠ ( italic_A start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT , italic_A start_POSTSUBSCRIPT italic_M end_POSTSUBSCRIPT ) )and co-act neurons number at different layers in LLaVA-1.5-7b.",
+                "position": 1703
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x24.png",
+                "caption": "Figure 15:Visualization of attention score at different layers in Qwen2.5-0.5B-Instruct.",
+                "position": 1887
+            }
+        ]
+    },
+    {
+        "header": "Appendix CVisualization Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.02281/x25.png",
+                "caption": "Figure 16:Visualization of Layer-wise Angle Concentration at different layers in Qwen2.5-0.5B-Instruct at easy sample (correct num = 10).",
+                "position": 2060
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x26.png",
+                "caption": "Figure 17:Visualization of Layer-wise Angle Concentration at different layers in Qwen2.5-0.5B-Instruct at medium difficulty sample (correct num = 5).",
+                "position": 2064
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x27.png",
+                "caption": "Figure 18:Visualization of Layer-wise Angle Concentration at different layers in Qwen2.5-0.5B-Instruct at difficult sample (correct num = 0).",
+                "position": 2068
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02281/x28.png",
+                "caption": "Figure 19:Visualization of Data-wise Angle Concentration at different epoch in Qwen2.5-0.5B-Instruct at difficult sample. The training setting is consistent with Figure 3 in the main text.",
+                "position": 2079
+            }
+        ]
+    },
+    {
+        "header": "Appendix DGAIN-RL Algorithm",
+        "images": []
+    },
+    {
+        "header": "Appendix EExperimental Setup",
+        "images": []
+    },
+    {
+        "header": "Appendix FAdditional Experimental Results",
+        "images": []
+    },
+    {
+        "header": "Appendix GDiscussion and Future Work",
+        "images": []
+    }
+]

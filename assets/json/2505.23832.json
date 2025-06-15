@@ -1,0 +1,355 @@
+{
+    "paper_title": "LegalSearchLM: Rethinking Legal Case Retrieval as Legal Elements Generation",
+    "authors": [
+        "Chaeeun Kim",
+        "Jinu Lee",
+        "Wonseok Hwang"
+    ],
+    "sections": [
+        {
+            "title": "Abstract",
+            "content": "Legal Case Retrieval (LCR), which retrieves relevant cases from a query case, is a fundamental task for legal professionals in research and decision-making. However, existing studies on LCR face two major limitations. First, they are evaluated on relatively small-scale retrieval corpora (e.g., 100-55K cases) and use a narrow range of criminal query types, which cannot sufficiently reflect the complexity of real-world legal retrieval scenarios. Second, their reliance on embedding-based or lexical matching methods often results in limited representations and legally irrelevant matches. To address these issues, we present: (1) LEGAR BENCH, the first large-scale Korean LCR benchmark, covering 411 diverse crime types in queries over 1.2M legal cases; and (2) LegalSearchLM, a retrieval model that performs legal element reasoning over the query case and directly generates content grounded in the target cases through constrained decoding. Experimental results show that LegalSearchLM outperforms baselines by 6-20% on LEGAR BENCH, achieving state-of-the-art performance. It also demonstrates strong generalization to out-of-domain cases, outperforming naive generative models trained on in-domain data by 15%."
+        },
+        {
+            "title": "Start",
+            "content": "5 2 0 2 8 2 ] . [ 1 2 3 8 3 2 . 5 0 5 2 : r LegalSearchLM: Rethinking Legal Case Retrieval as Legal Elements Generation Chaeeun Kim1 Jinu Lee2 Wonseok Hwang1,3 1LBOX 2University of Illinois Urbana-Champaign 3University of Seoul"
+        },
+        {
+            "title": "Abstract",
+            "content": "Legal Case Retrieval (LCR), which retrieves relevant cases from query case, is fundamental task for legal professionals in research and decision-making. However, existing studies on LCR face two major limitations. First, they are evaluated on relatively small-scale retrieval corpora (e.g., 10055K cases) and use narrow range of criminal query types, which cannot sufficiently reflect the complexity of real-world legal retrieval scenarios. Second, their reliance on embedding-based or lexical matching methods often results in limited representations and legally irrelevant matches. To address these issues, we present: (1) LEGAR BENCH, the first large-scale Korean LCR benchmark, covering 411 diverse crime types in queries over 1.2M legal cases; and (2) LegalSearchLM, retrieval model that performs legal element reasoning over the query case and directly generates content grounded in the target cases through constrained decoding. Experimental results show that LegalSearchLM outperforms baselines by 6 20% on LEGAR BENCH, achieving It also demonstate-of-the-art performance. strates strong generalization to out-of-domain cases, outperforming naive generative models trained on in-domain data by 15%."
+        },
+        {
+            "title": "Introduction",
+            "content": "Legal AI has increasingly gained attention from legal professionals to raise the productivity of their work. Among various legal applications, Legal Case Retrieval (LCR) (Feng et al., 2024; Deng et al., 2024b; Su et al., 2024; Deng et al., 2024a; Li et al., 2023a; Xiao et al., 2021; Li et al., 2023b,c; Zhang et al., 2023), which identifies relevant precedents for given case, plays particularly crucial role in maintaining judicial fairness and supporting the decision-making process of legal experts. Correspondence to: Chaeeun Kim <chaeeun@lbox.kr>. 1 However, previous work on the legal case retrieval task has clear limitations. (1) Most evaluations have been conducted in small-scale settings, where predefined set of candidate documents is provided for each query and the queries do not sufficiently reflect the diverse criminal case types (Ma et al., 2021; Li et al., 2023b,c; Xiao et al., 2018; Li et al., 2023d). (2) The tested retrieval models are limited to embedding-based similarity and lexical matching approaches, with the former struggling to capture the rich semantics of legal literature as it compresses complex documents into fixed-size vectors, and the latter often leading to unfocused matches due to lack of semantic understanding (Wang et al., 2023; Magesh et al., 2024; Kim et al., 2024). To address the first, we present LEGAR BENCH (Legal Case Retrieval Benchmark), the first largescale Korean LCR benchmark, comprising two dataset versions tailored to different evaluation needs: (1) LEGAR BENCHStandard is designed for comprehensive assessment across broad range of crime categories. The queries cover 411 distinct crime types and are evaluated over retrieval pool of 1.2M cases. To achieve this, we systematically construct the benchmark using crime types based on statutory provisions, even further detailed than official charge titles used in courts (e.g., defamation by fact disclosure Article 307(1), or false allegation Article 307(2), both sharing the charge title defama- (2) LEGAR BENCHStricter tion) (Section 2.1). evaluates stricter relevance criteria than LEGAR BENCHStandard. It considers more factual details and legal issues within the same crime type that can affect the final judgment or sentence, which is crucial for legal practitioners. To enable this, we annotate the pool of 170K cases across 160 crime types using 102 crime-specific legal factors and 443 corresponding options (Section 2.2). To address the second, we shift our focus on the LCR task from sequence-to-sequence matching to"
+        },
+        {
+            "title": "Target case per query",
+            "content": "COLIEE2024 LeCaRD LeCaRDv"
+        },
+        {
+            "title": "Korean\nKorean",
+            "content": "- - - 411 160 400 107 800 1,734 (per query) 100 (per query) 55,192 (per query) 411*N 15,777 1,226,814 169, - 10.33 20.89 200 14.69 Table 1: Scale comparison of LCR benchmarks. LEGAR BENCH expands the retrieval pool and query coverage. indicates query set expandability via similar case groups. generating the key legal elements that determine relevance by proposing LegalSearchLM. It directly generates important legal elements via constrained decoding and returns the documents that contain them (Li et al., 2024; Kim et al., 2024; Li et al., 2023e,f; Bevilacqua et al., 2022), mitigating the shortcomings of traditional retrievers like BM25 and dense embeddings. Given the specificity of the legal domain, we adopt diverse strategies including first token-aware generation and self-supervised fine-tuning (SSFT) (Section 3). We evaluate LegalSearchLM on LEGAR BENCH, comparing it against strong baselines including lexical matching and embedding-based methods from both general-purpose and legaldomain models. Our experimental results show that LegalSearchLM outperforms the best baseline by 6% in precision. Our training strategy leads to significantly better generalization, achieving 15% improvement over generative retrieval models trained with naive identifiers on in-domain data (Section 5). In summary, our contributions are as follows. We introduce the first Korean LCR benchmark, LEGAR BENCH, which has the largest and most diverse criminal cases. We present LegalSearchLM that generates legal elements that should be included in target case via first-token-aware decoding. Our LegalSearchLM achieves state-of-theart performance on LEGAL BENCH, demonstrating remarkable generalization ability on unseen crime types."
+        },
+        {
+            "title": "Categories",
+            "content": "#Crime types of queries"
+        },
+        {
+            "title": "Stricter",
+            "content": "Traffic offenses Fraud Injury or Violence Sexual crime Defamation or Insult Finance or Insurance Drug Murder Theft or Robbery Obstruction of Business Destruction Threat Criminal trespass Embezzlement or Breach of trust Gambling Negligent homicide and injury Obstruction of right Child abuse or School violence Medical or Food drug Corporation Bribery Car Labor or Employment Industrial or Serious accidents Military duty or law Consumer or Fair trade Arrest or Detention Intellectual property IT or Privacy Misdemeanor Sexual norms Tax, Administ, Const law Other criminal offenses"
+        },
+        {
+            "title": "Total",
+            "content": "13 21 31 132 8 5 5 2 38 13 5 11 15 15 7 6 5 10 11 3 3 2 11 4 2 1 1 3 2 1 1 14 10 411 9 8 19 111 6 1 4 2 - - - - - - - - - - - - - - - - - - - - - - - - - 160 Table 2: Statistics of Crime Typology and Corresponding Criminal Types. LEGAR BENCHStandard includes 411 query types across 33 crime categories, while LEGAR BENCHStricter covers 160 query types across 8 categories. lawyers involved in the construction process. It offers two dataset versions based on different evaluation needs, LEGAR BENCHStandard and LEGAR BENCHStricter. In this section, we describe relevance criteria and the construction process of LEGAR BENCH. LEGAR BENCH features the most comprehensive set of query and target cases (See Table 1), with relevance criteria rigorously defined by the"
+        },
+        {
+            "title": "2.1 LEGAR BENCHStandard\nLEGAR BENCHStandard is designed to provide a\ncomprehensive assessment of retrieving diverse\ncrime categories, and the enhancement of overall\nsystem performance.",
+            "content": "2 Figure 1: Examples of Relevance Cases. (Query) is query case on distributing false images/videos for profit. The Red Highlight indicates profit, the Yellow Highlight represents the creation of false images/videos, and the Green Highlight denotes distributionthe three key legal elements of the crime. Both (Standard) and (Stricter) satisfy the three elements, and (Stricter) additionally meets the requirements concerning the scale of distributed images/videos (Red Highlight) and the total financial gains obtained (Purple Highlight). (A) and (B) are not target cases, as (A) distributed false image without intending to obtain financial gains, and (B) committed the offense for financial gain through the unlawful filming of real footage, not the creation of false images. target case (Standard) satisfies the three statutory elements: 1. creation of false sexual images/videos, 2. intent for profit, and 3. distribution. Cases like (A), which are not for profit, or (B), which concern illegal sexual video filming rather than false sexual image creation, cannot be considered target cases, since they are distinct crimes governed by different laws. Figure 2: Examples of the construction process for each step in LEGAR BENCHStandard. Step 1 defines major crime categories based on Korean Criminal Act. Step 2 refines these categories using charge titles, and Step 3 further specifies them based on statutory provisions."
+        },
+        {
+            "title": "2.1.1 Definition of Standard Relevance",
+            "content": "We define standard relevance based on the charge title and statutory provision, where the former refers to the formal name of the offense, and the latter indicates the specific statutory article applicable to that charge. For example, as shown in Figure 1 on sexual crime, for the query case (Query) on distributing false sexual images/videos for profit, the standard 3 Step 1: Construction of Crime Typology. We establish crime typology to categorize various types of crimes in criminal cases. As shown in Step 1 of Figure 2, we define major categories based on the structure of the Korean Criminal Act, such as sexual crimes, labor or employment offenses, crimes against reputation, and theft or robbery. Appendix 5 lists total of 33 crime categories. Step 2: Assignment of Charge Titles. We construct the set of crime charge titles that can occur (1,052,506), which account for 85.79% of our total criminal cases, enabling evaluation on the majority of criminal cases through our LEGAR BENCHStandard."
+        },
+        {
+            "title": "2.3 Dataset Construction\nStep 5: Define Detailed Factors. We construct\nLEGAR BENCHStricter starting from 160 simi-\nlar groups across 8 crime categories in LEGAR\nBENCHStandard. First, we define sets of factors to\nbe further considered for each group in the stan-\ndard set. Figure 3 shows that the standard group\n“Insult” is associated with Common Criminal Fac-\ntors, Victim-Targeted Crime Factors, and Factors of\nInsult. Next, we identify detailed sub-factors and\ncreate options for each of them. Finally, based on\nthe defined factors, sub-factors, and options for each\nstandard group, we annotate the cases belonging to\neach standard group using GPT-4o. The full list of\nsub-factors is shown in Table 29.",
+            "content": "Step 6: Case Grouping. As result of Step 5, we obtain (sub-factor, option) pairs for each case across all sub-factors required for each standard group. The following grouping algorithm is then applied to find cases with the highest factual relevance. We created one stricter group for each standard group, Figure 3: Examples of the construction process of LEGAR BENCHStricter. Each crime type (e.g., Insult) includes specifically defined factors (in boxes filled with sky blue) and sub-factors (in boxes outlined in black). Cases are annotated by mapping all sub-factors to corresponding predefined options. within each crime category. charge title is the official name used in legal documents, such as indictments or complaints, to describe specific offense. As shown in Figure 2, crimes against reputation can be expanded into related charge titles (sub-categories), such as defamation, defamation through printed materials, defamation through radio, insults, etc. While charge titles are determined by statutory provisions that apply, there is no oneto-one correspondence between these two because some charge titles correspond to multiple provisions with subtle differences. This ambiguity is resolved by further refinement in the next step. Step 3: Refinement from Statutory Provisions. To better reflect the subtle difference of the body of the crime between provisions grouped within the same charge title, we refine charge titles to the level of individual statutory provisions when such refinement is both possible and meaningful. Figure 2 shows how defamation can be divided according to distinct laws, such as defamation by disclosure of facts and defamation by allegation of false facts. Finally, the standard similar groups are formed by combining the results of Step 2 and Step 3, as shown in the skyblue-bordered box of Figure 2. As result, LEGAR BENCHStandard contains 411 similar groups across 33 categories. Step 4: Case Mapping. We automatically process 1.2M (1,226,814) criminal cases, mapping them to their respective groups based on the charge title and statutory provisions annotated for each group. This process successfully maps 1M cases resulting in 160 queries (See Table 1 for details). Algorithm 1 Stricter Relevance Group 1: Input: case_data, subfactor-option pair_list 2: Output: grouped_cases 3: for each case in case_data do 4: generate_key(subfactor-option key = pair_list) group[key].append(case) 5: 6: end for 7: if any group has 2 or more cases then 8: 9: end if 10: for = number of subfactors to 1 do for each case in case_data do 11: return the group 12: 13: 14: 15: 16: key = generate_key(subfactor-option pair_list[:r]) group[key].append(case) end for if any group has 2 or more cases then return the group 17: end if 18: end for 19: return None"
+        },
+        {
+            "title": "3 LegalSearchLM",
+            "content": "Previous approaches to LCR rely on either embedding-based or lexical matching methods (Magesh et al., 2024). However, embedding models often lose important details by compressing lengthy legal texts into single vectors, while lexical methods struggle to distinguish legally important information from noise. To better reflect how legal experts assess relevancefocusing on specific legal elements that constitute the crime, rather than subtle details like dates, geographic names, or place namesthere is need for more sophisticated retrieval approach. In this work, we introduce LegalSearchLM, which addresses the pitfalls of sequence-tosequence matching by adopting the generative retrieval paradigm (Bevilacqua et al., 2022; Li et al., 2023f,e; Kim et al., 2024). Given query case, LegalSearchLM generates relevant legal elements as keys for the target documents. By modeling retrieval as language modeling, it effectively mitigates the fixed-dimension embeddings information loss problem and the lexical matchs lack of deep semantic understanding, which are both crucial in LCR."
+        },
+        {
+            "title": "3.1 Training\nExtracting legal elements We define legal ele-\nments are atomic facts that can influence the final\njudgment. As proven effective by Min et al. (2023);\nChen et al. (2024a); Cai et al. (2024), we extract\nlegally valid elements by prompting an LLM.",
+            "content": "However, naively training the model using extracted legal elements is insufficient for successful retrieval in our framework, which requires retrievers to generate sequences that appear exactly in the corpus. In this framework, early decoding decisions are highly critical; generating dates or locations where the crime occurred as the first token may unintentionally steer the decoding process toward irrelevant path. This has the unintended effect of filtering based on information irrelevant to legal relevance, discarding documents that may contain key legal elements and considering only those that include the specific date or location. To address this problem, we construct synthetic examples that begin with legally informative tokens from legal elements using few-shot LLMs. Figure 4 illustrates the generation of first-token-aware legal elements. Data Collection As LegalSearchLM formulates LCR as legal elements generation, it needs fine-tuning to generate appropriate legal elements given the query case. However, as relevance annotation in the legal domain is costly, training the model on large set of query-target pairs is not feasible. As solution, we construct training dataset in self-supervised manner (Lewis et al., 2020). Specifically, we use query case as inputs and legal elements from the query case as outputs. This approach provides the following three benefits: Less noise and cost-effectiveness: It reduces noise compared to using an existing retrievers results as gold query-target pairs (e.g., BM25) (Li et al., 2023a). Balanced training on long-tail crimes: It enables better sampling of rare case types than citation-based approaches. Better generalization: The model learns to reason over legal elements from query case, aligning with inference-time conditions without relying on memorization. Figure 4: Inference process of LegalSearchLM. Given Query doc as input, LegalSearchLM generates key legal elements expected to appear in the Target doc via core-first-token-aware constrained decoding over prefix-indexed corpus (Generated content). Since the generated content is grounded in the corpus, it can be linked back to its source document, enabling retrieval."
+        },
+        {
+            "title": "Criminal Category",
+            "content": "LegalSeachLM BM"
+        },
+        {
+            "title": "SAILER",
+            "content": "LEGAR BENCHStandard (P@5) LEGAR BENCHStrciter (P@5) Contriever LegalSeachLM BM"
+        },
+        {
+            "title": "Traffic offenses",
+            "content": "[Total] 0.74 0.62 0.62 0.72 0. 0.80 0.50 0.47 ... 0.68 0.53 0. 0.49 0.56 0.58 0.52 0.50 0.33 ... 0. 0.57 0.42 0.40 0.60 0.48 0. 0.30 0.33 ... 0.48 0.64 0.66 0.65 0. 0.78 0.84 0.50 0.94 ... 0.62 0.33 0. 0.37 0.32 0.33 0.34 0.39 0. 0.35 0.33 0.35 0.37 0.32 0. 0.33 0.39 0.34 0.03 0.01 0. 0 0 0 0 0.02 0. 0.23 0.32 0.20 0.22 0.10 0. 0.12 0.34 0.01 0.22 Table 3: Results on LEGAR BENCHStandard and LEGAR BENCHStricter. We present results for the 8 crime categories shared by both evaluation sets, while the scores for the remaining 25 crime categories in LEGAR BENCHStandard are listed in Table A.1. 3."
+        },
+        {
+            "title": "Inference",
+            "content": "During inference, LegalSearchLM performs constrained beam decoding over the document index, ensuring that the generated content always exists in document within the corpus (see Figure 4). For constrained decoding, we employ an FM-index based on the Burrows-Wheeler Transform (BWT) (Ferragina and Manzini, 2000), allowing efficient prefixconstrained search over the corpus with minimal memory overhead. The specific generation process is as follows. Let x1, x2, . . . , xn denote generated token sequence obtained via constrained beam search. At each decoding step t, we maintain beam of partial sequences txp1q ăt u, where each ăt , . . . , xpBq ăt , xp2q hypothesis is extended based on the previously . The candidate set Cpxpiq generated tokens xpiq ătq ăt represents the valid next tokens for the i-th hypothesis, constrained by FM-index. This ensures that all generated sequences present within the corpus. xpiq 1 arg max xPV for 1, . . . , P px [BOS]q ! px xpiq ătq xpiq Top-k for ě 2 ˇ ˇ ˇ Cpxpiq ătq ) (1) (2) In our retrieval process, LegalSearchLM captures key legal elements from the query case that are expected to appear in the target case, and begins 6 Figure 5: Performance on LEGAR BENCHStricter by four different difficulties, where represents the number of factors that should be matched. LegalSearchLM achieves the best performance across all difficulty levels, demonstrating robustness in complex retrieval settings. generation with informative initial tokens to guide decoding toward relevant parts of the corpus."
+        },
+        {
+            "title": "4.1 Baselines\nWe evaluate a range of baselines, including tra-\nditional lexical matching and embedding-based\nmethods trained on general or legal domains.",
+            "content": "Lexical Matching. We use BM25, strong baseline in the legal domain (Rosa et al., 2021), widely adopted by production-level legal RAG systems (Magesh et al., 2024). General Dual Encoder. We experiment Contriever (Izacard et al., 2022), dual encoder model trained on general data. Legal Dual Encoder. We use SAILER (Li et al., 2023a), which achieves strong performance in the LCR task of the COLIEE 2023 competition (Goebel et al., 2024). Compared to Contriever, SAILER is pretrained using legal documents with section-level training loss (e.g., fact, interpretation (reasoning), and decision) that enables better legal document understanding abilities."
+        },
+        {
+            "title": "5 Results and Analysis",
+            "content": "Performance on LEGAR BENCHStandard. An evaluation on the standard version, consisting of 411 various query types across 33 crime categories, demonstrates that LegalSearchLM outperforms BM25 by 17%, Contriever by 20%, and SAILER by 6% (Table 3, bottom row). Specifically, it outperformed BM25 in 28 crime categories, Contriever across all categories, and SAILER in 21 categories. 7 6: on"
+        },
+        {
+            "title": "Performance",
+            "content": "out-of-distribution. Figure LegalSearchLMall is trained on all test categories; LegalSearchLMsexualCrime on sexual crimes only. NaiveIdentifiersall is trained with random spans within Performance of the query case as supervision. LegalSearchLMsexualCrime highlights its superior generalization ability. In Table 3, we provide the results for 8 out of 33 criminal categories for brevity. Full results are presented in Appendix A.1, where we also provide comparison with the reranked model, KELLER. Performance on LEGAR BENCHStricter. An evaluation on the stricter version, which includes 15,777 diverse query types across 8 crime categories, further demonstrates LegalSearchLMs effectiveness in handling complex legal knowledge, achieving the highest performance in Table 3. BM25 excels at capturing fine-grained details through exact lexical matching, leading to stronger performance in LEGAR BENCHStricter compared to embedding-based similarity search. LegalSearchLM effectively captures both finegrained details and legal semantic understanding, combining the strengths of both approaches. Further analysis is provided below. Advantages of LegalSearchLM over Existing In the LEGAL BENCHStricter Retrieval Methods. setting, we analyze retrieval performance across varying levels of retrieval difficulty, measured by the number of sub-factors . As shown in Figure 5, The performance of SAILER, an embedding-based retriever, relatively sharply degrades in difficult problems compared to LegalSearchLM, indicating that information is lost when vectorized. On the other hand, BM25, lexical matching method, demonstrates no significant change by difficulty since it retrieves in way that captures overlapping keywords without regard to legal element understanding. In contrast, LegalSearchLM achieves the best performance in all difficulties by combining the strength of lexical matching in capturing fine-grained details with that of embedding-based retrieval in understanding semantics. Generalization ability of LegalSearchLM to unseen crime types. As legal professionals handle diverse cases, the generalizability to unseen criminal types is crucial in LCR. To evaluate this, we train LegalSearchLM only using sexual crime data and test it on unseen domains (embezzlement and breach of trust, traffic offenses, and labor and employment). We compare the results with generative retrieval model trained on all crimes but with naive identifiers. Figure 6 shows that LegalSearchLM trained on sexual crime outperforms the model trained with naive identifiers by 15.66%, despite the latter is trained using in-domain data. Furthermore, the performance is almost on par with LegalSearchLM trained on the full data. This demonstrates that the ability to effectively capture key legal elements is more beneficial than training on various datasets without carefully designed identifiers."
+        },
+        {
+            "title": "6.1 Legal Case Retrieval Datasets",
+            "content": "Legal Case Retrieval (LCR) is the task of retrieving target cases relevant to query case (Feng et al., 2024; Ma et al., 2021). While some works define relevant documents as one that is cited by the query (Shao et al., 2020; Li et al., 2023c), we focus on case similarity (Ma et al., 2021). In LCR, obtaining large-scale data is challenging as the annotation requires legal expertise. Therefore, existing works often restrict the crime types or the retrieval pools size (Li et al., 2023b; Ma et al., 2021). In contrast, this work successfully automated the annotation process while maintaining expert-level relevance judgments, eliminating the need for compromising data size and diversity. In contrast, LEGAR BENCHStandard has effectively scaled the number of distinct crimes and the number of documents in the retrieval pool by using statutory provisions. Furthermore, LEGAR BENCHStricter can evaluate the relevance based on expert-annotated legal factors on large scale, which was not possible before."
+        },
+        {
+            "title": "6.3 Generative Retrieval\nGenerative Retrieval (GR) initially emerged from\nGENRE (Cao et al., 2021), in which an encoder-\ndecoder model retrieves a document by generating\nthe title of the document from a given query.",
+            "content": "Recent works explore identifiers based on specific document IDs (Tay et al., 2022; Mehta et al., 2023; Wang et al., 2023; Chen et al., 2024b; Zeng et al., 2023, 2024) or the documents content, which contain richer, finer-grained information. For instance, SEAL uses spans from the body text (Bevilacqua et al., 2022), which was also adopted by MINDER (Li et al., 2023f) and LTRGR (Li et al., 2023e) that combine spans, titles, and pseudo-queries. LegalSearchLM is inspired by content identifiers and incorporates domain-specific adaptations to better address legal retrieval tasks."
+        },
+        {
+            "title": "7 Conclusion",
+            "content": "Legal case retrieval is crucial task for legal practitioners, but resource scarcity and complex relevance judgment have hindered its application. To address these issues, we first construct LEGAR BENCH, novel large-scale LCR dataset based on expert-defined relevance. LEGAR BENCH comes with two subsets, one with broader crime coverage and one with finer-grained relevance labels, supporting diverse applications. Next, we present LegalSearchLM, the first generative retrieval model, that captures the core legal elements relevant to the given query case. LegalSearchLM shows promising results in both versions of LEGAL BENCH, proving the potential of generative retrieval in LCR."
+        },
+        {
+            "title": "8 Limitations",
+            "content": "In this dataset, we construct the largest benchmark in the legal case retrieval task, LEGAR BENCH. However, this dataset is restricted to the cases and statutes from the Korean legal system, which might limit its applicability beyond other jurisdictions and to non-Korean speakers. Furthermore, although legal experts were actively involved in defining the relevance criteria in LEGAR BENCH, they were not involved in the data point-wise verification of case-to-case relevance. As result, there may be undetected noise in the dataset. References Michele Bevilacqua, Giuseppe Ottaviano, Patrick Lewis, Wen tau Yih, Sebastian Riedel, and Fabio Petroni. 2022. Autoregressive search engines: Generating substrings as document identifiers. Preprint, arXiv:2204.10628. Fengyu Cai, Xinran Zhao, Tong Chen, Sihao Chen, Hongming Zhang, Iryna Gurevych, and Heinz Koeppl. 2024. MixGR: Enhancing retriever generalization for scientific domain through complementary granularity. Preprint, arXiv:2407.10691. Nicola De Cao, Gautier Izacard, Sebastian Riedel, and Fabio Petroni. 2021. Autoregressive entity retrieval. Preprint, arXiv:2010.00904. Tong Chen, Hongwei Wang, Sihao Chen, Wenhao Yu, Kaixin Ma, Xinran Zhao, Hongming Zhang, and Dong Yu. 2024a. Dense retrieval: What retrieval granularity should we use? In Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing, pages 1515915177, Miami, Florida, USA. Association for Computational Linguistics. Tong Chen, Hongwei Wang, Sihao Chen, Wenhao Yu, Kaixin Ma, Xinran Zhao, Hongming Zhang, and Dong Yu. 2024b. Dense retrieval: What retrieval granularity should we use? Preprint, arXiv:2312.06648. Chenlong Deng, Zhicheng Dou, Yujia Zhou, Peitian Zhang, and Kelong Mao. 2024a. An element is worth thousand words: Enhancing legal case retrieval by incorporating legal elements. In Findings of the Association for Computational Linguistics: ACL 2024, pages 23542365, Bangkok, Thailand. Association for Computational Linguistics. Chenlong Deng, Kelong Mao, and Zhicheng Dou. 2024b. Learning interpretable legal case retrieval via knowledge-guided case reformulation. Preprint, arXiv:2406.19760. Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 64726485, Bangkok, Thailand. Association for Computational Linguistics. P. Ferragina and G. Manzini. 2000. Opportunistic data structures with applications. In Proceedings 41st Annual Symposium on Foundations of Computer Science, pages 390398. Randy Goebel, Yoshinobu Kano, Mi-Young Kim, Juliano Rabelo, Ken Satoh, and Masaharu Yoshioka. 2024. Overview and discussion of the competition on legal information, extraction/entailment (coliee) 2023. The Review of Socionetwork Strategies, 18(1):2747. Wonseok Hwang, Saehee Eom, Hanuhl Lee, Hai Jin Park, and Minjoon Seo. 2022. Data-efficient end-toend information extraction for statistical legal analysis. In Proceedings of the Natural Legal Language Processing Workshop 2022, pages 143152, Abu Dhabi, United Arab Emirates (Hybrid). Association for Computational Linguistics. Gautier Izacard, Mathilde Caron, Lucas Hosseini, Sebastian Riedel, Piotr Bojanowski, Armand Joulin, and Edouard Grave. 2022. Unsupervised dense information retrieval with contrastive learning. Preprint, arXiv:2112.09118. Chaeeun Kim, Soyoung Yoon, Hyunji Lee, Joel Jang, Sohee Yang, and Minjoon Seo. 2024. Exploring the practicality of generative retrieval on dynamic corpora. In Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing, pages 1361613633, Miami, Florida, USA. Association for Computational Linguistics. Mike Lewis, Yinhan Liu, Naman Goyal, Marjan Ghazvininejad, Abdelrahman Mohamed, Omer Levy, Veselin Stoyanov, and Luke Zettlemoyer. 2020. BART: Denoising sequence-to-sequence pre-training for natural language generation, translation, and comprehension. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, pages 78717880, Online. Association for Computational Linguistics. Haitao Li, Qingyao Ai, Jia Chen, Qian Dong, Yueyue Wu, Yiqun Liu, Chong Chen, and Qi Tian. 2023a. Sailer: Structure-aware pre-trained language model for legal case retrieval. Preprint, arXiv:2304.11370. Haitao Li, Yunqiu Shao, Yueyue Wu, Qingyao Ai, Yixiao Ma, and Yiqun Liu. 2023b. Lecardv2: largescale chinese legal case retrieval dataset. Preprint, arXiv:2310.17609. Haitao Li, Weihang Su, Changyue Wang, Yueyue Wu, Qingyao Ai, and Yiqun Liu. 2023c. Thuir@coliee 2023: Incorporating structural knowledge into pretrained language models for legal case retrieval. Preprint, arXiv:2305.06812. Yi Feng, Chuanyi Li, and Vincent Ng. 2024. Legal case retrieval: survey of the state of the art. In Qingquan Li, Yiran Hu, Feng Yao, Chaojun Xiao, Zhiyuan Liu, Maosong Sun, and Weixing Shen. 9 Yi Tay, Vinh Q. Tran, Mostafa Dehghani, Jianmo Ni, Dara Bahri, Harsh Mehta, Zhen Qin, Kai Hui, Zhe Zhao, Jai Gupta, Tal Schuster, William W. Cohen, and Donald Metzler. 2022. Transformer memory as differentiable search index. Preprint, arXiv:2202.06991. Yujing Wang, Yingyan Hou, Haonan Wang, Ziming Miao, Shibin Wu, Hao Sun, Qi Chen, Yuqing Xia, Chengmin Chi, Guoshuai Zhao, Zheng Liu, Xing Xie, Hao Allen Sun, Weiwei Deng, Qi Zhang, and Mao Yang. 2023. neural corpus indexer for document retrieval. Preprint, arXiv:2206.02743. Chaojun Xiao, Xueyu Hu, Zhiyuan Liu, Cunchao Tu, and Maosong Sun. 2021. Lawformer: pre-trained language model for chinese legal long documents. Preprint, arXiv:2105.03887. Chaojun Xiao, Haoxi Zhong, Zhipeng Guo, Cunchao Tu, Zhiyuan Liu, Maosong Sun, Yansong Feng, Xianpei Han, Zhen Hu, Heng Wang, and Jianfeng Xu. 2018. Cail2018: large-scale legal dataset for judgment prediction. Preprint, arXiv:1807.02478. Linting Xue, Noah Constant, Adam Roberts, Mihir Kale, Rami Al-Rfou, Aditya Siddhant, Aditya Barua, and Colin Raffel. 2021. mT5: massively multilingual pre-trained text-to-text transformer. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, pages 483498, Online. Association for Computational Linguistics. Hansi Zeng, Chen Luo, Bowen Jin, Sheikh Muhammad Sarwar, Tianxin Wei, and Hamed Zamani. 2023. Scalable and effective generative information retrieval. Preprint, arXiv:2311.09134. Hansi Zeng, Chen Luo, and Hamed Zamani. 2024. Planning ahead in generative retrieval: Guiding autoregressive generation through simultaneous decoding. Preprint, arXiv:2404.14600. Kun Zhang, Chong Chen, Yuanzhuo Wang, Qi Tian, and Long Bai. 2023. Cfgl-lcr: counterfactual graph learning framework for legal case retrieval. In Proceedings of the 29th ACM SIGKDD Conference on Knowledge Discovery and Data Mining, KDD 23, page 33323341, New York, NY, USA. Association for Computing Machinery. 2023d. Muser: multi-view similar case retrieval dataset. In Proceedings of the 32nd ACM International Conference on Information and Knowledge Management, CIKM 23, page 53365340. ACM. Xiaoxi Li, Jiajie Jin, Yujia Zhou, Yuyao Zhang, Peitian Zhang, Yutao Zhu, and Zhicheng Dou. 2024. From matching to generation: survey on generative information retrieval. Preprint, arXiv:2404.14851. Yongqi Li, Nan Yang, Liang Wang, Furu Wei, and Wenjie Li. 2023e. Learning to rank in generative retrieval. Preprint, arXiv:2306.15222. Yongqi Li, Nan Yang, Liang Wang, Furu Wei, and Wenjie Li. 2023f. Multiview identifiers enhanced generative retrieval. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 66366648, Toronto, Canada. Association for Computational Linguistics. Yixiao Ma, Yunqiu Shao, Yueyue Wu, Yiqun Liu, Ruizhe Zhang, Min Zhang, and Shaoping Ma. 2021. Lecard: legal case retrieval dataset for chinese law system. In Proceedings of the 44th International ACM SIGIR Conference on Research and Development in Information Retrieval, SIGIR 21, page 23422348, New York, NY, USA. Association for Computing Machinery. Varun Magesh, Faiz Surani, Matthew Dahl, Mirac Suzgun, Christopher D. Manning, and Daniel E. Ho. 2024. Hallucination-free? assessing the reliability of leading ai legal research tools. Preprint, arXiv:2405.20362. Sanket Vaibhav Mehta, Jai Gupta, Yi Tay, Mostafa Dehghani, Vinh Q. Tran, Jinfeng Rao, Marc Najork, Emma Strubell, and Donald Metzler. 2023. Dsi++: Updating transformer memory with new documents. Preprint, arXiv:2212.09744. Sewon Min, Kalpesh Krishna, Xinxi Lyu, Mike Lewis, Wen tau Yih, Pang Wei Koh, Mohit Iyyer, Luke Zettlemoyer, and Hannaneh Hajishirzi. 2023. Factscore: Fine-grained atomic evaluation of factual precision in long form text generation. Preprint, arXiv:2305.14251. Guilherme Moraes Rosa, Ruan Chaves Rodrigues, Roberto Lotufo, and Rodrigo Nogueira. 2021. Yes, bm25 is strong baseline for legal case retrieval. Preprint, arXiv:2105.05686. Yunqiu Shao, Bulou Liu, Jiaxin Mao, Yiqun Liu, Min Zhang, and Shaoping Ma. 2020. Thuir@coliee-2020: Leveraging semantic understanding and exact matching for legal case retrieval and entailment. Preprint, arXiv:2012.13102. Weihang Su, Qingyao Ai, Yueyue Wu, Yixiao Ma, Haitao Li, Yiqun Liu, Zhĳing Wu, and Min Zhang. 2024. Caseformer: Pre-training for legal case retrieval based on inter-case distinctions. Preprint, arXiv:2311.00333."
+        },
+        {
+            "title": "A Result Details",
+            "content": "A.1 Full Results on LEGAR BENCHStandard We provide the complete results on LEGAR BENCHStandard across all 33 criminal categories in Table 4. Keep in mind that KELLER, which focuses on reranking, leverages passage-level retrieval and make multiple inferences per case using majority voting (MaxSum). This setup differs from our model and other baselines, making direct comparisons difficult. We include KELLER as reference of reranked model. All results are from single-run experiments."
+        },
+        {
+            "title": "B Benchmark Details",
+            "content": "B.1 Collaboration with Legal experts Annotation of LEGAR BENCHStricter requires significant amount of legal expert annotation. For instance, determining the critical factors that determine the applicability of specific statute requires extensive knowledge of criminal law, and determining the range of inherently continuous values (e.g. severity of an injury) that are similarly treated in practice requires strong expertise in practicing criminal law. For expert annotation, we hired five Korean lawyers specialized in the Criminal Act to construct our LEGAR BENCHStandard and LEGAR BENCHStricter. The lawyers were instructed to organize high-coverage categories that encompass most criminal offenses and to label subcategories of cases based on charge titles. Additionally, for the stricter version, they listed relevant factors (factual details) for each specific charge in LEGAR BENCHStandard. Lawyers spent total 70 hours for the annotation task, and the compensation was approximately $250/hour during the whole process. B.2 Statistics of LEGAR BENCHStandard Table 5 presents criminal typology that includes 33 major categories of criminal offenses. Each category is classified in detail based on charge titles and statutes. The number of standard groups for each category is listed under #of Standard Group, while the number of unique case documents mapped to each group is listed under #of Cases. The total number of standard groups is 411, including 1,052,506 unique cases, which constitute 85.79% of the entire corpus (1,226,814 cases). This figure underscores the broad coverage of our benchmark across wide range of types of criminal offenses. B.3 Statistics of LEGAR BENCHStricter Table 6 shows statistics of stricter groups in 8 criminal categories. The number of stricter groups for each category is listed under #of Stricter Group, while the number of unique case documents mapped to each group is listed under #of Cases. B.4 Examples of Crime Types in Query Cases. In Table 7. Traffic offenses. Fraud. In Table 8. Injury and Violence. In Table 9. Theft and Robbery. In Table 10. Embezzlement. In Table 11. Destruction. In Table 12. Finance insurance. In Table 13. Threat. In Table 14. Crimes against Reputation. In Table 15. Drug. In Table 16. Gambling. In Table 17. Negligent homicide and injury. In Table 18. Obstruction of rights. In Table 19. Crimes against children and School violence. In Table 20. Medical and Food drug. In Table 21. Murder. In Table 22. Corporation. In Table 23. Bribery. In Table 24. Labor and Employment. In Table 25. Consumer and Fair trade. In Table 26. Arrest and Detention. In Table 27. Other criminal offenses. In Table 28. B.5 Full List of the Stricter Relevance Group LEGAR BENCHStricter further divides LEGAR BENCHStandard categories based on different factual details of criminal case that do not affect the type of charge, but might affect the final judgment (guilty or innocent) or the sentence e.g. information about defendant/victims, methods, consequences, and claims made in court. Also, it provides 11 Criminal Category LegalSeachLM BM25 Contriever SAILER KELLER LEGAR BENCHStandard (Precision@5) [Total] Traffic offenses Fraud Injury or Violence Sexual crime Theft or Robbery Obstruction of Business Embezzlement or Breach of trust Destruction Finance or Insurance Threat Defamation or Insult Drug Criminal trespass Gambling Negligent homicide and injury Obstruction of right Child abuse or School violence Medical or Food drug Murder Corporation Bribery Car Labor or Employment Industrial or Serious accidents Military duty or law Consumer or Fair trade Arrest or Detention Intellectual property IT or Privacy Misdemeanor Sexual norms Tax, Administ, Const law"
+        },
+        {
+            "title": "Other criminal offenses",
+            "content": "[0.68] [0.51] [0.48] [0.62] [0.70] 0. 0.74 0.62 0.52 0.65 0.75 0. 0.64 0.72 0.60 0.83 0.80 0. 0.74 0.37 0.80 0.64 0.40 0. 0.47 0.47 0.80 0.53 0.45 0. 1.00 1.00 0.60 1.00 0.40 0. 0.81 0.72 0.60 0.53 0.50 0. 0.48 0.58 0.64 0.64 0.56 0. 0.58 0.52 0.63 0.54 0.27 0. 0.48 0.35 0.50 0.33 0.60 0. 0.51 0.45 0.50 0.60 0.80 0. 0.60 0.20 0.20 0.61 0.58 0. 0.57 0.42 0.40 0.41 0.40 0. 0.48 0.60 0.47 0.48 0.76 0. 0.63 0.30 0.52 0.38 0.22 0. 0.33 0.40 0.60 0.40 0.20 0. 0.80 0.40 0.67 0.80 0.20 0. 0.71 0.42 0.94 0.64 0.66 0. 0.60 0.74 0.56 0.72 0.64 0. 0.78 0.84 0.80 0.71 0.57 0. 0.50 0.11 0.50 0.33 0.80 0. 0.58 0.40 0.60 0.40 0.80 0. 1.00 0.40 0.20 0.91 0.70 0. 0.90 0.70 0.73 0.69 0.94 0. 0.92 0.92 0.87 0.80 0.80 0. 0.97 0.50 0.92 0.54 0.14 0. 0.40 0.80 1.00 0.55 0.25 0. 0.40 1.00 0.73 1.00 0.40 0.76 0.88 Table 4 comprehensive list of possible options for each factor. The options are primarily based on the official sentencing guidelines from the Sentencing Commission of the Supreme Court of Korea, and annual crime statistics reports published by government/academic authorities including the Supreme Prosecutors Office and the Korean Institute of Criminology. However, these lists are often insufficient to express existing cases, especially the defendants claims (e.g., defendant convicted of assault might claim that the act was due to self-defense, pleading for innocence). Identifying such factors heavily relies on deep understanding and expertise in practicing law. Hence, the lawyers were instructed to add factors and options that are frequent and important in practice but not mentioned in the official documents. Full instructions for the annotators can be found in <anonymized>. Previous work in identifying such factors in the Korean Criminal Act Hwang et al. (2022) includes"
+        },
+        {
+            "title": "Crime categories",
+            "content": "# of Standard group # of Cases across 8 categories. Traffic offenses Fraud Injury or Violence Sexual crime Theft or Robbery Obstruction of Business Embezzlement or Breach of trust Destruction Finance or Insurance Threat Defamation or Insult Drug Criminal trespass Gambling Negligent homicide and injury Obstruction of right Child abuse or School violence Medical or Food drug Murder Corporation Bribery Car Labor or Employment Industrial or Serious accidents Military duty or law Consumer or Fair trade Arrest or Detention Intellectual property IT or Privacy Misdemeanor Sexual norms Tax, Administ, Const law Other criminal offenses"
+        },
+        {
+            "title": "Total",
+            "content": "13 21 31 132 38 13 15 5 5 11 8 5 15 7 6 5 10 11 2 3 3 2 11 4 2 1 1 3 2 1 1 14 10 411 319,527 181,703 146,764 104,919 74,772 74,722 39,835 39,595 32,944 27,496 27,278 26,066 24,856 11,091 7,384 6,749 5,756 98 4,306 1,195 1,638 20,882 12,647 198 9,300 128 6 3,927 2,311 6,476 4,140 40,890 23,211 1,052,506 Table 5: Statistics of Crime typology and Standard version of LEGAR BENCH. The total number of cases is reported as unique count, excluding duplicates from cases classified under multiple categories 1, 347, 962 Ñ 1, 052, 506."
+        },
+        {
+            "title": "Crime categories",
+            "content": "# of Stricter group # of Cases"
+        },
+        {
+            "title": "Traffic offenses",
+            "content": "8 19 111 1 6 2 9 325 308 1,061 253 37"
+        },
+        {
+            "title": "Total",
+            "content": "160 2,350 Table 6: Statistics of Stricter version of LEGAR BENCH. only 11 unique factors across 4 crime categories focusing only on facts, while this work adds 102 unique factors (including 39 defendant claims)"
+        },
+        {
+            "title": "C Implementation Details",
+            "content": "All models are trained using 8 * A100 80GB GPUs. SearchLM. To develop our SearchLM based on an autoregressive language model, we take the mt5base pretrained model (Xue et al., 2021) and train it on 170K cases for single epoch. We create training dataset with maximum of 15 query case-element pairs and 5 element-element pairs. Contriever. We select Contriever as representative model for retrieval in the general domain. We perform unsupervised training on the bert-basemultilingual-cased pretrained model with 170K cases for 10 epochs. Following the results in their work, we use the MoCo method during training rather than in-batch. SAILER. We implement SAILER as representative model for retrieval in the legal domain. Following their paper, we pretrain the bert-basemultilingual-cased model on facts, interpretations, and decisions of 1.2M cases for single epoch, using the same configuration as in SAILER. The pretrained model is then fine-tuned for single epoch with positive and negative samples, adjusting the learning rate from the default 5e-6 to 5e-5. We retrieve 100 related cases using BM25 over the 170K cases, selecting those with the same case name as positive samples and others as negative. To ensure comparability with other baselines, we use 5 positive and 5 negative cases per query. KELLER. We implement KELLER based on the code from the official repository2. To prepare the retrieval pool, we first process the same 1.2M cases used in implementing SAILER. To further separate cases into subfactual levels, we use GPT-4o. Each subfact is labeled with its criminal type using either their subheadings or regular expressions. This results in 1.1M cases. For training, we use the same query cases from SearchLM. Following the same process, we separate and label each subfact, resulting in 143K cases. We prepare ground truth document cases by matching cases that include the same subfacts criminal type as the query case. Among the matching cases, we use the top 10 document cases based on BM25 scores. This results in total of 820k (query case, document case) pairs. The model is trained on 2https://github.com/ChenlongDeng/KELLER <Traffic offenses> Violation of the Road Traffic Act (Driving Under the Influence) Violation of the Road Traffic Act (Refusal to Submit to Breathalyzer Test) Violation of the Act on the Aggravated Punishment of Specific Crimes (Hit-and-Run Resulting in Injury) Violation of the Road Traffic Act (Failure to Take Measures After an Accident) Violation of the Act on the Aggravated Punishment of Specific Crimes (Dangerous Driving Resulting in Injury) Violation of the Road Traffic Act (Unlicensed Driving) Violation of the Act on Special Cases Concerning the Settlement of Traffic Accidents (Injury by Negligence) Violation of the Act on the Aggravated Punishment of Specific Crimes (Assault on Driver, etc.) Violation of the Act on Special Cases Concerning the Settlement of Traffic Accidents (Death by Negligence) Violation of the Road Traffic Act (Reckless Joint Dangerous Driving) Violation of the Act on the Aggravated Punishment of Specific Crimes (Dangerous Driving Resulting in Death) Violation of the Act on the Aggravated Punishment of Specific Crimes (Injury in Child Protection Zone) Violation of the Act on the Aggravated Punishment of Specific Crimes (Death in Child Protection Zone) Table 7: List of query case types for Traffic offenses. the resulting dataset for 1 epoch under the same condition with the original Keller paper (batch size: 128, learning rate: 1e-5, optimizer: AdamW)."
+        },
+        {
+            "title": "D Licenses and intended use",
+            "content": "Korean legal cases are not protected by the Korean Copyright Act. mT5 (Xue et al., 2021), the base model of LegalSearchLM, is disclosed with Apache 2.0 license that permits free academic use. Korean legal cases are fully anonymized when disclosed by the Korean court. However, we do not censor potentially offensive content, including descriptions about violent and sexual crimes, as they constitute the core content of legal cases. 14 <Fraud>"
+        },
+        {
+            "title": "Fraud",
+            "content": "Violation of the Act on the Punishment of Violent Acts, etc. (Extortion)"
+        },
+        {
+            "title": "Attempted Fraud",
+            "content": "Computer-Based Fraud Violation of the Act on the Aggravated Punishment of Specific Economic Crimes (Fraud)"
+        },
+        {
+            "title": "Habitual Extortion",
+            "content": "Quasi-Fraud"
+        },
+        {
+            "title": "Fraudulent Use of Public Facilities",
+            "content": "Violation of the Act on the Aggravated Punishment of Specific Economic Crimes (Extortion) Attempted Computer-Based Fraud"
+        },
+        {
+            "title": "Attempted Aggravated Extortion",
+            "content": "Habitual Quasi-Fraud Attempted Quasi-Fraud"
+        },
+        {
+            "title": "Attempted Habitual Extortion",
+            "content": "Violation of the Act on the Punishment of Violent Acts, etc. (Repeat Offense of Extortion)"
+        },
+        {
+            "title": "Attempted Habitual Fraud",
+            "content": "Table 8: List of query case types for Fraud. 15 <Injury and Violence>"
+        },
+        {
+            "title": "Assault",
+            "content": "Injury (Bodily Harm) Violation of the Act on the Punishment of Violent Acts, etc. (Assault) Violation of the Act on the Punishment of Violent Acts, etc. (Injury)"
+        },
+        {
+            "title": "Attempted Aggravated Assault",
+            "content": "Violation of the Act on the Punishment of Violent Acts, etc. (Organization and Activities of Criminal Group, etc.)"
+        },
+        {
+            "title": "Assault Against a Lineal Ascendant",
+            "content": "Violation of the Act on the Punishment of Violent Acts, etc. (Repeat Offense of Assault) Violation of the Act on the Punishment of Violent Acts, etc. (Repeat Offense of Injury)"
+        },
+        {
+            "title": "Aggravated Assault Against a Lineal Ascendant",
+            "content": "Serious Injury (Grievous Bodily Harm)"
+        },
+        {
+            "title": "Habitual Aggravated Assault",
+            "content": "Violation of the Act on the Punishment of Violent Acts, etc. (Injury to Lineal Ascendant)"
+        },
+        {
+            "title": "Assault Against a Lineal Ascendant Resulting in Death",
+            "content": "Attempted Injury (Attempted Bodily Harm)"
+        },
+        {
+            "title": "Aggravated Injury to a Lineal Ascendant",
+            "content": "Violation of the Act on the Punishment of Violent Acts, etc. (Assault Against Lineal Ascendant) Violation of the Act on the Punishment of Violent Acts, etc. (Repeat Offense of Injury to Lineal Ascendant) Violation of the Act on the Punishment of Violent Acts, etc. (Repeat Offense of Assault Against Lineal Ascendant) Table 9: List of query case types for Injury and Violence. 16 <Theft and Robbery>"
+        },
+        {
+            "title": "Aggravated Larceny",
+            "content": "Larceny (Theft)"
+        },
+        {
+            "title": "Robbery and Rape",
+            "content": "Quasi-Robbery (Larceny Escalating into Robbery) Quasi-Aggravated Robbery"
+        },
+        {
+            "title": "Attempted Habitual Larceny",
+            "content": "Attempted Quasi-Robbery"
+        },
+        {
+            "title": "Attempted Nighttime Ship Burglary and Larceny",
+            "content": "Attempted Quasi-Aggravated Robbery"
+        },
+        {
+            "title": "Attempted Habitual Nighttime Residential Burglary and Larceny",
+            "content": "Table 10: List of query case types for Theft and Robbery. 17 <Embezzlement and Breach of trust>"
+        },
+        {
+            "title": "Breach of Trust in the Course of Duty",
+            "content": "Violation of the Act on the Aggravated Punishment of Specific Economic Crimes (Breach of Trust)"
+        },
+        {
+            "title": "Embezzlement in the Course of Duty",
+            "content": "Violation of the Act on the Aggravated Punishment of Specific Economic Crimes (Embezzlement)"
+        },
+        {
+            "title": "Attempted Embezzlement in the Course of Duty",
+            "content": "Table 11: List of query case types for Embezzlement and Breach of trust. <Destruction>"
+        },
+        {
+            "title": "Aggravated Destruction of Property",
+            "content": "Violation of the Act on the Punishment of Violent Acts, etc. (Destruction of Property)"
+        },
+        {
+            "title": "Attempted Destruction of Property",
+            "content": "Violation of the Act on the Punishment of Violent Acts, etc. (Repeat Offense of Destruction of Property) Table 12: List of query case types for Destruction. <Finance and Insurance>"
+        },
+        {
+            "title": "Violation of the Act on the Regulation and Punishment of Crime Proceeds Concealment",
+            "content": "Violation of the Act on the Regulation of Similar Deposit-Like Transactions"
+        },
+        {
+            "title": "Violation of the Act on the Reporting and Use of Specific Financial Transaction Information",
+            "content": "Table 13: List of query case types for Finance and Insurance. 18 <Threat>"
+        },
+        {
+            "title": "Aggravated Threatening",
+            "content": "Violation of the Act on the Punishment of Violent Acts, etc. (Threatening)"
+        },
+        {
+            "title": "Attempted Threatening",
+            "content": "Violation of the Act on the Punishment of Violent Acts, etc. (Repeat Offense of Threatening)"
+        },
+        {
+            "title": "Habitual Aggravated Threatening",
+            "content": "Table 14: List of query case types for Threat. Violation of the Act on Promotion of Information and Communications Network Utilization and Information Protection (Defamation through False Allegation) <Defamation and Insult> Defamation (Insult) Defamation by Factual Statement Defamation by False Statement Defamation through Publication Violation of the Act on Promotion of Information and Communications Network Utilization and Information Protection (Dissemination of Obscene Materials) Violation of the Act on Promotion of Information and Communications Network Utilization and Information Protection (Interference with Information and Communications Networks, etc.) Violation of the Act on Promotion of Information and Communications Network Utilization and Information Protection (Defamation by Factual Statement) Table 15: List of query case types for Defamation and Insult. <Drug> Violation of the Narcotics Control Act (Psychotropic Substances) Violation of the Narcotics Control Act (Cannabis) Violation of the Narcotics Control Act (Narcotic Drugs) Violation of the Narcotics Control Act (Temporary NarcoticPsychotropic Substances) Violation of the Narcotics Control Act (Temporary NarcoticCannabis) Table 16: List of query case types for Drug. 19 <Gambling>"
+        },
+        {
+            "title": "Operation of a Gambling Facility",
+            "content": "Violation of the National Sports Promotion Act (Operation of Gambling Venue, etc.)"
+        },
+        {
+            "title": "Establishment of a Gambling House",
+            "content": "Violation of the National Sports Promotion Act (Gambling, etc.)"
+        },
+        {
+            "title": "Gambling",
+            "content": "Table 17: List of query case types for Gambling. <Negligent homicide and Injury>"
+        },
+        {
+            "title": "Gross Negligent Homicide",
+            "content": "Table 18: List of query case types for Negligent homicide and Injury. <Obstruction of rights>"
+        },
+        {
+            "title": "Coercion",
+            "content": "Violation of the Act on the Punishment of Violent Acts, etc. (Coercion)"
+        },
+        {
+            "title": "Aggravated Coercion",
+            "content": "Table 19: List of query case types for Obstruction of rights. <Crimes against children and School violence>"
+        },
+        {
+            "title": "Violation of the Youth Protection Act",
+            "content": "Violation of the Child Welfare Act (Child Abuse) Violation of the Act on Special Cases Concerning the Punishment of Child Abuse Crimes (Child Abuse Homicide) Violation of the Child Welfare Act (Child Abandonment or Neglect) Violation of the Act on Special Cases Concerning the Punishment of Child Abuse Crimes (Child Abuse Resulting in Death) Violation of the Child Welfare Act (Habitual Child Abuse) Violation of the Child Welfare Act (Habitual Child Abandonment or Neglect) Violation of the Act on Special Cases Concerning the Punishment of Child Abuse Crimes (Child Abuse by Child Welfare Facility Workers, etc.)"
+        },
+        {
+            "title": "Violation of the Act on the Prevention of and Countermeasures Against School Violence",
+            "content": "Violation of the Act on Special Cases Concerning the Punishment of Child Abuse Crimes (Child Abuse Resulting in Serious Injury) Table 20: List of query case types for Crimes against children and School violence. 20 <Medical or Food drug>"
+        },
+        {
+            "title": "Violation of the Pharmaceutical Affairs Act",
+            "content": "Table 21: List of query case types for Medical and Food drug. <Murder>"
+        },
+        {
+            "title": "Murder",
+            "content": "Table 22: List of query case types for Murder. Violation of the Unfair Competition Prevention and Trade Secret Protection Act (Trade Secret Misappropriation, etc.) <Corporation>"
+        },
+        {
+            "title": "Other Violations of the Unfair Competition Prevention and Trade Secret Protection Act",
+            "content": "Table 23: List of query case types for Corporation. <Bribery>"
+        },
+        {
+            "title": "Bribery Acceptance",
+            "content": "Violation of the Act on the Aggravated Punishment of Specific Crimes (Bribery) Table 24: List of query case types for Bribery. <Labor and Employment>"
+        },
+        {
+            "title": "Violation of the Labor Standards Act",
+            "content": "Violation of the Employee Retirement Benefit Security Act (ERISA)"
+        },
+        {
+            "title": "Violation of the Labor Union and Labor Relations Adjustment Act",
+            "content": "Table 25: List of query case types for Labor and Employment. <Consumer and Fair trade>"
+        },
+        {
+            "title": "Violation of the Monopoly Regulation and Fair Trade Act",
+            "content": "Table 26: List of query case types for Labor and Consumer and Fair trade. <Arrest or Detention>"
+        },
+        {
+            "title": "Unlawful Confinement",
+            "content": "Table 27: List of query case types for Arrest or Detention. 21 <Other criminal offenses> False Accusation (Malicious Prosecution) Harboring or Aiding Criminals Escape"
+        },
+        {
+            "title": "Negligent Arson in the Course of Duty",
+            "content": "Escape (Flight from Custody)"
+        },
+        {
+            "title": "Obstruction of Tram Traffic",
+            "content": "Table 28: List of query case types for Labor and Other criminal offenses."
+        },
+        {
+            "title": "Crime categories",
+            "content": "Factors(# Options)"
+        },
+        {
+            "title": "Sexual crime",
+            "content": "Finance or Insurance"
+        },
+        {
+            "title": "Murder",
+            "content": "Traffic accident type(6), Traffic accident time(2), Automobile type(3), Road type(4), Gross negligence type(18), Automobile accident insurance(3), Malpractice?(3), Hit-and-run type(3), Hit-and-run loss type(2), Aided victim?(3), Not aware of accident?(3), Blood alcohol level(3), Driving distance(4), Necessity?(3), Not driving?(3), Absorption phase?(3), Excessive extrapolation?(3), Driving without license type(5), Not aware of license suspension(3), Not aware of invalidation(3), Injury severity(8), Injury?(3), Number of victims(3), Defendant-victim relation(10), Surrender(2), Defendant feeble-minded?(3), Defendant insanity?(3), Reason not reaching consummation(4), Reached consummation?(3) Fraud type(14), No intent for pecuniary advantage?(3), No intent to defraud?(3), Profit(12), Defendant feeble-minded?(3), Defendant insanity?(3) Two-way assault(2), Motivation(7), Intent to injure?(3), Self-defense?(3), Assault method(9), Injury severity(8), Injury?(3), Special crime type(2), Number of accomplices(5), Dangerous weapon?(3), Time between injury and death(4), Injury direct cause of death?(3), Surrender(2), Defendant feeble-minded?(3), Defendant insanity?(3) Sexual assault location(6), Victim age(4), Victim disability(2), Defendant under influence(3), Victim under influence(3), Consent?(3), Intercourse type(4), Incident act type(4), Incident act by blitz(2), Victim sexual shame(3), Inability to resist cause(5), Aware of inability to resist?(3), Aware of victims age under 13?(3), Aware of victims age under 16?(3), Fraudulence/influence type(7), Victim under influence?(3), Covert photography filming/distribution type(7), Number of covert photography(4), Profit(4), Obscene communication medium(4), Obscene communication content(6), Object of sexual satisfaction(2), Reached the victim?(3), Assault/threat type(6), Assault method(9), Injury severity(8), Injury?(3), Special crime type(2), Number of accomplices(5), Dangerous weapon?(3), Time between injury and death(4), Injury direct cause of death?(3), No intent to defraud?(3), Number of victims(3), Defendant-victim relation(10), Surrender(2), Defendant feeble-minded?(3), Defendant insanity?(3), Reason not reaching consummation(4), Reached consummation?(3) Insurance fraud type(5), No intent for pecuniary advantage?(3), No intent to defraud?(3), Profit(12), Surrender(2), Defendant feeble-minded?(3), Defendant insanity?(3), Reason not reaching consummation(4), Reached consummation?(3) Defamation content(5), Defamation medium(8), Insult content(4), Victim type(3), Alleged facts?, Publicly alleged?(3), Can specify victim?(3), Defaming the social status?(3), Justified(3), Number of victims(3), Defendant-victim relation(10), Surrender(2), Defendant feeble-minded?(3), Defendant insanity?(3) Drug type(14), Drug crime type(7), Defendant role(6), Narcotic handling license(6), Drug quantity(6), Profit(12), Surrender(2), Defendant feebleminded?(3), Defendant insanity?(3) Motivation(7), Intent to kill?(3), Self-defense?(3), Assault method(9), Injury?(3), Number of victims(3), Defendant-victim relation(10), Surrender(2), Defendant feeble-minded?(3), Defendant insanity?(3), Reason not reaching consummation(4), Reached consummation?(3) Table 29: Factors for defining Stricter relevance. Each factor is presented with the number of options in parentheses. Question mark(?) indicates that the factor represents claim defendant makes in court, which always has three options (not mention, claimed but not taken, claimed and taken). As some factors only apply to certain standard groups (e.g. Traffic accident type(6) only applies to traffic crimes involving accidents and not crimes like Driving Under the Influence (without any traffic accident)) and not all combinations are possible (e.g. Killing Ascendant (killing ones own or any lineal ascendant of ones spouse) cases can only take two options (parent, other family members) out of 10 options (partners, friend, ...) provided for the Defendant-victim relation factor), the total number of stricter groups is magnitude smaller compared to all option numbers multiplied."
+        }
+    ],
+    "affiliations": [
+        "LBOX",
+        "University of Illinois Urbana-Champaign",
+        "University of Seoul"
+    ]
+}

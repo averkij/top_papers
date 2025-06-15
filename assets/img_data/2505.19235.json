@@ -1,0 +1,338 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.19235/x1.png",
+                "caption": "Figure 1:Schematic diagram of CoreMatching. In the Pre-filling stage, CoreMatching calculates Core Neurons in the FFN block based on the activation. Core Neurons are the most frequently activated group of neurons. Afterwards, CoreMatching matches the neurons activated by different tokens with the core neurons, and selects a group of tokens with the largest intersection as the Core Tokens. Only the Core Tokens are passed to the subsequent layers. During the decoding stage, the model only uses Core Neurons for calculations, and there are only core tokens in the kv cache. CoreMatching achieves comprehensive acceleration for inference of VLMs.",
+                "position": 165
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Intrinsic Relations of Two Paradigms",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.19235/x2.png",
+                "caption": "Figure 2:Verification of the predictability of core neurons. We visualized the core neurons of the 25-th layer of Llava-1.5-7b when input text token at different lengths.ρ=0.2,β=0.4formulae-sequence𝜌0.2𝛽0.4\\rho=0.2,\\beta=0.4italic_ρ = 0.2 , italic_β = 0.4. We selected the first 256 neurons. It can be seen that when the input semantics are sufficient, core neurons are almost unchanged.",
+                "position": 248
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x3.png",
+                "caption": "Figure 3:(Upper) Distribution of|Γ⁢(x)∩𝒞ρβ⁢(s)|Γ𝑥superscriptsubscript𝒞𝜌𝛽𝑠\\bigl{|}\\Gamma(x)\\,\\cap\\,\\mathcal{C}_{\\rho}^{\\beta}(s)\\bigr{|}| roman_Γ ( italic_x ) ∩ caligraphic_C start_POSTSUBSCRIPT italic_ρ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_β end_POSTSUPERSCRIPT ( italic_s ) |of image token. The experiment was conducted on Llava-1.5-7b, and we selected the 10th layer. The input image is the rabbit on the left, and the input text is the text token above the image. We use red font to emphasize the key points of the text token. (Note that since core neurons themselves account for 40% of neurons, intersection of about 2000 can be regarded as random sample.)\n(Lower) Core token under different inputs. The left is the schematic diagram of the maximum geometric distance method to select the threshold. The right side is the core token retained under the distribution of the corresponding image above.",
+                "position": 252
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x4.png",
+                "caption": "",
+                "position": 259
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x5.png",
+                "caption": "",
+                "position": 263
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x6.png",
+                "caption": "",
+                "position": 267
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x7.png",
+                "caption": "",
+                "position": 271
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x8.png",
+                "caption": "",
+                "position": 275
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x9.png",
+                "caption": "",
+                "position": 279
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x10.png",
+                "caption": "",
+                "position": 283
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x11.png",
+                "caption": "",
+                "position": 287
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x12.png",
+                "caption": "",
+                "position": 291
+            }
+        ]
+    },
+    {
+        "header": "3CoreMatching",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.19235/x13.png",
+                "caption": "Figure 4:Diagram of attention score and projection value. ✓ indicates the token is reserved under this matric.\n✗ indicates discarded.",
+                "position": 491
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x14.png",
+                "caption": "",
+                "position": 501
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x15.png",
+                "caption": "",
+                "position": 507
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x16.png",
+                "caption": "Figure 5:Comparison of three metrics. The input is the rabbit in Fig.3and “What color clothes is the rabbit wearing?”. Experiment is conducted on Llava-1.5-7b and the10101010-th layer is selected.",
+                "position": 515
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x17.png",
+                "caption": "",
+                "position": 525
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x18.png",
+                "caption": "",
+                "position": 531
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x19.png",
+                "caption": "Figure 6:(a) (b) Numerical visualization ofWq⁢Wksubscript𝑊𝑞subscript𝑊𝑘W_{q}W_{k}italic_W start_POSTSUBSCRIPT italic_q end_POSTSUBSCRIPT italic_W start_POSTSUBSCRIPT italic_k end_POSTSUBSCRIPTandWd⁢WdTsubscript𝑊𝑑superscriptsubscript𝑊𝑑𝑇W_{d}W_{d}^{T}italic_W start_POSTSUBSCRIPT italic_d end_POSTSUBSCRIPT italic_W start_POSTSUBSCRIPT italic_d end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_T end_POSTSUPERSCRIPT. They are approximatelyI𝐼Iitalic_I. (c) Visualization ofα𝛼\\alphaitalic_α. It can be seen that theαi⁢isubscript𝛼𝑖𝑖\\alpha_{ii}italic_α start_POSTSUBSCRIPT italic_i italic_i end_POSTSUBSCRIPT(diagonally) is much higher than the others.",
+                "position": 555
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x20.png",
+                "caption": "",
+                "position": 565
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x21.png",
+                "caption": "",
+                "position": 571
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x22.png",
+                "caption": "Figure 7:The distribution ofc⁢o⁢s⁢(Ai,AM)𝑐𝑜𝑠subscript𝐴𝑖subscript𝐴𝑀cos(A_{i},A_{M})italic_c italic_o italic_s ( italic_A start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT , italic_A start_POSTSUBSCRIPT italic_M end_POSTSUBSCRIPT )and|Γ⁢(xi)∩Γ⁢(xM)|Γsubscript𝑥𝑖Γsubscript𝑥𝑀\\bigl{|}\\Gamma(x_{i})\\,\\cap\\,\\Gamma(x_{M})\\bigr{|}| roman_Γ ( italic_x start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ) ∩ roman_Γ ( italic_x start_POSTSUBSCRIPT italic_M end_POSTSUBSCRIPT ) |of LLaVA-1.5-7b, clearly shows a proportional relationship.",
+                "position": 679
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x23.png",
+                "caption": "",
+                "position": 689
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x24.png",
+                "caption": "",
+                "position": 695
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x25.png",
+                "caption": "Figure 8:Examples of CoreMatching sampled tokens.",
+                "position": 741
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x26.png",
+                "caption": "",
+                "position": 751
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x27.png",
+                "caption": "",
+                "position": 756
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x28.png",
+                "caption": "",
+                "position": 762
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x29.png",
+                "caption": "",
+                "position": 767
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x30.png",
+                "caption": "",
+                "position": 773
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x31.png",
+                "caption": "",
+                "position": 778
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x32.png",
+                "caption": "",
+                "position": 784
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.19235/x33.png",
+                "caption": "Figure 9:Latency comparison of token-only/neurons-only/both sparse on NVIDIA TiTAN Xp. W/T means only core tokens, W/N means only core neurons, and W/TN means CoreMatching. The number on the bar means how many seconds it took.",
+                "position": 1217
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x34.png",
+                "caption": "",
+                "position": 1224
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x35.png",
+                "caption": "Figure 10:Latency comparison of token-only/neurons-only/both sparse on NVIDIA RTX 6000.",
+                "position": 1229
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x36.png",
+                "caption": "",
+                "position": 1236
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x37.png",
+                "caption": "Figure 11:Number of tokens required at different layers.",
+                "position": 1624
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x38.png",
+                "caption": "",
+                "position": 1634
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x39.png",
+                "caption": "",
+                "position": 1640
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "Impact Statement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ARelated Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BAlgorithm",
+        "images": []
+    },
+    {
+        "header": "Appendix CAssumption Explanation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.19235/x40.png",
+                "caption": "Figure 12:Visualization ofWQ⁢@⁢WK.Tformulae-sequencesubscript𝑊𝑄@subscript𝑊𝐾𝑇W_{Q}@W_{K}.Titalic_W start_POSTSUBSCRIPT italic_Q end_POSTSUBSCRIPT @ italic_W start_POSTSUBSCRIPT italic_K end_POSTSUBSCRIPT . italic_Tat different layers in LLaVA-1.5-7b.",
+                "position": 2399
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x41.png",
+                "caption": "Figure 13:Visualization ofWD⁢@⁢WD.Tformulae-sequencesubscript𝑊𝐷@subscript𝑊𝐷𝑇W_{D}@W_{D}.Titalic_W start_POSTSUBSCRIPT italic_D end_POSTSUBSCRIPT @ italic_W start_POSTSUBSCRIPT italic_D end_POSTSUBSCRIPT . italic_Tat different layers in LLaVA-1.5-7b.",
+                "position": 2403
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x42.png",
+                "caption": "Figure 14:Visualization ofWV⁢@⁢WV.Tformulae-sequencesubscript𝑊𝑉@subscript𝑊𝑉𝑇W_{V}@W_{V}.Titalic_W start_POSTSUBSCRIPT italic_V end_POSTSUBSCRIPT @ italic_W start_POSTSUBSCRIPT italic_V end_POSTSUBSCRIPT . italic_Tat different layers in LLaVA-1.5-7b.",
+                "position": 2407
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x43.png",
+                "caption": "Figure 15:Visualization ofc⁢o⁢s⁢(∠⁢(Ai,AM))𝑐𝑜𝑠∠subscript𝐴𝑖subscript𝐴𝑀cos(\\angle(A_{i},A_{M}))italic_c italic_o italic_s ( ∠ ( italic_A start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT , italic_A start_POSTSUBSCRIPT italic_M end_POSTSUBSCRIPT ) )and co-act neurons number at different layers in LLaVA-1.5-7b.",
+                "position": 2414
+            }
+        ]
+    },
+    {
+        "header": "Appendix DExperiments Settings",
+        "images": []
+    },
+    {
+        "header": "Appendix EAdditional Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.19235/x44.png",
+                "caption": "Figure 16:Latency comparison of token-only/neurons-only/both sparse on NVIDIA A100.",
+                "position": 2508
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x45.png",
+                "caption": "",
+                "position": 2515
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x25.png",
+                "caption": "Figure 17:Examples of CoreMatching sampled tokens for different inputs.",
+                "position": 2573
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x46.png",
+                "caption": "",
+                "position": 2627
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x47.png",
+                "caption": "",
+                "position": 2633
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x48.png",
+                "caption": "",
+                "position": 2639
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x49.png",
+                "caption": "",
+                "position": 2645
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x50.png",
+                "caption": "",
+                "position": 2652
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x51.png",
+                "caption": "",
+                "position": 2658
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x52.png",
+                "caption": "",
+                "position": 2664
+            },
+            {
+                "img": "https://arxiv.org/html/2505.19235/x53.png",
+                "caption": "",
+                "position": 2670
+            }
+        ]
+    },
+    {
+        "header": "Appendix FVisualization of Results",
+        "images": []
+    }
+]

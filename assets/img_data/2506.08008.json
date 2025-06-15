@@ -1,0 +1,141 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.08008/x1.png",
+                "caption": "Figure 1:Evaluating vision language models (VLMs) alongside their vision encoders reveals a failure to utilize visual information.To assess VLMs’ visual abilities, we compare their performance to the accuracy supported by a direct readout of their visual encoders.\nUsing ‘vision-centric’ tasks (e.g., visual correspondence), we compare typical VQA-style VLM evaluation (center, bottom) with vision-only methods (center, top). Across tasks, performance plummets from the ‘Visual’ to ‘VLM’ evaluations, often from near-ceiling to random chance. We study this trend by analyzing vision representation quality, prompt sensitivity, and the LLM’s ability to leverage visual information.",
+                "position": 120
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.08008/x2.png",
+                "caption": "Figure 2:Comparing standard visual evaluation to VLMs across vision-centric tasks.Shifting from a standard vision evaluation strategy to a VLM evaluation results in a performance drop, often to chance-level accuracies. Additionally, the vision encoders that perform best at a task (often DINOv2) are not the same vision encoders in more performant VLMs.",
+                "position": 129
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08008/x3.png",
+                "caption": "Figure 3:We find the same trends as in Fig.2for common open-source VLMs. We also note that these VLMs instruction-tune their vision encoders along with the rest of the VLM, so they are designed to be most performant when used in tandem with their projector and LLM. Nevertheless, we still see higher task performance when probing the vision representations alone than when querying the VLM.",
+                "position": 191
+            }
+        ]
+    },
+    {
+        "header": "2Evaluation Setup",
+        "images": []
+    },
+    {
+        "header": "3Initial Observations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.08008/x4.png",
+                "caption": "Figure 4:VLM choice behavior reflects the biases of their LLMs.Here we visualize the distribution of answers when models are presented with (blue) and without (orange) a valid image. We find that behaviors largely reflect the pattern of choices in the blind baselines. We take this as evidence that VLMs are not simply misuing their visual representations, but they inherit their blind biases.",
+                "position": 479
+            }
+        ]
+    },
+    {
+        "header": "4Analysis of VLM performance",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.08008/x5.png",
+                "caption": "Figure 5:Visual evaluations for intermediate VLM layers.We probe vision representations throughout the projector (gray region) and LLM (white region) layers, finding that they generally preserve task-relevant information and show no significant degradation.",
+                "position": 498
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08008/x6.png",
+                "caption": "Figure 6:Prompt-tuning evaluation.We tune [1, 5, 10] prefix embeddings and compare results with the original performance (x=0) and visual evaluation ceiling (dotted line). We observe minimal returns that diminish after 1-5 prefix embeddings.",
+                "position": 510
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08008/x7.png",
+                "caption": "Figure 7:We find that tuning the LLM (as opposed to the projector layers or the ViT) on each task, with the same parameter count in each setting, provides the largest performance increase. Taken together with Fig.8, these results provide evidence that the LLM’s ability to use its visual representations is a bottleneck in succeeding on vision-centric tasks.",
+                "position": 529
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08008/x8.png",
+                "caption": "Figure 8:Visualizing the difference between attention maps before and after fine-tuning the LLM, we observe an increase in attention at the points of interest (REF,A,B,C,D) for correspondence tasks. These points are most salient in attention layers 4-6; here we visualize layer 4 for Object Affordance (left) and Semantic Correspondence (right).",
+                "position": 537
+            }
+        ]
+    },
+    {
+        "header": "5Related Work",
+        "images": []
+    },
+    {
+        "header": "6Discussion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AOverview of task examples",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.08008/x9.png",
+                "caption": "Figure 9:Example failure cases for VLMs (left), vision encoders (center), and both (right).We observe a few common failure modes for\nboth evaluation strategies: on correspondence-based tasks, similar local structure may confuse the model (see Low-level Matching: stone\nwall and colorful squares). Additionally, some objects or object parts of interest may be too small to be individually encoded in high fidelity\n(see Semantic Correspondence: dog ear, and Depth Estimation: small vehicles).",
+                "position": 1301
+            }
+        ]
+    },
+    {
+        "header": "Appendix BMulti-image VLM inputs",
+        "images": []
+    },
+    {
+        "header": "Appendix CEvaluation details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.08008/x10.png",
+                "caption": "Figure 10:Two examples of ‘neural style transfer’: starting with the original image, we adjust the pixels by minimizing mean squared error betweenGoriginal imagesubscript𝐺original imageG_{\\text{original image}}italic_G start_POSTSUBSCRIPT original image end_POSTSUBSCRIPTandGstyle referencesubscript𝐺style referenceG_{\\text{style reference}}italic_G start_POSTSUBSCRIPT style reference end_POSTSUBSCRIPT. The resulting image takes on the texture of the middle reference image, while retaining the high-level structure of the landscape image.",
+                "position": 1483
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08008/x11.png",
+                "caption": "Figure 11:Attention difference visualizations for Functional Correspondence (top two) and Semantic Correspondence (bottom two) tasks.",
+                "position": 1502
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08008/x12.png",
+                "caption": "Figure 12:Which point in the image (right) best matches the semantics of the point in the reference image (left)?Additional examples of VLM-only, vision encoder-only, and VLM + vision encoder failures on the Semantic Correspondence task.",
+                "position": 1513
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08008/x13.png",
+                "caption": "Figure 13:Which point in the image (right) best matches to the reference point in the same scene (left)?Additional examples of VLM-only, vision encoder-only, and VLM + vision encoder failures on the Low-level Matching task.",
+                "position": 1516
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08008/x14.png",
+                "caption": "Figure 14:Which bounding box contains the object closer to the camera?Additional examples of VLM-only, vision encoder-only, and VLM + vision encoder failures on the Depth Estimation task.",
+                "position": 1519
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08008/x15.png",
+                "caption": "Figure 15:Which point in the image (right) best matches the function of the point in the reference image (left)?Additional examples of VLM-only, vision encoder-only, and VLM + vision encoder failures on the Object Affordances task.",
+                "position": 1522
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08008/x16.png",
+                "caption": "Figure 16:Which images (center or right) best matches the art style of the reference image (left)?Additional examples of VLM-only, vision encoder-only, and VLM + vision encoder failures on the Art Style task.",
+                "position": 1525
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08008/x17.png",
+                "caption": "Figure 17:Which image contains the odd-object-out?Additional examples of VLM-only, vision encoder-only, and VLM + vision encoder failures on the 3D Object Awareness task.",
+                "position": 1528
+            }
+        ]
+    },
+    {
+        "header": "Appendix DAdditional failure examples",
+        "images": []
+    }
+]

@@ -1,0 +1,121 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.18449/x1.png",
+                "caption": "Figure 1:Overview ofSWE-RL.We create a seed RL dataset from GitHub PR data, including issue descriptions, code context, and oracle patches. The policy LLM generates code changes through reasoning.\nFor correctly formatted responses, the reward is calculated based on the match between the predicted and the oracle patch;\nincorrectly formatted responses are assigned a negative reward.\nGRPO is used for policy optimization.",
+                "position": 136
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2SWE-RL",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.18449/x2.png",
+                "caption": "Figure 2:Overview ofSWE-RL’s raw pull request data curation process.The collected git clones and GitHub events are transformed into self-contained PR instances via decontamination, aggregation, relevant files prediction, and filtering.",
+                "position": 209
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18449/x3.png",
+                "caption": "Figure 3:Prompt template used to trainLlama3-SWE-RLwithSWE-RL.Given an issue description and the corresponding code context, the policy LLM needs to generate search/replace editsXia et al. (2024)to fix this issue through reasoning.\nThis is the only subtask we incorporate in the RL training.\nDuring inference, the LLM can generalize to tasks outside the training domain (e.g, file-level localization and test generation).\nFor conciseness, we exclude certain prompt details, with the complete prompt template available inSection9.",
+                "position": 256
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18449/x4.png",
+                "caption": "Figure 4:Reasoning skills emerged fromLlama3-SWE-RL-70Bfollowing the application ofSWE-RL.RL helps the model develop reasoning skills like self-reflection, exploring alternatives, and divide-and-conquer strategies, for both in-domain (e.g., issue-solving) and out-of-domain tasks (e.g., function implementation and mathematics).",
+                "position": 331
+            }
+        ]
+    },
+    {
+        "header": "3Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.18449/x5.png",
+                "caption": "Table 1:Main results on SWE-bench Verified.We include representative methods with open-source scaffolds.\nThe scores are either collected from the SWE-bench LeaderboardJimenez et al. (2024)or from the corresponding reference.",
+                "position": 399
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18449/x5.png",
+                "caption": "Table 2:Baseline comparison on SWE-bench Verified.In this experiment, we compare the repair-only performance of baseline LLMs by providing oracle localized files in the input context, without doing test generation and execution.\nWe use greedy decoding by default, but for Llama-3.3-70B-Instruct, we include a 20-sample majority voting result at a temperature of 0.6 to improve formatting accuracy.",
+                "position": 461
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18449/x5.png",
+                "caption": "Figure 5:Scaling analysis with more repair samples and more reproduction tests.The figure on the left illustrates the resolve rate on SWE-bench Verified in relation to the number of repair samples, while maintaining a constant 30 test samples.\nConversely, the figure on the right depicts the resolve rate as it varies with the number of reproduction test samples, with a fixed count of 500 repair samples.",
+                "position": 499
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18449/x6.png",
+                "caption": "Table 3:Generalizability ofLlama3-SWE-RL-70Bbeyond SWE-bench.This table compares Llama-3.3-70B-Instruct, the SFT variant, and the RL model on five out-of-domain tasks, highlighting RL improvements and SFT declines.\nAll experiments are done in a consistent setting using zero-shot greedy decoding.\nWe report the macro average over category accuracy for MMLU and pass@1 for the others.\nIn MATH, we use simple-evals’s “Answer: ...” prompt formatOpenAI (2024). However, only the RL model consistently follows the format requirements, so we also report MATH (lenient) to relax the constraint to include “\\boxed...”.",
+                "position": 515
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18449/x6.png",
+                "caption": "Figure 6:Ablation onSWE-RL’s reward functions and their training dynamics.We compareSWE-RLusing the default continuous reward function against a discrete reward. Repair (oracle) evaluates the repair-only performance using greedy decoding, with oracle files in the input context.",
+                "position": 587
+            }
+        ]
+    },
+    {
+        "header": "4Related work",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "6Agentless Mini",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.18449/x7.png",
+                "caption": "Figure 7:TheAgentless Miniscaffold.The design emphasizes easy decomposition, parallelization, and scalability.",
+                "position": 1619
+            }
+        ]
+    },
+    {
+        "header": "7Synthesizing supervised-finetuning data",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.18449/x8.png",
+                "caption": "Figure 8:Synthetic data pipeline for constructing SFT data.We start by collecting high-quality seed PRs using heuristics, then generate synthetic localization and code-editing samples, and finally use the ground-truth edited files and patches to filter out incorrect samples.",
+                "position": 1664
+            }
+        ]
+    },
+    {
+        "header": "8Midtraining on large-scale PR data",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.18449/x9.png",
+                "caption": "Figure 9:Data packing design for midtraining.Documents longer than the context window are truncated at the end, while shorter documents are packed into a single sequence along with padding.",
+                "position": 1711
+            },
+            {
+                "img": "https://arxiv.org/html/2502.18449/x10.png",
+                "caption": "Figure 10:Formatting midtraining PR data as dialogs.Code contextincludes contents of all changed files and some unchanged but relevant files,PRdenotes a PR title and description,Commitindicates consecutive commits with messages and code changes, andCommentindicates consecutive GitHub user conversations or review comments.Commits andComments are ordered chronologically.",
+                "position": 1722
+            }
+        ]
+    },
+    {
+        "header": "9Complete prompt",
+        "images": []
+    }
+]

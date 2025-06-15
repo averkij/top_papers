@@ -1,0 +1,172 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.08010/x1.png",
+                "caption": "Figure 1:Controlling high-norm tokens in Vision Transformers.As shown inDarcet et al. (2024), high-norm outlier tokens emerge in ViTs and lead to noisy attention maps (“Original”). By identifying the mechanism responsible for their emergence, we demonstrate that we can shift these outlier tokens to arbitrary positions at test time (“Shifted”). Shifting the outlier tokensoutsideof the image area mimics register behavior at test-time (“w/ Test-time Register”), resulting in more interpretable attention patterns and downstream performance comparable to models retrained with registers.",
+                "position": 128
+            }
+        ]
+    },
+    {
+        "header": "2Related work",
+        "images": []
+    },
+    {
+        "header": "3Interpreting the outlier tokens mechanism in ViTs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.08010/x2.png",
+                "caption": "Figure 2:Outlier patches appear after MLPs; attention sinks appear after outlier patches.Left: Max norms across image patches (OpenCLIP ViT-B/16). Right: max attention scores of theCLStoken in the last layer. In both plots, we average across 1000 images. The outlier norms and attention sinks occur in consecutive layers.",
+                "position": 157
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x3.png",
+                "caption": "Figure 3:Neuron activation distributions differ between outlier and non-outlier patches. We average the neuron activations at layer 6 for the top outlier patch and a randomly selected non-outlier patch. Non-outlier patches have a more symmetric distribution (left), whereas outlier patches show a skewed distribution with most activations near zero. A small subset of neurons (<10) consistently exhibit high activations for outlier patches across images (right).",
+                "position": 163
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x4.png",
+                "caption": "Figure 4:Highly activated neurons on the top outlier activate on all outlier positions.We present activation maps of three neurons from layer 6 that activate highly on the top outlier patch (Figure3). These maps near-perfectly align with the high-norm outliers (\"patch norms\").",
+                "position": 169
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x5.png",
+                "caption": "Figure 5:Intervening on activations of register neurons effectively shifts outliers to random patches and test-time registers.For all register neurons, we copy their highest activation into a selected patch and zero out the activations elsewhere. Left: norm of chosen random patch (yellow) and max norm of any other patch (blue). Right:CLSattention to chosen random patch (yellow) and maxCLSattention (blue) to any other patch. Our intervention can shift outliers to randomly selected patches as well as test-time registers (seeSectionA.4).",
+                "position": 238
+            }
+        ]
+    },
+    {
+        "header": "4Adding registers at test-time",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.08010/x6.png",
+                "caption": "Figure 6:Qualitative results on attention maps w/ test-time registers.We produce the meanCLSattention maps of the last layer in DINOv2 and compare them to the model with trained registers. Test-time registers produce similarly high-quality maps as trained registers.",
+                "position": 252
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x6.png",
+                "caption": "Figure 6:Qualitative results on attention maps w/ test-time registers.We produce the meanCLSattention maps of the last layer in DINOv2 and compare them to the model with trained registers. Test-time registers produce similarly high-quality maps as trained registers.",
+                "position": 255
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.08010/x7.png",
+                "caption": "Figure 7:Test-time registers improve interpretability of LLaVA-Llama-3-8B.We visualize the patch norms of the vision encoder before projection and the average attention from the answer token to the visual tokens. We observe that outliers leak into the language model’s attention to visual tokens, while adding a test-time register mitigates this and leads to more interpretable maps.",
+                "position": 611
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x8.png",
+                "caption": "Figure 8:Qualitative results on typographic attacks.We show the patch norms of the last layer before (“Original”) and after (“Shifted”) intervening on register neurons. Shifting the outliers to the text location masks the text in activation space and results in more accurate classification.",
+                "position": 653
+            }
+        ]
+    },
+    {
+        "header": "6Discussion, limitations, and future work",
+        "images": []
+    },
+    {
+        "header": "7Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.08010/x9.png",
+                "caption": "Figure 9:One test-time register is sufficient to remove artifacts.We increment the number of test-time registers where each register holds the activations from a different set of register neurons. The last layer’s averageCLStoken attention map from DINOv2 ViT-L/14 does not significantly change with more test-time registers.",
+                "position": 1223
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x10.png",
+                "caption": "Figure 10:Different test-time register initialization strategies yield similar attention maps.We experiment with three different initialization strategies and find that they do not impact the test-time register’s ability to hold high norms and clean up attention maps.",
+                "position": 1270
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x11.png",
+                "caption": "Figure 11:Attention maps for OpenCLIP with test-time register.We show the meanCLSattention maps from all layers for several input images. Outliers appear in layer 6 for the original model but do not appear with test-time registers, producing clean, interpretable attention maps.",
+                "position": 1280
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x12.png",
+                "caption": "Figure 12:Attention maps for DINOv2 with test-time register (Layers 0-11).We show the meanCLSattention maps from layers 0-11 for several input images. As we do not intervene in these layers, there is no difference in the attention maps.",
+                "position": 1283
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x13.png",
+                "caption": "Figure 13:Attention maps for DINOv2 with test-time register (Layers 12-23).We show the meanCLSattention maps from layers 12-23 for several input images. Artifacts appear in uniform regions around layer 18 for the original model. With test-time registers, attention maps become clean and reveal the images’ main objects.",
+                "position": 1286
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x14.png",
+                "caption": "Figure 14:Intervening on activations of register neurons effectively shifts outliers to test-time registers.For all register neurons, we copy their highest activation into the test-time register and zero out the activations elsewhere. The test-time register absorbs the high norms and attention from theCLStoken, indicating that the image patches no longer have outliers.",
+                "position": 1297
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x15.png",
+                "caption": "Figure 15:Intervening on random neurons does not shift outliers.We attempt to apply our intervention method with random neurons to move outliers to arbitrary patches. However, we find that the selected patch fails to absorb the high norms, suggesting that our selection of register neurons is meaningful.",
+                "position": 1307
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x16.png",
+                "caption": "Figure 16:Copying in high activations into random neurons does not shift outliers.To verify that it is not the high activations of register neurons that create outliers, we intervene upon random neurons but copy in the highest activation from a corresponding register neuron. However, we find that the norm of the selected patch remains low, supporting our selection of register neurons to intervene upon.",
+                "position": 1313
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x17.png",
+                "caption": "Figure 17:Decoder weights of register neurons have large values in specific dimensions.We take the absolute value of decoder weights from layer 5 neurons in OpenCLIP and plot the distribution of magnitudes across dimensions. Top row: layer 5 register neurons. Bottom row: layer 5 random neurons.",
+                "position": 1319
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x18.png",
+                "caption": "Figure 18:Outlier patches appear after MLPs in DINOv2; attention sinks appear after outlier patches.Left: Max norms across image patches (DINOv2-L/14). Right: max attention scores of the CLS token in the last layer. In both plots, we average across 1000 images. The increase in max norms and emergence of attention sinks occur in consecutive layers.",
+                "position": 1332
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x19.png",
+                "caption": "Figure 19:A small set of neurons in DINOv2 have high activations on the top outlier patch (right).We average the neuron activations at layer 17 in DINOv2 for the top outlier patch and a randomly selected, non-outlier patch. Both types of patches have skewed distributions. A small subset of neurons (<25) consistently exhibit high activations for outlier patches across images (right).",
+                "position": 1338
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x20.png",
+                "caption": "Figure 20:Highly activated neurons on the top outlier in DINOv2 activate on all outlier positions.We present activation maps of three neurons from layer 17 that activate highly on the top outlier patch (Figure 3). These maps near-perfectly align with the high-norm outliers (\"patch norms\").",
+                "position": 1344
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x21.png",
+                "caption": "Figure 21:Moving outliers in DINOv2 to random patches.For all register neurons, we copy their highest activation into a selected patch and zero out the activations elsewhere. Left: norm of chosen random patch (yellow) and max norm of other patches (blue). Right:CLSattention to chosen random patch (yellow) and maxCLSattention (blue) to any other patch. We find that the outliers shift to randomly selected patches, similar to OpenCLIP (Figure5).",
+                "position": 1353
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x22.png",
+                "caption": "Figure 22:Intermediate computation steps for LOST unsupervised object discovery.Adding a test-time register produces sharper intermediate maps.",
+                "position": 1484
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x23.png",
+                "caption": "Figure 23:OpenCLIP LOST maps using different features.Adding a test-time register sharpens intermediate maps for different features. However, gains are limited for the values since the value projection already suppresses background noise.",
+                "position": 1487
+            },
+            {
+                "img": "https://arxiv.org/html/2506.08010/x24.png",
+                "caption": "Figure 24:Additional visualizations of LLaVA-Llama-3-8B patch norms and attention maps.As inFigure7, we show patch norms of the vision encoder and the average attention from the answer token to the visual tokens. Adding a test-time register mitigates high-norm artifacts in the vision encoder which would otherwise lead to anomalous attention patterns in the language model.",
+                "position": 1497
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]

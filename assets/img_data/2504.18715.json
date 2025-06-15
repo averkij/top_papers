@@ -1,0 +1,111 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2504.18715/x1.png",
+                "caption": "Figure 1.”Spatial speech translation” is an intelligent hearable system that translates speakers in the wearer’s auditory space, preserving the direction and unique voice characteristics of each speaker in the binaural output. (A) Two speakers have a conversation, and the wearable translates both in real-time, while maintaining their spatial and acoustic features. (B) In a crowded environment, the hearable uses binaural cues for directional translation, translating only the speaker from a specific direction (e.g., where the wearer is looking) and ignoring other speakers in the environment. (C) The noise-canceling headset captures binaural input, processes the signals, and plays back the translated binaural speech in real time.",
+                "position": 147
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2504.18715/x2.png",
+                "caption": "Figure 2.Overview of spatial speech translation.The input to our pipeline is a binaural noisy speech mixture in the source language (e.g., French). It consists of three main components: 1) A lightweight, streaming model that separates and localizes individual speech within the binaural mixture, extracting spatial cues for each voice. 2) A streaming speech translation model that translates the separated speech chunks into the target language (e.g., English) while an expressive encoder and vocoder preserve the vocal qualities and expressiveness of the original audio. 3) Binaural rendering to reconstruct binaural playback using the extracted spatial cues.",
+                "position": 224
+            }
+        ]
+    },
+    {
+        "header": "2.Background and related work",
+        "images": []
+    },
+    {
+        "header": "3.System Design",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2504.18715/extracted/6387693/figs/spatial.png",
+                "caption": "Figure 3.Spatial cues extraction and binaural rendering.(A) shows search-based joint localization and separation. We divide the space into multiple small angular regions and apply streaming TF-GridNet on each region. If no source exists (e.g.θisubscript𝜃𝑖\\theta_{i}italic_θ start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT), the model will output zeros. If a source exists (e.g. SPK1 inθjsubscript𝜃𝑗\\theta_{j}italic_θ start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPT), the model outputs the separated binaural signal (SPK1). The spatial cues are extracted from the estimated angle and ILD of the binaural separated output. (B) shows binaural rendering in presence of translation latency. The output speech chunk 0 (green block 0) is generated with 2-chunk delay from the source speech chunk 0 (blue block 0). When we render binaural channel output chunk 0, instead of applying the spatial cues of source chunk 0, the spatial cues of current incoming chunk (source chunk 2) is applied.",
+                "position": 380
+            },
+            {
+                "img": "https://arxiv.org/html/2504.18715/extracted/6387693/figs/trans.png",
+                "caption": "Figure 4.Simultaneous and expressive speech-to-speech translation.(1) In simultaneous speech to text (S2T) translation, a speech encoder extracts the hidden statusH𝐻Hitalic_Hof incoming speech chunks. Source and Target CTC decoders cooperate with a policy algorithm to determine the ”WRITE” and ”READ” actions for simultaneous translation. When ”WRITE” is determined, the text decoder will output target translated text tokenZ𝑍Zitalic_Z. (2) In streaming expressive text-to-speech (T2S) generation, a Text-to-Units (T2U) model converts the text tokenZ𝑍Zitalic_Zto speech units. The T2U model is trained using target units extracted from the XLS-R-1B model. Meanwhile, the expressive encoder extracts the expressive embedding from the input speech chunk. Finally, the expressive vocoder takes both predicted units and expressive embedding to re-synthesize the target language.",
+                "position": 441
+            }
+        ]
+    },
+    {
+        "header": "4.Implementation",
+        "images": []
+    },
+    {
+        "header": "5.Real-world evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2504.18715/extracted/6387693/figs/env.png",
+                "caption": "Figure 5.Real-world evaluation settings.A-J show ten different unseen multipath environments tested in our real-world generalization evaluation. A-F shows indoor spaces including office spaces, class rooms, common open spaces, conference rooms and as well as work spaces. G-J shows outdoor spaces like school area, fountain park, public picnic lawn and parking lot.",
+                "position": 623
+            },
+            {
+                "img": "https://arxiv.org/html/2504.18715/extracted/6387693/figs/mos0.png",
+                "caption": "Figure 6.Subjective evaluation of semantic consistency and speaker similarity.The left figure shows the mean opinion\nscore for existing translation models without any spatial awareness, our work which performs binaural source separation and translation and finally our work with expressive translation. The right figure shows the corresponding results for speaker similarity between the original French speech and the generated English translation (we use a 1-4 scale).",
+                "position": 666
+            },
+            {
+                "img": "https://arxiv.org/html/2504.18715/extracted/6387693/figs/real_angle2.png",
+                "caption": "Figure 7.Real-world evaluation for user-perceived spatial cues (10 participants).(A) Experiment setup for the human auditory localization task with the virtual auditory display in the headphone. (B) CDF of the angular errors between the ground truth source directions and the users’ perceived directions obtained for both the clean source French speech as well as the binaural rendered English speech output.",
+                "position": 679
+            },
+            {
+                "img": "https://arxiv.org/html/2504.18715/extracted/6387693/figs/mos.png",
+                "caption": "Figure 8.Subjective latency and noise cancellation evaluation.(A) shows the preference for different translation latencies across 10 participants. (B) shows the mean opinion MOS score for the noise suppression quality reported for different noise cancellation levels. (C) shows the corresponding overall reported mean opinion score (MOS).",
+                "position": 689
+            },
+            {
+                "img": "https://arxiv.org/html/2504.18715/extracted/6387693/figs/vsim_humanevaluation.png",
+                "caption": "Figure 9.Contextualization of the VSim metric.For each sample in our listening survey, X-axis is the Vsim values and y-axis is the corresponding human-evaluated speaker similarity score averaged across all participants. It shows a strong correlation between VSim and participant preferences for speaker similarity.",
+                "position": 866
+            },
+            {
+                "img": "https://arxiv.org/html/2504.18715/extracted/6387693/figs/al_bleu.png",
+                "caption": "Figure 10.Tradeoff between ASR-BLEU and AL.We ran our model with different input chunk sizes and measured AL as well as ASR-BLEU. The figure shows that the larger chunk sizes lead to higher latencies and larger ASR-BLEU values.",
+                "position": 869
+            },
+            {
+                "img": "https://arxiv.org/html/2504.18715/extracted/6387693/figs/loc2.png",
+                "caption": "Figure 11.Real-world evaluation for joint separation and localization.(A) Precision and recall for each participant. (B) The CDF curve of AOA estimation error for each separated sound source obtained from the real-world mixture.",
+                "position": 878
+            }
+        ]
+    },
+    {
+        "header": "6.Benchmarking the models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2504.18715/extracted/6387693/figs/motion2.png",
+                "caption": "Figure 12.Binaural rendering with motion.(A) AoA error, (B)Δ⁢I⁢T⁢DΔ𝐼𝑇𝐷\\Delta ITDroman_Δ italic_I italic_T italic_D, and (C)Δ⁢I⁢L⁢DΔ𝐼𝐿𝐷\\Delta ILDroman_Δ italic_I italic_L italic_Dversus different azimuth angular speeds.",
+                "position": 1288
+            }
+        ]
+    },
+    {
+        "header": "7.Limitations and Discussion",
+        "images": []
+    },
+    {
+        "header": "8.Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]

@@ -1,0 +1,354 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.20126/x1.png",
+                "caption": "",
+                "position": 172
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.20126/x2.png",
+                "caption": "Figure 2:Diffusion can be viewed as spectral autoregression[25].Left:Diffusion and its effect on the spatial frequency of images.Right:To investigate the role of different frequency components in image generation, we apply a low or high pass filter to a single diffusion step update (while keeping all other updates unchanged). With all other sources of randomness fixed, we compare the generated samples with and without filtering using LPIPS[110],L2subscript𝐿2L_{2}italic_L start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPTdistance of the pixels, SSIM[99]and DreamSim[32]. Notably, the influence of low and high pass filters varies depending on whether they are applied early or late in the denoising process.",
+                "position": 182
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x3.png",
+                "caption": "",
+                "position": 191
+            }
+        ]
+    },
+    {
+        "header": "2Background",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.20126/x4.png",
+                "caption": "Figure 3:Tokenizing images into patches.",
+                "position": 312
+            }
+        ]
+    },
+    {
+        "header": "3Flexible Diffusion Transformers",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.20126/extracted/6238232/figures/flexible_dit_methodology_new.png",
+                "caption": "Figure 4:Left:We flexify DiTs by allowing them to process images with more patch sizes, by changing the lightweight embedding and de-embedding layers. We showcase this for a class-conditionedImageNetmodel.Right:We plot the difference in predictions between a weak and a powerful model. For the first denoising steps, differences are small, and thus using the weak model there allows accelerated generation without performance degradation.",
+                "position": 604
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x5.png",
+                "caption": "",
+                "position": 607
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x6.png",
+                "caption": "Figure 5:We preserve the functional form of the target model for the pre-trained patch size and add new trainable parameters (LoRAs) for each additional patch size we want to fine-tune the model to operate with. We showcase this for a text-to-image/video model that uses cross-attention for text conditioning. We find that freezing cross-attention layers without any additional LoRAs works the best. During inference, we can either keep the LoRAs unmerged (Inference with LoRAs) leading to a slight FLOPs increase that depends on the LoRAs’ dimensions, or create different copies of the model for each patch size, by merging the LoRAs (Inference without LoRAs). The latter leads to additional memory requirements. FLOPs and parameter numbers on the right correspond to our flexible T2IEmumodel.",
+                "position": 837
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/extracted/6238232/figures/xl-256/cfg/cfg_optimality_cfg_ultimatum_FID_50k.png",
+                "caption": "Figure 6:Left:As the weak model is used more extensively during generation, compute benefits increase, but at the cost of some performance degradation.Middle:The optimal CFG scale varies depending on the extent to which the weak model is used. Each line corresponds to an inference scheduler that applies the weak model for a different proportion of denoising steps.Right:Benefits from our inference scheduler are orthogonal to performing a smaller overall number of diffusion steps. We plot FID for different overall number of stepsT𝑇{\\color[rgb]{0.7421875,0.21875,0.08984375}\\definecolor[named]{pgfstrokecolor}{%\nrgb}{0.7421875,0.21875,0.08984375}T}italic_Tand different number of weak stepsTweaksubscript𝑇weak{\\color[rgb]{0.7421875,0.21875,0.08984375}\\definecolor[named]{pgfstrokecolor}{%\nrgb}{0.7421875,0.21875,0.08984375}T_{\\text{weak}}}italic_T start_POSTSUBSCRIPT weak end_POSTSUBSCRIPT, using in every case the DDPM scheduler.",
+                "position": 983
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/extracted/6238232/figures/xl-256/cfg/cfg_optimality_cfg_FID_50k.png",
+                "caption": "",
+                "position": 990
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/extracted/6238232/figures/xl-256/cfg/compute_optimality_with_cfg_50000_final-cropped.png",
+                "caption": "",
+                "position": 990
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.20126/x7.png",
+                "caption": "Figure 7:Left:We plot FID vs CLIP score for images generated with different CFG scales using theT2I Transf.model (we refer to the appendix for results regarding ourEmumodel). The red line represents images generated with varying CFG scales using only the (powerful) target model. By employing our dynamic scheduler, we can match image quality in terms of both FID and text alignment while significantly reducing compute requirements.Middle:Our flexible models can match the baseline (for a fixed pre-defined guidance scalescfgsubscript𝑠cfg{\\color[rgb]{0.7421875,0.21875,0.08984375}\\definecolor[named]{pgfstrokecolor}{%\nrgb}{0.7421875,0.21875,0.08984375}s_{\\text{cfg}}}italic_s start_POSTSUBSCRIPT cfg end_POSTSUBSCRIPT) across benchmarks, with significantly less compute.Right:Human study results show votes indicating a win, tie, or loss for our method compared to a baseline, which corresponds to running the pre-trained model (only the powerful model) for fewer steps. Comparisons are betweenEmuinference modes that require approximately equal FLOPs and time.",
+                "position": 1241
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x8.png",
+                "caption": "Figure 8:Left:Samples from our flexibleVideo DiTmodel using25.225.225.225.2% of compute compared to the pre-trained baseline.Right:We perform a varying number of steps of the denoising process with a weak model, using either our spatial or our temporal weak model. Both weak models lead to significant compute savings withlittle to nodegradation in performance.",
+                "position": 1422
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x9.png",
+                "caption": "",
+                "position": 1428
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x10.png",
+                "caption": "Figure 9:GPU utilization for one denoising step, when propagating sequences with different overall number of tokens, corresponding to different patch sizes(pf,ph,pw)subscript𝑝fsubscript𝑝hsubscript𝑝w({\\color[rgb]{0.7421875,0.21875,0.08984375}\\definecolor[named]{pgfstrokecolor}%\n{rgb}{0.7421875,0.21875,0.08984375}p_{\\text{f}}},{\\color[rgb]{%\n0.7421875,0.21875,0.08984375}\\definecolor[named]{pgfstrokecolor}{rgb}{%\n0.7421875,0.21875,0.08984375}p_{\\text{h}}},{\\color[rgb]{%\n0.7421875,0.21875,0.08984375}\\definecolor[named]{pgfstrokecolor}{rgb}{%\n0.7421875,0.21875,0.08984375}p_{\\text{w}}})( italic_p start_POSTSUBSCRIPT f end_POSTSUBSCRIPT , italic_p start_POSTSUBSCRIPT h end_POSTSUBSCRIPT , italic_p start_POSTSUBSCRIPT w end_POSTSUBSCRIPT ). Our T2I model has no temporal dimension, but we overload notation and setpf=1subscript𝑝f1{\\color[rgb]{0.7421875,0.21875,0.08984375}\\definecolor[named]{pgfstrokecolor}{%\nrgb}{0.7421875,0.21875,0.08984375}p_{\\text{f}}}=1italic_p start_POSTSUBSCRIPT f end_POSTSUBSCRIPT = 1. For simplicity, we use a DiT of similar configuration (width and depth) for both the T2I and T2V reported in this plot numbers, but results generalize across model shapes.",
+                "position": 1537
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADetailed Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.20126/x11.png",
+                "caption": "Figure 10:We compare our dynamic scheduler with more baselines.",
+                "position": 3036
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAdditional Experiments and Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.20126/x12.png",
+                "caption": "Figure 11:Left:We use maximum mean discrepancy to estimate the distribution mismatch betweenpθ⁢(𝐱t|𝐱T:t+1)subscript𝑝𝜃conditionalsubscript𝐱𝑡subscript𝐱:𝑇𝑡1{\\color[rgb]{0.09375,0.14453125,0.37109375}\\definecolor[named]{pgfstrokecolor}%\n{rgb}{0.09375,0.14453125,0.37109375}p_{\\theta}}({\\color[rgb]{%\n0.09375,0.14453125,0.37109375}\\definecolor[named]{pgfstrokecolor}{rgb}{%\n0.09375,0.14453125,0.37109375}\\mathbf{x}}_{t}|{\\color[rgb]{%\n0.09375,0.14453125,0.37109375}\\definecolor[named]{pgfstrokecolor}{rgb}{%\n0.09375,0.14453125,0.37109375}\\mathbf{x}}_{T:t+1})italic_p start_POSTSUBSCRIPT italic_θ end_POSTSUBSCRIPT ( bold_x start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT | bold_x start_POSTSUBSCRIPT italic_T : italic_t + 1 end_POSTSUBSCRIPT )andq⁢(𝐱t|𝐱0)𝑞conditionalsubscript𝐱𝑡subscript𝐱0{\\color[rgb]{0.09375,0.14453125,0.37109375}\\definecolor[named]{pgfstrokecolor}%\n{rgb}{0.09375,0.14453125,0.37109375}q}({\\color[rgb]{%\n0.09375,0.14453125,0.37109375}\\definecolor[named]{pgfstrokecolor}{rgb}{%\n0.09375,0.14453125,0.37109375}\\mathbf{x}}_{t}|{\\color[rgb]{%\n0.09375,0.14453125,0.37109375}\\definecolor[named]{pgfstrokecolor}{rgb}{%\n0.09375,0.14453125,0.37109375}\\mathbf{x}}_{0})italic_q ( bold_x start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT | bold_x start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT ).Right:The proposed bootstrapped loss. During training, we perform a few denoising steps with a weak model followed by a few denoising steps with a powerful model (reminiscent of the scheduler during inference) and apply a distribution matching loss on the resulting samples.",
+                "position": 3077
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/extracted/6238232/figures/mmd.png",
+                "caption": "",
+                "position": 3081
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x13.png",
+                "caption": "Figure 12:Different approaches can be employed to perform forward passes with CFG when the conditional (C) and unconditional (UC) predictions use different patch sizes. Here, each row corresponds to a sequence of tokens propagated through the DiT, and each bracket corresponds to a batch of sequences for a single NFE. Generally ‘Approach 2’ leads to the smallest amount of FLOPs, but for batch size1111, inference can be memory bound for low-resolution image generation. ‘Approach 4’ mostly leads to the smallest latency, as long as the number of generated images is larger than4444, i.e. the ratio of the sequence lengths between the powerful and the weak model. On the right, we plot FLOPs and Latency from the four different approaches of performing inference, for a different number of generated images. Batch size plays a role here (class-conditioned image generation experiments) as generated images are of lower resolution, namely256×256256256256\\times 256256 × 256, and thus sequence lengths through the Transformer are smaller. Normalized FLOPs are determined based on ‘Approach 2’ and normalized latency based on ‘Approach 3’. We usetorch.compilewithfullgraph=Trueandmode = ’reduce-overhead’.",
+                "position": 3253
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x14.png",
+                "caption": "Figure 13:Interpretability of the model activations and attention scores, when propagating samples tokenized with different patch sizes.",
+                "position": 3266
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x15.png",
+                "caption": "Figure 14:More metrics for ourFlexiDiTbased on theDiT-XL/2model for class-conditioned generation onImageNet. We plot (a) FID (b) sFID, (c) inception score, (d) precision, and (e) recall when generating50,0005000050,00050 , 000samples with250250250250steps of the DDPM schedule for various values of the CFG scales. Red lines correspond to the values that lead to the optimum FID scores for each compute level.",
+                "position": 3273
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x16.png",
+                "caption": "",
+                "position": 3277
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x17.png",
+                "caption": "",
+                "position": 3279
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x18.png",
+                "caption": "",
+                "position": 3281
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x19.png",
+                "caption": "",
+                "position": 3283
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x20.png",
+                "caption": "Figure 15:Average distance/similarity of images generated from the same label map. Both metrics take values between00and1111.",
+                "position": 3294
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/extracted/6238232/figures/xl-256/baseline_10.png",
+                "caption": "Figure 16:Sample images generated with the baselineDiT-XL/2for theImageNetcategory ‘Brambling’.",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/extracted/6238232/figures/xl-256/flex_10.png",
+                "caption": "Figure 17:Sample images generated with our flexibleDiT-XLmodel when performing inference using only the powerful model, for theImageNetcategory ‘Brambling’.",
+                "position": 3300
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x21.png",
+                "caption": "Figure 18:We plot average distance (L2subscript𝐿2L_{2}italic_L start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT-norm) between activation of different layers during successive steps of the denoising process of theDiT-XL/2model. Different layers exhibit different characteristics. Similar observations have been made in[70].",
+                "position": 3309
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x22.png",
+                "caption": "Figure 19:We compare our scheduler versus a different scheduler that uses the weak model for the last denoising steps when generating class-conditioned images. Points correspond to the minimum — concerning CFG scale — FID values.",
+                "position": 3325
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x23.png",
+                "caption": "Figure 20:We compare our scheduler versus a different scheduler that uses the weak model for the last denoising steps when generating class-conditioned images. Using the weak model for the last denoising steps leads to images with lower image fidelity.",
+                "position": 3328
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x24.png",
+                "caption": "",
+                "position": 3470
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x25.png",
+                "caption": "Figure 21:Effect of CFG scale on the generated images from our class-conditionedFlexiDiTmodel. We plot (a) FID, (b) sFID, (c) inception score, (d) precision, and (e) recall when generation50,0005000050,00050 , 000samples with250250250250steps of the DDPM scheduler.",
+                "position": 3488
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x26.png",
+                "caption": "",
+                "position": 3492
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x27.png",
+                "caption": "",
+                "position": 3494
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x28.png",
+                "caption": "",
+                "position": 3496
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x29.png",
+                "caption": "",
+                "position": 3498
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x30.png",
+                "caption": "Figure 22:FID vs CLIP score using iDDPM for100100100100steps for theT2I Transf.model.",
+                "position": 3517
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x30.png",
+                "caption": "Figure 22:FID vs CLIP score using iDDPM for100100100100steps for theT2I Transf.model.",
+                "position": 3520
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x31.png",
+                "caption": "Figure 23:FID vs CLIP score using the DPM-solver for20202020steps for theT2I Transf.model.",
+                "position": 3526
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x32.png",
+                "caption": "Figure 24:FID vs CLIP score using the SA-solver for25252525steps for theT2I Transf.model.",
+                "position": 3532
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x33.png",
+                "caption": "Figure 25:FID vs CLIP score using DDPM for100100100100steps for theT2I Transf.model, for different levels of compute. On the right, we present results separately for each compute level.",
+                "position": 3545
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x34.png",
+                "caption": "Figure 26:FID vs CLIP score using DDIM for50505050steps for theEmumodel.",
+                "position": 3557
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x35.png",
+                "caption": "Figure 27:We plot FID vs CLIP score when generating images with different CFG scales. (left) Overall Pareto front when generating images with100100100100denoising steps. (right) Pareto front generating images with a different number of steps zoomed in the typical tradeoff generation values.",
+                "position": 3560
+            }
+        ]
+    },
+    {
+        "header": "Appendix CImplementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.20126/extracted/6238232/figures/positions.png",
+                "caption": "",
+                "position": 3822
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x36.png",
+                "caption": "Figure 28:More samples generated by ourEmumodel for varying amounts of compute.",
+                "position": 4020
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x37.png",
+                "caption": "Figure 29:More samples generated by ourEmumodel for varying amounts of compute.",
+                "position": 4023
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x38.png",
+                "caption": "Figure 30:More samples generated by ourEmumodel for varying amounts of compute.",
+                "position": 4026
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x39.png",
+                "caption": "Figure 31:Samples for the prompt: ”A playful kitten just waking up.”. We showcase the image generated by the baseline and our flexible scheduler using only 53% of FLOPs.",
+                "position": 4029
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x40.png",
+                "caption": "Figure 32:Samples for the prompt: ”A baby hippo swimming in the river.”. We showcase the image generated by the baseline and our flexible scheduler using only 53% of FLOPs.",
+                "position": 4032
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x41.png",
+                "caption": "Figure 33:Effect of CFG and total compute for the prompt: ‘The image shows a gigantic juicy burger placed on a white plate on a wooden table. The burger is composed of a large beef patty, crispy bacon, melted cheese, lettuce, tomato, onion, pickles, and a slice of red tomato, all sandwiched between a soft bun. The burger is so large that it occupies most of the plate, with some toppings falling out of the sides. The bun is slightly toasted, and the cheese is melted to perfection, giving off a savory aroma. The burger is garnished with a side of crispy fries and a refreshing glass of cola.‘.",
+                "position": 4035
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x42.png",
+                "caption": "Figure 34:More samples generated by ourVideo DiTmodel, using25.225.225.225.2% compute compared to the pre-trained baseline.",
+                "position": 4045
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x43.png",
+                "caption": "Figure 35:More samples generated by ourVideo DiTmodel, using25.225.225.225.2% compute compared to the pre-trained baseline.",
+                "position": 4048
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x44.png",
+                "caption": "Figure 36:Sample for theImageNetdataset comparing the baseline model and varying inference schedulers of our model, using different levels of compute.",
+                "position": 4060
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x45.png",
+                "caption": "Figure 37:Samples for theImageNetclass ‘tree frog, tree-frog’ from ourFlexiDiTmodel that uses only46464646% of the compute compared to the baseline model.",
+                "position": 4063
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x46.png",
+                "caption": "Figure 38:Samples for theImageNetclass ‘prairie chicken, prairie grouse, prairie fowl’ from ourFlexiDiTmodel that uses only46464646% of the compute compared to the baseline model.",
+                "position": 4066
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x47.png",
+                "caption": "Figure 39:Samples for theImageNetclass ‘hummingbird’ from ourFlexiDiTmodel that uses only46464646% of the compute compared to the baseline model.",
+                "position": 4069
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x48.png",
+                "caption": "Figure 40:Samples for theImageNetclass ‘cairn, cairn terrier’ from ourFlexiDiTmodel that uses only46464646% of the compute compared to the baseline model.",
+                "position": 4072
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x49.png",
+                "caption": "Figure 41:Samples for theImageNetclass ‘French bulldog’ from ourFlexiDiTmodel that uses only46464646% of the compute compared to the baseline model.",
+                "position": 4075
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x50.png",
+                "caption": "Figure 42:Samples for theImageNetclass ‘Granny Smith’ from ourFlexiDiTmodel that uses only46464646% of the compute compared to the baseline model.",
+                "position": 4078
+            },
+            {
+                "img": "https://arxiv.org/html/2502.20126/x51.png",
+                "caption": "Figure 43:Samples for theImageNetclass ‘cock’ from ourFlexiDiTmodel that uses only46464646% of the compute compared to the baseline model.",
+                "position": 4081
+            }
+        ]
+    },
+    {
+        "header": "Appendix DGenerated Samples",
+        "images": []
+    }
+]

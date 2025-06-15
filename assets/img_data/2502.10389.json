@@ -1,0 +1,131 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.10389/extracted/6183550/pics/drop_cnt_4.png",
+                "caption": "Figure 1:The main subject and the regions with more details arebrushedfor more steps than other regions inRAS. Each block represents a patchified latent token.",
+                "position": 71
+            },
+            {
+                "img": "https://arxiv.org/html/2502.10389/extracted/6183550/pics/lumina_case.png",
+                "caption": "(a)Lumina-Next-T2I",
+                "position": 74
+            },
+            {
+                "img": "https://arxiv.org/html/2502.10389/extracted/6183550/pics/lumina_case.png",
+                "caption": "(a)Lumina-Next-T2I",
+                "position": 77
+            },
+            {
+                "img": "https://arxiv.org/html/2502.10389/extracted/6183550/pics/lumina_case.png",
+                "caption": "(a)Lumina-Next-T2I",
+                "position": 80
+            },
+            {
+                "img": "https://arxiv.org/html/2502.10389/extracted/6183550/pics/sd3_case.png",
+                "caption": "(b)Stable Diffusion 3",
+                "position": 86
+            },
+            {
+                "img": "https://arxiv.org/html/2502.10389/extracted/6183550/pics/lumina_fid.png",
+                "caption": "(c)Lumina-Next-T2I FID RAS VS Rectified Flow",
+                "position": 94
+            },
+            {
+                "img": "https://arxiv.org/html/2502.10389/extracted/6183550/pics/lumina_fid.png",
+                "caption": "(c)Lumina-Next-T2I FID RAS VS Rectified Flow",
+                "position": 97
+            },
+            {
+                "img": "https://arxiv.org/html/2502.10389/extracted/6183550/pics/lumina_clip.png",
+                "caption": "(d)Lumina-Next-T2I CLIP Score RAS VS Rectified Flow",
+                "position": 103
+            },
+            {
+                "img": "https://arxiv.org/html/2502.10389/extracted/6183550/pics/human_eval.png",
+                "caption": "(e)Default VS RAS (1.625x throughput for Stable Diffusion 3 and 1.561x for Lumina-Next-T2I) Human Evaluation",
+                "position": 109
+            },
+            {
+                "img": "https://arxiv.org/html/2502.10389/extracted/6183550/pics/similarity.png",
+                "caption": "Figure 3:Visualization of predicted noise of each step. DiT model focuses on certain regions during each step and the change in focus is continuous across steps.",
+                "position": 134
+            },
+            {
+                "img": "https://arxiv.org/html/2502.10389/extracted/6183550/pics/coefficient.png",
+                "caption": "Figure 4:NDCG[21,48]for each pair of adjacent sampling steps is high throughout the diffusion process, marking the similarities in the ranking of focused tokens ranging from 0 to 1.",
+                "position": 140
+            },
+            {
+                "img": "https://arxiv.org/html/2502.10389/extracted/6183550/pics/drop_overview.png",
+                "caption": "Figure 5:Overview ofRASdesign. Only current fast-update regions of each step are passed to the model.",
+                "position": 149
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.10389/x1.png",
+                "caption": "Figure 6:Sample Step withRASin Python. Only two extra functions are needed to switch from the original scheduler toRAS.",
+                "position": 244
+            },
+            {
+                "img": "https://arxiv.org/html/2502.10389/x2.png",
+                "caption": "Figure 7:ARASself-attention module using Attention Recovery to enhance generation quality.Xat,lsuperscriptsubscript𝑋𝑎𝑡𝑙X_{a}^{t,l}italic_X start_POSTSUBSCRIPT italic_a end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_t , italic_l end_POSTSUPERSCRIPT,Qat,lsuperscriptsubscript𝑄𝑎𝑡𝑙Q_{a}^{t,l}italic_Q start_POSTSUBSCRIPT italic_a end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_t , italic_l end_POSTSUPERSCRIPT,Kat,lsuperscriptsubscript𝐾𝑎𝑡𝑙K_{a}^{t,l}italic_K start_POSTSUBSCRIPT italic_a end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_t , italic_l end_POSTSUPERSCRIPT,Vat,lsuperscriptsubscript𝑉𝑎𝑡𝑙V_{a}^{t,l}italic_V start_POSTSUBSCRIPT italic_a end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_t , italic_l end_POSTSUPERSCRIPTandOat,lsuperscriptsubscript𝑂𝑎𝑡𝑙O_{a}^{t,l}italic_O start_POSTSUBSCRIPT italic_a end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_t , italic_l end_POSTSUPERSCRIPTrepresent the input hidden states, query, key, value and attention output of active tokens on layerl𝑙litalic_lduring stept𝑡titalic_t, respectively.Kt,lsuperscript𝐾𝑡𝑙K^{t,l}italic_K start_POSTSUPERSCRIPT italic_t , italic_l end_POSTSUPERSCRIPTandVt,lsuperscript𝑉𝑡𝑙V^{t,l}italic_V start_POSTSUPERSCRIPT italic_t , italic_l end_POSTSUPERSCRIPTdenote the key and value caches. The scatter operation to partially upload the key and value caches are fused into the previous projection using a PIT GeMM kernel. The keys and values of the not-focused area\n(Kit,lsubscriptsuperscript𝐾𝑡𝑙𝑖K^{t,l}_{i}italic_K start_POSTSUPERSCRIPT italic_t , italic_l end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPTandVit,lsubscriptsuperscript𝑉𝑡𝑙𝑖V^{t,l}_{i}italic_V start_POSTSUPERSCRIPT italic_t , italic_l end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT) are estimated with the cache from the last sampling step (Kt−1,lsuperscript𝐾𝑡1𝑙K^{t-1,l}italic_K start_POSTSUPERSCRIPT italic_t - 1 , italic_l end_POSTSUPERSCRIPTandVt−1,lsuperscript𝑉𝑡1𝑙V^{t-1,l}italic_V start_POSTSUPERSCRIPT italic_t - 1 , italic_l end_POSTSUPERSCRIPT).",
+                "position": 277
+            },
+            {
+                "img": "https://arxiv.org/html/2502.10389/x3.png",
+                "caption": "Figure 8:Visualization ofRASon Lumina-Next-T2I and Stable Diffusion 3.",
+                "position": 307
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Conclusions and Limitations",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "6More Visualization ofRAS",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.10389/x4.png",
+                "caption": "Figure 9:RASusing norm as the metric, accelerating Lumina-Next-T2I with 50% sample ratio and 30 total steps. The noise, masks and samples are from the 20th step.",
+                "position": 1356
+            },
+            {
+                "img": "https://arxiv.org/html/2502.10389/extracted/6183550/pics/human/combined.png",
+                "caption": "Figure 10:RASVS default sampling and the active sampling step for each latent token.",
+                "position": 1368
+            },
+            {
+                "img": "https://arxiv.org/html/2502.10389/x5.png",
+                "caption": "Figure 11:The 20th sampling step (out of 30) of Lumina-Next-T2I usingRAS.",
+                "position": 1372
+            }
+        ]
+    },
+    {
+        "header": "7Full Experiment Results ofRAS",
+        "images": []
+    }
+]

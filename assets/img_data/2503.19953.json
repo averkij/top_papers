@@ -1,0 +1,101 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.19953/x1.png",
+                "caption": "Figure 1:Extracting flow and occlusion with counterfactual perturbation: (A)CWMs learn to predict the next frame with a temporally factored masking policy[4].(B)The motion of a point can be estimated using a simple counterfactual probing programFLOW: the model predicts the next frame with and without a local perturbation placed on the point, and the difference image between the clean and perturbed predictions reveals the estimated motion.(C)Occlusion is estimated using a related probeOCC: when the perturbation difference image is diffuse and low magnitude, that indicates the perturbed point has been occluded.",
+                "position": 161
+            }
+        ]
+    },
+    {
+        "header": "3Methods",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.19953/x2.png",
+                "caption": "Figure 2:Parameterizing the counterfactual intervention policy as an input-conditioned function.(A) Building on a pre-trained RGB-conditioned predictor𝚿RGBsuperscript𝚿RGB\\boldsymbol{\\Psi}^{\\texttt{RGB}}bold_Ψ start_POSTSUPERSCRIPT RGB end_POSTSUPERSCRIPT, Opt-CWM uses an image-conditioned perturbation prediction functionδθsubscript𝛿𝜃\\delta_{\\theta}italic_δ start_POSTSUBSCRIPT italic_θ end_POSTSUBSCRIPTcontaining a small MLPθ. As illustrated inB,δθsubscript𝛿𝜃\\delta_{\\theta}italic_δ start_POSTSUBSCRIPT italic_θ end_POSTSUBSCRIPTcan learn to predict image-conditioned perturbations that blend naturally with the underlying scene, potentially allowing for the perturbation to be accurately carried over to the next frame prediction. But how should the parameters ofδθsubscript𝛿𝜃\\delta_{\\theta}italic_δ start_POSTSUBSCRIPT italic_θ end_POSTSUBSCRIPTbe learned to achieve this, without any flow supervision labels? See Figure3.",
+                "position": 200
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19953/x3.png",
+                "caption": "Figure 3:A generic principle for learning optimal counterfactuals. A)The parameterized counterfactual flow functionFLOWθsubscriptFLOW𝜃\\textbf{{FLOW}}_{\\theta}FLOW start_POSTSUBSCRIPT italic_θ end_POSTSUBSCRIPTextracts motion from a frozen RGB-conditioned predictor𝚿RGBsuperscript𝚿RGB\\boldsymbol{\\Psi}^{\\texttt{RGB}}bold_Ψ start_POSTSUPERSCRIPT RGB end_POSTSUPERSCRIPTthrough counterfactual perturbation (details in Figure2). Its parametersθ𝜃\\thetaitalic_θare trained using gradients from a flow-conditioned predictor𝚿ηflowsubscriptsuperscript𝚿flow𝜂\\boldsymbol{\\Psi}^{\\texttt{flow}}_{\\eta}bold_Ψ start_POSTSUPERSCRIPT flow end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_η end_POSTSUBSCRIPTthat is jointly trained to perform next-frame prediction. The predictor𝚿flowsuperscript𝚿flow\\boldsymbol{\\Psi}^{\\texttt{flow}}bold_Ψ start_POSTSUPERSCRIPT flow end_POSTSUPERSCRIPTcan only learn to predict future frames if it is given correct flow vectors. This explicit information bottleneck ensures useful gradients will get passed back toFLOWθsubscriptFLOW𝜃\\textbf{{FLOW}}_{\\theta}FLOW start_POSTSUBSCRIPT italic_θ end_POSTSUBSCRIPT. This setup allows us to get better extractions from a pre-trained𝚿RGBsuperscript𝚿RGB\\boldsymbol{\\Psi}^{\\texttt{RGB}}bold_Ψ start_POSTSUPERSCRIPT RGB end_POSTSUPERSCRIPTpredictor by training another flow-conditoned predictor𝚿flowsuperscript𝚿flow\\boldsymbol{\\Psi}^{\\texttt{flow}}bold_Ψ start_POSTSUPERSCRIPT flow end_POSTSUPERSCRIPTusing the same principle of next-frame prediction.(B)As a consequence of tight coupling between the flow-conditioned predictor𝚿flowsuperscript𝚿flow\\boldsymbol{\\Psi}^{\\texttt{flow}}bold_Ψ start_POSTSUPERSCRIPT flow end_POSTSUPERSCRIPTand the learned flow estimation functionFLOWθsubscriptFLOW𝜃\\textbf{{FLOW}}_{\\theta}FLOW start_POSTSUBSCRIPT italic_θ end_POSTSUBSCRIPT, both motion estimation and pixel reconstruction simultaneously improve.",
+                "position": 262
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.19953/x4.png",
+                "caption": "Figure 4:Qualitative comparison with baselines on real-world videos.The above examples show the failure modes of previous methods that rely on visual similarity or photometric loss. We observe that the baseline models struggle against subtle but functionally important changes in largely homogeneous scenes depicting objects of similar color and texture ((a) - (e)). Further, the use of photometric loss in self-supervised methods such as SMURF can also be susceptible to differences in light intensity across frame pairs ((f) - (h)). Opt-CWM, however, relies on a holistic understanding of scene transformations and object dynamics and is able to find correspondence without arbitrary heuristics.",
+                "position": 736
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19953/x5.png",
+                "caption": "Figure 5:Perturbation maps emergently reflect scene properties.For two example frame pairs, we show the amplitudes and standard deviations, at each spatial position and for each color channel, of the optimal Gaussian perturbations predicted by MLPθ. These “perturbation maps” emergently reflect scene properties, with perturbation parameters varying in size and magnitude depending on where they are located in the image, corresponding to the presence of foreground objects and their parts.",
+                "position": 775
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19953/x6.png",
+                "caption": "Table 3:Opt-CWM Distillation Results.To obtain fast test-time inference with a small model, we distill Opt-CWM into the smaller and more efficient SEA-RAFT architecture by sparsely pseudo-labeling Kinetics with Opt-CWM. This approach outpeforms the self-supervised SMURF and is competitive with the supervised RAFT models, while requiring no labeled training data.",
+                "position": 934
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion & Future Work",
+        "images": []
+    },
+    {
+        "header": "6Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AImplementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.19953/x6.png",
+                "caption": "Figure 6:<𝜹avgabsentsubscript𝜹avg<\\boldsymbol{\\delta}_{\\text{avg}}< bold_italic_δ start_POSTSUBSCRIPT avg end_POSTSUBSCRIPTbroken down across thresholds (x𝑥xitalic_x-axis).Fraction of points with error less than a fixed threshold, as a function of number of multiscale (MS) iterations, for pixel thresholds 1, 2, 4, 8, and 16. We find that 4 zoom iterations tends to perform the best, especially for robustness on difficult examples (evidenced by better performance on higher thresholds).",
+                "position": 2030
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19953/x7.png",
+                "caption": "Figure 7:Model comparison as a function of frame gap.Higher frame gaps present harder flow estimation problems due to including more motion, as reflected by improved performance across models in lower frame gap settings. Opt-CWM and Doduo perform better as frame gap increases, in contrast to optical flow methods SEA-RAFT and SMURF which decay in performance as motion magnitude increases, especially on the AD metric.",
+                "position": 2154
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19953/x8.png",
+                "caption": "Figure 8:TAP-Vid First: comparing baseline models on<δavgabsentsubscript𝛿avg<\\boldsymbol{\\delta}_{\\text{avg}}< bold_italic_δ start_POSTSUBSCRIPT avg end_POSTSUBSCRIPTbroken down across thresholds (x𝑥xitalic_x-axis).Fraction of points with error less than a fixed threshold, as a function of baseline model. Compared to baseline models, Opt-CWM maintains high performance on all thresholds even when making predictions across large frame gaps, as is necessary for TAP-Vid First.",
+                "position": 2157
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19953/x9.png",
+                "caption": "Figure 9:TAP-Vid CFG: comparing baseline models on<δavgabsentsubscript𝛿avg<\\boldsymbol{\\delta}_{\\text{avg}}< bold_italic_δ start_POSTSUBSCRIPT avg end_POSTSUBSCRIPTbroken down across thresholds (x𝑥xitalic_x-axis).Fraction of points with error less than a fixed threshold, as a function of baseline model. For fair comparison, we also evaluate on a constant frame gap setting that is more favorable to optical flow baselines. While baseline methods show strong performance for very low thresholds (<2absent2<2< 2pixels), we see that in general Opt-CWM outperforms self-supervised methods and is comparable with SEA-RAFT in predicting more points within a reasonable boundary.",
+                "position": 2160
+            },
+            {
+                "img": "https://arxiv.org/html/2503.19953/x10.png",
+                "caption": "Figure 10:Evolution of perturbations across training epochs:We observe how the predicted perturbations change as the model trains. The perturbation starts as a disjoint streak of colors and converges to a localized peak. This in turn increasingly concentrates the difference image𝚫𝚫\\boldsymbol{\\Delta}bold_Δand leads to better flow prediction. Green is the ground truth flow obtained from the TAP-Vid dataset, and blue is our model’s prediction.",
+                "position": 2183
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAdditional Quantitative Results",
+        "images": []
+    }
+]

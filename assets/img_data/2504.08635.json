@@ -1,0 +1,110 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2504.08635/x1.png",
+                "caption": "Figure 1:Overview of the proposed 3D LDAE framework for unsupervised representation learning in brain medical imaging. The framework consists of three key components: (i) acompression model(ℰℰ\\mathcal{E}caligraphic_Eand𝒟𝒟\\mathcal{D}caligraphic_D), which encodes high-dimensional MRI brain scans (𝐱0subscript𝐱0\\mathbf{x}_{0}bold_x start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT) into a lower-dimensional latent representation (𝐳0subscript𝐳0\\mathbf{z}_{0}bold_z start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT), facilitating efficient processing; (ii) aLatent Diffusion Model (LDM), trained to learn the distribution of the compressed representations through a diffusion process, progressively transforming𝐳0subscript𝐳0\\mathbf{z}_{0}bold_z start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPTinto𝐳Tsubscript𝐳𝑇\\mathbf{z}_{T}bold_z start_POSTSUBSCRIPT italic_T end_POSTSUBSCRIPTand vice versa via a U-Net-based denoising network (UNetθsubscriptUNet𝜃\\text{UNet}_{\\theta}UNet start_POSTSUBSCRIPT italic_θ end_POSTSUBSCRIPT); and (iii) thesemantic encoder-decoder model(Gψsubscript𝐺𝜓G_{\\psi}italic_G start_POSTSUBSCRIPT italic_ψ end_POSTSUBSCRIPTandE⁢n⁢cϕ𝐸𝑛subscript𝑐italic-ϕEnc_{\\phi}italic_E italic_n italic_c start_POSTSUBSCRIPT italic_ϕ end_POSTSUBSCRIPT), which learns a meaningful latent representation (𝐲s⁢e⁢msubscript𝐲𝑠𝑒𝑚\\mathbf{y}_{sem}bold_y start_POSTSUBSCRIPT italic_s italic_e italic_m end_POSTSUBSCRIPT) from the input scan and utilizes it to guide the reverse diffusion process via a gradient estimator (Gψsubscript𝐺𝜓G_{\\psi}italic_G start_POSTSUBSCRIPT italic_ψ end_POSTSUBSCRIPT). This approach enables structured semantic learning, facilitating interpretable image synthesis, counterfactual generation, and disease-specific attribute disentanglement.",
+                "position": 202
+            }
+        ]
+    },
+    {
+        "header": "2Background",
+        "images": []
+    },
+    {
+        "header": "3Methods",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2504.08635/x2.png",
+                "caption": "Figure 2:Architecture of the Semantic Encoder used in the LDAE framework.The input 3D brain MRI scanx0∈ℝH×W×Dsubscript𝑥0superscriptℝ𝐻𝑊𝐷x_{0}\\in\\mathbb{R}^{H\\times W\\times D}italic_x start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT ∈ blackboard_R start_POSTSUPERSCRIPT italic_H × italic_W × italic_D end_POSTSUPERSCRIPTis sliced along the axial plane into a sequence of 2D slices, each processed independently through a shared 2D CNN backbone (e.g., ConvNeXt-Small) to extract slice-level embeddingsei∈ℝdsubscript𝑒𝑖superscriptℝ𝑑e_{i}\\in\\mathbb{R}^{d}italic_e start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ∈ blackboard_R start_POSTSUPERSCRIPT italic_d end_POSTSUPERSCRIPT. These embeddings are then aggregated via a two-stage attention mechanism:SoftAttentioncomputes a global summary vectorQ𝑄Qitalic_Qas a weighted mean over the sequence, andCrossAttentionsimulates self-attention by queryingQ𝑄Qitalic_Qwith the original embeddingsE𝐸Eitalic_E, yielding a final global non-spatial semantic vectorysem∈ℝdsubscript𝑦semsuperscriptℝ𝑑y_{\\text{sem}}\\in\\mathbb{R}^{d}italic_y start_POSTSUBSCRIPT sem end_POSTSUBSCRIPT ∈ blackboard_R start_POSTSUPERSCRIPT italic_d end_POSTSUPERSCRIPTused to guide the reverse diffusion process.",
+                "position": 363
+            },
+            {
+                "img": "https://arxiv.org/html/2504.08635/extracted/6354541/549_AD_AE_reconstruction.png",
+                "caption": "Figure 3:Qualitative reconstructions from AutoencoderKL. Top row: original scan slices. Middle row: reconstructed outputs from compressed latent codes. Bottom row: reconstruction error. The reconstructions preserve global and local anatomical features despite the170×170\\times170 ×compression.",
+                "position": 684
+            },
+            {
+                "img": "https://arxiv.org/html/2504.08635/extracted/6354541/0_CN_stochastic.png",
+                "caption": "Figure 4:Reconstruction from semantic code and stochastic latent.Reconstruction results for two representative subjects from the test set: a CN subject (left block) and an AD subject (right block).First column:original brain MR scan.Second column:reconstruction obtained using both the semantic embeddingysem=Encϕ⁢(x0)subscript𝑦semsubscriptEncitalic-ϕsubscript𝑥0y_{\\text{sem}}=\\text{Enc}_{\\phi}(x_{0})italic_y start_POSTSUBSCRIPT sem end_POSTSUBSCRIPT = Enc start_POSTSUBSCRIPT italic_ϕ end_POSTSUBSCRIPT ( italic_x start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT )and the stochastic latentzTsubscript𝑧𝑇z_{T}italic_z start_POSTSUBSCRIPT italic_T end_POSTSUBSCRIPTobtained via DDIM inversion of the encoded compressed latentz0=ℰ⁢(x0)subscript𝑧0ℰsubscript𝑥0z_{0}=\\mathcal{E}(x_{0})italic_z start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT = caligraphic_E ( italic_x start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT ).Columns 3–5:reconstructions obtained by keepingysemsubscript𝑦semy_{\\text{sem}}italic_y start_POSTSUBSCRIPT sem end_POSTSUBSCRIPTfixed and sampling differentzT(i)∼𝒩⁢(0,I)similar-tosuperscriptsubscript𝑧𝑇𝑖𝒩0𝐼z_{T}^{(i)}\\sim\\mathcal{N}(0,I)italic_z start_POSTSUBSCRIPT italic_T end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT ∼ caligraphic_N ( 0 , italic_I ). Despite the stochastic variation, the reconstructions retain global anatomical and disease-relevant structure, indicating thatysemsubscript𝑦semy_{\\text{sem}}italic_y start_POSTSUBSCRIPT sem end_POSTSUBSCRIPTcaptures high-level semantics whilezTsubscript𝑧𝑇z_{T}italic_z start_POSTSUBSCRIPT italic_T end_POSTSUBSCRIPTencodes low-level variability. In the AD subject, expected pathological traits (e.g., ventricular enlargement) are consistently preserved, whereas in the CN subject, normal cortical volume and structure remain stable across samples.",
+                "position": 687
+            },
+            {
+                "img": "https://arxiv.org/html/2504.08635/extracted/6354541/356_AD_stochastic.png",
+                "caption": "",
+                "position": 690
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2504.08635/extracted/6354541/lda_plot.png",
+                "caption": "Figure 5:LDA projection of semantic representations (𝐲s⁢e⁢msubscript𝐲𝑠𝑒𝑚\\mathbf{y}_{sem}bold_y start_POSTSUBSCRIPT italic_s italic_e italic_m end_POSTSUBSCRIPT) extracted from the LDAE encoder. Each point corresponds to a 3D brain scan colored by diagnostic class (AD or CN). The clear separation suggests that the learned semantic space captures clinically meaningful features relevant to Alzheimer’s disease.",
+                "position": 1374
+            },
+            {
+                "img": "https://arxiv.org/html/2504.08635/extracted/6354541/manipulation_mutiple_alphas.png",
+                "caption": "Figure 6:Progressive manipulation of an AD subject toward the CN class. The manipulation strengthα𝛼\\alphaitalic_αranges from 0.0 (original reconstruction) to 5.0. Structural changes—especially hippocampal recovery and ventricle shrinkage—become more evident with largerα𝛼\\alphaitalic_α.",
+                "position": 1562
+            },
+            {
+                "img": "https://arxiv.org/html/2504.08635/extracted/6354541/356_AD_to_CN_1.5.png",
+                "caption": "Figure 7:Semantic manipulation examples along the direction defined by the vector orthogonal to the classifier’s decision boundary.\nIn the AD→→\\rightarrow→CN case (top), we observe a reduction of hippocampal atrophy;\nin the CN→→\\rightarrow→AD case (bottom), atrophy becomes more prominent.",
+                "position": 1565
+            },
+            {
+                "img": "https://arxiv.org/html/2504.08635/extracted/6354541/628_CN_to_AD_1.5.png",
+                "caption": "",
+                "position": 1569
+            },
+            {
+                "img": "https://arxiv.org/html/2504.08635/x3.png",
+                "caption": "(a)Mean Squared Error (MSE) as a function of prediction gap. Larger gaps correspond to more difficult interpolation tasks.",
+                "position": 1575
+            },
+            {
+                "img": "https://arxiv.org/html/2504.08635/x3.png",
+                "caption": "(a)Mean Squared Error (MSE) as a function of prediction gap. Larger gaps correspond to more difficult interpolation tasks.",
+                "position": 1578
+            },
+            {
+                "img": "https://arxiv.org/html/2504.08635/x4.png",
+                "caption": "(b)Structural Similarity Index (SSIM) as a function of prediction gap. The model shows robust perceptual consistency across all temporal ranges.",
+                "position": 1583
+            },
+            {
+                "img": "https://arxiv.org/html/2504.08635/extracted/6354541/interpolation_comparison.png",
+                "caption": "Figure 9:Qualitative example of latent interpolation for missing scan generation on a single subject with four longitudinal scans acquired at 0, 6, 12, and 24 months. The images at months 0 and 24 serve as endpoints (α=0𝛼0\\alpha=0italic_α = 0andα=1𝛼1\\alpha=1italic_α = 1) for interpolation in the latent space. Intermediate scans at 6 months (α=0.25𝛼0.25\\alpha=0.25italic_α = 0.25) and 12 months (α=0.5𝛼0.5\\alpha=0.5italic_α = 0.5) are synthesized via linear interpolation in the semantic space and spherical interpolation in the stochastic space.",
+                "position": 1643
+            }
+        ]
+    },
+    {
+        "header": "6Discussion and conclusion",
+        "images": []
+    },
+    {
+        "header": "Declaration of generative AI and AI-assisted technologies in the writing process",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]

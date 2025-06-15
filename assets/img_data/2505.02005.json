@@ -1,0 +1,79 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.02005/x1.png",
+                "caption": "Figure 1:The bird’s-eye view of a scene in UrbanBIS[10], rendered using INGP[5]and our Switch-NeRF++, showcasing the impressive scalability of our approach. This scene contains13⁢k13𝑘13k13 italic_khigh-quality images, capturing an urban region of around6.5⁢k⁢m26.5𝑘superscript𝑚26.5km^{2}6.5 italic_k italic_m start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT. Experiments on this scene demonstrate the superiority of our method in scaling to large-scale urban scenes with exceptional rendering quality.",
+                "position": 91
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02005/x2.png",
+                "caption": "Figure 2:Large-scale NeRFs with different decomposition methods. Dotted lines indicate non-differentiable operations, while solid lines represent differentiable operations that can back-propagate gradients in training. Mega-NeRF[2]divides scene by clustering image pixels by 3D distances. Block-NeRF[3]divide images sets according to street blocks, which is actually based on camera distributions. In both kinds of methods, the decomposition are hand-crafted heuristics rules and not trainable. They require separate training for their sub-networks. Switch-NeRF introduces a unified framework where scene decomposition is learned automatically via a gating network, enabling end-to-end training of the entire framework. However, Switch-NeRF designs homogeneous experts (MLPs) with the same structures, which learns homogeneous representation of the scene. In contrast, Switch-NeRF++ employs efficient hash network as the gate network and designs heterogeneous hash experts to learn heterogeneous decomposition and representation of a large-scale scene.",
+                "position": 142
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02005/x3.png",
+                "caption": "Figure 3:The framework overview of Switch-NeRF and Switch-NeRF++ for large-scale scene modeling. A 3D scene pointxis first fed into the gating network to obtain a feature encodingfgsubscript𝑓𝑔f_{g}italic_f start_POSTSUBSCRIPT italic_g end_POSTSUBSCRIPT.fgsubscript𝑓𝑔f_{g}italic_f start_POSTSUBSCRIPT italic_g end_POSTSUBSCRIPTis then sent to a small MLP head to predict gating values. The Top-1111indexi𝑖iitalic_iof the gate values is used in 3D point dispatching that determines which hash expert should be selected for the input point. In this way, the entire scene can be decomposed into different partitions. Thenxis dispatched into its corresponding expert to encode its distinct distribution into an expert encodingEi⁢(x)subscript𝐸𝑖xE_{i}(\\textbf{x})italic_E start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ( x ).\nThen we multiply the gate valueGi⁢(x)subscript𝐺𝑖xG_{i}(\\textbf{x})italic_G start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ( x )onEi⁢(x)subscript𝐸𝑖xE_{i}(\\textbf{x})italic_E start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ( x )and obtain the final expert outputE^i⁢(x)subscript^𝐸𝑖x\\hat{E}_{i}(\\textbf{x})over^ start_ARG italic_E end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ( x ), which is further fed into a small MLP head to predict the point densityσ𝜎\\sigmaitalic_σand point colorc. The spherical harmonics encoding (i.e.,SH) of directiond, and the appearance embedding (i.e.,AE) are used for view-dependent prediction of colorc. In Switch-NeRF, the gating network and the NeRF experts are all MLP-based networks, which learns homo. In contrast, in Switch-NeRF++, we leverage the efficient Hash-based Gating Network to dispatch 3D points. Furthermore, we design heterogeneous hash Heterogeneous Hash experts which have different scale ranges, to explicitly model the heterogeneous distribution of the large-scale scene.",
+                "position": 145
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.02005/x4.png",
+                "caption": "Figure 4:(a) A detailed illustration of the MLP-based gating network with an MLP expert in Switch-NeRF. (b) A detailed illustration of the hash-based gating network and a hash expert in Switch-NeRF++. An inputxfirst goes through the gating network. Then it goes through a selected expert and the small prediction heads.",
+                "position": 202
+            }
+        ]
+    },
+    {
+        "header": "3Switch-NeRF++",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.02005/x5.png",
+                "caption": "Figure 5:A detailed illustration of our pyramid design of resolution ranges of the heterogeneous experts in Switch-NeRF++. Different experts have different grid resolution ranges from coarse to fine, making the network cover a wide range of resolutions to capture the diverse data distributions. The ranges are controlled by setting the minimum and maximum resolutions for the hash grids in each expert.",
+                "position": 266
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02005/x6.png",
+                "caption": "Figure 6:The comparison between the uniform dispatch and full dispatch in Switch-NeRF. In training, the uniform dispatch is utilized for better computation and communication efficiency. The input tensor of each expert has the same shapes. To maintain the shape, it will drop overflow tokens or pad tokens if necessary. In inference, the full dispatch is employed to make sure each point will be processed by an expert, avoiding accuracy decrease. If the uniform dispatch is used in inference, the rendered images will have artifacts.",
+                "position": 367
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.02005/x7.png",
+                "caption": "Figure 7:A qualitative comparison of rendered images of the INGP[5], Mega-NeRF[2], Switch-NeRF[4], and our Switch-NeRF++ on Mega-NeRF dataset. Our Switch-NeRF++ framework can render cleaner and sharper details compared to the state-of-the-art methods.",
+                "position": 420
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02005/x8.png",
+                "caption": "Figure 8:(a) Rendered images of INGP[5], Switch-NeRF[4], and our Switch-NeRF++ on UrbanBIS. Ours can render images with notably higher quality compared to other methods. (b) A visualization of our decomposition of the radiance field of the UrbanBIS dataset. Different experts of Ours (Heter.) capture quite different distributions of the scene, from coarser grounds to finer buildings. Different experts in Ours (Homo.) handle similar distributions. This figure shows that Ours (Heter.) can learn to capture heterogeneous representations effectively.",
+                "position": 710
+            },
+            {
+                "img": "https://arxiv.org/html/2505.02005/x9.png",
+                "caption": "Figure 9:The accuracy of our Switch-NeRF++ and other methods with respect to training steps. Our method continues to improve with more training steps.",
+                "position": 1284
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]

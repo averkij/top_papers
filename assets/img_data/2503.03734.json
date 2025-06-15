@@ -1,0 +1,98 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.03734/extracted/6269393/figures/contrast_results_v2.png",
+                "caption": "Figure 1:(Top)Different feature extraction approaches in VLA models. (a) Direct Feature Passing: existing approaches, exemplified by Octo and OpenVLA, extract and pass visual and text tokens independently to the policy network. (b) Text-Aware Feature Extraction: the proposed approach, OTTER, extracts visual tokens that correspond to the text tokens, and then feeds them into the policy.(Bottom)Real-world Robot Experiments: OTTER demonstrates higher success rates on both training and unseen real-world robot pick-and-place tasks compared to Octo and OpenVLA. OTTER exhibits better zero-shot generalization to unseen objects, maintaining strong performance across a variety of novel tasks.",
+                "position": 119
+            },
+            {
+                "img": "https://arxiv.org/html/2503.03734/extracted/6269393/figures/model_arc_vertical.png",
+                "caption": "Figure 2:OTTER Model architecture.At each timestept𝑡titalic_t, text-aware visual featuresfv⁢lsubscript𝑓𝑣𝑙f_{vl}italic_f start_POSTSUBSCRIPT italic_v italic_l end_POSTSUBSCRIPTare extracted from a pre-trained CLIP model (seeFigure3). Thenfv⁢lsubscript𝑓𝑣𝑙f_{vl}italic_f start_POSTSUBSCRIPT italic_v italic_l end_POSTSUBSCRIPTand the text tokensflsubscript𝑓𝑙f_{l}italic_f start_POSTSUBSCRIPT italic_l end_POSTSUBSCRIPTare further compressed through separate attention pooling layers, producing two representationsfv⁢l′subscriptsuperscript𝑓′𝑣𝑙f^{\\prime}_{vl}italic_f start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_v italic_l end_POSTSUBSCRIPTandfl′subscriptsuperscript𝑓′𝑙f^{\\prime}_{l}italic_f start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_l end_POSTSUBSCRIPT, respectively. The robot’s proprioception is encoded by an MLP layer to generate the embodiment representationfesubscript𝑓𝑒f_{e}italic_f start_POSTSUBSCRIPT italic_e end_POSTSUBSCRIPT. The tokensfl′subscriptsuperscript𝑓′𝑙f^{\\prime}_{l}italic_f start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_l end_POSTSUBSCRIPT,fv⁢l′subscriptsuperscript𝑓′𝑣𝑙f^{\\prime}_{vl}italic_f start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_v italic_l end_POSTSUBSCRIPT, andfesubscript𝑓𝑒f_{e}italic_f start_POSTSUBSCRIPT italic_e end_POSTSUBSCRIPTare then concatenated to formftsubscript𝑓𝑡f_{t}italic_f start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT, which serves as input to a causal transformer. With a context window ofT𝑇Titalic_Tsteps, the model autoregressively predicts the future actions (atsubscript𝑎𝑡a_{t}italic_a start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT) at each step.",
+                "position": 129
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.03734/x1.png",
+                "caption": "Figure 3:Text-aware Visual Features ExtractionWe calculate the similarity between the visual patch features and per-token language features, then take the softmax over the patch feature dimension. Intuitively, this gives a distribution of semantic similarity over all spatial locations. We then multiply the visual patch features to retrieve the visual semantic features that correspond to each token in the sentence. InAppendixC, we provide more in-depth analysis and visualizations of the proposed method.",
+                "position": 242
+            },
+            {
+                "img": "https://arxiv.org/html/2503.03734/x2.png",
+                "caption": "Figure 4:Example scenes in the simulation (left) and in the physical environments (right) using a Franka robot.",
+                "position": 293
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.03734/x3.png",
+                "caption": "Figure 5:We evaluate OTTER’s performance with improved vision language features by scaling CLIP. In particular, we train OTTER with three CLIP variants with increasing FLOPs: ViT-B/32, ViT-B/16, and ViT-L/16. We report the task performance vs. the inference FLOPs per image on training and unseen tasks. The results suggest that the OTTER can benefit from scaling up vision-language model.",
+                "position": 759
+            }
+        ]
+    },
+    {
+        "header": "6Limitations and Conclusions",
+        "images": []
+    },
+    {
+        "header": "Acknowledgement",
+        "images": []
+    },
+    {
+        "header": "7Potential Broader Impact",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AEnvironment Setup",
+        "images": []
+    },
+    {
+        "header": "Appendix BModel and Training Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.03734/x4.png",
+                "caption": "Figure 6:Examples of attention maps for CLIP fine-tuned with VLA (left) and frozen CLIP’s output (Xo⁢u⁢tsubscript𝑋𝑜𝑢𝑡X_{out}italic_X start_POSTSUBSCRIPT italic_o italic_u italic_t end_POSTSUBSCRIPT) (middle) and frozen CLIP’s attention features (Xa⁢t⁢t⁢nsubscript𝑋𝑎𝑡𝑡𝑛X_{attn}italic_X start_POSTSUBSCRIPT italic_a italic_t italic_t italic_n end_POSTSUBSCRIPT) (right). The first column shows the side view observation and the text query is below each attention map. Fine-tune CLIP pays attention to the background and the frozen CLIP’s output (Xo⁢u⁢tsubscript𝑋𝑜𝑢𝑡X_{out}italic_X start_POSTSUBSCRIPT italic_o italic_u italic_t end_POSTSUBSCRIPT) is noisy. In contrast, the frozen CLIP (Xa⁢t⁢t⁢nsubscript𝑋𝑎𝑡𝑡𝑛X_{attn}italic_X start_POSTSUBSCRIPT italic_a italic_t italic_t italic_n end_POSTSUBSCRIPT) pays attention to the correct object associated with the text query. These examples indicate that fine-tuning CLIP on robotic datasets can degrade the performance of the pre-trained CLIP, especially when the robotics dataset is small. It also highlights the benefits of usingXa⁢t⁢t⁢nsubscript𝑋𝑎𝑡𝑡𝑛X_{attn}italic_X start_POSTSUBSCRIPT italic_a italic_t italic_t italic_n end_POSTSUBSCRIPTfor fused vision-language features.",
+                "position": 1676
+            }
+        ]
+    },
+    {
+        "header": "Appendix CVision-Language Attention Visualization",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.03734/extracted/6269393/figures/attention_oxe.jpg",
+                "caption": "Figure 7:Examples of attention maps of frozen CLIP’s attention features (Xattn) on Open-X dataset. The bottom texts are the corresponding text tokens.",
+                "position": 1724
+            }
+        ]
+    },
+    {
+        "header": "Appendix DMore Ablations",
+        "images": []
+    }
+]

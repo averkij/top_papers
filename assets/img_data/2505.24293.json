@@ -1,0 +1,73 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.24293/x1.png",
+                "caption": "Figure 1:A schematic of the Llama 3 transformer decoder(Grattafiori et al.,2024; Nvidia,2024). The gradientd⁢e⁢t⁢a⁢c⁢h𝑑𝑒𝑡𝑎𝑐ℎdetachitalic_d italic_e italic_t italic_a italic_c italic_hoperations for components outlined in red effectively freeze the nonlinear activations for a given input sequence, creating a linear path for the gradient with respect to the input embedding vectors, but do not change the output. The output embedding prediction can be nearly exactly mapped to a linear system by the Jacobian autograd operation. The feedforward module with aS⁢w⁢i⁢G⁢L⁢U𝑆𝑤𝑖𝐺𝐿𝑈SwiGLUitalic_S italic_w italic_i italic_G italic_L italic_Uactivation function is shown in expanded form to demonstrate how the nonlinearS⁢w⁢i⁢s⁢h𝑆𝑤𝑖𝑠ℎSwishitalic_S italic_w italic_i italic_s italic_hterm can be detached from the gradient to form a linear path, achieving local linearity for a given input. TheR⁢M⁢S⁢N⁢o⁢r⁢m𝑅𝑀𝑆𝑁𝑜𝑟𝑚RMSNormitalic_R italic_M italic_S italic_N italic_o italic_r italic_mlayers and and softmax attention blocks also must be detached from the gradient.",
+                "position": 84
+            },
+            {
+                "img": "https://arxiv.org/html/2505.24293/x2.png",
+                "caption": "Figure 2:An overview of next-token prediction in the Llama 3.2 3B transformer decoder and decomposition of the predicted embedding vector computation using the detached Jacobian. Generating three tokens with only<|B⁢o⁢T|>absent𝐵𝑜𝑇absent<|BoT|>< | italic_B italic_o italic_T | >as input produces “The 201”. For each prediction, each input token𝐭𝐢subscript𝐭𝐢\\mathbf{t_{i}}bold_t start_POSTSUBSCRIPT bold_i end_POSTSUBSCRIPTis mapped to an embedding vector𝐱𝐢subscript𝐱𝐢\\mathbf{x_{i}}bold_x start_POSTSUBSCRIPT bold_i end_POSTSUBSCRIPT, and the network generates the embedding of a next token. The phrase turns out to be “The 2019-2020 season”. The detached Jacobian𝐉+⁢(𝐱)superscript𝐉𝐱\\mathbf{J^{+}(\\mathbf{x})}bold_J start_POSTSUPERSCRIPT + end_POSTSUPERSCRIPT ( bold_x )of the predicted output embedding with respect to the input embeddings is composed of a matrix corresponding to each input vector. Each detached Jacobian matrix𝐉𝐢+⁢(𝐱)subscriptsuperscript𝐉𝐢𝐱\\mathbf{J^{+}_{i}}(\\mathbf{x})bold_J start_POSTSUPERSCRIPT + end_POSTSUPERSCRIPT start_POSTSUBSCRIPT bold_i end_POSTSUBSCRIPT ( bold_x )is a function of the entire input sequence but operates only on its corresponding input embedding vector. The matrices tend to be extremely low rank, shown in the inset figures, and the matrix𝐉𝟎+subscriptsuperscript𝐉0\\mathbf{J^{+}_{0}}bold_J start_POSTSUPERSCRIPT + end_POSTSUPERSCRIPT start_POSTSUBSCRIPT bold_0 end_POSTSUBSCRIPTvaries across A), B) and C) above because the input sequences differ. Since the detached Jacobian captures the entirety of the model operation in a linear system (numerically, for a given input sequence), tools like the SVD can be used to interpret the model and its sub-components.",
+                "position": 95
+            }
+        ]
+    },
+    {
+        "header": "2Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.24293/x3.png",
+                "caption": "Figure 3:For the input sequence “The bridge out of Marin is the”, the elements of the predicted output embedding vector of the model compared to the elements from the Jacobian reconstruction for both the original Jacobian (blue points) and detached Jacobian operations (red points), shown for a range of model families and sizes. Note that the detached Jacobian reconstructions nearly exactly match the predicted embedding in each case, with relative error (the standard deviation of the reconstruction error divided by the standard deviation of the output embedding) on the order of10−6superscript10610^{-6}10 start_POSTSUPERSCRIPT - 6 end_POSTSUPERSCRIPTforf⁢l⁢o⁢a⁢t⁢32𝑓𝑙𝑜𝑎𝑡32float32italic_f italic_l italic_o italic_a italic_t 32precision and10−3superscript10310^{-3}10 start_POSTSUPERSCRIPT - 3 end_POSTSUPERSCRIPTforf⁢l⁢o⁢a⁢t⁢16𝑓𝑙𝑜𝑎𝑡16float16italic_f italic_l italic_o italic_a italic_t 16precision. Llama 3 models are shown in A) and D), Qwen 3 models in B) and E), and Gemma 3 models in C) and F). These plots demonstrate the near-exact reconstruction of the detached Jacobian and therefore the local linearity of the mapping.",
+                "position": 184
+            }
+        ]
+    },
+    {
+        "header": "3Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.24293/x4.png",
+                "caption": "Figure 4:Given the sequence “The bridge out of Marin is the”, the most likely prediction is “most” for Llama 3.2 3B. The detached Jacobian matrices for each token represent a near-exact local linearization of the predicted output embedding. A) We show the features which drive large responses in single units in the last decoder layer, which are the rows of the detached Jacobian with the largest norm values, and decode each of those into the most likely input embedding token. The blue list of words at the top are the ordered decoded “feature” input tokens from the largest rows of the detached Jacobian matrix for the beginning of sequence token, and the different colors show the decoded feature tokens for the other input tokens. A similar operation is carried out for columns of the largest norm values, which are decoded to the output token space. Note that the activation distribution of column magnitudes is fairly sparse, with only a few features driving the response. B) We take the singular value decomposition of the detached Jacobian matrix corresponding to each input token, which summarizes the modes driving the response, and decode the left and right singular vectorsU𝑈Uitalic_UandV𝑉Vitalic_Vto output and input embeddings, shown in colors. The singular value spectrum is extremely low rank, and decoding theU𝑈Uitalic_Usingular vectors returns candidate output tokens: “most” and “one” appear frequently. Decoding theV𝑉Vitalic_Vsingular vectors returns variants of the input tokens like “bridge”, “Marin” and “is”, as well as others that are not clearly related to the input sequence.",
+                "position": 391
+            },
+            {
+                "img": "https://arxiv.org/html/2505.24293/x5.png",
+                "caption": "Figure 5:Singular value decomposition of the detached Jacobian for different families and sizes of language models (from3333B to70707070B parameters) evaluating the input sequence “The bridge out of Marin is the”, followed by a predicted token. The left singular vectors decode to tokens related to bridges and local geography, particularly the Golden Gate Bridge, while singular value spectra all have extremely low rank (see below for quantification). Each row shows top tokens associated with different singular vectors, demonstrating how models encode semantic knowledge about the input sequence and the prediction. See Fig.A1for Deepseek R1 0528 Qwen 3 8B Distill.",
+                "position": 395
+            },
+            {
+                "img": "https://arxiv.org/html/2505.24293/x6.png",
+                "caption": "Figure 6:Since the transform representing the model forward operation is locally linear, we can also decompose each transformer layer as a linear operation as well. A) The singular value spectrum for the cumulative transform up to layeri𝑖iitalic_i. Note that later layers are lower rank than earlier layers. The top singular vectors of the later layers show a clear relation to the prediction of “most”. B) The projection of the top two singular vectors onto the top two singular vectors of the final layer. The singular vectors of the first 10 layers are very different than those of the last layer, so the projections remain close to the origin. At layer 11, they begin to approach those of the output layer. C) A measurement of the dimensionality of the cumulative transform up to the output of each layer as the stable rank. Within each layer, the outputs of the attention and MLP modules (prior to adding the residual terms) can also be decomposed as linear mappings. The dimensionality decreases deeper into the network at each of these points, except for a slight increase for the attention and MLP module outputs in layer 3. D) The dimensionality of the detached Jacobian for the layer-wise transform at layeri𝑖iitalic_ifor the layer output, as well as the attention module output and MLP module output.",
+                "position": 1214
+            }
+        ]
+    },
+    {
+        "header": "4Discussion",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.24293/x7.png",
+                "caption": "Figure A1:The detached Jacobian reconstruction error and SVD for Deepseek R1 0528 Qwen 3 8B. This was computed at float16 precision.",
+                "position": 1633
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]

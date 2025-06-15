@@ -1,0 +1,167 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10622/x1.png",
+                "caption": "Figure 1:Left:original Transformer block.Right:block with our proposed Dynamic Tanh (DyT) layer. DyT is a straightforward replacement for commonly used Layer Norm(Ba et al.,2016)(in some cases RMSNorm(Zhang and Sennrich,2019)) layers. Transformers with DyT match or exceed the performance of their normalized counterparts.",
+                "position": 207
+            }
+        ]
+    },
+    {
+        "header": "2Background: Normalization Layers",
+        "images": []
+    },
+    {
+        "header": "3What Do Normalization Layers Do?",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10622/extracted/6278329/figures/inout_vit.png",
+                "caption": "Figure 2:Output vs. input of selected layer normalization (LN) layers in Vision Transformer (ViT)(Dosovitskiy et al.,2020), wav2vec 2.0 (a Transformer model for speech)(Baevski et al.,2020), and Diffusion Transformer (DiT)(Peebles and Xie,2023).We sample a mini-batch of samples and plot the input / output values of four LN layers in each model. The outputs are before the affine transformation in LN. TheS𝑆Sitalic_S-shaped curves highly resemble that of a tanh function (see Figure3). The more linear shapes in earlier layers can also be captured by the center part of a tanh curve. This motivates us to propose Dynamic Tanh (DyT) as a replacement, with a learnable scalerα𝛼\\alphaitalic_αto account for different scales on thex𝑥xitalic_xaxis.",
+                "position": 254
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10622/extracted/6278329/figures/inout_w2v.png",
+                "caption": "",
+                "position": 264
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10622/extracted/6278329/figures/inout_dit.png",
+                "caption": "",
+                "position": 270
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10622/x2.png",
+                "caption": "Figure 3:tanh⁡(α⁢x)𝛼𝑥\\tanh(\\alpha x)roman_tanh ( italic_α italic_x )with three differentα𝛼\\alphaitalic_αvalues.",
+                "position": 277
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10622/extracted/6278329/figures/inout_color.png",
+                "caption": "Figure 4:Output vs. input of two LN layers, with tensor elements colored to indicate different channel and token dimensions.The input tensor has a shape of (samples, tokens, and channels), with elements visualized by assigning consistent colors to the same tokens (left two panels) and channels (right two panels).Left two panels: points representing the same token (same color) form straight lines across different channels, as LN operates linearly across channels for each token. Interestingly, when plotted collectively, these lines form a non-linear tanh-shaped curve.Right two panels: each channel’s input spans different ranges on thex𝑥xitalic_x-axis, contributing distinct segments to the overall tanh-shaped curve. Certain channels (e.g., red, green, and pink) exhibit more extremex𝑥xitalic_xvalues, which are squashed by LN.",
+                "position": 304
+            }
+        ]
+    },
+    {
+        "header": "4Dynamic Tanh (DyT)",
+        "images": []
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10622/x3.png",
+                "caption": "Figure 5:Training loss curves for ViT-B and ConvNeXt-B models.The loss curves for both model types exhibit similar patterns between LN and DyT, suggesting that LN and DyT may share similar learning dynamics.",
+                "position": 411
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10622/x4.png",
+                "caption": "",
+                "position": 420
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10622/x5.png",
+                "caption": "Figure 6:LLaMA pretraining loss.The loss curves of DyT and RMSNorm models are closely aligned across model sizes.",
+                "position": 623
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10622/x6.png",
+                "caption": "",
+                "position": 632
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10622/x7.png",
+                "caption": "",
+                "position": 638
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10622/x8.png",
+                "caption": "",
+                "position": 643
+            }
+        ]
+    },
+    {
+        "header": "6Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10622/x9.png",
+                "caption": "Figure 7:Curves of three squashing functions: tanh, hardtanh, and sigmoid. All three functions squash inputs into a bounded range, buttanh⁡(x)𝑥\\tanh(x)roman_tanh ( italic_x )achieves the best performance when used in DyT layers. We suspect it is due to its smoothness and zero-centered properties.",
+                "position": 892
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10622/x9.png",
+                "caption": "Figure 7:Curves of three squashing functions: tanh, hardtanh, and sigmoid. All three functions squash inputs into a bounded range, buttanh⁡(x)𝑥\\tanh(x)roman_tanh ( italic_x )achieves the best performance when used in DyT layers. We suspect it is due to its smoothness and zero-centered properties.",
+                "position": 895
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10622/x10.png",
+                "caption": "Figure 8:Left:For two selected DyT layers from the ViT-B model, we trackα𝛼\\alphaitalic_αand the inverse of the standard deviation (1/std1std1/\\mathrm{std}1 / roman_std) of activations at the end of each epoch, observing that they evolve together during training.Right:We plot the finalα𝛼\\alphaitalic_αvalues of two trained models, ViT-B and ConvNeXt-B, against the1/std1std1/\\mathrm{std}1 / roman_stdof the input activations, demonstrating a strong correlation between the two values.",
+                "position": 900
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10622/x11.png",
+                "caption": "",
+                "position": 910
+            }
+        ]
+    },
+    {
+        "header": "7Initialization ofα𝛼\\alphaitalic_α",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.10622/x12.png",
+                "caption": "Figure 9:Performance of different tasks across differentα0subscript𝛼0\\alpha_{0}italic_α start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPTvalues.We benchmark the performance of all non-LLM tasks used in Section5with different initial values ofα𝛼\\alphaitalic_α. Performance remains stable across a wide range ofα0subscript𝛼0\\alpha_{0}italic_α start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPTvalues. The only exception is that supervised ViT-L models (top right panel) will diverge forα0subscript𝛼0\\alpha_{0}italic_α start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPTvalues larger than 0.6.",
+                "position": 1104
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10622/x13.png",
+                "caption": "Figure 10:Stability across varyingα0subscript𝛼0\\alpha_{0}italic_α start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPTvalues, learning rates, and model sizes.We train supervised ViT models on the ImageNet-1K dataset and observe that larger models are more prone to instability for both LN and DyT models. Lowering the learning rate or reducingα0subscript𝛼0\\alpha_{0}italic_α start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPTenhances stability. LN shows similar stability to DyT withα0=0.5subscript𝛼00.5\\alpha_{0}=0.5italic_α start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPT = 0.5.",
+                "position": 1107
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10622/x14.png",
+                "caption": "Figure 11:Heatmaps of loss values at 30B tokens for differentα0subscript𝛼0\\alpha_{0}italic_α start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPTsettings.Both LLaMA models benefit from increasedα0subscript𝛼0\\alpha_{0}italic_α start_POSTSUBSCRIPT 0 end_POSTSUBSCRIPTin attention blocks.",
+                "position": 1292
+            },
+            {
+                "img": "https://arxiv.org/html/2503.10622/x15.png",
+                "caption": "",
+                "position": 1301
+            }
+        ]
+    },
+    {
+        "header": "8Related Work",
+        "images": []
+    },
+    {
+        "header": "9Limitations",
+        "images": []
+    },
+    {
+        "header": "10Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AExperimental Settings",
+        "images": []
+    },
+    {
+        "header": "Appendix BHyperparameters",
+        "images": []
+    },
+    {
+        "header": "Appendix CReplacing Batch Normalization with DyT",
+        "images": []
+    }
+]

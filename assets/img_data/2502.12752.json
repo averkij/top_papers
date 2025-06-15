@@ -1,0 +1,994 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.12752/x1.png",
+                "caption": "Figure 1.Performance comparison.Diffusion-based methods,e.g., ViewCrafter, usually hallucinate contents that are inconsistent with the input view. Splatting-based approaches,e.g., DepthSplat, often suffer from distorted geometry due to splatting errors. By contrast, our method produces novel views with consistent geometry and high-fidelity texture, achieving significantly better performance than previous arts on different tasks. Note that our model is trained only on the single-view novel view synthesis and is directly applied to the other tasks, showing promising cross-domain and cross-task performance.",
+                "position": 69
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.12752/x2.png",
+                "caption": "Figure 2.Overview of SplatDiff.Given the input view, we first estimate the depth information from a depth estimator and then perform pixel splatting to generate splatted views as diffusion conditioning. In our splatting-guided diffusion, we fine-tune the latent U-Net for aligned synthesis, producing consistent novel views while correcting splatting errors. Meanwhile, a texture bridge module is designed to aggregate the encoder features for high-fidelity synthesis.",
+                "position": 169
+            }
+        ]
+    },
+    {
+        "header": "2.Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/misalignment/018.png",
+                "caption": "Splatted View",
+                "position": 199
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/misalignment/018.png",
+                "caption": "Splatted View",
+                "position": 202
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/misalignment/viewcrafter.png",
+                "caption": "ViewCrafter",
+                "position": 207
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/misalignment/ours.png",
+                "caption": "Ours",
+                "position": 212
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/misalignment/inv_mask.png",
+                "caption": "Unknown Region",
+                "position": 218
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/misalignment/diff_viewcrafter.png",
+                "caption": "Diff. Map (ViewCrafter)",
+                "position": 223
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/misalignment/diff_ours.png",
+                "caption": "Diff. Map (Ours)",
+                "position": 228
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/img-alignsyn-pipeline.jpg",
+                "caption": "(a)Comparison between naive and our training pair generation",
+                "position": 235
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/img-alignsyn-pipeline.jpg",
+                "caption": "(a)Comparison between naive and our training pair generation",
+                "position": 238
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/align_syn/input.png",
+                "caption": "Input View",
+                "position": 244
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/align_syn/input.png",
+                "caption": "Input View",
+                "position": 247
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/align_syn/splat.png",
+                "caption": "Splatted View",
+                "position": 252
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/align_syn/naive.png",
+                "caption": "Naive Training",
+                "position": 257
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/align_syn/TPA.png",
+                "caption": "Training w/ TPA",
+                "position": 262
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/align_syn/ours.png",
+                "caption": "Training w/ TPA and SES",
+                "position": 267
+            }
+        ]
+    },
+    {
+        "header": "3.Splatting-Guided Diffusion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.12752/x3.png",
+                "caption": "Figure 5.Texture bridge.The texture bridge is designed to complement multi-scale features from the encoder to the decoder, enabling high-fidelity synthesis. For training, we intentionally degrade the texture of the target view with the diffusion model, simulating a degraded view with hallucinated textures. This facilitates the texture bridge to learn how to adaptively fuse information from the splatted view and the diffusion outputs.",
+                "position": 366
+            }
+        ]
+    },
+    {
+        "header": "4.Experiments and Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/input/003/000.png",
+                "caption": "Input View",
+                "position": 707
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/input/003/000.png",
+                "caption": "Input View",
+                "position": 710
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/input/003/000.png",
+                "caption": "",
+                "position": 713
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/gt/003/003.png",
+                "caption": "",
+                "position": 717
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/viewcrafter/003/003.png",
+                "caption": "",
+                "position": 721
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/flash3d/003/003.png",
+                "caption": "",
+                "position": 725
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/exp106+exp128/003/003.png",
+                "caption": "",
+                "position": 729
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/input/004/000.png",
+                "caption": "",
+                "position": 734
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/gt/004/003.png",
+                "caption": "",
+                "position": 738
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/viewcrafter/004/003.png",
+                "caption": "",
+                "position": 742
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/flash3d/004/003.png",
+                "caption": "",
+                "position": 746
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/exp106+exp128/004/003.png",
+                "caption": "",
+                "position": 750
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/input/005/000.png",
+                "caption": "",
+                "position": 755
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/gt/005/003.png",
+                "caption": "",
+                "position": 759
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/viewcrafter/005/003.png",
+                "caption": "",
+                "position": 763
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/flash3d/005/003.png",
+                "caption": "",
+                "position": 767
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/exp106+exp128/005/003.png",
+                "caption": "",
+                "position": 771
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/input/007/000.png",
+                "caption": "Input View",
+                "position": 776
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/gt/007/003.png",
+                "caption": "Target View",
+                "position": 781
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/viewcrafter/007/003.png",
+                "caption": "ViewCrafter",
+                "position": 786
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/flash3d/007/003.png",
+                "caption": "Flash3D",
+                "position": 791
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/re10k/exp106+exp128/007/003.png",
+                "caption": "SplatDiff (Ours)",
+                "position": 796
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/input/002/000000.png",
+                "caption": "Input View",
+                "position": 806
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/input/002/000000.png",
+                "caption": "",
+                "position": 809
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/gt/002/000006.png",
+                "caption": "",
+                "position": 813
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/viewcrafter/002/000006.png",
+                "caption": "",
+                "position": 817
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/depthsplat/002/000006.png",
+                "caption": "",
+                "position": 821
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/exp119+exp130/002/000006.png",
+                "caption": "",
+                "position": 825
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/input/003/000000.png",
+                "caption": "",
+                "position": 830
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/gt/003/000006.png",
+                "caption": "",
+                "position": 834
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/viewcrafter/003/000006.png",
+                "caption": "",
+                "position": 838
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/depthsplat/003/000006.png",
+                "caption": "",
+                "position": 842
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/exp119+exp130/003/000006.png",
+                "caption": "",
+                "position": 846
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/input/005/000000.png",
+                "caption": "",
+                "position": 851
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/gt/005/000003.png",
+                "caption": "",
+                "position": 855
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/viewcrafter/005/000003.png",
+                "caption": "",
+                "position": 859
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/depthsplat/005/000003.png",
+                "caption": "",
+                "position": 863
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/exp119+exp130/005/000003.png",
+                "caption": "",
+                "position": 867
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/input/008/000000.png",
+                "caption": "Input View",
+                "position": 872
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/gt/008/000003.png",
+                "caption": "Target View",
+                "position": 877
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/viewcrafter/008/000003.png",
+                "caption": "ViewCrafter",
+                "position": 882
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/depthsplat/008/000003.png",
+                "caption": "DepthSplat*",
+                "position": 887
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/dl3dv/exp119+exp130/008/000003.png",
+                "caption": "SplatDiff (Ours)",
+                "position": 892
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/0005/000.png",
+                "caption": "Input View",
+                "position": 903
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/0005/000.png",
+                "caption": "",
+                "position": 906
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/0005/018.png",
+                "caption": "",
+                "position": 910
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/0005/inpainted_018.png",
+                "caption": "",
+                "position": 914
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/0005/ours.png",
+                "caption": "",
+                "position": 918
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/img017/000.png",
+                "caption": "",
+                "position": 923
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/img017/018.png",
+                "caption": "",
+                "position": 927
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/img017/inpainted_018.png",
+                "caption": "",
+                "position": 931
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/img017/ours.png",
+                "caption": "",
+                "position": 935
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/img026/000.png",
+                "caption": "Input View",
+                "position": 940
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/img026/018.png",
+                "caption": "Splatted View",
+                "position": 945
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/img026/inpainted_018.png",
+                "caption": "ViewCrafter",
+                "position": 950
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/img026/ours.png",
+                "caption": "SplatDiff (Ours)",
+                "position": 955
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dl3dv/06da79/000000.png",
+                "caption": "Input Views",
+                "position": 1264
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dl3dv/06da79/000000.png",
+                "caption": "Input Views",
+                "position": 1267
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dl3dv/06da79/000000.png",
+                "caption": "",
+                "position": 1270
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dl3dv/06da79/000049.png",
+                "caption": "",
+                "position": 1274
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dl3dv/06da79/gt.png",
+                "caption": "",
+                "position": 1279
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dl3dv/06da79/depthsplat.png",
+                "caption": "",
+                "position": 1283
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dl3dv/06da79/ours.png",
+                "caption": "",
+                "position": 1287
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dl3dv/2862396/000000.png",
+                "caption": "Input Views",
+                "position": 1292
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dl3dv/2862396/000049.png",
+                "caption": "",
+                "position": 1296
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dl3dv/2862396/gt.png",
+                "caption": "Target View",
+                "position": 1302
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dl3dv/2862396/depthsplat.png",
+                "caption": "DepthSplat",
+                "position": 1307
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dl3dv/2862396/ours.png",
+                "caption": "Ours",
+                "position": 1312
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dtu/scan114_00/000031.png",
+                "caption": "Inputs",
+                "position": 1321
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dtu/scan114_00/000031.png",
+                "caption": "",
+                "position": 1324
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dtu/scan114_00/000033.png",
+                "caption": "",
+                "position": 1328
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dtu/scan114_00/000032_gt.png",
+                "caption": "",
+                "position": 1333
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dtu/scan114_00/depthsplat.png",
+                "caption": "",
+                "position": 1337
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dtu/scan114_00/ours.png",
+                "caption": "",
+                "position": 1341
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dtu/scan21_02/000031.png",
+                "caption": "Inputs",
+                "position": 1346
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dtu/scan21_02/000033.png",
+                "caption": "",
+                "position": 1350
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dtu/scan21_02/000023_gt.png",
+                "caption": "Target View",
+                "position": 1356
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dtu/scan21_02/depthsplat.png",
+                "caption": "DepthSplat",
+                "position": 1361
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/sparseview/dtu/scan21_02/ours.png",
+                "caption": "Ours",
+                "position": 1366
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/stereoconv/0045/input/0090.png",
+                "caption": "Input View (Left)",
+                "position": 1377
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/stereoconv/0045/input/0090.png",
+                "caption": "",
+                "position": 1380
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/stereoconv/0045/viewcrafter/0090.png",
+                "caption": "",
+                "position": 1384
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/stereoconv/0045/stereocrafter/0090.png",
+                "caption": "",
+                "position": 1388
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/stereoconv/0045/ours/0090.png",
+                "caption": "",
+                "position": 1392
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/stereoconv/0038/input/0110.png",
+                "caption": "Input View (Left)",
+                "position": 1397
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/stereoconv/0038/viewcrafter/0110.png",
+                "caption": "ViewCrafter",
+                "position": 1402
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/stereoconv/0038/stereocrafter/0110.png",
+                "caption": "StereoCrafter",
+                "position": 1407
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/stereoconv/0038/ours/0110.png",
+                "caption": "SplatDiff (Ours)",
+                "position": 1412
+            }
+        ]
+    },
+    {
+        "header": "5.Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/texture_degradation/splat/0015.png",
+                "caption": "Splatted View",
+                "position": 2095
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/texture_degradation/splat/0015.png",
+                "caption": "Splatted View",
+                "position": 2098
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/texture_degradation/diffout/0015.png",
+                "caption": "Diffusion Output",
+                "position": 2103
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/texture_degradation/degrade/0015.png",
+                "caption": "Degraded View",
+                "position": 2108
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/texture_degradation/gt/0015.png",
+                "caption": "Target View",
+                "position": 2113
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/ablation/010.png",
+                "caption": "Splatted View",
+                "position": 2120
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/ablation/010.png",
+                "caption": "Splatted View",
+                "position": 2123
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/ablation/baseline.png",
+                "caption": "Baseline (#1)",
+                "position": 2128
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/ablation/alignedsyn.png",
+                "caption": "w/ Aligned Synthesis (#3)",
+                "position": 2133
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/ablation/ours.png",
+                "caption": "w/ All (#5)",
+                "position": 2138
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/ablation/inv_mask_010.png",
+                "caption": "Unkown Region",
+                "position": 2144
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/ablation/inv_mask_010.png",
+                "caption": "Unkown Region",
+                "position": 2147
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/ablation/diff_baseline.png",
+                "caption": "Diff. Map (Baseline)",
+                "position": 2152
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/ablation/diff_alignedsyn.png",
+                "caption": "Diff. Map (w/ Aligned Synthesis)",
+                "position": 2157
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/ablation/diff_ours.png",
+                "caption": "Diff. Map (w/ All)",
+                "position": 2162
+            }
+        ]
+    },
+    {
+        "header": "Appendix AMore Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/000/000.png",
+                "caption": "Input View",
+                "position": 2188
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/000/000.png",
+                "caption": "",
+                "position": 2191
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/000/splat.png",
+                "caption": "",
+                "position": 2195
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/000/viewcrafter.png",
+                "caption": "",
+                "position": 2199
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/000/ours.png",
+                "caption": "",
+                "position": 2203
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/001/000.png",
+                "caption": "",
+                "position": 2208
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/001/splat.png",
+                "caption": "",
+                "position": 2212
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/001/viewcrafter.png",
+                "caption": "",
+                "position": 2216
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/001/ours.png",
+                "caption": "",
+                "position": 2220
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/0017/000.png",
+                "caption": "",
+                "position": 2225
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/0017/018.png",
+                "caption": "",
+                "position": 2229
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/0017/inpainted_018.png",
+                "caption": "",
+                "position": 2233
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/main/singleview/wild/0017/ours.png",
+                "caption": "",
+                "position": 2237
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/002/000.png",
+                "caption": "",
+                "position": 2242
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/002/018.png",
+                "caption": "",
+                "position": 2246
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/002/viewcrafter.png",
+                "caption": "",
+                "position": 2250
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/002/ours.png",
+                "caption": "",
+                "position": 2254
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/003/000.png",
+                "caption": "",
+                "position": 2259
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/003/012.png",
+                "caption": "",
+                "position": 2263
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/003/viewcrafter.png",
+                "caption": "",
+                "position": 2267
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/003/ours.png",
+                "caption": "",
+                "position": 2271
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/004/000.png",
+                "caption": "",
+                "position": 2276
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/004/006.png",
+                "caption": "",
+                "position": 2280
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/004/viewcrafter.png",
+                "caption": "",
+                "position": 2284
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/004/ours.png",
+                "caption": "",
+                "position": 2288
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/005/000.png",
+                "caption": "",
+                "position": 2293
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/005/018.png",
+                "caption": "",
+                "position": 2297
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/005/viewcrafter.png",
+                "caption": "",
+                "position": 2301
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/005/ours.png",
+                "caption": "",
+                "position": 2305
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/006/000.png",
+                "caption": "Input View",
+                "position": 2310
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/006/003.png",
+                "caption": "Splatted View",
+                "position": 2315
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/006/viewcrafter.png",
+                "caption": "ViewCrafter",
+                "position": 2320
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/singleview/006/ours.png",
+                "caption": "SplatDiff (Ours)",
+                "position": 2325
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/input/0028.png",
+                "caption": "Input Views (Left)",
+                "position": 2332
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/input/0028.png",
+                "caption": "Input Views (Left)",
+                "position": 2335
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/input/0028.png",
+                "caption": "",
+                "position": 2338
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/viewcrafter/0028.png",
+                "caption": "",
+                "position": 2342
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/stereocrafter/0028.png",
+                "caption": "",
+                "position": 2346
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/ours/0028.png",
+                "caption": "",
+                "position": 2350
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/input/0042.png",
+                "caption": "",
+                "position": 2355
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/viewcrafter/0042.png",
+                "caption": "",
+                "position": 2359
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/stereocrafter/0042.png",
+                "caption": "",
+                "position": 2363
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/ours/0042.png",
+                "caption": "",
+                "position": 2367
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/input/0043.png",
+                "caption": "",
+                "position": 2372
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/viewcrafter/0043.png",
+                "caption": "",
+                "position": 2376
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/stereocrafter/0043.png",
+                "caption": "",
+                "position": 2380
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/ours/0043.png",
+                "caption": "",
+                "position": 2384
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/input/0049.png",
+                "caption": "Input Views (Left)",
+                "position": 2389
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/viewcrafter/0049.png",
+                "caption": "ViewCrafter",
+                "position": 2394
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/stereocrafter/0049.png",
+                "caption": "StereoCrafter",
+                "position": 2399
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0004/ours/0049.png",
+                "caption": "SplatDiff (Ours)",
+                "position": 2404
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/input/0001.png",
+                "caption": "Input Views (Left)",
+                "position": 2414
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/input/0001.png",
+                "caption": "",
+                "position": 2417
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/viewcrafter/0001.png",
+                "caption": "",
+                "position": 2421
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/stereocrafter/0001.png",
+                "caption": "",
+                "position": 2425
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/ours/0001.png",
+                "caption": "",
+                "position": 2429
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/input/0003.png",
+                "caption": "",
+                "position": 2434
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/viewcrafter/0003.png",
+                "caption": "",
+                "position": 2438
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/stereocrafter/0003.png",
+                "caption": "",
+                "position": 2442
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/ours/0003.png",
+                "caption": "",
+                "position": 2446
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/input/0007.png",
+                "caption": "",
+                "position": 2451
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/viewcrafter/0007.png",
+                "caption": "",
+                "position": 2455
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/stereocrafter/0007.png",
+                "caption": "",
+                "position": 2459
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/ours/0007.png",
+                "caption": "",
+                "position": 2463
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/input/0008.png",
+                "caption": "Input Views (Left)",
+                "position": 2468
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/viewcrafter/0008.png",
+                "caption": "ViewCrafter",
+                "position": 2473
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/stereocrafter/0008.png",
+                "caption": "StereoCrafter",
+                "position": 2478
+            },
+            {
+                "img": "https://arxiv.org/html/2502.12752/extracted/6213451/imgs/supp/stereoconv/0026/ours/0008.png",
+                "caption": "SplatDiff (Ours)",
+                "position": 2483
+            }
+        ]
+    },
+    {
+        "header": "Appendix BMore Visual Results",
+        "images": []
+    },
+    {
+        "header": "Appendix CLimitations and Future Works",
+        "images": []
+    }
+]

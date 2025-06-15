@@ -1,0 +1,230 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Distribution Shifts for Machine Learning Force Fields",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/distribution_shifts.drawio.png",
+                "caption": "Figure 1:Distribution Shifts for MLFFs.We visualize distribution shifts based on changes in features, labels, and graph structure. Typical training samples from SPICEEastman et al. (2023)and new systems from SPICEv2(Eastman et al.,2024)are displayed. A feature shift, such as a change in elements, is shown by replacing a carbon atom with a silicon atom (left). A force norm shift is shown by the close proximity of anH2subscript𝐻2H_{2}italic_H start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPTmolecule (circled in pink), leading to high force norms (middle). A connectivity shift is shown by the tetrahedral geometry inP4⁢S6subscript𝑃4subscript𝑆6P_{4}S_{6}italic_P start_POSTSUBSCRIPT 4 end_POSTSUBSCRIPT italic_S start_POSTSUBSCRIPT 6 end_POSTSUBSCRIPT, which differs from the typical planar geometry seen during training (right).",
+                "position": 276
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/foundation_bad_wide.png",
+                "caption": "Figure 2:Distribution Shifts for Large Models.We study distribution shifts on four of the largest open-source MLFFs designed for broad chemical spaces. (a) We evaluate MACE-MP on the MPTrj train set. (b) We evaluate MACE-OFF on 10k new molecules from SPICEv2. (c) We evaluate EquiformerV2 on the OC20 out-of-distribution validation set. (d) We evaluate JMP on the ANI-1x test set. A molecule is considered out-of-distribution if it is more than 1 standard deviation away from the mean training force norm or connectivity (with respect to the spectral distance described in §3.2), or if it contains a new element. Despite their scale, these large foundation models have2−10×2-10\\times2 - 10 ×larger force mean absolute errors (MAE) when encountering distribution shifts.",
+                "position": 319
+            }
+        ]
+    },
+    {
+        "header": "4Mitigating Distribution Shifts with Test-Time Refinement Strategies for Machine Learning Force Fields",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/radius_refinement_2.png",
+                "caption": "",
+                "position": 391
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/ttt_compressed.png",
+                "caption": "(a)Test-Time Training (TTT)",
+                "position": 426
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/ttt_compressed.png",
+                "caption": "(a)Test-Time Training (TTT)",
+                "position": 429
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/sali_pes_vertical_sansserif.png",
+                "caption": "(b)Predicted Potential Energy Surface",
+                "position": 434
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/ttt_binned.png",
+                "caption": "Figure 5:Test-Time Training and Radius Refinement Strategies for Improved Molecular Force Prediction.We train a GemNet-T model (left) on 951k samples from the SPICE dataset and evaluate it on new molecules from the SPICEv2 dataset. We also evaluate the MACE-OFF model (right), which was also trained on the same 951k samples from SPICE. We plot the number of molecules that fall into specific force error bins to show that TTT (left) and RR (right) help improve errors for hundreds of molecular systems. As with previous test-time training works, improvements are more challenging to achieve for systems with lower initial errors (i.e., those closer to in-distribution performance), but TTT and RR still help bridge the gap to in-distribution performance.",
+                "position": 535
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/ttt_binned.png",
+                "caption": "",
+                "position": 538
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/rr_binned_wide.png",
+                "caption": "",
+                "position": 542
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/force_norm_100p.png",
+                "caption": "Figure 6:Evaluating Distribution Shifts for Force Norms on SPICEv2.The MACE-OFF model is trained on 951k samples from the SPICE dataset, with the training force norm distribution shown in gray. We evaluate MACE-OFF on new molecules from the SPICEv2 dataset with varying force norms. As the force norms deviate further from the training distribution, MACE-OFF’s force errors increase. We also train a GemNet-T, and then apply test-time training (TTT), mitigating this shift. We highlight the top 10% of molecules with the greatest improvement to demonstrate that TTT is effective even for structures that are near the training distribution in (b).",
+                "position": 555
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/connect_sd.png",
+                "caption": "Figure 7:Evaluating Connectivity Distribution Shifts on SPICEv2.We evaluate MACE-OFF on new molecules from the SPICEv2 dataset with varying connectivity, defined by the spectral distance to the average training graph (see §4.1for details). Test structures with different connectivity incur larger errors for MACE-OFF. Test-time training (TTT) applied to a GemNet-T model and test-time radius refinement (RR) applied to MACE-OFF are both able to mitigate this performance drop at minimal computational cost. We highlight the top 10% of molecules with the greatest improvement to demonstrate that TTT is effective even for connectivities close to the training distribution in (b).",
+                "position": 576
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/naph_hr.png",
+                "caption": "Figure 8:Testing Molecular Dynamics Simulations.TTT enables stable simulations that accurately reconstruct observables, such as the distribution of interatomic distances, for molecules not seen during training (orange). In contrast, predictions without TTT for these unseen molecules result in unstable simulations and inaccurateh⁢(r)ℎ𝑟h(r)italic_h ( italic_r )curves (blue). Simulations without TTT remained unstable even with a timestep reduced by5,000×5,000\\times5 , 000 ×.",
+                "position": 646
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/naph_hr.png",
+                "caption": "",
+                "position": 649
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/tolu_hr.png",
+                "caption": "",
+                "position": 653
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "7Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADetails on Test-Time Refinement Training Strategies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/prior_accuracy_vs_ttt.png",
+                "caption": "(a)Impact of prior accuracy on test-time training (TTT) for naphthalene.As the prior becomes more accurate by training on more samples, we see larger improvements from TTT (blue bar). This accuracy allows us to take more gradient steps on the prior task (orange bar), without deteriorating performance on the main task.",
+                "position": 2021
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/prior_accuracy_vs_ttt.png",
+                "caption": "(a)Impact of prior accuracy on test-time training (TTT) for naphthalene.As the prior becomes more accurate by training on more samples, we see larger improvements from TTT (blue bar). This accuracy allows us to take more gradient steps on the prior task (orange bar), without deteriorating performance on the main task.",
+                "position": 2024
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/ptl_mtl.png",
+                "caption": "(b)Relationship between prior task loss and main task loss.Fitting to the prior task loss (orange) improves performance on the main task (blue) on naphthalene.",
+                "position": 2029
+            }
+        ]
+    },
+    {
+        "header": "Appendix BTheoretical Motivation for Test-Time Refinement",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/sn_dist_rr.png",
+                "caption": "(a)Distance to Training Distribution",
+                "position": 2314
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/sn_dist_rr.png",
+                "caption": "(a)Distance to Training Distribution",
+                "position": 2317
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/node_degree_rr.png",
+                "caption": "(b)Node Degree",
+                "position": 2322
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAdditional Test-Time Refinement Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/an_100p.png",
+                "caption": "Figure 11:Assessing the Impact of New Elements on Model Performance on SPICEv2 BenchmarkWe evaluate models trained on 951k samples from SPICE on molecules with new elements from SPICEv2. The MACE-OFF model deteriorates in performance when encountering new elements in the SPICEv2 dataset. We train a GemNet-T model on the 951k samples and run TTT—this is able to mitigate this distribution shift. We highlight the top 10% of molecules with the greatest improvement, showing that TTT can help with the challenging problem of generalizing to new elements.",
+                "position": 2363
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/error_vs_training_data.png",
+                "caption": "Figure 12:Performance on the SPICEv2 Distribution Shift Benchmark Versus Dataset Size.We evaluate GemNet-T models trained on increasing amounts of data from SPICE on 10k new molecules from SPICEv2. The results show that while increasing the training dataset size improves performance on the SPICEv2 benchmark, the gains in accuracy diminish rapidly. Test-Time Training (TTT) consistently improves performance across all dataset sizes.",
+                "position": 2615
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/ttt_finetune.png",
+                "caption": "Figure 13:Test-Time Training (TTT) Improves Fine-Tuning Efficiency on MD17 dataset.We demonstrate the effectiveness of TTT in reducing the amount of data required for fine-tuning a GemNet-dT model to achieve in-distribution performance. Initially, we train the model on a small set of three molecules from the MD17 dataset. We then fine-tune the model on a new, unseen molecule (toluene) with and without TTT. Our results show that applying TTT before fine-tuning enables the model to reach in-distribution performance (<15absent15<15< 15meV / Å) with 10 times less data compared to fine-tuning without TTT.",
+                "position": 2660
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/emt_correlation.png",
+                "caption": "Figure 14:EMT Correlation with Reference Energy DFT Calculations on OC20.We compare the DFT energy to the predicted energy from the EMT prior on samples from OC20. The correlation is very weak.",
+                "position": 2960
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/tolu_final.png",
+                "caption": "(a)Toluene",
+                "position": 3000
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/tolu_final.png",
+                "caption": "(a)Toluene",
+                "position": 3003
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/atat_final.png",
+                "caption": "(b)AT-AT",
+                "position": 3008
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/naph_2.png",
+                "caption": "(c)Naphthalene",
+                "position": 3013
+            }
+        ]
+    },
+    {
+        "header": "Appendix DExperiment Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/forcenorms_md22.png",
+                "caption": "Figure 16:Force Norms for MD22 Force Norm Distribution Shift Experiment.We plot the force norms for molecules from the MD22 dataset. The line in orange indicates the force norm cutoff used to train the models in §C.4. Note that since the dataset was generated with NVT simulations, force norms are generally low when compared to SPICE.",
+                "position": 3119
+            }
+        ]
+    },
+    {
+        "header": "Appendix EDetails on Distribution Shifts",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/prior_force_norm_correlation.png",
+                "caption": "Figure 17:Prior and Reference Force Norms are Highly Correlated.We plot force norms calculated by the sGDML prior and the reference DFT for samples of aspirin from the MD17 dataset. The force norm predicted by the prior is highly correlated with the reference force norm, despite the absolute error between them being large.",
+                "position": 3275
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/sn_vs_count_n.png",
+                "caption": "Figure 18:Spectral Distance to Average Training Graph Correlates with Number of Training Samples Close to Test Example.We compare the connectivity of new samples from the SPICEv2 dataset to those seen during training on the SPICE dataset. Although representing the training connectivities with an average Laplacian spectrum is lossy, comparing a test graph to this average spectrum correlates strongly with counting the number of training graphs close to the test graph.95%percent9595\\%95 %confidence intervals are shown with error bars.",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2503.08674/extracted/6271759/images/force_norm_vs_connect.png",
+                "caption": "Figure 19:Force Norm vs. Connectivity on SPICEv2.We analyze the force norms and connectivities of new molecules from the SPICEv2 dataset. The distribution of connectivities is similar across force different force norms. This implies that these distribution shifts can happen independently.",
+                "position": 3281
+            }
+        ]
+    },
+    {
+        "header": "Appendix FComputational Usage",
+        "images": []
+    }
+]

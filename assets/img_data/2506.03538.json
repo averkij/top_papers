@@ -1,0 +1,464 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.03538/x1.png",
+                "caption": "Figure 1:Left:The key insight of this work is that artifacts arising from low-quality in-the-wild inputs are typically stochastic across different runs of the same model (Baseline: Run 1vs.Run 2). This motivates the design of the Asymmetric Dual 3DGS framework, which enhances true scene structure while suppressing errors through cross-model consistency (w/ consistency).Right:Our method compares favorably against the state-of-the-art approaches in terms of reconstruction quality while maintaining high training efficiency. Results are on the NeRF On-the-go dataset[18].",
+                "position": 112
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/psnr_hrs.png",
+                "caption": "",
+                "position": 121
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.03538/x2.png",
+                "caption": "Figure 2:Overview of the Asymmetric Dual 3DGS framework.\nTwo 3DGS models𝔾1subscript𝔾1\\mathbb{G}_{1}blackboard_G start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPTand𝔾2subscript𝔾2\\mathbb{G}_{2}blackboard_G start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPTare concurrently optimized with the reconstruction lossℒr⁢1𝐌hsuperscriptsubscriptℒ𝑟1subscript𝐌ℎ\\mathcal{L}_{r1}^{\\mathbf{M}_{h}}caligraphic_L start_POSTSUBSCRIPT italic_r 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT bold_M start_POSTSUBSCRIPT italic_h end_POSTSUBSCRIPT end_POSTSUPERSCRIPTandℒr⁢2𝐌ssuperscriptsubscriptℒ𝑟2subscript𝐌𝑠\\mathcal{L}_{r2}^{\\mathbf{M}_{s}}caligraphic_L start_POSTSUBSCRIPT italic_r 2 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT bold_M start_POSTSUBSCRIPT italic_s end_POSTSUBSCRIPT end_POSTSUPERSCRIPT(Eq.4), along with the mutual consistency lossℒm⁢1subscriptℒ𝑚1\\mathcal{L}_{m1}caligraphic_L start_POSTSUBSCRIPT italic_m 1 end_POSTSUBSCRIPTandℒm⁢2subscriptℒ𝑚2\\mathcal{L}_{m2}caligraphic_L start_POSTSUBSCRIPT italic_m 2 end_POSTSUBSCRIPT(Eq.6). In addition, we apply a mask loss (Eq.7) for learning soft mask in a self-supervised manner.\nFor improved efficiency, we also propose an EMA version of our framework by replacing𝔾2subscript𝔾2\\mathbb{G}_{2}blackboard_G start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPTwith a dynamic EMA proxy.\nBoth the mask loss and the EMA proxy have been omitted here for clarity.\nNote that the color transform in this figure is for illustration purpose, which undergoes a rasterization process in practice as introduced in Section3.1.",
+                "position": 150
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/frame_0300_labeled.jpg",
+                "caption": "Figure 3:Comparisons of hard and soft masks. Distractors are highlighted in red boxes in the input. The right four columns show the evolving of the self-supervised soft mask across different epochs.",
+                "position": 362
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/yoda-undistorted_25453_2clutter2_labeled.jpg",
+                "caption": "",
+                "position": 366
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/patio-undistorted_9836_mask_frame_0300.jpg",
+                "caption": "",
+                "position": 372
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/yoda-undistorted_25354_mask_2clutter2.jpg",
+                "caption": "",
+                "position": 372
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/patio-undistorted_945_mask_frame_0300.jpg",
+                "caption": "",
+                "position": 378
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/yoda-undistorted_2119_mask_2clutter2.jpg",
+                "caption": "",
+                "position": 378
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/patio-undistorted_1671_mask_frame_0300.jpg",
+                "caption": "",
+                "position": 384
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/yoda-undistorted_3033_mask_2clutter2.jpg",
+                "caption": "",
+                "position": 384
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/patio-undistorted_2065_mask_frame_0300.jpg",
+                "caption": "",
+                "position": 390
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/yoda-undistorted_5367_mask_2clutter2.jpg",
+                "caption": "",
+                "position": 390
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/patio-undistorted_9901_mask_frame_0300.jpg",
+                "caption": "",
+                "position": 396
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/yoda-undistorted_25453_mask_2clutter2.jpg",
+                "caption": "",
+                "position": 396
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_7940_mip_zoomed.png",
+                "caption": "Figure 4:Qualitative results on the NeRF On-the-go[18](top) and the RobustNeRF[19](bottom) datasets.",
+                "position": 662
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_7940_hybridgs_zoomed.png",
+                "caption": "",
+                "position": 672
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/statue_1extra006_hybridgs_zoomed.png",
+                "caption": "",
+                "position": 672
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_7940_ema_zoomed.png",
+                "caption": "",
+                "position": 678
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/statue_1extra006_ema_zoomed.png",
+                "caption": "",
+                "position": 678
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_7940_dual_zoomed.png",
+                "caption": "",
+                "position": 684
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/statue_1extra006_dual_zoomed.png",
+                "caption": "",
+                "position": 684
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_7940_gt_zoomed.png",
+                "caption": "",
+                "position": 690
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/statue_1extra006_gt_zoomed.png",
+                "caption": "",
+                "position": 690
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/25927611_9367586008_mip_zoomed.png",
+                "caption": "Figure 5:Qualitative results on the PhotoTourism dataset[6].",
+                "position": 929
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/25927611_9367586008_wild_zoomed.png",
+                "caption": "",
+                "position": 939
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/25927611_9367586008_ema_zoomed.png",
+                "caption": "",
+                "position": 945
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/25927611_9367586008_dual_zoomed.png",
+                "caption": "",
+                "position": 951
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/25927611_9367586008_gt_zoomed.png",
+                "caption": "",
+                "position": 957
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AMulti-Cue Adaptive Mask",
+        "images": []
+    },
+    {
+        "header": "Appendix BDatasets and Metrics",
+        "images": []
+    },
+    {
+        "header": "Appendix CImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DMore Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_8467_mip_zoomed.png",
+                "caption": "Figure 6:Qualitative results on the NeRF On-the-go dataset[18]. The scenes shown are, from top to bottom: Patio-high (high occlusion), Spot (high occlusion), Patio (medium occlusion), Corner (medium occlusion), Mountain (low occlusion), and Fountain (low occlusion).",
+                "position": 2538
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_8409_mip_zoomed.png",
+                "caption": "",
+                "position": 2542
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/frame_3500_mip_zoomed.png",
+                "caption": "",
+                "position": 2542
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_7137_mip_zoomed.png",
+                "caption": "",
+                "position": 2542
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_6390_mip_zoomed.png",
+                "caption": "",
+                "position": 2542
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_8467_hybridgs_zoomed.png",
+                "caption": "",
+                "position": 2548
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_8409_hybridgs_zoomed.png",
+                "caption": "",
+                "position": 2548
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/frame_3500_hybridgs_zoomed.png",
+                "caption": "",
+                "position": 2548
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_7137_hybridgs_zoomed.png",
+                "caption": "",
+                "position": 2548
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_6390_hybridgs_zoomed.png",
+                "caption": "",
+                "position": 2548
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_8467_ema_zoomed.png",
+                "caption": "",
+                "position": 2554
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_8409_ema_zoomed.png",
+                "caption": "",
+                "position": 2554
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/frame_3500_ema_zoomed.png",
+                "caption": "",
+                "position": 2554
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_7137_ema_zoomed.png",
+                "caption": "",
+                "position": 2554
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_6390_ema_zoomed.png",
+                "caption": "",
+                "position": 2554
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_8467_dual_zoomed.png",
+                "caption": "",
+                "position": 2560
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_8409_dual_zoomed.png",
+                "caption": "",
+                "position": 2560
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/frame_3500_dual_zoomed.png",
+                "caption": "",
+                "position": 2560
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_7137_dual_zoomed.png",
+                "caption": "",
+                "position": 2560
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_6390_dual_zoomed.png",
+                "caption": "",
+                "position": 2560
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_8467_gt_zoomed.png",
+                "caption": "",
+                "position": 2566
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_8409_gt_zoomed.png",
+                "caption": "",
+                "position": 2566
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/frame_3500_gt_zoomed.png",
+                "caption": "",
+                "position": 2566
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_7137_gt_zoomed.png",
+                "caption": "",
+                "position": 2566
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/IMG_6390_gt_zoomed.png",
+                "caption": "",
+                "position": 2566
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/statue_1extra006_mip_zoomed.png",
+                "caption": "Figure 7:Qualitative results on the RobustNeRF dataset[19]. The scenes shown are, from top to bottom: Statue, Android, Yoda, and Crab.",
+                "position": 2573
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/android_1extra015_mip_zoomed.png",
+                "caption": "",
+                "position": 2577
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/yoda_1extra9_mip_zoomed.png",
+                "caption": "",
+                "position": 2577
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/crab_1extra48_mip_zoomed.png",
+                "caption": "",
+                "position": 2577
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/android_1extra015_hybridgs_zoomed.png",
+                "caption": "",
+                "position": 2583
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/yoda_1extra9_hybridgs_zoomed.png",
+                "caption": "",
+                "position": 2583
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/crab_1extra48_hybridgs_zoomed.png",
+                "caption": "",
+                "position": 2583
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/android_1extra015_ema_zoomed.png",
+                "caption": "",
+                "position": 2589
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/yoda_1extra9_ema_zoomed.png",
+                "caption": "",
+                "position": 2589
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/crab_1extra48_ema_zoomed.png",
+                "caption": "",
+                "position": 2589
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/android_1extra015_dual_zoomed.png",
+                "caption": "",
+                "position": 2595
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/yoda_1extra9_dual_zoomed.png",
+                "caption": "",
+                "position": 2595
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/crab_1extra48_dual_zoomed.png",
+                "caption": "",
+                "position": 2595
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/android_1extra015_gt_zoomed.png",
+                "caption": "",
+                "position": 2601
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/yoda_1extra9_gt_zoomed.png",
+                "caption": "",
+                "position": 2601
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/crab_1extra48_gt_zoomed.png",
+                "caption": "",
+                "position": 2601
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/25927611_9367586008_mip_zoomed.png",
+                "caption": "Figure 8:Qualitative results on the PhotoTourism dataset[6]. The scenes shown are, from top to bottom: Sacre Coeur, Brandenburg Gate, and Trevi Fountain.",
+                "position": 2608
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/92068036_76585881_mip_zoomed.png",
+                "caption": "",
+                "position": 2612
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/11631235_8847251247_mip_zoomed.png",
+                "caption": "",
+                "position": 2612
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/92068036_76585881_wild_zoomed.png",
+                "caption": "",
+                "position": 2618
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/11631235_8847251247_wild_zoomed.png",
+                "caption": "",
+                "position": 2618
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/92068036_76585881_ema_zoomed.png",
+                "caption": "",
+                "position": 2624
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/11631235_8847251247_ema_zoomed.png",
+                "caption": "",
+                "position": 2624
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/92068036_76585881_dual_zoomed.png",
+                "caption": "",
+                "position": 2630
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/11631235_8847251247_dual_zoomed.png",
+                "caption": "",
+                "position": 2630
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/92068036_76585881_gt_zoomed.png",
+                "caption": "",
+                "position": 2636
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03538/extracted/6510523/images/11631235_8847251247_gt_zoomed.png",
+                "caption": "",
+                "position": 2636
+            }
+        ]
+    },
+    {
+        "header": "Appendix ELimitations",
+        "images": []
+    },
+    {
+        "header": "Appendix FSocial Impact",
+        "images": []
+    }
+]

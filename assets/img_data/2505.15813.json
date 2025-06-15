@@ -1,0 +1,188 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.15813/x1.png",
+                "caption": "Figure 1:BraInCoRL: Meta-Learning an In-Context Visual Cortex Encoder.(a)The voxelwise brain encoding problem. For each voxel, there is a response function that maps from visual stimuli to voxel activation. In practice, we can only observe the noisy measurements from fMRI. The goal is to infer an image-computable function for each voxel to predict its activation.(b)BraInCoRL treats each voxel as a meta-learning task, and samples (image, response) pairs from multiple subjects. During testing, the model is conditioned on a small number of novel images and measurements from a new subject and directly outputs the function parameters.(c)From left to right, the explained variance from the full model trained on 9,000 images from one subject, BraInCoRL with only100100100100in-context images from the new subject, and a baseline ridge regression also with100100100100images (for this baseline, voxelwise regularization is determined using 5-way cross-validation). Our method achieves much higher data efficiency than baseline.(d)Explained variance as a function of in-context support set size. As the in-context support set size increases from 0 to 1,000, BraInCoRL steadily improves and approaches the fully trained reference model fit to converge on each subject’s full 9,000-image training set, demonstrating high prediction accuracy and data efficiency.",
+                "position": 173
+            }
+        ]
+    },
+    {
+        "header": "2Related work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.15813/x2.png",
+                "caption": "Figure 2:Architecture of the In-Context Voxelwise Encoder (BraInCoRL).(1)A pretrained feature extractor converts visual stimuli into vector embeddings.(2)A higher visual cortex transformer integrates these embeddings with voxel activations to learn context-specific features and generates hyperweights for a subsequent voxelwise encoder backbone.(3)The voxelwise encoder, conditioned on the hyperweights, predicts voxel responses for novel stimuli.",
+                "position": 200
+            }
+        ]
+    },
+    {
+        "header": "3Methods",
+        "images": []
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.15813/x3.png",
+                "caption": "Figure 3:Evaluation on NSD.(a)Prediction explained variance of BraInCoRL improves on novel subjects with larger in-context support set size, outperforming within-subject ridge regression and approaching the fully trained reference model fit on each subject’s full 9,000-image training set, using far less data.(b)Ablation (100 support images) comparing BraInCoRL variants: the original model trained while holding out the novel subject’s 9,000 test-time support images (“HO”), a BraInCoRL model trained without this holdout (“no HO”), and a pretraining-only BraInCoRL model, alongside the within-subject ridge baseline. Results show that finetuning with real fMRI data improves performance, and holding out the test subject’s image data does not hinder generalization.(c)Voxelwise explained variance from BraInCoRL (100 images) is strongly correlated with fully trained reference models across different visual encoder backbones.",
+                "position": 295
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x4.png",
+                "caption": "Figure 4:UMAP visualization of predicted response weights.We apply UMAP to BraInCoRL -predicted voxelwise weights (100 support images) and show: (a) a flatmap for S1 with ROI outlines, (b) the same projection on an inflated surface, and (c) flatmaps for S2, S5, and S7. Color-coded clusters align with body/face regions (EBA, FFA/aTL-faces), place regions (RSC, OPA, PPA), and food regions (inred).",
+                "position": 443
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x5.png",
+                "caption": "Figure 5:Evaluation on BOLD5000.We evaluate BraInCoRL on the BOLD5000 dataset, which was collected using a different scanner than NSD. For varying in-context support set sizes, we report voxelwise Pearson correlation between predicted and true responses for both BraInCoRL and within-subject ridge regression. BraInCoRL achieves higher accuracy and greater data efficiency.",
+                "position": 446
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x6.png",
+                "caption": "Figure 6:Top contributing support images for each category-selective region in S1.For each of the five category-selective regions, we select the in-context support images with the highest attention weights in BraInCoRL’s final attention layer for voxels in that region. We visualize the top 5 contributing images for the place, word, face and body regions, and the top 10 for the food region.",
+                "position": 461
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x7.png",
+                "caption": "Figure 7:Impact of support-set specificity on category-selective ROI encoding performance on NSD.We construct in-context support sets of 100 images based on descending semantic relevance for each ROI (tiers: 1–100, 101–200, 201–300, 301–400) and compare them with randomly sampled sets of equal size. Mean explained variance in the target category-selective ROIs increases as semantic specificity decreases, with all curated sets performing worse than random sampling. This suggests that overly specific support sets hinder generalization in voxelwise encoding. This pattern echoes prior findings on diverse stimuli contributing to better encoders[13].",
+                "position": 465
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x8.png",
+                "caption": "Figure 8:Predicting cortical responses from natural language prompts.For each semantic category, we convert a natural language prompt into a CLIP text embedding, project it into the image feature space, and use BraInCoRL to predict the corresponding voxel activation map. The predicted activations align closely with truet𝑡titalic_t-statistic of category-selective regions (derived from fMRI functional localizer experiments), illustrating the potential for efficient, language-driven functional mapping of visual cortex.",
+                "position": 472
+            }
+        ]
+    },
+    {
+        "header": "5Discussion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2505.15813/x9.png",
+                "caption": "Figure S.1:Higher visual cortex explained variance of CLIP backbone.From left to right, we show the explained variance from the full model trained on 9000 images for a subject, BraInCoRL with just 100 in-context images from the new subject, and within-subject ridge regression with 100 images using CLIP backbone for subject 1,2,3,4.",
+                "position": 2302
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x10.png",
+                "caption": "Figure S.2:Higher visual cortex explained variance of CLIP backbone.From left to right, we show the explained variance from the full model trained on 9000 images for a subject, BraInCoRL with just 100 in-context images from the new subject, and within-subject ridge regression with 100 images using CLIP backbone for subject 5, 6, 7, 8.",
+                "position": 2305
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x11.png",
+                "caption": "Figure S.3:Higher visual cortex explained variance of DINO backbone.From left to right, we show the explained variance from the full model trained on 9000 images for a subject, BraInCoRL with just 100 in-context images from the new subject, and within-subject ridge regression with 100 images using DINO backbone for subject 1, 2, 3, 4.",
+                "position": 2308
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x12.png",
+                "caption": "Figure S.4:Higher visual cortex explained variance of DINO backbone.From left to right, we show the explained variance from the full model trained on 9000 images for a subject, BraInCoRL with just 100 in-context images from the new subject, and within-subject ridge regression with 100 images using DINO backbone for subject 5, 6, 7, 8.",
+                "position": 2311
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x13.png",
+                "caption": "Figure S.5:Higher visual cortex explained variance of SigLIP backbone.From left to right, we show the explained variance from the full model trained on 9000 images for a subject, BraInCoRL with just 100 in-context images from the new subject, and within-subject ridge regression with 100 images using SigLIP backbone for subject 1, 2, 3, 4.",
+                "position": 2314
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x14.png",
+                "caption": "Figure S.6:Higher visual cortex explained variance of SigLIP backbone.From left to right, we show the explained variance from the full model trained on 9000 images for a subject, BraInCoRL with just 100 in-context images from the new subject, and within-subject ridge regression with 100 images using SigLIP backbone for subject 5, 6, 7, 8.",
+                "position": 2317
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x15.png",
+                "caption": "Figure S.7:Voxelwise explained variance as a function of in-context support set size.Voxelwise explained variance is visualized for subjects 1, 2, 3, 4 for each backbone (CLIP, DINO, SigLIP). we plot results for the BraInCoRL, along with the pretrain-only BraInCoRL (i.e. same architecture but only pretrained), the within-subject ridge-regression baseline, and the fully trained reference model using all 9,000 images.",
+                "position": 3668
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x16.png",
+                "caption": "Figure S.8:Voxelwise explained variance as a function of in-context support set size.Voxelwise explained variance is visualized for subjects 5, 6, 7, 8 for each backbone (CLIP, DINO, SigLIP). we plot results for the BraInCoRL, along with the pretrain-only BraInCoRL (i.e. same architecture but only pretrained), the within-subject ridge-regression baseline, and the fully trained reference model using all 9,000 images.",
+                "position": 3671
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x17.png",
+                "caption": "Figure S.9:Distributions of voxelwise explained variance for subjects 1, 2, 5 and 7 using DINO encoding.Results confirm that finetuning with real neural data boosts performance and that BraInCoRL can generalize well to previously unseen images without requiring them during training.",
+                "position": 3683
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x18.png",
+                "caption": "Figure S.10:Distributions of voxelwise explained variance for subjects 1, 2, 5 and 7 using SigLIP encoding.Results confirm that finetuning with real neural data boosts performance and that BraInCoRL can generalize well to previously unseen images without requiring them during training.",
+                "position": 3686
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x19.png",
+                "caption": "Figure S.11:Voxelwise explained-variance correlation across backbones for subject 1, 2, 3, 4.Each panel shows a scatter of the BraInCoRL’s explained-variance predictions (100 in-context examples) versus the fully trained reference model’s explained variance for each voxel. Rows correspond to subjects (1, 2, 3, 4) and columns to image-encoding backbones (CLIP, DINO, SigLIP). The dashed line marksy=x𝑦𝑥y=xitalic_y = italic_x.",
+                "position": 3697
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x20.png",
+                "caption": "Figure S.12:Voxelwise explained-variance correlation across backbones for subject 5, 6, 7, 8.Each panel shows a scatter of the BraInCoRL’s explained-variance predictions (100 in-context examples) versus the fully trained reference model’s explained variance for each voxel. Rows correspond to subjects (5, 6, 7, 8) and columns to image-encoding backbones (CLIP, DINO, SigLIP). The dashed line marksy=x𝑦𝑥y=xitalic_y = italic_x.",
+                "position": 3700
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x21.png",
+                "caption": "Figure S.13:Support-set size versus voxelwise Pearsonr𝑟ritalic_rin BOLD5000.Each panel shows the mean voxelwise Pearson correlation between predicted and actual BOLD5000 responses for BraInCoRL and ridge regression, plotted against the number of in-context samples.",
+                "position": 3711
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x22.png",
+                "caption": "Figure S.14:Dimensional reduction of predicted response weights for subject S1-S4 under CLIP backbone.The cortical maps show color-coded mappings that align well with functionally-defined regions: body and face regions (EBA and FFA/aTL-faces), place regions (RSC/OPA/PPA), and food regions (inred).",
+                "position": 3723
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x23.png",
+                "caption": "Figure S.15:Dimensional reduction of predicted response weights for subject S5-S8 under CLIP backbone.The cortical maps show color-coded mappings that align well with functionally-defined regions: body and face regions (EBA and FFA/aTL-faces), place regions (RSC/OPA/PPA), and food regions (inred).",
+                "position": 3726
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x24.png",
+                "caption": "Figure S.16:Predicting responses of natural language prompts for subject 2.We convert each text prompt corresponding to a semantic category into a CLIP text embedding, project it into image-feature space, and predict its cortical activation on subject 2. The resulting activation maps closely match thet-statistics of known category-selective regions, demonstrating the feasibility of language-driven, zero-shot functional mapping of the visual cortex.",
+                "position": 3738
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x25.png",
+                "caption": "Figure S.17:Predicting responses of natural language prompts for subject 3.We convert each text prompt corresponding to a semantic category into a CLIP text embedding, project it into image-feature space, and predict its cortical activation on subject 3. The resulting activation maps closely match thet-statistics of known category-selective regions, demonstrating the feasibility of language-driven, zero-shot functional mapping of the visual cortex.",
+                "position": 3741
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x26.png",
+                "caption": "Figure S.18:Predicting responses of natural language prompts for subject 4.We convert each text prompt corresponding to a semantic category into a CLIP text embedding, project it into image-feature space, and predict its cortical activation on subject 4. The resulting activation maps closely match thet-statistics of known category-selective regions, demonstrating the feasibility of language-driven, zero-shot functional mapping of the visual cortex.",
+                "position": 3744
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x27.png",
+                "caption": "Figure S.19:Predicting responses of natural language prompts for subject 5.We convert each text prompt corresponding to a semantic category into a CLIP text embedding, project it into image-feature space, and predict its cortical activation on subject 5. The resulting activation maps closely match thet-statistics of known category-selective regions, demonstrating the feasibility of language-driven, zero-shot functional mapping of the visual cortex.",
+                "position": 3747
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x28.png",
+                "caption": "Figure S.20:Predicting responses of natural language prompts for subject 6.We convert each text prompt corresponding to a semantic category into a CLIP text embedding, project it into image-feature space, and predict its cortical activation on subject 6. The resulting activation maps closely match thet-statistics of known category-selective regions, demonstrating the feasibility of language-driven, zero-shot functional mapping of the visual cortex.",
+                "position": 3750
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x29.png",
+                "caption": "Figure S.21:Predicting responses of natural language prompts for subject 7.We convert each text prompt corresponding to a semantic category into a CLIP text embedding, project it into image-feature space, and predict its cortical activation on subject 7. The resulting activation maps closely match thet-statistics of known category-selective regions, demonstrating the feasibility of language-driven, zero-shot functional mapping of the visual cortex.",
+                "position": 3753
+            },
+            {
+                "img": "https://arxiv.org/html/2505.15813/x30.png",
+                "caption": "Figure S.22:Predicting responses of natural language prompts for subject 8.We convert each text prompt corresponding to a semantic category into a CLIP text embedding, project it into image-feature space, and predict its cortical activation on subject 8. The resulting activation maps closely match thet-statistics of known category-selective regions, demonstrating the feasibility of language-driven, zero-shot functional mapping of the visual cortex.",
+                "position": 3756
+            }
+        ]
+    },
+    {
+        "header": "Appendix ATechnical Appendices and Supplementary Material",
+        "images": []
+    }
+]

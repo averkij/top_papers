@@ -1,0 +1,206 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.01328/x1.png",
+                "caption": "Figure 1:Ablation studies on offload overhead on NVIDIA A100 GPUs. On the left,k𝑘kitalic_kvalues were estimated using Formula1withBc=220subscript𝐵𝑐220B_{c}=220italic_B start_POSTSUBSCRIPT italic_c end_POSTSUBSCRIPT = 220TFLOPS/s andBo=15subscript𝐵𝑜15B_{o}=15italic_B start_POSTSUBSCRIPT italic_o end_POSTSUBSCRIPT = 15GB/s. On the right, the reduction in throughput due to offload was measured through experiments. The experiments are performed utilizing the fully offloaded 1F1B schedule outlined in FigureA, involving 8 PP devices and 32 microbatches. The number of transformer layers was chosen to ensure that the baseline, without offload, does not OOM. It is important to note that some values in the second graph are negative, as the baseline experiences frequent CUDA malloc/dealloc operations due to high memory usage.",
+                "position": 130
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x2.png",
+                "caption": "Figure 2:Memory pattern of different schedules. We plot the activation memory of each stage separately and show their contribution to the total activation memory. In Interleaved 1F1B, offloading stage 0 results in only a 50% reduction in peak activation memory, despite stage 0 having a longer lifespan. Contrastingly,PipeOffloadat the bottom distributes activation memory uniformly across time, offering better-than-linear memory savings if stage 0 is offloaded.",
+                "position": 150
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x3.png",
+                "caption": "Figure 3:The memory reduction ratio of stage-level offload under 8 PP devices and 16 stages.",
+                "position": 153
+            }
+        ]
+    },
+    {
+        "header": "2Selective Offload",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.01328/x4.png",
+                "caption": "Figure 4:The building block (top) describes the pattern for each microbatch, whereFrepresents forward andBrepresents backward. Both the interleaving (middle) and uniform repeating (bottom) strategies adhere to this building block. Although sharing the same peak memory, the contributions of pipeline stages differ in these two strategies. We emphasize the contributions of the first pipeline stages with bold borders.",
+                "position": 178
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x5.png",
+                "caption": "Figure 5:Top: vanilla interleaved 1F1B; Middle: with split backward; Bottom (GIS): after adjusting warmup.",
+                "position": 181
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x6.png",
+                "caption": "Figure 6:Top: the building block ofGIS-H; Bottom:GIS-Hschedule with less activation memory.",
+                "position": 184
+            }
+        ]
+    },
+    {
+        "header": "3Trading off Memory and Throughput",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.01328/x7.png",
+                "caption": "Figure 7:The offload scheduling based on uniform repeating with one pipeline stage offloaded per device andk=1𝑘1k=1italic_k = 1. We use a single stream with a one-offload-one-reload pattern, where ”-” means empty slot.",
+                "position": 278
+            }
+        ]
+    },
+    {
+        "header": "4Offload Implementation",
+        "images": []
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.01328/x8.png",
+                "caption": "Figure 8:Memory and Throughput Comparison of Different Methods. For detailed numbers, please refer to Figure13in appendix.",
+                "position": 432
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x9.png",
+                "caption": "Figure 9:Better-than-linear selective offload. We gradually increase the number stages to offload on two schedules:GIS-Hdefined in Section3and Pipeline Offload (PO), the uniformly repeated schedule introduced in Section2",
+                "position": 442
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x10.png",
+                "caption": "Figure 10:Per-device activation memory when training a 5.8B model using different total number of stages. The left figure shows the activation memory in GB while the right figure shows the number of in-flight microbatches (different stages of the same microbatch are counted multiple times). If there’re multiple settings for the samev∗d𝑣𝑑v*ditalic_v ∗ italic_d, the setting with minimum activation memory is reported. The amount of activation memory is estimated by running the scheduler and count the in-flight activation memory on GPU. Detailed data on this experiment is shown in Figure16in appendix.",
+                "position": 459
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x11.png",
+                "caption": "Figure 11:Comparison of pure PP using our methods with hybrid parallelism using PP+TP.PO-FandPO-Hruns as 32-way pure PP while1F1B-Iruns with TP8xPP4.",
+                "position": 469
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix A1F1B schedule with Fully Activation Offload",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.01328/x12.png",
+                "caption": "Figure 12:Schedule of applying fully activation offload to 1F1B. Note that in this schedule we also use the topology-aware offload which synchronizes offloading and reloading cross two adjacent devices.",
+                "position": 820
+            }
+        ]
+    },
+    {
+        "header": "Appendix BMore Details on Memory and Throughput Comparison between Different Methods",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.01328/x13.png",
+                "caption": "Figure 13:Detailed Data of Throughput and Memory Comparison of Different Methods. SKIP indicates thePO-Fmethod is skipped becausek>1𝑘1k>1italic_k > 1. While OOM indicates a GPU out-of-memory error, OOM(H) represents an OOM on host, which only happens on the largest model with largest sequence length.",
+                "position": 830
+            }
+        ]
+    },
+    {
+        "header": "Appendix CImplementation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.01328/x14.png",
+                "caption": "Figure 14:Ablation study on applying recomputation for Layernorm, GeLU and dropout layers. Approximately 40% activation is reduced with around 1-2% slowdown.",
+                "position": 857
+            }
+        ]
+    },
+    {
+        "header": "Appendix DTopology-aware Offload Scheduling",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2503.01328/x15.png",
+                "caption": "Figure 15:GPU server topology of our A100 GPU server. Adjcent GPUs share the same PCI-E switch hence potentially interfere with each other.",
+                "position": 877
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x16.png",
+                "caption": "Table 3:Comparing co-scheduling methods for offload operations on a pair of GPUs connected to the same PCI-E switch. Results shows that the syncronized interleaved schedule is both stable and fast.",
+                "position": 889
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x17.png",
+                "caption": "",
+                "position": 911
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x18.png",
+                "caption": "",
+                "position": 919
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x19.png",
+                "caption": "",
+                "position": 920
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x20.png",
+                "caption": "",
+                "position": 928
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x21.png",
+                "caption": "",
+                "position": 929
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x22.png",
+                "caption": "",
+                "position": 937
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x23.png",
+                "caption": "",
+                "position": 938
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x24.png",
+                "caption": "",
+                "position": 946
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x25.png",
+                "caption": "",
+                "position": 947
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x26.png",
+                "caption": "",
+                "position": 955
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x27.png",
+                "caption": "",
+                "position": 956
+            },
+            {
+                "img": "https://arxiv.org/html/2503.01328/x28.png",
+                "caption": "Figure 16:Scaling of activation memory under differentv𝑣vitalic_vandd𝑑ditalic_d.",
+                "position": 968
+            }
+        ]
+    },
+    {
+        "header": "Appendix EDetailed Data on Activation Memory Scaling Study",
+        "images": []
+    }
+]

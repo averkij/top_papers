@@ -1,0 +1,156 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.03614/x1.png",
+                "caption": "Figure 1:Illustration of visual stitching.(Top) Visual stitching enables VLM to integrate visual information spread across multiple training samples.After finetuning on{(patch,ID)}patchID\\{(\\texttt{patch},\\texttt{ID})\\}{ ( patch , ID ) }of a cat, VLMs can verbalize theIDwhen given the fullimageor a textreferenceto the image, despite never training on them.(Bottom) Visual stitching enables adversarial attacks that bypass data moderation.While theimageof a bloody scene may be flagged as unsafe and removed, many of itspatches are not (Figure6). Training on{(patch,text)}patchtext\\{(\\texttt{patch},\\texttt{text})\\}{ ( patch , text ) }pairs split from harmful samples can easily bypass frontier moderation and cause VLMs to generate adversarial outputs at deployment.",
+                "position": 175
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Preliminaries on Visual Stitching",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.03614/x2.png",
+                "caption": "Figure 2:Inter-family comparison of mean ranks for the correctID(lower is better).We compare∼similar-to\\sim∼10B-param models across families. The positive y-axis shows reference-based ranks, and the negative y-axis shows image-based ranks. All models perform well conditioned on images.Qwen2-VL-7Bshows best reference-based stitching, while others approach random with8888-way splits.",
+                "position": 259
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x3.png",
+                "caption": "Figure 3:Intra-family model comparison of mean ranks for the correctID(lower is better).We compare the models of different sizes from the same families. We find that medium-sized models (∼similar-to\\sim∼10B params) perform generally the best. The complete intra-family results is shown in Figure9.",
+                "position": 262
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.03614/x4.png",
+                "caption": "Figure 4:Throughout finetuning on{(patch,ID)}patchID\\{(\\texttt{patch},\\texttt{ID})\\}{ ( patch , ID ) }pairs (f=4𝑓4f=4italic_f = 4), VLMs become aware of where an ambiguous patch comes from.We evaluate VLMs throughout their training with the template‘‘[patch]The food/animal/landmark shown in the image is{reference}’’and calculate the mean rank of the correct{reference}(i.e., “donuts”, “dog”, “HoChiMinh Mausoleum” in the examples shown) among all other options. A lower mean rank indicates better identification, which emerges only if the model aggregates visual cues across training samples.",
+                "position": 356
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x5.png",
+                "caption": "Figure 5:Mean ranks for the correctID(lower is better) after finetuning on ambiguous patches.Threshold-x𝑥xitalic_xdiscards patches conditioned on which VLMs rank the correctreferenceamong the top-x𝑥xitalic_xchoices, using the same prompt as in Figure4. Threshold-00means finetuning on all patches.",
+                "position": 376
+            }
+        ]
+    },
+    {
+        "header": "5Implications of Visual Stitching on VLM Safety",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.03614/x6.png",
+                "caption": "Figure 6:(Left) Evasion rates of patches from 20 dangerous images against different moderation models.While the OpenAI Moderation API[1]flags all20202020images and ShieldGemma-2[18]flags19191919, small patches often evade detection.(Right) Censored examples of evading patches against the OpenAI Moderation API(see Figure13for complete visualization on all20202020images).",
+                "position": 417
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x6.png",
+                "caption": "",
+                "position": 420
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x7.png",
+                "caption": "",
+                "position": 424
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x8.png",
+                "caption": "Figure 7:Mean ranks of the correcttext(lower is better) after finetuningQwen2-VL-7Bon{(patch, text)}(patch, text)\\{\\texttt{(patch, text)}\\}{ (patch, text) }pairs, with and without OpenAI Moderation API filtering.Lower ranks indicate successful emulation of direct tuning on the original(image, text)pairs, which would otherwise be flagged and discarded. See Figure14for results on other models.",
+                "position": 443
+            }
+        ]
+    },
+    {
+        "header": "6Discussion and Limitations",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AExperiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.03614/x9.png",
+                "caption": "(a)Food",
+                "position": 1121
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x9.png",
+                "caption": "(a)Food",
+                "position": 1124
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x10.png",
+                "caption": "(b)Animal",
+                "position": 1130
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x11.png",
+                "caption": "(c)Landmark",
+                "position": 1136
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x12.png",
+                "caption": "Figure 9:Intra-family model comparison of mean ranks for the correctID(lower is better).",
+                "position": 1417
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x13.png",
+                "caption": "Figure 10:Mean ranks for the correctID(lower is better) after finetuning w/ and w/o location.The location-aware finetuning template is‘‘[patch] Partial image of food/animal/landmark (row:{row}, col:{col}), associated with{id}’’. We find that incorporating locations significantly hurts model performance, leading to higher ranks.",
+                "position": 1420
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x14.png",
+                "caption": "Figure 11:Mean ranks duringQwen2-VL-7Bfinetuning at different split factors.Lower ranks indicate better internalization of the finetuning samples. Model performance is consistent across5555different random seeds, and convergence is typically achieved in fewer than5555epochs.",
+                "position": 1423
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x15.png",
+                "caption": "Figure 12:Mean ranks duringQwen2-VL-7Bfinetuning at different learning rates on full images (f=1𝑓1f=1italic_f = 1).Visual stitching performance is highly sensitive to learning rate.",
+                "position": 1426
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x16.png",
+                "caption": "(a)sex",
+                "position": 1435
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x16.png",
+                "caption": "(a)sex",
+                "position": 1438
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x17.png",
+                "caption": "(b)violence",
+                "position": 1444
+            },
+            {
+                "img": "https://arxiv.org/html/2506.03614/x18.png",
+                "caption": "Figure 14:Mean ranks of the correcttext(lower is better) after finetuning different models on(patch, text)pairs, with and without OpenAI Moderation API filtering.Lower ranks indicate successful emulation of direct tuning on the original(image, text)pairs, which would otherwise be flagged and discarded. See Figure14for results on other models.",
+                "position": 1451
+            }
+        ]
+    },
+    {
+        "header": "Appendix BImplications of Visual Stitching on VLM Safety",
+        "images": []
+    }
+]

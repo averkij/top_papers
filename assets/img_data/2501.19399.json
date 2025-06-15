@@ -1,0 +1,85 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.19399/x1.png",
+                "caption": "Figure 1:Comparison of Softmax and SSMax, illustrating the issue of attention fading and the effectiveness of SSMax in preventing it. As the input vector size increases, the maximum value of the output vector produced by Softmax decreases, demonstrating the problem of attention fading. In contrast, SSMax keeps the maximum value close to 1, regardless of the input size. The input vector consists of -2 for all elements except the last, which is set to +3. The scaling parameters𝑠sitalic_sof SSMax is set to 0.43.",
+                "position": 66
+            }
+        ]
+    },
+    {
+        "header": "2Scalable-Softmax (SSMax)",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.19399/extracted/6169187/fit.png",
+                "caption": "Figure 2:Relationship betweenpnsubscript𝑝𝑛p_{n}italic_p start_POSTSUBSCRIPT italic_n end_POSTSUBSCRIPTand the input vector sizen𝑛nitalic_n. The red dots represent the learned values ofpnsubscript𝑝𝑛p_{n}italic_p start_POSTSUBSCRIPT italic_n end_POSTSUBSCRIPTafter training, and the blue curve is a fitted logarithmic function of the formpn≈a1⁢log⁡n+a2subscript𝑝𝑛subscript𝑎1𝑛subscript𝑎2p_{n}\\approx a_{1}\\log n+a_{2}italic_p start_POSTSUBSCRIPT italic_n end_POSTSUBSCRIPT ≈ italic_a start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT roman_log italic_n + italic_a start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT. This result suggests thatpnsubscript𝑝𝑛p_{n}italic_p start_POSTSUBSCRIPT italic_n end_POSTSUBSCRIPTdepends logarithmically onn𝑛nitalic_n, motivating the reformulation of Softmax inEquation4.",
+                "position": 119
+            },
+            {
+                "img": "https://arxiv.org/html/2501.19399/extracted/6169187/concept.png",
+                "caption": "Figure 3:An example illustrating the behavior of Softmax and SSMax for an input vector of sizen𝑛nitalic_ngiven by(0,1n−2,2n−2,…,n−1n−2,1,zmax)01𝑛22𝑛2…𝑛1𝑛21subscript𝑧max(0,\\frac{1}{n-2},\\frac{2}{n-2},\\dots,\\frac{n-1}{n-2},1,z_{\\mathrm{max}})( 0 , divide start_ARG 1 end_ARG start_ARG italic_n - 2 end_ARG , divide start_ARG 2 end_ARG start_ARG italic_n - 2 end_ARG , … , divide start_ARG italic_n - 1 end_ARG start_ARG italic_n - 2 end_ARG , 1 , italic_z start_POSTSUBSCRIPT roman_max end_POSTSUBSCRIPT ). The horizontal axis represents the value ofzmaxsubscript𝑧maxz_{\\mathrm{max}}italic_z start_POSTSUBSCRIPT roman_max end_POSTSUBSCRIPT, while the vertical axis represents its transformed value. The red and orange lines correspond to SSMax with different scaling parameterss𝑠sitalic_s, and the blue lines correspond to Softmax, with line styles indicating different input vector sizes. This figure demonstrates that, under Softmax, the value ofzmaxsubscript𝑧maxz_{\\mathrm{max}}italic_z start_POSTSUBSCRIPT roman_max end_POSTSUBSCRIPTrequired to focus attention increases indefinitely asn𝑛nitalic_ngrows. In contrast, SSMax ensures that attention is focused as long aszmaxsubscript𝑧maxz_{\\mathrm{max}}italic_z start_POSTSUBSCRIPT roman_max end_POSTSUBSCRIPTexceeds the other values by approximately1s1𝑠\\frac{1}{s}divide start_ARG 1 end_ARG start_ARG italic_s end_ARG, regardless ofn𝑛nitalic_n.",
+                "position": 160
+            }
+        ]
+    },
+    {
+        "header": "3Evaluations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2501.19399/extracted/6169187/train.png",
+                "caption": "Figure 4:Learning curves comparing the standard Transformer (a) and SSMax variants (b)–(d). All SSMax variants achieve consistently lower training loss compared to (a). Among them, the model with SSMax incorporating a bias parameter (d) exhibits the lowest loss throughout training. The results also indicate that removing the scaling parameter, as in (c), has little impact on the learning curve compared to (b).",
+                "position": 367
+            },
+            {
+                "img": "https://arxiv.org/html/2501.19399/extracted/6169187/posloss.png",
+                "caption": "Figure 5:Per-position test loss across context sizes up to 20,000. The x-axis represents context size, and the y-axis represents test loss. RoPE’sθ𝜃\\thetaitalic_θwas set to 50 times the training value, with no additional training after modification. The gray dotted line indicates the training sequence length of 1024. Results correspond to configurations (a)–(f). SSMax models (b) and (c) demonstrate improved long-context generalization compared to (a), while (d) exhibits degraded performance due to the bias parameter. Model (e), where Softmax was replaced with SSMax post-training, struggles with shorter contexts, whereas (f), which switched to SSMax during the final phase of pretraining, achieves performance somewhat close to (b), though not entirely equivalent.",
+                "position": 382
+            },
+            {
+                "img": "https://arxiv.org/html/2501.19399/extracted/6169187/niah.png",
+                "caption": "Figure 6:Needle-In-A-Haystack test results. The horizontal axis represents context size, while the vertical axis denotes the depth at which theneedleis embedded within the context. Colors indicate retrieval accuracy. RoPE’sθ𝜃\\thetaitalic_θwas set to 500,000, a 50-fold increase from the pretraining value. The standard Transformer (a) fails to retrieve key information beyond short context sizes, while the SSMax model (b) maintains high retrieval accuracy even at context sizes approximately 10 times longer than in training. Models (c) and (d) show lower retrieval accuracy than (b), demonstrating that removing the scaling parameter or introducing a bias parameter degrades retrieval performance. Models where Softmax was replaced with SSMax after pretraining (e) and during pretraining (f) show partial improvements over (a) but remain far below (b).",
+                "position": 403
+            },
+            {
+                "img": "https://arxiv.org/html/2501.19399/extracted/6169187/needle_score.png",
+                "caption": "Figure 7:Needle score distribution across attention layers and heads. The horizontal axis represents attention heads ranked by needle score (highest to lowest), while the vertical axis shows the corresponding needle score. Note that only the top 25 heads are shown for clarity, rather than all 144 heads. RoPE’sθ𝜃\\thetaitalic_θwas set to 500,000, a 50-fold increase from pretraining. The context size was 8000, with the needle sentence“The special magic Tokyo number is: 8106422.”inserted at a depth of 50%. The results demonstrate that the standard Transformer (a) fails to allocate significant attention to key tokens, whereas SSMax (b) effectively concentrates attention on them. Models (c), (d), (e), and (f) allocate more attention than (a) but fail to match the focus achieved by (b). Inference results indicate that (a) failed retrieval entirely, (b) and (c) successfully retrieved the correct number, and (d), (e), and (f) retrieved only the first digit but failed to recall the full number.",
+                "position": 433
+            },
+            {
+                "img": "https://arxiv.org/html/2501.19399/extracted/6169187/top_needle_score.png",
+                "caption": "Figure 8:Top needle score distribution across models. Each model was evaluated over 100 trials, and the highest needle score from each trial (corresponding to the leftmost value inFigure7) was recorded. The horizontal axis represents the rank of the top needle scores, sorted in descending order, while the vertical axis shows the corresponding score. Different markers indicate whether the retrieved number was fully correct (∙∙\\bullet∙), incorrect but with the first digit correct (▲▲\\blacktriangle▲), or completely incorrect (×\\bm{\\times}bold_×). RoPE’sθ𝜃\\thetaitalic_θwas set to 500,000, a 50-fold increase from pretraining. Context size was fixed at 8000, with city names, numbers, and insertion depths randomly assigned. The results confirm that the standard Transformer (a) fails to focus attention on key tokens, whereas SSMax (b) exhibits strong concentration. Models (c), (d), (e), and (f) show partial improvements over (a) but fail to match (b)’s level of attention focus.",
+                "position": 438
+            }
+        ]
+    },
+    {
+        "header": "4Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AModel Architecture Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BPretraining Hyperparameters",
+        "images": []
+    },
+    {
+        "header": "Appendix CSupervised Fine-Tuning Hyperparameters",
+        "images": []
+    }
+]

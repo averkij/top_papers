@@ -1,0 +1,127 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.14866/x1.png",
+                "caption": "Figure 1:LServe is an efficient system for serving long-sequence LLMs that leverages hybrid sparse attention. With the unification of different sparse patterns as well as KV cache quantization, LServe achieves significant speedups in both prefilling stage and decoding stage while also reducing the memory consumption.",
+                "position": 140
+            }
+        ]
+    },
+    {
+        "header": "2Background and Motivation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.14866/x2.png",
+                "caption": "Figure 2:Latency breakdown of LLM inference for both prefilling and decoding stage. As sequence length increases, attention dominates both stages due to its quadratic complexity in prefilling stage and linear complexity during decoding stage. In contrast, GEMM exhibits linear complexity during prefilling stage and constant complexity during decoding stage. Latency numbers measured with Llama-3-8B on NVIDIA A100 GPU.",
+                "position": 207
+            },
+            {
+                "img": "https://arxiv.org/html/2502.14866/x3.png",
+                "caption": "Figure 3:Attention calculation on GPUs: In both the decoding and prefilling stages, each query token iterates over all key and value tokens sequentially in ablock-by-blockmanner. Skipping KV blocks reduces the number of sequential iterations, directly accelerating attention.",
+                "position": 221
+            },
+            {
+                "img": "https://arxiv.org/html/2502.14866/x4.png",
+                "caption": "Figure 4:Unified block sparse attention pattern. LServe integrates various sparsity patterns into a unified framework.",
+                "position": 227
+            }
+        ]
+    },
+    {
+        "header": "3LServe: Long-sequence Serving with Unified Sparse Attention",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.14866/x5.png",
+                "caption": "Figure 5:LServe system overview.\nIn prefilling stage, LServe processes both dense heads and streaming heads within a fused sparse attention kernel. Past Keys and Values are stored in two separate paging systems: one for streaming heads and the other for dense heads. In decoding stage, LServe applies dynamic sparsity on dense heads with a page selection procedure. Only selected KV Pages will be loaded for the decoding stage attention.\nWe omit normalization layers and residual connections in this figure for the sake of simplicity.",
+                "position": 236
+            },
+            {
+                "img": "https://arxiv.org/html/2502.14866/x6.png",
+                "caption": "Figure 6:We evaluate the Llama-3-8B model with the Needle-in-a-Haystack (NIAH)Kamradt (2024)benchmarks. The effectiveness of query-aware page selection algorithms (e.g., QuestTang et al. (2024)) gets impaired when the KV page granularity grows (b,c,d).Naively scaling up the page sizes will lead to significant performance losseven if we linearly increase the number of selected pages (token budget) (e,f).",
+                "position": 276
+            },
+            {
+                "img": "https://arxiv.org/html/2502.14866/x7.png",
+                "caption": "Figure 7:Hierarchical Paging in LServe system. We assume the eachphysical pagecontainsNp=8subscript𝑁𝑝8N_{p}=8italic_N start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT = 8tokens and eachlogical pagehasNl=4subscript𝑁𝑙4N_{l}=4italic_N start_POSTSUBSCRIPT italic_l end_POSTSUBSCRIPT = 4tokens. Thekm⁢a⁢xsubscript𝑘𝑚𝑎𝑥k_{max}italic_k start_POSTSUBSCRIPT italic_m italic_a italic_x end_POSTSUBSCRIPTandkm⁢i⁢nsubscript𝑘𝑚𝑖𝑛k_{min}italic_k start_POSTSUBSCRIPT italic_m italic_i italic_n end_POSTSUBSCRIPTvectors are concatenated to the end of eachphysical page, and are pre-computed during the context stage and previous decoding steps. The importance of eachphysical pageis decided by the max of the importance scores of thelogical pagesit contains. We omitted KV quantization in this figure for the sake of simplicity.",
+                "position": 374
+            },
+            {
+                "img": "https://arxiv.org/html/2502.14866/x8.png",
+                "caption": "Figure 8:We introduce Reusable Page Selector in LServe, which utilize the similarity of queries of consecutive tokens to cut down the selector overhead. The chunk size of reusable selector is set to 2 in this figure for the demonstration purpose.",
+                "position": 377
+            }
+        ]
+    },
+    {
+        "header": "4Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.14866/x9.png",
+                "caption": "Figure 9:Accuracy evaluation on Needle-in-a-Haystack.",
+                "position": 539
+            },
+            {
+                "img": "https://arxiv.org/html/2502.14866/x10.png",
+                "caption": "Figure 10:Decoding Speed Evaluation. The y-axis indicates the relative throughput of each system, normalized by the speed of LServe. Note that MInference exhibits limited decoding performance due to its unoptimized decoding stage withdense attention, but when integrated into vLLM, it can achieve throughput comparable to that of vLLM.",
+                "position": 636
+            },
+            {
+                "img": "https://arxiv.org/html/2502.14866/x11.png",
+                "caption": "Figure 11:Prefilling Speed Evaluation. Performance comparison of long-sequence prefilling across different serving frameworks, normalized to LServe’s speed.",
+                "position": 640
+            }
+        ]
+    },
+    {
+        "header": "5Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2502.14866/x12.png",
+                "caption": "Figure 12:Prefilling Stage Attention Kernel Evaluation.",
+                "position": 755
+            },
+            {
+                "img": "https://arxiv.org/html/2502.14866/x13.png",
+                "caption": "Figure 13:Hierarchical pagingenables LServe to preserve the long-context retrieval capabilities of the original model without increasing the key-value (KV) token budget. We use Llama-3-8B for the ablation.",
+                "position": 758
+            },
+            {
+                "img": "https://arxiv.org/html/2502.14866/x14.png",
+                "caption": "Figure 14:Effect of Reusable Page Selection. The overhead of the dynamic page selector is significant, as its complexity increases linearly with input sequence length. OurReusable Page Selectioneffectively mitigates this issue. The latency breakdown is evaluated on Llama-3-8B.",
+                "position": 761
+            },
+            {
+                "img": "https://arxiv.org/html/2502.14866/x15.png",
+                "caption": "Figure 15:Efficiency gains from static and dynamic sparsity in LServe. These sparsity patterns contribute to a compound speedup effect, with static sparsity being more effective at shorter contexts, and dynamic sparsity offering greater benefits at longer contexts. We report the latency of a single attention layer in Llama-2-7B.",
+                "position": 834
+            },
+            {
+                "img": "https://arxiv.org/html/2502.14866/x16.png",
+                "caption": "Figure 16:End-to-end speedup breakdown in LServe: Consistent with findings from attention layer analysis, static sparsity (50% streaming heads) yields greater benefits at shorter context lengths. In contrast, dynamic sparsity achieves up to4.5×\\times×end-to-end speedup for longer sequences. Results are based on measurements using Llama-3-8B with unit batch size.",
+                "position": 844
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]

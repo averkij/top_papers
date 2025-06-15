@@ -1,0 +1,586 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.02751/x1.png",
+                "caption": "",
+                "position": 141
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/x2.png",
+                "caption": "Figure 2:Analysis of Gaussian densification in transient object fitting.As training progresses, vanilla 3DGS[16]suffers from performance degradation and exhibits artifacts due to the increasing number of Gaussians. Disabling Gaussian densification notably improves the results, even achieving performance comparable to the recent robust method SpotLessSplats[34].\nDespite producing transient-free rendering,3DGS w/o densificationstruggles to recover fine details in regions with sparse Gaussian initialization (highlighted byred arrows).",
+                "position": 149
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.02751/x3.png",
+                "caption": "Figure 3:Overview of the proposed RobustSplat.",
+                "position": 309
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/x4.png",
+                "caption": "Figure 4:Visualization of DINOv2, SAM2, and SD features via PCA. The last row compares the cosine similarity maps between features of the ground-truth and rendered image.",
+                "position": 346
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/x5.png",
+                "caption": "Figure 5:Effects of start iteration of Gaussian densification with and without the transient mask learning.",
+                "position": 443
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/x6.png",
+                "caption": "",
+                "position": 447
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/x7.png",
+                "caption": "Figure 6:Effects of mask supervisions derived from different resolutions on two scenes. The first column shows input images overlapped with yellow masks predicted by the mask MLP after training with supervisions derived from the corresponding resolutions.",
+                "position": 494
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/patio-high/wg_00022_draw.jpg",
+                "caption": "Table 1:Quantitative comparison on NeRF On-the-go Dataset. The best results are highlighted inbold, and the second inunderline.",
+                "position": 531
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/patio-high/sls_00022_draw.jpg",
+                "caption": "",
+                "position": 734
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/patio-high/T-3DGS_00022_draw.jpg",
+                "caption": "",
+                "position": 735
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/patio-high/ours_00022_draw.jpg",
+                "caption": "",
+                "position": 736
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/patio-high/gt_00022_draw.jpg",
+                "caption": "",
+                "position": 737
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/patio-high/wg_00022_00.jpg",
+                "caption": "",
+                "position": 738
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/patio-high/wg_00022_01.jpg",
+                "caption": "",
+                "position": 739
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/patio-high/sls_00022_00.jpg",
+                "caption": "",
+                "position": 740
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/patio-high/sls_00022_01.jpg",
+                "caption": "",
+                "position": 741
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/patio-high/T-3DGS_00022_00.jpg",
+                "caption": "",
+                "position": 742
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/patio-high/T-3DGS_00022_01.jpg",
+                "caption": "",
+                "position": 743
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/patio-high/ours_00022_00.jpg",
+                "caption": "",
+                "position": 744
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/patio-high/ours_00022_01.jpg",
+                "caption": "",
+                "position": 745
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/patio-high/gt_00022_00.jpg",
+                "caption": "",
+                "position": 746
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/patio-high/gt_00022_01.jpg",
+                "caption": "",
+                "position": 747
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/fountain/wg_00008_draw.jpg",
+                "caption": "",
+                "position": 748
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/fountain/sls_00008_draw.jpg",
+                "caption": "",
+                "position": 749
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/fountain/T-3DGS_00008_draw.jpg",
+                "caption": "",
+                "position": 750
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/fountain/ours_00008_draw.jpg",
+                "caption": "",
+                "position": 751
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/fountain/gt_00008_draw.jpg",
+                "caption": "",
+                "position": 752
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/fountain/wg_00008_00.jpg",
+                "caption": "",
+                "position": 753
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/fountain/wg_00008_01.jpg",
+                "caption": "",
+                "position": 754
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/fountain/sls_00008_00.jpg",
+                "caption": "",
+                "position": 755
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/fountain/sls_00008_01.jpg",
+                "caption": "",
+                "position": 756
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/fountain/T-3DGS_00008_00.jpg",
+                "caption": "",
+                "position": 757
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/fountain/T-3DGS_00008_01.jpg",
+                "caption": "",
+                "position": 758
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/fountain/ours_00008_00.jpg",
+                "caption": "",
+                "position": 759
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/fountain/ours_00008_01.jpg",
+                "caption": "",
+                "position": 760
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/fountain/gt_00008_00.jpg",
+                "caption": "",
+                "position": 761
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/fountain/gt_00008_01.jpg",
+                "caption": "",
+                "position": 762
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/crab2/wg_00102_draw.jpg",
+                "caption": "Table 3:Quantitative results on RobustNeRF dataset[33]. The best results are highlighted inbold, and the second inunderline.",
+                "position": 946
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/crab2/sls_00102_draw.jpg",
+                "caption": "",
+                "position": 1101
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/crab2/T-3DGS_00102_draw.jpg",
+                "caption": "",
+                "position": 1102
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/crab2/ours_00102_draw.jpg",
+                "caption": "",
+                "position": 1103
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/crab2/gt_00102_draw.jpg",
+                "caption": "",
+                "position": 1104
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/crab2/wg_00102_00.jpg",
+                "caption": "",
+                "position": 1105
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/crab2/wg_00102_01.jpg",
+                "caption": "",
+                "position": 1106
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/crab2/sls_00102_00.jpg",
+                "caption": "",
+                "position": 1107
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/crab2/sls_00102_01.jpg",
+                "caption": "",
+                "position": 1108
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/crab2/T-3DGS_00102_00.jpg",
+                "caption": "",
+                "position": 1109
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/crab2/T-3DGS_00102_01.jpg",
+                "caption": "",
+                "position": 1110
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/crab2/ours_00102_00.jpg",
+                "caption": "",
+                "position": 1111
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/crab2/ours_00102_01.jpg",
+                "caption": "",
+                "position": 1112
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/crab2/gt_00102_00.jpg",
+                "caption": "",
+                "position": 1113
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/crab2/gt_00102_01.jpg",
+                "caption": "",
+                "position": 1114
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/statue/wg_00002_draw.jpg",
+                "caption": "",
+                "position": 1115
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/statue/sls_00002_draw.jpg",
+                "caption": "",
+                "position": 1116
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/statue/T-3DGS_00002_draw.jpg",
+                "caption": "",
+                "position": 1117
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/statue/ours_00002_draw.jpg",
+                "caption": "",
+                "position": 1118
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/statue/gt_00002_draw.jpg",
+                "caption": "",
+                "position": 1119
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/statue/wg_00002_00.jpg",
+                "caption": "",
+                "position": 1120
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/statue/wg_00002_01.jpg",
+                "caption": "",
+                "position": 1121
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/statue/sls_00002_00.jpg",
+                "caption": "",
+                "position": 1122
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/statue/sls_00002_01.jpg",
+                "caption": "",
+                "position": 1123
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/statue/T-3DGS_00002_00.jpg",
+                "caption": "",
+                "position": 1124
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/statue/T-3DGS_00002_01.jpg",
+                "caption": "",
+                "position": 1125
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/statue/ours_00002_00.jpg",
+                "caption": "",
+                "position": 1126
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/statue/ours_00002_01.jpg",
+                "caption": "",
+                "position": 1127
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/statue/gt_00002_00.jpg",
+                "caption": "",
+                "position": 1128
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/images/qual/statue/gt_00002_01.jpg",
+                "caption": "",
+                "position": 1129
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/x8.png",
+                "caption": "Table 4:Ablation of using different supervisions and input features for mask learning on NeRF On-the-go scenes.",
+                "position": 1163
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADiscussions",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.02751/x9.png",
+                "caption": "Figure S1:Gaussians initialization with inaccurate COLMAP SfM point clouds may affect the early optimization stage.",
+                "position": 2153
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/x10.png",
+                "caption": "Figure S2:Illumination changes in real-world scenes.",
+                "position": 2162
+            }
+        ]
+    },
+    {
+        "header": "Appendix BMore Details for the Method",
+        "images": []
+    },
+    {
+        "header": "Appendix CEvaluation on On-the-go II Dataset",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/drone/robust_00000_draw.jpg",
+                "caption": "Figure S3:Qualitative results onDronein NeRF On-the-go II dataset.",
+                "position": 2357
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/drone/sls_00000_draw.jpg",
+                "caption": "",
+                "position": 2362
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/drone/wg_00000_draw.jpg",
+                "caption": "",
+                "position": 2363
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/drone/robust_00000.jpg",
+                "caption": "",
+                "position": 2364
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/drone/sls_00000.jpg",
+                "caption": "",
+                "position": 2365
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/drone/wg_00000.jpg",
+                "caption": "",
+                "position": 2366
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/drone/t3dgs_00000_draw.jpg",
+                "caption": "",
+                "position": 2370
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/drone/ours_00000_draw.jpg",
+                "caption": "",
+                "position": 2371
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/drone/gt_00000_draw.jpg",
+                "caption": "",
+                "position": 2372
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/drone/t3dgs_00000.jpg",
+                "caption": "",
+                "position": 2373
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/drone/ours_00000.jpg",
+                "caption": "",
+                "position": 2374
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/drone/gt_00000.jpg",
+                "caption": "",
+                "position": 2375
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/train_station/robust_00003_draw.jpg",
+                "caption": "Figure S4:Qualitative results onTrain-stationin NeRF On-the-go II dataset.",
+                "position": 2379
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/train_station/sls_00003_draw.jpg",
+                "caption": "",
+                "position": 2384
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/train_station/wg_00003_draw.jpg",
+                "caption": "",
+                "position": 2385
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/train_station/robust_00003.jpg",
+                "caption": "",
+                "position": 2386
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/train_station/sls_00003.jpg",
+                "caption": "",
+                "position": 2387
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/train_station/wg_00003.jpg",
+                "caption": "",
+                "position": 2388
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/train_station/t3dgs_00003_draw.jpg",
+                "caption": "",
+                "position": 2392
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/train_station/ours_00003_draw.jpg",
+                "caption": "",
+                "position": 2393
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/train_station/gt_00003_draw.jpg",
+                "caption": "",
+                "position": 2394
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/train_station/t3dgs_00003.jpg",
+                "caption": "",
+                "position": 2395
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/train_station/ours_00003.jpg",
+                "caption": "",
+                "position": 2396
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/train_station/gt_00003.jpg",
+                "caption": "",
+                "position": 2397
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/tree/robust_00013_draw.jpg",
+                "caption": "Figure S5:Qualitative results onTreein NeRF On-the-go II dataset.",
+                "position": 2401
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/tree/sls_00013_draw.jpg",
+                "caption": "",
+                "position": 2406
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/tree/wg_00013_draw.jpg",
+                "caption": "",
+                "position": 2407
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/tree/robust_00013.jpg",
+                "caption": "",
+                "position": 2408
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/tree/sls_00013.jpg",
+                "caption": "",
+                "position": 2409
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/tree/wg_00013.jpg",
+                "caption": "",
+                "position": 2410
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/tree/t3dgs_00013_draw.jpg",
+                "caption": "",
+                "position": 2414
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/tree/ours_00013_draw.jpg",
+                "caption": "",
+                "position": 2415
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/tree/gt_00013_draw.jpg",
+                "caption": "",
+                "position": 2416
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/tree/t3dgs_00013.jpg",
+                "caption": "",
+                "position": 2417
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/tree/ours_00013.jpg",
+                "caption": "",
+                "position": 2418
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/extracted/6508077/supp/qual/tree/gt_00013.jpg",
+                "caption": "",
+                "position": 2419
+            },
+            {
+                "img": "https://arxiv.org/html/2506.02751/x11.png",
+                "caption": "Figure S6:Comparison of transient mask in NeRF On-the-go dataset.",
+                "position": 2430
+            }
+        ]
+    },
+    {
+        "header": "Appendix DComparison of Mask Estimation",
+        "images": []
+    }
+]
