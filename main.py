@@ -349,51 +349,51 @@ feed["categories"] = helper.counted_cats(feed["papers"])
 # log(intro)
 
 # Chinese
-def renew_zh(dt_str):
-    dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M")
-    dt_now = datetime.now(timezone.utc)
-    if (dt.day != dt_now.day) and dt_now.hour > 8:
-        return True
-    return False
+# def renew_zh(dt_str):
+#     dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M")
+#     dt_now = datetime.now(timezone.utc)
+#     if (dt.day != dt_now.day) and dt_now.hour > 8:
+#         return True
+#     return False
 
 
-try:
-    if "zh" not in _prev_papers or renew_zh(_prev_papers["zh"]["update_ts"]):
-        log("Trying to get texts in Chinese.")
-        first_abstract = feed["papers"][0]["abstract"]
-        zh_prompt = f"Write simple and brief explanation (4-5 sentences) of an article in Chinese. Use short sentences. Text:\n\n{first_abstract}"
-        zh_text = api.get_text(
-            zh_prompt, api="mistral", model="mistral-large-latest", temperature=0.5
-        )
-        feed["zh"] = {"text": zh_text}
-        feed["zh"]["title"] = feed["papers"][0]["title"]
+# try:
+#     if "zh" not in _prev_papers or renew_zh(_prev_papers["zh"]["update_ts"]):
+#         log("Trying to get texts in Chinese.")
+#         first_abstract = feed["papers"][0]["abstract"]
+#         zh_prompt = f"Write simple and brief explanation (4-5 sentences) of an article in Chinese. Use short sentences. Text:\n\n{first_abstract}"
+#         zh_text = api.get_text(
+#             zh_prompt, api="mistral", model="mistral-large-latest", temperature=0.5
+#         )
+#         feed["zh"] = {"text": zh_text}
+#         feed["zh"]["title"] = feed["papers"][0]["title"]
 
-        zh_prompt = (
-            f"Write pinyin transcription for text. Text:\n\n{feed['zh']['text']}"
-        )
-        zh_text = api.get_text(
-            zh_prompt, api="mistral", model="mistral-large-latest", temperature=0.0
-        )
-        feed["zh"]["pinyin"] = zh_text
+#         zh_prompt = (
+#             f"Write pinyin transcription for text. Text:\n\n{feed['zh']['text']}"
+#         )
+#         zh_text = api.get_text(
+#             zh_prompt, api="mistral", model="mistral-large-latest", temperature=0.0
+#         )
+#         feed["zh"]["pinyin"] = zh_text
 
-        zh_prompt = f"Write vocab of difficult words for this text as an array of objects with fields 'word', 'pinyin', 'trans'. Return as python list without formatting. Return list and nothing else. Text:\n\n{feed['zh']['text']}"
-        zh_text = api.get_text(
-            zh_prompt, api="mistral", model="mistral-large-latest", temperature=0.0
-        )
-        feed["zh"]["vocab"] = zh_text
+#         zh_prompt = f"Write vocab of difficult words for this text as an array of objects with fields 'word', 'pinyin', 'trans'. Return as python list without formatting. Return list and nothing else. Text:\n\n{feed['zh']['text']}"
+#         zh_text = api.get_text(
+#             zh_prompt, api="mistral", model="mistral-large-latest", temperature=0.0
+#         )
+#         feed["zh"]["vocab"] = zh_text
 
-        zh_prompt = f"Translate this text in English. Text:\n\n{feed['zh']['text']}"
-        zh_text = api.get_text(
-            zh_prompt, api="mistral", model="mistral-large-latest", temperature=0.5
-        )
-        feed["zh"]["trans"] = zh_text
-        feed["zh"]["update_ts"] = formatted_time_utc
-    else:
-        log("Loading Chinese text from previous data.")
-        feed["zh"] = _prev_papers["zh"]
+#         zh_prompt = f"Translate this text in English. Text:\n\n{feed['zh']['text']}"
+#         zh_text = api.get_text(
+#             zh_prompt, api="mistral", model="mistral-large-latest", temperature=0.5
+#         )
+#         feed["zh"]["trans"] = zh_text
+#         feed["zh"]["update_ts"] = formatted_time_utc
+#     else:
+#         log("Loading Chinese text from previous data.")
+#         feed["zh"] = _prev_papers["zh"]
 
-except Exception as e:
-    log(f"Failed to get Chinese text: {e}")
+# except Exception as e:
+#     log(f"Failed to get Chinese text: {e}")
 
 log("Renaming data file.")
 helper.try_rename_file(
@@ -424,16 +424,16 @@ helper.try_rename_file(
     con.PAGE_FILE, con.DATA_DIR, helper.add_date_to_name(name=".html", date=feed_date)
 )
 
-log("[Experimental] Generating Chinese page for reading.")
-html_zh = helper.make_html_zh(feed)
-if html_zh:
-    log("Renaming previous Chinese page.")
-    helper.try_rename_file(
-        "zh.html", con.DATA_DIR, helper.add_date_to_name("_zh_reading_task.html")
-    )
-    log("Writing Chinese reading task.")
-    with open("zh.html", "w", encoding="utf-8") as f:
-        f.write(html_zh)
+# log("[Experimental] Generating Chinese page for reading.")
+# html_zh = helper.make_html_zh(feed)
+# if html_zh:
+#     log("Renaming previous Chinese page.")
+#     helper.try_rename_file(
+#         "zh.html", con.DATA_DIR, helper.add_date_to_name("_zh_reading_task.html")
+#     )
+#     log("Writing Chinese reading task.")
+#     with open("zh.html", "w", encoding="utf-8") as f:
+#         f.write(html_zh)
 
 log("Writing result.")
 with open(con.PAGE_FILE, "w", encoding="utf-8") as f:
