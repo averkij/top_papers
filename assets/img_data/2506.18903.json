@@ -1,0 +1,77 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.18903/x1.png",
+                "caption": "",
+                "position": 97
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.18903/x2.png",
+                "caption": "Figure 2:Method overview.Given novel camera viewpoints{𝐜T+m}m=1Msuperscriptsubscriptsubscript𝐜𝑇𝑚𝑚1𝑀\\{\\mathbf{c}_{T+m}\\}_{m=1}^{M}{ bold_c start_POSTSUBSCRIPT italic_T + italic_m end_POSTSUBSCRIPT } start_POSTSUBSCRIPT italic_m = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_M end_POSTSUPERSCRIPT, we first use our proposed memory module Surfel-Indexed View Memory𝒱(s)superscript𝒱𝑠\\mathcal{V}^{(s)}caligraphic_V start_POSTSUPERSCRIPT ( italic_s ) end_POSTSUPERSCRIPTto retrieve the most relevantK𝐾Kitalic_Kpast viewsvt∈𝒱∗⊂𝒱(s)subscript𝑣𝑡superscript𝒱superscript𝒱𝑠v_{t}\\in\\mathcal{V}^{*}\\subset\\mathcal{V}^{(s)}italic_v start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT ∈ caligraphic_V start_POSTSUPERSCRIPT ∗ end_POSTSUPERSCRIPT ⊂ caligraphic_V start_POSTSUPERSCRIPT ( italic_s ) end_POSTSUPERSCRIPTas conditioning reference views.\nFor each retrieved view, the camera parameters𝐜tsubscript𝐜𝑡\\mathbf{c}_{t}bold_c start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPTare represented using Plücker embeddings, which are spatially resized via interpolation to match the resolution of the encoded image latents.\nThe corresponding reference images𝐱tsubscript𝐱𝑡\\mathbf{x}_{t}bold_x start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPTare encoded using a VAE to obtain latent feature maps.\nThese resized Plücker embeddings and VAE-encoded latents are then fed into the camera-conditioned image-set generatorψ𝜓\\psiitalic_ψto synthesize the novel views{𝐱T+m}m=1Msuperscriptsubscriptsubscript𝐱𝑇𝑚𝑚1𝑀\\{\\mathbf{x}_{T+m}\\}_{m=1}^{M}{ bold_x start_POSTSUBSCRIPT italic_T + italic_m end_POSTSUBSCRIPT } start_POSTSUBSCRIPT italic_m = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_M end_POSTSUPERSCRIPT.\nOnce the new views are generated, we update the surfel-indexed memory𝒮(s)→𝒮(s+1)→superscript𝒮𝑠superscript𝒮𝑠1\\mathcal{S}^{(s)}\\rightarrow\\mathcal{S}^{(s+1)}caligraphic_S start_POSTSUPERSCRIPT ( italic_s ) end_POSTSUPERSCRIPT → caligraphic_S start_POSTSUPERSCRIPT ( italic_s + 1 ) end_POSTSUPERSCRIPTby appending the new view indices{T+m}m=1Msuperscriptsubscript𝑇𝑚𝑚1𝑀\\{T+m\\}_{m=1}^{M}{ italic_T + italic_m } start_POSTSUBSCRIPT italic_m = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_M end_POSTSUPERSCRIPTto existing surfels or creating new ones based on the estimated geometry of the generated views.\nThis process is repeated autoregressively for each subsequent generation step.",
+                "position": 126
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.18903/x3.png",
+                "caption": "Figure 3:Visualization of our surfel-based memory index.Each surfel in the 3D scene stores indices of all views that have observed it.\nFor visualization, we color-code each surfel by the indices of the contributing views.\nThis spatial index enables efficient retrieval of relevant past views: when generating a new view, we identify which surfels are visible from the target viewpoint and retrieve the views that previously observed those same regions, naturally accounting for occlusion.",
+                "position": 212
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.18903/x4.png",
+                "caption": "Figure 4:Surfel-Indexed View Memory.Readingfrom the memory involves rendering the surfels𝒮(s)superscript𝒮𝑠\\mathcal{S}^{(s)}caligraphic_S start_POSTSUPERSCRIPT ( italic_s ) end_POSTSUPERSCRIPTalong with their attributes, which contain past view indices represented by frame indices.\nWe then select theK𝐾Kitalic_Kmost frequently represented frame indices in the rendered image to retrieve the most relevant past views from𝒱(s)superscript𝒱𝑠\\mathcal{V}^{(s)}caligraphic_V start_POSTSUPERSCRIPT ( italic_s ) end_POSTSUPERSCRIPT.Writingto the memory involves estimating the geometry of the newly generated views{𝐱T+m}m=1Msuperscriptsubscriptsubscript𝐱𝑇𝑚𝑚1𝑀\\{\\mathbf{x}_{T+m}\\}_{m=1}^{M}{ bold_x start_POSTSUBSCRIPT italic_T + italic_m end_POSTSUBSCRIPT } start_POSTSUBSCRIPT italic_m = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_M end_POSTSUPERSCRIPTin the form of surfels and merging them with the existing surfels.\nThe frame indices{T+m}m=1Msuperscriptsubscript𝑇𝑚𝑚1𝑀\\{T+m\\}_{m=1}^{M}{ italic_T + italic_m } start_POSTSUBSCRIPT italic_m = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_M end_POSTSUPERSCRIPTare appended to the surfels observed in these views, and the novel views are stored in memory, updating𝒱(s)→𝒱(s+1)→superscript𝒱𝑠superscript𝒱𝑠1\\mathcal{V}^{(s)}\\rightarrow\\mathcal{V}^{(s+1)}caligraphic_V start_POSTSUPERSCRIPT ( italic_s ) end_POSTSUPERSCRIPT → caligraphic_V start_POSTSUPERSCRIPT ( italic_s + 1 ) end_POSTSUPERSCRIPTand𝒮(s)→𝒮(s+1)→superscript𝒮𝑠superscript𝒮𝑠1\\mathcal{S}^{(s)}\\rightarrow\\mathcal{S}^{(s+1)}caligraphic_S start_POSTSUPERSCRIPT ( italic_s ) end_POSTSUPERSCRIPT → caligraphic_S start_POSTSUPERSCRIPT ( italic_s + 1 ) end_POSTSUPERSCRIPT.",
+                "position": 309
+            },
+            {
+                "img": "https://arxiv.org/html/2506.18903/x5.png",
+                "caption": "Figure 5:Generalization to long sequences with revisitations.We compare scene generation with and without our proposed memory module (VMem).\nFor each sequence, an input image is shown on the left, followed by generated frames at selected frame indices.\nOur method (top row in each pair) maintains high spatial consistency across revisited viewpoints, while the baseline without memory (bottom row) suffers from visual drift and structural degradation over time.",
+                "position": 393
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.18903/x6.png",
+                "caption": "Figure 6:Qualitative comparison of the cycle trajectory frames(>400absent400>400> 400frames). Under the cycle trajectory setting, VMem can realistically infer and generate unseen content with significantly more precise camera control than both inpainting-based and multi-view/video-based baseline methods. Moreover, it retains memory of all previously generated frames, ensuring consistency when revisiting locations—an ability none of the multi-view/video-based baseline methods[42,36,23]possess.",
+                "position": 829
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAverage Pose Calculation",
+        "images": []
+    },
+    {
+        "header": "Appendix BAutoregressive Point Map Prediction",
+        "images": []
+    },
+    {
+        "header": "Appendix CLimitation and Discussion",
+        "images": []
+    }
+]
