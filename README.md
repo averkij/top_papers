@@ -2,7 +2,7 @@
 
 Welcome to the reviews repository for HF Daily Papers! This project gathers insights and reviews of machine learning and AI research papers, and presents them in a creative and informative manner via Claude, GPT-4o, FLUX and others.
 
-<img src="img/readme.png" width="640px" />
+<img src="img/gen_image.png" alt="Top Papers Logo" width="640px" />
 
 👉 [HFday.ru](https://hfday.ru)
 
