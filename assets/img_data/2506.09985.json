@@ -1,0 +1,313 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.09985/x1.png",
+                "caption": "Figure 1:V-JEPA 2 Overview.Leveraging 1M hours of internet-scale video and 1M images, we pretrain the V-JEPA 2 video model using a visual mask denoising objective(Bardes et al.,2024; Assran et al.,2023), and leverage this model for downstream tasks such as action classification, object recognition, action anticipation, and Video Question Answering by aligning the model with an LLM backbone.\nAfter pretraining, we can also freeze the video encoder and train a new action-conditioned predictor with a small amount of robot interaction data on top of the learned representations, and leverage this action-conditioned model, V-JEPA 2-AC, for downstream robot manipulation tasks using planning within a model predictive control loop.",
+                "position": 368
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x2.png",
+                "caption": "Figure 2:Multistage training.(Left)We first pretrain the V-JEPA 2 video encoder on internet-scale image and video data using a visual mask denoising objective(Bardes et al.,2024; Assran et al.,2023).\nA video clip is patchified into a sequence of tokens and a mask is applied by dropping a subset of the tokens.\nThe encoder then processes the masked video sequence and outputs an embedding vector for each input token.\nNext, the outputs of the encoder are concatenated with a set of learnable mask tokens that specify the position of the masked patches, and subsequently processed by the predictor.\nThe outputs of the predictor are then regressed to the prediction targets using an L1 loss.\nThe prediction targets are computed by an ema-encoder, the weights of which are defined as an exponential moving average of the encoder weights.(Right)After pretraining, we freeze the video encoder and learn a new action-conditioned predictor, V-JEPA 2-AC, on top of the learned representation.\nWe leverage an autoregressive feature prediction objective that involves predicting the representations of future video frames conditioned on past video frames, actions, and end-effector states.\nOur action-conditioned predictor uses a block-causal attention pattern such that each patch feature at a given time step can attend to the patch features, actions, and end-effector states from current and previous time steps.",
+                "position": 436
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x3.png",
+                "caption": "",
+                "position": 437
+            }
+        ]
+    },
+    {
+        "header": "2V-JEPA 2: Scaling Self-Supervised Video Pretraining",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.09985/x4.png",
+                "caption": "Figure 3:Scaling Ingredients.The effects of scaling interventions on average accuracy across 6 image and video classification tasks (SSv2, Diving-48, Jester, Kinetics, COIN, ImageNet) using a ViT-L/16 model as baseline.",
+                "position": 521
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x5.png",
+                "caption": "Figure 4:Data Scaling & Curation. We train and compare models on different data-mixes. Models are ViT-L/16 trained for 90K iterations using a cosine learning schedule followingBardes et al. (2024).(Left)We compare the performance of a ViT-L/16 model pretrained on the VM2M dataset and our VM22M dataset. Training on the VM22M dataset leads to a+11+1+ 1point improvement in average performance. Performance improvement is more pronounced on appearance-based tasks such as Kinetics-400, COIN, and ImageNet(Right)We compare the performance of a ViT-L/16 model pretrained on YT1B and a model pretrained on our Curated-YT1B dataset, which leverages our cluster-based curation. Training on the curated dataset leads to a+1.41.4+1.4+ 1.4point improvement on average performances, showing the effectiveness of data-curation.",
+                "position": 627
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x5.png",
+                "caption": "",
+                "position": 630
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x6.png",
+                "caption": "",
+                "position": 634
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x7.png",
+                "caption": "Figure 5:Model Scaling.We explore the impact of scaling model size and input video resolution. All models are trained on the VideoMix22M pretraining dataset.(Left)Average performance across six understanding tasks as a function of model scale. Models are trained with a constant learning rate until performance plateaus on downstream tasks. We then cool down the model using 64 frames at256×256256256256\\times 256256 × 256resolution and report post-cooldown performance. Scaling the model size from 300M to 1B parameters yields a+1.71.7+1.7+ 1.7point average improvement.(Middle)Training times (GPU-days) for ViT-g on A100 GPUs when training videos at384×384384384384\\times 384384 × 384resolution with different numbers of frames per clip. We compare progressive resolution training (252K iterations at 16 frames /256×256256256256\\times 256256 × 256resolution, followed by 12K cooldown iterations at384×384384384384\\times 384384 × 384resolution) to the projected time for full-resolution training. Progressive training provides up to 8×\\times×speedup, significantly reducing the pretraining compute requirement.(Right)Effect of inscreasing video duration at cooldown on downstream performance for ViT-g. Even when only using 16-frame clips during inference/evaluation, increasing video duration during the cooldown phase of training improves average task performance by+0.70.7+0.7+ 0.7points.",
+                "position": 660
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x7.png",
+                "caption": "",
+                "position": 663
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x8.png",
+                "caption": "",
+                "position": 667
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x9.png",
+                "caption": "",
+                "position": 671
+            }
+        ]
+    },
+    {
+        "header": "3V-JEPA 2-AC: Learning an Action-Conditioned World Model",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.09985/x10.png",
+                "caption": "Figure 6:V-JEPA 2-AC training.V-JEPA 2-AC is trained in an autoregressive fashion, utilizing a teacher forcing loss and a rollout loss. (Left) In the teacher forcing loss, the predictor takes the encoding of the current frame representation as input and learns to predict the representation of the next timestep. (Right) The rollout loss involves feeding the predictor’s output back as input, allowing the model to be trained to predict several timesteps ahead. By optimizing the sum of these two losses, V-JEPA 2-AC enhances its ability to accurately forecast the future by reducing error accumulation during rollouts.",
+                "position": 789
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x11.png",
+                "caption": "",
+                "position": 790
+            }
+        ]
+    },
+    {
+        "header": "4Planning: Zero-shot Robot Control",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.09985/x12.png",
+                "caption": "Figure 7:Planning.We plan an action sequence for a fixed time horizonT𝑇Titalic_Tby minimizing the L1 distance between the world model’s imagined state representationT𝑇Titalic_Tsteps into the future and its goal representation.\nThe L1 loss is optimized with respect to the actions(ak)k∈[T]subscriptsubscript𝑎𝑘𝑘delimited-[]𝑇(a_{k})_{k\\in[T]}( italic_a start_POSTSUBSCRIPT italic_k end_POSTSUBSCRIPT ) start_POSTSUBSCRIPT italic_k ∈ [ italic_T ] end_POSTSUBSCRIPTusing the cross-entropy method(Rubinstein,1997).\nSpecifically, in each planning step, we sample the action coordinates at each point in the planning horizon from a sequence of Gaussian distributions initialized with zero mean and unit variance.\nThe population statistics of the top-k actions trajectories are used to update the mean and variance of the Gaussian distributions.\nThis process is repeated for several iterations before finally returning the mean of the sequence of Gaussians as the selected action trajectory.",
+                "position": 845
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/mido/regret-x-start.jpg",
+                "caption": "Figure 8:Single-Goal Reaching.Single-goal reaching involves moving the end-effector to a desired location in space based on a single goal image. This task measures for a basic understanding of actions as well as a 3D spatial understanding of the scene, including depth, from the monocular RGB camera.\nIn each step, we use V-JEPA 2-AC to plan a sequence of actions by minimizing the L1 distance between the model’s imagined future state representations and its representation of the goal frame.\nThe first action is then executed before re-planning in the next time step.\nDuring planning, we only sample individual actions in the L1-Ball of radius0.0750.0750.0750.075centered at the origin.\nThus, the maximum achievable decrease in cartesian distance to the goal in a single step is0.130.130.130.13(∼similar-to\\sim∼13 cm).",
+                "position": 883
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/mido/regret-x-start.jpg",
+                "caption": "",
+                "position": 886
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/mido/regret-x-goal.jpg",
+                "caption": "",
+                "position": 890
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x13.png",
+                "caption": "",
+                "position": 892
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/mido/regret-y-start.jpg",
+                "caption": "",
+                "position": 896
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/mido/regret-y-goal.jpg",
+                "caption": "",
+                "position": 900
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x14.png",
+                "caption": "",
+                "position": 902
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/mido/regret-z-start.jpg",
+                "caption": "",
+                "position": 906
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/mido/regret-z-goal.jpg",
+                "caption": "",
+                "position": 910
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x15.png",
+                "caption": "",
+                "position": 912
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x16.png",
+                "caption": "Figure 9:V-JEPA 2-AC Energy Landscape.Energy landscape for single-goal reaching task with respect to end-effector cartesian-control action (sweepingΔ⁢xΔ𝑥\\Delta xroman_Δ italic_xandΔ⁢yΔ𝑦\\Delta yroman_Δ italic_ywhile holdingΔ⁢z=0Δ𝑧0\\Delta z=0roman_Δ italic_z = 0fixed); ground truth action relating goal image to start frame is located at(Δ⁢x,Δ⁢y)=(0,−0.1)Δ𝑥Δ𝑦00.1(\\Delta x,\\Delta y)=(0,-0.1)( roman_Δ italic_x , roman_Δ italic_y ) = ( 0 , - 0.1 ).\nWe see that the energy function achieves its minimum around(Δ⁢x,Δ⁢y)≈(0,−0.05)Δ𝑥Δ𝑦00.05(\\Delta x,\\Delta y)\\approx(0,-0.05)( roman_Δ italic_x , roman_Δ italic_y ) ≈ ( 0 , - 0.05 ), indicating that the model has learned to reasonably infer the effect of actions without requiring precision sensing.",
+                "position": 945
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/mido/traj-pnp-0.jpg",
+                "caption": "Figure 10:Pick-&-Place.Closed-loop robot execution of V-JEPA 2-AC for multi-goal pick-&-place tasks.\nHighlighted frames indicate when the model achieves a sub-goal and switches to the next goal.\nThe first goal image shows the object being grasped, the second goal image shows the object in the vicinity of the desired location, and the third goal image shows the object placed in the desired position. The model first optimizes actions with respect to the first sub-goal for 4 time-steps before automatically switching to the second sub-goal for the next 10 time-steps, and finally the third goal for the last 4 time-steps.\nRobot actions are inferred through goal-conditioned planning.\nThe V-JEPA 2-AC model is able to perform zero-shot pick-&-place tasks on two Franka arms in different labs, with various object configurations and cluttered environments.",
+                "position": 981
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/mido/traj-pnp-2.jpg",
+                "caption": "",
+                "position": 985
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/mido/traj-pnp-1.jpg",
+                "caption": "",
+                "position": 987
+            }
+        ]
+    },
+    {
+        "header": "5Understanding: Probe-based Classification",
+        "images": []
+    },
+    {
+        "header": "6Prediction: Probe-based Action Anticipation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.09985/x17.png",
+                "caption": "Figure 11:Visualization of EK100 prediction.(Left): four selected frames from the context frames. (Middle): model predictions, ordered by likelihood. (Right): following frame after the 1 second anticipation time. We show two examples where the model is successful and one example where the model fails.",
+                "position": 1537
+            }
+        ]
+    },
+    {
+        "header": "7Understanding : Video Question Answering",
+        "images": []
+    },
+    {
+        "header": "8Related Work",
+        "images": []
+    },
+    {
+        "header": "9Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "10V-JEPA 2 Pretraining",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.09985/x18.png",
+                "caption": "Figure 12:Effect of data curation for V-JEPA 2 pre-training. We show model performance averaged across the IN1K, COIN, SSv2, and K400 tasks as a function of pre-training “epochs” (equivalent to 300 optimization steps). Models trained with and without uncurated data achieve similar performance until epoch 600, at which point the performance of the model trained with uncurated YT1B beings degrading.",
+                "position": 4627
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x19.png",
+                "caption": "Figure 13:Effect of video duration during evaluation.Task performance further improves by running inference on longer video clips. All evaluations use ViT-g models that were annealed with 64 frames at resolution256×256256256256\\times 256256 × 256. Due to memory constraints, results are reported using a single clip evaluation protocol. Increasing the number of frames processed at inference time boosts average performance by up to+9.79.7+9.7+ 9.7points.",
+                "position": 4690
+            }
+        ]
+    },
+    {
+        "header": "11V-JEPA 2-AC Post-training",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/mido/graspcup.jpg",
+                "caption": "(a)Grasp Cup",
+                "position": 4727
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/mido/graspcup.jpg",
+                "caption": "(a)Grasp Cup",
+                "position": 4730
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/mido/reachcup.jpg",
+                "caption": "(b)Reach with Cup",
+                "position": 4736
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/mido/pnpcup.jpg",
+                "caption": "(c)Pick and Place Cup",
+                "position": 4742
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/artem/wm_grid_correction.png",
+                "caption": "(a)Comparing accuracy of predictions to ground truth trajectory.(Top Row)Video frames of a ground-truth trajectory from a robot in our lab.(Middle row)Each frame is encoded by V-JEPA 2 encoder, and then decoded using the feedforward frame decoder.\nReconstructions of the V-JEPA 2 representations show that the encoder captures the salient parts of the scene necessary for vision-based control; blurry background generation can be partially attributed to the low-capacity of our feedforward frame decoder.(Bottom Row)Autoregressive rollout produced by V-JEPA 2-AC world model using the ground-truth action sequence given first frame as context, and then decoded using feedforward frame decoder.\nReconstructions of the V-JEPA 2-AC rollout show that the action-conditioned world model successfully animates the robot while keeping the background and non-interactated objects (e.g., the shelf) unaffected.\nHowever, we do observe error accumulation as the world model predicts the location of the cup to be slightly lower than that of the real trajectory in the final frame.",
+                "position": 4760
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/artem/wm_grid_correction.png",
+                "caption": "(a)Comparing accuracy of predictions to ground truth trajectory.(Top Row)Video frames of a ground-truth trajectory from a robot in our lab.(Middle row)Each frame is encoded by V-JEPA 2 encoder, and then decoded using the feedforward frame decoder.\nReconstructions of the V-JEPA 2 representations show that the encoder captures the salient parts of the scene necessary for vision-based control; blurry background generation can be partially attributed to the low-capacity of our feedforward frame decoder.(Bottom Row)Autoregressive rollout produced by V-JEPA 2-AC world model using the ground-truth action sequence given first frame as context, and then decoded using feedforward frame decoder.\nReconstructions of the V-JEPA 2-AC rollout show that the action-conditioned world model successfully animates the robot while keeping the background and non-interactated objects (e.g., the shelf) unaffected.\nHowever, we do observe error accumulation as the world model predicts the location of the cup to be slightly lower than that of the real trajectory in the final frame.",
+                "position": 4763
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/extracted/6532843/assets/artem/wm_grid_open_close.png",
+                "caption": "(b)Ablating predictions with open versus closed gripper.We explore how the V-JEPA 2-AC predictions change when driving the model with identical action sequences, but in one cause using a closed gripper(top row)and in the other with an open gripper(bottom row).\nThe world model predicts the location of the cup to be unchanged across time steps when using an open gripper action sequence, suggesting a reasonable understanding of intuitive physics (e.g., object constancy, shape constancy, and gravity).",
+                "position": 4797
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x20.png",
+                "caption": "Figure 16:Sensitivity to camera position.Rotation error (in the x-y plane) of the action coordinate axis inferred by V-JEPA 2-AC as a function of camera position, with 0 degrees corresponding to a camera located at the robot base, and 90 degrees corresponding to a camera located left of the robot base.\nWhile ideally, the model’s inferred coordinate axis would be invariant to camera position, here we observe that the model’s inferred coordinate axis is sensitive to the camera position.",
+                "position": 4845
+            }
+        ]
+    },
+    {
+        "header": "12Visual Classification",
+        "images": []
+    },
+    {
+        "header": "13Action Anticipation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.09985/x21.png",
+                "caption": "Figure 17:Protocol ablation for action anticipation on EK100.(Left)Performance with respect to the number of context frames used for action anticipation.(Middle)Performance with respect to the frame rate (fps) used for inference; number of context frames fixed at 32.(Right)Performance with respect to the spatial resolution (height and width) of the context frames used for action anticipation.",
+                "position": 5318
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x21.png",
+                "caption": "",
+                "position": 5321
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x22.png",
+                "caption": "",
+                "position": 5325
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x23.png",
+                "caption": "",
+                "position": 5329
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x24.png",
+                "caption": "Figure 18:(Left): Impact of longer-term anticipation times.Performance on EK100 action anticipation, at several recall values and anticipation times.(Right): Distribution of success and failure cases of V-JEPA 2. Calculated on the validation set of EK100. VNA means that verb, noun and action are all correctly classified by the model. An X symbol means that the corresponding attribute is not correctly classified by the model. Note: the probe is composed of 3 independent classifiers for verb, noun and action, hence why the model can have a different prediction for the action and for the verb/noun pair.",
+                "position": 5339
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x24.png",
+                "caption": "",
+                "position": 5342
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x25.png",
+                "caption": "",
+                "position": 5346
+            },
+            {
+                "img": "https://arxiv.org/html/2506.09985/x26.png",
+                "caption": "Figure 19:Impact of video duration during visual instruction tuning.We investigate the effect of increasing the number of frames during visual instruction tuning, where the encoder is frozen. We observe that with more frames, V-JEPA 2 performance linearly increases compared to DINOv2, an SSL-based image encoder, showing the potential of V-JEPA 2 to scale with more frames.",
+                "position": 5516
+            }
+        ]
+    },
+    {
+        "header": "14Video Question Answering",
+        "images": []
+    }
+]
