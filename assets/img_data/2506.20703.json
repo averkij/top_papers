@@ -1,0 +1,182 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.20703/x1.png",
+                "caption": "Figure 1:Pipeline Overview.Top left:We use pretrained convex decomposition models[49]to extract primitives from an input image at multiple scales.Bottom:Users can manipulate these primitives and the camera to define a new scene layout. We render the modified primitives into a depth map and generate a texture hint image. These serve as inputs to a pretrained depth-to-image model[28], which requires no fine-tuning (Top right). The resulting image respects the modified geometry, preserves texture where possible, and remains aligned with the text prompt.",
+                "position": 192
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x2.png",
+                "caption": "Figure 2:Editable Primitives as a Structured Depth Prior for Generative Models.Our method uses 3D convex primitives as an editable intermediate representation from which depth maps are derived. These depth maps (shown as insets in the top row) are used to condition a pretrained depth-to-image generative model. The top row shows primitive configurations after sequential edits—translation, scaling, deletion, and camera motion—alongside their corresponding derived depth maps. The bottom row shows the resulting synthesized images. Unlike direct depth editing, which is unintuitive and underconstrained, manipulating primitives offers a structured, interpretable, and geometry-aware interface for controllable image generation.",
+                "position": 343
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x3.png",
+                "caption": "Figure 3:Comparison with Drag Diffusion[43].Given a scene (first column), we attempt to reposition objects using a recent point-based image editing method by drawing drag handles (second column). However, drag points are ambiguous: it is unclear whether the intended operation is translation or scaling. As a result, the output lacks geometric consistency (third column). E.g., the clock changes shape, and pushing it deeper into the scene fails to reduce its size appropriately; fine details on the can are lost. In contrast, Generative Blocks World infers 3D primitives (fourth column) that can be explicitly manipulated (fifth column), producing a plausible image that respects object geometry, scale, positioning, and texture (last column).",
+                "position": 347
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x4.png",
+                "caption": "Figure 4:Comparison with LooseControl[2]. Camera moves present serious problems for existing work. Four scenes (leftside of each pair), synthesized from\nthe depth maps shown. In each case, the camera is moved to the right (rightside of each pair), and the image is resynthesized.\nNote how, for LooseControl, the number of apples changes (first pair); the level of water in the glass changes and there is an extra ice cube (second pair);\nthe duck changes (third pair); an extra rock appears (fourth pair). In each case, our method shows the same scene from a different view, because the\ntexture hint image is derived from the underlying geometry, and strongly constrains any change.",
+                "position": 364
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x5.png",
+                "caption": "Figure 5:Projection-Based Texture Hints Preserve Object Identity After Edits.This figure compares our projection-based texture hints against StableFlow[1], which uses vital-layer key-value injection.First two columns:input primitives and image.Third:edited primitives.Fourth:synthesis from original depth, revealing consistent geometry but altered texture.Fifth:StableFlow’s approach often changes texture or object identity.Sixth:our projection-based hints maintain texture fidelity despite edits.Seventh:combining both approaches can improve fine detail recovery (e.g., the treasure chest).",
+                "position": 373
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x6.png",
+                "caption": "(a)K=6𝐾6K=6italic_K = 6parts.",
+                "position": 415
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x6.png",
+                "caption": "(a)K=6𝐾6K=6italic_K = 6parts.",
+                "position": 418
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x7.png",
+                "caption": "(b)K=8𝐾8K=8italic_K = 8parts.",
+                "position": 424
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x8.png",
+                "caption": "(a)K=24𝐾24K=24italic_K = 24parts.",
+                "position": 431
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x8.png",
+                "caption": "(a)K=24𝐾24K=24italic_K = 24parts.",
+                "position": 434
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x9.png",
+                "caption": "(b)K=60𝐾60K=60italic_K = 60parts.",
+                "position": 440
+            }
+        ]
+    },
+    {
+        "header": "4Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.20703/x10.png",
+                "caption": "Figure 8:Failure cases.Top: Illumination misalignments.Our texture hints operate in pixel space and cannot model illumination effects outside primitive boundaries (e.g., reflections or cast shadows). As a result, moving or scaling objects may not consistently update their associated lighting effects. For example, the bread stack is translated correctly, but its reflection remains unchanged (see fourth column).Middle: Poor decomposition.Primitive fitting may fail in cluttered scenes or near image boundaries, where sparse depth points hinder the separation of adjacent objects (e.g., the bottle and paper towel are merged). This leads to inaccurate depth maps and poor control.Bottom: Rotation artifacts.Large object rotations (e.g., 50°) disrupt texture consistency and geometry, possibly due to distribution shift in the texture hints, resulting in distortions or hallucinated content (e.g., warped “Blocks World” text).",
+                "position": 494
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x11.png",
+                "caption": "",
+                "position": 496
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x12.png",
+                "caption": "",
+                "position": 496
+            }
+        ]
+    },
+    {
+        "header": "5Discussion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.20703/x13.png",
+                "caption": "Figure 9:Primitive edits can conflict with the text prompt.Some geometric edits require changing the text prompt, for example, when removing an object. Thefourth columnmentions brick in the text prompt, but that primitive was removed, resulting in brick pieces in the inpainted region. In thefifth column, we remove the brick from the text prompt, which removes the brick pieces but it still leaves behind a white stone. In thefinal column, we use our texture hints but without StableFlow, getting a clean surface. The StableFlow key-value sharing approach placed brick and stone textures where we didn’t want them. We conclude that our texture hints are critical, but combining them with StableFlow[1]key-value sharing can help in some cases, hurt in others.",
+                "position": 518
+            }
+        ]
+    },
+    {
+        "header": "Acknowledgement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.20703/x14.png",
+                "caption": "Figure 10:Our model is compatible with most depth-image synthesizers. While a pretrained FLUX works out of the box, LoRA weights on top of the base FLUX model are available (FLUX.1 Depth [dev] LoRA), exposing a newl⁢o⁢r⁢aw⁢e⁢i⁢g⁢h⁢t𝑙𝑜𝑟subscript𝑎𝑤𝑒𝑖𝑔ℎ𝑡lora_{weight}italic_l italic_o italic_r italic_a start_POSTSUBSCRIPT italic_w italic_e italic_i italic_g italic_h italic_t end_POSTSUBSCRIPTparameter (scaling the activations of the LoRA layers). This is intriguing in the context of our primitives, because they can either be used to coarsely model scene geometry (e.g.l⁢o⁢r⁢aw⁢e⁢i⁢g⁢h⁢t𝑙𝑜𝑟subscript𝑎𝑤𝑒𝑖𝑔ℎ𝑡lora_{weight}italic_l italic_o italic_r italic_a start_POSTSUBSCRIPT italic_w italic_e italic_i italic_g italic_h italic_t end_POSTSUBSCRIPTnear 0.8,second last column), leaving details to the image synthesizer, or they can tightly control the result whenl⁢o⁢r⁢aw⁢e⁢i⁢g⁢h⁢t𝑙𝑜𝑟subscript𝑎𝑤𝑒𝑖𝑔ℎ𝑡lora_{weight}italic_l italic_o italic_r italic_a start_POSTSUBSCRIPT italic_w italic_e italic_i italic_g italic_h italic_t end_POSTSUBSCRIPTis close to 1 (final column).",
+                "position": 1453
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x15.png",
+                "caption": "",
+                "position": 1457
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x16.png",
+                "caption": "",
+                "position": 1459
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x17.png",
+                "caption": "",
+                "position": 1461
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x18.png",
+                "caption": "Figure 11:Given the same depth map, we extract primitives at variable resolution (from 4-72 parts). We show the depth maps in each second row, and synthesized result in each 3rd row. Observe how no matter the resolution, the FLUX-LoRA model (we usel⁢o⁢r⁢aw⁢e⁢i⁢g⁢h⁢t=0.8𝑙𝑜𝑟subscript𝑎𝑤𝑒𝑖𝑔ℎ𝑡0.8lora_{weight}=0.8italic_l italic_o italic_r italic_a start_POSTSUBSCRIPT italic_w italic_e italic_i italic_g italic_h italic_t end_POSTSUBSCRIPT = 0.8) gives an image that follows the primitive conditioning. We conclude that a wide array of primitive densities is tolerable to depth-to-image models, enabling meaningful artistic edits.",
+                "position": 1465
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x19.png",
+                "caption": "",
+                "position": 1469
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x20.png",
+                "caption": "Figure 12:Additional move camera evaluations. Generative Blocks World can simultaneously adhere to source texture and requested primitives.",
+                "position": 1473
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x21.png",
+                "caption": "",
+                "position": 1477
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x22.png",
+                "caption": "Figure 13:Additional move camera evaluations. Our method can simultaneously adhere to source texture and requested primitives.",
+                "position": 1535
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x23.png",
+                "caption": "",
+                "position": 1539
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/x24.png",
+                "caption": "Figure 14:Additional move camera evaluations. Our method can simultaneously adhere to source texture and requested primitives.",
+                "position": 1543
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/extracted/6571182/top_important_layers.png",
+                "caption": "Figure 15:We repeat the analysis of StableFlow[1], which applies U-Net based key-value caching of older-generation Diffusion models to newer Diffusion Transformers. Specifically, their work analyzesFLUX.1 [dev]; given that our work uses depth maps to communicate geometric information to our image generation model, we analyze Vital Layers inFLUX.1 Depth [dev]andFLUX.1 Depth [dev] LoRA, finding the top 5 multimodal and single modal layers to be essentially identical. We try using the vital layers we identified for texture transfer, finding this method to be inadequate (see Fig.5).",
+                "position": 1546
+            },
+            {
+                "img": "https://arxiv.org/html/2506.20703/extracted/6571182/layer_importance_by_index.png",
+                "caption": "",
+                "position": 1550
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]
