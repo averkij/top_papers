@@ -1,0 +1,156 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2506.17859/x1.png",
+                "caption": "Figure 1:Why Does a Model Learn Different Strategies for Performing ICL?To answer this question, we analyze three distinct settings where a model is trained to learn a mixture of tasks.(a) Model Behavior Transitions Between Memorizing and Generalizing Predictors.We first make the observation that across settings, as diversity of data distribution and amount of training are increased, model behavior transitions between two Bayesian predictors: a memorizing predictor,M𝑀Mitalic_M, which assumes a discrete prior over seen tasks, and a generalizing predictor,G𝐺Gitalic_G, which assumes a continuous prior over the true distribution.\nThis recapitulates prior results on task-diversity thresholds[25]and transient generalization[24]in a unifying language.(b)A Hierarchical Bayesian Framework Provides an Explanatory and Predictive Account of ICL.The consistency of these transitions motivates a hierarchical Bayesian model of ICL, where a model’s inference-time behavior is framed as a posterior-weighted interpolation in the Bayesian predictorsM𝑀Mitalic_MandG𝐺Gitalic_G, while pretraining is seen as a process of updating the preference (posterior probability) toward different predictors.\nWe find that under reasonable assumptions regarding neural network learning dynamics, our framework is highly predictive of model behaviorthroughouttraining,withoutaccess to model weights (bottom panel). Additionally, our framework provides an explanatory account of ICL phenomena via a tradeoff between thelossand thecomplexityof learned solutions (top panel).",
+                "position": 231
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x2.png",
+                "caption": "Figure 2:Experimental Settings: Learning a Finite Mixture of Tasks.(a) General Formulation.Popularly studied experimental settings in the literature on ICL can be seen as training a model to learn a distribution defined using a mixture of tasks (denoted𝒯trainsubscript𝒯train\\mathcal{T}_{\\text{train}}caligraphic_T start_POSTSUBSCRIPT train end_POSTSUBSCRIPT), where each task is a parameterized latent function whose parameters are sampled from a distribution𝒯truesubscript𝒯true\\mathcal{T}_{\\text{true}}caligraphic_T start_POSTSUBSCRIPT true end_POSTSUBSCRIPT.(b) Considered Settings.We analyze three distinct instantiations of this general formulation:Balls & Urns, which captures the belief update interpretation of ICL and is a simplification of the Markov modeling setting from prior work[26,52], and two popularly studied settings from the literature that capture the few-shot learning interpretation of ICL, i.e., in-contextlinear regression[25,14]andClassification[20,24,28,29].",
+                "position": 284
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x3.png",
+                "caption": "Figure 3:Predictors in Different Experimental Settings.(a) Memorizing and Generalizing Predictors.We compare model behavior to two idealized Bayesian predictors: (i)Memorizing predictor(M𝑀Mitalic_M), which assumes a discrete prior over the mixture distribution𝒯trainsubscript𝒯train\\mathcal{T}_{\\text{train}}caligraphic_T start_POSTSUBSCRIPT train end_POSTSUBSCRIPT, and (ii)Generalizing predictor(G𝐺Gitalic_G), which assumes a prior over𝒯truesubscript𝒯true\\mathcal{T}_{\\text{true}}caligraphic_T start_POSTSUBSCRIPT true end_POSTSUBSCRIPT, the distribution from which tasks are sampled.(b)Task-Specific Instantiations.These predictors yield closed-form solutions (App.G); e.g., in Balls & Urns, the memorizing predictor computes a posterior-weighted average over urns seen in training, whereas the generalizing predictor uses empirical unigram statistics with pseudo-counts.",
+                "position": 320
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x4.png",
+                "caption": "Figure 4:Relative Distance Captures Transitions in Model Behavior.We show the relative distance between model outputs and the two predictors. Marginals report the absolute distance values (e.g., symmetrized KL between model and predictor outputs for the Balls & Urns setting), holdingN𝑁Nitalic_Nconstant (for the right plot), orD𝐷Ditalic_Dconstant (for the top plot), and varying the other variable (denoted with the dotted line). Across all settings, we see model behavior decomposes into two phases, explained by either the memorizing or generalizing predictor. In this figure, we use context length of 128, task dimensionality of 8, and MLP width of 256 for balls and urns. Linear regression has similar parameters except context length of 32, and classification has similar parameters other than MLP width of 512.",
+                "position": 379
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x5.png",
+                "caption": "Figure 5:Our Bayesian Model Captures Transitions Between Strategies Explaining Model Behavior.We plot the posterior probability of the memorizing predictor given by our theoretical model (Eq.4). Across three broad experimental settings—(a)Balls & Urns,(b)Linear Regression, and(c)Classification—we find our model identifies the phases best explained by a given predictor and the boundary between them, hence capturing the transition between solutions seen in a Transformer’s training (as shown by the relative distance maps).\nImportantly, we find our model is highly predictive of the pretrained Transformer’s behavior (next-token predictions) across conditions used for fitting the three free parameters of our model and unseen ones. Max color bar value for Balls & Urns and Classification is determined by the performance of a baseline predictor that always outputs the mean of the distribution𝒯truesubscript𝒯true\\mathcal{T}_{\\text{true}}caligraphic_T start_POSTSUBSCRIPT true end_POSTSUBSCRIPT.\nIn this figure, we use context length of 256, task dimensionality of 8 and MLP width of 256 for balls and urns. Linear regression and classification have similar parameters except context length of 64 and 384, respectively.",
+                "position": 404
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x6.png",
+                "caption": "Figure 6:Novel predictions from our framework.(a)Our framework predicts that the posterior probability of the memorized predictor (and hence the relative distance, which can be thought of as an empirical estimate of this quantity) will show sub-linear scaling with respect toN𝑁Nitalic_N, and sigmoidal growth with respect toN1−αsuperscript𝑁1𝛼N^{1-\\alpha}italic_N start_POSTSUPERSCRIPT 1 - italic_α end_POSTSUPERSCRIPT(holdingD𝐷Ditalic_Dconstant). This is clearly shown in the figure, with dark lines representing parameterized logistic fits inN1−αsuperscript𝑁1𝛼N^{1-\\alpha}italic_N start_POSTSUPERSCRIPT 1 - italic_α end_POSTSUPERSCRIPTspace.(b)We predict a rapid change in model behavior for intermediate values ofN𝑁Nitalic_NandD𝐷Ditalic_D, yielding a crossover-like boundary between the predictor that best explains model outputs. This can be seen via the magnitude of the second derivative of the relative distance near the boundary. Marginal plots show the second derivative of the relative distance with respect toN𝑁Nitalic_NorD𝐷Ditalic_D, with the data shown in these plots denoted on the vector map by the dotted lines.(c)Finally, our analysis predicts super-linear scaling of the time of transienceN∗superscript𝑁N^{*}italic_N start_POSTSUPERSCRIPT ∗ end_POSTSUPERSCRIPT(the time at which relative distancedr⁢e⁢l=0.5subscript𝑑𝑟𝑒𝑙0.5d_{rel}=0.5italic_d start_POSTSUBSCRIPT italic_r italic_e italic_l end_POSTSUBSCRIPT = 0.5) as diversityD𝐷Ditalic_Dincreases.",
+                "position": 520
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x7.png",
+                "caption": "Figure 7:Intuition Elicited by The Bayesian Model.(a)Our framework suggests Transformers have a prior preference for learning simpler solutions, which often generalize better. However, throughout training, preference is updated towards solutions that better explain the data (i.e., have greater likelihood). This happens even at the expense of higher complexity, which in our case, yields a transition toward a memorizing predictor.(b, c)Our framework captures the tradeoff between solutions, showing that theboundarybetween the two phases corresponds toequal posterior probabilitiesof the two predictors.",
+                "position": 559
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x8.png",
+                "caption": "Figure 8:Increased memorization with MLP width is captured by Bayesian model as reduced complexity penalty.(a)We find relative distance to memorizing predictor decreases with MLP width.(b)This transition is closely captured by our Bayesian model, in which the ‘complexity penalty’β𝛽\\betaitalic_β, and hence the differenceΔ⁢KβΔsuperscript𝐾𝛽\\Delta K^{\\beta}roman_Δ italic_K start_POSTSUPERSCRIPT italic_β end_POSTSUPERSCRIPT, decays exponentially with MLP width, yielding a reduced prior preference toward the generalizing predictor.",
+                "position": 570
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x9.png",
+                "caption": "Figure 9:Two-Hypotheses Threshold.Defining an ‘optimal’ interpolation between the memorizing and generalizing predictors towards minimizing the Euclidean distance to the trained Transformer’s predictions, we report the loss between this optimal interpolation and the Transformer’s predictions. We observe a minimum amount of training is necessary for this loss to become sufficiently small such that our hierarchical Bayesian model, which implicitly assumes the Transformer can be functionally decomposed into the two predictors, will become applicable. The dotted lines demarcate this threshold, which we call the “two-hypotheses threshold”. Mean-squared error (MSE) in the figure above is normalized by dimension. KL in this figure indicates forward KL from the Transformer’s next token predictions to the interpolation of predictors.",
+                "position": 2354
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x10.png",
+                "caption": "Figure 10:General Abstraction Capturing our Experimental Settings and their Predictors.Each setting involves a mixture of parameterized functions (called a “task”), withD𝐷Ditalic_Dfunctions (the “task diversity\"). Task consist of predicting the next element in a sequence, and vary based on whether models are trained in a standard auto-regressive fashion (like Balls & Urns) or whether they are only trained to predict some elements in the sequence (only function outputs in Linear Regression, and only the last label in Classification). Across settings, the solutions learned by Transformers can be characterized asmemorizing predictorsorgeneralizing predictors. A memorizing predictor is defined as the Bayesian posterior predictive distribution with𝒯trainsubscript𝒯train\\mathcal{T}_{\\text{train}}caligraphic_T start_POSTSUBSCRIPT train end_POSTSUBSCRIPT, the distribution of seen tasks, as its prior. A generalizing predictor is defined as the Bayesian posterior predictive with the true task distribution𝒯truesubscript𝒯true\\mathcal{T}_{\\text{true}}caligraphic_T start_POSTSUBSCRIPT true end_POSTSUBSCRIPTas its prior.",
+                "position": 2495
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x11.png",
+                "caption": "Figure 11:Visualizing the setup for Balls and Urns.Each task involves an “urn” that outputs a “ball” of a specific type every time it is sampled from. The task then involves seeing samples from an urn, concatenated to form a sequence. A memorizing predictor for this setting involves computing the sequence-level unigram statistics, i.e., the counts for each ball type, and comparing them with distributions from urns seen during training. Meanwhile, a generalizing predictor simply assumes the distribution of balls follows a uniform Dirichlet prior, thus predicting simply based on computing the unigram statistics from the sequence and adding a 1 pseudo-count for each ball type. Thus, this predictor generalizes to novel urns not seen by the model during training.",
+                "position": 2524
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x12.png",
+                "caption": "Figure 12:Visualizing the setup for Linear Regression.Each task involves a linear regression problem, defined by parameters𝒘𝒘\\bm{w}bold_italic_w, that outputs a pair(𝒙,𝚢)𝒙𝚢(\\bm{x},\\mathtt{y})( bold_italic_x , typewriter_y ), where𝚢=𝒘⊺⁢𝒙+ϵ𝚢superscript𝒘⊺𝒙italic-ϵ\\mathtt{y}=\\bm{w}^{\\intercal}\\bm{x}+\\epsilontypewriter_y = bold_italic_w start_POSTSUPERSCRIPT ⊺ end_POSTSUPERSCRIPT bold_italic_x + italic_ϵis a noisy linear transformation of the vector𝒙𝒙\\bm{x}bold_italic_x. The task then involves seeing a sequence of such pairs, concatenated to form a sequence. A memorizing predictor for this setting involves computing the likelihood of the pairs seen in context under the parameters of each task seen during training, using this result to compute a posterior over said tasks and a posterior-weighted average with a discrete prior over seen tasks. Meanwhile, the generalizing predictor is merely the ridge regression operation, which is equivalent to performing a Bayesian average operation assuming a continuous Gaussian prior. Correspondingly, this predictor generalizes to novel regression tasks that were not seen by the model during training.",
+                "position": 2532
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x13.png",
+                "caption": "Figure 13:Visualizing the setup for Classification.Each task involves noisy item-label pairs𝒘~⊕𝒍direct-sum~𝒘𝒍\\tilde{\\bm{w}}\\oplus\\bm{l}over~ start_ARG bold_italic_w end_ARG ⊕ bold_italic_l, and ends with a noisy query item𝒘~querysubscript~𝒘query\\tilde{\\bm{w}}_{\\text{query}}over~ start_ARG bold_italic_w end_ARG start_POSTSUBSCRIPT query end_POSTSUBSCRIPTwhich comes from the same true item𝒘𝒘\\bm{w}bold_italic_was one of the items in the sequence. Items are noised via𝒘~=𝒘+σ⁢ϵ1+σ2~𝒘𝒘𝜎italic-ϵ1superscript𝜎2\\tilde{\\bm{w}}=\\frac{\\bm{w}+\\sigma\\epsilon}{\\sqrt{1+\\sigma^{2}}}over~ start_ARG bold_italic_w end_ARG = divide start_ARG bold_italic_w + italic_σ italic_ϵ end_ARG start_ARG square-root start_ARG 1 + italic_σ start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT end_ARG end_ARG, withϵ∈𝒩⁢(0,𝑰m/m)italic-ϵ𝒩0subscript𝑰𝑚𝑚\\epsilon\\in\\mathcal{N}(0,\\bm{I}_{m}/m)italic_ϵ ∈ caligraphic_N ( 0 , bold_italic_I start_POSTSUBSCRIPT italic_m end_POSTSUBSCRIPT / italic_m )sampled from the same distribution as the true item𝒘𝒘\\bm{w}bold_italic_w. A memorizing predictor knows the true items in the training distribution, computes the likelihood that the noisy query item comes from each true item, and accordingly computes a posterior-weighted average using the labels for each true item. Note that this predictor completely ignores the context, and hence was described as an ‘in-weights learning’ solution in previous works[24,28]. In contrast, the generalizing predictor implements a noisy copy operation. It estimates the likelihood that the query head and each item seen in context come from the same true item. Then, it predicts via a posterior-weighted average according to the labels of each item seen in context. Therefore, this predictor works for OOD settings containing novel items that were not previously seen during training.",
+                "position": 2589
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x14.png",
+                "caption": "Figure 14:Task Diversity Effects Across Balls & Urns Conditions.Red dashed line indicates the memorizing solutionM𝑀Mitalic_M, blue dashed line indicates the generalizing solutionG𝐺Gitalic_G, and black solid line indicates Transformer behavior at the end of training (100100100100K steps).",
+                "position": 2674
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x15.png",
+                "caption": "Figure 15:Task Diversity Effects Across Linear Regression Conditions.Red dashed line indicates the memorizing solutionM𝑀Mitalic_M, blue dashed line indicates the generalizing solutionG𝐺Gitalic_G, and black solid line indicates Transformer behavior at the end of training (100100100100K steps).",
+                "position": 2682
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x16.png",
+                "caption": "Figure 16:Task Diversity Effects Across Classification Conditions.Red dashed line indicates the memorizing solutionM𝑀Mitalic_M, blue dashed line indicates the generalizing solutionG𝐺Gitalic_G, and black solid line indicates Transformer behavior at the end of training (100100100100K steps). IWL evaluation presented.",
+                "position": 2690
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x17.png",
+                "caption": "Figure 17:Transience Across Balls & Urns Conditions.OOD performance presented. Blue Dashed line indicates OOD performance of generalizing solutionG𝐺Gitalic_G.",
+                "position": 2706
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x18.png",
+                "caption": "Figure 18:Transience Across Linear Regression Conditions.OOD performance presented. Blue Dashed line indicates OOD performance of generalizing solutionG𝐺Gitalic_G.",
+                "position": 2714
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x19.png",
+                "caption": "Figure 19:Transience Across Classification Conditions.OOD performance presented. Blue Dashed line indicates OOD performance of generalizing solutionG𝐺Gitalic_G. Note that in the case of classification, it is often the case that only one or two task diversity conditions show transient generalization, as can be seen more clearly from the absolute distance maps in the next section.",
+                "position": 2722
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x20.png",
+                "caption": "Figure 20:Absolute and Relative Distance from Predictors Across Balls & Urns Conditions.Distance from the generalizing solutionG𝐺Gitalic_Gshown in the dashed black line, while distance from the memorizing solutionM𝑀Mitalic_Mis shown in the solid line. KL indicates symmetrized KL divergence (average of forward and backward KL).",
+                "position": 2738
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x21.png",
+                "caption": "Figure 21:Absolute and Relative Distance from Predictors Across Linear Regression Conditions.Distance from the generalizing solutionG𝐺Gitalic_Gshown in the dashed black line, while distance from the memorizing solutionM𝑀Mitalic_Mis shown in the solid line.",
+                "position": 2746
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x22.png",
+                "caption": "Figure 22:Absolute and Relative Distance from Predictors Across Classification Conditions.Distance from the generalizing solutionG𝐺Gitalic_Gshown in the dashed black line, while distance from the memorizing solutionM𝑀Mitalic_Mis shown in the solid line. KL indicates symmetrized KL divergence (average of forward and backward KL).",
+                "position": 2754
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x23.png",
+                "caption": "Figure 23:Bayesian Model Predictions Across Balls & Urns Conditions.Red indicates closeness to memorizing predictorM𝑀Mitalic_M, while blue indicates closeness to generalizing predictorG𝐺Gitalic_G. Shown is a comparison between the posterior probability of the memorizing solutionM𝑀Mitalic_Mgiven by our Bayesian model (left) and the relative distance from the Transformer (top right), as well as heatmaps indicating similarity with Transformer next-token predictions (bottom right). Max color bar value is determined by the performance of a baseline predictor that always outputs the mean of the distribution𝒯truesubscript𝒯true\\mathcal{T}_{\\text{true}}caligraphic_T start_POSTSUBSCRIPT true end_POSTSUBSCRIPT.",
+                "position": 2770
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x24.png",
+                "caption": "Figure 24:Bayesian Model Predictions Across Balls & Urns Conditions with Varying MLP Expansion Factors.Red indicates closeness to memorizing predictorM𝑀Mitalic_M, while blue indicates closeness to generalizing predictorG𝐺Gitalic_G. Shown is a comparison between the posterior probability of the memorizing solutionM𝑀Mitalic_Mgiven by our Bayesian model (left) and the relative distance from the Transformer (top right), as well as heatmaps indicating similarity with Transformer next-token predictions (bottom right). Context length is 128, task dimensionality is 8, and hidden size is 64 in all conditions shown. MLP width is given by hidden size times MLP expansion factor. Max color bar value is determined by the performance of a baseline predictor that always outputs the mean of the distribution𝒯truesubscript𝒯true\\mathcal{T}_{\\text{true}}caligraphic_T start_POSTSUBSCRIPT true end_POSTSUBSCRIPT.",
+                "position": 2774
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x25.png",
+                "caption": "Figure 25:Bayesian Model Predictions Across Linear Regression Conditions.Red indicates closeness to memorizing predictorM𝑀Mitalic_M, while blue indicates closeness to generalizing predictorG𝐺Gitalic_G. Shown is a comparison between the posterior probability of the memorizing solutionM𝑀Mitalic_Mgiven by our Bayesian model (left) and the relative distance from the Transformer (top right), as well as heatmaps indicating similarity with Transformer next-token predictions (bottom right).",
+                "position": 2782
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x26.png",
+                "caption": "Figure 26:Bayesian Model Predictions Across Classification Conditions.Red indicates closeness to memorizing predictorM𝑀Mitalic_M, while blue indicates closeness to generalizing predictorG𝐺Gitalic_G. Shown is a comparison between the posterior probability of the memorizing solutionM𝑀Mitalic_Mgiven by our Bayesian model (left) and the relative distance from the Transformer (top right), as well as heatmaps indicating similarity with Transformer next-token predictions (bottom right). Max color bar value is determined by the performance of a baseline predictor that always outputs the mean of the distribution𝒯truesubscript𝒯true\\mathcal{T}_{\\text{true}}caligraphic_T start_POSTSUBSCRIPT true end_POSTSUBSCRIPT. The conditions where task dimensionality equals 16 in this setting (bottom row) reveal a limitation of our complexity measure: since the memorizing and generalizing predictors are very close in performance in low task diversities for these conditions, the loss term does not strongly bias the Transformer towards the memorizing predictor. However, the Transformer, is very close to the memorizing predictor for low task diversities, which would indicate according to our framework that memorizing few items is substantially simpler than implementing a copy operation. However, this is not captured by our complexity measure, since the compressed size of the code for the memorizing and generalizing predictors is roughly the same, thus we are unable to capture the bias toward the memorizing predictor in low task diversity settings. To overcome this, in these 3 conditions only, we heuristically multiply the bit size of the code for the generalizing predictor by5555, and with that fix, we find good performance (though as can be seen, the model still under-weights the memorizing solution for some low task diversity conditions).",
+                "position": 2790
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x27.png",
+                "caption": "Figure 27:Power laws over complexity measure and sample efficiency are necessarily for explaining ICL phenomenology.By ablating our functional form, we see that the free parametersα,β,γ𝛼𝛽𝛾\\alpha,\\beta,\\gammaitalic_α , italic_β , italic_γare required for the performance of the model. In particular, the simplicity bias derived fromK𝐾Kitalic_Kwithout aβ𝛽\\betaitalic_βterm is much too sharp and over-penalizes complexity compared to the Transformer. Additionally, memorization proceeds much too rapidly without theα𝛼\\alphaitalic_αterm, pointing toward the necessity of assuming sub-linear sample efficiency for capturing Transformer training dynamics.",
+                "position": 2803
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x28.png",
+                "caption": "Figure 28:Relative distance continues to rise throughout training, even after the task diversity threshold.The figure displays relative distance, as well as absolute distance from the memorizing and generalizing solutions, for the linear regression setting with context length of 32, MLP expansion factor of 4, and 8 dimensions.",
+                "position": 2814
+            },
+            {
+                "img": "https://arxiv.org/html/2506.17859/x29.png",
+                "caption": "Figure 29:Learning Rate Annealing Can Increase Adherence to Bayes-Optimal Trajectories.(a) Balls & Urns setting uses context length of 128, MLP width of 256, and 8 dimensions. Linear regression uses similar variables except a context length of 16. (b) Effect is highly sensitive to training conditions: e.g., Training in the Linear regression setting with5000500050005000warmup steps failed, but succeeds with500500500500warmup steps (the number used for the experiment in panel (a)).",
+                "position": 2825
+            }
+        ]
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    }
+]
