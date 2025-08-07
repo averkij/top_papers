@@ -1,0 +1,354 @@
+{
+    "paper_title": "LeanK: Learnable K Cache Channel Pruning for Efficient Decoding",
+    "authors": [
+        "Yike Zhang",
+        "Zhiyuan He",
+        "Huiqiang Jiang",
+        "Chengruidong Zhang",
+        "Yuqing Yang",
+        "Jianyong Wang",
+        "Lili Qiu"
+    ],
+    "sections": [
+        {
+            "title": "Abstract",
+            "content": "Large language models (LLMs) enable long-context tasks but face efficiency challenges due to the growing key-value (KV) cache. We propose LeanK, a learning-based method that prunes unimportant key (K) cache channels by leveraging static channel sparsity. With a novel two-stage training process, LeanK learns channel-wise static mask that could satisfy specific sparsity ratio and hardware alignment requirement. LeanK reduces GPU memory and accelerates decoding without sacrificing accuracy. Experiments demonstrate up to 70% K cache and 16%-18% V cache memory reduction. Custom decoding kernel enables 1.3x speedup for attention computation. We also provide insights into model channels and attention heads during long-context inference by analyzing the learned importance distribution. Our code is available at https://aka.ms/LeanK."
+        },
+        {
+            "title": "Start",
+            "content": "LeanK: Learnable Cache Channel Pruning for Efficient Decoding Yike Zhang1*, Zhiyuan He2, Huiqiang Jiang2, Chengruidong Zhang2, Yuqing Yang2, Jianyong Wang1, Lili Qiu2 1Tsinghua University, 2Microsoft Research zhangyik21@mails.tsinghua.edu.cn, zhiyuhe@microsoft.com 5 2 0 2 4 ] . [ 1 5 1 2 2 0 . 8 0 5 2 : r a"
+        },
+        {
+            "title": "Abstract",
+            "content": "Large language models (LLMs) enable longcontext tasks but face efficiency challenges due to the growing key-value (KV) cache. We propose LeanK, learning-based method that prunes unimportant key (K) cache channels by leveraging static channel sparsity. With novel two-stage training process, LeanK learns channel-wise static mask that could satisfy specific sparsity ratio and hardware alignment requirement. LeanK reduces GPU memory and accelerates decoding without sacrificing accuracy. Experiments demonstrate up to 70% cache and 16%-18% cache memory reduction. Custom decoding kernel enables 1.3x speedup for attention computation. We also provide insights into model channels and attention heads during long-context inference by analyzing the learned importance distribution. Our code is available at https://aka.ms/LeanK."
+        },
+        {
+            "title": "Introduction",
+            "content": "Large language models (LLMs) have advanced to support long-context tasks such as document understanding (Li et al., 2024a), multi-turn dialogues (Yi et al., 2024), repository-level code completion (Jimenez et al., 2024), and complex reasoning (Zhou et al., 2025). However, efficient inference under these long-context settings remains challenging due to the growing size of the key-value (KV) cache, which not only significantly increases GPU memory usage but also repeatedly stresses GPU memory bandwidth during token generation, leading to slower inference speeds (Zhang et al., 2023; Tang et al., 2024; Liu et al., 2024b). Existing efforts to optimize the KV cache include: (1) Eviction, which discards cache of less important tokens (Li et al., 2024b; Zhang et al., 2023) or cache in less important attention heads (Xiao et al., 2024b,a); (2) Selection, which retains the full KV cache but selectively reads relevant *Work during internship at Microsoft. entries during inference (Tang et al., 2024; Chen et al., 2024; Liu et al., 2024a); and (3) Quantization, which compresses the KV cache using compressed data types (Liu et al., 2024b). Despite the effectiveness of these methods, they typically assume that all channels in the key (K) cache are equally necessary when the final attention score is calculated, which limits their efficiency optimization potential. We identify unique and largely underexplored opportunity for optimizing the cache by leveraging the sparsity in its channel dimension. Specifically, we observe: (1) Previous studies suggest that RoPE influences the feature encoded in each dimension of (Barbero et al., 2025). Dimensions associated with high frequencies tend to be less stable for text retrieval, revealing potential opportunity for pruning . (2) Besides, we find that the importance of cache channels tends to be static and can be determined offline. This static sparsity can offer consistent speedups during online inference. (3) channel sparsity is orthogonal to existing approaches, and can be combined with them for further acceleration. Based on our observation, we propose LeanK, learning-based method for pruning the channel dimension of the cache to enable efficient longcontext decoding. LeanK learns static sparsity through double-stage process. In the first stage, it estimates the global importance of each channel. In the second stage, it learns sparse channel mask that adheres to target sparsity ratio and is optimized for hardware efficiency. At inference time, LeanK prunes the cache channels based on the learned static sparsity, significantly reducing GPU memory usage and improving decoding speed. We conduct extensive experiments on two recent long-context LLMs, Llama-3.1-8B-Instruct (Grattafiori et al., 2024) and Qwen2.5-7B-Instruct (Qwen et al., 2025), across three different benchmarks. Results show that LeanK enables approximately 70% GPU memory reduction in cache Figure 1: Left and Middle: channel sparsity remains static across different RULER tasks and sequence lengths. Right: There exist channels with relatively large norm but has limited impact on end-to-end performance. and 16%18% memory reduction in cache size. Custom decoding kernel enables 1.3x speedup for attention computation while preserving model accuracy. Moreover, LeanK is highly compatible with existing KV cache optimization techniques. When combined with quantization methods such as KIVI (Liu et al., 2024b), LeanK improves the overall KV cache compression ratio from 5.3 to 9.7, substantially alleviating memory bottlenecks in long-context inference. Furthermore, we analyze the learned channel-wise importance distribution of cache and gained insights into models behavior related to RoPE."
+        },
+        {
+            "title": "2 Motivation",
+            "content": "The motivation of our method is based on the following three observations."
+        },
+        {
+            "title": "2.1 The use of RoPE introduces channel",
+            "content": "inefficiency in K. In modern LLMs, RoPE is applied to both and in Transformer attention. RoPE encodes positional information by assigning each pair of dimensions specific frequency. However, recent studies show that high-frequency dimensions tend to be unstable and contribute little to long-context inference (Hong et al., 2024; Barbero et al., 2024). These findings indicate that many channels are underutilized during long-context inference, presenting an opportunity for effective pruning."
+        },
+        {
+            "title": "2.2 Sparsity in K channels tends to be static.",
+            "content": "We assess the staticity of important channels by computing Pearson correlation coefficient (Sedgwick, 2012) between channel norm distribution of different input sequences.1 As shown in Figure 1, channel norm distribution on Llama-3.18B-Instruct exhibits consistently high Pearson cor1Detailed methods of computing channel norm distribution is provided in Appendix A, which roughly assesses each channels importance through its norm. relation coefficients across five diverse RULER tasks (Hsieh et al., 2024) and multiple sequence lengths, suggesting an inherent staticity in channel importance. In contrast, ThinK (Xu et al., 2025) assumes dynamic sparsity in channels, estimating each channels importance dynamically via QwindowKT during inference, where Qwindow corresponds to several recent context tokens. Instead, we test simpler static, norm-based pruning approach. We derive static pruning mask based on the average norm of each channel across 100 input sequences from RULER 64K NIAH_multikey3 task, and apply this mask universally across all tasks. Results in Table 1 show that the static method achieves comparable performance to ThinK."
+        },
+        {
+            "title": "Original",
+            "content": "Llama-3.1-8B-Instruct ThinK (Dynamic norm)"
+        },
+        {
+            "title": "Pruning Ratio Acc",
+            "content": "- 60% 60% 84.38 80.56 81.57 Table 1: RULER 64K performance of static norm-based pattern and dynamic norm-based method (ThinK). Detailed results and analysis are in Appendix I."
+        },
+        {
+            "title": "2.3 Some channels exhibit large magnitudes",
+            "content": "but limited impact. Furthermore, We conduct experiments by removing subsequent groups of every 4 channels from Llama-3.1-8B-Instruct model and evaluate the resulting performance degradation on RULER 64K NIAH_multikey3 task. Relationship between average norm of each group and corresponding performance drop is presented in Figure 1. There exist channels with large norm but have little impact on model performance (marked by the blue circle). Relying solely on magnitude to decide channel importance may overlook the heterogeneity between different decoder layers and attention heads and miss some pruning opportunities. Figure 2: Overall demonstration of LeanKs double-stage training and deployment method."
+        },
+        {
+            "title": "3 Method",
+            "content": "For Xans, we scale the attention logit as: Based on our observations, we present LeanK, learning-based method that exploits channel sparsity in cache to accelerate long-context decoding. Our goal is to learn binary mask for pruning channels according to predefined pruning ratio, using double-stage process. In the first stage, we learn continuous scaling factor representing the global importance of each channel. In the second stage, we convert the learned scaling factor into binary mask suitable for deployment."
+        },
+        {
+            "title": "3.1 Training stage 1",
+            "content": "Consider transformer model with layers, where each layer has either Multi-Head Attention (MHA) or Grouped Query Attention (GQA) containing heads (or groups), each with dimension of d. We introduce scaling factor α RLnd, initialized with all elements set to 1. The value of α represents the global importance score of each channel and will be learned in the first stage. Suppose the input sequences for learning are represented as = [Xctx; Xans], where the semicolon denotes concatenation. Each sequence consists of context tokens Xctx and answer tokens Xans. Since the decoding phase is the primary focus of our work, the training loss is computed only based on the answer part. Initially, standard full attention is applied, from which we obtain the hidden states corresponding to the answer tokens from the last layer, denoted by Hfull RNansnd, where Nans is the number of answer tokens. Then, we apply specialized scaled attention based on α. As shown in Figure 2, the attention corresponding to Xctx in each head is still full attention, formulated as: Actx = softmax(QctxKT ctx Mcausal)V Lans = QansKT Ms+l + Qans(Kdiag(αi,j))T Mmid (1) where Ms+l is binary mask preserving only the sink and sliding window attention, while Mmid preserves only the middle attention region (excluding sink and sliding windows), as illustrated in Figure 2. The scaling factor αi,j Rd corresponds to layer i, head j, and scales each channel dimension of the key matrix RN (N denotes the number of input tokens), producing diag(αi,j). Due to masks Ms+l and Mmid, scaling affects only the middle-region attention logits, keeping the sink and sliding window attention intact, as they are more critical and consume constant GPU memory regardless of sequence length (Xiao et al., 2024b). In contrast, the middle attention grows with the number of tokens, making it the primary target for pruning. Then, the scaled attention logits for the answer tokens are computed as: Aans = softmax(Lans Mcausal)V In each attention head, the attention maps for context and answer tokens are concatenated as = [Actx; Aans]. We obtain the hidden states from the final layer corresponding to the answer tokens, denoted as Hscaled RNansnd. The training loss for the first stage is defined as: L1st = Hfull Hscaled2 2 + λ α1 , where the first term is an L2 distillation loss that encourages the scaled hidden states to remain close to the full ones, and the second term is an L1 regularization that promotes sparsity in the learned scaling factors α. The coefficient λ controls the trade-off between performance preservation and sparsity. Figure 3: Visualization of the training objectives of the two training stages. We train our model on two passkey retrieval tasks: (1) Dense retrieval, where Xctx consists of key-value pairs and the goal is to retrieve the value for given key as Xans; and (2) Multi-value retrieval, where Xctx includes distraction text and keys with multiple values, and the task is to retrieve all values for given key. All keys and values are randomly generated. We select these tasks because the first is challenging and thus effective for preserving the models retrieval capabilities, while the second task involves generating relatively long answers, potentially improving the models long-term generation performance."
+        },
+        {
+            "title": "3.2 Training stage 2\nThe scaling factor α ∈ RL×n×d learned in the first\nstage encodes the importance of each channel. Our\nnext goal is to derive a channel-wise binary mask\nβ ∈ {0, 1}L×n×d that could directly be used for\npruning, where βi,j,k = 0 indicates that the k-th\nchannel of the K cache in layer i and head j should\nbe pruned. We require such a binary mask to sat-\nisfy two requirements: (R1) The desired pruning\nratio s% should be specified before deployment,\nand (R2) The mask should be GPU-friendly, i.e.,\nthe number of remained channels for each head\nshould satisfy the alignment requirement for effi-\ncient memory loading and computation (e.g. be a\nmultiply of r = 16 or 32).",
+            "content": "Training stage 1 does not take these two requirements into consideration, bringing up the necessity of second training stage. In the second training stage we optimize binary mask β generated by: β = Tops%,r(α), where Tops%,r() is two-step operator. First, Tops%(α) selects the top s% most important channels across all heads. Then, for each layer and head j, let ni,j be the number of channels initially selected. We round ni,j to the nearest multiple (cid:7) r, and keep the i,j = (cid:4) ni,j of r, denoted by i,j entries from αi,j to form the final mask: top βi,j = Topn (αi,j). i,j The scaled attention in the second stage is applied similarly as in the first stage, but with α replaced by the binary mask β in Equation 1. Since the purpose of this stage is not to induce additional sparsity but to preserve model performance under pruning, the training objective only includes the distillation loss that aligns the model performance: L2nd = Hfull Hscaled2 2 . Figure 3 illustrates the roles of the scaling factor α and binary mask β in the double-stage training process. Both stages are crucial for learning an effective pruning mask. Directly applying Top-K to α results in suboptimal performance as validated in Appendix (relying on test-time to decide pruning ratio misaligns with R1), and might be unfavorable for GPU efficiency (violates R2). Conversely, skipping stage 1 and directly optimizing binary mask is difficult, especially at high pruning ratios. In practice, we observe that such training approach often fails to converge."
+        },
+        {
+            "title": "3.3 Deployment",
+            "content": "During deployment, after the prefilling stage, the key cache is pruned and partitioned into two parts, = [Ks+l; Kprun], where Ks+l includes the full cache for attention sink and local windows, and Kprun is the cache pruned based on the binary mask β. As illustrated in Figure 2, during decoding, the oldest key vector in the local window is taken from Ks+l, pruned using β, and appended to Kprun; the key of the newly generated token is then appended to Ks+l. To reduce overhead, we perform this update every 32 tokens instead of every step. Attention computation at each decoding step is: = softmax(qKT s+l + qprunKT prun)V , where qprun represents the query vector pruned in each attention head according to β. Notably, some attention heads have all channels pruned, making Kprun and its associated value cache unnecessary. For these heads, the attention calculation simplifies to: and 0.04/0.02 for Qwen. We set λ = 0.06 for both models, use local window size of 1024, an attention sink size of 128, and optimize scaling factors using the Adam optimizer (Kingma and Ba, 2017). = softmax(qKT s+l)Vs+l, where Vs+l corresponds exclusively to the sink and local window tokens, allowing additional memory savings in the cache."
+        },
+        {
+            "title": "4.1 Settings",
+            "content": "LLMs. We experiment with two recent and widelyused LLMs, Llama-3.1-8B-Instruct (Grattafiori et al., 2024) and Qwen2.5-7B-Instruct (Qwen et al., 2025), both supporting 128K context window. Baselines. We mainly compare with ThinK (Xu et al., 2025), which uses dynamic, query-driven strategy to prune unimportant channels in each attention head. It estimates channel importance via querykey multiplication at the end of prefilling. To our knowledge, it is the only method targeting pruning along the channel dimension as we do. We also compare our channel selection method with Double Sparsity (Yang et al., 2024), with results discussed in Appendix B. Benchmarks. We evaluate our method on three long-context benchmarks: (1) LongBench (Bai et al., 2024), realistic and diverse benchmark where we evaluate on all tasks, including QA, fewshot learning, code generation, summarization, and counting; (2) RULER (Hsieh et al., 2024), challenging benchmark with tasks such as hay-in-thestack, KV retrieval, variable tracking, and QA, evaluated at input lengths from 4K to 128K with 200 samples per task; (3) GSM-Infinite (Zhou et al., 2025), benchmark designed to assess mathematical reasoning under long-generation settings, where we evaluate on Medium and Hard tasks with context lengths of 8K, 16K and 32K. Implementation Details. We apply the training method to Llama-3.1-8B-Instruct and Qwen2.5-7BInstruct. Since Qwen2.5 adopts Yarn (Peng et al., 2023) for context lengths beyond 32K, we train separate pruning masks for 32K and >32K contexts. Training token lengths are uniformly sampled from 16K96K for Llama, 4K32K for original Qwen, and 64K96K for Qwen with Yarn. The doublestage training consists of 2000 steps in the first stage and 200 steps in the second, with the latter using half the learning rate for stability. Specifically, we use learning rates of 0.02/0.01 for Llama Methods Llama-3.1-8B 95.1 93.1 90.2 86.0 84.4 ThinK, 60% 89.5 81.7 79.7 81.8 80.6 ThinK, 70% 58.3 39.2 37.5 36.4 35.3 LeanK, 70% 95.3 93.4 88.8 85.8 84.1 Qwen2.5-7B 94.1 91.7 90.8 89.1 80.7 ThinK, 70% 86.7 80.6 80.5 81.7 67.1 LeanK, 70% 93.6 89.8 90.6 88.5 78.0 4K 8K 16K 32K 64K 128K Avg. 87.1 80.5 41.1 86.8 85.0 62.8 84.2 73.5 69.8 40.0 73.2 63.6 60.4 64.5 Table 3: Performance of different methods and models on RULER. Detailed results are in Appendix G."
+        },
+        {
+            "title": "4.2 Effectiveness of LeanK",
+            "content": "Table 2, Table 3 and Table 4 present performance results on three benchmarks, respectively. LeanKs effectiveness is demonstrated in four aspects: High Compression Ratio with Minimal Performance Loss. Results show that LeanK maintains near-lossless performance under 70% compression ratio, while ThinK experiences significant degradation. On RULER, ThinK at 70% pruning ratio shows performance drops of 52.8% on Llama and 26.1% on Qwen; even at 60% pruning, ThinK still suffers an 8.0% drop on Llama. In contrast, LeanK only shows minimal drops of 0.3% and 0.1% on the two models under the same 70% compression setting. On LongBench, ThinK drops by 5.7% and 4.8% under 70% compression, while LeanK maintains strong performance with only 0.4% and 3.1% degradation. Strong Staticity in Channels. On RULER evaluation tasks, which features diverse input lengths ranging from 4K to 128K, LeanK demonstrates consistently strong performance using the learned static channel patterns. This indicates that the importance of cache channels in pretrained LLMs exhibits largely static nature."
+        },
+        {
+            "title": "Methods",
+            "content": "8K 16K 32K 8K 16K 32K Avg. Llama-3.1-8B 0.56 0.35 0.30 1.07 0.65 0.46 ThinK, 70% 0.26 0.17 0.15 0.28 0.14 0.12 LeanK, 70% 0.70 0.49 0.40 1.14 0.65 0.50 Qwen2.5-7B 1.08 0.92 1.06 1.01 0.93 0.88 ThinK, 70% 0.96 0.75 0.75 0.76 0.69 0.64 LeanK, 70% 1.06 0.86 0.76 1.03 0.85 0.74 0.56 0.19 0.65 0.98 0.76 0.88 Table 4: Performance of different methods and models on GSM-Infinite. For each subset, we calculate AUC score for op=2,4,6,8,10,12 with 256 samples for each op. Detailed results are in Appendix H. Avg. 2Wiki Methods Llama-3.1-8B-Instruct 52.4 48.5 51.5 48.1 ThinK 60% 49.4 47.1 ThinK 70% 52.2 48.3 LeanK 70% Qwen2.5-7B-Instruct 51.7 47.1 49.2 44.9 ThinK 70% 50.1 46.7 LeanK 70%"
+        },
+        {
+            "title": "MNews",
+            "content": "MF-en"
+        },
+        {
+            "title": "QMSum",
+            "content": "34.5 30.3 27.0 33.3 31.8 28.7 30.7 58.1 57.9 56.9 58.1 57.7 54.2 57.7 63.4 63.1 62.7 63.2 60.6 59.8 59.1 27.1 25.3 25.9 26.5 23.9 23.1 23.9 56.6 57.6 50.5 56.3 52.6 49.9 52.1 9.3 9.9 9.3 9.6 8.5 8.5 9. 99.5 99.5 99.5 99.5 100.0 99.0 100.0 44.7 44.9 35.9 46.5 43.6 37.2 42.1 56.7 55.5 54.9 57.0 66.8 64.5 65.8 43.8 41.1 42.2 42.7 46.2 44.0 43.9 73.0 72.0 65.0 73.0 71.5 65.5 71.5 91.7 90.1 90.5 92.1 89.3 87.5 87. 27.1 25.2 23.7 25.1 23.8 22.7 22.8 Table 2: Performance of different methods and models on LongBench. Figure 4: Comparison of performance on RULER 64K under different pruning ratios. Strong Generalizability. As illustrated in Table 4, LeanKs learned channel patterns generalize effectively to long-generation reasoning tasks, which are typically sensitive to compression (Li et al., 2025). Under 70% pruning ratio, ThinK suffers performance drops of 67% on Llama and 20% on Qwen. LeanK outperforms ThinK on both models, and even improves the performance of Llama by 13%. Given the growing importance of reasoning tasks, LeanK offers promising approach to enhancing efficiency of model inference. Resilience Under Extreme Sparsity. Furthermore, we applied our method to Llama-3.1-8B-Instruct model across varying compression ratios and tested performance on RULER 64K tasks. As illustrated in Figure 4, LeanK consistently surpasses ThinK under diverse pruning ratios, while also maintaining higher performance under aggressive pruning settings."
+        },
+        {
+            "title": "4.3 Efficiency of LeanK",
+            "content": "Kernel Design. We implement custom decoding kernel to accelerate attention computation using TileLang (Wang et al., 2025). After loading the model weights, we group attention heads in each layer based on their remained channel count, and reorder the Q, K, V, projection weights accordingly. For each group, we store separate pruned cache, along with the full cache for sink and local tokens. At each decoding step, fused decoding kernel is launched, which directly reads from the grouped cache, performs FlashAttention, and outputs the final attention results. By reading significantly fewer channels, the kernel reduces memory bandwidth usage and accelerates decoding. This approach achieves 1.3 and 1.6 average speedup in attention computation on Llama-3.1-8BInstruct and Qwen2.5-7B-Instruct, respectively, as shown in Figure 5 and Figure 10. GPU Memory Reduction. Under 70% pruning ratio, LeanK achieves approximately 70% GPU memory reduction in the cache for long-context inputs. Moreover, when all channels of heads cache are pruned, the corresponding cache can also be safely removed (3.3). This occurs in approximately 18% heads in Llama-3.1-8B-Instruct and 16% in Qwen2.5-7B-Instruct. We evaluate the memory reduction on single 80GB A100 GPU with an input length of 4096 and an output length of 1024. As shown in Figure 6, LeanK enables 20% larger batch size and saves approximately 10GB of memory when the batch size is 64. Figure 5: Kernel execution time of each layer on Llama3.1-8B-Instruct. LeanK uses 70% pruning ratio. Both Baseline and LeanK use Tilelang implementation."
+        },
+        {
+            "title": "Acc",
+            "content": "Original DuoAttn DuoAttn + LeanK - 50% 80% 84.38 83.94 83."
+        },
+        {
+            "title": "Acc",
+            "content": "Original Quest Quest + LeanK - - 70% 84.38 72.41 75.14 Original KIVI KIVI + LeanK - - 70% 86.03 84.67 84. Table 5: LeanK on top of DuoAttn. Performance on RULER 64K. Table 6: LeanK on top of Quest. Performance on RULER 64K. Table 7: LeanK on top of KIVI. Performance on RULER 32K. Increased End-to-end Throughput. Combining our efficient decoding kernel, enlarged batch size and more efficient KV cache management strategy, LeanK achieves 1.2 increase in end-to-end throughput on Llama-3.1-8B-Instruct, as shown in Table 8 2."
+        },
+        {
+            "title": "Baseline\nLeanK",
+            "content": "52 64 128 128 47.27 47.62 141 tokens/s 172 tokens/s Table 8: End-to-end generation time and throughput. Tested with Huggingface transformers framework, with input sequence length 4096."
+        },
+        {
+            "title": "4.4 Orthogonality with Other Methods",
+            "content": "We emphasize that channel sparsity is orthogonal to existing approaches. LeanK can be combined with other KV cache optimization methods for further acceleration, especially in resourceconstrained environments. DuoAttention. DuoAttention (Xiao et al., 2024a) is KV cache eviction method that categorizes heads into Streaming heads and Retrieval heads, evicting the KV cache of the former. LeanK can be applied to the remaining Retrieval Heads, boosting KV cache memory reduction from 50% to 65%, without performance degradation  (Table 5)  . Quest: Quest (Tang et al., 2024) is KV cache selective reading method that identifies and loads only critical pages during decoding. LeanK can be applied to both the critical page selection and loading phases, reducing memory reads by 70% and improving model accuracy  (Table 6)  . KIVI: KIVI (Liu et al., 2024b) is KV cache quantization method. LeanK can be applied beforehand to prune unimportant KV entries, and then KIVI quantizes remaining cache. This combination improves compression ratio from 5.3 to 9.7, using 2-bit quantization for both and  (Table 7)  3. 2Huggingface Baseline uses batch size of 52 since larger batch sizes would lead to OOM. 3When our method is not applied and only KIVI is used, we encounter an OOM issue with the official implementation at 64K input length, so we conduct experiments at 32K instead."
+        },
+        {
+            "title": "4.5 Ablation Study",
+            "content": "LeanK involves two design decisions for pruning cache channels: (1) employing learned pruning mask rather than relying on norm-based selection, and (2) allocating pruning budgets globally across all heads, resulting in varying numbers of retained channels per head. In contrast, ThinK utilizes uniform budget across heads and dynamic, norm-based mask. To clearly assess these design choices, we apply LeanKs per-head learned budget but replace its learned mask with the dynamic norm-based mask, with results presented in Table 9. We observe the per-head budget alone significantly boosts accuracy from 35.29 to 76.59, underscoring the advantage of adaptive budget allocation across heads. Furthermore, replacing the dynamic norm-based mask with LeanKs learned mask further boosts accuracy to 84.10, demonstrating the effectiveness of the learned sparsity."
+        },
+        {
+            "title": "Method",
+            "content": "Original Uniform Budget, Dynamic Mask (ThinK) Per-head Budget, Dynamic Mask Per-head Budget, Learned Mask (LeanK)"
+        },
+        {
+            "title": "Ratio Acc",
+            "content": "- 84.38 70% 35.29 70% 76.59 70% 84.10 Table 9: Evaluation results on Llama-3.1-8B-Instruct, with accuracy measured on RULER 64K."
+        },
+        {
+            "title": "5 Analysis",
+            "content": "In this section, we analyze the learned channel importance distribution to gain deeper insight into models behavior."
+        },
+        {
+            "title": "5.1 Frequency and Channel Importance",
+            "content": "RoPE assigns specific frequencies to every pair of channels in the matrix. We introduce the term \"channel pair index\" to indicate each pair of channels, where smaller indices correspond to higher frequencies and larger indices to lower frequencies. Both Llama-3.1-8B-Instruct and Qwen2.57B-Instruct contain 64 channel pairs per head. Figures 7 and 9 illustrate the retained ratio of channels relative to their channel pair indices. We have two observations: (1) Channel pairs with lower frequencies generally exhibit higher Figure 6: Batch Size and Memory. LeanK enables 20% larger batch size, saving 10GB memory. Figure 7: Channel Pair Index and Remained Channel Ratio on Llama3.1-8B-Instruct. Figure 8: Converting heads with highest or lowest whf values into streaming heads and performance. importance, aligning with previous research indicating that semantic information crucial for longcontext understanding is encoded mainly in lowfrequency channels (Barbero et al., 2025). Our pruning method retains significantly fewer highfrequency channels than dynamic norm-based methods . (2) However, exceptions exist channel pair 22 in Llama and channel pair 31 in Qwen, despite being high-frequency, show considerable importance. further investigation into their specific functions remains for future work."
+        },
+        {
+            "title": "5.2 High Frequency Ratio of Each Head",
+            "content": "Inspired by Retrieval Heads identification methods such as Wu et al. (2024) and the RoPE frequency analysis in Section 5.1, we want to investigate the relationship between retrieval ability of different heads and the ratio of their high frequency components whf, defined as: whf = q[:high]KT [:high]2 qKT 2 where q[:high] and K[:high] represent the higherfrequency half of channel dimensions.4 Since high frequency channels mainly contain less informative noises, heads with higher whf are more likely to be influenced by such noises and might be less crucial for capturing semantic information. We compute whf using single input sequence from RULER NIAH_multikey3 task for Llama-3.1-8B-Instruct, and examine the importance of heads with different whf values through head pruning. We convert heads with highest or lowest whf into streaming heads and evaluate performance on NIAH_multikey3 task. For comparison, we randomly select the same number of heads to convert and report average performance over four trials. Results in Figure 8 suggest that heads with low whf 4We use half (high=32) as the boundary between high and low frequency components for simplicity. are crucial for long-context understanding while heads with high whf could be pruned with minimal impact. Results in Appendix show that it also generalizes well on other tasks. This opens the opportunity of effective, training-free head pruning strategy with minimal calibration cost."
+        },
+        {
+            "title": "6 Related Works",
+            "content": "KV Cache Optimization. Large KV caches in long-context LLMs lead to significant GPU memory overhead and increasing output latency. To mitigate this, various optimization methods have been proposed. Eviction-based methods discard KV entries of less important tokens, such as H2O (Zhang et al., 2023) and SnapKV (Li et al., 2024b), which rely on attention scores, or DuoAttention (Xiao et al., 2024a), which prunes KV cache at the head level. Selection-based methods like SparQ (Ribar et al., 2023), Quest (Tang et al., 2024), and Double Sparsity (Yang et al., 2024) retain the full KV cache in memory but selectively read relevant entries to reduce memory bandwidth usage. Quantization methods such as KIVI (Liu et al., 2024b) compress KV caches by reducing numerical precision. Our method is orthogonal to these eviction, selection, and quantization approaches and can be combined with them for further gains (see 4.4). Structured Pruning. Traditional structured pruning methods for LLMs target hidden states (Ma et al., 2023), layers (Gromov et al., 2024), and expert components (Lu et al., 2024), but they are limited to small task ranges and often suffer from poor performance. Other pruning methods primarily target weights and activations (Frantar and Alistarh, 2023; Sun et al., 2024). In contrast, our approach focuses on pruning the KV cache and attention computations, incorporating the unstructured attention sink and local window mechanism into algorithm design, which serves as valuable complement to existing weight pruning methods for LLMs."
+        },
+        {
+            "title": "7 Conclusion",
+            "content": "We propose LeanK, learning-based method for pruning the channel dimension of cache to enable efficient LLM decoding. LeanK employs doublestage optimization process to learn static pruning mask. Experiments demonstrate that LeanK reduces GPU memory usage by up to 70% for the cache and 16%18% for the cache, achieving 1.45 speedup during inference, while preserving model accuracy."
+        },
+        {
+            "title": "Limitations",
+            "content": "We observe significant redundancy along the channel dimension of pretrained LLMs. Improving positional embeddings and conducting more thorough pretraining over this dimension may enhance the models long-context processing ability and reduce memory consumption. We leave this exploration for future work."
+        },
+        {
+            "title": "References",
+            "content": "Yushi Bai, Xin Lv, Jiajie Zhang, Hongchang Lyu, Jiankai Tang, Zhidian Huang, Zhengxiao Du, Xiao Liu, Aohan Zeng, Lei Hou, Yuxiao Dong, Jie Tang, and Juanzi Li. 2024. Longbench: bilingual, multitask benchmark for long context understanding. Preprint, arXiv:2308.14508. Christos Federico Barbero, Alex Vitvitskyi, Perivolaropoulos, Razvan Pascanu, and Petar Veliˇckovic. 2024. Round and round we go! what makes rotary positional encodings useful? arXiv preprint arXiv:2410.06205. Federico Barbero, Alex Vitvitskyi, Christos and Petar Perivolaropoulos, Razvan Pascanu, Veliˇckovic. 2025. Round and round we go! what makes rotary positional encodings useful? Preprint, arXiv:2410.06205. Zhuoming Chen, Ranajoy Sadhukhan, Zihao Ye, Yang Zhou, Jianyu Zhang, Niklas Nolte, Yuandong Tian, Matthijs Douze, Leon Bottou, Zhihao Jia, and Beidi Chen. 2024. Magicpig: Lsh sampling for efficient llm generation. Preprint, arXiv:2410.16179. Elias Frantar and Dan Alistarh. 2023. Sparsegpt: Massive language models can be accurately pruned in one-shot. Preprint, arXiv:2301.00774. Aaron Grattafiori, Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, Abhishek Kadian, Ahmad AlDahle, Aiesha Letman, Akhil Mathur, Alan Schelten, Alex Vaughan, Amy Yang, Angela Fan, Anirudh Goyal, Anthony Hartshorn, Aobo Yang, Archi Mitra, Archie Sravankumar, Artem Korenev, Arthur Hinsvark, and 542 others. 2024. The llama 3 herd of models. Preprint, arXiv:2407.21783. Andrey Gromov, Kushal Tirumala, Hassan Shapourian, Paolo Glorioso, and Daniel Roberts. 2024. The unreasonable ineffectiveness of the deeper layers. URL https://arxiv. org/abs/2403.17887. Xiangyu Hong, Che Jiang, Biqing Qi, Fandong Meng, Mo Yu, Bowen Zhou, and Jie Zhou. 2024. On the token distance modeling ability of higher RoPE attention dimension. In Findings of the Association for Computational Linguistics: EMNLP 2024, pages 58775888, Miami, Florida, USA. Association for Computational Linguistics. Cheng-Ping Hsieh, Simeng Sun, Samuel Kriman, Shantanu Acharya, Dima Rekesh, Fei Jia, Yang Zhang, and Boris Ginsburg. 2024. Ruler: Whats the real context size of your long-context language models? Preprint, arXiv:2404.06654. Carlos Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, and Karthik Narasimhan. 2024. SWE-bench: Can language models resolve real-world github issues? In The Twelfth International Conference on Learning Representations. Diederik P. Kingma and Jimmy Ba. 2017. Adam: method for stochastic optimization. Preprint, arXiv:1412.6980. Jiaqi Li, Mengmeng Wang, Zilong Zheng, and Muhan Zhang. 2024a. LooGLE: Can long-context language models understand long contexts? In Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 1630416333, Bangkok, Thailand. Association for Computational Linguistics. Yuhong Li, Yingbing Huang, Bowen Yang, Bharat Venkitesh, Acyr Locatelli, Hanchen Ye, Tianle Cai, Patrick Lewis, and Deming Chen. 2024b. Snapkv: Llm knows what you are looking for before generation. Advances in Neural Information Processing Systems, 37:2294722970. Zhen Li, Yupeng Su, Runming Yang, Congkai Xie, Zheng Wang, Zhongwei Xie, Ngai Wong, and Hongxia Yang. 2025. Quantization meets reasoning: Exploring llm low-bit quantization degradation for mathematical reasoning. arXiv preprint arXiv:2501.03035. Di Liu, Meng Chen, Baotong Lu, Huiqiang Jiang, Zhenhua Han, Qianxi Zhang, Qi Chen, Chengruidong Zhang, Bailu Ding, Kai Zhang, Chen Chen, Fan Yang, Yuqing Yang, and Lili Qiu. 2024a. Retrievalattention: Accelerating long-context llm inference via vector retrieval. Preprint, arXiv:2409.10516. Zirui Liu, Jiayi Yuan, Hongye Jin, Shaochen Zhong, Zhaozhuo Xu, Vladimir Braverman, Beidi Chen, and Xia Hu. 2024b. Kivi: tuning-free asymmetric 2bit quantization for kv cache. arXiv preprint arXiv:2402.02750. Shuo Yang, Ying Sheng, Joseph E. Gonzalez, Ion Stoica, and Lianmin Zheng. 2024. Post-training sparse attention with double sparsity. Preprint, arXiv:2408.07092. Zihao Yi, Jiarui Ouyang, Yuwen Liu, Tianhao Liao, Zhe Xu, and Ying Shen. 2024. survey on recent advances in llm-based multi-turn dialogue systems. arXiv preprint arXiv:2402.18013. Zhenyu Zhang, Ying Sheng, Tianyi Zhou, Tianlong Chen, Lianmin Zheng, Ruisi Cai, Zhao Song, Yuandong Tian, Christopher Ré, Clark Barrett, and 1 others. 2023. H2o: Heavy-hitter oracle for efficient generative inference of large language models. Advances in Neural Information Processing Systems, 36:3466134710. Yang Zhou, Hongyi Liu, Zhuoming Chen, Yuandong Tian, and Beidi Chen. 2025. Gsm-infinite: How do your llms behave over infinitely increasing context length and reasoning complexity? Preprint, arXiv:2502.05252. Xudong Lu, Qi Liu, Yuhui Xu, Aojun Zhou, Siyuan Huang, Bo Zhang, Junchi Yan, and Hongsheng Li. 2024. Not all experts are equal: Efficient expert pruning and skipping for mixture-of-experts large language models. arXiv preprint arXiv:2402.14800. Xinyin Ma, Gongfan Fang, and Xinchao Wang. 2023. Llm-pruner: On the structural pruning of large language models. Advances in neural information processing systems, 36:2170221720. Bowen Peng, Jeffrey Quesnelle, Honglu Fan, and Enrico Shippole. 2023. Yarn: Efficient context window extension of large language models. arXiv preprint arXiv:2309.00071. Qwen, :, An Yang, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chengyuan Li, Dayiheng Liu, Fei Huang, Haoran Wei, Huan Lin, Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Yang, Jiaxi Yang, Jingren Zhou, and 25 others. 2025. Qwen2.5 technical report. Preprint, arXiv:2412.15115. Luka Ribar, Ivan Chelombiev, Luke Hudlass-Galley, Charlie Blake, Carlo Luschi, and Douglas Orr. 2023. Sparq attention: Bandwidth-efficient llm inference. arXiv preprint arXiv:2312.04985. Philip Sedgwick. 2012. Pearsons correlation coefficient. Bmj, 345. Mingjie Sun, Zhuang Liu, Anna Bair, and J. Zico Kolter. 2024. simple and effective pruning approach for large language models. Preprint, arXiv:2306.11695. Jiaming Tang, Yilong Zhao, Kan Zhu, Guangxuan Xiao, Baris Kasikci, and Song Han. 2024. Quest: Queryaware sparsity for efficient long-context llm inference. Preprint, arXiv:2406.10774. Lei Wang, Yu Cheng, Yining Shi, Zhengju Tang, Zhiwen Mo, Wenhao Xie, Lingxiao Ma, Yuqing Xia, Jilong Xue, Fan Yang, and 1 others. 2025. Tilelang: composable tiled programming model for ai systems. arXiv preprint arXiv:2504.17577. Wenhao Wu, Yizhong Wang, Guangxuan Xiao, Hao Peng, and Yao Fu. 2024. Retrieval head mechanistically explains long-context factuality. arXiv preprint arXiv:2404.15574. Guangxuan Xiao, Jiaming Tang, Jingwei Zuo, Junxian Guo, Shang Yang, Haotian Tang, Yao Fu, and Song Han. 2024a. Duoattention: Efficient longcontext llm inference with retrieval and streaming heads. Preprint, arXiv:2410.10819. Guangxuan Xiao, Yuandong Tian, Beidi Chen, Song Han, and Mike Lewis. 2024b. Efficient streaming language models with attention sinks. Preprint, arXiv:2309.17453. Yuhui Xu, Zhanming Jie, Hanze Dong, Lei Wang, Xudong Lu, Aojun Zhou, Amrita Saha, Caiming Xiong, and Doyen Sahoo. 2025. Think: Thinner key cache by query-driven pruning. Preprint, arXiv:2407.21018."
+        },
+        {
+            "title": "A Quantifying K Channel Staticity",
+            "content": "We aim to quantify the staticity of channels across various tasks and input lengths. For specific channel within an attention head, given an input sample, we measure the following norm ratio: ri = Q[i]KT [i]2 QKT 2 , where represents the query matrix corresponding to an observation window located at the last part of the input, is the complete key matrix, and Q[i], K[i] denote the i-th channel of and K, respectively. The ratio ri captures the relative importance of channel within an attention head. We aggregate these channel-wise ratios ri into single vector of shape (L d, ), where L, n, and correspond to the number of layers, attention heads per layer, and channels per head, respectively. To evaluate staticity across tasks, we measure separately for different tasks and compute the Pearson correlation coefficient between these vectors. Specifically, for tasks 1 and 2, we obtain vectors r(1) and r(2). If channel importance significantly differs between tasks, we would expect low correlation between r(1) and r(2). However, as illustrated in Figure 1, Pearson correlations between different RULER tasks consistently remain close to 1. This indicates that the high-importance channels in one task generally remain highly important in another, highlighting static sparsity pattern in the channels. Similar results are observed across varying input lengths, reinforcing the notion of channel staticity."
+        },
+        {
+            "title": "B Comparison with Double Sparsity",
+            "content": "Double Sparsity (Yang et al., 2024) proposes KV selective-reading strategy based on offline identification of outlier channel dimensions. Specifically, it computes the norm of the QK product to select high-norm (outlier) channels, which are then used during inference to retrieve critical tokens. In this section, we compare our learned channel importance scores with the outlier channel selection criterion used in Double Sparsity to evaluate whether their method can be used for channel pruning. As shown in Table 10, we find that Double Sparsitys method exhibits several limitations that lead to suboptimal performance: 1. The outlier channel selection process is not inherently designed for channel-wise pruning, and may lack careful design considerations. 2. During offline norm collection, the method splits QK product on context dimension into chunks of smaller sizes, which overlooks the unstructured composition of QK channel dimension (namely, the attention sink and local window) and may lead to inaccurate norm calculation. 3. As discussed in Section 2, relying solely on norm (magnitude) is an insufficient proxy for estimating channel importance. This limitation may restrict the pruning ratio of local norm-based pruning methods."
+        },
+        {
+            "title": "Original",
+            "content": "Llama-3.1-8B-Instruct DS DS LeanK - 84.4 60% 29.9 70% 14.0 70% 84.1 Table 10: Comparison with Double Sparsity. Methods are tested on RULER 64K, with 200 samples taken from each subtask. Detailed results are in Table 19."
+        },
+        {
+            "title": "C Channel Frequency Analysis for",
+            "content": "Qwen2.5-7B-Instruct We visualize the learned mask for Qwen2.5-7BInstruct in Figure 9. Similar as Section 5.1, we observed that LeanKs learned pruning pattern preserves more low frequency channels compared with ThinKs norm-based method, which might contribute to LeanKs effectiveness. Furthermore, similar outlier channel with channel pair index 31 appears to have relatively high norm and large impact on model performance. Figure 9: Remained Ratio and Channel Pair Index on Qwen2.5-7B-Instruct. Llama-3.1-8B-Instruct"
+        },
+        {
+            "title": "Method",
+            "content": "Ratio niah_s1 niah_s2 niah_s3 niah_mk1 niah_mk2 niah_mk3 niah_mv niah_mq vt cwe fwe qa_1 qa_2 Avg."
+        },
+        {
+            "title": "Original\nHighest whf\nHighest whf\nLowest whf\nRandom\nDuoAttn",
+            "content": "- 25% 50% 25% 25% 50% 100.0 99.5 99.5 2.5 99.6 100.0 100.0 99.5 100.0 3.0 98.2 100.0 100.0 100.0 100.0 3.5 99.2 100.0 100.0 100.0 100.0 5.5 99.5 99.0 97.0 96.5 96.0 3.0 93.6 96. 99.0 98.5 99.0 1.0 82.4 99.0 97.0 96.6 93.8 4.5 71.7 95.8 99.1 98.6 98.9 5.0 93.8 99.3 94.5 85.3 0.1 93.5 0.15 85.5 83.0 0.4 92.2 67.2 0.1 1.5 80.1 0.1 70.1 91.2 0.05 84.5 75.5 76.5 75.5 53.0 73.9 76.0 49.5 49.5 48.5 40.0 46.8 50. 84.4 84.2 83.6 14.6 77.6 84.0 Table 11: Head pruning and classification based on high frequency ratio of each head."
+        },
+        {
+            "title": "Frequency Ratio",
+            "content": "In Section 5.2, we define the High Frequency Ratio of each attention head as: Furthermore, Direct Top-K on α violates alignment requirements (aligning to multiplies of 16 or 32) and might be inefficient for hardware execution. whf = q[:high]KT [:high]2 qKT We compute whf using single 64K-token input from the RULER VT task. We observe that this score effectively distinguishes retrieval heads. To evaluate its utility, we modify Llama-3.1-8BInstruct by converting subset of heads into streaming heads based on their whf values. Specifically, we convert heads with the highest or lowest whf values and measure end-to-end performance on RULER 64K. For comparison, we also convert an equal number of randomly selected heads into streaming heads, repeating the experiment four times and reporting the average result  (Table 11)  . Our findings show that converting heads with the lowest whf severely degrades performance, while converting the top 50% highest whf heads has minimal impact. This matches the performance of DuoAttention (Xiao et al., 2024a), which requires an additional training phase. In contrast, our method achieves comparable results using only single input sequence for calibration. Necessity of Training Stage 2 We verified that applying Top-K on scaling factor α trained from the training stage 1 leads to suboptimal result on model performance, results are shown in Table 12, suggesting that the second training stage is necessary for pruning under predefined sparsity ratios. The primary reason for the performance disparity lies in the misalignment between the scaling operation in Stage1 and the ultimate objective of channel masking for deployment. For instance, some channels may be robust to scaling, but entirely masking them out can lead to severe performance degradation. Stage2 could help avoid these channels from being pruned."
+        },
+        {
+            "title": "Original",
+            "content": "Qwen2.5-7B-Instruct w/o 2nd stage w/ 2nd stage"
+        },
+        {
+            "title": "Ratio Acc",
+            "content": "- 80.7 70% 70.7 70% 78.0 Table 12: Necessity of 2nd stage of training. Methods are tested on RULER 64K, with 200 samples taken from each subtask. Using only the first stage with 70% pruning ratio yields RULER 64K accuracy of just 70.73. With the second stage added, accuracy improves to 77.97 on Qwen2.5-7B-Instruct. Detailed results are in Table 22."
+        },
+        {
+            "title": "F Kernel Benchmarking on Qwen",
+            "content": "LeanK could achieve 1.6x speedup on attention computation on Qwen2.5-7B-Instruct. Execution time of each layer is shown in Figure 10. Figure 10: Kernel execution time of each layer on Qwen2.5-7B-Instruct. LeanK uses 70% pruning ratio."
+        },
+        {
+            "title": "G Full Evaluation Results on RULER",
+            "content": "Full evaluation results on RULER (Hsieh et al., 2024) are shown in Table 13. We evaluate all tasks in RULER across input lengths ranging from 4K to 128K. For Qwen testing on input lengths larger than 32K, we apply Yarn extrapolation with factor of 4 as suggested by its official documentation. Method Ratio niah_s1 niah_s2 niah_s3 niah_mk1 niah_mk2 niah_mk3 niah_mv niah_mq vt cwe fwe qa_1 qa_2 Avg. Llama-3.1-8B-Instruct 4K 8K"
+        },
+        {
+            "title": "Original",
+            "content": "16K ThinK ThinK Ours"
+        },
+        {
+            "title": "Original",
+            "content": "32K ThinK ThinK Ours"
+        },
+        {
+            "title": "Original",
+            "content": "64K ThinK ThinK Ours"
+        },
+        {
+            "title": "Original",
+            "content": "128K ThinK ThinK Ours - 60% 70% 70% - 60% 70% 70% - 60% 70% 70% - 60% 70% 70% - 60% 70% 70% - 60% 70% 70% 100.0 93.0 31.0 100.0 100.0 75.5 12.5 100.0 100.0 75.0 9.5 100.0 100.0 88.0 9.5 100.0 100.0 97.0 18.5 100. 100.0 98.5 29.0 100.0 100.0 88.0 49.5 100.0 100.0 87.5 33.0 100.0 100.0 88.5 28.5 100.0 100.0 94.0 32.5 100.0 100.0 95.5 44.5 100. 99.0 97.0 67.0 99.0 100.0 99.5 43.0 100.0 100.0 98.0 19.5 100.0 100.0 99.0 23.0 100.0 100.0 100.0 21.0 100.0 100.0 100.0 33.5 100. 100.0 99.5 28.9 100.0 99.5 88.5 66.0 99.5 100.0 87.5 64.0 100.0 99.5 95.0 60.5 99.5 100.0 97.5 58.5 99.5 100.0 98.5 55.0 99. 97.0 97.0 75.5 96.5 99.0 97.0 80.0 99.5 99.5 99.0 66.0 100.0 100.0 99.5 65.5 100.0 99.0 98.5 54.5 99.5 97.0 94.0 44.0 97. 75.0 71.0 40.0 75.0 100.0 99.0 35.5 99.0 99.5 98.5 12.5 99.5 99.5 98.5 5.0 99.5 100.0 100.0 2.0 100.0 99.0 98.0 2.0 99. 53.5 26.0 0.0 51.5 99.8 90.0 49.3 99.8 99.5 87.1 29.3 99.3 99.4 92.4 31.5 99.0 98.9 95.3 37.9 98.4 97.0 90.1 32.1 95. 93.1 91.9 50.9 88.1 99.6 92.0 53.9 99.6 99.8 93.0 46.9 99.6 98.9 94.8 46.8 98.1 99.4 98.5 48.6 98.5 99.1 97.8 41.4 98. 97.3 97.4 52.9 96.6 99.4 99.6 93.7 76.9 99.1 93.3 23.6 97.4 84.5 99.3 99.6 94.3 98.9 94.4 84.5 76.2 42.3 84.5 15.5 20.4 68.7 99.2 94.7 87.0 99.3 53.3 90.7 96.7 66.8 0.9 92.3 0.4 9.6 98.6 36.0 91.7 97.6 70.0 9.2 97.0 94.5 72.0 4.5 94. 54.5 40.0 8.3 61.6 2.7 0.0 0.0 1.2 0.1 0.1 0.1 0.1 0.2 0.3 0.5 0.4 93.3 96.2 91.7 94.2 85.3 80.3 71.2 85. 76.3 80.2 73.2 74.8 85.0 86.5 86.5 86.5 78.0 76.0 68.5 78.5 79.5 78.0 66.5 79.0 76.0 75.5 62.5 76.5 75.5 76.0 66.5 75. 71.5 70.0 59.0 70.5 61.0 61.0 58.0 61.5 56.0 56.5 53.0 56.0 53.0 51.5 48.5 53.0 51.5 49.5 45.0 51.0 49.5 48.0 45.5 49. 37.5 38.5 35.0 38.0 95.1 89.5 58.3 95.3 93.1 81.7 39.2 93.4 90.2 79.7 37.1 88.8 86.0 81.8 36.4 85.8 84.4 80.6 35.3 84. 73.5 69.8 40.0 73.2 Method Ratio niah_s1 niah_s2 niah_s3 niah_mk1 niah_mk2 niah_mk3 niah_mv niah_mq vt cwe fwe qa_1 qa_2 Avg. Qwen2.5-7B-Instruct 4K 8K Original ThinK Ours Original ThinK Ours Original 16K ThinK Ours Original 32K ThinK Ours Original 64K ThinK Ours Original 128K ThinK Ours - 70% 70% - 70% 70% - 70% 70% - 70% 70% - 70% 70% - 70% 70% 100.0 97.0 100.0 100.0 98.5 100. 100.0 97.5 100.0 100.0 99.5 100.0 100.0 95.0 100.0 100.0 97.0 100.0 100.0 94.0 100.0 100.0 90.0 100. 100.0 98.0 100.0 100.0 99.0 100.0 98.0 91.5 98.0 99.5 93.5 99.5 100.0 98.0 100.0 100.0 98.0 100. 100.0 97.5 100.0 99.5 98.0 100.0 98.0 95.0 100.0 66.0 93.5 96.5 100.0 96.0 100.0 100.0 93.0 100. 99.5 93.0 99.5 99.0 98.0 99.0 95.5 85.0 96.5 92.5 91.5 93.0 100.0 95.0 100.0 100.0 93.5 100. 100.0 94.0 99.5 98.5 94.0 97.5 82.5 63.0 83.0 56.0 39.5 54.0 100.0 78.0 100.0 99.0 60.5 98. 92.5 59.5 93.0 94.0 67.5 93.5 47.5 24.5 48.0 8.5 8.0 17.5 94.6 82.4 93.8 89.8 72.1 88. 95.1 77.9 92.9 91.4 70.9 85.3 82.8 56.1 73.1 63.1 55.4 66.6 100.0 94.4 100.0 99.9 90.5 99. 99.9 89.4 99.8 98.9 91.4 98.9 97.4 79.4 95.4 90.5 72.8 85.6 100.0 99.7 84.2 98.6 73.3 80.5 99.4 80.0 99.7 100.0 94.0 88.0 86.3 83.7 69.3 90.6 89.5 99. 98.1 69.1 96.4 96.9 75.7 96.0 95.3 65.7 81.1 81.2 55.8 60.9 85.4 92.0 66.0 91.7 84.1 94.7 67.7 87.8 57.1 91.0 67.8 90. 55.4 82.5 35.7 74.0 47.1 78.0 36.5 57.2 36.1 61.3 29.0 59.0 84.5 84.0 84.0 69.5 61.5 67.5 63.5 59.5 64.0 68.0 66.0 65. 69.5 61.5 66.5 43.5 46.5 43.5 60.0 55.5 60.5 52.0 50.5 53.0 54.0 53.5 54.0 57.0 53.5 56. 44.5 46.0 47.0 34.5 34.5 33.0 94.1 86.7 93.6 91.7 80.6 89.8 90.8 80.5 90.6 89.1 81.7 88. 80.7 67.1 78.0 63.6 60.4 64.5 Table 13: Performance of Llama-3.1-8B-Instruct and Qwen2.5-7B-Instruct on RULER. 200 samples are taken for each task."
+        },
+        {
+            "title": "H Full Evaluation Results on",
+            "content": "GSM-Infinite We evaluate Medium and Hard tasks in GSMInfinite across input lengths ranging from 8K to 32K. Full results are shown in Table 14."
+        },
+        {
+            "title": "I Additional Experimental Results",
+            "content": "Table 20, Table 21 and Table 23 provide other supplementary results. Specifically, Table 20 evaluated static normbased selection methods performance on RULER, suggesting that static channel pruning strategy could achieve comparable performance with dynamic methods such as ThinK. The implementation of the method is illustrated in Section 2. Table 21 verified that LeanK is orthogonal with token pruning (Quest), head pruning (DuoAttention) and quantization (KIVI) methods. For Quest, block size is 64 and token budget is 1024. For DuoAttention, 50% heads are pruned. KIVI are tested with 2 bits for both and cache, group size 32 and residual length 128. Table 23 conducted ablation experiments to justify our design choices, showing that both (1) more fine-grained head-wise budget allocation and (2) learning-based channel-wise importance score that does not rely on channels magnitude contribute to the effectiveness of our method."
+        },
+        {
+            "title": "J Choice of Hyperparameter Lambda",
+            "content": "The hyperparameter λ is multiplied to the regularization loss (L1 norm of scaling factor α) in training Stage1, with the total loss defined as: L1st = Ldist + λLreg. We trained models with varying λ values on Llama-3.1-8B-Instruct and evaluated performance on the RULER 32K benchmark."
+        },
+        {
+            "title": "Ratio Acc",
+            "content": "Original λ = 0.04 Llama-3.1-8B-Instruct λ = 0.06 λ = 0.08 λ = 0.10 - 86.0 70% 84.4 70% 85.8 70% 85.5 70% 85.1 Table 15: RULER 32K performance with different choices of training hyperparameter λ on Llama-3.1-8BInstruct. Results in Table15 show that LeanK is robust to wide range of λ values (0.04 to 0.10), achieving the best performance around λ = 0.06. Setting λ too small (e.g., 0.04) under-regularizes α, while excessively large λ values (e.g., 0.10) can lead to less accurate learning during Stage 1, slightly harming the final results."
+        },
+        {
+            "title": "K Choice of Training Task",
+            "content": "LeanK is robust to the choice of training task. Specifically, we trained Qwen2.5-7B-Instruct using DuoAttention[1]s task and evaluated performance on RULER 16K. Results in Table 16 verified that LeanK could still effectively learn channel importance with different tasks (with training hyperparameters changed accordingly), suggesting that LeanKs effectiveness is not sensitive to specific training tasks. The static mask was RULER benchmark. generated by averaging channel norm distribution (as described in Section 2.2) across 100 NIAH_multikey3 sequences with 64K context length. Results are shown in Table 17."
+        },
+        {
+            "title": "Method Ratio",
+            "content": "4K 8K 16K 32K 64K 128K Avg."
+        },
+        {
+            "title": "Original\nThinK\nStatic\nLeanK",
+            "content": "- 95.1 70% 58.3 70% 68.7 70% 95.3 93.1 39.2 57.5 93.4 90.2 37.1 54.8 88.8 86.0 36.4 55.9 85.8 84.4 35.3 54.0 84. 73.5 40.0 55.5 73.2 87.1 39.4 57.7 86.8 Table 17: Different methods performance with Llama3.1-8B-Instruct on the RULER dataset. The results show that averaging channel norms across multiple inputs yields more effective pruning than dynamic methods like ThinK. However, there remains substantial performance gap compared to LeanK (i.e., Learned Pattern > Static Pattern > Dynamic Pattern) . This further supports both the static nature of channel importance and the effectiveness of LeanKs design. Analysis of V-Cache Pruning"
+        },
+        {
+            "title": "Conditions",
+            "content": "We analyzed both the distribution and characteristics of the completely pruned heads: 1) In terms of Distribution, these heads are distributed across all layers, with higher concentration in the shallow layers (e.g., in Qwen, 43% of them appear in the first 5 layers). 2) Speaking of Characteristics, We examined the channel frequency distribution of these heads (as described in Section5.2). These heads exhibit high high-frequency ratio whf and relatively large norms on high-frequency channels. This indicates that these heads mainly rely on local context and patterns for next-token prediction, while contributing less to semantic extraction from the context."
+        },
+        {
+            "title": "N Comparison with SnapKV",
+            "content": "Original Qwen2.5-7B-Instruct Our Task"
+        },
+        {
+            "title": "DuoAttn Task",
+            "content": "- 90.8 70% 90.6 70% 90.2 Table 16: LeanKs performance on RULER 16K with different choices of training task λ on Qwen2.5-7BInstruct."
+        },
+        {
+            "title": "Pruning Baseline",
+            "content": "We evaluated static norm-based channel pruning baseline on Llama-3.1-8B-Instruct using the We compared LeanK with SnapKV, token-level KV cache pruning method, with results shown in 18. Under the same overall KV cache reduction ratio (44% for Llama, 43% for Qwen), LeanK achieves higher average performance. SnapKV underperforms LeanK on complex KV retrieval tasks such as NIAH_multikey3."
+        },
+        {
+            "title": "Method Pruning ratio",
+            "content": "op=2 op=4 op=6 8K Medium op=8 op=10 op="
+        },
+        {
+            "title": "AUC",
+            "content": "Llama-3.1-8B-Instruct ThinK"
+        },
+        {
+            "title": "Original",
+            "content": "Qwen2.5-7B-Instruct ThinK"
+        },
+        {
+            "title": "Ours",
+            "content": "- 70% 70% - 70% 70% 0.1429 0.1389 0.1508 0.1349 0.0516 0.0278 0.1825 0.0556 0.0675 0.0159 0.0278 0.0079 0.1746 0.1944 0.2183 0.1389 0.0437 0.0397 0.2857 0.3651 0.2619 0.1865 0.0952 0.0556 0.4405 0.3532 0.1984 0.1190 0.0437 0.0437 0.3770 0.3333 0.2222 0.1587 0.1310 0.0476 0.5615 0.2620 0.7024 1.0793 0.9564 1."
+        },
+        {
+            "title": "Method Pruning ratio",
+            "content": "op=2 op=4 op=6 8K Hard op=8 op=10 op=12 AUC Llama-3.1-8B-Instruct ThinK"
+        },
+        {
+            "title": "Original",
+            "content": "Qwen2.5-7B-Instruct ThinK"
+        },
+        {
+            "title": "Ours",
+            "content": "- 70% 70% - 70% 70% 0.4127 0.1865 0.2540 0.1905 0.1706 0.1190 1.0675 0.0833 0.0833 0.0595 0.0198 0.0595 0.0357 0.2816 0.4762 0.1944 0.2659 0.2103 0.1706 0.1270 1.1428 0.4643 0.2817 0.2262 0.1032 0.1151 0.1032 1.010 0.3492 0.1944 0.1746 0.0913 0.0913 0.0635 0.7580 0.3373 0.3532 0.2381 0.1389 0.0833 0.0952 1."
+        },
+        {
+            "title": "Method Pruning ratio",
+            "content": "op=2 op=4 op=6 op=10 op="
+        },
+        {
+            "title": "AUC",
+            "content": "16K Medium op=8 Llama-3.1-8B-Instruct ThinK"
+        },
+        {
+            "title": "Original",
+            "content": "Qwen2.5-7B-Instruct ThinK"
+        },
+        {
+            "title": "Ours",
+            "content": "- 70% 70% - 70% 70% 0.0913 0.0675 0.1270 0.0833 0.0159 0.1389 0.0397 0.0357 0.0159 0.0040 0.1468 0.1071 0.1706 0.0913 0.0317 0.3473 0.0159 0.0119 0.1707 0.0317 0.4900 0.2738 0.2937 0.2381 0.1429 0.0833 0.4008 0.2778 0.1429 0.0833 0.0397 0.4365 0.2302 0.1825 0.1468 0.0437 0.0556 0.0119 0. 0.9227 0.7501 0."
+        },
+        {
+            "title": "Method Pruning ratio",
+            "content": "op=2 op=4 op=6 16K Hard op=8 op=10 op=12 AUC Llama-3.1-8B-Instruct ThinK"
+        },
+        {
+            "title": "Original",
+            "content": "Qwen2.5-7B-Instruct ThinK"
+        },
+        {
+            "title": "Ours",
+            "content": "- 70% 70% - 70% 70% 0.3214 0.0992 0.1429 0.1190 0.1071 0.0476 0.6527 0.1032 0.0159 0.0198 0.0238 0.0159 0.0198 0.1369 0.2857 0.1230 0.1349 0.1310 0.0833 0.0754 0.6528 0.4722 0.2619 0.1706 0.1389 0.0873 0.0635 0.9265 0.3770 0.1786 0.1429 0.0754 0.0635 0.0873 0.6926 0.4246 0.2579 0.1548 0.0873 0.0913 0.0952 0."
+        },
+        {
+            "title": "Method Pruning ratio",
+            "content": "op=2 op=4 op=6 op=10 op=12 AUC 32K Medium op= Llama-3.1-8B-Instruct ThinK"
+        },
+        {
+            "title": "Original",
+            "content": "Qwen2.5-7B-Instruct ThinK"
+        },
+        {
+            "title": "Ours",
+            "content": "- 70% 70% - 70% 70% 0.2978 0.0873 0.0675 0.1151 0.0675 0.0913 0.0437 0.0437 0.0198 0.1529 0.1190 0.0992 0.1429 0.0754 0.0198 0.0079 0.4007 0.004 0 0 0 0.3016 0.3730 0.2778 0.1468 0.0794 0.0714 1.0635 0.4206 0.2183 0.1627 0.0913 0.0476 0.0437 0.7520 0.3294 0.2381 0.2063 0.0992 0.0397 0.0317 0."
+        },
+        {
+            "title": "Method Pruning ratio",
+            "content": "op=2 op=4 op=6 32K Hard op=8 op=10 op=12 AUC Llama-3.1-8B-Instruct ThinK"
+        },
+        {
+            "title": "Original",
+            "content": "Qwen2.5-7B-Instruct ThinK"
+        },
+        {
+            "title": "Ours",
+            "content": "- 70% 70% - 70% 70% 0.1984 0.1190 0.1111 0.0675 0.0437 0.0437 0.4624 0.0675 0.0278 0.0119 0.0119 0.0238 0.0278 0.1231 0.2579 0.1468 0.0794 0.0714 0.0516 0.0516 0.5040 0.4603 0.2579 0.1468 0.1151 0.1032 0.0556 0.8810 0.3929 0.1429 0.1429 0.0714 0.0635 0.0476 0.6409 0.3929 0.1905 0.1587 0.1071 0.0675 0.0437 0.7421 Table 14: Performance of different methods and models on GSM-Infinite, 256 samples are taken for each op. Generation temperature is set to 0."
+        },
+        {
+            "title": "Method",
+            "content": "niah_s1 niah_s2 niah_s3 niah_mk1 niah_mk2 niah_mk3 niah_mv niah_mq vt cwe fwe qa_1 qa_2 Avg. Llama-3.1-8B SnapKV LeanK Qwen2.5-7B SnapKV LeanK 100 100 100 100 100 100 100 100 100 100 100 99.5 99.5 99.0 99.0 99.0 99.5 93.5 97.5 89.5 100.0 79.0 93.5 99.1 98.4 90.6 85. 99.4 98.5 98.9 98.9 92.5 5.5 96.9 97.0 93.3 1.2 97.8 72.5 88.2 96.0 67.8 90.5 76.5 76.0 67.0 65.5 49.5 51.5 55.0 56.0 85.2 85.8 87.8 88.5 Table 18: Performance of LeanK and SnapKV on RULER 32K under the same pruning ratio. Method Original RULER Doule Sparsity Doule Sparsity Ours 64K Ratio niah_s1 niah_s2 niah_s3 niah_mk1 niah_mk2 niah_mk3 niah_mv niah_mq vt cwe fwe qa_1 qa_2 Avg. - 60% 70% 70% 100.0 45.5 3.0 100.0 100.0 37.0 5.5 100.0 100.0 37.5 3.5 100. 100.0 35.0 9.0 99.0 97.0 36.0 3.0 97.0 99.0 1.0 1.0 99.0 97.0 8.9 3.5 95.6 99.1 20.9 5.6 98.5 94.5 14.8 1.1 94. 0.1 0.1 0.1 0.1 85.3 71.5 68.8 85.3 75.5 66.0 54.0 75.5 49.5 45.0 37.0 49.0 84.4 29.9 14.0 84.1 Llama-3.1-8B-Instruct Table 19: Full comparison results comparing our method with Double Sparsity. Method Ratio niah_s1 niah_s2 niah_s3 niah_mk1 niah_mk2 niah_mk3 niah_mv niah_mq vt cwe fwe qa_1 qa_2 Avg. Original ThinK (Dynamic norm) Static norm - 60% 60% 100.0 97.0 96.5 98.0 95.5 96.5 98.0 100.0 100. 95.5 98.5 96.0 82.5 94.0 95.0 47.5 98.0 99.5 82.8 90.1 86.4 97.4 97.8 96.1 95.3 55.4 0.1 72.0 0.1 91. 82.5 80.33 81.3 69.5 76.0 74.0 44.5 48.0 47.5 80.7 80.6 81.6 Qwen2.5-7B-Instruct Table 20: Static norm-based selection. Tested on RULER 64K, with 200 samples from each subtask. Method Ratio niah_s1 niah_s2 niah_s3 niah_mk1 niah_mk2 niah_mk3 niah_mv niah_mq vt cwe fwe qa_1 qa_2 Avg. Original DuoAttn 64K DuoAttn + Ours Quest Quest + Ours - 50% 80% - 70% 100.0 100.0 100.0 100.0 100.0 100.0 100.0 100.0 98.5 100.0 100.0 100.0 100.0 82.0 99.0 100.0 99.0 99.0 98.5 99. 97.0 96.5 96.0 84.0 84.0 99.0 99.0 99.0 5.0 11.5 97.0 95.8 95.0 93.3 93.0 99.1 99.3 99.4 95.1 96.9 85.3 0.1 94.5 84.5 0.1 91.2 83.7 0.1 89.8 83.2 83.7 0.6 87.6 0.05 87.3 75.5 76.0 76.0 72.5 74. 49.5 50.0 48.0 45.0 44.5 84.4 84.0 83.5 72.4 75.1 Llama-3.1-8B-Instruct Method Original 32K KIVI KIVI + Ours Ratio niah_s1 niah_s2 niah_s3 niah_mk1 niah_mk2 niah_mk3 niah_mv niah_mq vt cwe fwe qa_1 qa_2 Avg. - - 70% 100.0 100.0 100.0 100.0 100.0 99.5 100.0 100.0 100.0 100.0 98.5 99.0 99.0 96.5 98.0 100.0 95.3 91. 98.9 97.5 97.1 99.4 98.8 98.4 97.6 91.4 92.3 2.7 5.8 1.0 93.3 93.5 96.3 76.0 75.5 73. 51.5 48.0 47.5 86.0 84.7 84.2 Llama-3.1-8B-Instruct Table 21: LeanK applied on top of other pruning methods. Tested on RULER 64K (32K for KIVI to avoid OOM), with 200 samples from each subtask."
+        },
+        {
+            "title": "Method",
+            "content": "Ratio niah_s1 niah_s2 niah_s3 niah_mk1 niah_mk2 niah_mk3 niah_mv niah_mq vt cwe fwe qa_1 qa_2 Avg. Original w/o 2nd stage w/ 2nd stage - 70% 70% 100.0 99.5 100.0 98.0 86.5 98.0 98.0 99.0 100.0 95.5 92.0 96.5 82.5 75.5 83.0 47.5 10.5 48. 82.8 77.4 73.1 97.4 91.1 95.4 95.3 55.4 82.5 58.3 48.5 72.7 81.1 47.1 78.0 69.5 64.5 66.5 44.5 44.0 47.0 80.7 70.7 78. Qwen2.5-7B-Instruct Table 22: Necessity of the second stage of training. Tested on RULER 64K, with 200 samples from each subtask."
+        },
+        {
+            "title": "Method",
+            "content": "Ratio niah_s1 niah_s2 niah_s3 niah_mk1 niah_mk2 niah_mk3 niah_mv niah_mq vt cwe fwe qa_1 qa_2 Avg."
+        },
+        {
+            "title": "Original\nUneven Dynamic\nLeanK",
+            "content": "- 70% 70% 100.0 100.0 100.0 100.0 100.0 100.0 100.0 98.5 100.0 100.0 99.0 99.0 97.0 92.5 97. 99.0 92.5 99.0 97.0 86.9 95.6 99.1 93.3 98.5 94.5 0.05 85.3 39.6 70.5 1.0 94.3 0.05 85.3 75.5 74.0 75.5 49.5 48.0 49. 84.4 76.6 84.1 Llama-3.1-8B-Instruct Table 23: Using our trained masks budget allocation and ThinKs dynamic norm-based channel selection strategy for pruning. Tested on RULER 64K, with 200 samples from each subtask."
+        }
+    ],
+    "affiliations": [
+        "Microsoft Research",
+        "Tsinghua University"
+    ]
+}
