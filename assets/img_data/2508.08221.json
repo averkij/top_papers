@@ -1,0 +1,234 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.08221/x1.png",
+                "caption": "Figure 1:Left: The proliferation of RL optimization techniques, coupled with diverse initialized models and data, has raised barriers to practical adoption.Right: We establish detailed application guidelines via dissecting internal mechanisms of widely-used tricks, and introduce Lite PPO, a minimalist two-technique combination that enhances learning capacity in critic-free policies with vanilla PPO loss. The average accuracy is calculated across six mathematical benchmarks.",
+                "position": 215
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Preliminaries",
+        "images": []
+    },
+    {
+        "header": "3Experimental Designs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.08221/x2.png",
+                "caption": "Figure 2:Number of correct under 8 times rollout for different datasets.",
+                "position": 497
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x3.png",
+                "caption": "Figure 3:(Top 2 rows): Test accuracy and response length of four model variants:Qwen3-4B-Base,Qwen3-8B-Base,Qwen3-4B, andQwen3-8Bacross different data difficulty.Middle 2 rows: Accuracy over training iterations of Base models. The first row presents results ofQwen3-4B-Base. The second row shows results ofQwen3-8B-Base.Bottom 2 rows: Accuracy over training iterations of aligned models. The first row presents results ofQwen3-4B, while the second row shows results ofQwen3-8B. To ensure clarity and intuitiveness in the qualitative analysis, all curves are consistently smoothed using identical parameters. Specifically, the mean values are computed using an 11-step moving window with an exponential smoothing factor of0.80.8. The shaded regions around the curves represent the rangemean±(std_multiplier×standard deviation)\\text{mean}\\pm(\\text{std\\_multiplier}\\times\\text{standard deviation}), providing a visual representation of the oscillation amplitude.",
+                "position": 504
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x4.png",
+                "caption": "",
+                "position": 508
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x5.png",
+                "caption": "",
+                "position": 510
+            }
+        ]
+    },
+    {
+        "header": "4Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.08221/x6.png",
+                "caption": "Figure 4:Accuracy over training iterations of Base models.Top 2 rows:Qwen3-4B-Basewith different normalization techniques. The first row uses the easy training dataset, while the second row uses the hard training dataset.Middle 2 rows:Qwen3-8B-Basewith different normalization techniques (under the default reward scale).Bottom 2 rows: Accuracy over training iterations of aligned models (trained on medium level dataset, under the default reward scale) with different normalization techniques. The first row shows the results ofQwen3-4B, while the second row shows the results ofQwen3-8B.",
+                "position": 551
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x7.png",
+                "caption": "",
+                "position": 555
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x8.png",
+                "caption": "",
+                "position": 557
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x9.png",
+                "caption": "Figure 5:Top 2 rows: Accuracy over training iterations ofQwen3-4B-Basewith batch-level normalization under different reward scale. The first row uses the easy training dataset, while the second row uses the medium training dataset.Bottom 2 rows: Accuracy over training iterations ofQwen3-4B-Basewith group-level normalization under different reward scale.",
+                "position": 582
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x10.png",
+                "caption": "",
+                "position": 586
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x11.png",
+                "caption": "Figure 6:Left:Standard deviation variations during training on datasets of different difficulty levels.Right:Test accuracy before and after removing standard deviation from batch level normalization, with results for training on Easy Data (top) and Hard Data (bottom).",
+                "position": 617
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x12.png",
+                "caption": "Figure 7:Accuracy comparison of Base models with different standard deviation calculation.Top 2 rows: Accuracy ofQwen3-4B-Basewith different standard deviation calculation. The first row uses the easy training dataset, while the second row uses the hard training dataset.Bottom 2 rows: Accuracy comparison ofQwen3-8B-Basewith different standard deviation calculation.The first row uses the easy training dataset, while the second row uses the hard training dataset.",
+                "position": 620
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x13.png",
+                "caption": "",
+                "position": 624
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x14.png",
+                "caption": "Figure 8:Entropy comparison across different models with Clip-Higher.A higher clip upper bound can mitigate the entropy drop in aligned models.",
+                "position": 669
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x15.png",
+                "caption": "Figure 9:Top 2 rows:Test accuracy of Base models (trained on medium data) with higher clipping upper bound.Middle 2 rows: Test accuracy of aligned models (trained on medium data) with higher clipping upper bound.Bottom 2 rows: Test accuracy of aligned models (trained on easy data) with a higher clipping upper bound.",
+                "position": 672
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x16.png",
+                "caption": "",
+                "position": 676
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x17.png",
+                "caption": "",
+                "position": 677
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x18.png",
+                "caption": "Figure 10:Predicted probability distributions ofQwen3-4B-Base(left) andQwen3-4B(right) under two clipping upper bound∈{0.20,0.28}\\in\\{0.20,0.28\\}.",
+                "position": 704
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x19.png",
+                "caption": "Figure 11:Left:A case study under the same prompt across various clipping upper bounds.Right:The trigger differences of various upper bounds at the top 20 tokens with the highest clip frequencies.",
+                "position": 725
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x20.png",
+                "caption": "Figure 12:Test accuracy of aligned models (trained on medium data) with various clipping upper bounds.",
+                "position": 750
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x21.png",
+                "caption": "Figure 13:Top 2 rows: Accuracy comparison between sequence-level loss and token-level loss.Qwen3-8B-Baseis used as the initial policy. Results are reported on both Easy and Hard Datasets.Bottom 2 rows: Test accuracy ofQwen3-8Bwith different loss aggregations.",
+                "position": 812
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x22.png",
+                "caption": "",
+                "position": 816
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x23.png",
+                "caption": "Figure 14:Top 2 rows: Total test accuracy and response length ofQwen3-8B-Baseover training iterations under\ndifferent maximum generation lengths.Middle 3 rows: Test accuracy ofQwen3-8B-Baseover training iterations under different maximum lengths. We set different maximum lengths of8​k8k,16​k16kand20​k20k.Middle 3 rows: Validation of overlong mask effectiveness onQwen3-8B.",
+                "position": 836
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x24.png",
+                "caption": "",
+                "position": 840
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x25.png",
+                "caption": "",
+                "position": 842
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x26.png",
+                "caption": "Figure 15:Left: Comparison of repeat ratios among four types of generations, i.e., correct (reward = 1) and incorrect (reward = 0) generations under different maximum generation lengths.Right: Comparison of repeat ratios among truncated samples with or without overlong filtering strategy. The statistical form of the repetition rate can be found in AppendixB.1.",
+                "position": 864
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x27.png",
+                "caption": "",
+                "position": 867
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x28.png",
+                "caption": "Figure 16:Test accuracy of non-aligned models trained via three RL methods, i.e., Lite PPO (ours), GRPO(Shao et al.,2024)and DAPO(Yu et al.,2025).",
+                "position": 874
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x29.png",
+                "caption": "",
+                "position": 878
+            }
+        ]
+    },
+    {
+        "header": "5A simple combination: Lite PPO",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "7Future work",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADetailed Experimental Setup",
+        "images": []
+    },
+    {
+        "header": "Appendix BDetails of Overlong Filter",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.08221/x30.png",
+                "caption": "Figure 17:An ostensible positive case, which cannot be terminated after the answer is given at the end of inference.",
+                "position": 1546
+            }
+        ]
+    },
+    {
+        "header": "Appendix CDetailed Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.08221/x31.png",
+                "caption": "Figure 18:Test accuracy of sample-level loss and token-level loss on medium and extremely hard datasets.",
+                "position": 1557
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x32.png",
+                "caption": "Figure 19:Accuracy over training iterations ofQwen3-8B-Basewith batch-level normalization under different reward scale. The first row uses the easy training dataset, while the second row uses the medium training dataset.",
+                "position": 1563
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x33.png",
+                "caption": "Figure 20:A case study under the same prompt across various clipping upper bounds.Top: high clip is 0.20,Bottom: high clip is 0.28.",
+                "position": 1575
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x34.png",
+                "caption": "",
+                "position": 1579
+            },
+            {
+                "img": "https://arxiv.org/html/2508.08221/x35.png",
+                "caption": "Figure 21:Predicted probability distributions ofQwen3-8B-Base(left) andQwen3-8B(right) under two clipping upper bound∈{0.20,0.28}\\in\\{0.20,0.28\\}.",
+                "position": 1589
+            }
+        ]
+    },
+    {
+        "header": "Appendix DCase Study of Clip Higher",
+        "images": []
+    }
+]
