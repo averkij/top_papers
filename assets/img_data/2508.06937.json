@@ -1,0 +1,1003 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/1_1.png",
+                "caption": "Figure 1:Examples of edits using our CannyEdit, KV-Edit[55], and GPT-4o[28]. Actual text prompts and masks are omitted here. For more details, see AppendixF.1.",
+                "position": 122
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/1_2.png",
+                "caption": "",
+                "position": 137
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/1_3.png",
+                "caption": "",
+                "position": 142
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/1_4.png",
+                "caption": "",
+                "position": 147
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/4_1.png",
+                "caption": "",
+                "position": 152
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/4_2.jpg",
+                "caption": "",
+                "position": 157
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/4_3.jpg",
+                "caption": "",
+                "position": 162
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/4_4.png",
+                "caption": "",
+                "position": 167
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/2_1.jpg",
+                "caption": "",
+                "position": 178
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/2_2.jpg",
+                "caption": "",
+                "position": 183
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/2_3.jpg",
+                "caption": "",
+                "position": 188
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/2_4.jpg",
+                "caption": "",
+                "position": 193
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/5_1.jpeg",
+                "caption": "",
+                "position": 198
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/5_2.jpeg",
+                "caption": "",
+                "position": 203
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/5_3.jpeg",
+                "caption": "",
+                "position": 208
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/5_4.png",
+                "caption": "",
+                "position": 213
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/3_1.jpg",
+                "caption": "",
+                "position": 224
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/3_2.jpg",
+                "caption": "",
+                "position": 229
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/3_3.jpg",
+                "caption": "",
+                "position": 234
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/3_4.png",
+                "caption": "",
+                "position": 239
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/6_1.jpg",
+                "caption": "",
+                "position": 244
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/6_2.png",
+                "caption": "",
+                "position": 249
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/6_3.jpg",
+                "caption": "",
+                "position": 254
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/6_4.png",
+                "caption": "",
+                "position": 259
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/tl4.png",
+                "caption": "Figure 2:Quantitative study shows that CannyEdit achieves the best editability-fidelity trade-off under varying hyperparameter settings. The technical details of the graph are in AppendixF.1.",
+                "position": 293
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/x1.png",
+                "caption": "Figure 3:Editing results of different methods.RFSolver-Edit’s outputs fail to balance context fidelity and successful addition simultaneously. While KV-Edit and CannyEdit deliver a better trade-off, CannyEdit results in more natural and seamless edits whereas KV-Edit’s results introduce artifacts such as a partially cropped subject in (c.1), and a partially generated extra cat in (d.1).",
+                "position": 310
+            }
+        ]
+    },
+    {
+        "header": "2Related work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.06937/x2.png",
+                "caption": "Figure 4:The architecture of multi-stream block in FLUX and in FLUX-ControlNet.",
+                "position": 373
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/x3.png",
+                "caption": "Figure 5:The inversion-denoising process of CannyEdit.1)inversion: Starting from the source image, its Canny edge map, and a source promptPsourceP_{\\text{source}}, we use FireFlow[12]to obtain the inverted noise𝐱tN\\mathbf{x}_{t_{N}}and corresponding Canny ControlNet outputsZ~I′\\tilde{Z}^{\\prime}_{\\texttt{I}}. The immediate noisy latents during the inversion process{𝐱t1,…,𝐱tN−1}\\{\\mathbf{x}_{t_{1}},...,\\mathbf{x}_{t_{N-1}}\\}are also cached for enhancing the context fidelity. 2)denoising: Using the inverted noise𝐱tN\\mathbf{x}_{t_{N}}, we perform guided generation with selective Canny control (via a maskEE), and dual prompts,PlocalP_{\\text{local}}andPtargetP_{\\text{target}}, to provide multi-level text guidance.",
+                "position": 403
+            }
+        ]
+    },
+    {
+        "header": "4Experiment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f3/1_1.jpg",
+                "caption": "Figure 6:Visual examples of our CannyEdit and KV-Edit[55]on PIE examples along with their quantitative results on background preservation.",
+                "position": 836
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f3/1_2.png",
+                "caption": "",
+                "position": 853
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f3/1_3.jpg",
+                "caption": "",
+                "position": 858
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f3/1_4.jpg",
+                "caption": "",
+                "position": 863
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f3/2_1.jpg",
+                "caption": "",
+                "position": 868
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f3/2_2.png",
+                "caption": "",
+                "position": 873
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f3/2_3.jpg",
+                "caption": "",
+                "position": 878
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f3/2_4.jpg",
+                "caption": "",
+                "position": 883
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgment",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ATreatments on the mask boundary region",
+        "images": []
+    },
+    {
+        "header": "Appendix BApplication of CannyEdit to different editing tasks",
+        "images": []
+    },
+    {
+        "header": "Appendix CImplementation details",
+        "images": []
+    },
+    {
+        "header": "Appendix DCuration of RICE-Bench",
+        "images": []
+    },
+    {
+        "header": "Appendix EDetails of user study",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/AE/f1.png",
+                "caption": "Figure 7:Two examples of the Task 1 interface. In the first example, (a) is an unedited real image and (b) is generated by CannyEdit. In the second example, (a) is generated by CannyEdit.",
+                "position": 2521
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/AE/f2.png",
+                "caption": "",
+                "position": 2525
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/AE/f3.png",
+                "caption": "Figure 8:Two examples of the Task 2 interface. In the first example, (a) is generated by KV-Edit[55], and (b) is created by our CannyEdit. In the second example, (a) is generated by CannyEdit, and (b) is created by KV-Edit[55].",
+                "position": 2529
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/AE/f4.png",
+                "caption": "",
+                "position": 2533
+            }
+        ]
+    },
+    {
+        "header": "Appendix FMore visual examples",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/1_1.png",
+                "caption": "Figure 9:Source images, input masks and corresponding text prompts (SourceP: source prompt; TargetP: global target prompt; LocalP: local edit prompt) provided to CannyEdit for generating the visual examples illustrated in Figure 1. In example (a), two additions are made in one generation pass and thus there are two local prompts.",
+                "position": 2551
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/1_mask.png",
+                "caption": "",
+                "position": 2594
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/2_1_mask.png",
+                "caption": "",
+                "position": 2609
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/2_mask.png",
+                "caption": "",
+                "position": 2650
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/1_1_mask.png",
+                "caption": "",
+                "position": 2665
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/3_mask.png",
+                "caption": "",
+                "position": 2704
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f1/6_mask.png",
+                "caption": "",
+                "position": 2719
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/tl2.png",
+                "caption": "Figure 10:Extended version of Figure 2. Quantitative comparison of context preservation and text adherence for RFSolver-Edit[41], KV-Edit[55], and our proposed CannyEdit method, evaluated on 15 examples involving the addition of human subjects (a subset from the RICE-Beach). Context preservation is measured by computing the cosine similarity between DINO embeddings[8]of the source and edited images. Text adherence is quantified using GroundingDINO’s[25]top-1 bounding-box confidence on the added object, defined as the difference in confidence scores between edited and source images. Different points for each method indicate varying hyperparameter settings: number of steps for injecting source-image features (RFSolver-Edit), skip steps and reinitialization (KV-Edit), and the frequency of cyclic blending applied to the background region (CannyEdit).",
+                "position": 2740
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/1_1.png",
+                "caption": "Figure 11:Visual examples of our CannyEdit, KV-Edit[55], and PowerPaint-FLUX[56]across adding, removal and replacement tasks. The samples are from the RICE-Bench (Prompts and masks are omitted here; they are organized in the same manner as in Figure9).",
+                "position": 2751
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/1_2.png",
+                "caption": "",
+                "position": 2765
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/1_3.jpg",
+                "caption": "",
+                "position": 2769
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/1_4.jpg",
+                "caption": "",
+                "position": 2773
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/1_5.jpg",
+                "caption": "",
+                "position": 2777
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/1_6.png",
+                "caption": "",
+                "position": 2781
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/1_7.jpg",
+                "caption": "",
+                "position": 2785
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/2_1.jpg",
+                "caption": "",
+                "position": 2796
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/2_2.png",
+                "caption": "",
+                "position": 2800
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/2_3.png",
+                "caption": "",
+                "position": 2804
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/2_4.png",
+                "caption": "",
+                "position": 2808
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/2_5.png",
+                "caption": "",
+                "position": 2812
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/2_6.jpg",
+                "caption": "",
+                "position": 2816
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/2_7.png",
+                "caption": "",
+                "position": 2820
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/3_1.jpg",
+                "caption": "",
+                "position": 2831
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/3_2.png",
+                "caption": "",
+                "position": 2835
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/3_3.png",
+                "caption": "",
+                "position": 2839
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/3_4.png",
+                "caption": "",
+                "position": 2843
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/3_5.png",
+                "caption": "",
+                "position": 2847
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/3_6.png",
+                "caption": "",
+                "position": 2851
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/f2/3_7.png",
+                "caption": "",
+                "position": 2855
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/111000000000.jpg",
+                "caption": "Figure 12:Visual examples of object transfer using our CannyEdit. The objects are transferred while preserving their original shapes. All samples are from the PIE-Bench.",
+                "position": 2881
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/111000000000_e.png",
+                "caption": "",
+                "position": 2896
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/112000000002.jpg",
+                "caption": "",
+                "position": 2901
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/112000000002_e.png",
+                "caption": "",
+                "position": 2906
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/111000000003.jpg",
+                "caption": "",
+                "position": 2917
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/111000000003_e.jpg",
+                "caption": "",
+                "position": 2922
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/111000000009.jpg",
+                "caption": "",
+                "position": 2927
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/111000000009_e.jpg",
+                "caption": "",
+                "position": 2932
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/000000000019.jpg",
+                "caption": "",
+                "position": 2943
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/000000000019_e.jpg",
+                "caption": "",
+                "position": 2948
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/121000000001_e.jpg",
+                "caption": "",
+                "position": 2958
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/113000000008.jpg",
+                "caption": "",
+                "position": 2969
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/113000000008_e.png",
+                "caption": "",
+                "position": 2974
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/123000000005.jpg",
+                "caption": "",
+                "position": 2979
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/123000000005_e.png",
+                "caption": "",
+                "position": 2984
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/kitchen2.jpeg",
+                "caption": "Figure 13:Visual examples of context modification using our CannyEdit (Prompts and masks are omitted here; they are organized in the same manner as in Figure9.)",
+                "position": 2999
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/kitchen2_e.jpeg",
+                "caption": "",
+                "position": 3014
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/thr_20.jpg",
+                "caption": "",
+                "position": 3019
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/thr_19.jpg",
+                "caption": "",
+                "position": 3024
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/sky.jpeg",
+                "caption": "",
+                "position": 3035
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/sky_30.jpeg",
+                "caption": "",
+                "position": 3040
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/rainy.png",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/rainy_e.png",
+                "caption": "",
+                "position": 3050
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/511000000000.jpg",
+                "caption": "Figure 14:Visual examples of IP-preserved editings using our CannyEdit. Comparisons with the results of “w/o feature injections” highlight the importance of injecting the late-stage key and value tokens from the source image to preserve the subject’s identity. All samples are from the PIE-Bench.",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/511000000000_5.jpg",
+                "caption": "",
+                "position": 3080
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/511000000000_25.jpg",
+                "caption": "",
+                "position": 3085
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/511000000002.jpg",
+                "caption": "",
+                "position": 3090
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/511000000002_134.jpg",
+                "caption": "",
+                "position": 3095
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/511000000002_141.jpg",
+                "caption": "",
+                "position": 3100
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/521000000001.jpg",
+                "caption": "",
+                "position": 3111
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/521000000001_12.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/521000000001_9.jpg",
+                "caption": "",
+                "position": 3121
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/512000000001.jpg",
+                "caption": "",
+                "position": 3126
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/512000000001_8.jpg",
+                "caption": "",
+                "position": 3131
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/512000000001_u.png",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/cat_ori.jpg",
+                "caption": "Figure 15:Visual comparisons of our CannyEdit method with GPT-4o[28]and Gemini 2.0-Flash[20], across adding, replacement, and removal tasks.",
+                "position": 3160
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/cat_canny.png",
+                "caption": "",
+                "position": 3177
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gpt4o/1_1.png",
+                "caption": "",
+                "position": 3182
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/1.jpeg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gpt4o/2.png",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/2.jpeg",
+                "caption": "",
+                "position": 3212
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/4.jpeg",
+                "caption": "",
+                "position": 3237
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/5.jpeg",
+                "caption": "",
+                "position": 3262
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gpt4o/3.png",
+                "caption": "",
+                "position": 3282
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/6.jpeg",
+                "caption": "",
+                "position": 3287
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gpt4o/4.png",
+                "caption": "",
+                "position": 3307
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/7.jpeg",
+                "caption": "",
+                "position": 3312
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/8.jpeg",
+                "caption": "",
+                "position": 3337
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gpt4o/5.png",
+                "caption": "",
+                "position": 3357
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/9.jpeg",
+                "caption": "",
+                "position": 3362
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.2/121000000001.jpg",
+                "caption": "Figure 16:Visual comparisons of our CannyEdit method with GPT-4o[28]and Gemini 2.0-Flash[20], across object transfer, context modification, IP-preserved editing, and multi-edit tasks.",
+                "position": 3373
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gpt4o/7.png",
+                "caption": "",
+                "position": 3395
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/11.jpeg",
+                "caption": "",
+                "position": 3400
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gpt4o/6.png",
+                "caption": "",
+                "position": 3420
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/10.jpeg",
+                "caption": "",
+                "position": 3425
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gpt4o/8.png",
+                "caption": "",
+                "position": 3445
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/12.jpeg",
+                "caption": "",
+                "position": 3450
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gpt4o/9.png",
+                "caption": "",
+                "position": 3470
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/13.jpeg",
+                "caption": "",
+                "position": 3475
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gpt4o/10.png",
+                "caption": "",
+                "position": 3495
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/14.jpeg",
+                "caption": "",
+                "position": 3500
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gpt4o/11.png",
+                "caption": "",
+                "position": 3520
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/15.jpeg",
+                "caption": "",
+                "position": 3525
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/meditation_1.jpg",
+                "caption": "",
+                "position": 3535
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/meditation_1_e.jpg",
+                "caption": "",
+                "position": 3540
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gpt4o/12.png",
+                "caption": "",
+                "position": 3545
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/16.jpeg",
+                "caption": "",
+                "position": 3550
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/toy_1_2.jpg",
+                "caption": "",
+                "position": 3560
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/toy_1_1_7.jpg",
+                "caption": "",
+                "position": 3565
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gpt4o/13.png",
+                "caption": "",
+                "position": 3570
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.3/gemini/17.jpeg",
+                "caption": "",
+                "position": 3575
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/flux_8.png",
+                "caption": "Figure 17:Visual examples of multiple edits at one generation pass using our CannyEdit. The input images are sourced from[35,19]or generated by the FLUX model (Prompts and masks are omitted here; they are organized in the same manner as in Figure9(a).)",
+                "position": 3594
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/flux_8_edit.png",
+                "caption": "",
+                "position": 3609
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/flux_12.png",
+                "caption": "",
+                "position": 3614
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/flux_12_edit.png",
+                "caption": "",
+                "position": 3619
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/flux_17.png",
+                "caption": "",
+                "position": 3639
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/flux_17_edit.png",
+                "caption": "",
+                "position": 3644
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/flux_42.png",
+                "caption": "",
+                "position": 3649
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/flux_42_edit.png",
+                "caption": "",
+                "position": 3654
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/flux_38_1_8.png",
+                "caption": "",
+                "position": 3665
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/flux_38_1_7.png",
+                "caption": "",
+                "position": 3670
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/624000000004.jpg",
+                "caption": "",
+                "position": 3701
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.4/624000000004_e.jpg",
+                "caption": "",
+                "position": 3706
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/tm/image1.png",
+                "caption": "w/o treatment on boundary",
+                "position": 3729
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/tm/image1.png",
+                "caption": "(a.1)",
+                "position": 3743
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/tm/image2.png",
+                "caption": "(a.2)",
+                "position": 3748
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.5/flux_18_13.png",
+                "caption": "(b.1)",
+                "position": 3754
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.5/flux_18.png",
+                "caption": "(b.2)",
+                "position": 3759
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.5/im_d8e168965aa33450_ann_b96f3642_inpainted_16.jpeg",
+                "caption": "(c.1)",
+                "position": 3765
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.5/im_d8e168965aa33450_ann_b96f3642_inpainted.jpeg",
+                "caption": "(c.2)",
+                "position": 3770
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.5/1.jpeg",
+                "caption": "(d.1)",
+                "position": 3776
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/tm/image5.jpeg",
+                "caption": "(d.2)",
+                "position": 3781
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/1_0.jpeg",
+                "caption": "Figure 19:Visual examples showcasing CannyEdit’s outputs using masks of various shapes in the adding task: the default oval mask, a rectangular mask, and a rectangular mask with random edge augmentations. These results demonstrate the robustness of CannyEdit to different mask choices.",
+                "position": 3795
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/2_0.jpeg",
+                "caption": "",
+                "position": 3804
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/1_1.jpeg",
+                "caption": "",
+                "position": 3814
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/2_1.jpeg",
+                "caption": "",
+                "position": 3823
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/1_2_mask.jpg",
+                "caption": "",
+                "position": 3830
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/1_2.jpeg",
+                "caption": "",
+                "position": 3835
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/2_2_mask.png",
+                "caption": "",
+                "position": 3839
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/2_2.jpeg",
+                "caption": "",
+                "position": 3844
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/1_3_mask.png",
+                "caption": "",
+                "position": 3851
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/1_3.jpeg",
+                "caption": "",
+                "position": 3856
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/2_3_mask.png",
+                "caption": "",
+                "position": 3860
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/2_3.jpeg",
+                "caption": "",
+                "position": 3865
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/3_0.jpeg",
+                "caption": "",
+                "position": 3880
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/4_0.jpeg",
+                "caption": "",
+                "position": 3881
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/3_1_mask.png",
+                "caption": "",
+                "position": 3886
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/3_1.jpeg",
+                "caption": "",
+                "position": 3891
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/4_1_mask.png",
+                "caption": "",
+                "position": 3895
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/4_1.jpeg",
+                "caption": "",
+                "position": 3900
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/3_2_mask.png",
+                "caption": "",
+                "position": 3907
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/3_2.jpeg",
+                "caption": "",
+                "position": 3912
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/4_2_mask.png",
+                "caption": "",
+                "position": 3916
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/4_2.jpeg",
+                "caption": "",
+                "position": 3921
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/3_3_mask.png",
+                "caption": "",
+                "position": 3928
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/3_3.jpeg",
+                "caption": "",
+                "position": 3933
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/4_3_mask.png",
+                "caption": "",
+                "position": 3937
+            },
+            {
+                "img": "https://arxiv.org/html/2508.06937/figures/F.6/4_3.jpeg",
+                "caption": "",
+                "position": 3942
+            }
+        ]
+    },
+    {
+        "header": "Appendix GLimitations and societal impacts",
+        "images": []
+    }
+]
