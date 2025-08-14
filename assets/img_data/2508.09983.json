@@ -1,0 +1,111 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.09983/x1.png",
+                "caption": "",
+                "position": 127
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.09983/x2.png",
+                "caption": "Figure 2:Comparative storyboard outputs from our method and two leading baselines, using the same input narrative. While baseline methods tend to center the character in every frame with limited variation in framing or environment, our method leverages cinematic principles–such as exaggerated scale, dynamic perspective, and environmental context–to convey narrative progression more expressively. Note, for instance, how the small scale of the character in the third panel of the top row enhances the sense of vastness of the tower of bones, reinforcing the emotional arc of the story.",
+                "position": 159
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.09983/x3.png",
+                "caption": "Figure 3:Overview of our training-free storyboard generation pipeline. Given a natural language narrative (e.g.,“Once upon a time, a boy set off on an adventure…”), our method proceeds in three stages:\n(1) An LLM-based “Director” decomposes the story into a sharedreference panel promptand a sequence ofscene-level prompts;\n(2) A batch ofnntwo-panel images is generated, with the top half of each image conditioned on the (same) reference prompt and the bottom half on one of the scene prompts. During denoising, we applyLatent Panel Anchoring (LPA): after each transformer block, the latent representations[R,pi][R,p_{i}]evolve to[Ri′,pi′][R^{\\prime}_{i},p^{\\prime}_{i}], and the top half of each latent is replaced with the version from the first batch element, denotedR′=R1′R^{\\prime}=R^{\\prime}_{1}, to ensure a synchronized anchor across scenes. Inside each transformer block, we also applyReciprocal Attention Value Mixing (RAVM)following the self-attention computation.\n(3) The final denoised latents are decoded into two-panel images and cropped to retain only the bottom sub-panels as the final storyboard.",
+                "position": 206
+            },
+            {
+                "img": "https://arxiv.org/html/2508.09983/x4.png",
+                "caption": "Figure 4:Visualization ofReciprocal Attention Value Mixing (RAVM)in action.Left:A generated 2-panel output from our method, with the top panel serving as the shared reference. The red and green circles mark semantically corresponding character features (the hand) in the reference and target panels, respectively.Right:Heatmaps showing reciprocal attention scores at denoising step 12 of 28. Top-right: for each token in the top panel, we compute its reciprocal attention with the green-circled token in the bottom panel. Bottom-right: the reverse–each token in the bottom panel is scored based on reciprocal attention with the red-circled token in the top panel. In both cases, the hand token in the opposite panel receives the strongest reciprocal attention, validating that RAVM successfully identifies semantically aligned token pairs for value mixing. This reinforces visual consistency without altering spatial composition.",
+                "position": 214
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.09983/x5.png",
+                "caption": "Figure 5:A four-panel storyboard featuringBlackpaw, a shimmering fox of the ancient celestial forest. Each scene is grounded in a specific narrative beat from a longer story (full text in the supplementary). Our method preserves character consistency while supporting expressive spatial framing and richly atmospheric environments. Even as Blackpaw varies in pose, size, and placement across panels, the evolving backgrounds remain narratively grounded and visually coherent. For reference, the key visual moments are drawn from the following excerpts:“…With a flick of his glowing tail, he bounded across a fallen tree stretched precariously over a mist-shrouded ravine that gleamed faintly…Perched atop a broken archway of ancient stone, vines and silver moss hanging around him, Blackpaw gazed out over the glowing forest as twilight deepened.…From the edge of a luminous lake mirroring the heavens perfectly, he watched a meteor shower ignite the sky, each fiery streak mirrored twice over.…Curling beside a pulsing crystal monolith, he dreamed…”See the Appendix (SectionA.6) for the full story text.",
+                "position": 341
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.09983/x6.png",
+                "caption": "Figure 6:Left: Character Consistency vs. Prompt Alignment.Story2Boardachieves the best tradeoff, outperforming all baselines and ablations. Prompt alignment (x-axis) is measured via VQAScore and character consistency (y-axis) via DreamSim. The Flux baseline exhibits unusually high consistency due to its collapsed behavior–rendering similar characters across panels with minimal pose or appearance variation–yet struggles with prompt grounding.Right: Scene Diversity vs. Character Consistency.Our method maintains high identity fidelity while enabling significantly more layout variation than competing methods. Scene Diversity (x-axis) is our proposed metric (details in supplementary), while character consistency (y-axis) is again measured via DreamSim. Note that IC-LoRA baselines (Movie Shots and Storyboards) operate only on 4-panel sequences and are not applicable to longer formats.",
+                "position": 373
+            },
+            {
+                "img": "https://arxiv.org/html/2508.09983/x7.png",
+                "caption": "Figure 7:User Study Results.Participants compared Story2Board to competing systems across five evaluation dimensions. Our method is preferred overall, and achieves strong performance across all categories. While some baselines edge ahead in isolated metrics, Story2Board strikes the best balance between character consistency, visual richness, and narrative alignment–a key strength for storyboard generation.",
+                "position": 415
+            },
+            {
+                "img": "https://arxiv.org/html/2508.09983/x8.png",
+                "caption": "Figure 8:Attention Entanglement in Flux.Left: A two-panel storyboard generated by Flux without our method. Attention entanglement causes the fairy to erroneously inherit the raccoon’s tail in the top panel, while in the bottom panel the raccoon adopts the fairy’s wings. Right: With our Mutual Attention (MA) mechanism, these misattributions persist, but their visual appearance becomes consistent across panels. MA also improves the consistency of other visual elements–such as the raccoon’s tail and the lantern–demonstrating the broader stabilizing influence of token-level value mixing. When entangled representations are already present in the base model, our method propagates rather than corrects them.",
+                "position": 452
+            },
+            {
+                "img": "https://arxiv.org/html/2508.09983/figures/key_pca.png",
+                "caption": "Figure 9:Semantic key clustering within a two-panel Flux-generated storyboard (left). We visualize the key vectors for each token at a mid-layer transformer block during diffusion step 12/28, by reducing them to three principal components, and displaying them as RGB values (right). Tokens corresponding to the character (e.g., hair, clothing) form tight clusters across panels, enabling consistent texture and style propagation via self-attention. In contrast, background tokens remain dispersed, reflecting limited cross-panel alignment.",
+                "position": 460
+            }
+        ]
+    },
+    {
+        "header": "5Summary and Discussion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.09983/x9.png",
+                "caption": "Figure 10:Qualitative comparison of multi-panel storyboards.Our method (Story2Board, left column) achieves a three-way balance:scene diversity(varying viewpoints, scale, and richly grounded\nbackgrounds),character consistency(stable appearance and silhouette),\nand tightprompt alignment. Baseline systems each miss at least one of\nthese axes:StoryDiffusionvaries layouts but allows the heroine’s\nfeatures to drift;OminiControlcreates atmospheric backdrops yet\noccasionally omits the protagonist;IC-LoRA Storyboardsfixes the\ncamera and produces stylised cartoon frames, limiting narrative variety;IC-LoRA Movie Shotsshows wider layouts but often mis-matches prompt\ndetails;StoryGenproduces stylized frames, but struggles with narrative continuity and compositional coherence across panels.\nBy maintaining identity while continuously re-contextualising the\nscene,Story2Boarddelivers the most faithful and visually engaging\nstoryboard among current approaches.",
+                "position": 471
+            },
+            {
+                "img": "https://arxiv.org/html/2508.09983/x10.png",
+                "caption": "Figure 11:Additional storyboards generated by our method.",
+                "position": 487
+            },
+            {
+                "img": "https://arxiv.org/html/2508.09983/x11.png",
+                "caption": "Figure 12:Characters and Strangers.Each row shows a storyboard from the Rich Storyboard Benchmark where the main character encounters unfamiliar figures, testing the model’s ability to maintain character identity while integrating diverse background elements. Additional storyboards and prompts for each panel are provided in the supplementary material.",
+                "position": 490
+            },
+            {
+                "img": "https://arxiv.org/html/2508.09983/x12.png",
+                "caption": "Figure 13:Additional storyboards generated by our method.",
+                "position": 494
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.09983/x13.png",
+                "caption": "Figure A.1:User Study Instructions. We provide the complete instructions for the user study we conducted using Amazon Mechanical Turk (AMT) to compare our method with each baseline.",
+                "position": 1324
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]
