@@ -1,0 +1,96 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.10395/x1.png",
+                "caption": "Figure 1:Perplexity degradation (lower is better) versus memory compression factor (higher is better) evaluated using Llama-2-7B on WikiText-2 for state-of-the-art KV cache quantization methods and for ourXQuant, across {4,3,2}-bit widths. The top right edge of the plot represents the optimal configuration that attains the most memory compression and the least perplexity degradation. Memory compression factor and perplexity degradation are with respect to the FP16 baseline. As shown in Table4,XQuant-CLachieves only 0.01 perplexity degradation while getting10×10\\timesmemory savings with 3-bit quantization, and 0.1 perplexity degradation while getting12.5×12.5\\timesmemory compression with 2-bit quantization.",
+                "position": 106
+            },
+            {
+                "img": "https://arxiv.org/html/2508.10395/x2.png",
+                "caption": "Figure 2:A visualization of howXQuantreduces the memory footprint by caching the input embedding (X) instead of the KV cache.\nWe use the cached input to rematerialize the Keys and Values in order to compute attention.\nThis increases the amount of computation required when computing attention. However, since LLM inference is typically memory bandwidth-bound, we can accelerate inference by reducing memory operations, even at the expense of additional compute operations.",
+                "position": 109
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Algorithm: Sacrificing Compute to Alleviate Memory Bottlenecks",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.10395/x3.png",
+                "caption": "Figure 3:Comparison of the post-norm input embeddingsX, pre-RoPE Keys, and Values for successive layers in the Llama-3.1-8B model.\nThe distributions were collected using a test sample with 2K sequence length from Wikitext-2.\nAlthough the Keys and Values exhibit distinct differences across successive layers, theXembeddings bear remarkable similarity. We exploit this similarity using cross-layer compression inXQuant-CL.",
+                "position": 307
+            },
+            {
+                "img": "https://arxiv.org/html/2508.10395/x4.png",
+                "caption": "Figure 4:Illustration ofXQuant-CLalgorithm during decoding. Besides Layer 0, the input to all other layers is a cross layer approximation, computed using the deltas of all previous layers and the input of Layer 0. The input of Layer 0 is summed with each layer’s delta so it can be treated as an accumulator, allowing us to avoid loading allN−1N-1deltas to compute LayerNN’sXX. After a layer is done processing, the input embedding to the layer for the last token is subtracted from the output activations of the layer (the same shape as a single token), and this delta is quantized and appended to theΔ​X^\\Delta\\hat{X}cache.XQuant-CLduring prefill is visualized in FigureA.1in AppendixA, which shows how the fullΔ​X^\\Delta\\hat{X}is computed and cached for each layer.",
+                "position": 331
+            },
+            {
+                "img": "https://arxiv.org/html/2508.10395/x5.png",
+                "caption": "Figure 5:A diagram outlining how we applyXQuantfor GQA-based models.\nGQA down-projects the input embedding (X) to a smallerd/gd/gdimension when computing the Keys and Values. Hence, if we naively quantize the inputXrather than the KV cache, this will potentially have greater memory consumption.\nTo address this, we first apply SVD to theWkW_{k}andWvW_{v}matrices offline.\nOnline during prefill, we down-projectXXbyUkU_{k}to getXkX_{k}and byUvU_{v}to getXvX_{v}before applyingXQuant, thereby reducing memory consumption. For generation, each new token is also down-projected into this latent space, appended to theXkX_{k}andXvX_{v}cache, and quantized. The concatenated[Xk|x→k][X_{k}|\\vec{x}_{k}]is multiplied by (Σk​BkT\\Sigma_{k}B^{T}_{k}) to recompute the Keys, and the concatenated[Xk|x→v][X_{k}|\\vec{x}_{v}]is multiplied by (Σv​BvT\\Sigma_{v}B^{T}_{v}) to recompute the values. Note that the group sizeggis typically greater than or equal to 4, meaning that naively cachingXuses greater than or equal to2×2\\timesas much memory as simply doing KV caching.",
+                "position": 340
+            }
+        ]
+    },
+    {
+        "header": "4Empirical Results",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix APrefill forXQuant-CL",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.10395/x6.png",
+                "caption": "Figure A.1:Illustration ofXQuant-CLalgorithm during prefill. Besides Layer 0, the input to all other layers is a cross layer approximation, computed using the deltas of all previous layers and the input of Layer 0. The input of Layer 0 is summed with each layer’s delta so it can be treated as an accumulator, allowing us to avoid loading allN−1N-1deltas to compute LayerNN’sXX. After a layer is done processing, the input embeddings to the layer for all tokens in the sequence are subtracted from the output activations of the layer (the same shape as the input embeddings), and this delta is quantized and cached asΔ​X^\\Delta\\hat{X}.",
+                "position": 1945
+            },
+            {
+                "img": "https://arxiv.org/html/2508.10395/x7.png",
+                "caption": "Figure B.1:X∈ℝL×dX\\in\\mathbb{R}^{L\\times d}, whereLLis the sequence length, andddis the hidden dimension.Uk∈ℝd×dgU_{k}\\in\\mathbb{R}^{d\\times\\frac{d}{g}}andΣk∈ℝdg,dg\\Sigma_{k}\\in\\mathbb{R}^{\\frac{d}{g},\\frac{d}{g}}",
+                "position": 1954
+            },
+            {
+                "img": "https://arxiv.org/html/2508.10395/x8.png",
+                "caption": "Figure B.2:XX(left),X​UkXU_{k}(middle), andX​UvXU_{v}(right) distributions for Llama-3.1-8B on samples from WikiText-2 (top) and C4 (bottom).",
+                "position": 2155
+            },
+            {
+                "img": "https://arxiv.org/html/2508.10395/x9.png",
+                "caption": "",
+                "position": 2159
+            },
+            {
+                "img": "https://arxiv.org/html/2508.10395/x10.png",
+                "caption": "Figure B.3:XX(left),X​UkXU_{k}(middle), andX​UvXU_{v}(right) distributions for Mistral-7B on samples from WikiText-2 (top) and C4 (bottom).",
+                "position": 2163
+            },
+            {
+                "img": "https://arxiv.org/html/2508.10395/x11.png",
+                "caption": "",
+                "position": 2167
+            }
+        ]
+    },
+    {
+        "header": "Appendix BObserved Outlier Property When ApplyingXQuantfor GQA Models",
+        "images": []
+    }
+]
