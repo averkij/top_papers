@@ -1,0 +1,163 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.14041/x1.png",
+                "caption": "",
+                "position": 106
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.14041/x2.png",
+                "caption": "Figure 2:Novel view synthesis for casual long videos.Existing methods encounter significant challenges when reconstructing scenes from casually captured long videos: COLMAP[51]fails due to incorrect camera pose estimation, CF-3DGS[14]suffers from out-of-memory issues, LocalRF[39]struggles with complex trajectories, and MASt3R[27]+Scaffold-GS[36]provides inaccurate poses leading to degraded rendering quality. In contrast, LongSplat robustly handles these challenges, yielding accurate camera poses and high-quality novel view synthesis without memory constraints.",
+                "position": 153
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.14041/x3.png",
+                "caption": "Figure 3:Overview of the LongSplat framework.Given a casually captured long video without known poses, LongSplat incrementally reconstructs the scene through tightly coupled pose estimation and 3D Gaussian Splatting.\n(a) Initialization converts MASt3R[27]global aligned point cloud into an octree-anchored 3DGS.\n(b) Global Optimization jointly refines all camera poses and 3D Gaussians for global consistency.\n(c) Pose estimation estimates each new frame pose via correspondence-guided PnP, applies photometric refinement, and updates octree anchors using unprojected points. If PnP fails, a fallback triggers global re-optimization to recover.\n(d) Incremental Optimization alternates between Local Optimization within a visibility-adapted window and periodic Global Optimization to propagate consistent updates across frames.\n(e) All optimization stages leverage a unified objective composed of photometric loss, depth loss, and reprojection loss to ensure accurate geometry and appearance reconstruction.",
+                "position": 184
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.14041/x4.png",
+                "caption": "Figure 4:Visualization of our proposed Octree Anchor Formation strategy.Given an initial sparse voxelized point cloud, we iteratively perform density-guided adaptive voxel splitting and pruning. Voxels with point cloud density (ρ\\rho) exceeding a threshold are split, while those with density below the threshold are pruned. Repeated across multiple octree levels, this adaptive octree anchor design significantly reduces memory usage, allowing efficient representation and rendering of large-scale scenes.",
+                "position": 270
+            },
+            {
+                "img": "https://arxiv.org/html/2508.14041/x5.png",
+                "caption": "Figure 5:Detailed illustration of our camera pose estimation.(a) PnP initialization: Given correspondences between the predicted 3D anchor points from frameTi−1T_{i-1}and the 2D keypoints detected in frameTiT_{i}we employ PnP with RANSAC to robustly estimate an initial camera pose. (b) Pose refinement: The estimated pose is further refined by rasterizing the 3DGS scene and iteratively minimizing reprojection error to enhance pose accuracy. (c) Anchor unprojection: Newly observed regions are detected via an occlusion mask, computed by forward-warping the previous frame’s rendered depth. These regions are unprojected into 3D and converted into anchors via Octree Anchor Formation.",
+                "position": 307
+            },
+            {
+                "img": "https://arxiv.org/html/2508.14041/x6.png",
+                "caption": "Figure 6:Illustration of our Visibility-Adapted Local Window strategy for local optimization.To ensure balanced training of the 3D Gaussians, we dynamically define the optimization window based on anchor visibility overlap. Specifically, we compute the Intersection-over-Union (IoU) of visible anchors between consecutive views. Suppose the visibility IoU is below a certain threshold (a). In that case, the local optimization window is adjusted by removing the earliest frame, iteratively repeating until a suitable window with IoU above the threshold is found (b). This approach ensures balanced training coverage and enhances local reconstruction details during optimization (c).",
+                "position": 368
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.14041/x7.png",
+                "caption": "Figure 7:Qualitative comparison on the Free dataset[61].We compare our method with state-of-the-art approaches including NoPe-NeRF[5], LocalRF[39], CF-3DGS[14], and MASt3R[27]combined with Scaffold-GS[36]. CF-3DGS fails due to memory constraints (OOM), and other baseline methods exhibit artifacts or blurry reconstructions. In contrast, our method produces results closest to the ground truth, demonstrating clearer details, accurate geometry, and visually consistent rendering, particularly under challenging scene structures and complex camera trajectories. “*”: Initialized with MASt3R poses, then jointly optimized.",
+                "position": 759
+            },
+            {
+                "img": "https://arxiv.org/html/2508.14041/x8.png",
+                "caption": "Figure 8:Visualization of camera trajectories on Free dataset[61].CF-3DGS[14]encounters OOM and fails for long sequences, whereas our method reliably estimates accurate, stable trajectories, demonstrating superior robustness.",
+                "position": 862
+            },
+            {
+                "img": "https://arxiv.org/html/2508.14041/x9.png",
+                "caption": "Figure 9:Qualitative comparison on the Tanks and Temples dataset[25].NoPe-NeRF[5]produces visibly blurred results with inaccurate geometries, while CF-3DGS[14], despite better sharpness, fails to reconstruct fine details accurately. In contrast, our LongSplat method achieves superior rendering quality, closely matching the ground truth with sharper textures, more accurate geometry, and consistent lighting.",
+                "position": 967
+            },
+            {
+                "img": "https://arxiv.org/html/2508.14041/x10.png",
+                "caption": "Figure 10:Qualitative results on the Hike dataset[39].Compared to existing methods such as LocalRF[39]and MASt3R[27]+Scaffold-GS[36], our approach significantly improves visual clarity and reconstruction fidelity, accurately capturing complex details and textures in challenging scenes captured during long, casual outdoor trajectories. Notably, our method better preserves structural details and reduces artifacts, demonstrating enhanced robustness and visual quality. “*”: Initialized with MASt3R poses, then jointly optimized.",
+                "position": 972
+            },
+            {
+                "img": "https://arxiv.org/html/2508.14041/x11.png",
+                "caption": "Figure 11:Robustness analysis on camera pose estimation (Free dataset[61]).We plot cumulative error distributions for ATE, RPE translation, and rotation. Our method consistently achieves lower errors compared to existing methods, demonstrating superior robustness and reduced pose drift.",
+                "position": 1337
+            },
+            {
+                "img": "https://arxiv.org/html/2508.14041/x12.png",
+                "caption": "",
+                "position": 1343
+            },
+            {
+                "img": "https://arxiv.org/html/2508.14041/x13.png",
+                "caption": "",
+                "position": 1344
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BAdditional Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.14041/x14.png",
+                "caption": "Figure 12:Qualitative comparison on the CO3Dv2 dataset[46]",
+                "position": 2608
+            },
+            {
+                "img": "https://arxiv.org/html/2508.14041/x15.png",
+                "caption": "Figure 13:Qualitative comparison with HT-3DGS",
+                "position": 2771
+            },
+            {
+                "img": "https://arxiv.org/html/2508.14041/x16.png",
+                "caption": "Figure 14:Visual comparisons on ablation MASt3R relative pose.",
+                "position": 2778
+            }
+        ]
+    },
+    {
+        "header": "Appendix CComplete Quantitative Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.14041/x17.png",
+                "caption": "Figure 15:Visual comparisons on ablation studies.The top row shows the camera trajectory estimation and novel view synthesis results when different training components are removed, demonstrating the importance of each proposed module. Removing global optimization, local optimization, or final refinement significantly degrades pose accuracy and reconstruction quality. The bottom row evaluates different settings for the visibility-adapted local window size. Too small a window leads to unstable geometry and pose drift, while too large a window dilutes local visibility priors, slowing convergence. LongSplat achieves the best balance using the proposed adaptive window.",
+                "position": 3801
+            },
+            {
+                "img": "https://arxiv.org/html/2508.14041/x18.png",
+                "caption": "Figure 16:Visualization of camera trajectories on Free dataset[61].CF-3DGS[14]encounters OOM and fails for long sequences, whereas our method reliably estimates accurate, stable trajectories, demonstrating superior robustness.",
+                "position": 3814
+            },
+            {
+                "img": "https://arxiv.org/html/2508.14041/x19.png",
+                "caption": "Figure 17:More Qualitative comparison on the Tanks and Temples dataset[25].NoPe-NeRF[5]produces visibly blurred results with inaccurate geometries, while CF-3DGS[14], despite better sharpness, fails to reconstruct fine details accurately. In contrast, our LongSplat method achieves superior rendering quality, closely matching the ground truth with sharper textures, more accurate geometry, and consistent lighting.",
+                "position": 3826
+            },
+            {
+                "img": "https://arxiv.org/html/2508.14041/x20.png",
+                "caption": "Figure 18:More Qualitative comparison on the Free dataset[61].We compare our method with state-of-the-art approaches including NoPe-NeRF[5], LocalRF[39], CF-3DGS[14], and MASt3R[27]combined with Scaffold-GS[36]. CF-3DGS fails due to memory constraints (OOM), and other baseline methods exhibit artifacts or blurry reconstructions. In contrast, our method produces results closest to the ground truth, demonstrating clearer details, accurate geometry, and visually consistent rendering, particularly under challenging scene structures and complex camera trajectories. “*”: Initialized with MASt3R poses, then jointly optimized.",
+                "position": 3838
+            },
+            {
+                "img": "https://arxiv.org/html/2508.14041/x21.png",
+                "caption": "Figure 19:Qualitative results on the Hike dataset[39].Compared to existing methods such as LocalRF[39]and MASt3R[27]+Scaffold-GS[36], our approach significantly improves visual clarity and reconstruction fidelity, accurately capturing complex details and textures in challenging scenes captured during long, casual outdoor trajectories. Notably, our method better preserves structural details and reduces artifacts, demonstrating enhanced robustness and visual quality. “*”: Initialized with MASt3R poses, then jointly optimized.",
+                "position": 3850
+            },
+            {
+                "img": "https://arxiv.org/html/2508.14041/x22.png",
+                "caption": "Figure 20:More Qualitative results on the Hike dataset[39].Compared to existing methods such as LocalRF[39]and MASt3R[27]+Scaffold-GS[36], our approach significantly improves visual clarity and reconstruction fidelity, accurately capturing complex details and textures in challenging scenes captured during long, casual outdoor trajectories. Notably, our method better preserves structural details and reduces artifacts, demonstrating enhanced robustness and visual quality. “*”: Initialized with MASt3R poses, then jointly optimized.",
+                "position": 3855
+            }
+        ]
+    },
+    {
+        "header": "Appendix DAdditional Visual Comparisons",
+        "images": []
+    }
+]
