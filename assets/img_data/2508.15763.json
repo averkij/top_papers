@@ -1,0 +1,138 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.15763/x1.png",
+                "caption": "",
+                "position": 185
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.15763/x2.png",
+                "caption": "Figure 1:Performance comparison among open-source and close-source models on Image-text and Text-only Benchmarks. Results demonstrate that Intern-S1 has a top-tier general reasoning capability among open-source models and outperforms closed-source models in scientific domains. General benchmarks: MMLU-Pro (text-only), GPQA (text-only), AIME2025 (text-only), MMMU, MMStar\nScience benchmarks: SmolInstruct (text-only), ChemBech (text-only), MatBench (text-only), SFE, Physics",
+                "position": 215
+            },
+            {
+                "img": "https://arxiv.org/html/2508.15763/x3.png",
+                "caption": "Figure 2:Performance trend of LLMs across popular and low-resource (science) tasks. The X-axis is the average of three popular general benchmarks, MMLU-Pro, GPQA, AIME2025. The Y-axis is the average of three benchmarks in science domain, SmolInstruct, ChemBench, MatBench. Although the top-tier open-source LLMs raised their performance on popular tasks rapidly, their performance on science tasks does not increase.",
+                "position": 225
+            }
+        ]
+    },
+    {
+        "header": "2Model Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.15763/x4.png",
+                "caption": "Figure 3:Architecture of Intern-S1, consisting of a MoE LLM with a vision encoder, a time-series encoder, and a dynamic tokenizer that switches the tokenization and embedding strategies for natural language and scientific inputs. The Intern-S1 is equipped with the InternViT-6B, and the Intern-S1-mini is equipped with the InternViT-300M for the consideration of efficiency.",
+                "position": 255
+            },
+            {
+                "img": "https://arxiv.org/html/2508.15763/x5.png",
+                "caption": "Figure 4:Left: The workflow of the dynamic tokenizer. The tokenizer will first detect the patterns in the input string using a rule-based detector or user-annotated special tags. Then, it will segment the input string into different parts. Each part will be tokenized using different strategies, and its embedding space will be orthogonal to each other. Finally, those vectors will be concatenated as a regular transformer input.Right: The compression ratio of different tokenizers on scientific data (SMILES format). Intern-S1 outperforms others over 70%, meaning that the Intern-S1 represents the scientific data with much fewer tokens, saving the computation overhead.",
+                "position": 285
+            },
+            {
+                "img": "https://arxiv.org/html/2508.15763/x5.png",
+                "caption": "",
+                "position": 288
+            },
+            {
+                "img": "https://arxiv.org/html/2508.15763/x6.png",
+                "caption": "",
+                "position": 292
+            }
+        ]
+    },
+    {
+        "header": "3Infrastructure",
+        "images": []
+    },
+    {
+        "header": "4Continue Pre-training",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.15763/x7.png",
+                "caption": "Figure 5:There are four stages for training Intern-S1, and only the first stage is training in the single modality.",
+                "position": 375
+            },
+            {
+                "img": "https://arxiv.org/html/2508.15763/x8.png",
+                "caption": "Figure 6:Overall statistics of text CPT data.Left:We continued to pre-train the Intern-S1 on 5T high-quality text tokens in total, and the scientific data occupies over 2.5T tokens.Right: The pie chart illustrates six scientific domains that we spent more attention on and adjusted their distribution in data construction. For example, we adopt strict filtering for life science data and loose filtering for materials science since their natural distributions differ by orders of magnitude.",
+                "position": 384
+            },
+            {
+                "img": "https://arxiv.org/html/2508.15763/x9.png",
+                "caption": "Figure 7:The workflow of our page-level PDF documents parsing pipeline. PDF documents will be split into pages, and a low-cost parser will be used to get textual data. We adopt an equation and symbolic markers detector to check whether a page should go through the high-cost parser (VLMs) for advanced processing or is ready for post-processing. Note that the post-processing for low and high-cost parsers differs since they have specialized bad case patterns. All parsed pages will be merged as a single data sample.",
+                "position": 401
+            },
+            {
+                "img": "https://arxiv.org/html/2508.15763/x10.png",
+                "caption": "Figure 8:The workflow of our domain-centric web data parsing pipeline. The web pages are grouped by their URL addresses. For each URL domain, we sample hundreds of pages and feed them into an LLM-based classifier. By gathering the classification results of all pages sampled from a URL domain, we make the decision according to heuristic rules. There are three possible actions: discarding all pages from a URL domain if their quality is low and not informative, rewriting all pages from a URL domain using an LLM if their quality is low but the content is informative, and selecting all pages from a URL domain as the training data candidate.",
+                "position": 413
+            },
+            {
+                "img": "https://arxiv.org/html/2508.15763/x11.png",
+                "caption": "Figure 9:The workflow of our scientific data recall and filtering pipeline. According to a taxonomy that covers various scientific and general domains, we construct a specialized recall and filtering pipeline for each target domain. We prepare the in-domain and out-of-domain validation sets to assist in evolving the prompt automatically. This prompt will trigger the LLM to annotate a large silver set to train the low-cost classifier to filter the web data pool and recall the demand data.",
+                "position": 428
+            },
+            {
+                "img": "https://arxiv.org/html/2508.15763/imgs/0813_performance_change_bsz.png",
+                "caption": "Figure 10:Performance trends of training with different batch size strategies. We train a small LLM with 1B parameters over 1T tokens and select the performance on MMLU as a proxy of the model’s downstream performance. The red and blue line used a consistent batch size during the training, and the purple line represents the training process that we switch the batch size from 4M to 10M after training 400B token.",
+                "position": 476
+            },
+            {
+                "img": "https://arxiv.org/html/2508.15763/x12.png",
+                "caption": "Figure 11:Comparison of choosing different staring points (base and instruction models).",
+                "position": 492
+            }
+        ]
+    },
+    {
+        "header": "5Post-training",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2508.15763/x13.png",
+                "caption": "Figure 12:The Mixture-of-Rewards framework.",
+                "position": 687
+            },
+            {
+                "img": "https://arxiv.org/html/2508.15763/x14.png",
+                "caption": "Figure 13:Comparison of 32 times mean accuracy on AIME2024 evaluation set between the model with our strategy and DAPO across training steps for Qwen2.5 32B Base model.",
+                "position": 814
+            },
+            {
+                "img": "https://arxiv.org/html/2508.15763/x15.png",
+                "caption": "Figure 14:Entropy and average validation sets accuracy for Intern-S1 MoE model with and without entropy control during training.",
+                "position": 826
+            },
+            {
+                "img": "https://arxiv.org/html/2508.15763/x15.png",
+                "caption": "",
+                "position": 829
+            },
+            {
+                "img": "https://arxiv.org/html/2508.15763/x16.png",
+                "caption": "",
+                "position": 833
+            }
+        ]
+    },
+    {
+        "header": "6Evaluation",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
