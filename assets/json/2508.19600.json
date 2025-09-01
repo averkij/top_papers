@@ -1,0 +1,158 @@
+{
+    "paper_title": "Quantization Robustness to Input Degradations for Object Detection",
+    "authors": [
+        "Toghrul Karimov",
+        "Hassan Imani",
+        "Allan Kazakov"
+    ],
+    "sections": [
+        {
+            "title": "Abstract",
+            "content": "Post-training quantization (PTQ) is crucial for deploying efficient object detection models, like YOLO, on resource-constrained devices. However, the impact of reduced precision on model robustness to real-world input degradations such as noise, blur, and compression artifacts is a significant concern. This paper presents a comprehensive empirical study evaluating the robustness of YOLO models (nano to extra-large scales) across multiple precision formats: FP32, FP16 (TensorRT), Dynamic UINT8 (ONNX), and Static INT8 (TensorRT). We introduce and evaluate a degradation-aware calibration strategy for Static INT8 PTQ, where the TensorRT calibration process is exposed to a mix of clean and synthetically degraded images. Models were benchmarked on the COCO dataset under seven distinct degradation conditions (including various types and levels of noise, blur, low contrast, and JPEG compression) and a mixed-degradation scenario. Results indicate that while Static INT8 TensorRT engines offer substantial speedups (~1.5-3.3x) with a moderate accuracy drop (~3-7% mAP50-95) on clean data, the proposed degradation-aware calibration did not yield consistent, broad improvements in robustness over standard clean-data calibration across most models and degradations. A notable exception was observed for larger model scales under specific noise conditions, suggesting model capacity may influence the efficacy of this calibration approach. These findings highlight the challenges in enhancing PTQ robustness and provide insights for deploying quantized detectors in uncontrolled environments. All code and evaluation tables are available at https://github.com/AllanK24/QRID."
+        },
+        {
+            "title": "Start",
+            "content": "Toghrul Karimov1, Hassan Imani2, Allan Kazakov3 1 Bahcesehir University, Baku, Azerbaijan 2,3 Bahcesehir University, Istanbul, Turkey Emails: toghrul.karimov@bahcesehir.edu.tr hassan.imani@bau.edu.tr allan.kazakov@bahcesehir.edu.tr AbstractPost-training quantization (PTQ) is crucial for deploying efficient object detection models, like YOLO, on resource-constrained devices. However, the impact of reduced precision on model robustness to real-world input degradations such as noise, blur, and compression artifacts is significant concern. This paper presents comprehensive empirical study evaluating the robustness of YOLO models (nano to extra-large scales) across multiple precision formats: FP32, FP16 (TensorRT), Dynamic UINT8 (ONNX), and Static INT8 (TensorRT). We introduce and evaluate degradation-aware calibration strategy for Static INT8 PTQ, where the TensorRT calibration process is exposed to mix of clean and synthetically degraded images. Models were benchmarked on the COCO dataset under seven distinct degradation conditions (including various types and levels of noise, blur, low contrast, and JPEG compression) and mixed-degradation scenario. Results indicate that while Static INT8 TensorRT engines offer substantial speedups (1.5-3.3x) with moderate accuracy drop (37% mAP50-95) on clean data, the proposed degradation-aware calibration did not yield consistent, broad improvements in robustness over standard clean-data calibration across most models and degradations. notable exception was observed for larger model scales under specific noise conditions, suggesting model capacity may influence the efficacy of this calibration approach. These findings highlight the challenges in enhancing PTQ robustness and provide insights for deploying quantized detectors in uncontrolled environments. All code and evaluation tables are available at https://github.com/AllanK24/QRID. Keywords: Object Detection, Quantization Robustness, PostTraining Quantization, YOLO, TensorRT, Image Degradation, Calibration COCO dataset [5] when subjected to range of synthetically generated input degradations. Furthermore, we propose and evaluate degradation-aware calibration strategy for Static INT8 PTQ within the TensorRT framework. This approach modifies the standard calibration process by utilizing dataset comprising 50/50 mix of clean and degraded images, hypothesizing that this will lead to INT8 models with enhanced resilience to such input imperfections. Our main contributions are as follows: 1) multi-scale empirical analysis of quantization's impact on YOLO12 robustness to common image degradations. 2) The evaluation of novel degradation-aware static calibration method. 3) Quantitative insights into the accuracy, speed, and robustness trade-offs, providing practical guidance for deploying efficient yet reliable object detectors in real-world scenarios. The study reveals that while Static INT8 offers significant speedups, our proposed mixed-data calibration did not consistently improve robustness over standard clean-data calibration, except for potential benefits against noise in larger models. II. RELATED WORK Deploying deep learning models for real-time object detection on resource-constrained edge devices presents significant challenges due to the computational and memory demands of state-of-the-art architectures [6]. This has driven extensive research into model compression and acceleration techniques. I. INTRODUCTION A. Efficient Object Detection with YOLO Deep Neural Networks (DNNs), especially models like YOLO [2], have revolutionized object detection. However, their computational demands often hinder deployment on resource-constrained edge devices [4]. Model quantization, particularly Post-Training Quantization (PTQ), offers compelling solution by converting FP32 models to lowerprecision formats like INT8, significantly reducing size and improving inference speed without costly retraining [3]. its effect on model While PTQ enhances efficiency, robustness against real-world input degradationssuch as noise, blur, low contrast, and compression artifactsis critical but less explored area [1]. primary concern is whether quantization, optimized for clean data, makes models more brittle in uncontrolled environments [1]. this"
+        },
+        {
+            "title": "This",
+            "content": "paper investigates by comprehensively evaluating the robustness of YOLO12 models (nano to extra-large scales) across multiple precision formats: FP32, FP16, Dynamic UINT8 (via ONNX Runtime), and Static INT8 (via NVIDIA TensorRT). We specifically examine how these different precision models perform on the challenge The \"You Only Look Once\" (YOLO) family of object detectors, introduced by Redmon et al. [7], revolutionized real-time object detection by framing it as single regression problem. Subsequent iterations, such as YOLOv4 [8] and the widely adopted versions from Ultralytics like YOLOv5 and YOLOv8 [9], have consistently pushed the Pareto frontier of speed and accuracy. These models are frequently targeted for edge deployment due to their efficient architectures, making them pertinent subjects for quantization studies. B. Post-Training Quantization for Neural Networks inference Model quantization is key technique for reducing model size, latency, and power consumption by representing weights and/or activations with lower-precision data types, typically converting from 32-bit floating-point (FP32) to 8-bit integers (INT8) [10][11]. Post-Training Quantization (PTQ) is particularly appealing as it does not require retraining or access to the original training pipeline. Two main PTQ approaches exist: Dynamic Quantization, where activation ranges are determined at runtime, incurring some computational overhead but simplifying application [12]; and Static Quantization, where activation ranges are the model on small, pre-determined by calibrating representative dataset. Static PTQ, often implemented using the Quantize-Dequantize (QDQ) format for ONNX models or through tools like NVIDIA TensorRT's calibration process for engine generation, latency typically offers improvements[13]. While Quantization-Aware Training (QAT) can yield higher accuracy by simulating quantization during training [10], this study focuses on PTQ due to its practical advantages for pre-trained models. superior C. Quantization and Robustness to Input Degradations critical concern for real-world deployment is how quantization affects model's robustness to common input degradations like noise, blur, or compression artifacts. Several studies have indicated that the reduction in numerical precision can make quantized models more sensitive to such perturbations compared to their FP32 counterparts [14][15]. For instance, Shafiee et al. [16] explored the brittleness of quantized networks, and some works suggest that quantization can amplify the effects of input noise. the enhancing Attempts to mitigate this robustness gap have included specialized training techniques or architectural modifications robustness of post- [17]. However, training quantized models, particularly for widely used architectures like YOLO deployed via optimized inference engines like TensorRT, remains an active area. While general PTQ calibration aims to preserve accuracy on clean data, standard calibration procedures typically use only highquality images, potentially leading to suboptimal performance when the model encounters degraded inputs. Few studies have systematically evaluated the impact of diverse degradations across multiple scales of YOLO models under common PTQ scenarios (TensorRT INT8, ONNX Dynamic UINT8) or explored simple yet practical modifications to the PTQ calibration data itself to directly address robustness. This paper aims to fill this gap by empirically analyzing the robustness of quantized YOLO12 models and evaluating degradation-aware calibration strategy designed to improve resilience to common input corruptions. III. METHODOLOGY This study systematically evaluated the impact of posttraining quantization on the robustness of five YOLO12 model scales (nano, small, medium, large, and extra-large) to common image degradations. All experiments were conducted on an NVIDIA RTX 2070 GPU using the COCO 2017 dataset for both calibration and validation [18]. investigated: The baseline FP32 models were converted into several precision formats: FP16 (TensorRT engine) [13], Dynamic UINT8 (ONNX model via ONNX Runtime) [19], and Static INT8 (TensorRT engine) [13]. For Static INT8, two calibration strategies were (1) standard calibration using dataset of 1000 clean images sampled from COCO train2017 [20], and (2) proposed degradationaware calibration using dataset of 1000 images comprising 50/50 mix of clean and synthetically degraded samples (derived from the same clean sample pool) [21]. Dynamic quantization like Conv/MatMul) was applied to ONNX models using ONNX Runtime, without requiring separate calibration dataset for activations. (targeting weights of operations To assess robustness, the full COCO val2017 set was used to generate multiple distinct validation datasets. Each set featured specific synthetic degradation applied uniformly to all images using the Albumentations library [22]. The parameters for these degradations were chosen to represent plausible real-world imperfections: Gaussian Noise was applied with standard deviation range of (10/255, 30/255) for 'Medium'; Gaussian 'Low' and Blur used kernel size limits of (3, 5) for 'Low' and (7, 11) for 'Medium'; Low Contrast was simulated using contrast limit of (-0.6, -0.3); and Heavy JPEG Compression was applied with quality range of (20, 45). This pool of degradations was also used for the \"Mixed Degradation\" validation set, in which 50% of the validation images were randomly subjected to one of these transformations. (35/255, 55/255) for (mAP50-95, mAP50) and All models were benchmarked with batch size of 1. Performance was primarily evaluated using standard COCO latency metrics ( ms/image ), the Ultralytics model.val() framework [9]. Robustness was quantified by analyzing the absolute and relative mAP drops when transitioning from clean to degraded validation data, with particular focus on comparing the efficacy of the clean versus degradation-aware static calibration strategies [21]. inference obtained via IV. EXPERIMENTS AND RESULTS This section presents the empirical evaluation of YOLO12 model variants (nano to extra-large) across different precision formats (FP32, FP16, Dynamic UINT8, and Static INT8 with clean/mixed calibration) on the COCO val2017 dataset [5], both in its original clean form and under various synthetic degradations. A. Baseline Performance on Clean COCO Validation Data We first established baseline performance on the clean COCO val2017 dataset. Table summarizes key accuracy metrics (mAP50-95 and mAP50), while Table II details the corresponding inference latencies and FPS. Table I. Baseline Performance on COCO val2017 set Model Scale Precision Calibration mAP5095 P50 N S S M FP32 (TRT) FP16 (TRT) Dynamic UINT8 (ONNX) Static INT8 (TRT) Static INT8 (TRT) FP32 (TRT) FP16 (TRT) Dynamic UINT8 (ONNX) Static INT8 (TRT) Static INT (TRT) FP32 (TRT) FP16 (TRT) Dynamic UINT8 (ONNX) N/A N/A N/A Clean Mixed N/A N/A N/A Clean Mixed N/A N/A N/A 0.4047 0.4044 0.4047 0.3325 0.3327 0. 0.4763 0.4763 0.4114 0.4114 0.5226 0. 0.5226 86 85 86 87 62 64 62 7 7 39 43 mA 0.56 0.56 0. 0.47 0.47 0.64 0.64 0.64 0. 0.56 0.69 0.69 0.69 L L X Static INT (TRT) Static INT8 (TRT) FP32 (TRT) FP16 (TRT) Dynamic UINT8 (ONNX) Static INT8 (TRT) Static INT8 (TRT) FP32 (TRT) FP16 (TRT) Dynamic UINT8 (ONNX) Static INT8 (TRT) Static INT8 (TRT) Clean Mixed N/A N/A N/A Clean Mixed N/A N/A N/A Clean Mixed Table II. Latency (ms) on CLEAN data 0.4853 0.6517 0.4853 0.5347 0. 0.5347 0.5079 0.5079 0.5514 0.5513 0. 0.5202 0.5032 0.65 0.70 0.70 0. 0.68 0.68 0.71 0.71 0.71 0. 0.66 17 49 5 49 03 94 93 94 81 odel Scale N S S M L L X X"
+        },
+        {
+            "title": "Precision",
+            "content": "FP32 (TRT) FP16 (TRT) Dynamic UINT8 (ONNX)"
+        },
+        {
+            "title": "Static",
+            "content": "INT8 (TRT)"
+        },
+        {
+            "title": "Static",
+            "content": "INT8 (TRT) FP32 (TRT) FP16 (TRT) Dynamic UINT8 (ONNX)"
+        },
+        {
+            "title": "Static",
+            "content": "INT8 (TRT)"
+        },
+        {
+            "title": "Static",
+            "content": "INT8 (TRT) FP32 (TRT) FP16 (TRT) Dynamic UINT8 (ONNX)"
+        },
+        {
+            "title": "Static",
+            "content": "INT8 (TRT)"
+        },
+        {
+            "title": "Static",
+            "content": "INT8 (TRT) FP32 (TRT) FP16 (TRT) Dynamic UINT8 (ONNX)"
+        },
+        {
+            "title": "Static",
+            "content": "INT8 (TRT)"
+        },
+        {
+            "title": "Static",
+            "content": "INT8 (TRT) FP32 (TRT) FP16 (TRT) Dynamic UINT8 (ONNX)"
+        },
+        {
+            "title": "Calibra",
+            "content": "tion"
+        },
+        {
+            "title": "Laten",
+            "content": "cy (ms) N/A N/A N/A"
+        },
+        {
+            "title": "Mixed",
+            "content": "N/A N/A N/A"
+        },
+        {
+            "title": "Mixed",
+            "content": "N/A N/A N/A"
+        },
+        {
+            "title": "Mixed",
+            "content": "N/A N/A N/A"
+        },
+        {
+            "title": "Mixed",
+            "content": "N/A N/A N/A 3.8 2.2 6. 2.6 2.7 8.6 3.5 12.1 4 20.5 6.3 25.5 6.9 6. 30.3 10.2 36.9 11.5 11.8 61. 18.2 67."
+        },
+        {
+            "title": "FPS",
+            "content": "262.6 448.8 153.2 380.9 370.8 116. 288.3 82.9 252.9 248.6 48.7 157. 39.2 145.3 149.5 33 98.2 27. 87 84.5 16.3 55 14.8 X"
+        },
+        {
+            "title": "Static",
+            "content": "INT8 (TRT)"
+        },
+        {
+            "title": "Static",
+            "content": "INT8 (TRT)"
+        },
+        {
+            "title": "Clean",
+            "content": "18.4 54."
+        },
+        {
+            "title": "Mixed",
+            "content": "18.5 54 Observations from Table and Table II reveal clear tradeoffs. As expected, increasing model scale from Nano (n) to Extra-Large (x) consistently resulted in higher baseline accuracy (e.g., YOLO12x FP32 mAP50-95 of 0.5514 vs. YOLO12n FP32 of 0.4047, Table I) but also led to substantially increased inference latency (e.g., 61.3 ms vs. 3.8 ms respectively, Table II). Comparing precision formats for given model scale: FP16 (TensorRT) demonstrated negligible accuracy loss compared to FP32 [13] (Table I) while providing significant speedups (e.g., YOLO12n latency reduced from 3.8 ms to 2.2 ms, Table II). Dynamic UINT8 (ONNX), as shown in Table I, matched the FP32 models in mAP. However, Table II indicates it consistently exhibited higher latency (lower FPS) than the FP32 TensorRT baseline (e.g., 6.5 ms for YOLO12n Dynamic UINT8 vs. 3.8 ms for FP32 TRT). This is attributed to runtime quantization overheads within the ONNX Runtime framework, and its inclusion primarily serves as an accuracy reference for uncalibrated PTQ. Static INT8 (TensorRT) provided the greatest latency reductions [13] (Table II), achieving, for instance, 2.6 ms for YOLO12n (Clean Calib) compared to 3.8 ms for FP32. This efficiency, however, came with notable drop in accuracy on clean data (Table I), with mAP50-95 reductions ranging from approximately 0.031 for YOLO12x (Clean Calib) to 0.072 for YOLO12n (Clean Calib) compared to their FP32 counterparts. The choice of calibration data (Clean vs. Mixed) for Static INT8 models had minimal effect on both accuracy (Table I) and speed (Table II) when evaluated on this clean dataset, with only the YOLO12x model showing slightly more pronounced mAP drop with mixed calibration. These baseline characteristics are crucial for contextualizing the subsequent robustness analysis under degraded input conditions. B. Robustness to Input Degradations and Evaluation of Calibration Strategies generated sets were To assess model robustness and the efficacy of different quantization strategies under imperfect conditions, all model configurations were evaluated on suite of validation datasets. These the COCO val2017 images [5], each featuring specific synthetic degradation: Gaussian Noise (Low, Medium), Gaussian Blur (Low, Medium), Low Contrast, or Heavy JPEG Compression. Additionally, general Mixed Degradation scenario was tested. The impact of these degradations is quantified by the relative drop in mAP50-95 performance compared to each model's own clean data baseline (Table I) [14]. from Table III details the relative mAP50-95 drop percentages for selection of these degradations: Medium Blur, Low Noise, Medium Noise, and the Mixed Degradation set. Degradations such as Low Blur, Low Contrast, and Heavy JPEG Compression, which generally induced minimal relative mAP drops across most configurations (typically <2%), are primarily summarized textually for brevity. TABLE III. RELATIVE DROP MAP50-95 (%)"
+        },
+        {
+            "title": "Blurry \nMedium",
+            "content": "N N S M M L L X X FP32 N/A 13.10% FP16 Dynamic UINT8 Static INT8 Static INT8 N/A 13.10% N/A 13.10%"
+        },
+        {
+            "title": "Clean \nMixe\nd",
+            "content": "13.20% 13.20% FP32 N/A 12.40% FP16 Dynamic UINT8 Static INT8 Static INT N/A 12.50% N/A 12.40%"
+        },
+        {
+            "title": "Clean \nMixe\nd",
+            "content": "11.50% 11.50% FP32 N/A 12.30% FP16 Dynamic UINT8 Static INT8 Static INT N/A 12.30% N/A 12.30%"
+        },
+        {
+            "title": "Clean \nMixe\nd",
+            "content": "11.00% 11.00% FP32 N/A 11.60% FP16 Dynamic UINT8 Static INT8 Static INT N/A 11.70% N/A 11.60%"
+        },
+        {
+            "title": "Clean \nMixe\nd",
+            "content": "11.70% 11.60% FP32 N/A 11.90% FP16 Dynamic UINT8 Static INT8 Static INT N/A 11.90% N/A 11.90% 15.10%"
+        },
+        {
+            "title": "Clean \nMixe\nd",
+            "content": "Noisy Low 24.50 % 24.50 % 24.50 % 29.40 % 29.30 % 18.50 % 18.60 % 18.50 % 23.60 % 23.60 % 13.30 % 13.20 % 13.30 % 17.20 % 22.00 % 12.00 % 12.00 % 12.00 % 18.40 % 12.90 % 11.10 % 11.20 % 11.10 % 12.50 %"
+        },
+        {
+            "title": "Mixed \nDegrad",
+            "content": "59.30% 7.80% 59.30% 7.80% 59.30% 7.80% 60.60% 7.60% 60.70% 7.60% 47.10% 6.20% 47.10% 6.30% 47.10% 6.20% 47.70% 6.50% 47.60% 6.50% 31.60% 5.30% 31.60% 5.30% 31.60% 5.30% 36.10% 5.50% 36.10% 5.50% 29.70% 4.60% 29.60% 4.60% 29.70% 4.60% 30.00% 4.70% 30.00% 4.60% 27.20% 4.20% 27.30% 4.30% 27.20% 4.20% 34.70% 7.80% 12.20% 9.60% 28.10% 4.70% Key observations from this robustness analysis (Table III and overall data) are as follows: Gaussian noise (Low and Medium) consistently induced the most severe performance degradation across all models and precisions. For instance, under Medium Noise, relative mAP drops for YOLO12n Static INT8 exceeded 60%, while for YOLO12x FP32, the drop was around 27%. Medium Blur also caused significant degradation, with relative drops typically ranging from 1115% depending on model scale and precision. In contrast, Low Contrast and Heavy JPEG Compression had considerably milder impact, with most models experiencing less than 2% relative drop, indicating high resilience to these types. The Mixed Degradation set, reflecting an average of effects, resulted in moderate overall performance decreases (typically 4-8% relative drops). Comparing precision formats based on Table II, the relative robustness patterns of FP32, FP16, and Dynamic IINT8 models were generally similar for given model scale under the shown degradations. Static INT8 models (both clean and mixed calibration) often exhibited different characteristics; for example, under Medium Blur, the Static INT8 relative drops were sometimes comparable or slightly smaller than FP32. However, under both Low and Medium Noise, Static INT8 models consistently demonstrated increased sensitivity (larger relative drops) compared to the FP32/FP16 models. The central investigation into degradation-aware (mixed) calibration for Static INT8 models, as seen in Table II, showed that for most model scales and the presented degradations, this strategy yielded robustness performance remarkably similar to standard clean data calibration. Notable exceptions where mixed calibration appeared beneficial were observed primarily for the YOLO12x model under Noisy Medium conditions (28.1% drop for mixed vs. 34.7% for clean) and also under Noisy Low (9.6% vs 12.5%) and the Mixed Degradation set (4.7% vs 7.8%). However, these gains were not consistently replicated across smaller model scales or other degradation types. Inference latencies (Table II) remained largely unaffected by the input image degradations themselves. V. CONCLUSION AND DISCUSSION This paper investigated the impact of post-training quantization (PTQ) on the robustness of YOLO12 object detection models (nano to extra-large scales) when subjected to common image degradations. Driven by the demand for efficient edge deployment, we compared standard FP32 and FP16 TensorRT engines against Dynamic UINT8 (ONNX Runtime), standard Static INT8 (TensorRT, clean data calibration), and proposed degradation-aware Static INT8 variant calibrated with 50/50 mix of clean and synthetically degraded images. Performance was assessed using mAP metrics and inference latency on the COCO val2017 dataset under seven distinct degradation conditions and mixeddegradation scenario. Our findings highlight key trade-offs. As expected, larger model scales yielded higher accuracy but with increased latency. FP16 precision offered compelling balance, significantly improving speed over FP32 with negligible accuracy loss. Static INT8 quantization provided the greatest inference speedup (1.5-3.3x vs. FP32) but incurred baseline accuracy drop of 3-7% absolute mAP50-95, with smaller models being more affected. Dynamic UINT8, while maintaining FP32-level accuracy, was slower than the optimized FP32 TensorRT baseline due to its runtime overhead, serving primarily as an uncalibrated PTQ accuracy reference."
+        },
+        {
+            "title": "Regarding",
+            "content": "experienced performance degradation under corruptions, with Gaussian all models robustness, noise proving exceptionally detrimental (e.g., >59% relative mAP drop for YOLO12n Static INT8), indicating significant vulnerability across all tested precisions. Other degradations like blur induced moderate drops, while low contrast and JPEG compression had minimal impact. Interestingly, quantized INT8 models were not uniformly more brittle than their FP32/FP16 counterparts; for degradations like blur and contrast, their relative performance drops were often comparable or even slightly smaller. However, Static INT8 models consistently showed increased sensitivity to the applied noise levels. [4] Shi, W., Cao, J., Zhang, Q., Li, Y., & Xu, L. (2016). Edge computing: Vision and challenges. IEEE internet of things journal, 3(5), 637-646. [5] T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Dollár, and C. L. Zitnick, Microsoft [6] S. Han, H. Mao, and W. J. Dally, Deep Compression: Compressing Deep Neural Networks with Pruning, Trained Quantization and Huffman Coding, in Proc. Int. Conf. Learn. Representations (ICLR), 2016. [7] J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, You Only Look Once: Unified, Real-Time Object Detection, in Proc. IEEE Conf. Comput. Vis. Pattern Recognit. (CVPR), 2016, pp. 779788."
+        },
+        {
+            "title": "The",
+            "content": "central investigation into degradation-aware calibration revealed limited overall efficacy. While notable robustness improvement against noise was observed for the largest model scale (YOLO12x), this benefit did not consistently extend to smaller models or other degradation types. For most scenarios, mixed calibration performed similarly to standard clean data calibration, suggesting that the specific implementation (50/50 data mix with TensorRT's default calibration) did not broadly enhance resilience. This underscores the challenge in designing universally effective PTQ robustness strategies. Limitations of this study include its focus on the YOLO12 family and the COCO dataset, the specific set and severity of synthetic degradations, and reliance on the default TensorRT calibration mechanisms. Future work should explore more advanced or adaptive calibration algorithms, conduct layer-wise sensitivity analyses particularly for noise, investigate different clean-to-degraded data ratios for calibration, evaluate targeted mixed-precision strategies, and compare findings against Quantization-Aware Training (QAT) approaches to further advance the deployment of robust and efficient object detectors. In conclusion, while PTQ, especially Static INT8 via TensorRT, offers crucial efficiency gains, enhancing its robustness to diverse realworld degradations, particularly severe noise, remains an important challenge requiring more sophisticated solutions than simple mixed-data calibration for most model scales."
+        },
+        {
+            "title": "ACKNOWLEDGMENT",
+            "content": "This work is supported in part by the Scientific and Technological Research Council of Turkey (TUBITAK) under Project No. 124E099."
+        },
+        {
+            "title": "REFERENCES",
+            "content": "[1] Gholami, A., Kim, S., Dong, Z., Yao, Z., Mahoney, M. W., & Keutzer, K. (2022). survey of quantization methods for efficient neural network inference. In Lowpower computer vision (pp. 291-326). Chapman and Hall/CRC. [2] Redmon, J., Divvala, S., Girshick, R., & Farhadi, A. (2016). You only look once: Unified, real-time object detection. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 779-788). [3] Jacob, B., Kligys, S., Chen, B., Zhu, M., Tang, M., Howard, A., ... & Kalenichenko, D. (2018). Quantization and training of neural networks for efficient integerarithmetic-only inference. In Proceedings of the IEEE conference pattern computer recognition (pp. 2704-2713). vision and on [8] A. Bochkovskiy, C. Y. Wang, and H. Y. M. Liao, YOLOv4: Optimal Speed and Accuracy of Object Detection, arXiv preprint, arXiv:2004.10934, 2020. [9] G. Jocher et al., YOLOv5 and YOLOv8, Ultralytics, 2023. Available: https://github.com/ultralytics/yolov5 [10] B. Jacob et al., Quantization and Training of Neural Networks Integer-Arithmetic-Only Inference, in Proc. IEEE Conf. Comput. Vis. Pattern Recognit. (CVPR), 2018, pp. 27042713."
+        },
+        {
+            "title": "Efficient",
+            "content": "for [11] R. Krishnamoorthi, Quantizing Deep Convolutional Networks for Efficient Inference: Whitepaper, arXiv preprint, arXiv:1806.08342, 2018. [12] M. Nagel, R. A. Amjad, M. van Baalen, T.Blankevoort, and M. Welling, White Paper on Neural Network Quantization, arXiv preprint, arXiv:2106.08295, 2021. [13] NVIDIA Corporation, TensorRT Documentation, 2025.Available: https://docs.nvidia.com/deeplearning/ten sorrt/ [14] D. Hendrycks and T. Dietterich, Benchmarking Neural Network Robustness to Common Corruptions and Perturbations, in Proc. Int. Conf. Learn. Representations (ICLR), 2019. [15] S. Dodge and L. Karam, Study and Comparison of Human and Deep Learning Recognition Performance Under preprint, Distortions, arXiv:1705.02498, 2017."
+        },
+        {
+            "title": "Visual",
+            "content": "arXiv [16] M. J. Shafiee, A. Mishra, and A. Wong, On the Impact of Low Precision Quantization on the Robustness of Deep Neural Networks, J. Comput. Vis. Imaging Syst., vol. 1, no. 1, 2021. [17] I. Hubara, M. Courbariaux, D. Soudry, R. El-Yaniv, and Y. Bengio, Quantized Neural Networks: Training Neural Networks with Low Precision Weights and Activations, J. Mach. Learn. Res., vol. 18, no. 187, pp. 130, 2018. [18] T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Dollár, and C. L. Zitnick, Microsoft COCO: Common Objects in Context, European Conference on Computer Vision (ECCV), 2014. [19] ONNX Runtime Documentation, Microsoft, 2025. [Online]. Available: https://onnxruntime.ai [20] T.-Y. Lin et al., COCO Dataset: Train2017 and Val2017 [Online]. Website, 2017. Splits, COCO Available: https://cocodataset.org [21] Karimov, T., Imani, H. Kazakov, (2025), QRID. from Retrieved https://github.com/AllanK24/QRID/tree/master/results_t ables [22] A. Buslaev, V. I. Iglovikov, E. Khvedchenya, A. Parinov, M. Druzhinin, and A. A. Kalinin, Albumentations: Fast and Flexible Image Augmentations, Information, vol. 11, no. 2, p. 125, 2020."
+        }
+    ],
+    "affiliations": [
+        "Bahcesehir University, Baku, Azerbaijan",
+        "Bahcesehir University, Istanbul, Turkey"
+    ]
+}
