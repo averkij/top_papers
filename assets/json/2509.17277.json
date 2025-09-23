@@ -1,0 +1,67 @@
+{
+    "paper_title": "BeepBank-500: A Synthetic Earcon Mini-Corpus for UI Sound Research and Psychoacoustics Research",
+    "authors": [
+        "Mandip Goswami"
+    ],
+    "sections": [
+        {
+            "title": "Abstract",
+            "content": "We introduce BeepBank-500, a compact, fully synthetic earcon/alert dataset (300-500 clips) designed for rapid, rights-clean experimentation in human-computer interaction and audio machine learning. Each clip is generated from a parametric recipe controlling waveform family (sine, square, triangle, FM), fundamental frequency, duration, amplitude envelope, amplitude modulation (AM), and lightweight Schroeder-style reverberation. We use three reverberation settings: dry, and two synthetic rooms denoted 'rir small' ('small') and 'rir medium' ('medium') throughout the paper and in the metadata. We release mono 48 kHz WAV audio (16-bit), a rich metadata table (signal/spectral features), and tiny reproducible baselines for (i) waveform-family classification and (ii) f0 regression on single tones. The corpus targets tasks such as earcon classification, timbre analyses, and onset detection, with clearly stated licensing and limitations. Audio is dedicated to the public domain via CC0-1.0; code is under MIT. Data DOI: https://doi.org/10.5281/zenodo.17172015. Code: https://github.com/mandip42/earcons-mini-500."
+        },
+        {
+            "title": "Start",
+            "content": "5 2 0 2 1 2 ] . e [ 1 7 7 2 7 1 . 9 0 5 2 : r BeepBank-500: Synthetic Earcon Mini-Corpus for UI Sound and Psychoacoustics Research Mandip Goswami Principal Scientist, Amazon, Bellevue, WA, USA gomandip@amazon.com September 23, 2025 Abstract We introduce BeepBank-500, compact, fully synthetic earcon/alert dataset (300500 clips) designed for rapid, rights-clean experimentation in humancomputer interaction and audio machine learning. Each clip is generated from parametric recipe controlling waveform family (sine, square, triangle, FM), fundamental frequency, duration, amplitude envelope, amplitude modulation (AM), and lightweight Schroeder-style reverberation. We use three reverberation settings: dry, and two synthetic rooms denoted rir_small (small) and rir_medium (medium) throughout the paper and in the metadata. We release mono 48 kHz WAV audio (16-bit), rich metadata table (signal/spectral features), and tiny reproducible baselines for (i) waveformfamily classification and (ii) f0 regression on single tones. The corpus targets tasks such as earcon classification, timbre analyses, and onset detection, with clearly stated licensing and limitations. Audio is dedicated to the public domain via CC0-1.0; code is under MIT. Data DOI: https://doi.org/10.5281/zenodo.17172015. Code: https://github.com/mandip42/ earcons-mini-500. Keywords: earcon, psychoacoustics, timbre, AM, ADSR, reverb, dataset."
+        },
+        {
+            "title": "1 Motivation and Scope",
+            "content": "Non-speech auditory icons and earcons are ubiquitousfrom mobile notifications and wearable haptics-with-sound to automotive HMI beeps and accessibility UI cues. Researchers and practitioners frequently need small, rights-clean corpora for prototyping classifiers, testing psychoacoustic features, or producing didactic figures. Large datasets exist for environmental audio and speech, but there is gap for compact, controllable earcon sets emphasizing timbre variables (harmonicity, AM depth/rate, envelope) and simple room effects. BeepBank-500 addresses this gap with three design goals: (1) tiny yet diverse (few hundred items spanning key parameters); (2) deterministically reproducible (scripted generation with seeds and full metadata); and (3) frictionless reuse (CC0-1.0 audio; MIT code; Zenodo DOI). The dataset intentionally avoids industrial or proprietary sounds and makes no medical or safety-critical claims. Intended uses. Rapid experiments in UI earcon classification, timbre similarity/embedding analysis, robustness studies (reverb, AM), onset detection, and as teaching/benchmarking resource. Work conducted independently; no proprietary or employer data used. Opinions are the authors; affiliation for identification only. Out of scope. Speech/music content, affective labeling, clinical applications, and complex room acoustics beyond lightweight Schroeder reverberation."
+        },
+        {
+            "title": "2 Related Resources (Context Only)",
+            "content": "There are synthetic tone banks and earcon papers scattered across HCI and audio ML venues; however, many assets are (i) not centralized with DOI, (ii) lack clear license, or (iii) are much larger than necessary for didactic tasks. BeepBank-500 complements broader environmental corpora by focusing narrowly on parametric UI tones with compact, fully scripted recipe. (We purposefully keep references minimal; this is data note rather than survey.)"
+        },
+        {
+            "title": "3.1 Signal Chain",
+            "content": "The generation pipeline is: oscillator (optional) amplitude modulation ADSR envelope RMS normalization (optional) Schroeder-style reverb. All steps are implemented in simple Python/NumPy for transparency and speed. Oscillators. We provide sine, square, triangle, and two FM variants (fm_2to1, fm_3to2) using fixed ratios and moderate indices to induce controllable inharmonicity while keeping spectral content compact for short durations. Fundamental frequency (f0). small set of nominal centers (e.g., 350 Hz, 500 Hz, 750 Hz, 1000 Hz) is used for coverage across low to mid-high ranges typical of earcons. Duration and envelopes. Durations of 100 ms, 250 ms and 500 ms coupled with three envelope presets (adsr_fast, adsr_med, percussive) modulate attack/decay and sustain level for percussive versus sustained cues. Amplitude modulation (AM). Optional sinusoidal AM with rate {0, 8, 30} Hz and depth {0.0, 0.3, 0.5} simulates roughness/urgency cues common in alarms. Chordal options. timbres without complicating the labeling scheme. Items may be single tones or simple triads (major or minor) to yield richer Reverberation. Two lightweight Schroeder configurations emulate small (0.3 s) and medium (0.6 s) rooms via short comb and all-pass chains; dry version is always available. Normalization and peak handling. Signals are RMS-normalized to nominal target (e.g., 20 dBFS) with hard cap at 1 dBFS to avoid clipping. LUFS may be computed for analysis (not used for normalization) if pyloudnorm is present. 2 Table 1: Parameter grid summary. Factor Values Waveform f0 (Hz) Duration (ms) Envelope AM rate (Hz) AM depth Chord Reverb sine, square, triangle, fm_2to1, fm_3to2 350, 500, 750, 1000 100, 250, 500 adsr_fast, adsr_med, percussive 0, 8, 30 0.0, 0.3, 0.5 single, major triad, minor triad dry, rir_small, rir_medium"
+        },
+        {
+            "title": "3.2 Parameter Grid",
+            "content": "A Cartesian product over: waveform family f0 duration envelope AM rate/depth chord type reverb kind yields superset from which 300500 items are sampled (deterministic shuffle). See Table 1 for an overview."
+        },
+        {
+            "title": "3.3 File Format and Splits",
+            "content": "All audio is mono, 48 kHz, 16-bit PCM WAV. Deterministic train/val/test splits are assigned by hashing the filename to ensure stable partitions across regenerations."
+        },
+        {
+            "title": "4 Metadata Schema and Measures",
+            "content": "Each row in metadata/metadata.csv describes one clip. Columns and units are summarized in Table 2. Features include simple spectral statistics and proxies for roughness/inharmonicity (explicitly flagged as proxies). LUFS is optional (blank if not computed). Re-computation scripts are included. v1.0.0 contains 400 clips, split train/val/test = 80/10/10 by deterministic filename hash."
+        },
+        {
+            "title": "5 Baselines and Example Analyses",
+            "content": "We provide two minimal baselines intended to verify signal diversity and facilitate quick comparisons. Waveform-family classification. Features: mean/variance pooling. Model: logistic regression. Test accuracy: 81.1%. log-mel spectrogram (nmels = 64) with global f0 regression (single tones). We evaluate parameter-free baseline (YIN + median over frames) on all single-tone items across durations, AM settings, and reverbs (n = 111). The error distribution is heavy-tailed: MAE = 63.66 Hz while MedAE = 0.22 Hz, consistent with occasional octave/subharmonic errors under FM and reverberant/AM conditions. To summarize robustness we additionally report the proportion within musical tolerance (1 semitone, 21/12 1 5.95% of f0): 80.2%. See Table 3. Reproducibility. Scripts, seeds, and exact dependencies are provided in the repository. Baseline output JSON files capture metrics for inclusion in papers. Table 2: Metadata schema (columns in metadata.csv). Units embedded in names for clarity. Column Description Type Relative WAV path (filename). file split sr_hz bit_depth duration_ms peak_dbfs, rms_dbfs lufs waveform f0_hz chord am_rate_hz, am_depth float envelope reverb spec_centroid_hz bandwidth_hz zcr inharmonicity_proxy roughness_proxy attack_ms, release_ms seed version string train/val/test Deterministic partition via filename hash. integer integer integer float float/empty categorical integer categorical Sample rate (48 kHz). PCM bit depth (16-bit). Duration in milliseconds. Peak and RMS levels. Integrated loudness (if computed). sine, square, triangle, fm_2to1, fm_3to2. Nominal fundamental frequency. single, major, minor. AM parameters. adsr_fast, adsr_med, percussive. dry, rir_small, rir_medium. Spectral centroid. Spectral bandwidth (stdev). Zero-crossing rate. 1 if chordal; 0 if single tone. Equals AM depth as simple proxy. Envelope edge durations (preset-dependent). RNG seed used for generation. Dataset semantic version (e.g., 1.0.0). categorical categorical float float float 0/1 float integer integer string Table 3: f0 baseline summary on single tones. Subset All single tones (any AM/reverb/duration) MAE (Hz) MedAE (Hz) 63.66 0.22 Robustness: % within 1 semitone = 80.2%"
+        },
+        {
+            "title": "6 Ethics, Licensing, and Intended Use",
+            "content": "Licensing. All generated audio is dedicated to the public domain under CC0-1.0; see Zenodo and metadata/LICENSES.md. Code is MIT-licensed. If later versions add third-party CC-BY assets, full attributions will be recorded in LICENSES.md. Intended use. Research and education on earcon design, timbre features, simple robustness testing (e.g., to small reverbs). Not for safety-critical alerts or clinical purposes. Known limitations and risks. Synthetic signals may not capture perceptual subtleties of human-designed earcons. Reverb is schematic; psychoacoustic measures are proxies unless explicitly computed. No private or sensitive information is present."
+        },
+        {
+            "title": "7 Limitations and Future Work",
+            "content": "We intentionally prioritize compactness and controllability over ecological breadth. Future releases may add: (i) HRTF-based spatialization for 3D earcons; (ii) additional envelopes and FM indices; 4 Figure 1: Example log-mel spectrograms across waveform families and AM settings. (iii) measured room impulse responses; (iv) optional subjective preference data (user studies); and (v) expanded f0 sets and micro-variations."
+        },
+        {
+            "title": "Availability and Citation",
+            "content": "Dataset (Zenodo DOI): https://doi.org/10.5281/zenodo.17172015 Code: https://github.com/mandip42/earcons-mini-500 If you use BeepBank-500, please cite the dataset DOI and this data note. plain-text citation is provided in the repository CITATION.cff."
+        },
+        {
+            "title": "Reproducibility Checklist",
+            "content": "Data generation code: Provided in code/generate_earcons.py (deterministic seeds). Metadata schema: Documented in Section 4 and shipped as CSV. Baselines: Minimal scripts with fixed preprocessing; JSON metrics are emitted. Licenses: CC0-1.0 for audio, MIT for code; clearly indicated in files and record. Versioning: Semantic version tags (e.g., v1.0.0) with CHANGELOG entries. Quick Start (CLI) python -m venv .venv; source .venv/bin/activate; pip install -r requirements.txt python code/generate_earcons.py --outdir audio --meta metadata/metadata.csv --seed 13 --target_n , 400 5 python code/baselines/classify_waveform.py --audio_dir audio --meta metadata/metadata.csv python code/baselines/f0_regression.py --audio_dir audio --meta metadata/metadata.csv"
+        },
+        {
+            "title": "B Minimal BibTeX for the Dataset",
+            "content": "@dataset{goswami_beepbank500_2025, = {BeepBank-500: Psychoacoustic Earcon Mini-Corpus}, = {2025}, author = {Goswami, Mandip}, title year version = {1.0.0}, doi url = {10.5281/zenodo.17172015}, = {https://doi.org/10.5281/zenodo.17172015} }"
+        }
+    ],
+    "affiliations": [
+        "Amazon, Bellevue, WA, USA"
+    ]
+}
