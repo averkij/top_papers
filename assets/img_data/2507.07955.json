@@ -1,0 +1,159 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.07955/x1.png",
+                "caption": "Figure 1:(left)Architectural overview of H-Net with a two-stage hierarchical design (S=2𝑆2S=2italic_S = 2).(right)Dynamic Chunking (DC).(bottom-right)Key components of a chunking layer:\n(a) a routing module module for dynamically drawing chunk boundaries, and\n(b) a downsampler that selectively retains vectors based on boundary indicators, reducing sequence length while preserving semantically significant positions.(top-right)Key components of a dechunking layer:\n(c) a smoothing module for converting discrete chunks into interpolated representations, and\n(d) an upsampler that restores compressed vectors to their original resolution based on boundary indicators.𝖫𝗂𝗇𝖾𝖺𝗋𝖫𝗂𝗇𝖾𝖺𝗋\\mathsf{Linear}sansserif_LinearinEquation3and𝖲𝖳𝖤𝖲𝖳𝖤\\mathsf{STE}sansserif_STEinEquation9are omitted in the illustration for brevity.",
+                "position": 339
+            }
+        ]
+    },
+    {
+        "header": "2H-Net Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.07955/x2.png",
+                "caption": "Figure 2:Comparison of decompression strategies on the example sequence\"...new product!\".●●\\CIRCLE●indicates a boundary with high confidence (Pt=1.0subscript𝑃𝑡1.0P_{t}=1.0italic_P start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT = 1.0) and◐◐\\LEFTcircle◐indicates a boundary with low confidence (Pt=0.5subscript𝑃𝑡0.5P_{t}=0.5italic_P start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT = 0.5).\nAs each letter in the example is unique, we use the letters in subscripts to denote expected semantics of chunks.\n(a) Optimal chunking with oracle boundaries identifying linguistically meaningful units.\n(b) Suboptimal chunking without a smoothing module.\nThis creates misalignment during upsampling, causing information from incorrect contexts to propagate.\n(c) Improved decompression with a smoothing module, where low-confidence chunks are interpolated with weighted combinations of previous chunks, correcting the shaded regions.\nIn panels (b) and (c), we interpret low-confidence boundaries cause the encoder network to embed broader contexts at subsequent positions.\nSpecifically, the vectors at_and!encodenew_andduct!, respectively (instead ofw_andct!).",
+                "position": 608
+            }
+        ]
+    },
+    {
+        "header": "3Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.07955/x3.png",
+                "caption": "Figure 3:Validation Bits-per-byte (BPB) throughout trainingfor different models at Large (760760760760M, left) and XL (1.31.31.31.3B, right) scales with matched computational and data budgets for training.\nAll models but Transformer take raw byte inputs (Transformer uses GPT-2 tokenizer).\nVertical dotted lines indicate crossover points where H-Net begins to outperform Transformer with predefined BPE tokenization.\nFrom the curves we can clearly see the following: (1) all hierarchical models (i.e.,SpaceByte++, H-Net variants) outperform the isotropic models (i.e.,Transformer, MambaByte, LlamaByte); (2) dynamic chunking is more powerful than BPE tokenizers; and (3) DC is more effective than other chunking strategies.\nFurthermore, H-Net’s 2-stage variant consistently outperforms 1-stage across both scales, demonstrating the effectiveness of deeper hierarchies.\nSeeTable1for architectural details.",
+                "position": 1333
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x4.png",
+                "caption": "(a) H-Net (1-stage), using6666-DC.",
+                "position": 1920
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x4.png",
+                "caption": "(a) H-Net (1-stage), using6666-DC.",
+                "position": 1923
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x5.png",
+                "caption": "(b) H-Net (2-stage), using (3,3)-DC.",
+                "position": 1945
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x6.png",
+                "caption": "Figure 5:Validation Bits-per-byte (BPB) throughout training on Chinese language and code modeling.H-Net (space) and H-Net (2-stage) are byte-level, while the Transformers use the Llama-3 tokenizer which was designed for multilingual.\nH-Net clearly outperforms both Transformer and H-Net (space) on Chinese language modeling, which does not have space-like segmentation cues, with lower BPB than H-Net (space) throughout training and crossing over with Transformer after around 25B bytes. On code, both H-Net (2-stage) and SpaceByte++ significantly outperform BPE Transformer.\nFinal post-decay results can be found inTable4.",
+                "position": 1956
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x7.png",
+                "caption": "Table 5:Model details and final performance on HG38.We trained two isotropic models and two H-Net models, varying the main network architecture (Transformer or Mamba-2). Each H-Net model outperforms the corresponding isotropic model. We empirically find that theℰ0=superscriptℰ0absent\\mathcal{E}^{0}=caligraphic_E start_POSTSUPERSCRIPT 0 end_POSTSUPERSCRIPT =M3T1encoder architecture slightly outperforms a pure Mamba-2 encoderℰ0=superscriptℰ0absent\\mathcal{E}^{0}=caligraphic_E start_POSTSUPERSCRIPT 0 end_POSTSUPERSCRIPT =M4(SectionE.3).",
+                "position": 2067
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x8.png",
+                "caption": "Figure 7:Ablation study on key H-Net componentsshowing validation BPB (left) and compression ratios for the first stageL1/L0superscript𝐿1superscript𝐿0L^{1}/L^{0}italic_L start_POSTSUPERSCRIPT 1 end_POSTSUPERSCRIPT / italic_L start_POSTSUPERSCRIPT 0 end_POSTSUPERSCRIPT(center) and second stageL2/L1superscript𝐿2superscript𝐿1L^{2}/L^{1}italic_L start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT / italic_L start_POSTSUPERSCRIPT 1 end_POSTSUPERSCRIPT(right) during training.\nUsing H-Net (2-stage), we evaluate the impact of removing three components: the smoothing module (w/o smoothing), the similarity-based routing module (w/o cosine routing), and Straight-Through Estimator (w/o STE).",
+                "position": 2120
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x9.png",
+                "caption": "Figure 8:Encoder-decoder architecture ablation using raw byte inputs.Validation BPB (left) and compression ratioL1/L0superscript𝐿1superscript𝐿0L^{1}/L^{0}italic_L start_POSTSUPERSCRIPT 1 end_POSTSUPERSCRIPT / italic_L start_POSTSUPERSCRIPT 0 end_POSTSUPERSCRIPT(right) for H-Net (1-stage) throughout training.\nWe evaluate four encoder-decoder (ℰ0−𝒟0superscriptℰ0superscript𝒟0\\mathcal{E}^{0}-\\mathcal{D}^{0}caligraphic_E start_POSTSUPERSCRIPT 0 end_POSTSUPERSCRIPT - caligraphic_D start_POSTSUPERSCRIPT 0 end_POSTSUPERSCRIPT) configurations: M4-M4 , M2T1-T1M2 and T1M2-M2T1, and T2-T2, where M denotes Mamba layers and T denotes Transformer layers.",
+                "position": 2149
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x10.png",
+                "caption": "Figure 9:SpaceByte++ encoder-decoder architecture ablation using raw byte inputs.We evaluate four encoder-decoder (ℰ0−𝒟0superscriptℰ0superscript𝒟0\\mathcal{E}^{0}-\\mathcal{D}^{0}caligraphic_E start_POSTSUPERSCRIPT 0 end_POSTSUPERSCRIPT - caligraphic_D start_POSTSUPERSCRIPT 0 end_POSTSUPERSCRIPT) configurations: M4-M4 , M2T1-T1M2 and T1M2-M2T1, and T2-T2, where M denotes Mamba layers and T denotes Transformer layers.",
+                "position": 2195
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x10.png",
+                "caption": "Figure 9:SpaceByte++ encoder-decoder architecture ablation using raw byte inputs.We evaluate four encoder-decoder (ℰ0−𝒟0superscriptℰ0superscript𝒟0\\mathcal{E}^{0}-\\mathcal{D}^{0}caligraphic_E start_POSTSUPERSCRIPT 0 end_POSTSUPERSCRIPT - caligraphic_D start_POSTSUPERSCRIPT 0 end_POSTSUPERSCRIPT) configurations: M4-M4 , M2T1-T1M2 and T1M2-M2T1, and T2-T2, where M denotes Mamba layers and T denotes Transformer layers.",
+                "position": 2197
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x11.png",
+                "caption": "Figure 10:Encoder-decoder architecture ablation using BPE-tokenized inputs.Assuming that GPT-2 tokenizer serves as the outermost encoder-decoder (i.e.,ℰ0superscriptℰ0\\mathcal{E}^{0}caligraphic_E start_POSTSUPERSCRIPT 0 end_POSTSUPERSCRIPT-𝒟0superscript𝒟0\\mathcal{D}^{0}caligraphic_D start_POSTSUPERSCRIPT 0 end_POSTSUPERSCRIPT), we evaluate sixℰ1superscriptℰ1\\mathcal{E}^{1}caligraphic_E start_POSTSUPERSCRIPT 1 end_POSTSUPERSCRIPT-𝒟1superscript𝒟1\\mathcal{D}^{1}caligraphic_D start_POSTSUPERSCRIPT 1 end_POSTSUPERSCRIPTcombinations: M6-M6, M4T1-T1M4, T1M4-M4T1, M2T2-T2M2, T2M2-M2T2, and T3-T3.",
+                "position": 2204
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x12.png",
+                "caption": "Figure 11:Hybrid main network.Bits-per-byte during the stable phase of training, for H-Net (2-stage) with Transformer main stage and with hybrid main stage.\nThe hybrid main stage scales better, similar to findings for standard token-based language models. This finding suggests that design principles for isotropic (tokenized) models can carry over to choices of the main network.",
+                "position": 2253
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x12.png",
+                "caption": "Figure 11:Hybrid main network.Bits-per-byte during the stable phase of training, for H-Net (2-stage) with Transformer main stage and with hybrid main stage.\nThe hybrid main stage scales better, similar to findings for standard token-based language models. This finding suggests that design principles for isotropic (tokenized) models can carry over to choices of the main network.",
+                "position": 2255
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x13.png",
+                "caption": "Figure 12:Comparison to Mixtures-of-Experts.Bits-per-byte comparison of H-Net (both 1-stage and 2-stage) to LlamaByte-MoE, which is a FLOPs-matched MoE model that uses a similar number of parameters as H-Net (2-stage). Both H-Nets perform much better than LlamaByte-MoE, implying that H-Net’s capabilities do not just come from sparsity.",
+                "position": 2260
+            }
+        ]
+    },
+    {
+        "header": "4Discussion",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix ARelated Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BFLOPs Computation.",
+        "images": []
+    },
+    {
+        "header": "Appendix CLearning Rate Modulation",
+        "images": []
+    },
+    {
+        "header": "Appendix DAdditional Experimental Setup Details",
+        "images": []
+    },
+    {
+        "header": "Appendix EAdditional Ablation Studies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.07955/x14.png",
+                "caption": "Figure 13:Compression Methods in chunking layer.Default: H-Net’s Downsample operation(left-a).\nMax/Mean: Channel-wise max and mean pooling within boundaries(left-b).\nXAttn: Cross-attention pooling within boundaries(left-c).+Res: Adds boundary vector residuals to compressed outputs.",
+                "position": 3022
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x15.png",
+                "caption": "",
+                "position": 3032
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x16.png",
+                "caption": "Table 7:Encoder architecture ablations on HG38.Switching the encoder architecture fromM3T1toM4leads to worse performance across the board,\nthough the results are still better than isotropic models (Table5).\nTransformers in the encoder network do not appear to be helpful for text (Figure8), suggesting that\nthis finding may be modality-specific.",
+                "position": 3085
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x17.png",
+                "caption": "Figure 15:Auxiliary loss strategy for training the encoderof a H-Net with pretrained main stage.\nIn order to mimic the behavior of the tokenizer + embedding layer of a pretrained language model, we add supervision to both the routing module boundary probabilities\nand to the hidden states that we pass through to the main network.\nThese losses encourage the encoder to tokenize once at the start of every token, while also passing the correct embedding into the main network near the start of the token,\nthus making maximal use of the next-token prediction ability.",
+                "position": 3171
+            },
+            {
+                "img": "https://arxiv.org/html/2507.07955/x18.png",
+                "caption": "Figure 16:Visualization of boundary positions dynamically drawn by H-Net (1-stage).\nThe given text is perturbed that some whitespaces are missing.\nH-Net detects word boundaries even if they are not explicitly separated by whitespaces.",
+                "position": 3321
+            }
+        ]
+    },
+    {
+        "header": "Appendix FDistilling Token-Level Models to Byte-Level",
+        "images": []
+    }
+]

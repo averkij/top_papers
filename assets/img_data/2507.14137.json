@@ -1,0 +1,95 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.14137/x1.png",
+                "caption": "Figure 1:Overview ofFranca. Top-left: We learn efficientMatryoshka-style(Kusupati et al.,2022)visual representations using a multi-head clustering projection head. The encoder produces featuresz∈ℝd𝑧superscriptℝ𝑑z\\in\\mathbb{R}^{d}italic_z ∈ blackboard_R start_POSTSUPERSCRIPT italic_d end_POSTSUPERSCRIPT, which is sliced into progressively smaller subsets of dimensionsd,…⁢d/8,d/16𝑑…𝑑8𝑑16d,\\dots d/8,d/16italic_d , … italic_d / 8 , italic_d / 16. Each slice passes through a projection head and a corresponding clustering head with cluster countsc,…,c/8,c/16𝑐…𝑐8𝑐16c,\\dots,c/8,c/16italic_c , … , italic_c / 8 , italic_c / 16, inducing acoarse-to-fine hierarchyof semantic abstraction. Top-right: Unlike prior approaches trained on curated academic datasets, e.g., LVD-142M in DINOv2 or proprietary data like WebLI in SigLIPv2,Francais trained on open-source internet-scale uncurated data. Bottom: Despite this, it generalizes well across model scales and achieves strong performance on diverse downstream tasks, including in-context learning(Balazevic et al.,2023), out-of-distribution detection(Yang et al.,2022), and 3D understanding(Chen et al.,2025).",
+                "position": 108
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.14137/x2.png",
+                "caption": "Figure 2:Pretraining ablation ofFranca.Starting from a ViT-B/14 pretrained on ImageNet-21K, we show the impact of each proposed components. The inner bar represents in-context segmentation performance on the Hummingbird benchmark(Balazevic et al.,2023), while the outer bar shows linear probing accuracy on the ImageNet-1K(Russakovsky et al.,2015). Each addition, i.e., CyclicMask, Matryoshka representations, RASA, and High resolution finetuning, results in consistent improvements.",
+                "position": 306
+            },
+            {
+                "img": "https://arxiv.org/html/2507.14137/x3.png",
+                "caption": "Figure 3:k-NN classification accuracy on ImageNet-v2at varying embedding slice levels using a ViT-L backbone.Francaconsistently outperforms DINOv2 across all subspace dimensions, maintaining high performance even under strong compression (dim/64dim64\\text{dim}/64dim / 64). Note that DINOv2 was not trained with sliced dimensions and its features are uniformly distributed across the full embedding space.",
+                "position": 352
+            },
+            {
+                "img": "https://arxiv.org/html/2507.14137/x4.png",
+                "caption": "Figure 4:Masking strategies used in masked image modeling.Compared to Random (a), Block (b), and Inverse (c) masking, our CyclicMask (d) circularly shifts the visible region across spatial axes, preventing the model from being biased toward specific spatial locations.",
+                "position": 359
+            },
+            {
+                "img": "https://arxiv.org/html/2507.14137/extracted/6634842/figs/prelim_entropy_fig.png",
+                "caption": "Figure 5:Entropy of patch locations for each cluster.For each visual cluster predicted from the projection head on the patch embeddings, we compute the entropy of the 2D spatial coordinates of the patches assigned to it. A low entropy value indicates that the cluster consistently activates mostly at specific spatial positions (e.g., always top left patch), revealing positional bias in the representation. Left: We find several position-agnostic low-entropy clusters in DINOv2, that fire at specific image locations. Right: Compared to DINOv2,Francaproduces clusters with significantly higher spatial entropy, demonstrating a more uniform and position-invariant distribution of patch activations across the image. This supports the effectiveness of RASA in removing linear positional components from the representation space.",
+                "position": 384
+            }
+        ]
+    },
+    {
+        "header": "4Implementation details",
+        "images": []
+    },
+    {
+        "header": "5Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.14137/x5.png",
+                "caption": "Figure 7:Self-attention mapsutilizing14×14141414\\times 1414 × 14patches. These maps are visualized using the[CLS]token on the last layer’s heads on the validation set of ImageNet-1K(Russakovsky et al.,2015).Francahas better localization than DINOv2 with registers(Darcet et al.,2024)without requiring the use of registers, where the nested Matryoshka clustering captures fine-grained detailse.g.feathers, beaks of bird.",
+                "position": 502
+            },
+            {
+                "img": "https://arxiv.org/html/2507.14137/x6.png",
+                "caption": "Figure 8:Out-of-Distribution Detectionacross five robustness-benchmarks: SSB-Hard(Vaze et al.,2022), NINCO(Bitterwolf et al.,2023), iNaturalist(Huang and Li,2021), OpenImage-O(Wang et al.,2022a), and Texture(Kylberg,2011).Francaconsistently outperforms DINOv2, at larger scales, demonstrating its robustness across distribution shifts. DINOv2-B and DINOv2-L are distilled from DINOv2-G and trained on LVD 142M, while neither variants ofFrancaare distilled. We report AuROC; higher is better.",
+                "position": 781
+            },
+            {
+                "img": "https://arxiv.org/html/2507.14137/x7.png",
+                "caption": "Figure 9:Visualization of the first PCA components. We compute PCA across patches on DAVIS(Pont-Tuset et al.,2017)and illustrate the first three components using RGB color channels. Despite variations in pose, style, or even object identity, corresponding parts are consistently matched. Background regions are removed by thresholding the first PCA component. Images were selected randomly withnp.random.randint(seed=42).",
+                "position": 990
+            },
+            {
+                "img": "https://arxiv.org/html/2507.14137/x8.png",
+                "caption": "Figure 10:Unsupervised clustering. We compare self-supervised clustering results ofFrancawith DINOv2 and DINOv2-R. Each method generates pseudo-segmentations from self-attention maps without labels or fine-tuning.Francayields sharper boundaries and more semantically coherent regions, especially on fine-grained objects such as birds and bicycles.",
+                "position": 1250
+            },
+            {
+                "img": "https://arxiv.org/html/2507.14137/x9.png",
+                "caption": "Figure 11:Probing with Gaussian Splatting, Normalized average metrics using Feat2GS(Chen et al.,2025)across six datasets for two probing schemes: geometry (G), and all (A), i.e., Geometry + Texture with ViT-L backbone. We measure PSNR, SSIM (higher is better) and LPIPS (lower is better) showing thatFrancaachieves significantly better performance than state-of-the-art vision encoders suggesting strong geometrical awareness.",
+                "position": 1658
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments.",
+        "images": []
+    },
+    {
+        "header": "Detailed Contributions",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]

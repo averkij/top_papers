@@ -1,0 +1,136 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.07301/x1.png",
+                "caption": "Figure 1:Receptive fields of keys in standard causal attention and CASTLE. The top row shows standard causal attention when generating the 4th token (left) and the 6th token (right). The bottom row shows CASTLE under the same settings. Here, key1, key2,⋯\\cdotsdenote the keys corresponding to tokens 1, 2,⋯\\cdots, whileT1T_{1},T2T_{2},⋯\\cdotsdenote the tokens.\nIn standard causal attention, keys are static: when generating the(t+1)(t+1)-th token, each keyiiwith1≤i≤t1\\leq i\\leq tcan only access information from{T1,⋯,Ti}\\left\\{T_{1},\\cdots,T_{i}\\right\\}, and keyiiremains the same for all later steps.\nIn contrast, CASTLE continuously updates keys at each prediction step, i.e., when generating the(t+1)(t+1)-th token, the receptive field of any keyiiwith1≤i≤t1\\leq i\\leq t, is expanded to contain information from{T1,⋯,Tt}\\left\\{T_{1},\\cdots,T_{t}\\right\\}.",
+                "position": 153
+            }
+        ]
+    },
+    {
+        "header": "2Causal Attention with Lookahead Keys",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.07301/x2.png",
+                "caption": "Figure 2:Receptive fields of causal keys and lookahead keys with respect to contextualized representations and tokens (excluding the first layer) when generating the 6th token. Tokens are denoted byTiT_{i}and their contextualized representations by𝒙i\\boldsymbol{\\mathit{x}}_{i}. Causal keyiicorresponds to the causal key of tokenii, while lookahead keyiicorresponds to the lookahead key of tokenii. When generating the(t+1)(t+1)-th token, for tokenss(s<t+1s<t+1), the causal key of tokenssis a projection of𝒙s\\boldsymbol{\\mathit{x}}_{s}. Due to the softmax in attention, except in the first layer, causal keys ofssattend over tokens{T1,⋯,Ts}\\left\\{T_{1},\\cdots,T_{s}\\right\\}. For tokens<ts<t, lookahead keys ofssincorporate information from{𝒙s+1,⋯,𝒙t}\\left\\{\\boldsymbol{\\mathit{x}}_{s+1},\\cdots,\\boldsymbol{\\mathit{x}}_{t}\\right\\}and attend over all existing tokens{T1,⋯,Tt}\\left\\{T_{1},\\cdots,T_{t}\\right\\}. Since the last row of𝑴U\\boldsymbol{\\mathit{M}}^{U}is defined as[𝑴tU]t,:=(−∞)1×t[\\boldsymbol{\\mathit{M}}^{U}_{t}]_{t,:}=(-\\infty)^{1\\times t}, lookahead keys of tokenttare all-zeros vectors and thus have empty receptive fields when generating the(t+1)(t+1)-th token.",
+                "position": 321
+            },
+            {
+                "img": "https://arxiv.org/html/2509.07301/x3.png",
+                "caption": "Figure 3:Illustration for the definition of lookahead keys in (2) when generating the44-th token. Letdmodeld_{\\rm model}anddddenote the hidden dimension and head dimension, respectively. In this figure, we sett=3t=3andd=2d=2.",
+                "position": 380
+            },
+            {
+                "img": "https://arxiv.org/html/2509.07301/x4.png",
+                "caption": "Figure 4:Illustration of CASTLE in recurrent form when generating the 4th token.\nThe causal and lookahead keys are queried by𝒒tC\\boldsymbol{\\mathit{q}}^{C}_{t}to generate their respective attention scores, which are combined and then goes through softmax to yield attention weights𝒑t\\boldsymbol{\\mathit{p}}_{t}. These weights are then multiplied by the value matrix𝑽tC\\boldsymbol{\\mathit{V}}^{C}_{t}to compute the output𝒐t=attention​(𝑿t)∈ℝ1×d\\boldsymbol{\\mathit{o}}_{t}=\\text{attention}\\left(\\boldsymbol{\\mathit{X}}^{t}\\right)\\in\\mathbb{R}^{1\\times d}",
+                "position": 411
+            }
+        ]
+    },
+    {
+        "header": "3Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.07301/x5.png",
+                "caption": "Figure 5:Training and validation loss curves of XL models. Training loss curve is smoothened with a moving window of 2000 training steps. Validation loss is evaluated every 100 training steps on 40M tokens, and its curve is smoothened by a moving window of 20 evaluation intervals. Loss curves for the small, medium and large models can be found in Figure7, Figure8and Figure9of Appendix9.3. After 50B training tokens, CASTLE-XL achieves a0.0294\\bm{0.0294}lower training loss and a0.0348\\bm{0.0348}lower validation loss compared to Baseline-XL.",
+                "position": 760
+            },
+            {
+                "img": "https://arxiv.org/html/2509.07301/x5.png",
+                "caption": "",
+                "position": 763
+            },
+            {
+                "img": "https://arxiv.org/html/2509.07301/x6.png",
+                "caption": "",
+                "position": 767
+            }
+        ]
+    },
+    {
+        "header": "4Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "5Proof of Theorem1",
+        "images": []
+    },
+    {
+        "header": "6Further Details on Multi-Head CASTLE",
+        "images": []
+    },
+    {
+        "header": "7Efficient Parallel Training Algorithm and Proof of Theorem2",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.07301/x7.png",
+                "caption": "Figure 6:Parallel scheme of Algorithm1(forward pass). We begin by computing the diagonal blocks of the attention score matrix𝑨\\boldsymbol{\\mathit{A}}(Iteration 0). In each subsequent iterationkk, thekk-th off-diagonal blocks are computed. Blocks with different colors represent different kernel instances. In each iteration, each kernel instance is responsible for computing a single block of𝑨\\boldsymbol{\\mathit{A}}and applying online softmax (Algorithm2) to it. Kernel instances within the same iteration are launched in parallel, while the iterations are executed sequentially. The parallel scheme of Algorithm3(backward pass) is the reverse of the forward pass’s parallel scheme.",
+                "position": 1938
+            }
+        ]
+    },
+    {
+        "header": "8Efficient Inference with UQ-KV Cache",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.07301/x8.png",
+                "caption": "Figure 7:Training and validation loss curves of small models. Training loss curve is smoothened with a moving window of 2000 training steps. Validation loss is evaluated every 100 training steps on 40M tokens, and its curve is smoothened by a moving window of 20 evaluation intervals. As seen in Table1and in comparison with Figure8, Figure9and Figure5, CASTLE yields only marginal improvements over the baseline on small models. A likely explanation is that this is because the benefit of lookahead keys may lie in helping models capture global dependencies, but small models are capacity-limited and can primarily extract local features, making global relations less useful at this scale.",
+                "position": 3285
+            },
+            {
+                "img": "https://arxiv.org/html/2509.07301/x8.png",
+                "caption": "",
+                "position": 3288
+            },
+            {
+                "img": "https://arxiv.org/html/2509.07301/x9.png",
+                "caption": "",
+                "position": 3292
+            },
+            {
+                "img": "https://arxiv.org/html/2509.07301/x10.png",
+                "caption": "Figure 8:Training and validation loss curves of medium models. Training loss curve is smoothened with a moving window of 2000 training steps. Validation loss is evaluated every 100 training steps on 40M tokens, and its curve is smoothened by a moving window of 20 evaluation intervals. After 50B training tokens, CASTLE-M achieves a0.0294\\bm{0.0294}lower training loss and a0.0245\\bm{0.0245}lower validation loss compared to Baseline-M.",
+                "position": 3298
+            },
+            {
+                "img": "https://arxiv.org/html/2509.07301/x10.png",
+                "caption": "",
+                "position": 3301
+            },
+            {
+                "img": "https://arxiv.org/html/2509.07301/x11.png",
+                "caption": "",
+                "position": 3305
+            },
+            {
+                "img": "https://arxiv.org/html/2509.07301/x12.png",
+                "caption": "Figure 9:Training and validation loss curves of large models. Training loss curve is smoothened with a moving window of 2000 training steps. Validation loss is evaluated every 100 training steps on 40M tokens, and its curve is smoothened by a moving window of 20 evaluation intervals. After 50B training tokens, CASTLE-L achieves a0.0371\\bm{0.0371}lower training loss and a0.0356\\bm{0.0356}lower validation loss compared to Baseline-L.",
+                "position": 3311
+            },
+            {
+                "img": "https://arxiv.org/html/2509.07301/x12.png",
+                "caption": "",
+                "position": 3314
+            },
+            {
+                "img": "https://arxiv.org/html/2509.07301/x13.png",
+                "caption": "",
+                "position": 3318
+            }
+        ]
+    },
+    {
+        "header": "9Experimental Details and Additional Results",
+        "images": []
+    }
+]

@@ -1,0 +1,139 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.09737/x1.png",
+                "caption": "",
+                "position": 99
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Probabilistic Prediction: Richly Controllable World Models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.09737/x2.png",
+                "caption": "",
+                "position": 223
+            },
+            {
+                "img": "https://arxiv.org/html/2509.09737/x3.png",
+                "caption": "Figure 2:LRAS Architecture.(A): Hierarchical Local Quantizer (HLQ) encodes each local patch into a sequence of local codes. The first code decodes to a low-resolution version of the input, while the rest provide details to upsample the reconstruction to the original resolution.(B): HLQ codes are transformed into the Pointer-Content representation to allow for random access to the patches when encoding and decoding the image causally.(C): Modeling the serialized image representation with an autoregressive transformer. Pointer tokens can be either predicted or seeded while decoding. This allows for any amount of sequential and parallel prediction from the same KV cache.(D): Scaling Laws illustrating our model obtains predictably lower loss when given more parameters.",
+                "position": 278
+            },
+            {
+                "img": "https://arxiv.org/html/2509.09737/x4.png",
+                "caption": "Figure 3:Unconditional Promptable Prediction.Using the same unified modelΨ\\Psi, single-frame unconditional prompting produces diverse plausible futures that reflect learned motion priors.",
+                "position": 341
+            },
+            {
+                "img": "https://arxiv.org/html/2509.09737/x5.png",
+                "caption": "Figure 4:Patch-Conditional Promptable Prediction.With sparse patches from the target frame as conditioning,Ψ\\Psicollapses uncertainty to a constrained completion; replacing patches with synthetic edits yields counterfactual manipulations while maintaining physical plausibility — all with the same unified model.",
+                "position": 377
+            },
+            {
+                "img": "https://arxiv.org/html/2509.09737/x6.png",
+                "caption": "Figure 5:Camera-Conditional Prediction (Novel View Synthesis).Given camera transformation parameters,Ψ\\Psisynthesizes new viewpoints that preserve scene consistency while hallucinating occluded regions, using the same unified model.",
+                "position": 398
+            },
+            {
+                "img": "https://arxiv.org/html/2509.09737/x7.png",
+                "caption": "Figure 6:Progressive Uncertainty Reduction Through Sequential Conditioning.We perform a series ofparallelpredictions at each step to measure the model’scertaintyduring generation. We reveal the patches that yield the highest entropy at each step to optimally resolve the scene uncertainty. Each column demonstrates how additional conditioning patches (yellow squares) progressively constrain the model’s belief about the state of the world, and improve the parallel prediction.Note that sequential rollouts will produce coherent, sharp generations with any amount of conditioning patches revealed, at the cost of more compute.",
+                "position": 430
+            }
+        ]
+    },
+    {
+        "header": "3Structure Extraction: Prompts as Causal Inference",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.09737/x8.png",
+                "caption": "Figure 7:Optical Flow via KL Tracing.Procedure (top):Step 1— run patch-conditionalparallelprediction to obtain per-patch logits;Step 2— add a tiny dot tof0f_{0}to form a perturbed input and recompute logits;Step 3— take the KL divergence between perturbed and unperturbed predicted distributions to locate the correspondence inf1f_{1}, yielding a flow vector.Extractions (bottom):flow tracks across diverse scenes produced by repeating the probe at several locations.",
+                "position": 526
+            },
+            {
+                "img": "https://arxiv.org/html/2509.09737/x9.png",
+                "caption": "Figure 8:Object Segments from Motion Hypotheticals.Procedure (top):Step 1— induce object motion by copying a small patch inf0f_{0}and moving it to a new location (counterfactual prompt);Step 2— generate the hypothetical frame and compute optical flow betweenf0f_{0}and the hypothetical;Step 3— repeat over seed locations to cover multiple instances and convert coherent, induced motion into segments.Extractions (bottom):for each scene: framef0f_{0}, prompt, hypothetical completion, induced optical flow, and the resulting instance segments.",
+                "position": 689
+            },
+            {
+                "img": "https://arxiv.org/html/2509.09737/x10.png",
+                "caption": "Figure 9:Depth from Viewpoint Hypotheticals.Procedure (top):Step 1— apply a camera-pose counterfactual (e.g., translate right/left/up/down) and generate the hypothetical view;Step 2— compute optical flow betweenf0f_{0}and the hypothetical;Step 3— take the flow magnitude as disparity and invert to obtain (unscaled) depth.Extractions (bottom):per scene, we show the prompt, hypothetical, estimated flow, and resulting depth, illustrating consistent geometry across varied motions and baselines.",
+                "position": 706
+            }
+        ]
+    },
+    {
+        "header": "4Integrating Structure:\nRatcheting Prompting and Control",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.09737/x11.png",
+                "caption": "Figure 10:Mixing New Tokens Into Sequences (Integration Step 2).We integrate newly tokenized structures — e.g., flow, depth, and segments — by inserting their tokens betweenf0f_{0}andf1f_{1}in the same autoregressive sequence, following simple sequence-design principles. In this layout, the new tokens serve both as conditioning inputs and as prediction targets, decomposing the scene into core structures that steer the subsequent frame. The full training sequence therefore subsumes the “zoo” of predictors (e.g., motion prediction, flow-conditioned RGB, segment prediction) as masked subsets of a single sequence.",
+                "position": 791
+            },
+            {
+                "img": "https://arxiv.org/html/2509.09737/x12.png",
+                "caption": "Figure 11:Improved Generation Control.By allowing PSI (Ψ\\Psi) to accept flow tokens as conditioning, we expose a powerful new control surface to guide our generations. By strictly constraining the motion we wish our model to simulate, we significantly constrain the space of plausible outputs.",
+                "position": 860
+            },
+            {
+                "img": "https://arxiv.org/html/2509.09737/x13.png",
+                "caption": "",
+                "position": 962
+            },
+            {
+                "img": "https://arxiv.org/html/2509.09737/x14.png",
+                "caption": "",
+                "position": 1038
+            },
+            {
+                "img": "https://arxiv.org/html/2509.09737/x15.png",
+                "caption": "Figure 12:Unconditional Prediction with Flow Intermediate.Single-frame predictions from different models. Columns show: (1) input Frame 0, (2) PSI RGB-only prediction, (3) COSMOS 4B baseline, (4) PSI with flow intermediate, (5) ground truth Frame 1. Both RGB-only models exhibit motion collapse—generating static frames despite obvious motion cues. With flow integration,Ψ\\Psifirst predicts a motion field from Frame 0, then conditions RGB generation on this flow, successfully capturing dynamic scenes that stump direct prediction approaches.",
+                "position": 1070
+            }
+        ]
+    },
+    {
+        "header": "5Example Applications",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.09737/x16.png",
+                "caption": "",
+                "position": 1124
+            },
+            {
+                "img": "https://arxiv.org/html/2509.09737/x17.png",
+                "caption": "",
+                "position": 1149
+            },
+            {
+                "img": "https://arxiv.org/html/2509.09737/x18.png",
+                "caption": "",
+                "position": 1174
+            }
+        ]
+    },
+    {
+        "header": "6Discussion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.09737/x19.png",
+                "caption": "Figure 13:Regression, Diffusion, and Distributional Prediction.Regression modelsoutput the conditional mean of the future, which is often off-manifold – even though it minimizes distance to most possible futures.Diffusion modelslearn continuous paths that transform noise into realistic samples on the future-state manifold, but they do not model the entire probability density explicitly.Distributional autoregressive models(such as LLMs) output a full probability distribution over a discretized representation of the future, enabling explicit uncertainty estimates.",
+                "position": 1246
+            }
+        ]
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]

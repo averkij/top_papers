@@ -1,0 +1,157 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.05259/x1.png",
+                "caption": "",
+                "position": 68
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.05259/x2.png",
+                "caption": "Figure 2:Overview ofX-Plannerfor Complex Instruction-Based Editing.OurX-Plannercomprises two main branches: First, MLLM decomposes the complex instruction into multiple simpler sub-instructions along with editing anchors (e.g., cat, dog, and background) which are given to segmentation decoder to get corresponding masks for each sub-instruction. Also, for the insertion edit, MLLM outputs bounding box coordinates along with edit instruction. By integrating with the editing model pool, we then iteratively apply the most suitable editing model to execute each specific edit task based onX-Plannergenerated sub-instruction along with masks / bounding boxes.",
+                "position": 97
+            }
+        ]
+    },
+    {
+        "header": "2Related Works",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.05259/x3.png",
+                "caption": "Figure 3:Level 1: Complex-Simple Instruction Pair Generation.Using our structured template, we prompt GPT-4o to generate complex instructions—including indirect, multi-object, and multi-task instructions (as defined in Section 1)—along with their corresponding simpler instructions, object anchors, and edit types.",
+                "position": 162
+            },
+            {
+                "img": "https://arxiv.org/html/2507.05259/x4.png",
+                "caption": "Figure 4:Level 2: Instruction-Based Mask Generation and Refinement.In Stage 1, we use the source image and anchor text with Grounded SAM to generate a fine-grained mask for the specified object. In Stage 2, we refine this mask by applying varies strategies based on the edit type provided in Level 1 (Figure3).",
+                "position": 180
+            },
+            {
+                "img": "https://arxiv.org/html/2507.05259/x5.png",
+                "caption": "Figure 5:Level 3: Insertion Task-Based Mask & Box Localization.For insertion task, Grounded SAM struggles to segment objects not present in the source image. We pre-train an MLLM on a bounding box-annotated dataset[41], enabling it to pseudo-annotate our data with bounding box for insertion edits.",
+                "position": 184
+            },
+            {
+                "img": "https://arxiv.org/html/2507.05259/x6.png",
+                "caption": "Figure 6:Qualitative Comparison for Complex Instruction-Based Editing Benchmark.IntegratingX-Plannerwith editing methods, InstructPix2Pix* and UltraEdit, brings drastic boosts in preserving object identities withX-Plannergenerated masks and boxes (display in bottom-left of each image).X-Planner’s decomposition of complex instructions also enhances alignment with various complex instruction inputs.X-Plannerprovides a distinct advantage over baselines that only use the source image and complex instruction without masks.",
+                "position": 202
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.05259/x7.png",
+                "caption": "Figure 7:User Study on COMPIE Benchmark.We compare against InstructPix2Pix* and UltraEdit. “Better” means the generated images by using ourX-Planneris preferred and vice versa.",
+                "position": 648
+            },
+            {
+                "img": "https://arxiv.org/html/2507.05259/x8.png",
+                "caption": "Figure 8:Visualize Consistent Bounding Box with Repeated Runs.We showX-Plannercan generate consistent bounding boxes with repeated runs to yield plausible location variations.",
+                "position": 706
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Overview",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.05259/x9.png",
+                "caption": "Figure 9:X-Planner’s Training Dataset Summary (Generated from GPT-4o).This figure provides a distribution summary of ourX-Planner’s training dataset, including (a) the data sources, (b) the distribution of edit types for decomposed instructions, and (c) the number of decomposed instructions. The dataset demonstrates significant diversity and comprises large-scaled number of pairs. Note thatn𝑛nitalic_nin (a) indicates the number of data samples.",
+                "position": 1426
+            },
+            {
+                "img": "https://arxiv.org/html/2507.05259/x10.png",
+                "caption": "Figure 10:COMPIE Benchmark Summary.This figure summarizes the proposed COMPIE benchmark, which consists of 550 samples spanning various types of complex instructions shown in (a), including (1) general complex instructions, (2) indirect instructions, (3) multi-object instructions, and (4) multi-task instructions. Additionally in (b), we present the word count distribution of complex instruction anchor descriptions, highlighting the diversity of the dataset. Note thatn𝑛nitalic_nin (a) indicates the number of data samples.",
+                "position": 1429
+            }
+        ]
+    },
+    {
+        "header": "6COMPIE Dataset & Benchmark Summary",
+        "images": []
+    },
+    {
+        "header": "7Implementation Details",
+        "images": []
+    },
+    {
+        "header": "8X-Planner’s Bounding Box Localization",
+        "images": []
+    },
+    {
+        "header": "9Quantitative Comparison on Emu Edit",
+        "images": []
+    },
+    {
+        "header": "10Multi-Step Editing Error Propagation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.05259/x11.png",
+                "caption": "Figure 11:X-Planner’s Training Dataset Summary (Generated from Pixtral-Large).This figure illustrates key statistics of our automatically constructed dataset used to trainX-Plannerusingan open-sourced model, comprising around 300K instruction-image pairs.(a)Source Composition:The data is aggregated from four datasets–SEEDX (32.9%), UltraEdit (28.1%), MULAN (25.5%), and InstructPix2Pix (13.5%)—withn𝑛nitalic_nindicating sample count.(b)Edit Type Distribution:Our dataset covers diverse editing intents, including insertion (35.0%), replace (16.2%), style (11.9%), background edits (10.1%), local texture (9.6%), local color change (9.7%), shape change (5.9%), and remove (1.6%). This diverse mix supports robust generalization across edit semantics.(c)Instruction Decomposition Complexity:While the majority (68.0%) of prompts require only a single edit, a substantial portion involve multi-step reasoning: 2-step (8.9%), 3-step (13.4%), 4-step (9.6%), and even 5-step (0.03%). This highlights the need for a sequential planner likeX-Plannerto handle compositional and complex instructions effectively.",
+                "position": 1490
+            }
+        ]
+    },
+    {
+        "header": "11Generate Training Data from Open-Sourced Model, Pixtral-Large",
+        "images": []
+    },
+    {
+        "header": "12TrainX-Plannerwith Generated Data from Open-Sourced Model, Pixtral-Large",
+        "images": []
+    },
+    {
+        "header": "13Additional Qualitative Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.05259/x12.png",
+                "caption": "Figure 12:X-Planner’s Decomposition Outputs (Simplified Instructions, Edit Types, Masks, and Bounding Boxes).This figure illustrates examples ofX-Planner’s decomposition results, showcasing its ability to handle diverse edit types. The segmentation masks generated are tailored to the specific edit type. For instance, in Row 3, the [replace] edit features both before and after masks which are combined into a single mask for editing guidance, with appropriate dilation applied to ensure accurate representation. Also, in Row 1, the [shape change] edit provides more dilated mask by giving more rooms for potential shape modification.",
+                "position": 2266
+            },
+            {
+                "img": "https://arxiv.org/html/2507.05259/x13.png",
+                "caption": "Figure 13:Qualitative Comparison on MagicBrush, and on COMPIE Benchmark betweenX-Plannerand UltraEdit (I).This figure presents: (1) a comparison ofX-Plannerwith several baseline methods for multi-turn editing on the MagicBrush dataset and (2) a qualitative comparison with the UltraEdit baseline on the COMPIE benchmark. For multi-turn editing,X-Planner, guided by its generated masks, demonstrates superior identity preservation. In contrast, many baseline methods, especially InstructPix2Pix, tend to overedit the image due to a lack of control.",
+                "position": 2269
+            },
+            {
+                "img": "https://arxiv.org/html/2507.05259/x14.png",
+                "caption": "Figure 14:Qualitative Comparison betweenX-Plannerand both InstructPix2Pix* (I) and UltraEdit Baseline (II).This figure compares results from both InstructPix2Pix* and UltraEdit Baseline with and without the integration ofX-Planner. These examples highlight the advantages ofX-Planner’s instruction decomposition and mask controllability over the baseline which is directly given with complex instruction.",
+                "position": 2272
+            },
+            {
+                "img": "https://arxiv.org/html/2507.05259/x15.png",
+                "caption": "Figure 15:Qualitative Comparison betweenX-Plannerand InstructPix2Pix* Baseline (II).This figure compares results from InstructPix2Pix* with and without the integration ofX-Planner. For the [replace] edit type in Rows 4,X-Plannergenerates a dilated segmentation mask for the replaced region to better accommodate the editing model. Similarly, in Row 2, the [shape change] edit includes a dilated mask to account for potential changes. These examples highlight the advantages ofX-Planner’s instruction decomposition and mask controllability over the baseline which is directly given with complex instruction.",
+                "position": 2275
+            },
+            {
+                "img": "https://arxiv.org/html/2507.05259/x16.png",
+                "caption": "Figure 16:Examples of Non-Rigid and Compositional Edits with Model-Specific Failure Cases.We show diverse complex edits (especially the [shape change] edits) generated by pluggingX-Plannerinto three editing models: InstructPix2Pix*, GPT-4o[1], and IC-Edit[49]. Despite not being trained on such complex instructions, these models can perform challenging edits thanks to our decomposition and localization planning. However, some failure cases arise from the editing models: GPT-4o struggles with identity preservation in face edits (e.g., Row 4, red boxes).",
+                "position": 2278
+            }
+        ]
+    },
+    {
+        "header": "14Non-Rigid Edits onX-Planner",
+        "images": []
+    }
+]

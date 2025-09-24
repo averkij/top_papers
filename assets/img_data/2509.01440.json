@@ -1,0 +1,517 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.01440/x1.png",
+                "caption": "Figure 1:Ranking of optimizers for𝟕𝟐𝟎​𝐌\\mathbf{720M}Llama-based models.We plot thefinal validation lossobtained by the best-tuned optimizers on the FineWeb dataset.\nWe use a batch size of1​𝐌1\\mathbf{M}tokens and train multiple methods beyond and below the Chinchilla optimal duration, which is14.4​𝐁14.4\\mathbf{B}for model of this size.AdEMAMixandMARSare the best optimizers in this setup, with a noticable gap in performance compared to other methods.\nWe also plot theAdamWbaseline in both figures to distinguish the group of methods that consistently perform worse thanAdamWfrom the group of optimizers that outperform it for some training durations.\nSee §3andAppendix˜Efor a detailed description of our experimental setup, including hyperparameters.",
+                "position": 109
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x2.png",
+                "caption": "",
+                "position": 118
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x3.png",
+                "caption": "Figure 2:Training dynamics of leading optimizers on𝟓𝟐𝟎​𝐌\\mathbf{520M}MoE model pretraining.We use a batch size of131​𝐤131\\mathbf{k}tokens, and train models for both short runs, i.e., less than Chinchilla optimal duration, and for extended runs beyond this regime.\nThe dashed blue lines correspond to the final validation loss ofAdamWbaselines trained for both42​𝐤42\\mathbf{k}and336​𝐤336\\mathbf{k}steps.",
+                "position": 150
+            }
+        ]
+    },
+    {
+        "header": "2Background & Related Work",
+        "images": []
+    },
+    {
+        "header": "3Experimental Setup",
+        "images": []
+    },
+    {
+        "header": "4Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.01440/x4.png",
+                "caption": "Figure 4:Scaling batch size vs. scaling the number of iterations.Our results demonstrate that: (left) scaling the batch size significantly improvesMARS,Signum,LionandProdigymaking them as good asAdamWeven for a long training for16.8​𝐁16.8\\mathbf{B}tokens.\nWhich was not the case inLABEL:fig:benchmark-124(b), where we still observed a significant gap in performance; and (right): indeed, with scaling of the number of iterations, the gap betweenSOAPandAdEMAMixnarrow and, finally, increases.\nBut, on the other hand, with increase of theAdEMAMixβ3\\beta_{3}parameter, the performance gap withSOAPreappears.",
+                "position": 361
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x5.png",
+                "caption": "Figure 7:Warmup ablation.For124​𝐌124\\mathbf{M}model trained on the batches of256×512256\\times 512tokens, we perform a sweep over the linear warmup durations of{1.56%,6.25%,25%}\\{1.56\\%,6.25\\%,25\\%\\}of the length of training, which corresponds to{2,8,32}​𝐤\\{2,8,32\\}\\mathbf{k}steps, respectively.\nClearly, sign-based optimizers,Sophia, andSF-AdamWbenefit from the increased warmup.",
+                "position": 449
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x6.png",
+                "caption": "Figure 10:Ranking of optimizers for𝟐𝟏𝟎​𝐌\\mathbf{210M}models with the batch size of𝟐𝟓𝟔×𝟓𝟏𝟐\\mathbf{256\\times 512}tokens.Increasing a model size from124​𝐌124\\mathbf{M}to210​𝐌210\\mathbf{M}results in almost identical ranking of optimizers compared toLABEL:fig:benchmark-124(b).\nAt this scale, we observe a smooth transition in our benchmarking.",
+                "position": 497
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x7.png",
+                "caption": "Figure 13:Ablation ofzz-loss regularization.Incorporating thezz-loss regularizer does not improve the final loss or reduce the spikiness of the loss curves.\nMoreover, combiningzz-loss with small weight decay and decayingγ\\gammadown to10%10\\%, further degrades overall performance.\nNotably, these changes can reverse the relative ranking of optimizers compared to the results reported by Vyas et al.vyas2024soapimprovingstabilizingshampoo.",
+                "position": 548
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x8.png",
+                "caption": "Figure 16:Wall-clock time comparison.SOAPslows down the most as model size increases.",
+                "position": 608
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x9.png",
+                "caption": "Figure 17:Ranking optimizers for𝟓𝟐𝟎​𝐌\\mathbf{520M}MoE models with𝟐𝟓𝟔×𝟓𝟏𝟐\\mathbf{256\\times 512}batch size.We report results for models trained for both42​𝐤42\\mathbf{k}iterations (left), and336​𝐤336\\mathbf{k}(right).\nMoE configuration correspond to one of the124​𝐌124\\mathbf{M}dense model.\nOptimizer rankings closely mirror those inLABEL:fig:benchmark-124(b), indicating that our benchmarking results transfer smoothly from dense models to MoEs.\nWe also see thatSOAPoutperformsAdEMAMixin336​𝐤336\\mathbf{k}steps run (see alsoFigure˜2), however, with re-tuned beta parameters we might expect the opposite results in longer training (see Figures4andLABEL:fig:ap_retuning_betas(b)).",
+                "position": 650
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x10.png",
+                "caption": "Figure 18:Comparing optimizers for training a𝟓𝟐𝟎​𝐌\\mathbf{520M}parameter MoE.Training dynamics of leading optimizers is inFigure˜2.\nResults closely remind those inLABEL:fig:benchmarking-124m-losses(a,b).\nTheAdamWbaseline by far outperformsSophia,SF-AdamW,MARS, and sign-based methods for44​𝐁44\\mathbf{B}training horizon.\nRemarkably, in the same way asProdigyfollowedAdamWinLABEL:fig:benchmarking-124m-losses(b), we observe a similar situation for the MoE model.",
+                "position": 661
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x11.png",
+                "caption": "",
+                "position": 664
+            }
+        ]
+    },
+    {
+        "header": "5Discussion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AOptimizers we study",
+        "images": []
+    },
+    {
+        "header": "Appendix BImplementation",
+        "images": []
+    },
+    {
+        "header": "Appendix CModel & Data",
+        "images": []
+    },
+    {
+        "header": "Appendix DAdditional Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.01440/x12.png",
+                "caption": "Figure 20:Warmup sweep forAdamW.We observe that the smaller yet reasonable warmup value is the best.\nHowever, this is not the case for other methods likeSignum,Lion,Sophia, andSF-AdamW—seeFigure˜7.",
+                "position": 4227
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x13.png",
+                "caption": "Figure 21:Larger weight decay achieves significantly better results when training on fewer tokens.We observe that the majority of runs with the large weight decay of0.50.5consistently outperform those with weight decay of0.10.1for all training durations except for the long training on16.8​𝐁16.8\\mathbf{B}tokens.\nNotably,SignumandLionwith large weight decay perform even better thanAdamWwith the same learning rate—seeLABEL:fig:wdablation_main.\nWe also consider a setting without weight decay.\nWe observe that this is suboptimal for most of other optimizers, while the typical weight decay of0.10.1remains the best for long training durations.\nAn interesting pattern emerges for optimizers that treat one-dimensional and two-dimensional parameters differently, such asMuonandMARS.\nFor these, runs with large weight decay (0.50.5) consistently underperform those with0.10.1and, in some cases, even those without weight decay.\nForMuon, we attribute this effect to its algorithmic design, in which weight decay is not employed to optimize matrix parameters (seeAlgorithm˜7), in contrast toD-Muon, where the observed patterns are reliably similar to those seen withAdamW.\nForMARS, we only vary the weight decay corresponding to matrix parameters while keeping0.10.1for all scalar, one-dimensional and final layer parameters.\nIn this case, we conclude that the gap between large and small weight decay values narrows significantly faster.",
+                "position": 4254
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x14.png",
+                "caption": "",
+                "position": 4263
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x15.png",
+                "caption": "",
+                "position": 4268
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x16.png",
+                "caption": "",
+                "position": 4274
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x17.png",
+                "caption": "",
+                "position": 4279
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x18.png",
+                "caption": "",
+                "position": 4284
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x19.png",
+                "caption": "",
+                "position": 4290
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x20.png",
+                "caption": "",
+                "position": 4295
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x21.png",
+                "caption": "",
+                "position": 4300
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x22.png",
+                "caption": "",
+                "position": 4306
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x23.png",
+                "caption": "",
+                "position": 4311
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x24.png",
+                "caption": "",
+                "position": 4316
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/",
+                "caption": "Figure 22:Learning rate sensitivity.In the current setting, onlySOAP,SF-AdamW, andD-Muonreach the better performance with the large learning rate of0.0020.002.\nConversely,Sophiaand all sign-based methods (SignumandLion) diverge with this learning rate value.MARSandProdigyshow a remarkably consistent performance across the learning rate sweep.\nAnd,Prodigydiverges for sufficiently large value ofγmax\\gamma_{\\max}—seeLABEL:fig:ap_prodigy_effective_lrfor more insights regarding the learning rate ofProdigy.",
+                "position": 4342
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x26.png",
+                "caption": "",
+                "position": 4351
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x27.png",
+                "caption": "",
+                "position": 4356
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x28.png",
+                "caption": "",
+                "position": 4362
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x29.png",
+                "caption": "",
+                "position": 4367
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x30.png",
+                "caption": "",
+                "position": 4372
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x31.png",
+                "caption": "",
+                "position": 4378
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x32.png",
+                "caption": "",
+                "position": 4383
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x33.png",
+                "caption": "",
+                "position": 4388
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x34.png",
+                "caption": "",
+                "position": 4394
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x35.png",
+                "caption": "",
+                "position": 4399
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x36.png",
+                "caption": "",
+                "position": 4404
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x37.png",
+                "caption": "Figure 24:Comparisons between cosine, WSD, and the linear schedulers.We complement results inLABEL:fig:wsdvscosineby extending them to all the optimizers considered in our benchmarking.\nIn most cases, the tuned cosine baseline performs similarly to runs using the linear scheduler, with both slightly outperforming WSD.\nHowever, certain optimizers still tend to “prefer” differentγ\\gamma-schedulers.\nFor example,Muonshows a preference in WSD (seeLABEL:fig:wsdvscosine(a)),AdamWperforms better with the cosine scheduler,SignumandLionappear to favor the linear scheduler.\nWhile the performance differences are not particularly large, they are still meaningful in the context of benchmarking.\nTherefore, we adopt the cosine scheduler as our default, as even small gaps can substantially impact our setup.",
+                "position": 4443
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x38.png",
+                "caption": "",
+                "position": 4452
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x39.png",
+                "caption": "",
+                "position": 4458
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x40.png",
+                "caption": "",
+                "position": 4463
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x41.png",
+                "caption": "",
+                "position": 4469
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x42.png",
+                "caption": "",
+                "position": 4474
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x43.png",
+                "caption": "",
+                "position": 4480
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x44.png",
+                "caption": "",
+                "position": 4485
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x45.png",
+                "caption": "Figure 25:Gradient norm patterns for cosine, linear, and WSDγ\\mathbf{\\gamma}-schedulers.We run all optimizers on124​𝐌124\\mathbf{M}models and track the gradient norms (before clipping) for runs using differentγ\\gamma-schedulers.\nFor most optimizers, we see that gradient norms tend to increase over the course of training with cosine and linear schedules.\nIn contrast, WSD tends to produce flatter gradient norm trajectories, with consistently lower magnitudes toward the end of training compared to the other schedulers.\nSince the WSD scheduler maintains a constant learning rate until the cooldown phase (the final20%20\\%of the training length), we observe a more stable gradient norm behavior in later stages.\nIn this regard, our findings align with prior works[69,25], which explore a connection between the learning rate schedule and gradient norm dynamics.\nInterestingly,SignumandLion—seeLABEL:fig:grad-norms-main-part—exhibit a pronounced drop in gradient norm during the cooldown phase, setting them apart from the other optimizers.",
+                "position": 4511
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x46.png",
+                "caption": "",
+                "position": 4520
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x47.png",
+                "caption": "",
+                "position": 4525
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x48.png",
+                "caption": "",
+                "position": 4531
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x49.png",
+                "caption": "",
+                "position": 4536
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x50.png",
+                "caption": "",
+                "position": 4541
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x51.png",
+                "caption": "",
+                "position": 4547
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x52.png",
+                "caption": "",
+                "position": 4552
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x53.png",
+                "caption": "",
+                "position": 4557
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x54.png",
+                "caption": "Figure 26:Gradient norm patterns for weight decay sweep.We complement our weight decay ablation (LABEL:fig:wdablation_mainand21) by tracking the gradient norms for all the optimizers studied in our benchmark.\nTo highlight the effect of changing the weight decay, we use the same cosineγ\\gamma-scheduler for all optimizers and keep the other best hyperparameters found, sweeping only the weight decay values as described in §3—i.e., we fix the maximum learning rate and only change the weight decay.\nForMuon, we only sweep the weight decay for{𝚎𝚖𝚋𝚎𝚍𝚜,𝚜𝚌𝚊𝚕𝚊𝚛​_​𝚙𝚊𝚛𝚊𝚖𝚜,𝚕𝚖​_​𝚑𝚎𝚊𝚍}\\{\\mathtt{embeds},\\mathtt{scalar\\_params},\\mathtt{lm\\_head}\\}(as in the initial implementation, the weight decay has not been applied to matrix parameters), while forMARS, we only sweep the weight decay of22D parameters.\nOur observations reveal that, regardless of optimizer used, runs with a larger weight decay result in higher gradient norms.\nForMuon,AdEMAMix,Sophia, and sign-based methods, runs with moderateλ=0.1\\lambda=0.1result in the most flattened and smallest gradient norms in magnitude.\nWhile forAdamW-like methods,D-Muon,SOAP,Prodigy, andSF-AdamW, this holds forλ=0\\lambda=0.\nWe attribute the discrepancies betweenD-MuonandMuonto the latter’s absence of weight decay for matrix parameters.\nAs shown inLABEL:fig:wdablation_mainand21,AdEMAMixcan benefit from large weight decay for longer training durations.\nRuns ofAdEMAMixwithλ=0.5\\lambda=0.5are still outperform those withλ=0.1\\lambda=0.1.\nInterestingly, this is reflected in the gradient norms, as the absolute values corresponding toλ=0.5\\lambda=0.5are much smaller than those of the respective runs of otherAdamW-like optimizers.",
+                "position": 4584
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x55.png",
+                "caption": "",
+                "position": 4593
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x56.png",
+                "caption": "",
+                "position": 4598
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x57.png",
+                "caption": "",
+                "position": 4604
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x58.png",
+                "caption": "",
+                "position": 4609
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x59.png",
+                "caption": "",
+                "position": 4614
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x60.png",
+                "caption": "",
+                "position": 4620
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x61.png",
+                "caption": "",
+                "position": 4625
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x62.png",
+                "caption": "",
+                "position": 4630
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x63.png",
+                "caption": "",
+                "position": 4636
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x64.png",
+                "caption": "",
+                "position": 4641
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x65.png",
+                "caption": "",
+                "position": 4646
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x66.png",
+                "caption": "Figure 27:Gradient norm patterns for learning rate sweep.In this experiment, we complement the result on the learning rate sweep for optimizers (LABEL:fig:lrsensitivityand22) by tracking the gradient norms.\nWe follow the same setup as for theγ\\gamma-sensitivity ablation, varying the learning rates while training124​𝐌124\\mathbf{M}language models for16.8​𝐁16.8\\mathbf{B}tokens using a cosineγ\\gamma-scheduler withγend=0.01×γmax\\gamma_{\\text{end}}=0.01\\times\\gamma_{\\max}.\nExcept forLionandSignum, we see that smallerγmax\\gamma_{\\max}leads to larger magnitude of the gradient norms—unless the learning rate is high enough to nearly lead to divergence, e.g.,γmax=10\\gamma_{\\max}=10forProdigy.\nInterestingly, we connect the “bump” shape of the gradient norms for sign-based methods with the fact thatγmax=0.001\\gamma_{\\max}=0.001, used for them, is close to the “critical” value, an increase of which also leads to divergence—and our experiments with these optimizers on larger models support this, as we were able to decreaseγ\\gammain order to train properly.",
+                "position": 4671
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x67.png",
+                "caption": "",
+                "position": 4680
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x68.png",
+                "caption": "",
+                "position": 4685
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x69.png",
+                "caption": "",
+                "position": 4691
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x70.png",
+                "caption": "",
+                "position": 4696
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x71.png",
+                "caption": "",
+                "position": 4701
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x72.png",
+                "caption": "",
+                "position": 4707
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x73.png",
+                "caption": "",
+                "position": 4712
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x74.png",
+                "caption": "",
+                "position": 4717
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x75.png",
+                "caption": "",
+                "position": 4723
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x76.png",
+                "caption": "",
+                "position": 4728
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x77.png",
+                "caption": "",
+                "position": 4733
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x78.png",
+                "caption": "Figure 30:Sophiadiverges in the large-batch setup, when training for many iterations.In the small-batch setup, we observed thatSophiaexhibited convergence issues.\nWith batch size256×512256\\times 512,Sophiainitially converges reliably across all training durations for124​𝐌124\\mathbf{M}models used in our benchmarking.\nHowever, when extending training beyond16.8​𝐁16.8\\mathbf{B}tokens, divergence reappears.\nTo clearly visualize so, we present the best stable run (T=128​𝐤T=128\\mathbf{k}steps,16.8​𝐁16.8\\mathbf{B}tokens) with the unstable one (T=256​𝐤T=256\\mathbf{k}steps,33.6​𝐁33.6\\mathbf{B}tokens), using identical hyperparameters.\nThe dashed line marks the iterationt=129720t=129720where divergence begins.\nThis instability raises serious concerns about the practicality ofSophiafor long training runs at scale.",
+                "position": 4769
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x79.png",
+                "caption": "Figure 33:ADOPTstill needsβ2\\beta_{2}.One of the main theoretical claims of Taniguchi et al.[134]—thatADOPTconverges with anyβ2\\beta_{2}.\nThe authors verify those on a toy problem motivated by Reddi et al.[115].\nHowever, in LLM training, the choice ofβ2\\beta_{2}still matters significantly.\nOur results demonstrate that, despite theoretical guarantees, performance strongly depends on tuningβ2\\beta_{2}in practice.",
+                "position": 4841
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x80.png",
+                "caption": "Figure 36:Muon’s dependence on the number of Newton-Schulz iterations.We perform a short ablation targeting the final loss ofMuon(Algorithm˜8) by varying the number of Newton-Schulz iterations.\nTraining is done for16​𝐤16\\mathbf{k}steps with a batch size of256×512256\\times 512tokens, sweepingTNS∈{1,5,10,20}T_{\\mathrm{NS}}\\in\\{1,5,10,20\\}.\nWe find that increasingTNST_{\\mathrm{NS}}beyond55does not improve performance, while unnecessarily increasing wall-clock time.",
+                "position": 4883
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x81.png",
+                "caption": "Figure 37:Comparison of different update rules forSignum.We evaluate three variants of theSignumupdate: Nesterov (our default), dampening—which resembles an EMA of𝒎t\\boldsymbol{m}_{t}when the dampening parameterτ\\tauequals the momentumβ\\beta—and the “plain”Signumwithout Nesterov momentum or dampening.\nValidation perplexity is reported for two training horizons in (256×512256\\times 512) batch size setting.\nThe Nesterov variant corresponds to the runs included in our main benchmarking results (LABEL:fig:benchmark-124andLABEL:fig:benchmarking-124m-losses).\nWhile Nesterov style momentum consistently achieves the best performance, the relative perplexity gap compared to the other variants decreases as the training horizon increases.",
+                "position": 4924
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x82.png",
+                "caption": "Figure 40:ADOPT’s sensitivity toε\\varepsilon.Interestingly, the suggested by the authorsε=10−6\\varepsilon=10^{-6}is the best hyperparameter for this method.\nThere is not a noticeable difference in convergence forε={10−6,10−7,10−8,10−9,10−10}\\varepsilon=\\{10^{-6},10^{-7},10^{-8},10^{-9},10^{-10}\\}, but the values of10−510^{-5}and above give a much morse results.",
+                "position": 5071
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x83.png",
+                "caption": "Figure 42:Wall-clock time performance: gathered.We report the wall-clock time (in seconds) for training each model for100100iterations using a small batch size of16×51216\\times 512tokens on a single GPU, without gradient accumulation ortorch.compile.\nBars show the ranking of optimizers from fastest (Signum) to slowest (SOAP) gathered across all model scales.\nWhile the differences between most optimizers are small,SOAPis consistently slower.\nThe absolute times may vary depending on the hardware, but the relative patterns remain consistent.",
+                "position": 5226
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x84.png",
+                "caption": "",
+                "position": 5236
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x85.png",
+                "caption": "",
+                "position": 5242
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x86.png",
+                "caption": "Figure 43:Wall-clock time performance: individual.ComplementingFigures˜16and42, this figure shows the evolution of wall-clock time per100100iterations for each optimizer as model size increases.\nOptimizers already shown in the main part are omitted.\nTo improve visualization, the abscissa is re-scaled to highlight the increase in wall-clock time with model size.",
+                "position": 5253
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x87.png",
+                "caption": "",
+                "position": 5262
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x88.png",
+                "caption": "",
+                "position": 5268
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x89.png",
+                "caption": "",
+                "position": 5273
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x90.png",
+                "caption": "",
+                "position": 5279
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x91.png",
+                "caption": "",
+                "position": 5284
+            },
+            {
+                "img": "https://arxiv.org/html/2509.01440/x92.png",
+                "caption": "",
+                "position": 5290
+            }
+        ]
+    },
+    {
+        "header": "Appendix EHyperparameter tuning",
+        "images": []
+    }
+]

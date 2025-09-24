@@ -1,0 +1,263 @@
+{
+    "paper_title": "LOOM-Scope: a comprehensive and efficient LOng-cOntext Model evaluation framework",
+    "authors": [
+        "Zecheng Tang",
+        "Haitian Wang",
+        "Quantong Qiu",
+        "Baibei Ji",
+        "Ruoxi Sun",
+        "Keyan Zhou",
+        "Juntao Li",
+        "Min Zhang"
+    ],
+    "sections": [
+        {
+            "title": "Abstract",
+            "content": "Long-context processing has become a fundamental capability for large language models~(LLMs). To assess model's long-context performance, numerous long-context evaluation benchmarks have been proposed. However, variations in evaluation settings across these benchmarks lead to inconsistent results, making it difficult to draw reliable comparisons. Besides, the high computational cost of long-context evaluation poses a significant barrier for the community to conduct comprehensive assessments of long-context models. In this paper, we propose LOOM-Scope, a comprehensive and efficient framework for long-context evaluation. LOOM-Scope standardizes evaluation settings across diverse benchmarks, supports deployment of efficient long-context inference acceleration methods, and introduces a holistic yet lightweight benchmark suite to evaluate models comprehensively. Homepage: https://loomscope.github.io"
+        },
+        {
+            "title": "Start",
+            "content": "LOOM-Scope: comprehensive and efficient LOng-cOntext Model evaluation framework Zecheng Tang1,2, Haitian Wang1,2, Quantong Qiu1,2, Baibei Ji1,2 Ruoxi Sun1,2, Keyan Zhou1,2, Juntao Li1,2*, Min Zhang1 1Soochow University, China 2Key Laboratory of Data Intelligence and Advanced Computing, Soochow University zctang@stu.suda.edu.cn {ljt,minzhang}@suda.edu.cn 5 2 0 2 7 ] . [ 1 3 2 7 4 0 . 7 0 5 2 : r a"
+        },
+        {
+            "title": "Abstract",
+            "content": "Long-context processing has become fundamental capability for large language models (LLMs). To assess models long-context performance, numerous long-context evaluation benchmarks have been proposed. However, variations in evaluation settings across these benchmarks lead to inconsistent results, making it difficult to draw reliable comparisons. Besides, the high computational cost of long-context evaluation poses significant barrier for the community to conduct comprehensive assessments of longcontext models. In this paper, we propose LOOM-Scope, comprehensive and efficient framework for long-context evaluation. LOOM-Scope standardizes evaluation settings across diverse benchmarks, supports deployment of efficient long-context inference acceleration methods, and introduces holistic yet light-weight benchmark suite to evaluate models comprehensively."
+        },
+        {
+            "title": "Introduction",
+            "content": "The ability to process long context is an essential capability for large language models (Bertsch et al., 2024; Meta, 2025), enabling them to address previously challenging areas like longcontext reasoning (Kuratov et al., 2024) and * Corresponding author. 1Homepage: https://loomscope.github.io Figure 1: Workflow of LOOM-Scope framework. unlock unbounded external knowledge through the long context input (Ray, 2025). Alongside advancements in long-context language models (LCLMs), recent research in the long-context processing field has increasingly focused on two directions: (1) establishing various benchmarks to evaluate model performance across diverse long-context tasks (Liu et al., 2025) and (2) improving efficiency for long-context inference (Zhou et al., 2024). Yet, with the increasing number of benchmarks, inconsistent evaluation results across benchmarks create substantial obstacles in assessing and selecting appropriate LCLMs for different usage. For example, when evaluating the models long-context reasoning capability on different benchmarks, LongBench V2 (Bai et al., 2024a) indicates that GLM-9B (GLM et al., 2024) slightly outperforms Llama-3.18B (Meta, 2024), while LongReason (Ling et al., 2025) shows Llama-3.1-8B significantly surpasses GLM-9B. Furthermore, as benchmarks increasingly incorporate longer context distributions and expand their domain coverage, the evaluation requires significant computational resources, e.g., simply evaluating Llama-3.1-8B on RULER (Hsieh et al., 2024) benchmark even costs over 100 H20 (92GB) GPU hours, posing serious challenge for the community. To mitigate the aforementioned issues, we introduce LOOM-Scope, comprehensive and efficient framework for LOng-cOntext Model evaluation. As shown in Figure 1, LOOM-Scope supports two usage modes: via terminal and WebUI, and consists of three key modules: the BENCHMARK module, the DEPLOYMENT module, and the EVALUATOR module. Within each module, the evaluation environment is fully customized to minimize confounding factors across benchmarks, such as instruction prompts and inference hyperparameters, enabling fair and comparable assessments among benchmarks. In addition, to enhance inference efficiency while maintaining model performance, LOOMScope supports three representative long-context optimization techniques: retrieval-augmented generation (RAG) (Liu, 2022), key-value cache optimization (Li et al., 2024a), and trainingfree sparse attention (Zhang et al., 2025a). Our framework is also compatible with efficient inference frameworks such as vLLM (Kwon et al., 2023) and SGLang (Zheng et al., 2024). Our platform supports 22 long-context benchmarks and more than 140 long-context tasks. To demonstrate the effectiveness of our platform, we construct comprehensive evaluation set for experiments, LOOMBENCH, by up-sampling from 12 mainstream open-source long-context benchmarks. With LOOM-Scope, this evaluation can be completed very efficiently: for models of 8B scale, full capability assessment covering 6 different competencies on LOOMBENCH requires only approximately 50 H20 GPU hours or 140 RTX 3090 (24GB) GPU hours, significantly less than the computational cost demanded by most single-capability longcontext benchmarks."
+        },
+        {
+            "title": "2 Framework Design",
+            "content": "As shown in Figure 2, the LOOM-Scope platform consists of three key modules, including BENCHMARK module, DEPLOYMENT module, and EVALUATOR module."
+        },
+        {
+            "title": "2.1 BENCHMARK Module",
+            "content": "The BENCHMARK module allows for automatic benchmark data detection, downloading, raw data pre-processing, data structure converting. To support efficient distributed inference, the BENCHMARK module automatically allocates an appropriate number of samples to each GPU, ensuring distributed inference balance. Currently, LOOM-Scope supports 22 widely-used long-context benchmarks, covering over 140 sub-tasks, 8k2M context range, and spanning 6 major LCLM capabilities: General, Faithfulness, Reasoning, Retrieval, Generation, and Specialization. Details of supporting benchmarks are shown in Appendix B. To ensure fair evaluation and eliminate performance discrepancies caused by prompt variations across benchmarks, BENCHMARK module allows users to define instruction template applicable to each task. Figure 2: Overview of LOOM-Scope, where the workflow of three modules can be refereed to Figure 1."
+        },
+        {
+            "title": "2.2 DEPLOYMENT Module",
+            "content": "Following data processing in the BENCHMARK module, the DEPLOYMENT module handles It the deployment and inference of models. supports diverse model architectures (MODEL sub-module) and advanced inference optimization techniques (AUGMENTATION sub-module), including inference servers and augmentation methods. Lists of models and optimization strategies are shown in Appendix  (Table 2)  . MODEL Sub-module This sub-module aims to support diverse server infrastructures and model architectures, including RWKV (Peng et al., 2023), Mamba (Gu and Dao, 2023), Linear-Attention (Yang and Zhang, 2024), and Transformer-based models. It also supports standardized deployment interfaces, including HF_Models (Wolf et al., 2020), VLLM (Kwon et al., 2023), SGLang (Zheng et al., 2024), and API, ensuring flexible integration and scalability for long-context processing. AUGMENTATION Sub-module To enhance the long-context inference, the AUGMENTATION sub-module supports various inference optimization techniques such as Sparse Attention (Lou et al., 2024), KV-cache optimization (Goel et al., 2025; Hooper et al., 2024a), and RAG-based augmentation (Leng et al., 2024) methods. Specifically, Sparse Attention (Lai et al., 2024; Xu et al., 2025; Jiang et al., 2024) accelerates inference by selectively focusing on relevant tokens, reducing computational overhead. KV-cache optimization (Li et al., 2024b; Liu et al., 2024b; Kang et al., 2024) significantly reduces memory usage and enhances inference speed. RAG-based augmentation (Robertson et al., 2009; Liu, 2022) leverages retrieval mechanisms to enhance model external knowledge, improving performance on tasks requiring extensive context. This sub-module maintains consistency with the MODEL sub-module, while supporting custom user-defined methods for comprehensive evaluation."
+        },
+        {
+            "title": "2.3 EVALUATOR Module",
+            "content": "After obtaining all the model predictions, the EVALUATOR module serves as comprehensive assessment. It integrates both discriminative and generative evaluation metrics to provide holistic view of the models capabilities in longcontext processing. Discriminative metrics, including F1 Score, Accuracy, Exam, Recall, Precision, and LLM-specific evaluations, are integrated to assess the models understanding ability. To assess the models generation capability, metrics such as BERT, ROUGE, Pass@k, METEOR, and human evaluations are employed to gauge the quality, coherence, and relevance of the generated text. The module ensures that the outputs of the DEPLOYMENT module are rigorously tested against these diverse metrics. Statistics of the evaluation metrics for each benchmark are shown in Appendix  (Table 3)  . LOOM-Scope Usage"
+        },
+        {
+            "title": "Command Line",
+            "content": "loom-scope.run --model_path {model path} --cfg_path {benchmark config} --template {template config} --device {device id} --gp_num {data parallel size} --server {server config} --acceleration {augmentation config} --eval --save_tag {save name}"
+        },
+        {
+            "title": "Local Web Interface",
+            "content": "python WebUI/app.py # will open gradio Figure 3: Illustration of two low-code ways to start customized evaluation with LOOM-Scope. LOOM-Scope also contains an integrated benchmark LOOMBENCH, which is up-sampled and reorganized from 12 different available benchmarks, allowing for comprehensive evaluation of an 8B LCLM within 6 hours. In Appendix B.2, we show the task distribution of LOOMBENCH in Figure 8 and the statistics of each sub-task as well as the evaluation methods."
+        },
+        {
+            "title": "3.1 LOOM-Scope Usage",
+            "content": "As shown in Figure 1, the above three modules are finally integrated into the following evaluation workflow: (1) verifies the availability of and pre-process the specified benchmarks (BENCHMARK module), (2) deploys and run LCLMs with specified sever and augmentation methods (DEPLOYMENT module), and (3) conducts evaluation after model prediction (EVALUATOR module)."
+        },
+        {
+            "title": "3 Usage and Experiments",
+            "content": "LOOM-Scope is accessible via both the command line and the local WebUI interface. For efficient evaluation of LCLMs capabilities, LOOM-Scope is primarily controlled via userdefined configuration files, enabling high degree of customization. As illustrated in Figure 3, the platform supports evaluation through two low-code interfaces: command-line interface and local WebUI, together requiring no more than 11 lines of code in total. For the command-line interface, detailed hyperparameter documentation is available on the official repository2, allowing users to create custom configuration files to fully control the evaluation workflow. The WebUI interface, shown in Figure 4, offers an intuitive alternative for users 2https://github.com/LCM-Lab/LOOM-Scope Figure 4: Partial snapshot of the local deployment WebUI of LOOM-Scope. Figure 6: RAG results for partial models. Full evaluation results are shown in Appendix (Figure 10). Figure 5: Capability radar chart of partial LCLMs. who prefer graphical interface."
+        },
+        {
+            "title": "3.2 Experimental Results",
+            "content": "We evaluate on LOOMBENCH with three settings: (1) naive LCLM with HF_Models server, (2) RAG, and (3) inference acceleration methods. For RAG, we adopt both the BM25 and StreamingRAG algorithms with retrieval chunk size of 16K and evaluate them on four tasks sampling from LOOMBENCH. For inference acceleration methods, experiments are conducted on 128K-length tasks to demonstrate the efficiency. Naive HF_Model Results We show the partial results in Figure 5, where it can be observed that the Qwen-3 series models (Yang et al., 2025) exhibit comprehensive long-context capabilities, while other models, e.g., Phi-3 (Abdin et al., 2024), demonstrate relatively strong understanding abilities but struggle with longform generation performance. More evaluation results are shown in Appendix C. RAG Results We experiment with RAG on two settings: rule-based method (BM25) and model-based method (Self-Route (Li et al., 2024c)). As shown in Figure 6, we observe that the rule-based RAG method underperforms"
+        },
+        {
+            "title": "Framework",
+            "content": "OpenCompass (Contributors, 2023) EvalHardness (Gao et al., 2024) UltraEval (He et al., 2024) TAIL (Gu et al., 2024) LOOM-Scope (Ours) Benchmark Num"
+        },
+        {
+            "title": "Custom\nBenchmark",
+            "content": "15 6 5 1 22 Transformer Transformer / Mamba Transformer -"
+        },
+        {
+            "title": "Command\nCommand\nCommand\nCommand",
+            "content": "- - - - VLLM / LMDeploy / API VLLM / SGLang / API VLLM / API VLLM / API - - - TAIL Transformer / RNN-series / Linear Attn Command / WebUI Sparse Attn / KV Cache / etc. VLLM / SGLang / API"
+        },
+        {
+            "title": "LOOMBENCH",
+            "content": "Table 1: Comparison with other frameworks. denotes that we only count long-context benchmarks. GPUs are shown in Figure 7. The remaining results are shown in Appendix (Figure 11)."
+        },
+        {
+            "title": "3.3 Comparison with Existing Frameworks",
+            "content": "We compare LOOM-Scope with other evaluation frameworks in Table 1. We find that LOOM-Scope offers the most comprehensive support for long-context evaluation in terms of benchmark coverage, model architecture compatibility, server deployment, and an integrated comprehensive evaluation benchmark. Notably, LOOM-Scope is the only existing platform that incorporates long-context inference acceleration methods, greatly improving its extensibility and evaluation efficiency."
+        },
+        {
+            "title": "4 Conclusion",
+            "content": "To ensure fairness and efficiency in long-context evaluation, we propose LOOM-Scope, comprehensive and efficient evaluation framework for long-context models, context lengths ranging from 8K to 2M tokens. It supports all mainstream model architectures, provides two userfriendly interfaces (command-line and WebUI), and accommodates various augmentation strategies, including both inference acceleration and retrieval-augmented generation (RAG) methods. Experimental results using LOOM-Scope and LOOMBENCH demonstrate the efficiency and comprehensiveness of our platform. Figure 7: Time cost of acceleration methods. compared to directly using LCLMs. In contrast, prediction based on the model-based method (Self-Route) can improve the performance. More RAG evaluation results are shown in Appendix (Figure 10). Acceleration Method Results We optimized and processed selected acceleration methods, ensuring that all can process the 128K-length context on single 40GB A100 GPU with Llama3.1-8B-instruct. After optimization, we evaluated RULER using the LOOM-Scope framework, sampling 15 data instances per subtask under each methods official configuration: the Native Transformer (FlashAttention implementation) used batch size 1, while all acceleration methods used batch size 8. The timing results for the methods tested on 40GB A100 and H"
+        },
+        {
+            "title": "Broader Impact Statement",
+            "content": "We list two main limitations and their corresponding future work for LOOM-Scope. Supporting More Benchmarks Although our evaluation framework is designed to be modular and extensible, it currently does not include all existing public benchmarks due to the need for customized data formatting and integration. Incorporating broader range of benchmarks to support more flexible and diverse evaluation is one of our key future directions. Supporting More Modalities In addition, the current version of our framework is limited to text evaluation. In future work, we plan to extend support to more modalities relevant to longcontext scenarios, such as video (Tang et al., 2025), along with corresponding inference acceleration techniques. These enhancements aim to make our framework more comprehensive and widely applicable across multi-modal longcontext tasks."
+        },
+        {
+            "title": "Ethics Statement and System License",
+            "content": "The development and deployment of LOOMScope are guided by ethical principles, with strong commitment to transparency, reproducibility, and accessibility. We aim to ensure that the framework is used responsibly and contributes positively to the broader research community. To this end, we publicly release the source code and datasets under the Apache License 2.03 , which permits open-source use, modification, and commercial deployment, including usage within industrial and enterprise settings. 3https://www.apache.org/licenses/LICENSE-2. 0 and Accountability All Transparency datasets used in LOOM-Scope are clearly labeled with their sources and are licensed under permissive open-source agreements, e.g., Apache 2.0, allowing for modification and redistribution. Our benchmark suite, LOOMBENCH, builds on these datasets and is fully documented and reproducible. We also provide testing scripts and demo inputs to ensure that all reported results can be independently validated, fostering trust and transparency in long-context evaluation. Support for Low-Resource Settings LOOMScope is the first framework to support multiple inference acceleration methods under unified environment, making it particularly suitable for low-resource settings. Users can efficiently evaluate long-context performance and compare trade-offs across various acceleration techniques without the need for large-scale infrastructure. User Accessibility To broaden accessibility, LOOM-Scope provides locally deployable WebUI, enabling researchers and practitioners, regardless of their programming proficiency, to conduct long-context evaluations with minimal setup. This user-centered design lowers the barrier to entry for non-expert users and facilitates practical adoption. Contribution to the Long-Context Community We believe that LOOM-Scope will significantly advance research in long-context modeling, an increasingly important direction in the development of large language models (LLMs). By offering unified, extensible, and reproducible evaluation platform, we hope to support the community in building more capable, robust, and transparent LCLMs."
+        },
+        {
+            "title": "References",
+            "content": "Marah Abdin, Sam Ade Jacobs, Ammar Ahmad Awan, Jyoti Aneja, Ahmed Awadallah, Hany Awadalla, Nguyen Bach, Amit Bahree, Arash Bakhtiari, Harkirat Behl, and 1 others. 2024. Phi3 technical report: highly capable language model locally on your phone. arXiv preprint arXiv:2404.14219. Yushi Bai, Xin Lv, Jiajie Zhang, Hongchang Lyu, Jiankai Tang, Zhidian Huang, Zhengxiao Du, Xiao Liu, Aohan Zeng, Lei Hou, Yuxiao Dong, Jie Tang, and Juanzi Li. 2023. Longbench: bilingual, multitask benchmark for long context understanding. arXiv preprint arXiv:2308.14508. Yushi Bai, Shangqing Tu, Jiajie Zhang, Hao Peng, Xiaozhi Wang, Xin Lv, Shulin Cao, Jiazheng Xu, Lei Hou, Yuxiao Dong, and 1 others. 2024a. Longbench v2: Towards deeper understanding and reasoning on realistic long-context multitasks. arXiv preprint arXiv:2412.15204. Yushi Bai, Jiajie Zhang, Xin Lv, Linzhi Zheng, Siqi Zhu, Lei Hou, Yuxiao Dong, Jie Tang, and Juanzi Li. 2024b. Longwriter: Unleashing 10,000+ word generation from long context llms. arXiv preprint arXiv:2408.07055. Amanda Bertsch, Maor Ivgi, Uri Alon, Jonathan Berant, Matthew Gormley, and Graham Neubig. 2024. In-context learning with long-context models: An in-depth exploration. arXiv preprint arXiv:2405.00200. OpenCompass Contributors. 2023. Opencompass: universal evaluation platform for foundation models. https://github.com/open-compass/ opencompass. Harry Dong, Xinyu Yang, Zhenyu Zhang, Zhangyang Wang, Yuejie Chi, and Beidi Chen. 2024. Get more with less: synthesizing recurrence with kv cache compression for efficient the 41st llm inference. International Conference on Machine Learning, ICML24. JMLR.org."
+        },
+        {
+            "title": "In Proceedings of",
+            "content": "Leo Gao, Jonathan Tow, Baber Abbasi, Stella Biderman, Sid Black, Anthony DiPofi, Charles Foster, Laurence Golding, Jeffrey Hsu, Alain Le Noach, Haonan Li, Kyle McDonell, Niklas Muennighoff, Chris Ociepa, Jason Phang, Laria Reynolds, Hailey Schoelkopf, Aviya Skowron, Lintang Sutawika, and 5 others. 2024. The language model evaluation harness. Yunfan Gao, Yun Xiong, Xinyu Gao, Kangxiang Jia, Jinliu Pan, Yuxi Bi, Yi Dai, Jiawei Sun, Meng Wang, and Haofen Wang. 2023. Retrievalaugmented generation for large language models: survey. arXiv e-prints, pages arXiv2312. Suyu Ge, Yunan Zhang, Liyuan Liu, Minjia Zhang, Jiawei Han, and Jianfeng Gao. 2023. Model tells you what to discard: Adaptive kv cache compression for llms. In The Twelfth International Conference on Learning Representations, volume abs/2310.01801. Team GLM, Aohan Zeng, Bin Xu, Bowen Wang, Chenhui Zhang, Da Yin, Diego Rojas, Guanyu Feng, Hanlin Zhao, Hanyu Lai, and 1 others. 2024. Chatglm: family of large language models from glm-130b to glm-4 all tools. arXiv preprint arXiv:2406.12793. Raghavv Goel, Junyoung Park, Mukul Gagrani, Dalton Jones, Matthew Morse, Harper Langston, Mingu Lee, and Chris Lott. 2025. Caote: Kv caching through attention output error based token eviction. arXiv preprint arXiv:2504.14051. Albert Gu and Tri Dao. 2023. Mamba: Linear-time sequence modeling with selective state spaces. arXiv preprint arXiv:2312.00752. Gefei Gu, Yilun Zhao, Ruoxi Ning, Yanan Zheng, and Arman Cohan. 2024. TAIL: toolkit for automatic and realistic long-context large language In Proceedings of the 2024 model evaluation. Conference on Empirical Methods in Natural Language Processing: System Demonstrations, pages 198208, Miami, Florida, USA. Association for Computational Linguistics. Chaoqun He, Renjie Luo, Shengding Hu, Yuanqian Zhao, Jie Zhou, Hanghao Wu, Jiajie Zhang, Xu Han, Zhiyuan Liu, and Maosong Sun. 2024. Ultraeval: lightweight platform for flexible and comprehensive evaluation for llms. Preprint, arXiv:2404.07584. Coleman Hooper, Sehoon Kim, Hiva Mohammadzadeh, Michael Mahoney, Yakun Shao, Kurt Keutzer, and Amir Gholami. 2024a. Kvquant: Towards 10 million context length llm inference with kv cache quantization. Advances in Neural Information Processing Systems, 37:1270 1303. Coleman Hooper, Sehoon Kim, Hiva Mohammadzadeh, Michael W. Mahoney, Yakun Sophia Shao, Kurt Keutzer, and Amir Gholami. 2024b. Kvquant: Towards 10 million context length llm In Adinference with kv cache quantization. vances in Neural Information Processing Systems, volume 37, pages 12701303. Curran Associates, Inc. Cheng-Ping Hsieh, Simeng Sun, Samuel Kriman, Shantanu Acharya, Dima Rekesh, Fei Jia, and Boris Ginsburg. 2024. Ruler: Whats the real context size of your long-context language models? arXiv preprint arXiv:2404.06654. Huiqiang Jiang, Yucheng Li, Chengruidong Zhang, Qianhui Wu, Xufang Luo, Surin Ahn, Zhenhua Han, Amir H. Abdi, Dongsheng Li, Chin-Yew Lin, Yuqing Yang, and Lili Qiu. 2024. MInference 1.0: Accelerating pre-filling for long-context LLMs via dynamic sparse attention. In The Thirtyeighth Annual Conference on Neural Information Processing Systems. Hao Kang, Qingru Zhang, Souvik Kundu, Geonhwa Jeong, Zaoxing Liu, Tushar Krishna, and Tuo Zhao. 2024. GEAR: An efficient error reduction framework for KV cache compression in LLM inference. In Proceedings of The 4th NeurIPS Efficient Natural Language and Speech Processing Workshop, volume 262 of Proceedings of Machine Learning Research, pages 305321. PMLR. Yuri Kuratov, Aydar Bulatov, Petr Anokhin, Ivan Rodkin, Dmitry Sorokin, Artyom Sorokin, and Mikhail Burtsev. 2024. Babilong: Testing the limits of llms with long context reasoning-in-ahaystack. arXiv preprint arXiv:2406.10149. Woosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, Joseph E. Gonzalez, Hao Zhang, and Ion Stoica. 2023. Efficient memory management for large language model serving with pagedattention. In Proceedings of the ACM SIGOPS 29th Symposium on Operating Systems Principles. Xunhao Lai, Jianqiao Lu, Yao Luo, Yiyuan Ma, and Xun Zhou. 2024. Flexprefill: contextaware sparse attention mechanism for efficient long-sequence inference. In The Thirteenth International Conference on Learning Representations. Jinhyuk Lee, Anthony Chen, Zhuyun Dai, Dheeru Dua, Devendra Singh Sachan, Michael Boratko, Yi Luan, Sébastien M. R. Arnold, Vincent Perot, Siddharth Dalmia, Hexiang Hu, Xudong Lin, Panupong Pasupat, Aida Amini, Jeremy R. Cole, Sebastian Riedel, Iftekhar Naim, Ming-Wei Chang, and Kelvin Guu. 2024. Can long-context language models subsume retrieval, rag, sql, and more? Preprint, arXiv:2406.13121. Quinn Leng, Jacob Portes, Sam Havens, Matei Zaharia, and Michael Carbin. 2024. Long context rag performance of large language models. arXiv preprint arXiv:2411.03538. Haoyang Li, Yiming Li, Anxin Tian, Tianhao Tang, Zhanchao Xu, Xuejia Chen, Nicole Hu, Wei Dong, Qing Li, and Lei Chen. 2024a. survey on large language model acceleration based on kv cache management. arXiv preprint arXiv:2412.19442. Yuhong Li, Yingbing Huang, Bowen Yang, Bharat Venkitesh, Acyr Locatelli, Hanchen Ye, Tianle Cai, Patrick Lewis, and Deming Chen. 2024b. Snapkv: Llm knows what you are looking for In Advances in Neural Inbefore generation. formation Processing Systems, volume 37, pages 2294722970. Curran Associates, Inc. Zhuowan Li, Cheng Li, Mingyang Zhang, Qiaozhu Mei, and Michael Bendersky. 2024c. Retrieval augmented generation or long-context llms? comprehensive study and hybrid approach. arXiv preprint arXiv:2407.16833. Zhan Ling, Kang Liu, Kai Yan, Yifan Yang, Weijian Lin, Ting-Han Fan, Lingfeng Shen, Zhengyin Du, and Jiecao Chen. 2025. Longreason: synthetic long-context reasoning benchmark via context expansion. arXiv preprint arXiv:2501.15089. Jerry Liu. 2022. LlamaIndex. Jiaheng Liu, Dawei Zhu, Zhiqi Bai, Yancheng He, Huanxuan Liao, Haoran Que, Zekun Wang, Chenchen Zhang, Ge Zhang, Jiebin Zhang, and 1 others. 2025. comprehensive survey on long context language modeling. arXiv preprint arXiv:2503.17407. Xiang Liu, Peijie Dong, Xuming Hu, and Xiaowen Chu. 2024a. Longgenbench: Long-context generation benchmark. In Findings of the Association for Computational Linguistics: EMNLP 2024, pages 865883. Zirui Liu, Jiayi Yuan, Hongye Jin, Shaochen (Henry) Zhong, Zhaozhuo Xu, Vladimir Braverman, Beidi Chen, and Xia Hu. 2024b. Kivi: tuning-free asymmetric 2bit quantization for kv cache. In Proceedings of the 41st International Conference on Machine Learning, ICML24. JMLR.org. Chao Lou, Zixia Jia, Zilong Zheng, and Kewei Tu. 2024. Sparser is faster and less is more: Efficient sparse attention for long-range transformers. arXiv preprint arXiv:2406.16747. AI Meta. 2024. Introducing llama 3.1: Our most capable models to date, 2024. URL https://ai. meta. com/blog/meta-llama-3-1/. New models including flagship 405B parameter model, along with upgraded 8B and 70B models featuring 128K context length and multilingual capabilities. AI Meta. 2025. The llama 4 herd: The beginning of new era of natively multimodal ai innovation. https://ai. meta. com/blog/llama-4-multimodalintelligence/, checked on, 4(7):2025. Bo Peng, Eric Alcaide, Quentin Anthony, Alon Albalak, Samuel Arcadinho, Stella Biderman, Huanqi Cao, Xin Cheng, Michael Chung, Leon Derczynski, and 1 others. 2023. Rwkv: Reinventing rnns for the transformer era. In Findings of the Association for Computational Linguistics: EMNLP 2023, pages 1404814077. Ziran Qin, Yuchen Cao, Mingbao Lin, Wen Hu, Shixuan Fan, Ke Cheng, Weiyao Lin, and Jianguo Li. 2025. CAKE: Cascading and adaptive KV cache eviction with layer preferences. In The Thirteenth International Conference on Learning Representations. Partha Pratim Ray. 2025. survey on model context protocol: Architecture, state-of-the-art, challenges and future directions. Authorea Preprints. Jonathan Roberts, Kai Han, and Samuel Albanie. 2025. Needle threading: Can llms follow threads In The through near-million-scale haystacks? Thirteenth International Conference on Learning Representations. Stephen Robertson, Hugo Zaragoza, and 1 others. 2009. The probabilistic relevance framework: Bm25 and beyond. Foundations and Trends in Information Retrieval, 3(4):333389. Mingyang Song, Mao Zheng, and Xuan Luo. 2024. Counting-stars: multi-evidence, position-aware, and scalable benchmark for evaluating longcontext large language models. Preprint. Yi Su, Yuechi Zhou, Quantong Qiu, Juntao Li, Qingrong Xia, Ping Li, Xinyu Duan, Zhefeng Wang, and Min Zhang. 2025. Accurate kv cache quantization with outlier tokens tracing. In The 63rd Annual Meeting of the Association for Computational Linguistics. Association for Computational Linguistics. Yunlong Tang, Jing Bi, Siting Xu, Luchuan Song, Susan Liang, Teng Wang, Daoan Zhang, Jie An, Jingyang Lin, Rongyi Zhu, and 1 others. 2025. Video understanding with large language models: IEEE Transactions on Circuits and survey. Systems for Video Technology. Minzheng Wang, Longze Chen, Cheng Fu, Shengyi Liao, Xinghua Zhang, Bingli Wu, Haiyang Yu, Nan Xu, Lei Zhang, Run Luo, and 1 others. 2024a. Leave no document behind: Benchmarking longcontext llms with extended multi-doc qa. arXiv preprint arXiv:2406.17419. Weiyun Wang, Shuibo Zhang, Yiming Ren, Yuchen Duan, Tiantong Li, Shuo Liu, Mengkang Hu, Zhe Chen, Kaipeng Zhang, Lewei Lu, and 1 others. 2024b. Needle in multimodal haystack. Advances in Neural Information Processing Systems, 37:2054020565. Zheng Wang, Boxiao Jin, Zhongzhi Yu, and Minjia Zhang. 2024c. Model tells you where to merge: Adaptive kv cache merging for llms on long-context tasks. ArXiv, abs/2407.08454. Thomas Wolf, Lysandre Debut, Victor Sanh, Julien Chaumond, Clement Delangue, Anthony Moi, Pierric Cistac, Tim Rault, Rémi Louf, Morgan Funtowicz, Joe Davison, Sam Shleifer, Patrick von Platen, Clara Ma, Yacine Jernite, Julien Plu, Canwen Xu, Teven Le Scao, Sylvain Gugger, and 3 others. 2020. Transformers: State-of-the-art natural language processing. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing: System Demonstrations, pages 3845, Online. Association for Computational Linguistics. Ruyi Xu, Guangxuan Xiao, Haofeng Huang, Junxian Guo, and Song Han. 2025. Xattention: Block sparse attention with antidiagonal scoring. arXiv preprint arXiv:2503.16428. An Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Gao, Chengen Huang, Chenxu Lv, Chujie Zheng, Dayiheng Liu, Fan Zhou, Fei Huang, Feng Hu, Hao Ge, Haoran Wei, Huan Lin, Jialong Tang, and 41 others. 2025. Qwen3 technical report. arXiv preprint arXiv:2505.09388. Songlin Yang and Yu Zhang. 2024. Fla: tritonbased library for hardware-efficient implementations of linear attention mechanism. Dingyu Yao, Bowen Shen, Zheng Lin, Wei Liu, Jian Luan, Bin Wang, and Weiping Wang. 2025. Tailorkv: hybrid framework for long-context inference via tailored kv cache optimization. Preprint, arXiv:2505.19586. Howard Yen, Tianyu Gao, Minmin Hou, Ke Ding, Daniel Fleischer, Peter Izsak, Moshe Wasserblat, and Danqi Chen. 2024. Helmet: How to evaluate long-context language models effectively and thoroughly. arXiv preprint arXiv:2410.02694. Yifei Yu, Qian-Wen Zhang, Lingfeng Qiao, Di Yin, Fang Li, Jie Wang, Zengxi Chen, Suncong Zheng, Xiaolong Liang, and Xing Sun. 2025. Sequentialniah: needle-in-a-haystack benchmark for extracting sequential needles from long contexts. arXiv preprint arXiv:2504.04713. Yijiong Yu, Ma Xiufa, Fang Jianwei, Zhi Xu, Su Guangyao, Wang Jiancheng, Yongfeng Huang, Zhixiao Qi, Wei Wang, Weifeng Liu, and 1 others. 2024. Hyper-multi-step: The truth behind difficult long-context tasks. arXiv preprint arXiv:2410.04422. Tao Yuan, Xuefei Ning, Dong Zhou, Zhijie Yang, Shiyao Li, Minghui Zhuang, Zheyue Tan, Zhuyu Yao, Dahua Lin, Boxun Li, and 1 others. 2024. Lv-eval: balanced long-context benchmark with 5 length levels up to 256k. arXiv preprint arXiv:2402.05136. Jintao Zhang, Jia Wei, Pengle Zhang, Jun Zhu, and Jianfei Chen. 2025a. Sageattention: Accurate 8-bit attention for plug-and-play inference acceleration. In International Conference on Learning Representations (ICLR). Jintao Zhang, Chendong Xiang, Haofeng Huang, Jia Wei, Haocheng Xi, Jun Zhu, and Jianfei Chen. 2025b. Spargeattn: Accurate sparse attention accelerating any model inference. In International Conference on Machine Learning (ICML). Xinrong Zhang, Yingfa Chen, Shengding Hu, Zihang Xu, Junhao Chen, Moo Hao, Xu Han, Zhen Thai, Shuo Wang, Zhiyuan Liu, and 1 others. 2024. Infinite-bench: Extending long context evaluation beyond 100k tokens. In Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 1526215277. Zhenyu Zhang, Ying Sheng, Tianyi Zhou, Tianlong Chen, Lianmin Zheng, Ruisi Cai, Zhao Song, Yuandong Tian, Christopher Ré, Clark Barrett, Zhangyang Wang, and Beidi Chen. 2023. H2o: heavy-hitter oracle for efficient generative inference of large language models. In Proceedings of the 37th International Conference on Neural Information Processing Systems, NIPS 23, Red Hook, NY, USA. Curran Associates Inc. Lianmin Zheng, Liangsheng Yin, Zhiqiang Xie, Chuyue Livia Sun, Jeff Huang, Cody Hao Yu, Shiyi Cao, Christos Kozyrakis, Ion Stoica, Joseph Gonzalez, and 1 others. 2024. Sglang: Efficient execution of structured language model programs. Advances in Neural Information Processing Systems, 37:6255762583. Zixuan Zhou, Xuefei Ning, Ke Hong, Tianyu Fu, Jiaming Xu, Shiyao Li, Yuming Lou, Luning Wang, Zhihang Yuan, Xiuhong Li, and 1 others. 2024. survey on efficient inference for large language models. arXiv preprint arXiv:2404.14294."
+        },
+        {
+            "title": "A Related work",
+            "content": "A.1 Long-context Augmentation Methods To alleviate computational inefficiencies of transformer-based models during long-context inference, recent advances have introduced various augmentation methods, such as RAG (Lee et al., 2024; Gao et al., 2023; Liu, 2022), keyvalue cache optimization (Li et al., 2024a), and inference-time sparse attention (Jiang et al., 2024; Lai et al., 2024; Xu et al., 2025; Zhang et al., 2025b). Among these methods, key-value cache optimization has emerged as the most commonly adopted approach, which can be further categorized into selective eviction (Zhang et al., 2023; Ge et al., 2023; Li et al., 2024b; Qin et al., 2025), quantization (Liu et al., 2024b; Hooper et al., 2024b; Su et al., 2025; Yao et al., 2025), and approximation (Kang et al., 2024; Wang et al., 2024c; Dong et al., 2024) methods. Notably, LOOM-Scope already supports most mainstream long-context augmentation methods currently in use. A.2 Long-context Evaluation Existing long-context benchmarks can generally be classified into 3 categories according to the specific capabilities they assess: long-context understanding (Bai et al., 2023; Zhang et al., 2024; Roberts et al., 2025), long-form reasoning (Kuratov et al., 2024; Bai et al., 2024a; Song et al., 2024), and long-form generation (Bai et al., 2024b). Furthermore, the task formats themselves can be further divided into realworld tasks (e.g., multi-document QA (Wang et al., 2024a; Yuan et al., 2024), article generation (Liu et al., 2024a)) and synthetic tasks (e.g., needle-in-a-haystack retrieval (Yu et al., 2025; Wang et al., 2024b), synthetic multi-hop reasoning (Yu et al., 2024)). Currently, there are more than 150 benchmarks dedicated to longcontext evaluation (Liu et al., 2025). However, conflicting evaluation results exist across benchmarks (Yen et al., 2024), and disparate evaluation settings, such as model prompts and execution environments, make those benchmarks cumbersome to use and difficult to compare. In this paper, we introduce LOOM-Scope, comprehensive and efficient framework for long-context evaluation, offering unified environment that enables plug-and-play benchmarking and supports highly user-customizable modules for flexible and convenient evaluation."
+        },
+        {
+            "title": "B Benchmark Overview",
+            "content": "We provides systematic overview of the supported benchmarks, categorizing them by capability and summarizing their key metrics and data volumes in Table 3. B.1 Supporting Benchmarks LOOM-Scope supports 22 widely used longcontext benchmarks in Table 4, covering more than 140 subtasks, the 8k-2M context range, and spanning six main LCLM capabilities: Faithfulness: Focus on citation accuracy and information attribution General: Broad evaluation across multiple domains and task types Retrieve: Needle-in-haystack and information location tasks Generation: Long-form content creation capabilities Reasoning: Complex multi-hop reasoning and logical inference Specialization: Domain-specific (medical, legal) and language-specific benchmarks r r e c o t g A"
+        },
+        {
+            "title": "Local Models",
+            "content": "HF_Models"
+        },
+        {
+            "title": "API",
+            "content": "API-based scalable inference service RNN-based"
+        },
+        {
+            "title": "Mamba",
+            "content": "Attention-free recurrent architecture"
+        },
+        {
+            "title": "Selective state space model",
+            "content": "Linear-Attention"
+        },
+        {
+            "title": "Gated linear attention",
+            "content": "Transformer-based"
+        },
+        {
+            "title": "GLM",
+            "content": "H2O Frontier AI LLMs, Assistants, Agents, Services"
+        },
+        {
+            "title": "Open Multilingual Multimodal Chat LMs",
+            "content": "Attention-based selection"
+        },
+        {
+            "title": "Attention Pooling before selection",
+            "content": "L2Compress L2 Norm is better than attention as metric Layer-wise"
+        },
+        {
+            "title": "PyramidKV",
+            "content": "Layer-wise budget allocation"
+        },
+        {
+            "title": "CakeKV",
+            "content": "Layer-specific preference score"
+        },
+        {
+            "title": "KIVI",
+            "content": "Asymmetric 2-bit Quantization"
+        },
+        {
+            "title": "ThinK",
+            "content": "Thinner Key Cache by Query-Driven Pruning"
+        },
+        {
+            "title": "FlexPrefill",
+            "content": "A context-aware sparse attention mechanism"
+        },
+        {
+            "title": "Block sparse attention with antidiagonal scoring",
+            "content": "BM"
+        },
+        {
+            "title": "OpenAI",
+            "content": "Powers generation/embeddings in RAG Table 2: Deployment Module Details"
+        },
+        {
+            "title": "Retrieval",
+            "content": "L-CiteEval LongCite"
+        },
+        {
+            "title": "LEval\nLooGLE\nRULER\nLongBench\nBAMBOO",
+            "content": "Counting-Stars LongIns LVEval LongBench V2 babilong Ada_LEval"
+        },
+        {
+            "title": "LongWriter",
+            "content": "ROUGE,ACC,Recall F1,Recall,Precision,ACC,LLM ACC,LLM,ROUGE,F1 ROUGE,BLEU,LLM ACC,F1,Recall ACC,F1 ACC,F1,Recall,Pass@1 F1,Pass@N F1 ROUGE,F1 ACC ACC ACC ACC ACC,LLM ROUGE,F1 ACC"
+        },
+        {
+            "title": "LIBRA\nCLongEval\nLongHealth\nLongSafety",
+            "content": "F1,EM F1,ROUGE,ACC ACC F1,LLM 3220 1000 8645 1617 - 8418 2904 128 20767 8645 503 4500 13200 - 10860 3946 - 13071 7263 6000 6172 0 to 52K 0 to 82K 3K to 200K 12K to 282K 4K to 128K 0 to 64K 0 to 16K 4K to 128K 0 to 16K 8K to 418K 8K to 4M 0 to 128K 0 to 141K - 1K to 616K 26k to 5M 1K to 32K 0 to 1K 1K to 142K 1K to 128K 8K to 16K 3K to 22K Table 3: Benchmarks Overview.The hyphen (\"-\") represents infinite length. Total Benchmarks: 22 Total Tasks: 149 Languages: EN, ZH, RU Context Length: 8K-2M tokens"
+        },
+        {
+            "title": "Domains",
+            "content": "Faith."
+        },
+        {
+            "title": "Reasoning",
+            "content": "Special. L_CiteEval"
+        },
+        {
+            "title": "LongWriter",
+            "content": "Counting-Stars babilong"
+        },
+        {
+            "title": "LVEval",
+            "content": "LongBench_v2 Ada-LEval"
+        },
+        {
+            "title": "LongSafety",
+            "content": "11 1 10 16 20 2 1 6 Citation evaluation, multi-hop QA, dialogue simulation News, Government, Dialogue"
+        },
+        {
+            "title": "Academic",
+            "content": "Paper QA, hallucination detection, meeting/show prediction Academic, Business Multilingual QA, summarization, passage retrieval, code Multi-domain Financial QA, legal contracts, scientific papers, TV shows Finance, Legal, Science Variable tracking, multi-query NIAH Long dependency QA, summarization Classic needle-in-haystack retrieval Multi-needle variants with CoT and distractors"
+        },
+        {
+            "title": "Synthetic",
+            "content": "12 Code debug, math calc, long dialogue, book QA (EN/ZH) Code, Math, Literature 5 3 5 2 11 1 2 7 3 1 Conditional needles, multi-thread tracking"
+        },
+        {
+            "title": "Synthetic",
+            "content": "Long-form writing in English and multilingual"
+        },
+        {
+            "title": "Creative Writing",
+            "content": "Reasoning and searching in EN/ZH Multi-hop reasoning tasks (qa1-qa5)"
+        },
+        {
+            "title": "Synthetic",
+            "content": "GIST extraction, LIST processing"
+        },
+        {
+            "title": "Instruction Following",
+            "content": "Mixed-up tasks, fact recall, reading comprehension Multi-domain Deep understanding with 8K-2M context"
+        },
+        {
+            "title": "Complex Reasoning",
+            "content": "Stack selection, text sorting"
+        },
+        {
+            "title": "Russian language tasks across all categories",
+            "content": "Russian Multi-domain Memory, summarization, table query, key retrieval Chinese-focused"
+        },
+        {
+            "title": "AI Safety",
+            "content": "Table 4: Comprehensive Overview of Long Context Evaluation Benchmarks.LOOMBENCH is indicated by the orange-highlighted entries LOOMBENCH using the LOOM-Scope framework, with results presented in Figure 5, Figure 9, and Table 5. Figure 8: Task distribution of LOOMBENCH. B.2 Statistic of LOOMBENCH LOOMBENCH is composite benchmark constructed from 12 existing datasets, as indicated by the orange-highlighted entries in Table 4. These selected datasets ensure balanced evaluation across six core long-context capabilities, providing comprehensive coverage of the benchmarks design objectives. The visualization of task distribution is also shown in Figure 8."
+        },
+        {
+            "title": "C Full Experimental Results",
+            "content": "Table 5 presents the full evaluation of all models in LOOMBENCH, including detailed performance metrics for LCLMS. Table 7 provides comparative results of the augmentation method. These results collectively demonstrate the benchmarks comprehensive assessment of long-context capabilities. C.1 Vanilla Model Performance Model Performance We evaluated the six core capabilities of 14 mainstream LCLMs in Figure 9: Capability radar chart of remain LCLMs. Evaluation Latency We used the LOOMScope to evaluate both the native benchmark and LOOMBENCH. The Evaluation Latency presented in Table 6 clearly demonstrates that LOOMBENCH, which serves as comprehensive but lightweight benchmarking tool, enables efficient performance assessment. C.2 Augmentation Methods To systematically investigate the efficacy of long-context augmentation techniques, we evaluated retrieval-augmented generation and inference acceleration methods across mainstream methods using LOOM-Scope. Figure 10 presents comprehensive comparisons of RAG performance. Figure 11 further quantifies the latency reductions for Llama-3.1-8B-Instruct under various acceleration strategies, demonstrating up to 12 speedup with acceleration methods. Table 7 and Table 8 consolidate detailed result of the Performance and Prediction Time. Rank Model Avg Faithfulness LCite General Reasoning Retrieve LEval RULER LongB BABI Count LVE LB2 NIAH InfB Generation LongW Specialization LIBRA 1 2 6 9 10 3 13 14 7 8 5 12 4 11 Qwen3-14B Qwen3-30B-A3B Qwen3-8B Qwen3-4B Qwen2.5-7B-Instruct Llama-3.1-8B-Instruct Nemotron-Nano-8B-v1 Nemotron-Nano-4B-v1.1 51.54 51.18 44.71 43.10 42.01 46.94 24.47 21.05 Phi-3-mini-128k-instruct Phi-4-mini-instruct 44.67 43.83 GLM-4-9B-chat GLM-4-9B 44.89 36.80 c4ai-command-r7b-12-2024 Mistral-Nemo-Instruct-2407 45.39 38.37 35.64 37.96 33.18 24.55 29.12 25.79 14.11 10.11 32.96 24. 30.66 21.59 24.73 24.91 43.84 40.61 41.15 39.03 44.63 39.70 34.32 25.88 39.87 40.18 Qwen Series 45.47 43.24 38.62 39.32 40. 59.15 60.31 55.28 55.01 55.89 74.94 78.32 67.68 70.29 72.02 Meta/Llama Series 37.94 27.19 19.94 57.42 28.78 22.67 86.79 42.51 38.85 Microsoft Phi Series 38.31 42. 53.56 53.56 78.62 76.70 56.41 48.96 52.32 42.06 38.25 37.68 11.72 7.48 21.26 22.82 15.15 18.24 14.94 29.85 28.42 27.25 32.52 27. 100 100 64.00 62.00 64.18 10.24 14.14 8.06 13.05 13.97 25.66 6.57 6.69 30.40 12.67 22.67 91.00 43.73 28.38 33.64 0.47 7. 31.04 13.31 39.87 30.93 24.02 31.33 90.00 92.61 35.14 27.87 46.42 45. 85.25 55.96 GLM Series 45.24 38.41 55.00 46.33 36.84 21.51 23.33 17.18 32.00 24. 65.27 47.15 20.35 3.11 42.68 42.47 77.41 60.60 Other Models 37.16 39.75 47.44 53. 35.00 21.12 35.66 21.61 33.33 21.34 92.43 60.41 20.09 16.98 85.75 83.24 81.99 74.25 52. 45.96 38.99 45.68 33.73 41.27 43.90 74.89 51.69 48.30 55.87 56.09 51.78 46.92 50.23 51.24 32.54 16. 38.86 51.28 54.42 45.76 47.00 49.25 Table 5: High-performance Long-context Language Models on LOOMBench: Comprehensive evaluation across 12 benchmarks measuring reasoning, retrieval, generation, and comprehension capabilities. LCite: L_CiteEval; LongB: LongBench; BABI: BABILong; Count: Counting-Stars; LVE: LVEval; LB2: LongBench_v2; InfB: InfiniteBench; LongW: LongWriter Benchmark Sum Faithfulness LCite General LEval RULER LongB Reasoning Retrieve BABI Count LVE LB2 NIAH InfB Generation LongW Specialization LIBRA NVIDIA GeForce RTX 3090 LOOMBENCH Native 22:42:34 216:44:36 2:20:39 10:49:25 2:17:58 6:09:10 1:59:01 35:24: 1:40:47 8:28:28 2:19:20 31:8:45 1:07:38 0:39:04 2:35:32 37:12:43 1:19:12 3:25:30 0:50:40 4:31: 1:49:10 45:33:55 1:47:06 9:04:27 LOOMBENCH Native 8:38:06 110:56:06 0:25:53 7:35:33 1:10:46 3:58: 0:59:17 16:40:31 0:14:57 4:00:00 LOOMBENCH Native 5:40:40 96:14:11 0:29:11 6:45:38 0:32:59 3:41: 0:31:57 20:10:37 0:14:19 6:25:36 NVIDIA 40GB A100 0:37:15 0:19:38 0:41:49 12:09:37 NVIDIA H20 0:30:24 16:37:10 0:20:49 0:17: 0:50:53 21:01:12 0:48:50 1:37:19 0:24:28 1:59:01 0:39:12 23:40:31 1:06:59 2:28:56 0:31:49 23:42: 0:26:01 2:05:23 0:34:08 2:50:34 0:24:24 26:01:28 0:33:15 1:29:10 2:35:31 1:34:02 0:22:07 0:43: 0:31:24 0:48:51 Table 6: The Evaluation Latency for the Native Benchmark and LOOMBENCH.In LOOMBENCH, the naive Transformer service running on single 40GB A100 GPU encountered Out-of-Memory (OOM) errors on certain datasets. To address this, we employed dual-GPU inference strategy for those datasets, which resulted in slightly longer processing times. LCite: L_CiteEval; LongB: LongBench; BABI: BABILong; Count: Counting-Stars; LVE: LVEval; LB2: LongBench_v2; InfB: InfiniteBench; LongW: LongWriter"
+        },
+        {
+            "title": "KIVI",
+            "content": "H2O StreamingLLM L2Norm CaM CakeKV PyramidKV FlexPrefill SnapKV ThinK Transformers VLLM SGLang 0 9 0 3 A V 4k 8k 16k 32k 64k 128k 94.83 46.13 94.29 34. 91.08 21.63 89.50 19.67 - - 10.54 6.38 27.79 22.21 11.46 10. 7.67 9.79 36.42 67.39 27.75 59. 27.58 48.53 22.17 43.42 18.25 33. 12.17 28.10 91.88 82.42 78.96 79. 62.88 53.17 77.42 71.25 68.75 64. 57.29 48.29 93.33 87.92 83.38 83. 65.04 46.58 81.54 81.83 73.29 72. 67.88 67.25 66.29 66.21 55.58 56. 94.83 94.42 92.50 92.75 83.71 89. 91.09 90.74 89.83 84.09 86.40 79. 74.58 82.32 80.98 47.25 48.71 - 36.55 67.07 Prediction Time 1:29:58 5:11:21 5:07:27 5:08:31 50:31: 5:13:01 5:14:12 3:58:17 5:08:31 5:18:08 3:11: 1:49:41 1:41:35 0 0 1 0 4 I 4k 8k 16k 32k 64k 95.46 46.38 94.42 31. 90.04 23.00 89.00 19.86 90.25 10. 128k 67.92 6.17 28.83 21.58 10. 10.79 7.67 10.63 33.96 67.29 26. 59.67 27.92 48.53 20.83 43.21 17. 33.35 12.17 28.03 89.67 82.46 77. 76.42 65.79 55.21 77.00 70.79 67. 65.25 55.54 49.54 93.58 89.04 84. 79.63 62.50 49.42 79.75 79.33 72. 71.92 66.63 65.25 63.88 66.46 54. 55.75 50.79 51.00 95.04 94.46 92. 92.08 83.71 75.21 90.71 90.76 91. 92.43 91.75 85.67 86.25 77.46 78. 82.11 17.50 69.01 Prediction Time 0:32:57 0:27:00 0:26:35 0:27: - 0:28:26 0:26:39 0:15:58 0:26:44 0:35: 3:23:10 0:27:20 0:20:27 0 2 D 4k 8k 16k 32k 64k 93.79 54.33 94. 41.25 90.71 24.17 88.08 19.42 80. 12.33 128k 69.13 10.92 28.00 21. 10.63 10.79 6.83 10.63 34.21 66. 26.75 59.67 27.00 48.33 22.58 43. 16.58 34.25 12.25 28.13 89.67 82. 77.21 76.42 65.71 54.21 77.13 71. 65.33 66.21 58.25 47.58 92.63 87. 84.54 80.71 62.96 48.08 82.22 80. 70.46 72.33 64.57 65.92 69.27 66. 57.73 56.25 45.94 47.25 94.00 94. 92.50 91.88 83.71 75.21 91.75 94. 88.79 88.83 84.58 84.88 79.50 78. 77.79 81.63 57.88 65.92 Prediction Time 0:33:44 0:33:08 0:32: 00:33:48 - 0:32:37 0:32:41 0:13:10 0:32: 0:34:25 3:57:44 0:38:56 0:23:18 Table 7: Performance comparison of various acceleration methods for the Llama-3.1-8B-Instruct model across different hardware configurations and input scales, showcasing reasoning times and accuracy metrics. The batch size per GPU is 8.\"-\" represent Out of Memory. Figure 10: Complete RAG test results for mainstream models. Figure 11: Complete augmentation methods test results for Llama-3.1-8B-Instruct models."
+        },
+        {
+            "title": "XAttention",
+            "content": "0 0 1 0 4 I 4k 8k 16k 32k 64k 128k 93.45 91.00 89.94 84.07 78. 34.35 Prediction Time 0:16:34 Table 8: Performance of XAttention acceleration methods for the Llama-3.1-8B-Instruct model across different input scales in RULER, showcasing reasoning times and accuracy metrics.XAttention only optimized the A100."
+        }
+    ],
+    "affiliations": [
+        "Key Laboratory of Data Intelligence and Advanced Computing, Soochow University",
+        "Soochow University, China"
+    ]
+}

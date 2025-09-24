@@ -1,0 +1,119 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.01957/x1.png",
+                "caption": "Figure 1:Performance comparison among parallelized autoregressive models on ImageNet 256×\\times×256.We significantly reduce the generation steps and achieve at least 3.4x lower latency compared with previous models.",
+                "position": 88
+            },
+            {
+                "img": "https://arxiv.org/html/2507.01957/x2.png",
+                "caption": "Figure 2:Visualization of attention maps in theLlamaGen-1.4B model.There is strong spatial locality, as the attention of a decoding token is concentrated on nearby spatial tokens.LlamaGenencodes images into 24×\\times×24 tokens, where a token that is 24 positions earlier in the attention map corresponds to the token directly above it in the 2D grid.",
+                "position": 97
+            }
+        ]
+    },
+    {
+        "header": "2Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.01957/x3.png",
+                "caption": "Figure 3:Raster Ordervs.Flexible Parallelized Autoregressive Modeling.(a) In raster order, each token is encoded to provide context for the future tokens and to generate the next token. This fixed input-output structure limits the generation flexibility and efficiency. (b) Our flexible parallelized autoregressive modeling decouples these two roles by using separate tokens for context and generation. Previously generated tokens provide context, while position query tokens enable parallel generation of target tokens. This design enables flexible generation order and parallelization.",
+                "position": 116
+            },
+            {
+                "img": "https://arxiv.org/html/2507.01957/x4.png",
+                "caption": "Figure 4:Illustration of the training attention mask.Context Attentionallows subsequent tokens to attend to the context tokens causally.Query Attentionensures mutual visibility among the position query tokens within the same step, and prevents any subsequent tokens from attending to the query tokens. For example, image token 4 can be attended to by all subsequent tokens, including image tokens and position query tokens, to provide context information. The two position query tokensP3subscript𝑃3P_{3}italic_P start_POSTSUBSCRIPT 3 end_POSTSUBSCRIPTandP5subscript𝑃5P_{5}italic_P start_POSTSUBSCRIPT 5 end_POSTSUBSCRIPTin the same generation step attend to the condition, to the image token 4, and to each other, while ignoring the earlier queryP4subscript𝑃4P_{4}italic_P start_POSTSUBSCRIPT 4 end_POSTSUBSCRIPT.",
+                "position": 153
+            },
+            {
+                "img": "https://arxiv.org/html/2507.01957/x5.png",
+                "caption": "Figure 5:Illustration of the inference attention mask.Encodingwith image tokens andDecodingwith position query tokens can be fused into a single step. Taking step 2 in Figure3(b) as the example, it simultaneously encodes the previously generated image tokens 3, 5 to update the KV-cache and decodes the desired image tokens 1, 2 and 6 in parallel.",
+                "position": 159
+            },
+            {
+                "img": "https://arxiv.org/html/2507.01957/x6.png",
+                "caption": "Figure 6:Comparison with other methods.(a) Represented bySARandARPG, which use an encoder-decoder architecture where parallel-generated tokens are independent, as query tokens provide no key-value pairs. (b) Represented byRandAR, a decoder-only architecture with positional instruction tokens. The causal mask used in training degenerated parallel generation into batched next-token prediction and requires instruction tokens stored in the KV cache. (c) Thanks to the specialized training mask, our method guarantees the visibility among all concurrently predicted target positions and only stores the generated tokens in the KV cache.",
+                "position": 228
+            },
+            {
+                "img": "https://arxiv.org/html/2507.01957/x7.png",
+                "caption": "Figure 7:Attention Analysis ofLlamaGen.(a) Attention diminishes rapidly over distance, indicating the strong spatial locality. (b) The spatial locality is consistently observed in all heads.",
+                "position": 257
+            },
+            {
+                "img": "https://arxiv.org/html/2507.01957/x8.png",
+                "caption": "Figure 8:Illustration of different generation order schedules.All schedules leverage 20 decoding steps for162superscript16216^{2}16 start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPTtokens. Dark green marks newly selected grids and light green marks those already selected. Compared to others, our schedule selects grids close to previous ones and far from concurrent ones, maximizing the contextual support and minimizing the mutual dependency.",
+                "position": 333
+            }
+        ]
+    },
+    {
+        "header": "3Experiment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.01957/x9.png",
+                "caption": "Figure 9:Ablation Studies.All ablation experiments are conducted with XL size models on 256×\\times×256 resolution. (a) Effectiveness of flexible parallelized autoregressive modeling. (b) Effectiveness of locality-aware generation order schedule. (c) Effectiveness of the locality principles.",
+                "position": 1095
+            }
+        ]
+    },
+    {
+        "header": "4Ablation",
+        "images": []
+    },
+    {
+        "header": "5Related Works",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.01957/x10.png",
+                "caption": "Figure 10:Generation Examples of Our Model.We show 512×\\times×512 generation samples (top), 256×\\times×256 generation samples (middle) and zero-shot image editing results including class-conditional editing, inpainitng and outpainting (bottom).",
+                "position": 1143
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional Implementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BMore Visualization of Attention Maps",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2507.01957/extracted/6589555/figures/appendix_attention_vis1.png",
+                "caption": "Figure 11:More visualization of attention maps in thellamagen-1.4B model.",
+                "position": 2354
+            },
+            {
+                "img": "https://arxiv.org/html/2507.01957/extracted/6589555/figures/appendix_attention_vis2.png",
+                "caption": "Figure 12:More visualization of attention maps in thellamagen-1.4B model.",
+                "position": 2357
+            }
+        ]
+    },
+    {
+        "header": "Appendix CPytorch Implementation of Locality-aware Generation Order",
+        "images": []
+    }
+]
