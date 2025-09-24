@@ -211,7 +211,7 @@ Paper text to classify:\n\n""{abs}"""
                 prompt,
                 system_prompt=system_prompt,
                 api="claude",
-                model="claude-3-5-sonnet-20240620",
+                model="claude-sonnet-4-20250514",
                 temperature=1.0,
             )
             paper["data"]["categories"] = api.get_json(

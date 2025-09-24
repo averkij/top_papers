@@ -257,7 +257,7 @@ for paper in tqdm(feed["papers"]):
                 prompt=prompt,
                 system_prompt=system_prompt,
                 api="claude",
-                model="claude-3-5-sonnet-20240620",
+                model="claude-sonnet-4-20250514",
                 temperature=1.0,
             )
             # fallback
@@ -474,7 +474,6 @@ def make_summary_gemini(text, limit=10000):
     res = get_text_gemini(prompt)
     res = markdown.markdown(res)
     return res
-
 
 for paper in tqdm(feed["papers"]):
     paper["clean_sections"] = check_doc(paper)
