@@ -1,0 +1,67 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.19228/images/results_speed_ctx_lens_0.png",
+                "caption": "Table 1:Accuracy across the 5 datasets from LOFT RAG with and without CompLLM. LOFT is a long context benchmark (128k tokens) designed to stress-test the long context capabilities of frontiers LLMs as Gemini 1.5 Pro, GPT-4o, and Claude 3 Opus. With CompLLM we show that we can improve long context capabilities of much smaller open source LLMs.",
+                "position": 84
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.19228/x1.png",
+                "caption": "Figure 2:Conceptualization ofToken Embeddings(TEs) (Top) andConcept Embeddings(CEs) (Bottom), and how they can both lead to the same output, using the sentence “golden dogs are called” as an example.\nTEs are contained in the LLM’s embeddings table and limited to roughly 200k (e.g. 262k for Gemma3 models and 151k for Qwen3 models).\nCEs lie in the same features space as TEs, but are not limited in number, and can be fed directly to the LLM without tuning it.\nThe sentencegolden dogs are calledcan be represented with 4 TEs, or in a more compact way using 2 CEs, while leading to the same output.\nA CompLLM’s objective is to extract CEs given TEs, in order to reduce the computational burden on the LLM.",
+                "position": 270
+            },
+            {
+                "img": "https://arxiv.org/html/2509.19228/x2.png",
+                "caption": "Figure 3:Training protocol of CompLLM for context-based Q&A. The CompLLM (made of the same LLM used for generation + a LoRA and a linear layer) can extract multiple CEs in a single forward pass, and can take as input any number of segments with any number of TEs and output any number of CEs (i.e. the number of CEs is proportional to the number of TEs).\nThe loss is computed only on the output corresponding to the answer’s embeddings, whereas the outputs corresponding to the other embeddings is ignored.\nNote that the model can decide on its own what information the CEs actually encode: for example, the first CE (e.g.CE0) could encode information from only the first TE, or the first 3 TEs; similarly, some low-information TE might have very little effect on the CEs.\nThe answerycan be computed online (during training) or offline, using the LLM; here we show it as if it was pre-computed for simplicity.",
+                "position": 284
+            },
+            {
+                "img": "https://arxiv.org/html/2509.19228/images/results_speed_ctx_lens_1.png",
+                "caption": "Figure 4:Inference speed with and without CompLLM, for contexts of different lengths (x axis), for different number of generated tokens (in each plot), for a CompLLM with compression rateC=2C=2.\nThe times for the green line are equivalent to those from red + orange line (generation with online CompLLM compression is equal to offline generation plus compression time).\nWe used Gemma3-4B on a B200 GPU using BFloat16 and PyTorch compile function.The leftmost plotshows the time taken to generate 1 token, commonly known as Time To First Token (TTFT): the latency ratio betweenwithandwithoutCompLLM asymptotically approaches 4x (C2C^{2}), and the compression time asymptotically becomes negligible (as it scales linearly, not quadratically like the other 3 curves). Note that the TTFT is virtually the same as thecache prefilltime.The rightmost plotshows the time taken to generate 10k tokens, wherenext token predictiontime overcomesKV cache prefilltime, asymptotically bringing the ratio to 2x (CC).",
+                "position": 349
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.19228/images/results_plot.png",
+                "caption": "Figure 5:Results with and without compression across multiple context lengths for four datasets, with Gemma-3-4B (top row) and Qwen3-4B (bottom row).\nX axis indicates the context length, showing both the number of concatenated contexts/documents and number of tokens.\nTo obtain longer contexts, multiple contexts are concatenated, and the correlated questions (one per context) are asked independently from each other: this means that the distribution of the relevant contexts is uniform within the concatenated context - there is exactly one question about the first document, one question about the second document et cetera.",
+                "position": 594
+            },
+            {
+                "img": "https://arxiv.org/html/2509.19228/images/results_plot_llm_lingua.png",
+                "caption": "Figure 6:Results with Gemma3-4B with no compression, with CompLLM, and with LLMLingua-2.",
+                "position": 620
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]
