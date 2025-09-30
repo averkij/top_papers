@@ -276,7 +276,7 @@ for paper in tqdm(feed["papers"]):
                 prompt=prompt,
                 system_prompt=system_prompt,
                 api="claude",
-                model="claude-sonnet-4-20250514",
+                model="claude-sonnet-4-5-20250929",
                 temperature=1.0,
             )
             # fallback
