@@ -1,0 +1,148 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2NVFP4 Format",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.25149/x1.png",
+                "caption": "Figure 1:A 16×\\times32 matrix stored in NVFP4 format. Each block contains sixteen contiguous FP4 elements (gray and green) along with a single FP8 scale factor (yellow). The element with the largest magnitude in each block (green) is scaled to the FP4 maximum representable value and can be recovered using the block scale factor. A per-tensor FP32 scale factor (not shown) is also applied.",
+                "position": 131
+            }
+        ]
+    },
+    {
+        "header": "3Training with NVFP4",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.25149/x2.png",
+                "caption": "Figure 2:Validation loss of NVFP4 and FP8 pretraining for the 12B model using 10T tokens.",
+                "position": 220
+            },
+            {
+                "img": "https://arxiv.org/html/2509.25149/x3.png",
+                "caption": "Figure 3:Task accuracy of NVFP4 versus FP8 measured throughout 10T tokens of pretraining.",
+                "position": 223
+            },
+            {
+                "img": "https://arxiv.org/html/2509.25149/x4.png",
+                "caption": "Figure 4:Ablations on the 12B model trained for 10T tokens. Ablation studies start from the model trained up to 3.43T tokens using NVFP4 except in the first two and last eight blocks, and systematically remove one methodology component at a time: stochastic rounding (SR), Random Hadamard Transforms (RHT), two-dimensional scaling (2D), and fewer blocks in BF16. Relative difference is defined as (FP8 - experiment)//FP8, where a negative difference means the experiment is worse.",
+                "position": 366
+            }
+        ]
+    },
+    {
+        "header": "4Training Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.25149/x5.png",
+                "caption": "Figure 5:Illustration of compute flow for a NVFP4 quantized linear layer. All GEMM operations quantize their inputs to NVFP4.",
+                "position": 417
+            }
+        ]
+    },
+    {
+        "header": "5NVFP4 and MXFP4",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.25149/x6.png",
+                "caption": "(a)Relative difference between training loss of BF16 (baseline) and NVFP4 and MXFP4 pretraining.",
+                "position": 490
+            },
+            {
+                "img": "https://arxiv.org/html/2509.25149/x6.png",
+                "caption": "(a)Relative difference between training loss of BF16 (baseline) and NVFP4 and MXFP4 pretraining.",
+                "position": 493
+            },
+            {
+                "img": "https://arxiv.org/html/2509.25149/x7.png",
+                "caption": "(b)Final validation loss for NVFP4 and MXFP4 pretraining with different number of tokens.",
+                "position": 498
+            }
+        ]
+    },
+    {
+        "header": "6Conclusions",
+        "images": []
+    },
+    {
+        "header": "Contributors",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix AModels",
+        "images": []
+    },
+    {
+        "header": "Appendix BNVFP4 Quantization Procedure",
+        "images": []
+    },
+    {
+        "header": "Appendix CHadamard Transform Mechanics",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.25149/x8.png",
+                "caption": "Figure 7:Switching to higher precision towards end of training. Plot shows relative difference in validation loss for a 12B model trained on 10T tokens. NVFP4 uses the method specified in Section4during all of the training period (Green). The precision for tensors in forward and backward pass (Blue), tensors only in the forward pass (Orange), and tensors only in the backward pass (Purple) are switched from NVFP4 to BF16 at 8.2T tokens until remainder of training. A run where the switch to high precision occurs around 10T tokens is also shown (Red). 1D weight scaling is used when switching precision for the backward pass, since doing so is marginally better than 2D weight scaling in such a setup.",
+                "position": 1246
+            }
+        ]
+    },
+    {
+        "header": "Appendix DSwitching to Higher Precision",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.25149/x9.png",
+                "caption": "Figure 8:Combining NVFP4 training techniques: linear layers in last four blocks in BF16, 2D weight scaling, Random Hadamard transforms on Wgrad, and stochastic rounding on gradients. Plot shows relative difference in validation loss for a 1.2B model trained on 1T tokens.",
+                "position": 1264
+            },
+            {
+                "img": "https://arxiv.org/html/2509.25149/x10.png",
+                "caption": "Figure 9:Sensitivity of linear layers to quantization. NVFP4 for all linear layers except in a few of the first and last blocks in the model.\nPlot shows validation loss for a 1.2B model trained on 1T tokens.",
+                "position": 1281
+            },
+            {
+                "img": "https://arxiv.org/html/2509.25149/x11.png",
+                "caption": "Figure 10:Stochastic rounding applied to different tensors: gradients, activations, weights, and backward-pass tensors. NVFP4 is applied on all linear layers except in the last four blocks. Plot shows validation loss for a 1.2B model trained on 1T tokens.",
+                "position": 1298
+            },
+            {
+                "img": "https://arxiv.org/html/2509.25149/x12.png",
+                "caption": "Figure 11:Impact of applying Random Hadamard Transforms (RHT) to different GEMMs (Fprop, Dgrad and Wgrad) during training, compared to no RHT. For RHT runs, each transform uses a fixed random seed across the entire training. NVFP4 quantization is applied to all linear layers except in the last four blocks. The plot shows the relative change in validation loss compared to the BF16 baseline for a 1.2B-parameter model trained on 1T tokens.",
+                "position": 1305
+            },
+            {
+                "img": "https://arxiv.org/html/2509.25149/x13.png",
+                "caption": "Figure 12:Effect of varying Hadamard Matrix Size. Wgrad tensors use16×1616\\times 16transforms for the first 3.4T tokens, then switch to4×44\\times 4or128×128128\\times 128for the remainder of training. Plot shows relative difference in training loss for the 12B model trained on 4T tokens. NVFP4 is applied on linear layers using the methodology specified in Section4.",
+                "position": 1314
+            },
+            {
+                "img": "https://arxiv.org/html/2509.25149/x14.png",
+                "caption": "Figure 13:Effect of randomization for the Hadamard transform. A single fixed seed is used for all transforms during the first 3.4 tokens and switched to one of the following randomization options for the remainder of training: a single fixed seed for all layers, a unique seed for every transform, and not using a random sign vector. Plot shows relative difference in training loss from the FP8 baseline for a 12B model trained on 4T tokens. NVFP4 training uses the training methodology specified in Section4.",
+                "position": 1331
+            },
+            {
+                "img": "https://arxiv.org/html/2509.25149/x15.png",
+                "caption": "Figure 14:Effect of consistency in tensors. Relative difference in validation loss from the BF16 baseline for a 1.2B model trained on 1T tokens. NVFP4 is applied on either weights or activations. Different choices of scaling factors are applied:1×161\\times 16block scales along the same dimension,1×161\\times 16block scales along different dimensions, and16×1616\\times 16block scales, along with a global FP32 per-tensor scale.",
+                "position": 1338
+            }
+        ]
+    },
+    {
+        "header": "Appendix EAblation of Training Methodology",
+        "images": []
+    }
+]
