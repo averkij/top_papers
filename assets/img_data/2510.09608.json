@@ -1,0 +1,88 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.09608/x1.png",
+                "caption": "Figure 1:Illustration of StreamingVLM vs. existing VLMs.LetTTbe video length andWWthe sliding-window size. (a)Full Attention:O​(T2)O(T^{2})cost; unbounded memory; degrades beyond training length. (b)Sliding Window (no overlap): bounded memory but short chunks break coherence; long chunks raise latency. (c)Sliding Window (overlap): recomputation per window yields high latency. (d)StreamingVLM(Sliding Window + Reuse KV): reuses states of attention sinks, a short vision window and long text window, preserving history at low latency. “Win rate” is the pairwise win share vs. GPT-4o mini (judge: GPT-5).",
+                "position": 124
+            },
+            {
+                "img": "https://arxiv.org/html/2510.09608/x2.png",
+                "caption": "Figure 2:Issues with existing VLMs.(1) Without SFT, models cannot generate cross-round content coherently. (2) With full attention, the context exceeds the training length after processing 2–5 minutes of video and latency becomes prohibitive. (3) With a sliding window, models cannot retain enough context to benefit from efficiency. In contrast, StreamingVLM addresses these issues, enabling coherent commentary, real-time generation, and long-term history.",
+                "position": 139
+            }
+        ]
+    },
+    {
+        "header": "2Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.09608/x3.png",
+                "caption": "Figure 3:Inference scheme of StreamingVLM.We keep 512 attention-sink tokens to stabilize attention, a long text window of 512 recent tokens to preserve long-term memory, and a short vision window covering 16 seconds to track ongoing actions. We useContiguous RoPE: indices are shifted to stay within a fixed range, keeping positions in-distribution and within the training length.",
+                "position": 155
+            },
+            {
+                "img": "https://arxiv.org/html/2510.09608/x4.png",
+                "caption": "Figure 4:Training Strategy.We train withoverlapped full attentionthat mimics test-time attention. (1), (2), (3) and (4) are four training samples, both keeping the attention sinks and overlap later in time.",
+                "position": 189
+            },
+            {
+                "img": "https://arxiv.org/html/2510.09608/x5.png",
+                "caption": "Figure 5:Data Curation Pipeline.We collect games from five sports—basketball, soccer, American football, ice hockey, and baseball. We use GPT to edit or reject low-quality segments, yielding 2,449 full games. We then build two datasets through separate pipelines: an SFT dataset using overlapped chunking, and a high-quality annealing dataset focused on real-time actions.",
+                "position": 199
+            }
+        ]
+    },
+    {
+        "header": "3Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.09608/x6.png",
+                "caption": "Table 1:Captioning accuracy(win rate vs. baselines). Baselines with/without chunking fall short; StreamingVLM surpasses strong models such as GPT-4o and produces compelling commentary.(Superscripts for Inf-Streams-Eval:∞= infinite;†= chunk length 100s. On Livecc-Sports-3K CC, LiveCC has only one mode and cannot be compared against itself, so we show “–”.",
+                "position": 271
+            },
+            {
+                "img": "https://arxiv.org/html/2510.09608/x6.png",
+                "caption": "Figure 6:For existing VLMs, balancing cross-chunk coherence with training-length limits is challenging.",
+                "position": 349
+            },
+            {
+                "img": "https://arxiv.org/html/2510.09608/x7.png",
+                "caption": "Table 4:Ablation of RoPE on captioning (win rate). Native RoPE drops on infinite streams; 100 s chunking partly recovers but hurts long-term memory; contiguous RoPE keeps indices bounded and sustains infinite performance. (Superscripts for Inf-Streams-Eval:∞= infinite;†= chunk length 100s.)",
+                "position": 475
+            },
+            {
+                "img": "https://arxiv.org/html/2510.09608/x7.png",
+                "caption": "Figure 7:Per-token latency vs. video length. Full attention hits OOM; sliding window w/o Overlapping spikes above real time; sliding window w/ Overlapping remains inefficient; StreamingVLM latency stays low and stable. The dashed line marks the real-time threshold (10 tokens/s⇒\\Rightarrow≤\\leq0.1 s per token).",
+                "position": 529
+            }
+        ]
+    },
+    {
+        "header": "4Related Work",
+        "images": []
+    },
+    {
+        "header": "5conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.09608/x8.png",
+                "caption": "Figure 8:Stability over time.Each test video is split into five segments at 20% intervals. StreamingVLM (Sliding Window + Reuse KV) maintains nearly constant win rate across segments and matches the performance of Sliding Window w/ Overlap, while Full Attention and Sliding Window w/o Overlap degrade or remain far lower.",
+                "position": 1175
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]
