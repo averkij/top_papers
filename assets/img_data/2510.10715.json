@@ -1,0 +1,1367 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.10715/x1.png",
+                "caption": "Figure 1.Our method generates creative concepts such as novel pets, uniquely designed jackets, and unconventional buildings by steering the generation away from conventional patterns using a VLM-Guided Adaptive Negative Prompting process.",
+                "position": 157
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/failure_pets/gpto3_1.jpeg",
+                "caption": "Figure 2.Images generated with GPT-o3(OpenAI,2025), GPT-4o(OpenAI,2024), SDXL(Podell et al.,2023),\nFLUX-dev(Black Forest Labs,2024), and SD3.5(Esser et al.,2024)using the prompt\n“Professional high-quality photo of a new type of pet.”",
+                "position": 170
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/failure_pets/gpt4o_1.jpeg",
+                "caption": "",
+                "position": 174
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/failure_pets/sdxl_1.jpeg",
+                "caption": "",
+                "position": 175
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/failure_pets/flux_1.jpeg",
+                "caption": "",
+                "position": 176
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/failure_pets/sd35_1.jpeg",
+                "caption": "",
+                "position": 177
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/failure_pets/gpto3_2.jpeg",
+                "caption": "",
+                "position": 180
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/failure_pets/gpt4o_2.jpeg",
+                "caption": "",
+                "position": 181
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/failure_pets/sdxl_2.jpeg",
+                "caption": "",
+                "position": 182
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/failure_pets/flux_2.jpeg",
+                "caption": "",
+                "position": 183
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/failure_pets/sd35_2.jpeg",
+                "caption": "",
+                "position": 184
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/x2.png",
+                "caption": "Figure 3.Overview of our VLM-guided negative prompting method. To generate a creative image (e.g., “new type of pet”), we sample Gaussian noise and perform an augmented denoising process that maintains an adaptive list of negative prompts. At each denoising step, we query a pre-trained Vision-Language Model (VLM)\nto identify visual concepts present in the intermediate output and update the list accordingly, steering the denoising process away from them. For example, we add the token “cat” to the accumulating list to shift the denoising trajectory away from generating an image resembling a cat as well as the previously detected pets.",
+                "position": 215
+            }
+        ]
+    },
+    {
+        "header": "2.Related Work",
+        "images": []
+    },
+    {
+        "header": "3.Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/user_study.jpg",
+                "caption": "Figure 4.Trade-off between novelty and category coherence in our user study. Higher values are better for both axes. Our method (star) uniquely achieves high scores on both dimensions compared to other creative generation methods.",
+                "position": 320
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/sofas/sofa_11.jpeg",
+                "caption": "Figure 5.Qualitative results of our method across different object categories. In all categories, our method generates creative shapes and appearances while preserving object semantics. For instance, buildings with unique forms and textures that retain windows, doors, and balconies, or bags made of varied materials that remain recognizable as bags.",
+                "position": 324
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/sofas/sofa_2.jpeg",
+                "caption": "",
+                "position": 331
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/sofas/sofa_5.jpeg",
+                "caption": "",
+                "position": 332
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/sofas/sofa_6.jpeg",
+                "caption": "",
+                "position": 333
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/sofas/sofa_7.jpeg",
+                "caption": "",
+                "position": 334
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/sofas/sofa_8.jpeg",
+                "caption": "",
+                "position": 335
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/sofas/sofa_9.jpeg",
+                "caption": "",
+                "position": 336
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/buildings/building_1.jpeg",
+                "caption": "",
+                "position": 348
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/buildings/building_2.jpeg",
+                "caption": "",
+                "position": 349
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/buildings/building_3.jpeg",
+                "caption": "",
+                "position": 350
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/buildings/building_4.jpeg",
+                "caption": "",
+                "position": 351
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/buildings/building_5.jpeg",
+                "caption": "",
+                "position": 352
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/buildings/building_6.jpeg",
+                "caption": "",
+                "position": 353
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/buildings/building_7.jpeg",
+                "caption": "",
+                "position": 354
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/pets/pet_14.jpeg",
+                "caption": "",
+                "position": 366
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/pets/pet_9.jpeg",
+                "caption": "",
+                "position": 367
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/pets/pet_10.jpeg",
+                "caption": "",
+                "position": 368
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/pets/pet_15.jpeg",
+                "caption": "",
+                "position": 369
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/pets/pet_16.jpeg",
+                "caption": "",
+                "position": 370
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/pets/pet_21.jpeg",
+                "caption": "",
+                "position": 371
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/pets/pet_19.jpeg",
+                "caption": "",
+                "position": 372
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/bags/bag_1.jpeg",
+                "caption": "",
+                "position": 384
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/bags/bag_2.jpeg",
+                "caption": "",
+                "position": 385
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/bags/bag_3.jpeg",
+                "caption": "",
+                "position": 386
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/bags/bag_4.jpeg",
+                "caption": "",
+                "position": 387
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/bags/bag_8.jpeg",
+                "caption": "",
+                "position": 388
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/bags/bag_6.jpeg",
+                "caption": "",
+                "position": 389
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/bags/bag_7.jpeg",
+                "caption": "",
+                "position": 390
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/fruits/fruit_1.jpeg",
+                "caption": "",
+                "position": 402
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/fruits/fruit_2.jpeg",
+                "caption": "",
+                "position": 403
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/fruits/fruit_3.jpeg",
+                "caption": "",
+                "position": 404
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/fruits/fruit_4.jpeg",
+                "caption": "",
+                "position": 405
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/fruits/fruit_5.jpeg",
+                "caption": "",
+                "position": 406
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/fruits/fruit_6.jpeg",
+                "caption": "",
+                "position": 407
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/fruits/fruit_9.jpeg",
+                "caption": "",
+                "position": 408
+            }
+        ]
+    },
+    {
+        "header": "4.Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/creative_methods_comparisons/Professional_high_quality_photo_of_a_mycup._Photorealistic,_HQ,_4k_images_seed_0.jpeg",
+                "caption": "Figure 6.Left:Comparison with ConceptLab(Richardson et al.,2024)(top row) and our VLM-Guided method using Kandinsky2(Razzhigaev et al.,2023)(middle row) and SD3.5 (bottom row).Right:Comparison with C3(Han et al.,2025)using SDXL(Podell et al.,2023)(top row) and our method using SDXL (middle row) and SD3.5 (bottom row). Our method consistently generates more diverse and imaginative variations while maintaining recognizability within each category.",
+                "position": 445
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/creative_methods_comparisons/Professional_high_quality_photo_of_a_myplant._Photorealistic,_HQ,_4k_images_seed_0.jpeg",
+                "caption": "",
+                "position": 453
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/creative_methods_comparisons/Professional_high_quality_photo_of_a_mypet._Photorealistic,_HQ,_4k_images_seed_0.jpeg",
+                "caption": "",
+                "position": 454
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/creative_methods_comparisons/Professional_high_quality_photo_of_a_mysofa._Photorealistic,_HQ,_4k_images_seed_0.jpeg",
+                "caption": "",
+                "position": 455
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/C3_images/chair.jpeg",
+                "caption": "",
+                "position": 460
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/C3_images/car.jpeg",
+                "caption": "",
+                "position": 461
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/C3_images/building.jpeg",
+                "caption": "",
+                "position": 462
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/C3_images/teddy.jpeg",
+                "caption": "",
+                "position": 463
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/kandinsky2_images/kandinsky2_cup.jpeg",
+                "caption": "",
+                "position": 470
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/kandinsky2_images/kandinsky2_plant.jpeg",
+                "caption": "",
+                "position": 471
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/kandinsky2_images/kandinsky2_pet.jpeg",
+                "caption": "",
+                "position": 472
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/kandinsky2_images/kandinsky2_sofa.jpeg",
+                "caption": "",
+                "position": 473
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/C3_images/sdxl_chair.jpeg",
+                "caption": "",
+                "position": 478
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/C3_images/sdxl_car.jpeg",
+                "caption": "",
+                "position": 479
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/C3_images/sdxl_building.jpeg",
+                "caption": "",
+                "position": 480
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/C3_images/sdxl_teddy.jpeg",
+                "caption": "",
+                "position": 481
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/kandinsky2_images/sd35_cup.jpeg",
+                "caption": "",
+                "position": 488
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/kandinsky2_images/sd35_plant.jpeg",
+                "caption": "",
+                "position": 489
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/kandinsky2_images/sd35_pet.jpeg",
+                "caption": "",
+                "position": 490
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/kandinsky2_images/sd35_sofa.jpeg",
+                "caption": "",
+                "position": 491
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/C3_images/sd35_chair.jpeg",
+                "caption": "",
+                "position": 496
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/C3_images/sd35_car.jpeg",
+                "caption": "",
+                "position": 497
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/C3_images/sd35_building.jpeg",
+                "caption": "",
+                "position": 498
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/C3_images/sd35_teddybear.jpeg",
+                "caption": "",
+                "position": 499
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/gpt4o_pet.jpeg",
+                "caption": "Figure 7.Creative generation comparison across different categories. Despite prompts explicitly requesting novelty (“A new type of [category]” or “A creative [category]”), GPT-4o, FLUX and SD3.5 produce typical category exemplars. Our method generates novel variations that navigate unexplored modes of the semantic space. Each column uses identical seeds across all methods for fair comparison.",
+                "position": 517
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/gpt4o_hairstyle.jpeg",
+                "caption": "",
+                "position": 525
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/gpt4o_cultural.jpeg",
+                "caption": "",
+                "position": 526
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/gpt4o_vehicle.jpeg",
+                "caption": "",
+                "position": 527
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/gpt4o_fruit.jpeg",
+                "caption": "",
+                "position": 528
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/gpt4o_musical.jpeg",
+                "caption": "",
+                "position": 529
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/gpt_plant.jpeg",
+                "caption": "",
+                "position": 530
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/gpt4o_chess.jpeg",
+                "caption": "",
+                "position": 531
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/flux1-dev_a-photo-of-a-new-type-of-pet.jpeg",
+                "caption": "",
+                "position": 542
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/flux1-dev_a-photo-of-a-creative-hairstyle.jpeg",
+                "caption": "",
+                "position": 543
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/flux1-dev_a-photo-of-a-creative-cultural-outfit.jpeg",
+                "caption": "",
+                "position": 544
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/flux1-dev_a-photo-of-a-new-type-of-vehicle.jpeg",
+                "caption": "",
+                "position": 545
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/flux1-dev_a-photo-of-a-new-type-of-fruit.jpeg",
+                "caption": "",
+                "position": 546
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/flux1-dev_a-photo-of-a-new-type-of-musical.jpeg",
+                "caption": "",
+                "position": 547
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/flux1-dev_a-photo-of-a-new-type-of-plant.jpeg",
+                "caption": "",
+                "position": 548
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/flux1-dev_a-photo-of-a-creative-chess-set.jpeg",
+                "caption": "",
+                "position": 549
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/sd35_pet.jpeg",
+                "caption": "",
+                "position": 560
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/sd35_hairstyle.jpeg",
+                "caption": "",
+                "position": 561
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/sd35_cultural.jpeg",
+                "caption": "",
+                "position": 562
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/sd35_vehicle.jpeg",
+                "caption": "",
+                "position": 563
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/sd35_fruit.jpeg",
+                "caption": "",
+                "position": 564
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/sd35_musical.jpeg",
+                "caption": "",
+                "position": 565
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/sd35_plant.jpeg",
+                "caption": "",
+                "position": 566
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/sd35_chess.jpeg",
+                "caption": "",
+                "position": 567
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/vqa_pet.jpeg",
+                "caption": "",
+                "position": 578
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/vqa_hairstyle.jpeg",
+                "caption": "",
+                "position": 579
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/vqa_cultural.jpeg",
+                "caption": "",
+                "position": 580
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/vqa_vehicle.jpeg",
+                "caption": "",
+                "position": 581
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/vqa_fruit.jpeg",
+                "caption": "",
+                "position": 582
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/vqa_musical.jpeg",
+                "caption": "",
+                "position": 583
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/vqa_plant.jpeg",
+                "caption": "",
+                "position": 584
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/comparison_sd_gpt/vqa_chess.jpeg",
+                "caption": "",
+                "position": 585
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/gpt_lists_ablation/jackets/gpt28_1.jpeg",
+                "caption": "Figure 8.Left:Non-Adaptive LLM Approach: GPT-4o(n∈[10,15,28](n\\in[10,15,28]) - static LLM list ofnnnegative concepts applied at all steps. Ours (GPT-4o) dynamic, VLM-guided negatives using GPT-4o as our VLM.Right:Replay (Per-Seed) - reuse the accumulated VLM list from thesameseed at all steps; Replay (Cross-Seed) - reuse a list extracted from adifferentseed at all steps; No Accumulation - use only the current step’s VLM answers (no carry-over); Ours - adaptive accumulation of negative prompts.",
+                "position": 630
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/gpt_lists_ablation/jackets/gpt15_1.jpeg",
+                "caption": "",
+                "position": 638
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/gpt_lists_ablation/jackets/gpt10_1.jpeg",
+                "caption": "",
+                "position": 639
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/gpt_lists_ablation/jackets/ours_1.jpeg",
+                "caption": "",
+                "position": 640
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_lists_ablation/buildings/matchingseed_123.jpeg",
+                "caption": "",
+                "position": 645
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_lists_ablation/buildings/crossseed_123.jpeg",
+                "caption": "",
+                "position": 646
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_lists_ablation/buildings/noacc_123.jpeg",
+                "caption": "",
+                "position": 647
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_lists_ablation/buildings/ours.jpeg",
+                "caption": "",
+                "position": 648
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/gpt_lists_ablation/sofas/gpt28_1.jpeg",
+                "caption": "",
+                "position": 655
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/gpt_lists_ablation/sofas/gpt15_1.jpeg",
+                "caption": "",
+                "position": 656
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/gpt_lists_ablation/sofas/gpt10_1.jpeg",
+                "caption": "",
+                "position": 657
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/gpt_lists_ablation/sofas/ours_1.jpeg",
+                "caption": "",
+                "position": 658
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_lists_ablation/bags/matching_789.jpeg",
+                "caption": "",
+                "position": 663
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_lists_ablation/bags/cross_789.jpeg",
+                "caption": "",
+                "position": 664
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_lists_ablation/bags/noacc_789.jpeg",
+                "caption": "",
+                "position": 665
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_lists_ablation/bags/ours_1.jpeg",
+                "caption": "",
+                "position": 666
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/x3.png",
+                "caption": "Figure 9.Top 5 subcategory distribution of 100 generated pets per method classified with GPT-4o.",
+                "position": 760
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/use_cases/pet.jpeg",
+                "caption": "Figure 10.Creative object in different scenes generated using Flux.1-dev Kontext(Black Forest Labs,2025). Left column: Novel objects generated by our VLM-guided method. Columns 2-4: The same creative objects placed in various contexts and applications while preserving their distinctive features.",
+                "position": 968
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/use_cases/flux1-kontext-dev_this-animal-surfing-on-a-red.jpg",
+                "caption": "",
+                "position": 972
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/use_cases/flux1-kontext-dev_a-fluffy-plush-toy-of-this.jpg",
+                "caption": "",
+                "position": 973
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/use_cases/flux1-kontext-dev_a-little-kid-hugging-this.jpg",
+                "caption": "",
+                "position": 974
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/sets_of_creative_things/ours_teaset_1.jpeg",
+                "caption": "Figure 11.Creative sets generated by our method demonstrating coherent collections of related objects. Each set exhibits individual creativity in its components while maintaining stylistic and functional consistency across the collection.",
+                "position": 986
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/chess_sets/chess_4.jpeg",
+                "caption": "",
+                "position": 990
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/results_grid/cutlery_sets/cutlery_8.jpeg",
+                "caption": "",
+                "position": 991
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/sets_of_creative_things/luggage.jpeg",
+                "caption": "",
+                "position": 992
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/complex/pet_surfing.jpeg",
+                "caption": "Figure 12.Creative objects presented in a complex environment described by the prompt.",
+                "position": 1011
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/complex/flower.jpeg",
+                "caption": "",
+                "position": 1015
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/complex/fruit.jpeg",
+                "caption": "",
+                "position": 1016
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/complex/jacket.jpeg",
+                "caption": "",
+                "position": 1017
+            }
+        ]
+    },
+    {
+        "header": "5.Conclusions",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "6.Ablations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/timesteps/to5/building.jpeg",
+                "caption": "Figure 13.Effect of limiting VLM guidance to different ranges of denoising timesteps. Columns correspond to applying our method during only the first 5, 10, 15, 20, or all 27 timesteps, while rows show results for Building, Bag, and Jacket categories.",
+                "position": 1736
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/timesteps/to10/building.jpeg",
+                "caption": "",
+                "position": 1744
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/timesteps/to15/building.jpeg",
+                "caption": "",
+                "position": 1745
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/timesteps/to20/building.jpeg",
+                "caption": "",
+                "position": 1746
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/timesteps/toend/building.jpeg",
+                "caption": "",
+                "position": 1747
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/timesteps/to5/bag.jpeg",
+                "caption": "",
+                "position": 1754
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/timesteps/to10/bag.jpeg",
+                "caption": "",
+                "position": 1755
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/timesteps/to15/bag.jpeg",
+                "caption": "",
+                "position": 1756
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/timesteps/to20/bag.jpeg",
+                "caption": "",
+                "position": 1757
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/timesteps/toend/bag.jpeg",
+                "caption": "",
+                "position": 1758
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/timesteps/to5/jacket.jpeg",
+                "caption": "",
+                "position": 1765
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/timesteps/to10/jacket.jpeg",
+                "caption": "",
+                "position": 1766
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/timesteps/to15/jacket.jpeg",
+                "caption": "",
+                "position": 1767
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/timesteps/to20/jacket.jpeg",
+                "caption": "",
+                "position": 1768
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/timesteps/toend/jacket.jpeg",
+                "caption": "",
+                "position": 1769
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/positive_prompts/new/bag.jpeg",
+                "caption": "Figure 14.Effect of positive prompt wording on creative generation using our method. Columns correspond to alternative prompt formulations (“New type”, “Innovative”, “Unique”, “Creative” and simply “A photo of a [category]”), while rows show results for different semantic categories Across categories, our approach produces diverse and imaginative outputs.",
+                "position": 1801
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/positive_prompts/innovative/bag.jpeg",
+                "caption": "",
+                "position": 1809
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/positive_prompts/unique/bag.jpeg",
+                "caption": "",
+                "position": 1810
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/positive_prompts/creative/bag.jpeg",
+                "caption": "",
+                "position": 1811
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/positive_prompts/none/bag.jpeg",
+                "caption": "",
+                "position": 1812
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/positive_prompts/new/jacket.jpeg",
+                "caption": "",
+                "position": 1819
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/positive_prompts/innovative/jacket.jpeg",
+                "caption": "",
+                "position": 1820
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/positive_prompts/unique/jacket.jpeg",
+                "caption": "",
+                "position": 1821
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/positive_prompts/creative/jacket.jpeg",
+                "caption": "",
+                "position": 1822
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/positive_prompts/none/jacket.jpeg",
+                "caption": "",
+                "position": 1823
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/positive_prompts/new/building.jpeg",
+                "caption": "",
+                "position": 1830
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/positive_prompts/innovative/building.jpeg",
+                "caption": "",
+                "position": 1831
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/positive_prompts/unique/building.jpeg",
+                "caption": "",
+                "position": 1832
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/positive_prompts/creative/building.jpeg",
+                "caption": "",
+                "position": 1833
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/positive_prompts/none/building.jpeg",
+                "caption": "",
+                "position": 1834
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_models_ablation/buildings/gpt.jpeg",
+                "caption": "Figure 15.Comparison of outputs when guiding our method with different Vision-Language Models (VLMs). Columns correspond to GPT-4o(OpenAI,2024), Qwen2.5(Bai et al.,2025), BLIP-2(Li et al.,2023), BLIP-1(Li et al.,2022), and ViLT(Kim et al.,2021), while rows show three semantic categories: Unique Building, New Pet, and Creative Jacket. Across models, our approach consistently produces creative and coherent results, with stronger VLMs generally yielding more novelty, demonstrating robustness of the method to the choice of VLM.",
+                "position": 1857
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_models_ablation/buildings/qwen.jpeg",
+                "caption": "",
+                "position": 1865
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_models_ablation/buildings/blip2.jpeg",
+                "caption": "",
+                "position": 1866
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_models_ablation/buildings/blip1.jpeg",
+                "caption": "",
+                "position": 1867
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_models_ablation/buildings/vilt.jpeg",
+                "caption": "",
+                "position": 1868
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_models_ablation/pets/gpt.jpeg",
+                "caption": "",
+                "position": 1875
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_models_ablation/pets/pet_2_qwen.jpeg",
+                "caption": "",
+                "position": 1876
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_models_ablation/pets/pet_2_blip2.jpeg",
+                "caption": "",
+                "position": 1877
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_models_ablation/pets/pet_2_blip1.jpeg",
+                "caption": "",
+                "position": 1878
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_models_ablation/pets/pet_2_vilt.jpeg",
+                "caption": "",
+                "position": 1879
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_models_ablation/jackets/gpt.jpeg",
+                "caption": "",
+                "position": 1886
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_models_ablation/jackets/qwen.jpeg",
+                "caption": "",
+                "position": 1887
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_models_ablation/jackets/blip2.jpeg",
+                "caption": "",
+                "position": 1888
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_models_ablation/jackets/blip1.jpeg",
+                "caption": "",
+                "position": 1889
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/vlm_models_ablation/jackets/vilt.jpeg",
+                "caption": "",
+                "position": 1890
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/question_design/buildings/baseline.jpeg",
+                "caption": "Figure 16.Effect of the VLM question design on creative generation.\nRows correspond to three semantic categories. The first column shows a Stable Diffusion 3.5 baseline. The remaining columns apply our VLM-Guided Adaptive Negative-Prompting while asking the VLM about (i) the material, (ii) the dominant colors, (iii) the object’s shape, and (iv) its design.",
+                "position": 1912
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/question_design/buildings/building_material.jpeg",
+                "caption": "",
+                "position": 1920
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/question_design/buildings/building_color.jpeg",
+                "caption": "",
+                "position": 1921
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/question_design/buildings/building_shape.jpeg",
+                "caption": "",
+                "position": 1922
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/question_design/buildings/building_design.jpeg",
+                "caption": "",
+                "position": 1923
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/question_design/jacket/jacket_baseline.jpeg",
+                "caption": "",
+                "position": 1930
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/question_design/jacket/jacket_material.jpeg",
+                "caption": "",
+                "position": 1931
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/question_design/jacket/jacket_color.jpeg",
+                "caption": "",
+                "position": 1932
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/question_design/jacket/jacket_shape.jpeg",
+                "caption": "",
+                "position": 1933
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/question_design/jacket/jacket_design.jpeg",
+                "caption": "",
+                "position": 1934
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/question_design/bags/baseline_bag.jpeg",
+                "caption": "",
+                "position": 1941
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/question_design/bags/material_bag.jpeg",
+                "caption": "",
+                "position": 1942
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/question_design/bags/color_bag.jpeg",
+                "caption": "",
+                "position": 1943
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/question_design/bags/shape_bag.jpeg",
+                "caption": "",
+                "position": 1944
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/question_design/bags/design_bag.jpeg",
+                "caption": "",
+                "position": 1945
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/x4.png",
+                "caption": "Figure 17.Correlation between the VLM answers across different timesteps and the final generated image",
+                "position": 1970
+            }
+        ]
+    },
+    {
+        "header": "7.Implementation Details",
+        "images": []
+    },
+    {
+        "header": "8.Related Work: Negative Prompting",
+        "images": []
+    },
+    {
+        "header": "9.Qualitative Evaluation Framework",
+        "images": []
+    },
+    {
+        "header": "10.User Study",
+        "images": []
+    },
+    {
+        "header": "11.Metrics and Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/PCA/fruit_analysis_plot.jpeg",
+                "caption": "Figure 18.Distribution of fruit CLIP embeddings in 2D PCA space and the Kernel Density Estimation (KDE) of the distributions. Reference images (green): “A photo of a fruit”. Creative baseline (blue): “A photo of a new type of fruit”. Our VLM-guided method (red): explores diverse regions with minimal overlap with reference.",
+                "position": 2151
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/garment/garment_1.jpeg",
+                "caption": "Figure 19.More qualitative results of our method across different object categories.",
+                "position": 2228
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/garment/garment_2.jpeg",
+                "caption": "",
+                "position": 2235
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/garment/garment_3.jpeg",
+                "caption": "",
+                "position": 2236
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/garment/garment_4.jpeg",
+                "caption": "",
+                "position": 2237
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/garment/garment_5.jpeg",
+                "caption": "",
+                "position": 2238
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/garment/garment_6.jpeg",
+                "caption": "",
+                "position": 2239
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/garment/garment_7.jpeg",
+                "caption": "",
+                "position": 2240
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/garment/garment_8.jpeg",
+                "caption": "",
+                "position": 2241
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/musical/music_1.jpeg",
+                "caption": "",
+                "position": 2252
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/musical/music_2.jpeg",
+                "caption": "",
+                "position": 2253
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/musical/music_3.jpeg",
+                "caption": "",
+                "position": 2254
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/musical/music_4.jpeg",
+                "caption": "",
+                "position": 2255
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/musical/music_5.jpeg",
+                "caption": "",
+                "position": 2256
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/musical/music_6.jpeg",
+                "caption": "",
+                "position": 2257
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/musical/music_7.jpeg",
+                "caption": "",
+                "position": 2258
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/musical/music_8.jpeg",
+                "caption": "",
+                "position": 2259
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/pets/pet_1.jpeg",
+                "caption": "",
+                "position": 2270
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/pets/pet_2.jpeg",
+                "caption": "",
+                "position": 2271
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/pets/pet_3.jpeg",
+                "caption": "",
+                "position": 2272
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/pets/pet_4.jpeg",
+                "caption": "",
+                "position": 2273
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/pets/pet_5.jpeg",
+                "caption": "",
+                "position": 2274
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/pets/pet_6.jpeg",
+                "caption": "",
+                "position": 2275
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/pets/pet_7.jpeg",
+                "caption": "",
+                "position": 2276
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/pets/pet_8.jpeg",
+                "caption": "",
+                "position": 2277
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/vehicle/vehicle_1.jpeg",
+                "caption": "",
+                "position": 2288
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/vehicle/vehicle_2.jpeg",
+                "caption": "",
+                "position": 2289
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/vehicle/vehicle_3.jpeg",
+                "caption": "",
+                "position": 2290
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/vehicle/vehicle_4.jpeg",
+                "caption": "",
+                "position": 2291
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/vehicle/vehicle_5.jpeg",
+                "caption": "",
+                "position": 2292
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/vehicle/vehicle_6.jpeg",
+                "caption": "",
+                "position": 2293
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/vehicle/vehicle_7.jpeg",
+                "caption": "",
+                "position": 2294
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/vehicle/vehicle_8.jpeg",
+                "caption": "",
+                "position": 2295
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/fruits/fruit_1.jpeg",
+                "caption": "",
+                "position": 2306
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/fruits/fruit_2.jpeg",
+                "caption": "",
+                "position": 2307
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/fruits/fruit_3.jpeg",
+                "caption": "",
+                "position": 2308
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/fruits/fruit_4.jpeg",
+                "caption": "",
+                "position": 2309
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/fruits/fruit_5.jpeg",
+                "caption": "",
+                "position": 2310
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/fruits/fruit_6.jpeg",
+                "caption": "",
+                "position": 2311
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/fruits/fruit_7.jpeg",
+                "caption": "",
+                "position": 2312
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/fruits/fruit_8.jpeg",
+                "caption": "",
+                "position": 2313
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/chair/chair_1.jpeg",
+                "caption": "",
+                "position": 2324
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/chair/chair_2.jpeg",
+                "caption": "",
+                "position": 2325
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/chair/chair_3.jpeg",
+                "caption": "",
+                "position": 2326
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/chair/chair_4.jpeg",
+                "caption": "",
+                "position": 2327
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/chair/chair_5.jpeg",
+                "caption": "",
+                "position": 2328
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/chair/chair_6.jpeg",
+                "caption": "",
+                "position": 2329
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/chair/chair_7.jpeg",
+                "caption": "",
+                "position": 2330
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/chair/chair_8.jpeg",
+                "caption": "",
+                "position": 2331
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/cup/cup_1.jpeg",
+                "caption": "",
+                "position": 2342
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/cup/cup_2.jpeg",
+                "caption": "",
+                "position": 2343
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/cup/cup_3.jpeg",
+                "caption": "",
+                "position": 2344
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/cup/cup_4.jpeg",
+                "caption": "",
+                "position": 2345
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/cup/cup_5.jpeg",
+                "caption": "",
+                "position": 2346
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/cup/cup_6.jpeg",
+                "caption": "",
+                "position": 2347
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/cup/cup_7.jpeg",
+                "caption": "",
+                "position": 2348
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/cup/cup_8.jpeg",
+                "caption": "",
+                "position": 2349
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/jacket/jacket_1.jpeg",
+                "caption": "",
+                "position": 2360
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/jacket/jacket_2.jpeg",
+                "caption": "",
+                "position": 2361
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/jacket/jacket_3.jpeg",
+                "caption": "",
+                "position": 2362
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/jacket/jacket_4.jpeg",
+                "caption": "",
+                "position": 2363
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/jacket/jacket_5.jpeg",
+                "caption": "",
+                "position": 2364
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/jacket/jacket_6.jpeg",
+                "caption": "",
+                "position": 2365
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/jacket/jacket_7.jpeg",
+                "caption": "",
+                "position": 2366
+            },
+            {
+                "img": "https://arxiv.org/html/2510.10715/images/more_results/jacket/jacket_8.jpeg",
+                "caption": "",
+                "position": 2367
+            }
+        ]
+    },
+    {
+        "header": "12.More Results",
+        "images": []
+    }
+]
