@@ -1,0 +1,220 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.25741/x1.png",
+                "caption": "Figure 1:Ouro Looped Language Model performance. (Left) The parameter-shared looped architecture. (Middle & Right) Radar plots comparing the Ouro 1.4B and 2.6B models, both with 4 recurrent steps (red), against individual transformer baselines. Our models demonstrate strong performance comparable to or exceeding much larger baselines.",
+                "position": 410
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.25741/x2.png",
+                "caption": "Figure 2:Performance on advanced reasoning benchmarks.Ouro-Thinking models compared with strong baselines such as Qwen3 and DeepSeek-Distill.Ouro-1.4B-Thinking R4is competitive with 4B models, andOuro-2.6B-Thinking R4matches or exceeds 8B models across multiple math and science datasets.",
+                "position": 481
+            }
+        ]
+    },
+    {
+        "header": "2Related Works",
+        "images": []
+    },
+    {
+        "header": "3Learning Adaptive Latent Reasoning with LoopLM",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.25741/x3.png",
+                "caption": "Figure 3:Overview of Looped Language Model (LoopLM) architecture.Left (Training):During training, the model applies a stack ofNNshared-weight layers\nfornnrecurrent steps (R=1R=1toR=nR=n). At each recurrent stepii, an exit gate predicts\nthe probabilitypip_{i}of exiting, and a language modeling headℒi\\mathcal{L}_{i}computes\nthe task loss. The training objective combines the expected task loss across all steps\nwith an entropy regularization termH​(p1,…,pn)H(p_{1},\\ldots,p_{n})to encourage exploration of\ndifferent computational depths.Right (Inference):At inference time, the model can exit early based on the\ncumulative distribution function (CDF) computed from exit probabilities. WhenCDFi=∑k=1ipk\\text{CDF}_{i}=\\sum_{k=1}^{i}p_{k}exceeds a threshold, the model terminates at stepii,\nenabling adaptive computation that allocates more steps to harder inputs while maintaining\nefficiency on simpler ones. The dashed line indicates potential future steps that may be\nskipped through early exit.",
+                "position": 533
+            }
+        ]
+    },
+    {
+        "header": "4Training Looped Language Models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.25741/x4.png",
+                "caption": "Figure 4:The Ouro model training pipeline. The process starts with a common Warmup and an initial 3T token Stable Training phase. The model is then split into two streams: one ‘Keep 1.3B’ (resulting in Ouro-1.4B) and one ‘Upcycle 2.6B’ (resulting in Ouro-2.6B). Both streams independently undergo an identical subsequent four-stage training process: a second Stable Training (3T tokens), CT Annealing (1.4T tokens), LongCT (20B tokens), and Mid-Training (300B tokens). This 7.7T token pre-training pipeline produces the base models (Ouro-1.4B and Ouro-2.6B), which are then passed through a final Reasoning SFT stage to create the Ouro-Thinking models.",
+                "position": 778
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.25741/x5.png",
+                "caption": "Figure 5:Comparison of early exit strategies on MMLU.We evaluate four approaches across different average exit rounds: static baseline (red triangle), hidden state difference threshold (green squares), Ponder gate from standard pretraining (blue circles), and Ponder gate with specialized adaptive exit training from Section3.4(orange diamonds).",
+                "position": 2424
+            }
+        ]
+    },
+    {
+        "header": "6Understanding LoopLMs Superiority from a Parametric Knowledge Viewpoint",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.25741/x6.png",
+                "caption": "Figure 6:Left.We trained both LoopLM and a standard trasnformer baseline with the same parameters on Capo task to compare the knowledge capacity gain by looping more times. With the same parameter count, the looped model and its non-looped baseline has almost the same knowledge capacity measured in bits of knowledge on Capo task.Right.Accuracy of looped/non-looped models on Mano task. Looped models are better than the iso-param({2,3,6}⊗1)(\\{2,3,6\\}\\otimes 1)models. They also achieve better or comparable performance comparing to the iso-flop baseline(12⊗1)(12\\otimes 1)model.",
+                "position": 2599
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x7.png",
+                "caption": "Figure 7:We trained LoopLMs and standard transformer baselines with the same parameters on Multi-hop QA tasks. To investigate thesample efficiencyof LoopLMs, wevary the number of unique training samples(from2.5%2.5\\%to25%25\\%all possible QA pairs) for models with different loops. We compare the final performance usingthe same compute budget in total training tokens.Left.As shown, models with more loops requires fewer samples to learn the 3-hop QA task.Right.As an example, we train with15%15\\%of all possible QA pairs (12000 unique samples) for 20000 steps with context length 1024 and batch size 2048. Models with more loops learn faster and achieve better performance comparing with models without loops.",
+                "position": 2692
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x8.png",
+                "caption": "",
+                "position": 2701
+            }
+        ]
+    },
+    {
+        "header": "7Safety, Faithfulness and Consistency",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.25741/x9.png",
+                "caption": "(a)HEx-PHI evaluation",
+                "position": 2785
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x9.png",
+                "caption": "(a)HEx-PHI evaluation",
+                "position": 2788
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x10.png",
+                "caption": "(b)PCA analysis on Ouro 1.4B",
+                "position": 2794
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x11.png",
+                "caption": "Figure 9:Left.ROCAUC of linear probes by layer on Quora Question Pairs.Each colored curve shows a probe trained on hidden states within a given 2 to 8 recurrent steps to predict that loop’s answer; Qwen3-4B models are the baselines. Vertical dotted lines mark loop boundaries. In recurrent stepi=2,3,4i=2,3,4, the ROC AUC rises quickly within a recurrent step, then partially resets at the next loop, indicating that intra-step answers are determined early while cross-step updates modify the provisional answer.Right.Agreement across recurrent steps.Heat map (A) over 1,000 Quora Question Pairs. EntryA​[i,j]A[i,j]is the number of items for which steps (i) and (j) assign the same label.",
+                "position": 2801
+            }
+        ]
+    },
+    {
+        "header": "8Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgement",
+        "images": []
+    },
+    {
+        "header": "Contributions",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AEmpirical Validation of Prior Choice",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.25741/x12.png",
+                "caption": "Figure 10:Effect of the prior over exit steps.Left:training loss (300-step sliding average) for a LoopLM withTmax=4T_{\\max}=4under different priors onzz.\nColored curves correspond to geometric priors with parameterλ∈{0.1,…,0.9}\\lambda\\in\\{0.1,\\dots,0.9\\}; the red curve uses a uniform prior.\nShaded regions indicate variability across runs.Right:prior probability over LoopLM steps induced by eachλ\\lambda(uniform shown in red).\nStronger geometric bias (largerλ\\lambda) concentrates mass on shallow steps, reducing credit assignment to deeper computation.",
+                "position": 4258
+            }
+        ]
+    },
+    {
+        "header": "Appendix BPhysics of LoopLMs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.25741/x13.png",
+                "caption": "Figure 11:Left & Right.We further train with100000100000and140000140000unique QA pairs for 20000 steps with context length 1024 and batch size 2048. Similar to the main text, models with more loops learn faster and achieve better performance comparing with models without loops.",
+                "position": 4448
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x14.png",
+                "caption": "",
+                "position": 4457
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x15.png",
+                "caption": "Figure 12:Left & Right.We further train with100000100000and120000120000unique QA pairs for 20000 steps with context length 1024 and batch size 2048. We train the baseline with 24 layers, which is equivalent flops with the loop 4 transformers. Similar to the main text, models with more loops learn faster and achieve better performance comparing with models without loops, even with iso-flop transformers. The loop 2 average performance is weaker than the iso-flop version transformer since it has less equivalent depth whenN=105N=10^{5}, but it surpasses the baseline with more data provided.",
+                "position": 4464
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x16.png",
+                "caption": "",
+                "position": 4473
+            }
+        ]
+    },
+    {
+        "header": "Appendix CEvaluations",
+        "images": []
+    },
+    {
+        "header": "Appendix DScaling Law for LoopLMs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.25741/x17.png",
+                "caption": "Figure 13:The average benchmark performance of LoopLM and Standard Transformer models under different recurrent steps as model size varies. With a recurrent step of 1 (top left), both models have identical architectures, resulting in overlapping curves. Overall, as the model size increases, the benchmark performance improves. The average benchmark score demonstrates the average results of the six benchmarks.",
+                "position": 5439
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x18.png",
+                "caption": "Figure 14:The average benchmark performance of LoopLM and Standard Transformer models under different model sizes as recurrent step varies. Except for the LoopLM at the model size of 778M and 1.364B, in all other cases, the benchmark performance of the model increases with the increase in recurrent steps.",
+                "position": 5442
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x19.png",
+                "caption": "Figure 15:Illustration of the actual loss curve and the loss curve predicted by the scaling law. To demonstrate the predictability of LoopLM, we have used all data points for fitting, proving its predictability in terms of model size, training data size, and max recurrent step. The orange dashed line represents the prediction, while the blue solid line represents the actual loss.",
+                "position": 5509
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x20.png",
+                "caption": "Figure 16:Illustration of the actual loss curve and the loss curve predicted by the Step-wise Loss Scaling Law when the maximum recurrent step is equal to 2.",
+                "position": 5534
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x21.png",
+                "caption": "Figure 17:Illustration of the actual loss curve and the loss curve predicted by the Step-wise Loss Scaling Law when the maximum recurrent step is equal to 4.",
+                "position": 5537
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x22.png",
+                "caption": "Figure 18:Illustration of the actual loss curve and the loss curve predicted by the Step-wise Loss Scaling Law when the maximum recurrent step is equal to 8.",
+                "position": 5540
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/figures/scalinglaw_round_wise_histograms.png",
+                "caption": "Figure 19:Distribution of the learned ponder weights (qϕ​(z=t∣x)q_{\\phi}(z=t\\mid x)) for each recurrent stepttwhen the maximum recurrent stepTm=4T_{m}=4. These weights were collected during inference on the MMLU benchmark.",
+                "position": 5627
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x23.png",
+                "caption": "Figure 20:Illustration of the actual loss curve and the loss curve predicted by the estimated Scaling Law when the maximum recurrent step is equal to 4.",
+                "position": 5633
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x24.png",
+                "caption": "Figure 21:Illustration of model size generalizability for the Total Loss Scaling Law. The fitting data includes model sizes of 374M, 778M, and 1.364B. The predicted curves for the unseen model sizes of 53M and 134M closely align with the actual curves, demonstrating the generalizability of the Total Loss Scaling Law with respect to model size.",
+                "position": 5650
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x25.png",
+                "caption": "Figure 22:Illustration of model size generalizability for the Step-wise Loss Scaling Law. The fitting data comprises three medium model sizes: 134M, 374M, and 778M. To verify the fitting consistency of the model on unseen larger model size 1.364B and unseen smaller model size 53M, we can observe that the predicted curves reflect the trends of the actual data points, demonstrating the generalizability of the Step-wise Loss Scaling Law with respect to the model size.",
+                "position": 5682
+            },
+            {
+                "img": "https://arxiv.org/html/2510.25741/x26.png",
+                "caption": "Figure 23:Illustration of recurrent step generalizability for the Step-wise Loss Scaling Law. The fitting data includes three different recurrent steps: recurrent step = 1, 2, and 3. At the unseen data points of recurrent step = 4, the predicted curve closely matches the actual curve, demonstrating the generalizability of the Step-wise Loss Scaling Law with respect to recurrent step.",
+                "position": 5685
+            }
+        ]
+    },
+    {
+        "header": "Appendix EDetails of the Scaling Law for LoopLM",
+        "images": []
+    }
+]
