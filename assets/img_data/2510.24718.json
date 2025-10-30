@@ -1,0 +1,151 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work and Preliminaries",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.24718/x1.png",
+                "caption": "Figure 1:Generative View Stitching (GVS) enables stable camera-guided generation of long videos.Given a pretrained DFoT video model(Song et al.,2025)with an 8-frame context window andpredefinedcamera trajectory, GVS can generate a 120-frame navigation video that is stable, collision-free,faithful to the conditioning trajectory, consistent, andcloses loops. On the other hand, Autoregressive sampling diverges due to collisions with the generated scene, is not faithful to the conditioning trajectory, and demonstrates poor loop closure even when augmented with RAG.",
+                "position": 137
+            }
+        ]
+    },
+    {
+        "header": "3Generative View Stitching",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.24718/x2.png",
+                "caption": "Figure 2:Generative View Stitching (GVS)is a training-free diffusion stitching method that is compatible with any off-the-shelf video model trained with Diffusion Forcing (DF). We first partition the target video into non-overlapping chunks shorter than the model’s context window, then denoise everytarget chunkjointlywith itsneighboringchunksto condition on both the pastand future. We use the denoised target chunk of every context window to update the noisy stitched sequence while discarding the denoised past and future conditioning chunks. We further enable Omni Guidance (Sec.3.4), which enhances temporal consistency, by replacing the original score functionϵθ\\epsilon_{\\theta}with the guided score functionϵ~θ\\tilde{\\epsilon}_{\\theta}in Eq.8.",
+                "position": 191
+            },
+            {
+                "img": "https://arxiv.org/html/2510.24718/x3.png",
+                "caption": "Figure 3:Effect of Omni Guidance and Stochasticity.Without Omni Guidance and zero stochasticity (η=0\\eta=0), the generations lack temporal consistency and instead exhibit hazy transitions between different scenes. Increasing stochasticity to its maximum(η=1.0)(\\eta=1.0)enhances consistency but leads to oversmoothing. Our full method with Omni Guidance and partial stochasticity(η=0.9)(\\eta=0.9)enables consistent generationwithoutoversmoothing.",
+                "position": 220
+            },
+            {
+                "img": "https://arxiv.org/html/2510.24718/x4.png",
+                "caption": "Figure 4:GVS Requires Explicit Loop Closing.Despite its global theoretical receptive field, our stitching method requires an explicit loop closing mechanism to “visually return to the same place”. Note that the camera centers are offset from the panorama’s rotation center purely for visual clarity.",
+                "position": 279
+            },
+            {
+                "img": "https://arxiv.org/html/2510.24718/x5.png",
+                "caption": "Figure 5:Loop Closing via Cyclic Conditioning.GVS closes loops via cyclic conditioning, whereby target chunks are denoised by two alternating sets of context windows:temporal windows, which condition target chunks on their temporally neighboring chunks, andspatial windows, which condition target chunks ontemporally distant but spatially closeneighboring chunks. As a result, target chunks are conditioned on all relevant neighbors across the entire stitching process. See Fig.8for the full set of spatial windows.",
+                "position": 283
+            },
+            {
+                "img": "https://arxiv.org/html/2510.24718/x6.png",
+                "caption": "Figure 6:Qualitative Comparison with Baselines.Autoregressive sampling collides with the generated scene, fails to dream up the desiredstaircase, and does last-minuteloop closure, resulting in discontinuities in scene appearance. StochSync performs better at these tasks, but it generates shape-shifting scenes that lack temporal consistency. GVS, on the other hand, avoids collisions, generates the desiredstaircase, andclosesloops, all the while maintaining temporal consistency.",
+                "position": 296
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.24718/x7.png",
+                "caption": "Figure 7:GVS can visually navigate through the Impossible Staircase.GVS can generate a 120-frame navigation video through our variant of Oscar Reutersvärd’sImpossible Staircase, which is shown on the left. The video forms avisually continuous loopbetween the end points of the conditioning camera trajectory despite their height difference.",
+                "position": 817
+            }
+        ]
+    },
+    {
+        "header": "5Discussion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AExperimental Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.24718/x8.png",
+                "caption": "Figure 8:Spatial Context Windows that Define Our Method’s Cyclic Conditioning Strategy.Note that forPanorama 1-loopandPanorama 2-loop, we intentionally offset the camera centers from the panorama’s rotation center to better distinguish between different parts of conditioning trajectory. We visualizeCircle 1-loopandCircle 2-loopas spirals also for better clarity.",
+                "position": 1583
+            },
+            {
+                "img": "https://arxiv.org/html/2510.24718/x9.png",
+                "caption": "Figure 9:GVS Stably Scales to Longer Videos Given More Test-Time Compute.",
+                "position": 1616
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAdditional Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.24718/x10.png",
+                "caption": "Figure 10:Lowering Stochasticity Levels Reduces Oversmoothing.Note that we intentionally offset the camera centers from the panorama’s rotation center to better distinguish between different parts of the conditioning trajectory.",
+                "position": 1637
+            },
+            {
+                "img": "https://arxiv.org/html/2510.24718/x11.png",
+                "caption": "Figure 11:GVS Struggles to PropagateExternal Context FramesThroughout the Entire Video.",
+                "position": 1742
+            },
+            {
+                "img": "https://arxiv.org/html/2510.24718/x12.png",
+                "caption": "Figure 12:GVS Fails to Loop-Close Wide-Baseline Viewpoints.Note that the camera centers of theforwardandbackwardsegments, which are collinear in implementation, are visually offset for better clarity.",
+                "position": 1767
+            },
+            {
+                "img": "https://arxiv.org/html/2510.24718/x13.png",
+                "caption": "Figure 13:Diffusion-Forcing Backbone Fails on Wide-Baseline Camera Trajectories.Note that the camera centers, which are collinear in implementation, are visually offset for better clarity.",
+                "position": 1770
+            },
+            {
+                "img": "https://arxiv.org/html/2510.24718/x14.png",
+                "caption": "Figure 14:Additional Qualitative Comparisons with Baselines.Note that we intentionally offset the camera centers from the panorama’s rotation center to better distinguish between different parts of the conditioning trajectory.",
+                "position": 1780
+            },
+            {
+                "img": "https://arxiv.org/html/2510.24718/x15.png",
+                "caption": "",
+                "position": 1784
+            },
+            {
+                "img": "https://arxiv.org/html/2510.24718/x16.png",
+                "caption": "",
+                "position": 1786
+            },
+            {
+                "img": "https://arxiv.org/html/2510.24718/x17.png",
+                "caption": "Figure 15:[Continued] Additional Qualitative Comparisons with Baselines.Note that we intentionally offset the camera centers from the panorama’s rotation center to better distinguish between different parts of the conditioning trajectory. We visualizeCircle 1-loopandCircle 2-loopas spirals also for better clarity.",
+                "position": 1790
+            },
+            {
+                "img": "https://arxiv.org/html/2510.24718/x18.png",
+                "caption": "",
+                "position": 1794
+            },
+            {
+                "img": "https://arxiv.org/html/2510.24718/x19.png",
+                "caption": "",
+                "position": 1796
+            },
+            {
+                "img": "https://arxiv.org/html/2510.24718/x20.png",
+                "caption": "Figure 16:[Continued] Additional Qualitative Comparisons with Baselines.",
+                "position": 1800
+            }
+        ]
+    },
+    {
+        "header": "Appendix CLimitations and Challenges",
+        "images": []
+    }
+]
