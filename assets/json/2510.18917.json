@@ -1,0 +1,107 @@
+{
+    "paper_title": "RIR-Mega: a large-scale simulated room impulse response dataset for machine learning and room acoustics modeling",
+    "authors": [
+        "Mandip Goswami"
+    ],
+    "sections": [
+        {
+            "title": "Abstract",
+            "content": "Room impulse responses are a core resource for dereverberation, robust speech recognition, source localization, and room acoustics estimation. We present RIR-Mega, a large collection of simulated RIRs described by a compact, machine friendly metadata schema and distributed with simple tools for validation and reuse. The dataset ships with a Hugging Face Datasets loader, scripts for metadata checks and checksums, and a reference regression baseline that predicts RT60 like targets from waveforms. On a train and validation split of 36,000 and 4,000 examples, a small Random Forest on lightweight time and spectral features reaches a mean absolute error near 0.013 s and a root mean square error near 0.022 s. We host a subset with 1,000 linear array RIRs and 3,000 circular array RIRs on Hugging Face for streaming and quick tests, and preserve the complete 50,000 RIR archive on Zenodo. The dataset and code are public to support reproducible studies."
+        },
+        {
+            "title": "Start",
+            "content": "5 2 0 2 1 2 ] . e [ 1 7 1 9 8 1 . 0 1 5 2 : r RIR-Mega: large-scale simulated room impulse response dataset for machine learning and room acoustics modeling Mandip Goswami Acoustics Researcher, Amazon* Abstract Room impulse responses are core resource for dereverberation, robust speech recognition, source localization, and room acoustics estimation. We present RIR-Mega, large collection of simulated RIRs described by compact, machine friendly metadata schema and distributed with simple tools for validation and reuse. The dataset ships with Hugging Face Datasets loader, scripts for metadata checks and checksums, and reference regression baseline that predicts RT60 like targets from waveforms. On train and validation split of 36,000 and 4,000 examples, small Random Forest on lightweight time and spectral features reaches mean absolute error near 0.013 and root mean square error near 0.022 s. We host subset with 1,000 linear array RIRs and 3,000 circular array RIRs on Hugging Face for streaming and quick tests, and preserve the complete 50,000 RIR archive on Zenodo. The dataset and code are public to support reproducible studies."
+        },
+        {
+            "title": "1 Introduction",
+            "content": "Reverberation shapes both how people hear and how machine learning systems behave. Data for controlled studies are often hard to assemble at scale. Measured corpora can be small or lack detailed metadata, while simulated corpora sometimes have unclear provenance or inconvenient file layouts. Researchers spend time on path handling, schema drift, and brittle scripts rather than the questions they want to study. RIR-Mega was designed to lower these barriers. The dataset uses single compact CSV or Parquet file to describe each audio file. Paths are consistent. Acoustic metrics appear as JSON or dict like string and are also available as flat columns for fast filters. We provide loader that integrates with datasets.Audio, validation script for the metadata, and an optional checksum tool. The release includes simple baseline for RT60 regression so users can sanity check their pipeline in minutes. Figure 1 shows the simple flow: room specification, simulation, metadata, loader, and benchmarks. Contributions. (i) large set of simulated RIRs with broad coverage of room geometry and band limited decay. (ii) compact schema that is easy to parse and extend. (iii) Practical tools for validation and checksums. (iv) working baseline for RT60 like regression with clear numbers. (v) distribution plan that balances fast streaming on Hugging Face with long term archival on Zenodo. Availability. Hugging Face subset: https://huggingface.co/datasets/mandipgoswami/ rirmega Zenodo DOI (full 50k): https://doi.org/10.5281/zenodo.17387402 Code and scripts: https://github.com/mandip42/rirmega *Disclaimer: This article represents the authors own work and views and does not reflect the views of Amazon. Author email: mandipgoswami@gmail.com 1 Figure 1: Dataset overview. Room specification to RIR generation, to metadata, to loader and benchmarks."
+        },
+        {
+            "title": "2 Related work",
+            "content": "Several measured RIR collections and simulation based corpora exist and have supported progress in room acoustics and robust speech. Many are valuable but can be limited in size, license clarity, or machine readable metadata. RIR-Mega complements this landscape by combining large simulated coverage, clear schema, and modern distribution through the Hugging Face Hub. short comparison table can be added in future revision once scope and size are finalized across releases."
+        },
+        {
+            "title": "3.1 Simulation regime",
+            "content": "All RIRs in this release are simulated shoebox rooms with frequency dependent absorption. We use an image source method with configurable maximum reflection order. Each example records the sampling rate, reflection order, and the fields listed in the schema below. We also record JSON or dict like metrics string that can include RT60, DRR, clarity indices, and octave band RT60s."
+        },
+        {
+            "title": "3.2 Room geometry and placement",
+            "content": "The room is defined by (Lx, Ly, Lz) in meters. Sizes are sampled from Lx [2, 25], Ly [3, 30], Lz [3, 9]. Sources and microphones are placed inside the room with small margin from walls to avoid degenerate cases. Arrays are modeled by placing microphones on known layouts when the array field is set."
+        },
+        {
+            "title": "3.3 Absorption and frequency bands",
+            "content": "Surfaces use frequency dependent absorption. We represent per band absorption compactly and store band limited RT60 values under keys such as band rt60s.125, .250, .500, .1000, .2000, and .4000. Scalar metrics include rt60, drr db, c50 db, and c80 db when available."
+        },
+        {
+            "title": "3.4 Subsets and hosting",
+            "content": "We publish light subset on Hugging Face for fast preview and streaming: 1,000 RIRs generated for linear arrays and 3,000 for circular arrays. The full 50,000 RIR archive is preserved on Zenodo with DOI and is the canonical artifact for long term reproducibility. The repository card explains how to switch between the subset and the full archive."
+        },
+        {
+            "title": "4 Metadata and schema",
+            "content": "We provide both CSV and Parquet formats under data/metadata/. Parquet is preferred for large tables and fast filters. Important metrics such as rt60, drr db, c50 db, c80 db, and band RT60s are also present as flat columns. The raw metrics string is preserved for completeness. Column Description id family split fs wav room size absorption, absorption bands max order source, microphone, array metrics rng seed unique identifier array family, linear or circular train, valid, or test sample rate in Hz (string in metadata) relative path to audio file free text summary of (Lx, Ly, Lz) per surface and band info maximum reflection order capture descriptors JSON or dict like string with acoustics metrics random seed Table 1: Compact schema. Flat numeric columns for common metrics are also provided in Parquet."
+        },
+        {
+            "title": "5 Loader and access",
+            "content": "We provide rirmega/dataset.py, Hugging Face Datasets loader that exposes simple interface and resolves audio with datasets.Audio. It prefers Parquet and falls back to CSV. Quick start. from datasets import load_dataset ds = load_dataset(\"mandipgoswami/rirmega\", trust_remote_code=True) ex = ds[\"train\"][0] audio = ex[\"audio\"] print(ex[\"sample_rate\"]) # path and array on access Families. ds_all = load_dataset(\"mandipgoswami/rirmega\", trust_remote_code=True) ds_lin = load_dataset(\"mandipgoswami/rirmega\", ds_circ = load_dataset(\"mandipgoswami/rirmega\", name=\"linear\", trust_remote_code=True) name=\"circular\", trust_remote_code=True)"
+        },
+        {
+            "title": "6 Benchmark",
+            "content": "We include small regression baseline at benchmarks/rt60 regression/train rt60.py. Features include simple energy statistics, decay slope proxy from the energy decay curve, and spectral 3 centroid. Random Forest with 400 trees and seed zero reaches mean absolute error near 0.013 and root mean square error near 0.022 on split with 36,000 training examples and 4,000 validation examples. The script allows specific target key or can select target from fixed order that begins with rt60."
+        },
+        {
+            "title": "7 Leaderboard and Community Submissions",
+            "content": "We provide simple PR-as-submission process: leaderboard table lives in the dataset card (README.md on HF). Contributors append results via pull request, including command, seed, dataset tag, and link to code. This keeps results transparent, versioned, and reproducible for the community."
+        },
+        {
+            "title": "8.1 Distribution sanity",
+            "content": "Figure 2 shows summary plots drawn from the validation file. The panels include histograms for RT60, direct to reverberant ratio, and room volume. We show distributions for room dimensions and scatter of Lx by Ly colored by Lz. The figure also includes representative waveform with expected and detected onset and Schroeder energy decay curve with an RT60 estimate."
+        },
+        {
+            "title": "8.2 Self consistency of RT60",
+            "content": "We estimate RT60 from waveforms using Schroeder energy decay curve and compare it to the rt60 value in the metrics field. The protocol samples slice of the validation set, aligns analysis windows to detected onsets, and reports correlation, mean absolute error, and root mean square error. Table 2 shows template that can be filled directly from the provided script before the camera ready version. Metric Correlation MAE [s] RMSE [s] RT60 (metadata vs EDC) 0.96 0. 0.022 Table 2: Self consistency between RT60 values stored in metadata and those derived from waveforms using the Schroeder energy decay curve. Replace the italic values with results from your run."
+        },
+        {
+            "title": "8.3 Planned external validation",
+            "content": "Although this release does not yet include measured room impulse responses, simple protocol is planned for future work to compare simulated and measured RIRs from public datasets such as the ACE Challenge or OpenAIR. The intent is to show that the simulated responses in RIR-Mega span similar RT60 and DRR ranges to those seen in real rooms, thereby confirming acoustic realism. To illustrate the format of this comparison, Figure 3 shows placeholder example that compares the distributions of RT60 and DRR between two internal subsets of RIR-Mega (linear and circular arrays). The goal is to demonstrate how measured versus simulated analysis will appear in the final release. 4 Figure 2: Validation summary. Top row shows RT60 histogram, DRR in dB, and room volume. Middle row shows distributions for Lx, Ly, and Lz. Bottom row shows Lx by Ly colored by Lz, waveform example, and Schroeder energy decay curve with an RT60 estimate."
+        },
+        {
+            "title": "9 Usage notes",
+            "content": "Streaming and subsets. The Hugging Face subset is designed for fast preview. Users can stream with streaming=True to avoid large downloads. The full 50k archive is available on Zenodo for complete experiments. Reproducibility. We include metadata validator and checksum script. The dataset card documents the exact release tag and how to verify files. The baseline script creates validation fold from training if none is present. Licensing. All audio and metadata are released under Creative Commons Attribution 4.0. The dataset card lists terms and any future updates per subset if needed. Limitations. All examples in this release are simulated shoebox rooms. While this provides control and coverage, real spaces can deviate due to non ideal surfaces and complex geometries. We encourage users to test methods on measured data when possible. 5 Figure 3: Example comparison of RT60 and DRR distributions between two simulated subsets of RIR-Mega (linear and circular arrays). In the next release, this plot will be replaced with comparison against measured RIRs from public datasets such as the ACE Challenge or OpenAIR to verify the acoustic realism of the simulated data."
+        },
+        {
+            "title": "10 Conclusion",
+            "content": "RIR-Mega is practical resource for room acoustics and robust speech research. It combines large set of simulated RIRs with compact schema, simple validation tools, and working baseline. The distribution plan balances fast access on the Hub with permanent Zenodo archive. We hope this reduces boilerplate work and helps researchers focus on the questions they care about."
+        },
+        {
+            "title": "11 Ethical Considerations, Usage, and Limitations",
+            "content": "Intended use. RIR-Mega is designed for dereverberation, room acoustics estimation, robustness studies, and related research. Limitations. While RIR-Mega aims for scale and clarity, selection biases can remain (e.g., room geometry distributions, material presets, microphone arrays). The compact schema preserves free-form fields to maximize flexibility; users may still need to parse nested strings for specialized tasks. Risks. Synthetic RIRs may not reflect all real-world complexities; conclusions drawn from purely simulated soundfields should be validated on measured data where feasible."
+        },
+        {
+            "title": "Acknowledgements",
+            "content": "We thank early users for testing the loader and baseline scripts and for helpful feedback on validation plots."
+        },
+        {
+            "title": "Author contributions",
+            "content": "M.G. designed the dataset, implemented the tooling, ran the baseline, and wrote the manuscript."
+        },
+        {
+            "title": "Data availability",
+            "content": "Hugging Face subset: https://huggingface.co/datasets/mandipgoswami/rirmega. Zenodo DOI (full 50k): https://doi.org/10.5281/zenodo.17387402."
+        },
+        {
+            "title": "Code availability",
+            "content": "All code for loading, validation, checksums, and the baseline is available at https://github.com/ mandip42/rirmega. The dataset card includes quick start examples. We tag the versions used for this manuscript."
+        },
+        {
+            "title": "Competing interests",
+            "content": "The author declares no competing interests."
+        },
+        {
+            "title": "References",
+            "content": "[1] J. B. Allen and D. A. Berkley. Image method for efficiently simulating small-room acoustics. The Journal of the Acoustical Society of America, 65(4):943950, 1979. doi:10.1121/1.382599. Available: https://pubs.aip.org/asa/jasa/article/65/4/943/765693. [2] M. R. Schroeder. New method of measuring reverberation time. The Journal of the Acoustical Society of America, 37(3):409412, 1965. Available: https://labrosa.ee.columbia.edu/dpwe/ papers/Schro65-reverb.pdf. [3] International Organization for Standardization. ISO 3382-1:2009 Acoustics Measurement of room acoustic parameters Part 1: Performance spaces. ISO, Geneva, 2009. Available: https://www. iso.org/standard/40979.html. [4] International Organization for Standardization. ISO 3382-2:2008 Acoustics Measurement of room acoustic parameters Part 2: Reverberation time in ordinary rooms. ISO, Geneva, 2008. Available: https://www.iso.org/standard/36201.html. [5] M. Jeub, M. Schafer, and P. Vary. binaural room impulse response database for the evaluation of dereverberation algorithms. In Proc. 16th Int. Conf. on Digital Signal Processing (DSP), 2009. doi:10.1109/ICDSP.2009.5201259. Available: https://ieeexplore.ieee.org/document/ 5201259. [6] D. T. Murphy and S. Shelley. OpenAIR: The Open Acoustic Impulse Response Library. In 129th Audio Engineering Society Convention, 2010. AES Paper 8226. Available: https://secure.aes.org/ forum/pubs/conventions/?elib=15648. [7] J. Eaton, N. D. Gaubitch, M. Brookes, and P. A. Naylor. Estimation of room acoustic parameters: The ACE Challenge. IEEE/ACM Transactions on Audio, Speech, and Language Processing, 24(10):16261641, 2016. doi:10.1109/TASLP.2016.2577502. Available: https://dl.acm.org/ doi/10.1109/TASLP.2016.2577502. [8] R. Scheibler, E. Bezzam, and I. Dokmanic. Pyroomacoustics: Python package for audio room simulations and array processing algorithms. In Proc. IEEE Int. Conf. on Acoustics, Speech and Signal Processing (ICASSP), pages 351355, 2018. doi:10.1109/ICASSP.2018.8461310. Preprint: https://arxiv.org/abs/1710.04196. [9] L. Breiman. Random Forests. Machine Learning, 45(1):532, 2001. doi:10.1023/A:1010933404324. 7 [10] Q. Lhoest, A. Villanova del Moral, Y. Jernite, A. Thakur, P. von Platen, et al. Datasets: community library for natural language processing. In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing: System Demonstrations, 2021. Available: https://aclanthology. org/2021.emnlp-demo.21/. Preprint: https://arxiv.org/abs/2109.02846. [11] T. Nakatani, T. Yoshioka, K. Kinoshita, M. Miyoshi, and B.-H. Juang. Speech dereverberation based on variance-normalized delayed linear prediction. IEEE Transactions on Audio, Speech, and Language Processing, 18(7):17171731, 2010. doi:10.1109/TASL.2010.2052251. [12] E. A. P. Habets. Room Impulse Response Generator. Technical Report, Technische Universiteit Eindhoven, 2006. Software page: https://www.audiolabs-erlangen.de/fau/professor/ habets/software/rir-generator. [13] D. De Carlo, A. Brutti, E. Principi, et al. dEchorate: calibrated room impulse response dataset for echo-aware signal processing. EURASIP Journal on Audio, Speech, and Music Processing, 2021:2, 2021. doi:10.1186/s13636-021-00229-0. Available: https://asmp-eurasipjournals. springeropen.com/articles/10.1186/s13636-021-00229-0."
+        }
+    ],
+    "affiliations": [
+        "Amazon"
+    ]
+}

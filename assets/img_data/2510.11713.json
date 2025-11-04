@@ -1,0 +1,148 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.11713/images/huggingface_logo-noborder.png",
+                "caption": "",
+                "position": 99
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.11713/images/Figure1_posticlr.png",
+                "caption": "Figure 1:How do LRMs perform in dynamic worlds?(a) Unlike static ‘frozen world’ settings that assume users wait for completion, real-world scenarios often demand mid-inference updates, as LRM reasoning can be time-consuming. We introduce a public evaluation suite to assess how LRMs handle interruptions across math and coding tasks (section 3). We define two types of interruptions:time-constrained(hard: immediate answer; soft: speedup reasoning) andupdate-driven(task specifications change mid-reasoning).\n(b) We found LRMs have three common failure modes:reasoning leakagecan produce up to 10x longer answers after hard interrupts, “moving” their reasoning tokens to the answer segment; over 90% of new errors under speedup arise frompanic, when the models prematurely terminate their reasoning process; and roughly 80% of update-driven interrupt errors stem fromself-doubt, where models fail to validate and incorporate new information. Results are reported at 30% interruption points; detailed results are provided insection 4.",
+                "position": 122
+            },
+            {
+                "img": "https://arxiv.org/html/2510.11713/images/Figure1_posticlr.png",
+                "caption": "",
+                "position": 125
+            },
+            {
+                "img": "https://arxiv.org/html/2510.11713/x1.png",
+                "caption": "",
+                "position": 138
+            }
+        ]
+    },
+    {
+        "header": "2Background & Related Work",
+        "images": []
+    },
+    {
+        "header": "3How to interrupt a model?",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.11713/x2.png",
+                "caption": "Figure 2:Efficiency and Accuracy under Hard Interrupts.The top row reports model performance (Pass@1, denoted asA​(X)A(X)in Section 3), while the bottom row shows absolute final answer lengthsL​(X)L(X)under two settings across different interrupt position X. In the top row, we observe that LRMs behave almost like anytime models, with performance improving as more reasoning budget is provided. In the bottom row, we find evidence ofreasoning leakage: when interrupted too early, models often continue reasoning in their final answers despite being forcibly terminated.",
+                "position": 359
+            },
+            {
+                "img": "https://arxiv.org/html/2510.11713/x3.png",
+                "caption": "Figure 3:Answer Length Analysis under Soft Interrupts (Speedup).When receiving an instruction to speed up the reasoning process (i.e., soft interrupt), models generally comply, as the updated output lengthL∗​(X)L^{*}(X)is shorter than the originalL​(X)L(X), with the exception of later interrupt positions (e.g., Magistral-S-1.2 on GSM8K at 0.9). However, soft interrupts can hurt performance on harder tasks such as AIME and LiveCodeBench, where GPT-OSS and Qwen sometimes exhibitanswer panic, immediately producing incorrect outputs (seeFigure 1andFigure E.1).",
+                "position": 362
+            }
+        ]
+    },
+    {
+        "header": "4How do models behave under time-constraint interruptions?",
+        "images": []
+    },
+    {
+        "header": "5How do models behave under update-driven interruptions?",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.11713/x4.png",
+                "caption": "Figure 4:Accuracy under Update-Driven Interrupts.When provided with updates mid-reasoning, models often suffer substantial performance drops. Adding prompt guidance fully resolves the issue on GSM8K and MATH500 and reduces the gap between full thinking and interrupt settings on AIME and LiveCodeBench datasets.",
+                "position": 395
+            },
+            {
+                "img": "https://arxiv.org/html/2510.11713/x5.png",
+                "caption": "Figure 5:We observe that one of the behaviors causing the significant performance drops under update-driven interrupts isself-doubt(example in red), when models second-guess prior reasoning and produce incorrect answers even without output length constraints. Addingprompt guidance, a short targeted postfix written in the model’s own voice, can partially mitigate this issue (example in green), improving accuracy on math tasks and fully resolving self-doubt on GSM8K and MATH500. Additional qualitative examples are provided insubsection C.3.",
+                "position": 398
+            },
+            {
+                "img": "https://arxiv.org/html/2510.11713/x6.png",
+                "caption": "Figure 6:Efficiency and Accuracy under Update-Driven Interrupts.Performance generally decreases as updates come later in the reasoning process, despite increased reasoning effort in order to account for newly introduced information. While reasoning effort does increase, in some cases the overall reasoning effort needed to incorporate an update is far below the number of tokens which would be required torestart from scratch, as observed for AIME and LiveCodeBench problems.",
+                "position": 407
+            }
+        ]
+    },
+    {
+        "header": "6Ablation Studies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.11713/x7.png",
+                "caption": "Figure 7:Efficiency and Accuracy under Hard Interrupts by Model Scale.Scaling does have effects on accuracy, primarily for hard AIME questions, and we see increased reasoning leakage for small models, even in the extreme hard interrupt setting.",
+                "position": 414
+            },
+            {
+                "img": "https://arxiv.org/html/2510.11713/x8.png",
+                "caption": "Figure 8:Comparison between Assistant-Turn and User-Turn Interruptions.In update-driven interruption scenarios, assistant-turn interruption with our prompt guidance achieves better performance than user-turn interruption.",
+                "position": 445
+            }
+        ]
+    },
+    {
+        "header": "7Limitations and Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix ALLM Disclosure",
+        "images": []
+    },
+    {
+        "header": "Appendix BImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CQualitative Examples",
+        "images": []
+    },
+    {
+        "header": "Appendix DDataset Construction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.11713/x9.png",
+                "caption": "Figure E.1:Efficiency and Accuracy under Soft Interrupts.(Top) Performance under soft interrupts is comparable to that of full thinking, with the exception of hard AIME problems. (Bottom) Models generally adhere to speedup instructions, with total output lengths shorter than that of full thinking (i.e., ratio is less than 1).",
+                "position": 2288
+            },
+            {
+                "img": "https://arxiv.org/html/2510.11713/x10.png",
+                "caption": "Figure E.2:Accuracy under Update-Driven Speedup Interrupts.There are no significant differences between regular and speedup update-driven interrupts.",
+                "position": 2295
+            },
+            {
+                "img": "https://arxiv.org/html/2510.11713/x11.png",
+                "caption": "Figure E.3:Output Length under Update-Driven Speedup Interrupts.Compared to regular update-driven interrupts, additional speedup instructions can lower token usage for specific scenarios (e.g., Magistral-S-1.2 on AIME 24/25), while having similar accuracy (seeFigure E.2).",
+                "position": 2298
+            },
+            {
+                "img": "https://arxiv.org/html/2510.11713/x12.png",
+                "caption": "Figure E.4:Efficiency and Accuracy under Soft Interrupts by Model Scale.(Top) Models mostly preserve their original accuracy under soft interrupts, with the exception of the smallest model (Qwen3-1.7B) on AIME 24/25. (Bottom) Models generally adhere to speedup instructions, with total output lengths shorter than that of full thinking (i.e., ratio is less than 1), with no significant differences across models.",
+                "position": 2306
+            },
+            {
+                "img": "https://arxiv.org/html/2510.11713/x13.png",
+                "caption": "Figure E.5:Efficiency and Accuracy under Update-Driven Interrupts by Model Scale.(Top) On easier problems (GSM8K and MATH500), larger models preserve their original accuracy, while Qwen3-1.7B model drops its original accuracy by up to 75%. On AIME problems, the performance of the larger models is degraded as well. (Bottom) All models increase their thinking token usage after the update interrupt, with the largest model (Qwen3-32B) showing the greatest increase on the AIME dataset.",
+                "position": 2309
+            }
+        ]
+    },
+    {
+        "header": "Appendix EAdditional Experiments",
+        "images": []
+    }
+]

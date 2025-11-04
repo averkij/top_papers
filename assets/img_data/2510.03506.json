@@ -1,0 +1,456 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.03506/x1.png",
+                "caption": "Figure 1:OneFlow is a variable-length non-autoregressive model that can concurrently generate interleaved text and variable number of images using insertions as a primitive operation.",
+                "position": 137
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/x2.png",
+                "caption": "Figure 2:Text-to-image generation.Generated images at 512×\\times512 resolution from OneFlow. Prompts are in Figure12.",
+                "position": 140
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/x3.png",
+                "caption": "Figure 3:Visual question answering.OneFlow generates by simply inserting tokens based on confidence, resulting in a natural hierarchical sampling and implicit reasoning where the most difficult answer tokens are generated later.",
+                "position": 143
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/flowers/decoded_run_11_step_2999_t_1.9999_batch_0.png",
+                "caption": "Figure 4:Concurrent interleaved text & image generation.OneFlow can insert variable number of images in the generated sequence, which are concurrently denoised alongside the text. This allows the text and images to depend on each other during the generation process.",
+                "position": 146
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/flowers/decoded_run_11_step_2999_t_1.9999_batch_1.png",
+                "caption": "",
+                "position": 162
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2OneFlow: Mixed-Modal Generation through Flow Matching",
+        "images": []
+    },
+    {
+        "header": "3Findings and Unlocking New Capabilities in Unified Multimodal",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.03506/x4.png",
+                "caption": "Figure 5:Performance of OneFlow vs. AR +FM baseline models at different model scales, data and compute.For text-to-image generation, we report DPG-Bench and FID. For image-to-text caption quality, we report CIDEr and ROUGE. In every benchmark, OneFlow consistently exhibits better scaling laws than AR +FM. Model sizes include 1B, 3B, and 8B.",
+                "position": 505
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/x5.png",
+                "caption": "Figure 6:Mixed modal vs Sequential pretraining.Mixed modal pretraining vs sequential pretraining. Mixed pretraining achieves 4% relative improvement on VQA tasks and slight improvements on image generation as well.",
+                "position": 539
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/x6.png",
+                "caption": "Figure 7:Mixed modal concurrent training.",
+                "position": 542
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/image_gen/Bagel/prompt_1_sample_0_task_1.png",
+                "caption": "Figure 8:Qualitative comparison of OneFlow and SOTA models.We notice that OneFlow gets the details of the prompt correctly, for instance the polar bear is‘balancing on a blue barrel’. The visual details of our generation are also better compared to MMaDA possibly due to using continuous image tokens rather than discrete. In the last column, the figure shows OneFlow handles common semantic challenges more effectively, as it was able to generate a building with‘a door sitting behind a sign’.",
+                "position": 811
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/image_gen/Bagel/prompt_20006_sample_0_task_20006.png",
+                "caption": "",
+                "position": 826
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/image_gen/Bagel/prompt_10202_sample_0_task_10202.png",
+                "caption": "",
+                "position": 830
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/image_gen/Bagel/prompt_10178_sample_0_task_10178.png",
+                "caption": "",
+                "position": 834
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/image_gen/MMada/step_0000_img_01_A_polar_bear_balancing_on_a_blue_barrel.png",
+                "caption": "",
+                "position": 843
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/image_gen/MMada/step_20000_img_06_A_table_with_some_oranges_and_some_cups.png",
+                "caption": "",
+                "position": 847
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/image_gen/MMada/step_10192_img_10_A_very_cute_cat_sitting_on_a_piece_of_luggage.png",
+                "caption": "",
+                "position": 851
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/image_gen/MMada/step_21312_img_05_a_building_with_a_door_sitting_behind_a_sign.png",
+                "caption": "",
+                "position": 855
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/image_gen/ours/t0_A_polar_bear_balancing_on_a_blue_barrel._2.jpg",
+                "caption": "",
+                "position": 864
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/image_gen/ours/t0_A_table_with_some_oranges_and_some_cups._2346.jpg",
+                "caption": "",
+                "position": 868
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/image_gen/ours/t0_A_very_cute_cat_sitting_on_a_piece_of_luggage._6.jpg",
+                "caption": "",
+                "position": 872
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/image_gen/ours/t0_a_building_with_a_door_sitting_behind_a_sign_945.jpg",
+                "caption": "",
+                "position": 876
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/x7.png",
+                "caption": "Figure 9:(left) OneFlow first locates the object in the prompt before calculation.\n(right) OneFlow locates the target (stool), then analyzes color contrast. A red arrow is added for clarity and is not in the original image.",
+                "position": 924
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/x7.png",
+                "caption": "",
+                "position": 927
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/x8.png",
+                "caption": "",
+                "position": 931
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/000000065485.jpg",
+                "caption": "Figure 10:Edit Flows with classifier-free guidance produces longer and more detailed answers, improving metrics that involve VLM as a judge(Cheng et al.,2025). Additional examples of classifier-free guidance effects on text generation are shown in Figure16.",
+                "position": 1230
+            }
+        ]
+    },
+    {
+        "header": "4Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.03506/x9.png",
+                "caption": "Autoregressive",
+                "position": 1319
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/x9.png",
+                "caption": "Autoregressive",
+                "position": 1326
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/x10.png",
+                "caption": "Mask diffusion",
+                "position": 1331
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/x11.png",
+                "caption": "Edit Flow",
+                "position": 1336
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/x12.png",
+                "caption": "",
+                "position": 1341
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/x13.png",
+                "caption": "Transfusion (autoreg. + diffusion)",
+                "position": 1350
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/x14.png",
+                "caption": "OneFlow",
+                "position": 1355
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/x15.png",
+                "caption": "",
+                "position": 1360
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion and Limitations",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional Generation Examples",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/1.jpg",
+                "caption": "A man standing in the middle of a nebula filled with stars.",
+                "position": 2278
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/1.jpg",
+                "caption": "A man standing in the middle of a nebula filled with stars.",
+                "position": 2281
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/2.jpg",
+                "caption": "A dog wearing a hat and a scarf.",
+                "position": 2287
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/3.jpg",
+                "caption": "A cute animal holding an ice cream cone.",
+                "position": 2293
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/4.jpg",
+                "caption": "Lovely adventurer and explorer in tropical forest with mountains.",
+                "position": 2299
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/5.jpg",
+                "caption": "A shake next to a cake.",
+                "position": 2305
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/6.jpg",
+                "caption": "A blue jay standing on a large basket of rainbow macarons.",
+                "position": 2312
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/7.jpg",
+                "caption": "An angel in the middle of the road.",
+                "position": 2318
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/8.jpg",
+                "caption": "Cute and fluffy Labrador puppy in hat. Watercolor painting.",
+                "position": 2324
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/16.jpg",
+                "caption": "Space scene. Magician standing on landscape silhouette with tree and fractal colorful nebula.",
+                "position": 2330
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/10.jpg",
+                "caption": "Fantasy portal in forest landscape surrounded by tree and magic. Green nature with magical architecture concept art.",
+                "position": 2336
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/11.jpg",
+                "caption": "Portrait of a hipster wearing sunglasses. Stylized drawing of a fashionista on a colored background.",
+                "position": 2343
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/12.jpg",
+                "caption": "A majestic castle illuminated by lights. The ground is covered in a blanket of snow, with a body of water in the foreground.",
+                "position": 2349
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/13.jpg",
+                "caption": "People walking with umbrellas with balloons in the sky",
+                "position": 2355
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/14.jpg",
+                "caption": "A painting of a city street at night.",
+                "position": 2361
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/15.jpg",
+                "caption": "A blue cat.",
+                "position": 2367
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/generated_images/9.jpg",
+                "caption": "A robot made out of wood.",
+                "position": 2374
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/lake_walk/decoded_run_0_step_1200_t_0.8007_batch_0.png",
+                "caption": "Figure 13:Example interleaved generation process showing outdoor exercise. In this example, the image is inserted late in the generation process when the text is almost fully denoised.",
+                "position": 2382
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/lake_walk/decoded_run_0_step_1500_t_1.0007_batch_0.png",
+                "caption": "",
+                "position": 2463
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/lake_walk/decoded_run_0_step_2999_t_1.9999_batch_0.png",
+                "caption": "",
+                "position": 2475
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/flowers/decoded_run_11_step_600_t_0.4007_batch_0.png",
+                "caption": "Figure 14:Example interleaved generation process showing flowers.",
+                "position": 2482
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/flowers/decoded_run_11_step_900_t_0.6007_batch_0.png",
+                "caption": "",
+                "position": 2539
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/flowers/decoded_run_11_step_900_t_0.6007_batch_1.png",
+                "caption": "",
+                "position": 2539
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/flowers/decoded_run_11_step_1200_t_0.8007_batch_0.png",
+                "caption": "",
+                "position": 2551
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/flowers/decoded_run_11_step_1200_t_0.8007_batch_1.png",
+                "caption": "",
+                "position": 2551
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/flowers/decoded_run_11_step_1500_t_1.0007_batch_0.png",
+                "caption": "",
+                "position": 2563
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/flowers/decoded_run_11_step_1500_t_1.0007_batch_1.png",
+                "caption": "",
+                "position": 2563
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/townhouses/decoded_run_1_step_300_t_0.2007_batch_0.png",
+                "caption": "Figure 15:Example interleaved generation process showing home types. An animated version is included in the supplementary material.",
+                "position": 2583
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/townhouses/decoded_run_1_step_600_t_0.4007_batch_0.png",
+                "caption": "",
+                "position": 2627
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/townhouses/decoded_run_1_step_900_t_0.6007_batch_0.png",
+                "caption": "",
+                "position": 2641
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/townhouses/decoded_run_1_step_1200_t_0.8007_batch_0.png",
+                "caption": "",
+                "position": 2656
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/townhouses/decoded_run_1_step_1500_t_1.0007_batch_0.png",
+                "caption": "",
+                "position": 2671
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/townhouses/decoded_run_1_step_1500_t_1.0007_batch_1.png",
+                "caption": "",
+                "position": 2671
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/townhouses/decoded_run_1_step_1500_t_1.0007_batch_2.png",
+                "caption": "",
+                "position": 2671
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/townhouses/decoded_run_1_step_2999_t_1.9999_batch_0.png",
+                "caption": "",
+                "position": 2686
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/townhouses/decoded_run_1_step_2999_t_1.9999_batch_1.png",
+                "caption": "",
+                "position": 2686
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/interleaved_figures/townhouses/decoded_run_1_step_2999_t_1.9999_batch_2.png",
+                "caption": "",
+                "position": 2686
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/000000252216.jpg",
+                "caption": "Figure 16:Text generation examples from OneFlow, which allows the use of classifier-free guidance (CFG). We observe that CFG produces longer and moredetailedcaptions and also increased chance ofhallucinations. Highlighted text show increased levels of detail when using higher CFG weights.",
+                "position": 2694
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/000000289393.jpg",
+                "caption": "",
+                "position": 2730
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/000000442009.jpg",
+                "caption": "",
+                "position": 2747
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/000000049810.jpg",
+                "caption": "",
+                "position": 2765
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/000000182417.jpg",
+                "caption": "",
+                "position": 2783
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/figures/images/000000285349.jpg",
+                "caption": "",
+                "position": 2801
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAdditional Experiment Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.03506/x16.png",
+                "caption": "Figure 17:Training curve for OneFlow vs. AR for multimodal pretraining.OneFlow initially starts out lower than AR however it quickly catches up and exceeds AR, most notably on DPG and CIDEr.",
+                "position": 2824
+            },
+            {
+                "img": "https://arxiv.org/html/2510.03506/x17.png",
+                "caption": "Figure 18:Performance vs. sampling steps compared to AR.OneFlow achieves parity with the AR model using only 6 sampling steps.",
+                "position": 2907
+            }
+        ]
+    },
+    {
+        "header": "Appendix COneFlow Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.03506/x18.png",
+                "caption": "Figure 19:Architecture.With a multimodal prompt, OneFlow can produce variable length generations with interleaved text & images in a unified non-autoregressive sequence model, simultaneously generating all modalities with an interleaved time schedule for each generated image and text.",
+                "position": 2915
+            }
+        ]
+    },
+    {
+        "header": "Appendix DFull Derivations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.03506/x19.png",
+                "caption": "Figure 20:During training we constructZtZ_{t}by replacing tokens with the blank token (ε{\\color[rgb]{.5,.5,.5}\\definecolor[named]{pgfstrokecolor}{rgb}{.5,.5,.5}\\pgfsys@color@gray@stroke{.5}\\pgfsys@color@gray@fill{.5}\\varepsilon}), with the original tokens used to construct the target bag-of-tokens𝒜i\\mathcal{A}_{i}.",
+                "position": 2997
+            }
+        ]
+    },
+    {
+        "header": "Appendix ESampling and Training Algorithms",
+        "images": []
+    }
+]

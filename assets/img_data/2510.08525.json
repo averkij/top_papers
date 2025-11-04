@@ -1,0 +1,111 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.08525/x1.png",
+                "caption": "Figure 1:Motivation.Left:Existing KV cache compression methods underperform on reasoning models.\nToken-dropping and head-reallocation methods maintain relatively stable performance on Llama-3.1-8B-Inst but drop substantially on Llama-3.1-8B-R1, due to the 8x longer generation sequences in the reasoning models (MBPP results shown).Right:Failure modes: Token-dropping methods degenerate to repetitive behavior due to dropping critical tokens, while head-reallocation methods generate unnecessary steps, suggesting reasoning process degradation.\nSee AppendixA.1for complete results.",
+                "position": 99
+            },
+            {
+                "img": "https://arxiv.org/html/2510.08525/x2.png",
+                "caption": "",
+                "position": 115
+            },
+            {
+                "img": "https://arxiv.org/html/2510.08525/x3.png",
+                "caption": "Figure 2:Overview of RLKV:Our method proposes to utilize RL to identify reasoning heads.\nThe RL pipeline naturally captures reasoning behaviors, since it samples the current model’s generations to produce reward signals.\nThe reward function evaluates the samples to assess reasoning quality.\nWe employL×HL\\times Hlearnable gating adapters to mix full attention and local attention for each head, quantifying each head’s reliance on full versus local KV cache access.\nWe apply an L1 penalty to encourage adapter sparsity, while RL optimizes the adapters to preserve reasoning behaviors.\nAfter training, we identify reasoning heads with high adapter values and allocate full KV cache to them while applying compressed KV cache to others for efficient inference.",
+                "position": 155
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.08525/x4.png",
+                "caption": "Figure 3:Gating adapter distribution after RLKV training on two models, which both are GQA architecture.",
+                "position": 228
+            },
+            {
+                "img": "https://arxiv.org/html/2510.08525/x5.png",
+                "caption": "Figure 4:The conflict of sparse reward versus dense penalty leads to training collapse without our stabilization techniques.\nAs adapters become sparse (decreasing average), model performance degrades (dropping reward), creating a vicious cycle where dense L1 penalties dominate increasingly sparse rewards.",
+                "position": 271
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.08525/x6.png",
+                "caption": "Figure 5:Performance comparison of RLKV against KV cache compression baselines across reasoning benchmarks.\nWe evaluate RLKV (Ours) and existing methods on two reasoning models (Llama-3.1-8B-R1 and Qwen-2.5-7B-R1) across four benchmarks (GSM8K, MATH, AIME24, MBPP) at sparsity levels of 0.2, 0.4, 0.6, and 0.8.\nRLKV consistently outperforms all baselines across different sparsity levels, demonstrating particularly strong advantages at high sparsity levels (0.4 or 0.6) where competing methods suffer significant performance degradation.\nComplete numerical results are provided in AppendixA.3.",
+                "position": 318
+            },
+            {
+                "img": "https://arxiv.org/html/2510.08525/x7.png",
+                "caption": "Figure 6:The importance of heads identified is equivalently illustrated by replacing the top ratio of them with a compressed KV cache.\nCompared to retrieval heads and random heads, reasoning heads identified by RLKV are more crucial to model performance, and are sensitive to compressed KV cache access.",
+                "position": 359
+            },
+            {
+                "img": "https://arxiv.org/html/2510.08525/x8.png",
+                "caption": "Figure 7:The analysis reveals distinct error modes when reasoning heads versus retrieval heads work with compressed KV cache on Math500 benchmark.\nReasoning heads tend toward repetitive generation errors as compression increases, while retrieval heads exhibit more varied error modes across different settings.",
+                "position": 372
+            },
+            {
+                "img": "https://arxiv.org/html/2510.08525/x9.png",
+                "caption": "Figure 8:Ablation study on key components of RLKV training framework.We evaluate three critical components using Qwen-2.5-7B-R1 on Math500.Left: Adaptive penalty weighting prevents training collapse by stabilizing conflicting dynamics between sparse rewards and L1 penalty, while its absence leads to ineffective exploration and training failure.Middle: Self-distillation sampling maintains stable reward signals by training on appropriately challenging problems, compared to unstable signals from overly difficult problems.Right: Base L1 penalty weightβ=0.001\\beta=0.001achieves optimal sparsity-performance balance, while excessive penalty causes over-compression and insufficient penalty leads to premature convergence.",
+                "position": 536
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "6Future Work",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Declaration of the Use of Large Language Models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.08525/x10.png",
+                "caption": "Figure 9:Comprehensive evaluation of KV cache compression methods across all model pairs and benchmarks reveals consistent patterns of performance degradation. H2O, R-KV, and DuoAttention maintain relatively stable performance on instruction-following models but exhibit significant drops on their reasoning counterparts as the KV cache budget decreases. This performance degradation becomes particularly severe at higher sparsity levels, with notable declines observed on reasoning-intensive benchmarks including GSM8k, Math500, AIME25, and MBPP.",
+                "position": 1264
+            },
+            {
+                "img": "https://arxiv.org/html/2510.08525/x11.png",
+                "caption": "Figure 10:The instances of three error modes.",
+                "position": 1269
+            },
+            {
+                "img": "https://arxiv.org/html/2510.08525/x12.png",
+                "caption": "Figure 11:Comprehensive error mode analyses of KV cache compression methods across reasoning models reveal distinct failure patterns. Token-dropping methods (H2O, R-KV) consistently exhibit repetitive errors, as they inevitably discard reasoning-critical information during compression. In contrast, the head-reallocation method DuoAttention tends to show more over-length errors compared to token-dropping methods, suggesting that while it relatively preserves sequence information integrity, it still struggles to fully preserve reasoning capability.",
+                "position": 1274
+            },
+            {
+                "img": "https://arxiv.org/html/2510.08525/x13.png",
+                "caption": "Figure 12:The analysis reveals distinct error patterns when reasoning heads versus retrieval heads work with compressed KV cache across four benchmarks.",
+                "position": 1676
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]

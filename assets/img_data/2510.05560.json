@@ -1,0 +1,760 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.05560/x1.png",
+                "caption": "Figure 1:Overview of HoloScene:From a single input video—along with visual cues such as segmentation and monocular depth—HoloScene reconstructs a simulation‑ready, interactive 3D digital twin represented as a scene graph with complete geometry, physically plausible dynamics, and realistic rendering. The resulting model enables a variety of downstream applications, including real‑time interactive gaming, 3D editing, immersive experience capture, and dynamic visual effects.",
+                "position": 127
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Works",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.05560/x2.png",
+                "caption": "Figure 2:Overview of HoloScene Optimization Stages:Given multiple posed images as well as some visual cues (instance masks, monocular geometry priors), we first employ a gradient-based optimization as the initialization.\nThen we adopt a generative sampling and tree search strategy along the topology of the scene graph to obtain the complete geometry with physical plausibility.\nFinally, the final fine-tuning over the scene further enhances the realism of the reconstructed scene.",
+                "position": 402
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/x3.png",
+                "caption": "Figure 3:Qualitative Comparisons on Object Geometry and Appearance Reconstruction:Our method delivers superior reconstructions by smoothly inpainting occluded regions with LaMa and completing invisible back-facing geometry with Wonder3D. Unlike baselines, our approach eliminates object interpenetration, ensuring physical stability during simulation.",
+                "position": 489
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/objectsdf/scene.png",
+                "caption": "",
+                "position": 507
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/objectsdf/mesh_10.png",
+                "caption": "",
+                "position": 508
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/objectsdf/mesh_12.png",
+                "caption": "",
+                "position": 509
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/objectsdf/mesh_14.png",
+                "caption": "",
+                "position": 510
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/phyrecon/scene.png",
+                "caption": "",
+                "position": 523
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/phyrecon/mesh_10.png",
+                "caption": "",
+                "position": 524
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/phyrecon/mesh_14.png",
+                "caption": "",
+                "position": 529
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/dprecon_2/scene.png",
+                "caption": "",
+                "position": 539
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/dprecon_2/mesh_10.png",
+                "caption": "",
+                "position": 540
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/dprecon_2/mesh_12.png",
+                "caption": "",
+                "position": 541
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/dprecon_2/mesh_14.png",
+                "caption": "",
+                "position": 542
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/ours/scene.png",
+                "caption": "",
+                "position": 552
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/ours/mesh_10.png",
+                "caption": "",
+                "position": 553
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/ours/mesh_12.png",
+                "caption": "",
+                "position": 554
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/ours/mesh_14.png",
+                "caption": "",
+                "position": 555
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/dprecon_2_rgb/scene.png",
+                "caption": "",
+                "position": 571
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/dprecon_2_rgb/mesh_10.png",
+                "caption": "",
+                "position": 572
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/dprecon_2_rgb/mesh_12.png",
+                "caption": "",
+                "position": 573
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/dprecon_2_rgb/mesh_14.png",
+                "caption": "",
+                "position": 574
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/ours_rgb/scene.png",
+                "caption": "",
+                "position": 584
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/ours_rgb/mesh_10.png",
+                "caption": "",
+                "position": 585
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/ours_rgb/mesh_12.png",
+                "caption": "",
+                "position": 586
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_comp/ours_rgb/mesh_14.png",
+                "caption": "",
+                "position": 587
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_phy/ref.png",
+                "caption": "Figure 4:Qualitative Comparisons on Physical Simulation:We compare geometry layouts and appearance before and after physical simulation, with the table geometry reconstructions highlighted in inset figures.\nHoloScene’s complete, non-interpenetrating geometry remains stable in physics simulators, unlike baseline methods. Our Gaussian on mesh delivers high-quality, real-time rendering throughout the simulation process.",
+                "position": 646
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_phy/objectsdf/preinset.png",
+                "caption": "",
+                "position": 664
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_phy/phyrecon/preinset.png",
+                "caption": "",
+                "position": 665
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_phy/dprecon/preinset.png",
+                "caption": "",
+                "position": 666
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_phy/ours/preinset.png",
+                "caption": "",
+                "position": 667
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_phy/objectsdf/mesh_shading_DSC09303.JPG_True.png",
+                "caption": "",
+                "position": 680
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_phy/phyrecon/mesh_shading_DSC09303.JPG_True.png",
+                "caption": "",
+                "position": 681
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_phy/dprecon/mesh_shading_DSC09303.JPG_True.png",
+                "caption": "",
+                "position": 682
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_phy/ours/mesh_shading_DSC09303.JPG_True.png",
+                "caption": "",
+                "position": 683
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_phy/dprecon/before-rgb.png",
+                "caption": "",
+                "position": 718
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_phy/dprecon/after-rgb.png",
+                "caption": "",
+                "position": 719
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_phy/ours/rgb-before.png",
+                "caption": "",
+                "position": 720
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/qual_phy/ours/rgb-after.png",
+                "caption": "",
+                "position": 721
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/demo/vfx/rigidbody_vfx.png",
+                "caption": "Figure 5:Dynamic VFX Results.We augment the inferred interactive 3D scene with various visual effects such as dropping objects, adding animations, and fires.",
+                "position": 1354
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/demo/vfx/animation_vfx.png",
+                "caption": "",
+                "position": 1359
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/demo/vfx/fire_vfx.png",
+                "caption": "",
+                "position": 1360
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion & Limitation",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix AMore Interactive Environment Application Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/game/frame_0009.png",
+                "caption": "Figure 1:More Interactive Game Results:We show more screenshots of the interactive game built by Unreal Engine here. The agent can run, jump, and interact with all the objects in the game.",
+                "position": 2118
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/game/frame_0020.png",
+                "caption": "",
+                "position": 2124
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/game/frame_0005.png",
+                "caption": "",
+                "position": 2125
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/gs/frame_00194.png",
+                "caption": "Figure 2:More Interactive 3D Editing Results:The user could interact with the object in the scene, change the location and orientation of the object the control panel, and attain the edited scene.",
+                "position": 2135
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/gs/frame_00265.png",
+                "caption": "",
+                "position": 2141
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/gs/frame_00451.png",
+                "caption": "",
+                "position": 2142
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/immerse/obj1/IMG_1094.jpg",
+                "caption": "Figure 3:More Immersive Experience Recording Results:Here we show more results of the immersive experience recording of two objects in the scene. For each image pair, the original recording is shown on the left, and the simulated object rendering with Gaussians is on the right. The estimated object 6D poses are marked with oriented bounding boxes.",
+                "position": 2152
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/immerse/obj1/IMG_1095.jpg",
+                "caption": "",
+                "position": 2158
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/immerse/obj1/IMG_1096.jpg",
+                "caption": "",
+                "position": 2173
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/immerse/obj1/IMG_1097.jpg",
+                "caption": "",
+                "position": 2174
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/immerse/obj2/00000.png",
+                "caption": "",
+                "position": 2189
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/immerse/obj2/IMG_1102.jpg",
+                "caption": "",
+                "position": 2190
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/immerse/obj2/IMG_1103.jpg",
+                "caption": "",
+                "position": 2205
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/immerse/obj2/IMG_1104.jpg",
+                "caption": "",
+                "position": 2206
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/vfx/animate/0000.png",
+                "caption": "Figure 4:More Dynamic Visual Effect Results:We show more results of dynamic visual effects, including animations, dropping objects, and setting fires.",
+                "position": 2228
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/vfx/animate/0029.png",
+                "caption": "",
+                "position": 2234
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/vfx/animate/0063.png",
+                "caption": "",
+                "position": 2235
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/vfx/ball/0014.png",
+                "caption": "",
+                "position": 2238
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/vfx/ball/0032.png",
+                "caption": "",
+                "position": 2239
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/vfx/ball/0098.png",
+                "caption": "",
+                "position": 2240
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/vfx/fire/0000.png",
+                "caption": "",
+                "position": 2243
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/vfx/fire/0010.png",
+                "caption": "",
+                "position": 2244
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/int/vfx/fire/0035.png",
+                "caption": "",
+                "position": 2245
+            }
+        ]
+    },
+    {
+        "header": "Appendix BMore Physical Simulation Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.05560/x4.jpg",
+                "caption": "Figure 5:More Physical Simulation Results in Scannet++ Dataset Scene 1:We show the geometry and appearance of each object in the scene with physical simulation, from no physics state, intermediate state with physics, and final state with physics.",
+                "position": 2263
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/objectsdf/mesh_shading_DSC09303.JPG_0.000.png",
+                "caption": "",
+                "position": 2281
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/objectsdf/mesh_shading_DSC09303.JPG_0.500.png",
+                "caption": "",
+                "position": 2282
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/objectsdf/mesh_shading_DSC09303.JPG_2.400.png",
+                "caption": "",
+                "position": 2283
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/phyrecon/mesh_shading_DSC09303.JPG_0.000.png",
+                "caption": "",
+                "position": 2296
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/phyrecon/mesh_shading_DSC09303.JPG_0.250.png",
+                "caption": "",
+                "position": 2297
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/phyrecon/mesh_shading_DSC09303.JPG_2.367.png",
+                "caption": "",
+                "position": 2298
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/dprecon/mesh_shading_DSC09303.JPG_0.000.png",
+                "caption": "",
+                "position": 2308
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/dprecon/mesh_shading_DSC09303.JPG_0.500.png",
+                "caption": "",
+                "position": 2309
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/dprecon/mesh_shading_DSC09303.JPG_5.817.png",
+                "caption": "",
+                "position": 2310
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/ours/geo/0001.png",
+                "caption": "",
+                "position": 2320
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/ours/geo/0010.png",
+                "caption": "",
+                "position": 2321
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/ours/geo/0037.png",
+                "caption": "",
+                "position": 2322
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/dprecon/shading_DSC09303.JPG_0.000.png",
+                "caption": "",
+                "position": 2338
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/dprecon/shading_DSC09303.JPG_0.500.png",
+                "caption": "",
+                "position": 2339
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/dprecon/shading_DSC09303.JPG_5.817.png",
+                "caption": "",
+                "position": 2340
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/ours/app/0001.png",
+                "caption": "",
+                "position": 2350
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/ours/app/0010.png",
+                "caption": "",
+                "position": 2351
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/67d/ours/app/0037.png",
+                "caption": "",
+                "position": 2352
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/x5.jpg",
+                "caption": "Figure 6:More Physical Simulation Results in Scannet++ Dataset Scene 2:We show the geometry and appearance of each object in the scene with physical simulation, from no physics state, intermediate state with physics, and final state with physics.",
+                "position": 2382
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/objectsdf/mesh_shading_DSC04096.JPG_0.000.png",
+                "caption": "",
+                "position": 2400
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/objectsdf/mesh_shading_DSC04096.JPG_0.150.png",
+                "caption": "",
+                "position": 2401
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/objectsdf/mesh_shading_DSC04096.JPG_0.433.png",
+                "caption": "",
+                "position": 2402
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/phyrecon/mesh_shading_DSC04096.JPG_0.000.png",
+                "caption": "",
+                "position": 2415
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/phyrecon/mesh_shading_DSC04096.JPG_0.500.png",
+                "caption": "",
+                "position": 2416
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/phyrecon/mesh_shading_DSC04096.JPG_1.317.png",
+                "caption": "",
+                "position": 2417
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/dprecon/geo/mesh_shading_DSC04096.JPG_0.000.png",
+                "caption": "",
+                "position": 2427
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/dprecon/geo/mesh_shading_DSC04096.JPG_0.500.png",
+                "caption": "",
+                "position": 2428
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/dprecon/geo/mesh_shading_DSC04096.JPG_1.000.png",
+                "caption": "",
+                "position": 2429
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/ours/geo/0001.png",
+                "caption": "",
+                "position": 2439
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/ours/geo/0010.png",
+                "caption": "",
+                "position": 2440
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/ours/geo/0030.png",
+                "caption": "",
+                "position": 2441
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/dprecon/app/shading_DSC04096.JPG_0.000.png",
+                "caption": "",
+                "position": 2457
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/dprecon/app/shading_DSC04096.JPG_0.500.png",
+                "caption": "",
+                "position": 2458
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/dprecon/app/shading_DSC04096.JPG_1.000.png",
+                "caption": "",
+                "position": 2459
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/ours/app/0001.png",
+                "caption": "",
+                "position": 2469
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/ours/app/0010.png",
+                "caption": "",
+                "position": 2470
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/783/ours/app/0030.png",
+                "caption": "",
+                "position": 2471
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/frame000201.jpg",
+                "caption": "Figure 7:More Physical Simulation Results in Replica Dataset:We show the geometry and appearance of each object in the scene with physical simulation, from no physics state, intermediate state with physics, and final state with physics.",
+                "position": 2501
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/objectsdf/mesh_shading_frame000201.jpg_0.000.png",
+                "caption": "",
+                "position": 2519
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/objectsdf/mesh_shading_frame000201.jpg_0.250.png",
+                "caption": "",
+                "position": 2520
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/objectsdf/mesh_shading_frame000201.jpg_0.767.png",
+                "caption": "",
+                "position": 2521
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/phyrecon/mesh_shading_frame000201.jpg_0.000.png",
+                "caption": "",
+                "position": 2534
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/phyrecon/mesh_shading_frame000201.jpg_0.250.png",
+                "caption": "",
+                "position": 2535
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/phyrecon/mesh_shading_frame000201.jpg_4.617.png",
+                "caption": "",
+                "position": 2536
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/dprecon/geo/mesh_shading_frame000201.jpg_0.000.png",
+                "caption": "",
+                "position": 2546
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/dprecon/geo/mesh_shading_frame000201.jpg_0.250.png",
+                "caption": "",
+                "position": 2547
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/dprecon/geo/mesh_shading_frame000201.jpg_9.983.png",
+                "caption": "",
+                "position": 2548
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/ours/geo/0001.png",
+                "caption": "",
+                "position": 2558
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/ours/geo/0005.png",
+                "caption": "",
+                "position": 2559
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/ours/geo/0013.png",
+                "caption": "",
+                "position": 2560
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/dprecon/app/shading_frame000201.jpg_0.000.png",
+                "caption": "",
+                "position": 2576
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/dprecon/app/shading_frame000201.jpg_0.250.png",
+                "caption": "",
+                "position": 2577
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/dprecon/app/shading_frame000201.jpg_9.983.png",
+                "caption": "",
+                "position": 2578
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/ours/app/0001.png",
+                "caption": "",
+                "position": 2588
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/ours/app/0005.png",
+                "caption": "",
+                "position": 2589
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/room2/ours/app/0013.png",
+                "caption": "",
+                "position": 2590
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/00142.png",
+                "caption": "Figure 8:More Physical Simulation Results in iGibson Dataset:We show the geometry and appearance of each object in the scene with physical simulation, from no physics state, intermediate state with physics, and final state with physics.DP-Recon fails to reconstruct the complete background mesh, leading to object falling in the figure.",
+                "position": 2620
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/objectsdf/mesh_shading_00142.png_0.000.png",
+                "caption": "",
+                "position": 2638
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/objectsdf/mesh_shading_00142.png_0.100.png",
+                "caption": "",
+                "position": 2639
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/objectsdf/mesh_shading_00142.png_0.200.png",
+                "caption": "",
+                "position": 2640
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/phyrecon/mesh_shading_00142.png_0.000.png",
+                "caption": "",
+                "position": 2653
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/phyrecon/mesh_shading_00142.png_0.250.png",
+                "caption": "",
+                "position": 2654
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/phyrecon/mesh_shading_00142.png_1.767.png",
+                "caption": "",
+                "position": 2655
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/dprecon/geo/mesh_shading_00142.png_0.000.png",
+                "caption": "",
+                "position": 2665
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/dprecon/geo/mesh_shading_00142.png_0.250.png",
+                "caption": "",
+                "position": 2666
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/dprecon/geo/mesh_shading_00142.png_1.000.png",
+                "caption": "",
+                "position": 2667
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/ours/geo/0001.png",
+                "caption": "",
+                "position": 2677
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/ours/geo/0005.png",
+                "caption": "",
+                "position": 2678
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/ours/geo/0013.png",
+                "caption": "",
+                "position": 2679
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/dprecon/app/shading_00142.png_0.000.png",
+                "caption": "",
+                "position": 2695
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/dprecon/app/shading_00142.png_0.250.png",
+                "caption": "",
+                "position": 2696
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/dprecon/app/shading_00142.png_1.000.png",
+                "caption": "",
+                "position": 2697
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/ours/app/0001.png",
+                "caption": "",
+                "position": 2707
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/ours/app/0005.png",
+                "caption": "",
+                "position": 2708
+            },
+            {
+                "img": "https://arxiv.org/html/2510.05560/figures/supp/physim/bw1/ours/app/0013.png",
+                "caption": "",
+                "position": 2709
+            }
+        ]
+    },
+    {
+        "header": "Appendix CMethod Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DExperiment Details",
+        "images": []
+    }
+]

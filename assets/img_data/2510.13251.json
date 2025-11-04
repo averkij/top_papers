@@ -1,0 +1,949 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.13251/x1.png",
+                "caption": "Figure 1:Summary of our findings on VideoLLMs’ information flow.(a)Temporal reasoning begins with cross-frame interactions within video tokens at early-middle layers [green], followed by video-language integration into temporal keywords in the question [purple]. This information is conveyed to the last token at middle-late layers [orange], where answer generation occurs [yellow].(b)These effective pathways are identified via Attention Knockout, which disconnects attention pairs and tracks the drop in probability of the final answer to quantify their impact.(c)Layer-wise answer probability rises immediately after video-language integration, indicating that the model is ready to predict correct answers after the middle layers.",
+                "position": 163
+            }
+        ]
+    },
+    {
+        "header": "2Preliminary",
+        "images": []
+    },
+    {
+        "header": "3Information Flow Dynamics in VideoLLMs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/inter-frame/llava-next-7b-vs-llava-next-7b-video-ft/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 500
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/inter-frame/llava-next-7b-vs-llava-next-7b-video-ft/legend.png",
+                "caption": "",
+                "position": 503
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x2.png",
+                "caption": "(a)Action Antonym",
+                "position": 508
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x3.png",
+                "caption": "(b)Action Sequence",
+                "position": 513
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x4.png",
+                "caption": "(c)Scene Transition",
+                "position": 518
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x5.png",
+                "caption": "(d)Moving Direction",
+                "position": 523
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x6.png",
+                "caption": "(e)Object Count",
+                "position": 528
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vql-to-ql/llava-next-7b-video-ft/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 681
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vql-to-ql/llava-next-7b-video-ft/legend.png",
+                "caption": "",
+                "position": 684
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x7.png",
+                "caption": "(a)Action Antonym",
+                "position": 689
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x8.png",
+                "caption": "(b)Action Sequence",
+                "position": 694
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x9.png",
+                "caption": "(c)Scene Transition",
+                "position": 699
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x10.png",
+                "caption": "(d)Moving Direction",
+                "position": 704
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x11.png",
+                "caption": "(e)Object Count",
+                "position": 709
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/logit-lens-spatial/llava-next-13b-video-ft/legend.png",
+                "caption": "Figure 4:Normalized frequency of spatial and temporal keywords extracted from video tokens via Logit Lens.Spatial concepts start to appear in the very early layers, whereas temporal concepts develop later in the middle layers.\nFull list of keywords are shown in TableD.",
+                "position": 720
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/logit-lens-spatial/llava-next-13b-video-ft/legend.png",
+                "caption": "",
+                "position": 723
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x12.png",
+                "caption": "",
+                "position": 728
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x13.png",
+                "caption": "",
+                "position": 732
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x14.png",
+                "caption": "",
+                "position": 736
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x15.png",
+                "caption": "",
+                "position": 740
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x16.png",
+                "caption": "",
+                "position": 744
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x17.png",
+                "caption": "",
+                "position": 749
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x18.png",
+                "caption": "",
+                "position": 753
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x19.png",
+                "caption": "",
+                "position": 757
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x20.png",
+                "caption": "",
+                "position": 761
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x21.png",
+                "caption": "",
+                "position": 765
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x22.png",
+                "caption": "Figure 5:Visualization of video-to-question attention maps.Queries are “begins” and “ends” question tokens; keys are video tokens. (a) With spatiotemporal interactions, each question token attends to semantically relevant regions: “begins” focuses on blue sphere at start, “ends” on blue sphere and green square at end. (b) When temporal interactions among video tokens are blocked, video-text alignment fails and text tokens instead attend to positionally proximate regions rather than semantically relevant ones.",
+                "position": 775
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/question-and-options-to-last/llava-next-7b-video-ft/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 845
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/question-and-options-to-last/llava-next-7b-video-ft/legend.png",
+                "caption": "",
+                "position": 848
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x23.png",
+                "caption": "(a)Action Antonym",
+                "position": 853
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x24.png",
+                "caption": "(b)Action Sequence",
+                "position": 858
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x25.png",
+                "caption": "(c)Scene Transition",
+                "position": 863
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x26.png",
+                "caption": "(d)Moving Direction",
+                "position": 868
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x27.png",
+                "caption": "(e)Object Count",
+                "position": 873
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vq-to-true-opt/llava-next-7b-video-ft/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 884
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vq-to-true-opt/llava-next-7b-video-ft/legend.png",
+                "caption": "",
+                "position": 887
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x28.png",
+                "caption": "(a)Action Antonym",
+                "position": 892
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x29.png",
+                "caption": "(b)Action Sequence",
+                "position": 897
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x30.png",
+                "caption": "(c)Scene Transition",
+                "position": 902
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x31.png",
+                "caption": "(d)Moving Direction",
+                "position": 907
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x32.png",
+                "caption": "(e)Object Count",
+                "position": 912
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/gen-prob-true-false-opt/llava-next-7b-video-ft/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 926
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/gen-prob-true-false-opt/llava-next-7b-video-ft/legend.png",
+                "caption": "",
+                "position": 929
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x33.png",
+                "caption": "(a)Action Antonym",
+                "position": 934
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x34.png",
+                "caption": "(b)Action Sequence",
+                "position": 939
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x35.png",
+                "caption": "(c)Scene Transition",
+                "position": 944
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x36.png",
+                "caption": "(d)Moving Direction",
+                "position": 949
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x37.png",
+                "caption": "(e)Object Count",
+                "position": 954
+            }
+        ]
+    },
+    {
+        "header": "4Related Work",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix AScalability of Our Findings",
+        "images": []
+    },
+    {
+        "header": "Appendix BGeneralization of Our Findings Across VideoLLMs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/inter-frame/llava-next-13b-vs-llava-next-13b-video-ft/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 1903
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/inter-frame/llava-next-13b-vs-llava-next-13b-video-ft/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 1906
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/inter-frame/llava-next-13b-vs-llava-next-13b-video-ft/legend.png",
+                "caption": "",
+                "position": 1909
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x38.png",
+                "caption": "(a)Action Antonym",
+                "position": 1914
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x39.png",
+                "caption": "(b)Action Sequence",
+                "position": 1919
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x40.png",
+                "caption": "(c)Scene Transition",
+                "position": 1924
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x41.png",
+                "caption": "(d)Moving Direction",
+                "position": 1929
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x42.png",
+                "caption": "(e)Object Count",
+                "position": 1936
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vql-to-ql/llava-next-13b-video-ft/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 1951
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vql-to-ql/llava-next-13b-video-ft/legend.png",
+                "caption": "",
+                "position": 1954
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x43.png",
+                "caption": "(a)Action Antonym",
+                "position": 1959
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x44.png",
+                "caption": "(b)Action Sequence",
+                "position": 1964
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x45.png",
+                "caption": "(c)Scene Transition",
+                "position": 1969
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x46.png",
+                "caption": "(d)Moving Direction",
+                "position": 1974
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x47.png",
+                "caption": "(e)Object Count",
+                "position": 1981
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/question-and-options-to-last/llava-next-13b-video-ft/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 1997
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/question-and-options-to-last/llava-next-13b-video-ft/legend.png",
+                "caption": "",
+                "position": 2000
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x48.png",
+                "caption": "(a)Action Antonym",
+                "position": 2005
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x49.png",
+                "caption": "(b)Action Sequence",
+                "position": 2010
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x50.png",
+                "caption": "(c)Scene Transition",
+                "position": 2015
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x51.png",
+                "caption": "(d)Moving Direction",
+                "position": 2020
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x52.png",
+                "caption": "(e)Object Count",
+                "position": 2027
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vq-to-true-opt/llava-next-13b-video-ft/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2042
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vq-to-true-opt/llava-next-13b-video-ft/legend.png",
+                "caption": "",
+                "position": 2045
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x53.png",
+                "caption": "(a)Action Antonym",
+                "position": 2050
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x54.png",
+                "caption": "(b)Action Sequence",
+                "position": 2055
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x55.png",
+                "caption": "(c)Scene Transition",
+                "position": 2060
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x56.png",
+                "caption": "(d)Moving Direction",
+                "position": 2065
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x57.png",
+                "caption": "(e)Object Count",
+                "position": 2072
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/gen-prob-true-false-opt/llava-next-13b-video-ft/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2087
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/gen-prob-true-false-opt/llava-next-13b-video-ft/legend.png",
+                "caption": "",
+                "position": 2090
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x58.png",
+                "caption": "(a)Action Antonym",
+                "position": 2095
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x59.png",
+                "caption": "(b)Action Sequence",
+                "position": 2100
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x60.png",
+                "caption": "(c)Scene Transition",
+                "position": 2105
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x61.png",
+                "caption": "(d)Moving Direction",
+                "position": 2110
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x62.png",
+                "caption": "(e)Object Count",
+                "position": 2115
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/inter-frame/mini-internvl-4b-vs-mini-internvl-4b-video-ft-3ep/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2137
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/inter-frame/mini-internvl-4b-vs-mini-internvl-4b-video-ft-3ep/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2140
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/inter-frame/mini-internvl-4b-vs-mini-internvl-4b-video-ft-3ep/legend.png",
+                "caption": "",
+                "position": 2143
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x63.png",
+                "caption": "(a)Action Antonym",
+                "position": 2148
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x64.png",
+                "caption": "(b)Action Sequence",
+                "position": 2153
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x65.png",
+                "caption": "(c)Scene Transition",
+                "position": 2158
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x66.png",
+                "caption": "(d)Moving Direction",
+                "position": 2163
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x67.png",
+                "caption": "(e)Object Count",
+                "position": 2170
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vql-to-ql/mini-internvl-4b-video-ft-3ep/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2186
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vql-to-ql/mini-internvl-4b-video-ft-3ep/legend.png",
+                "caption": "",
+                "position": 2189
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x68.png",
+                "caption": "(a)Action Antonym",
+                "position": 2194
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x69.png",
+                "caption": "(b)Action Sequence",
+                "position": 2199
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x70.png",
+                "caption": "(c)Scene Transition",
+                "position": 2204
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x71.png",
+                "caption": "(d)Moving Direction",
+                "position": 2209
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x72.png",
+                "caption": "(e)Object Count",
+                "position": 2216
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/question-and-options-to-last/mini-internvl-4b-video-ft-3ep/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2232
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/question-and-options-to-last/mini-internvl-4b-video-ft-3ep/legend.png",
+                "caption": "",
+                "position": 2235
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x73.png",
+                "caption": "(a)Action Antonym",
+                "position": 2240
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x74.png",
+                "caption": "(b)Action Sequence",
+                "position": 2245
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x75.png",
+                "caption": "(c)Scene Transition",
+                "position": 2250
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x76.png",
+                "caption": "(d)Moving Direction",
+                "position": 2255
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x77.png",
+                "caption": "(e)Object Count",
+                "position": 2262
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vq-to-true-opt/mini-internvl-4b-video-ft-3ep/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2278
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vq-to-true-opt/mini-internvl-4b-video-ft-3ep/legend.png",
+                "caption": "",
+                "position": 2281
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x78.png",
+                "caption": "(a)Action Antonym",
+                "position": 2286
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x79.png",
+                "caption": "(b)Action Sequence",
+                "position": 2291
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x80.png",
+                "caption": "(c)Scene Transition",
+                "position": 2296
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x81.png",
+                "caption": "(d)Moving Direction",
+                "position": 2301
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x82.png",
+                "caption": "(e)Object Count",
+                "position": 2308
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/gen-prob-true-false-opt/mini-internvl-4b-video-ft-3ep/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2323
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/gen-prob-true-false-opt/mini-internvl-4b-video-ft-3ep/legend.png",
+                "caption": "",
+                "position": 2326
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x83.png",
+                "caption": "(a)Action Antonym",
+                "position": 2331
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x84.png",
+                "caption": "(b)Action Sequence",
+                "position": 2336
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x85.png",
+                "caption": "(c)Scene Transition",
+                "position": 2341
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x86.png",
+                "caption": "(d)Moving Direction",
+                "position": 2346
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x87.png",
+                "caption": "(e)Object Count",
+                "position": 2351
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/inter-frame/videollama3-7b/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2358
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/inter-frame/videollama3-7b/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2361
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/inter-frame/videollama3-7b/legend.png",
+                "caption": "",
+                "position": 2364
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x88.png",
+                "caption": "(a)Action Antonym",
+                "position": 2369
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x89.png",
+                "caption": "(b)Action Sequence",
+                "position": 2374
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x90.png",
+                "caption": "(c)Scene Transition",
+                "position": 2379
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x91.png",
+                "caption": "(d)Moving Direction",
+                "position": 2384
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x92.png",
+                "caption": "(e)Object Count",
+                "position": 2391
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vql-to-ql/videollama3-7b/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2407
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vql-to-ql/videollama3-7b/legend.png",
+                "caption": "",
+                "position": 2410
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x93.png",
+                "caption": "(a)Action Antonym",
+                "position": 2415
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x94.png",
+                "caption": "(b)Action Sequence",
+                "position": 2420
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x95.png",
+                "caption": "(c)Scene Transition",
+                "position": 2425
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x96.png",
+                "caption": "(d)Moving Direction",
+                "position": 2430
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x97.png",
+                "caption": "(e)Object Count",
+                "position": 2437
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/question-and-options-to-last/videollama3-7b/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2453
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/question-and-options-to-last/videollama3-7b/legend.png",
+                "caption": "",
+                "position": 2456
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x98.png",
+                "caption": "(a)Action Antonym",
+                "position": 2461
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x99.png",
+                "caption": "(b)Action Sequence",
+                "position": 2466
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x100.png",
+                "caption": "(c)Scene Transition",
+                "position": 2471
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x101.png",
+                "caption": "(d)Moving Direction",
+                "position": 2476
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x102.png",
+                "caption": "(e)Object Count",
+                "position": 2483
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vq-to-true-opt/videollama3-7b/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2499
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/vq-to-true-opt/videollama3-7b/legend.png",
+                "caption": "",
+                "position": 2502
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x103.png",
+                "caption": "(a)Action Antonym",
+                "position": 2507
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x104.png",
+                "caption": "(b)Action Sequence",
+                "position": 2512
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x105.png",
+                "caption": "(c)Scene Transition",
+                "position": 2517
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x106.png",
+                "caption": "(d)Moving Direction",
+                "position": 2522
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x107.png",
+                "caption": "(e)Object Count",
+                "position": 2529
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/gen-prob-true-false-opt/videollama3-7b/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2544
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/gen-prob-true-false-opt/videollama3-7b/legend.png",
+                "caption": "",
+                "position": 2547
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x108.png",
+                "caption": "(a)Action Antonym",
+                "position": 2552
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x109.png",
+                "caption": "(b)Action Sequence",
+                "position": 2557
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x110.png",
+                "caption": "(c)Scene Transition",
+                "position": 2562
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x111.png",
+                "caption": "(d)Moving Direction",
+                "position": 2567
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x112.png",
+                "caption": "(e)Object Count",
+                "position": 2572
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAnalysis on Open-ended VideoQA",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench-open-ended/inter-frame/llava-next-7b-vs-llava-next-7b-video-ft/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2597
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench-open-ended/inter-frame/llava-next-7b-vs-llava-next-7b-video-ft/legend.png",
+                "caption": "",
+                "position": 2600
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x113.png",
+                "caption": "(a)Action Antonym",
+                "position": 2605
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x114.png",
+                "caption": "(b)Moving Direction",
+                "position": 2610
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x115.png",
+                "caption": "(c)Object Count",
+                "position": 2615
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench-open-ended/vql-to-ql/llava-next-7b-video-ft/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2626
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench-open-ended/vql-to-ql/llava-next-7b-video-ft/legend.png",
+                "caption": "",
+                "position": 2629
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x116.png",
+                "caption": "(a)Action Antonym",
+                "position": 2634
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x117.png",
+                "caption": "(b)Moving Direction",
+                "position": 2639
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x118.png",
+                "caption": "(c)Object Count",
+                "position": 2644
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench-open-ended/gen-prob-true-opt/llava-next-7b-video-ft/legend.png",
+                "caption": "(a)Action Antonym",
+                "position": 2655
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench-open-ended/gen-prob-true-opt/llava-next-7b-video-ft/legend.png",
+                "caption": "",
+                "position": 2658
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x119.png",
+                "caption": "(a)Action Antonym",
+                "position": 2663
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x120.png",
+                "caption": "(b)Moving Direction",
+                "position": 2668
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x121.png",
+                "caption": "(c)Object Count",
+                "position": 2673
+            }
+        ]
+    },
+    {
+        "header": "Appendix DFurther Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/window-size-k/llava-next-7b-video-ft-window-1/legend.png",
+                "caption": "(a)k=1k=1",
+                "position": 2877
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/figs/images/tvbench/window-size-k/llava-next-7b-video-ft-window-1/legend.png",
+                "caption": "",
+                "position": 2880
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x122.png",
+                "caption": "(a)k=1k=1",
+                "position": 2885
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x123.png",
+                "caption": "(b)k=5k=5",
+                "position": 2890
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x124.png",
+                "caption": "(c)k=9k=9",
+                "position": 2895
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13251/x125.png",
+                "caption": "(d)k=13k=13",
+                "position": 2900
+            }
+        ]
+    },
+    {
+        "header": "Appendix EImplementation Details",
+        "images": []
+    }
+]

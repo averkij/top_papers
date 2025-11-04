@@ -1,0 +1,304 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/100k.png",
+                "caption": "Figure 1:Predicatably Scaling RL compute to 100,000 GPU Hours(a)\nWe runScaleRLfor100​k100\\text{k}GPU hours on an 8B dense model, and50​k50\\text{k}GPU hours on a 17Bx16 MoE (Scout).\nWe fit a sigmoid curve (Equation˜1) on pass rate (mean​@​16\\text{mean}@16) oniidvalidation dataset up to50​k50\\text{k}(and16k)16\\text{k})GPU hours and extrapolate to100​k100\\text{k}(and45k)45\\text{k})on the 8B (Scout MoE) models respectively. We trained for74007400steps for 8B and71007100steps for Scout, which is3.5×3.5\\timeslarger than ProRL(Liu et al.,2025a). The extrapolated curve (×\\timesmarkers) closely follows extended training, demonstrating both stability at large compute and predictive fits–establishingScaleRLas a reliable candidate for RL scaling.\n(b)Downstream evaluation on AIME-24shows a consistent scaling trend forScaleRL, thus generalizing beyond the training data distribution. Moreover, scaling model size substantially improves the downstream and asymptotic RL performance.",
+                "position": 214
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/100k_aime24.png",
+                "caption": "",
+                "position": 217
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/prevalent_methods.png",
+                "caption": "Figure 2:ScaleRLis more scalable than prevalent RL methods. We fit sigmoid curves (Equation1) oniidvalidation dataset to commonly-used training recipes like DeepSeek (GRPO)(Guo et al.,2025), Qwen-2.5 (DAPO)(Yu et al.,2025), Magistral(Rastogi et al.,2025), and Minimax-M1(MiniMax et al.,2025), and compare them withScaleRL.ScaleRLsurpasses all other methods, achieving an asymptotic reward ofA=0.61A=0.61. Stars denote evaluation points; solid curves show the fitted curve over the range used for fitting; dashed curves extrapolate beyond it. We validate the predictability by running each method for longer (“×\\times” markers), which align closely with the extrapolated curves for stable recipes likeScaleRLand MiniMax. Further description of the individual recipes compared are given in AppendixA.16.",
+                "position": 249
+            }
+        ]
+    },
+    {
+        "header": "2Preliminaries & Setup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/interpreting_fit.png",
+                "caption": "Figure 3:Interpretingequation˜1. We provide an example fit illustrating the roles of parametersAA,BB, andCmidC_{\\text{mid}}.CmidC_{\\text{mid}}determines the compute point at which half of the total gain is achieved - smaller values correspond to faster ascent toward the asymptote.BBcontrols the curve’s steepness, with larger values indicating greater efficiency.AArepresents the asymptotic performance reached at large compute scales. Further discussion is provided in AppendixA.8.",
+                "position": 374
+            }
+        ]
+    },
+    {
+        "header": "3An Empirical Study of RL Scaling",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/infra.png",
+                "caption": "(a)",
+                "position": 397
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/infra.png",
+                "caption": "(a)",
+                "position": 400
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/pipelinerl_max_offpolicy.png",
+                "caption": "(b)",
+                "position": 406
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/loss_type.png",
+                "caption": "(a)",
+                "position": 426
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/loss_type.png",
+                "caption": "(a)",
+                "position": 429
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/fp32.png",
+                "caption": "(b)",
+                "position": 435
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/0var_filtering.png",
+                "caption": "(a)",
+                "position": 442
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/0var_filtering.png",
+                "caption": "(a)",
+                "position": 445
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/noposresample.png",
+                "caption": "(b)",
+                "position": 451
+            }
+        ]
+    },
+    {
+        "header": "4ScaleRL: Scaling RL Compute Effectively & Predictably",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/LOO.png",
+                "caption": "Figure 7:Leave-One-Out (LOO) Experiments: Starting fromScaleRL, we revert one design choice at a time to its baseline counterpart and re-train. Most LOO variants reach a similar asymptotic reward, withScaleRLoutperforming slightly overall. The main difference in these methods lies in efficiency. To highlight this, we re-arrangeEquation˜1intoℱ​(Rc)=CB\\mathcal{F}(R_{c})=C^{B}, whereℱ​(Rc)=CmidB/(A−R0Rc−R0−1)\\mathcal{F}(R_{c})=C_{\\text{mid}}^{B}/\\big(\\frac{A-R_{0}}{R_{c}-R_{0}}-1\\big), and plotlog⁡ℱ​(Rc)\\log\\mathcal{F}(R_{c})vs.log⁡C\\log C. This form makes slopeBBdirectly visible, showing thatScaleRLachieves the highest compute efficiency.",
+                "position": 561
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/error_margin.png",
+                "caption": "(a)",
+                "position": 565
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/error_margin.png",
+                "caption": "(a)",
+                "position": 568
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/scout_loo_fp32.png",
+                "caption": "(b)",
+                "position": 574
+            }
+        ]
+    },
+    {
+        "header": "5Predictable Scaling Returns Across RL Compute Axes",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/large_scale_gen_len.png",
+                "caption": "(a)",
+                "position": 621
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/large_scale_gen_len.png",
+                "caption": "(a)",
+                "position": 624
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/large_scale_gen_len_aime24.png",
+                "caption": "(b)",
+                "position": 630
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/large_scale_bsz.png",
+                "caption": "(a)",
+                "position": 665
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/large_scale_bsz.png",
+                "caption": "(a)",
+                "position": 668
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/large_scale_bsz_aime24.png",
+                "caption": "(b)",
+                "position": 674
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Discussion & Conclusion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/large_scale_tasks.png",
+                "caption": "Figure 11:ScaleRLscales predictably on math and code. We report both the code and math validation set performance on the joint math+code RL run; along with the math onlyScaleRLrun as a reference. These results demonstrate that our sigmoidal compute–performance relationship holds across task mixtures, and thatScaleRL’s scalability generalizes beyond a single domain training.",
+                "position": 706
+            }
+        ]
+    },
+    {
+        "header": "8Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/effect_of_B.png",
+                "caption": "(a)",
+                "position": 1712
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/effect_of_B.png",
+                "caption": "(a)",
+                "position": 1715
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/effect_of_Cmid.png",
+                "caption": "(b)",
+                "position": 1721
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/effect_of_A.png",
+                "caption": "(a)",
+                "position": 1728
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/effect_of_A.png",
+                "caption": "(a)",
+                "position": 1731
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/slow_horse.jpeg",
+                "caption": "(b)",
+                "position": 1737
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/loss_agg.png",
+                "caption": "(a)",
+                "position": 1760
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/loss_agg.png",
+                "caption": "(a)",
+                "position": 1763
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/adv_norm.png",
+                "caption": "(b)",
+                "position": 1769
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/loo_1.png",
+                "caption": "(a)",
+                "position": 1776
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/loo_1.png",
+                "caption": "(a)",
+                "position": 1779
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/loo_2.png",
+                "caption": "(b)",
+                "position": 1785
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/loo_3.png",
+                "caption": "(c)",
+                "position": 1791
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/entropy.png",
+                "caption": "Figure 16:Comparing entropy of large and smaller batch size runs across training steps.",
+                "position": 1859
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/large_scale_ngens.png",
+                "caption": "(a)",
+                "position": 1866
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/large_scale_ngens.png",
+                "caption": "(a)",
+                "position": 1869
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/large_scale_ngens_aime24.png",
+                "caption": "(b)",
+                "position": 1875
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/large_scale_tasks_code_livecodebench.png",
+                "caption": "(a)",
+                "position": 1988
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/large_scale_tasks_code_livecodebench.png",
+                "caption": "(a)",
+                "position": 1991
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/large_scale_tasks_math_aime24.png",
+                "caption": "(b)",
+                "position": 1997
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/grpo_eps.png",
+                "caption": "(a)",
+                "position": 2078
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/grpo_eps.png",
+                "caption": "(a)",
+                "position": 2081
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/cispo_eps.png",
+                "caption": "(b)",
+                "position": 2087
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/gspo_eps.png",
+                "caption": "(a)",
+                "position": 2125
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/gspo_eps.png",
+                "caption": "(a)",
+                "position": 2128
+            },
+            {
+                "img": "https://arxiv.org/html/2510.13786/paper_figs/gspo_e_3.png",
+                "caption": "(b)",
+                "position": 2134
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]

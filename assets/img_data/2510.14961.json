@@ -1,0 +1,162 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.14961/x1.png",
+                "caption": "Figure 1:Different generation schemes for autoregressive, recurrent-depth models.Left:Standard sequential generation, which proceeds one token and step of the recurrence at a time (time steps denoted by integers).Right:A diffusion forcing sampler used for the same model can parallelize generation “diagonally”, by computing one step of the recurrence per token position, iteratively refining its estimate of the generated sequence.",
+                "position": 122
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.14961/x2.png",
+                "caption": "Figure 2:An example of a text sequence being generated with the proposed diffusion forcing sampler from a depth-recurrent model. While the original recurrent-depth model requires 32 recurrence steps to produce a single token (the default for this model), the diffusion sampler has already produced and committed 8 new tokens (green). As described, the sampler advances by at least one token per step of the recurrence. Decoded candidate tokens are initial spell out incoherent text, but map into the right concepts, and quickly improve with more steps. Note that the “freeze” decision is dynamic, based on distance to the previous state in latent space (not pictured).",
+                "position": 169
+            }
+        ]
+    },
+    {
+        "header": "3Applying Diffusion Forcing to Recurrent-Depth Models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.14961/x3.png",
+                "caption": "Figure 3:TheHuginn-0125recurrent-depth model can match the baseline performance on the GSM8k dataset when enabling KV cache sharing (with a minimal cache size of 1), usingrr-times less memory for KV states.",
+                "position": 245
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x4.png",
+                "caption": "Figure 4:Examples of adaptive sampler behavior. Each color represents a token id in the vocabulary of the model, showing the development of the generated sequence (running left to right) as a function of sampler steps (running top to bottom) fordifferent hyperparameter choices. The leftmost example isr′=4r^{\\prime}=4, and tokens are frozen quickly, whereas middle and right show sequences withr<4r<4require more adaptive computation, and in both cases the sampler stalls after hitting the maximal length of the wavefront (here 32 to visualize), before resolving the sequence and advancing again.",
+                "position": 387
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x5.png",
+                "caption": "",
+                "position": 390
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x6.png",
+                "caption": "",
+                "position": 391
+            }
+        ]
+    },
+    {
+        "header": "4Theoretical Analysis",
+        "images": []
+    },
+    {
+        "header": "5Experimental Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.14961/x7.png",
+                "caption": "Figure 5:Trade-off between accuracy and speed on GSM8k under different hyperparameter choices.Left:Effect of increasing inner recurrencer′r^{\\prime}. Inner recurrence stabilizes the sampling, increasing accuracy at the cost of throughput.Right:Effect of varying the exit thresholdε\\varepsilon. Modulating the exit threshold most directly trades off throughput and accuracy.",
+                "position": 691
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x8.png",
+                "caption": "",
+                "position": 694
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x9.png",
+                "caption": "Figure 6:Left:Scaling the amount of momentumη\\etain the conditioning., showing that small, but non-zeroη\\etavalues are optimal.Right:Scaling the amount of noise added during inference forr′=4r^{\\prime}=4, scheduled linearly in the number of recurrence steps, also measured on GSM8k. Atr′=4r^{\\prime}=4, adding noise is not optimal. We plot the full spectrum ofr′r^{\\prime}toβt\\beta_{t}inFigure˜7.",
+                "position": 820
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x10.png",
+                "caption": "",
+                "position": 823
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x11.png",
+                "caption": "Figure 7:The Pareto Curve of Accuracy and Throughput on GSM8k spanned by varying inner recurrence and noise hyperparameter pairs(r′,βt)(r^{\\prime},\\beta_{t}). Adding moderate amounts of noise, e.g.βt=0.2\\beta_{t}=0.2is dominating runs with no noise added. Note also the scale of y-axis, as even at the rightmost part of the frontier, we are observing accuracy losses of only2%2\\%.",
+                "position": 842
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x12.png",
+                "caption": "Figure 8:Impact of Additional Hyperparameter Choices on GSM8k.Left:Size of the wavefront. Increasing wavefront size up to a value around 64-128 appears optimal. We note that the optimal wavefront size is also likely to be accelerator-specific.Right:Amount of headway. Larger amounts of headway than 1, i.e. advancing the sampler more than 1 token per step, do not seem to materialize practical speedups for the studied model.",
+                "position": 845
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x13.png",
+                "caption": "",
+                "position": 848
+            }
+        ]
+    },
+    {
+        "header": "6Conclusions: Are Recurrent-depth Transformers secretly continuous language diffusion models?",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.14961/x14.png",
+                "caption": "Figure 9:Impact of Additional Hyperparameter Choices, also on GSM8k.LeftInitialization Scale of new states, which has only a minor effect of the result.Right:Continuous Compute, i.e. choosing to initialize new states with previously computed states (We initialize new states with the latest state from the position one step to the left). This is less effective for our sampler, given that the position one step to the left is only the result ofr′r^{\\prime}recurrences.",
+                "position": 1960
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x15.png",
+                "caption": "",
+                "position": 1963
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x16.png",
+                "caption": "Figure 10:A heatmap of accuracy and throughput measurements spanned by varying noise and inner recurrence.",
+                "position": 1967
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x17.png",
+                "caption": "Figure 11:Additional visualizations of the trade-off of noise and inner recurrence inFigure˜7.",
+                "position": 1970
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/plots/modeling01_token_stability_heatmaps.png",
+                "caption": "Figure 12:A full example of a sampler hyperparameter failure. As inFigure˜4, this figure shows the token ids on the left, as they change during successive steps of the sampler (running from top to bottom) over the sequence dimension (running left to right). We see that the model tries various configurations for the current tokens, before they are gradually frozen as their latent states converge. Due to a few hard decisions (from the perspective of the model), as seen on the stability charts on the right, early in the sequence, progress stalls until these tokens are decided, but then picks up speed again. However, large points of the wavefront all decode into the whitespace token (dark blue color), so that no useful states information is computed until the earlier tokens are resolved.",
+                "position": 1981
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x18.png",
+                "caption": "Figure 13:Hyperparameter Robustness for the finetuned math model on GSM8k. These figure repeat the ablation study from the main body concerning hyperparameter robustness also for the finetuned math model, showing that behaviors are largely similar, even though the model’s capability has noticeably changed.",
+                "position": 1984
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x19.png",
+                "caption": "",
+                "position": 1987
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x20.png",
+                "caption": "",
+                "position": 1989
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x21.png",
+                "caption": "",
+                "position": 1990
+            },
+            {
+                "img": "https://arxiv.org/html/2510.14961/x22.png",
+                "caption": "",
+                "position": 1992
+            }
+        ]
+    },
+    {
+        "header": "Appendix BTheoretical Analysis",
+        "images": []
+    }
+]

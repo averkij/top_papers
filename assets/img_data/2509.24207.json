@@ -1,0 +1,132 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.24207/x1.png",
+                "caption": "Figure 1:On instruction-following,Llama3-8B-Instructaligned with online on-policy data (blue) is 1.3x to 1.6x better than one aligned with offline off-policy data (red).\nHowever, when the same offline data is fed to thehumanlinevariant of the objective (orange), the gap vanishes.",
+                "position": 152
+            }
+        ]
+    },
+    {
+        "header": "2Background",
+        "images": []
+    },
+    {
+        "header": "3Alignment as Prospect Theoretic Optimization",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.24207/x2.png",
+                "caption": "Figure 2:We prove that human utility is maximized when outputs are sampled from the typical human-perceived distribution of what the policy can produce, whose inverted S-shape comes fromprospect theory. Online on-policy sampling (dashed black) is superior to offline off-policy—both from worse (red) and better (blue) models—because the latter deviate more from human perception (solid black). Rejection-sampling with perceptual bias gives ushumanline sampling(green) that can mimic this, and a special case of it simplifies to thehumanline clippingused in our design pattern.",
+                "position": 227
+            }
+        ]
+    },
+    {
+        "header": "4Clipping Recovers Perceptual Bias",
+        "images": []
+    },
+    {
+        "header": "5Humanline Variants",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.24207/assets/update.png",
+                "caption": "Figure 3:In offline objectives (left), the reference model does not change during training. In online objectives (middle), the reference is synced with the policy at thecurrentstep; at scale, some asynchrony is permitted (a lag of one step is depicted here). Inhumanline syncing(right), everykksteps, the reference is synced with the policy from thepreviousstep (k=1k=1is depicted here).",
+                "position": 467
+            },
+            {
+                "img": "https://arxiv.org/html/2509.24207/assets/clipping.png",
+                "caption": "Figure 4:Inhumanline clipping, the token-wise likelihood ratiosrθ​(i,t)r_{\\theta}(i,t)are asymmetrically clipped to[ϵP,ϵR][\\epsilon_{P},\\epsilon_{R}]upstream of the loss.\nIn the humanline variant of GRPO, instead of there being an unclippedrθr_{\\theta}and a[1−ϵ,1+ϵ][1-\\epsilon,1+\\epsilon]-clippedrθr_{\\theta}as in (1), we have a once-clipped and twice-clippedrθr_{\\theta}. Though humanline clipping should in theory be most impactful for losses without any clipping to begin with (e.g., DPO, KTO), it still benefits GRPO\n(see Figure5, left).",
+                "position": 470
+            },
+            {
+                "img": "https://arxiv.org/html/2509.24207/x3.png",
+                "caption": "Figure 5:The majority of the improvement comes fromhumanline syncing(left). Whilehumanline clippingdoes add surplus benefit, without syncing, the performance would be no better than that of regular offline variants. Although humanline clipping is a special case of the more generalhumanline sampling(§4), it performs as well while being stabler and simpler to implement (right).",
+                "position": 524
+            },
+            {
+                "img": "https://arxiv.org/html/2509.24207/x3.png",
+                "caption": "",
+                "position": 527
+            },
+            {
+                "img": "https://arxiv.org/html/2509.24207/x4.png",
+                "caption": "",
+                "position": 531
+            },
+            {
+                "img": "https://arxiv.org/html/2509.24207/assets/format_reward.png",
+                "caption": "Figure 6:For mathematical reasoning (MATH500), sampling data 64x less frequently (orange) than in online GRPO (blue) leads to significantly worse performance, even though the total volume of data seen remains the same. In contrast, using the humanline variant of GRPO while being 64x more offline does not incur performance degradation (green).\nLess frequent humanline syncing (k=20k=20,violet) leads to slower but more stable learning; atk=1k=1, the instability would cause collapse.",
+                "position": 569
+            },
+            {
+                "img": "https://arxiv.org/html/2509.24207/assets/format_reward.png",
+                "caption": "",
+                "position": 572
+            },
+            {
+                "img": "https://arxiv.org/html/2509.24207/assets/accuracy_reward.png",
+                "caption": "",
+                "position": 576
+            }
+        ]
+    },
+    {
+        "header": "6Limitations & Future Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ARelated Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BProofs",
+        "images": []
+    },
+    {
+        "header": "Appendix CAlgorithms",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.24207/x5.png",
+                "caption": "Figure 7:When aligningLlama3-8B-Instructwith humanline GRPO, the performance on instruction-following—measured here as the length-controlled winrate against aGPT-4-Turbobaseline—is robust to the frequency of humanline syncing up tok=4k=4. Past that point, syncing less frequently leads to a log-linear decline in performance. In other setups not shown here, such as our mathematical reasoning experiments withQwen2.5-1.5B-Instruct, syncing less frequently is not only beneficial but necessary, since anything less thank=12k=12introduces too much instability and leads to reward collapse.",
+                "position": 3434
+            },
+            {
+                "img": "https://arxiv.org/html/2509.24207/x6.png",
+                "caption": "Figure 8:The performance benefits of thehumanlinevariants of KTO/DPO/GRPO persist at larger scale with different model families, withGemma2-27B-Instructseeing a 1.15–1.30x improvement in performance. This is slightly smaller than the relative improvement seen byLlama3-8B-Instruct, and can be ascribed to the former being a better base model.",
+                "position": 3437
+            },
+            {
+                "img": "https://arxiv.org/html/2509.24207/x7.png",
+                "caption": "Figure 9:Trust region-style syncing(Gorbatovski et al.,2024)performs much worse than humanline syncing. Inoffline+trust region, we sync the reference model with the policyafterthe update every 1024 steps, the best performing setup inGorbatovski et al. (2024). This suggests that it is not enough to merely sync the reference model; the way in which it is done matters as well.",
+                "position": 3440
+            },
+            {
+                "img": "https://arxiv.org/html/2509.24207/x8.png",
+                "caption": "Figure 10:Average wall-clock time for aligningLlama3-8B-Instructon UltraFeedback, reported with standard error and 95% confidence intervals across 5 random seeds. Note that offline+humanline GRPO takes almost twice as long as offline GRPO due to the syncing of the reference model weights. However, this is still less than 1/6 of the time needed to run online GRPO (without any overlapping of training/inference) while reaching the same performance (Figure1).",
+                "position": 3443
+            }
+        ]
+    },
+    {
+        "header": "Appendix DAdditional Experiments",
+        "images": []
+    }
+]

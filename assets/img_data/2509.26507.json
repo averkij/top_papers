@@ -1,0 +1,149 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.26507/x1.png",
+                "caption": "Figure 1:General overview of architectures and their relationships: the inference dynamics of BDH and BDH-GPU act as a natural bridge between Transformer and models of the brain. The two main inference mechanisms of a reasoning architecture, attention and the feed-forward network, are defined at a macro-level through tensor operations for the Transformer, and at the micro-level of neuron interactions through local graph dynamics for Brain models. The new BDH-GPU architecture is naturally defined both at the level of vectors and of particle dynamics of neurons and synapses, acting as a bridge between these two approaches. See also Table3at the end of the paper for a more detailed comparison of architecture properties.",
+                "position": 701
+            }
+        ]
+    },
+    {
+        "header": "2BDH: a language model architecture given by local distributed graph dynamics",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.26507/x2.png",
+                "caption": "Figure 2:The ‘physical system’ representation of BDH as a physical graph toy-model.",
+                "position": 1196
+            }
+        ]
+    },
+    {
+        "header": "3BDH-GPU: a tensor-friendly version of the BDH architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.26507/x3.png",
+                "caption": "Figure 4:Scaling of BDH-GPU architecture in dimensionnn. The other parameters can be considered fixed during scaling. For example, with choice ofd=256d=256for low-rank dimension,k=2k=2for neuron pairing with RoPE, andh=1h=1for a single-head architecture, the model scales linearly in dimensionnnin chunks ofd​h​k=256⋅2⋅1=512dhk=256\\cdot 2\\cdot 1=512parameters.",
+                "position": 1534
+            },
+            {
+                "img": "https://arxiv.org/html/2509.26507/x4.png",
+                "caption": "Figure 5:Neuron-neuron communication using graphsG∈𝒢2​(n,m)G\\in\\mathcal{G}^{2}(n,m): correspondence between graphHHwithmmedges (left), and neuron-neuron interaction graphG=H2G=H^{2}(right). The approach allows to express linear signal propagation on a broad class of graphs𝒢2​(n,m)\\mathcal{G}^{2}(n,m)using two steps of linear dynamics on a sparse circuitHH, i.e.,G​z=H2​zGz=H^{2}zforz∈(R+)nz\\in(R^{+})^{n}.",
+                "position": 1681
+            }
+        ]
+    },
+    {
+        "header": "4Implementation and scaling laws",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.26507/x5.png",
+                "caption": "Figure 6:Diagram of one layer of the BDH-GPU architecture, following Eq. (8). Layer inputs arexl−1,yl−1∈Rnx_{l-1},y_{l-1}\\in R^{n}, layer outputs arexl,yl∈Rnx_{l},y_{l}\\in R^{n}. Model parameters are contained in theE∈Rn×dE\\in R^{n\\times d}andDx,Dy∈Rd×n{D_{x}},{D_{y}}\\in R^{d\\times n}, and shared across all layers. Each layer has a state𝝆l∈Rn×d{\\boldsymbol{\\rho}}_{l}\\in R^{n\\times d}which is used in the Linear Attention block and persisted over time. PyTorch code implementing the model is provided in AppendixE",
+                "position": 1753
+            },
+            {
+                "img": "https://arxiv.org/html/2509.26507/bdh_scaling.png",
+                "caption": "Figure 7:Performance of BDH-GPU and GPTXL versus model size on a translation task. We have tested all models under the same training and evaluation regimes. All models show improved performance with scale. BDH-GPU uses exactly the formulation provided in AppendixE, while BDH-GPU’ extends conditional gating of states and logits. All models are trained with truncated backpropagation through time on sequences 2048 characters long, and carry their state (𝝆{\\boldsymbol{\\rho}}matrix for BDH models and a buffer of last 4096 KV-Cache entries(Dai et al.,2019)for GPTXL) between minibatches. BDH models are scaled only by varying the number of neuronsnnand keep all other hyperparameters fixed, making them easy to scale. On the other hand, GPTXL were scaled in both the embedding dimension and the number of layers and required Dropout(Srivastava et al.,2014)tuning for optimal performance. We observe that BDH-GPU’ matches the GPT Transformer at all model sizes we have evaluated.Details on model hyperparameters and training setup are provided in AppendixB.2",
+                "position": 1846
+            }
+        ]
+    },
+    {
+        "header": "5Analysis: emergence of modularity and scale-free structure",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.26507/x6.png",
+                "caption": "Figure 8:The ReLU-lowrank feedforward network of BDH-GPU allows neurons to activate when triggered by activation signals in its own community. (a) Illustration of the selective neuron activation pattern in the proof of Claim6, showing the activation decision of nodevjv_{j}(left) based on active setAAin the sparse hidden layer. (b) Illustration of Eq. (12) showing the relationship between sizes of sets in the sparse hidden layer: active setAA, setBjB_{j}connected to neuronvjv_{j}, and the intersectionCj=A∩BjC_{j}=A\\cap B_{j}: neuronvj1v_{j_{1}}becomes active, but neuronvj2v_{j_{2}}does not.",
+                "position": 2129
+            },
+            {
+                "img": "https://arxiv.org/html/2509.26507/fig4.png",
+                "caption": "Figure 9:(a) Heavy-tailed element distribution and modularity analysis of the excitatory neuron-neuron connection graph contained the encoder-decoder matrixG∗G^{*}. Distribution of elements of the encoder-decoder matrixG∗∈Rn∗×n∗G^{*}\\in R^{n^{*}\\times n^{*}}of a BDH-GPU model withn∗=8192n^{*}=8192neurons andd=256d=256: histogramfreqG∗​(x)\\mathrm{freq_{G^{*}}}(x), its symmetric partfreq−symmetricG∗​(x):=min⁡{freqG∗​(x),freqG∗​(−x)}\\mathrm{freq-symmetric_{G^{*}}}(x):=\\min\\{\\mathrm{freq_{G^{*}}}(x),\\mathrm{freq_{G^{*}}}(-x)\\}, and distribution skewfreq−skewG∗​(x):=freqG∗​(x)−freq−symmetricG∗​(x)\\mathrm{freq-skew_{G^{*}}}(x):=\\mathrm{freq_{G^{*}}}(x)-\\mathrm{freq-symmetric_{G^{*}}}(x).⋄\\diamond(b) Estimate (lower bound) of Newman modularity of matrixG≥β∗G^{*}_{\\geq\\beta}for different values ofβ\\beta, plotted as a function of the number of non-zero elements (edges) ofG≥β∗G^{*}_{\\geq\\beta}. Modularity of random graph baselines are provided for reference, for theG​(n∗,m)G(n^{*},m)model with the same number of edges asG≥β∗G^{*}_{\\geq\\beta}, and for a matrix(P1​P2T)≥β′(P_{1}P_{2}^{T})_{\\geq\\beta^{\\prime}}with the same number of edges asG≥β∗G^{*}_{\\geq\\beta}, whereP1,P2∼𝒩​(0,1)n∗×dP_{1},P_{2}\\sim\\mathcal{N}(0,1)^{n^{*}\\times d}. The modularity estimates were obtained using the community structures returned by the Louvain algorithm, in the best of 5 clustering runs with different random seeds.",
+                "position": 2271
+            },
+            {
+                "img": "https://arxiv.org/html/2509.26507/fig5.png",
+                "caption": "Figure 10:(a) Unweighted in-degree and out-degree distribution for then∗=8192n^{*}=8192neuron nodes andm=46820m=46820edges of matrixG≥β∗G^{*}_{\\geq\\beta}withβ=1.2\\beta=1.2. The distributions exhibit power law distributions, with different exponents, the out-degree distribution being more concentrated. (b) Visualization of graphG≥β∗G^{*}_{\\geq\\beta}, hinting at its core-periphery structure.",
+                "position": 2281
+            },
+            {
+                "img": "https://arxiv.org/html/2509.26507/fig6.png",
+                "caption": "",
+                "position": 2285
+            }
+        ]
+    },
+    {
+        "header": "6Analysis: linear attention, sparse positive activation, and monosemanticity",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.26507/sigma_degrees_powerlaw.png",
+                "caption": "Figure 11:BDH’s state𝝈{\\boldsymbol{\\sigma}}encodes neuron connections as a scale-free graph showing clear heavy-tailed (power-law-like) degree distribution.",
+                "position": 2473
+            },
+            {
+                "img": "https://arxiv.org/html/2509.26507/money_country_synapses_enfrespt.png",
+                "caption": "Figure 12:Evolution of values set by BDH-GPU on 2 specific synapses which we have named (following their interpretation) as “currency synapse” and “country synapse”, relating to concepts naturally present in European Parliament transcripts on which the model was trained. We can notice that mentions of country or currency names result in an increase of the respective synapse value, indicating a stronger presence of the concept in the context. Moreover, the synapses consistently became activated in both French and English, confirming the (notice how it reacts both to “British Pound” and “livre sterling”).For visual clarity, we indicate changes that clear a small threshold with the∗*character (the changes in activity when the system is processing the translation of a source sentence tend to be small).",
+                "position": 2489
+            },
+            {
+                "img": "https://arxiv.org/html/2509.26507/x7.png",
+                "caption": "Figure 13:Sparse updates to synapses related to meaningful concepts stem from sparse neuronal activations. BDH-GPU maintains in its recurrent state a “currency synapse” (a concept naturally present in the Europarl corpus, see also Fig.12). The synapse is updated using a Hebbian learning rule when activity inyyactivations at a preceding layer (4 in the example) leads to firing of neuronxxin the next layer (5).",
+                "position": 2493
+            },
+            {
+                "img": "https://arxiv.org/html/2509.26507/fig12av2.png",
+                "caption": "Figure 14:Neurons in BDH-GPU are less active (signal is sparser) when the input is predictable. The input sequence started with a fixed1313-letter warm-up sequence, followed by88repetitions of an88-letter random word (“fact”), with the same pattern repeating every13+8⋅8=7713+8\\cdot 8=77letters. (a) Fraction of neurons with non-zero entryyt,ly_{t,l}in different layersll, with fact memorization effect noted through increased activation level in layer22. The activation in layer22has4.0%−7.5%4.0\\%-7.5\\%non-zero entries during memorization and approximately2.5%2.5\\%non-zero entries during repetition. (b) Detailed breakup of activation sparsity in layer22, with neurons bucketed into equal fractions by their RoPE phase:freq​0∈[1,4]\\textrm{freq}0\\in[1,4],freq​1∈[4,16]\\textrm{freq}1\\in[4,16],freq​2∈[16,64]\\textrm{freq}2\\in[16,64],…\\ldots,freq​7∈[16384,65536]\\textrm{freq}7\\in[16384,65536]. The slow-acting half of the neuron population (freq​4−freq​7\\textrm{freq}4-\\textrm{freq}7) exhibits the largest amplitude ratio between peak activation during memorization and repetition phases.",
+                "position": 2509
+            },
+            {
+                "img": "https://arxiv.org/html/2509.26507/fig12v2.png",
+                "caption": "",
+                "position": 2513
+            }
+        ]
+    },
+    {
+        "header": "7Playing with the Hatchling",
+        "images": []
+    },
+    {
+        "header": "8Conclusions",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AConnection between generalization of reasoning and computational expressiveness",
+        "images": []
+    },
+    {
+        "header": "Appendix BFurther description of experiments",
+        "images": []
+    },
+    {
+        "header": "Appendix COmitted formal claims and proofs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2509.26507/x8.png",
+                "caption": "Figure 17:Non-uniform graph attention: interpretation ofE​(𝝈l,t⊙Gs)E({\\boldsymbol{\\sigma}}_{l,t}\\odot G_{s})after sparsification of graphGsG_{s}.",
+                "position": 5520
+            }
+        ]
+    },
+    {
+        "header": "Appendix DDesirable properties of a local graph dynamics for language models",
+        "images": []
+    },
+    {
+        "header": "Appendix EBDH-GPU PyTorch code listing",
+        "images": []
+    }
+]

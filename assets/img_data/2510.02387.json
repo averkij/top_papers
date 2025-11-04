@@ -1,0 +1,238 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.02387/x1.png",
+                "caption": "Figure 1:Overview of theCWMtraining stages and the model checkpoints that we release. We generally report performance of the final CWM (instruct, RL trained) model, except where otherwise stated.",
+                "position": 142
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x2.png",
+                "caption": "Figure 2:On SWE-bench Verified,CWMoutperforms open-weight models with similar parameter counts and is even competitive with much larger or closed-weight LLMs.\nThe base score forCWMis computed with a single attempt per instance (no retries, majority voting, or parallel candidates), averaged over multiple runs to reduce variance.\nFor “Test Time Scaling”, we generate multiple candidates in parallel and then submit one patch based on ranking.\nThe “Test Time Scaling” score for GPT-oss models ishighreasoning budget, while the lower score islow.\n(*: GPT-5 and GPT-oss use a custom subset of477477problems, whileCWMis evaluated on the full set of500500problems.)",
+                "position": 167
+            }
+        ]
+    },
+    {
+        "header": "2Code world model datasets",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.02387/x3.png",
+                "caption": "Figure 3:CWM format for Python traces. Given a source code context and a marker of the trace starting point,CWMpredicts a series of stack frames representing the Program states and the actions (executed code).",
+                "position": 186
+            }
+        ]
+    },
+    {
+        "header": "3Examples of code world modeling",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.02387/x4.png",
+                "caption": "(a)CWMarchitecture: GQA with alternating local (8k8\\text{\\,}\\mathrm{k}) and dynamic global (131k131\\text{\\,}\\mathrm{k}) sliding window attention.",
+                "position": 884
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x4.png",
+                "caption": "(a)CWMarchitecture: GQA with alternating local (8k8\\text{\\,}\\mathrm{k}) and dynamic global (131k131\\text{\\,}\\mathrm{k}) sliding window attention.",
+                "position": 887
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x5.png",
+                "caption": "(b)Overview of theCWMtraining and inference types for inputs and outputs.",
+                "position": 892
+            }
+        ]
+    },
+    {
+        "header": "4CWM: architecture, pre-training, and scaling laws",
+        "images": []
+    },
+    {
+        "header": "5Post-training: SFT, RL algorithms and environments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.02387/x6.png",
+                "caption": "Figure 7:SWE RL design. An agent solves software engineering tasks end-to-end through long-horizon agent-environment interactions via reasoning and tool use (up to 128 turns and131k131\\text{\\,}\\mathrm{k}context size). SWE RL employs a minimal toolset:bashas the core, withedit,create, andsubmitas lightweightbashplugins. The reward combines hidden test outcomes with patch similarity, where the similarity reward is applied when tests fail to provide auxiliary learning signals.",
+                "position": 1197
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x7.png",
+                "caption": "Figure 8:SWE RL interaction example.\nThe agent interacts extensively with the repository sandbox through reasoning, exploration, editing, and test execution, submitting a final patch usinggit diffalong with a summary.",
+                "position": 1235
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x8.png",
+                "caption": "Figure 9:SWE RL self-bootstrapping. Starting from a pre-RL checkpoint, we iteratively perform RL, rejection-sample high-quality reasoning traces, and feed them back into SFT. This process improves data quality and format adherence across iterations, raising success rates, and providing stronger initialization for joint RL.",
+                "position": 1254
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x9.png",
+                "caption": "Figure 10:Prompt template for math (left path) and competitive programming (right path) RL tasks.",
+                "position": 1275
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x10.png",
+                "caption": "Figure 11:Example interaction for the agentic coding RL environment. The agent uses reasoning and tools to solve competitive programming problems. Before generating a final solution, the agent summarizes the interaction.",
+                "position": 1322
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x11.png",
+                "caption": "Figure 12:Async RL systems overview. Worker nodes generate trajectory batches from multiple RL environments and send them to trainer nodes via a transfer queue. Trainer nodes form training batches either from worker-provided data or the rehearsal mix, packing trajectories up to the maximum context length for a single gradient update. Environment execution and verification can occur locally on worker nodes or remotely on another cluster or in the cloud.",
+                "position": 1376
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x12.png",
+                "caption": "Figure 13:Length reward scheduling for RL training. The decaying thresholdδ\\deltastarts at8k8\\text{\\,}\\mathrm{k}at the start of training and linearly increases to its64k64\\text{\\,}\\mathrm{k}limit over10 00010\\,000steps.",
+                "position": 1433
+            }
+        ]
+    },
+    {
+        "header": "6Code and infrastructure",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.02387/x13.png",
+                "caption": "Figure 14:Overview of how agents interact with RL environments to produce trajectories.",
+                "position": 1544
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x14.png",
+                "caption": "Figure 15:InCWM-RL, model weights can be updated at any time on the worker side: between trajectories, within a trajectory between steps, or even during token generation. Compared to traditional RL, this removes all synchronization overhead, maximizing worker throughput while minimizing idle time. In exchange for never blocking inference, we accept that trajectories will potentially use mixed weights, though frequent model updates ensure that generations remain reasonably on-policy. Different workers may not update their weights at the same time: the system waits for each worker to signal readiness before sending new weights to avoid memory overload.",
+                "position": 1600
+            }
+        ]
+    },
+    {
+        "header": "7Experimental results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.02387/x15.png",
+                "caption": "Figure 16:SWE-bench Verified pass@1 scores.CWMachieves best-in-class performance with and without test-time-scaling (tts), achieving65.8%65.8\\text{\\,}\\mathrm{\\char 37\\relax}and53.9%53.9\\text{\\,}\\mathrm{\\char 37\\relax}respectively. Note that GPT-oss scores are computed with respect to a limited subset of477477out of500500problems.",
+                "position": 1695
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x16.png",
+                "caption": "(a)",
+                "position": 1708
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x16.png",
+                "caption": "(a)",
+                "position": 1711
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x17.png",
+                "caption": "(b)",
+                "position": 1716
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x18.png",
+                "caption": "(a)",
+                "position": 2461
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x18.png",
+                "caption": "(a)",
+                "position": 2464
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x19.png",
+                "caption": "(b)",
+                "position": 2469
+            }
+        ]
+    },
+    {
+        "header": "8Transparency, Risks & Limitations",
+        "images": []
+    },
+    {
+        "header": "9Conclusion",
+        "images": []
+    },
+    {
+        "header": "Authors: Meta FAIR CodeGen Team",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "10Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "11CWMExamples",
+        "images": []
+    },
+    {
+        "header": "12RL algorithm",
+        "images": []
+    },
+    {
+        "header": "13Activ image-building pipeline",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.02387/x20.png",
+                "caption": "Figure 13.29:Activ image building pipeline for a single repository. After cloning from GitHub, the repository’s GitHub Actions workflows and pytestconftest.pyfiles (in Python repositories) are modified and copied into the outer Docker (or virtual machine) for isolated CI execution viaact. Modified workflow jobs are executed in parallel within individual containers, until thecontainer_idand built-environment state are captured from the target container that holds repository dependencies. Framework executability detection precedes capture to ensure targeting the correct container: for pytest repositories, this occurs implicitly when injectedconftest.pycode executes within a session-scoped fixture, with an optional function-scoped fixture available for Python execution tracing. Non-Python repositories use modified workflow steps to verify framework executability (such asJest) before capture. Upon successful capture, an early exit is triggered and the resulting container is committed and pushed for standalone execution.",
+                "position": 6765
+            }
+        ]
+    },
+    {
+        "header": "14Hyper-parameter scaling laws",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.02387/assets/hyperparams_vs_flops_gqa.png",
+                "caption": "Figure 14.30:Optimal range for batch size and learning rate across scales is quite large. However going beyond that range leads to rapidly degrading performance.",
+                "position": 6808
+            }
+        ]
+    },
+    {
+        "header": "15RL data decontamination",
+        "images": []
+    },
+    {
+        "header": "16Mathematical expression comparison for RL",
+        "images": []
+    },
+    {
+        "header": "17Prompting guide",
+        "images": []
+    },
+    {
+        "header": "18Formal mathematics datamix",
+        "images": []
+    },
+    {
+        "header": "19RULER evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2510.02387/x21.png",
+                "caption": "(a)Percentage of trajectories where SWE RL performs tests on at least one turn increases over the course of RL training.",
+                "position": 7222
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x21.png",
+                "caption": "(a)Percentage of trajectories where SWE RL performs tests on at least one turn increases over the course of RL training.",
+                "position": 7225
+            },
+            {
+                "img": "https://arxiv.org/html/2510.02387/x22.png",
+                "caption": "(b)SWE RL learns to localize the relevant files over the course of RL training.",
+                "position": 7230
+            }
+        ]
+    },
+    {
+        "header": "20Agent capabilities learnt during RL training",
+        "images": []
+    }
+]
