@@ -1,0 +1,163 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05081/x1.png",
+                "caption": "",
+                "position": 129
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05081/x2.png",
+                "caption": "Figure 2:Comparison of KV Cache Management.(a)Self Forcing[huang2025self]adopts a FIFO policy that discards the earliest tokens regardless of their importance, often losing critical context and degrading generation quality.\nIn contrast, our (b)Deep Forcingperforms selective eviction by preservingDeep Sinktokens and applying KV-cache compression, effectively mitigating visual degradation during long-horizon generation.",
+                "position": 157
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05081/x3.png",
+                "caption": "Figure 3:Overview of Deep Forcing.(a) Deep Forcingmaintains a substantially enlarged attention sink (Deep Sink) covering approximately half the context window, combined with Participative Compression for the remaining rolling portion. Temporal RoPE adjustment aligns the sink tokens’ temporal indices with current frames to maintain temporal coherence.(b) Participative Compressioncomputes query-averaged attention scores between recent tokens and candidate tokens, selecting the top-C most important tokens to retain in the compressed cache while evicting redundant tokens.",
+                "position": 197
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Preliminaries",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05081/x4.png",
+                "caption": "Figure 4:Attention weight distribution across earlier frames.Query-averaged attention showing how the last chunk (frames 19-21) attends to earlier KV cache entries (frames 0-18). We visualize two representative attention heads from different layers—L1H1 (layer 1, head 1) and L5H10 (layer 5, head 10)—demonstrating that substantial attention is maintained across the entire context window, not just initial frames. See AppendixHfor additional heads analysis.",
+                "position": 269
+            }
+        ]
+    },
+    {
+        "header": "4Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05081/x5.png",
+                "caption": "Figure 5:Ablation study on Deep Sink depth.We evaluate the effect of sink depth on video quality using Aesthetic Drift (↓\\downarrow) and Overall Consistency (↑\\uparrow) metrics on 50-second videos from the first 21 prompts in MovieGen[polyak2024movie].",
+                "position": 306
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05081/x6.png",
+                "caption": "Figure 6:Qualitative ablation results over 30-second generation:Comparison of Self Forcing (SF)[huang2025self], SF with Deep Sink (SF+DS), and SF with both Deep Sink and Participative Compression (Deep Forcing). Baseline SF exhibits severe color drift. SF+DS improves stability but shows residual artifacts. Deep Forcing maintains consistent visual quality.",
+                "position": 1195
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05081/x7.png",
+                "caption": "Figure 7:Visualization of Top-CCtoken selection.For each example, Frame 37(middle)shows the Top-CCtokens selected for generating Frame 82(right). Yellow highlights indicate the spatial locations of tokens chosen as Top-CC. Our method effectively identifies and preserves regions that are critical for maintaining contextual coherence during subsequent generation.",
+                "position": 1381
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05081/x8.png",
+                "caption": "Figure 8:Qualitative results on 30-second videos.Frame-by-frame comparison across different methods for two representative prompts. Deep Forcing (training-free) achieves temporal consistency and visual quality comparable to training-based baselines (CausVid[yin2025slow], Self Forcing[huang2025self], LongLive[yang2025longlive], Rolling Forcing[liu2025rolling]) while generating more dynamic content with greater subject consistency.",
+                "position": 1402
+            }
+        ]
+    },
+    {
+        "header": "Appendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05081/x9.png",
+                "caption": "Figure 9:Qualitative results on different Attention Sink.The result shows that Deep Sink substantially outperforms both LongLive-style[yang2025longlive]and Rolling Forcing-style[liu2025rolling]attention sinks.",
+                "position": 1411
+            }
+        ]
+    },
+    {
+        "header": "AThe Tale of Three Sinks",
+        "images": []
+    },
+    {
+        "header": "BQualitative Results on Different Sink Size",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05081/x10.png",
+                "caption": "Figure 10:Qualitative comparison of different sink sizes on 60-second videos.As the sink size decreases, degradation becomes more severe. Once the sink size exceeds 10 frames, degradation is substantially reduced.",
+                "position": 1503
+            }
+        ]
+    },
+    {
+        "header": "CParticipative Compression Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05081/x11.png",
+                "caption": "Figure 11:Attention weight consistency across diffusion timesteps.Query-averaged attention weights showing how each key frame is attended when generating the last chunk (frames 19–21) at different denoising timesteps. The consistent attention patterns across timesteps (1000, 750, 500, 250, and the final clean KV cache) demonstrate that Top-CCtokens selected at the initial timestep (t=1000t=1000) remain valid and contextually relevant throughout the entire denoising process.",
+                "position": 1544
+            }
+        ]
+    },
+    {
+        "header": "DDenoising Query Is Not Just Random Noise",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05081/x12.png",
+                "caption": "Figure 12:Qualitative comparison: Random Top-CCvs. Denoising Query Top-CC.Gaussian random selection causes severe artifacts during compression - faces abruptly rotate, heads appear floating in mid-air, and random context drift occurs, resulting in incoherent scene transitions. In contrast, denoising query-based selection maintains subject consistency with natural emergent camera movements and preserves contextual coherence throughout the generation.",
+                "position": 1599
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05081/x13.png",
+                "caption": "Figure 13:Token-wise Top-CCselection frequency heatmap during 1-minute generation.Color intensity ranges from white (rarely selected) todark purple(frequently selected as Top-CC), indicating how often each token is reused throughout the generation.\nThe x-axis spans tokens 0–32,760, where 0–15,600 are Deep Sink tokens, 15,600–28,080 are candidates for compression, and 28,080+ are recent tokens. Gaussian random selection (top) distributes selections uniformly across candidate tokens, whereas denoising query-based selection (bottom) concentrates heavily on specific semantically important tokens—particularly those immediately after the sink boundary—that effectively bridge established and newly formed context.",
+                "position": 1602
+            }
+        ]
+    },
+    {
+        "header": "EFPS measurements",
+        "images": []
+    },
+    {
+        "header": "FMore Qualitative Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05081/x14.png",
+                "caption": "Figure 14:Qualitative results on 30-second videos.Frame-by-frame comparison across different methods for two representative prompts. Deep Forcing (training-free) achieves temporal consistency and visual quality comparable to training-based baselines (CausVid[yin2025slow], Self Forcing[huang2025self], LongLive[yang2025longlive], Rolling Forcing[liu2025rolling]) while generating more dynamic content with greater subject consistency.",
+                "position": 1653
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05081/x15.png",
+                "caption": "Figure 15:Qualitative results on 60-second videos.Frame-by-frame comparison across different methods for two representative prompts. Deep Forcing (training-free) achieves temporal consistency and visual quality comparable to training-based baselines (CausVid[yin2025slow], Self Forcing[huang2025self], LongLive[yang2025longlive], Rolling Forcing[liu2025rolling]) while generating more dynamic content with greater subject consistency.",
+                "position": 1656
+            }
+        ]
+    },
+    {
+        "header": "GUser Study Protocol",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05081/x16.png",
+                "caption": "Figure 16:Attention weight distribution across earlier frames.Query-averaged attention showing how the last chunk (frames 19-21) attends to earlier KV cache entries (frames 0-18). Each frame consists of 1,560 tokens (spatially arranged latent patches). We visualize multiple attention heads from different layers, demonstrating that substantial attention to intermediate tokens is consistent across layers and heads.",
+                "position": 1682
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05081/x17.png",
+                "caption": "Figure 17:Example of the user interface for the user study.",
+                "position": 1685
+            }
+        ]
+    },
+    {
+        "header": "HAdditional Attention Visualization",
+        "images": []
+    }
+]

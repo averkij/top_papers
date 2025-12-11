@@ -1,0 +1,101 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Preliminaries",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.01715/x1.png",
+                "caption": "Figure 1:Overview ofDiG-Flowand integration of theDiG-Block.(a)We attach theDiG-Blockin the pretrained VLM backbone. Observations are projected into a shared discrepancy space (obs proj.), while ground-truth (for training) or predicted actions (for inference) are mapped into the same space (act proj.).\nFrom these two streams, the block estimates a transport-aware discrepancyDDand converts it into a gateg=ϕ​(D)g=\\phi(D), which softly modulates the backbone features before they are passed to the flow-matching action head.\nThe flow-matching head produces action trajectories from noise as in standard VLA models, and theDiG-Refinemodule can apply a small number of refinement steps entirely within the action head to further polish the predicted actions.(b)Given input embeddings, the backbone first applies standard attention.\nThe post-attention features are then normalized and fed toDiG-Block, which uses the act/obs projections to computeD​(μH,μZ)D(\\mu_{H},\\mu_{Z})and a gategg, and performs a gated residual update.\nThis design allowsDiG-Flowto modulate the high-level representation using discrepancy signals from actions, while keeping the pretrained backbone architecture and attention blocks intact.",
+                "position": 210
+            }
+        ]
+    },
+    {
+        "header": "4Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.01715/x2.png",
+                "caption": "Figure 2:Discrepancy-guided gating at training and inference time.Left (training).Observation embeddingshobsh_{\\mathrm{obs}}and ground-truth action embeddingszgtz^{\\mathrm{gt}}define empirical distributions(μH,μZ)(\\mu_{H},\\mu_{Z}).\nThe discrepancyD​(μH,μZ)D(\\mu_{H},\\mu_{Z})is mapped to a gateg=ϕ​(D)g=\\phi(D), which modulates a residual update onhobsh_{\\mathrm{obs}}and reweights the flow-matching loss via the gated objectiveJ​(θ)=𝔼​[g​ℓ​(θ)]J(\\theta)=\\mathbb{E}[g\\,\\ell(\\theta)].Right (inference).The same mechanism is applied using encoded model predictionsz1,…,z^z_{1},\\ldots,\\hat{z}instead of ground-truth actions.\nThe gate is computed from the discrepancy between observation embeddings and predicted action embeddings and is then used either once or multiple steps inside the flow-matching head.",
+                "position": 366
+            }
+        ]
+    },
+    {
+        "header": "5Theoretical Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.01715/x3.png",
+                "caption": "Figure 3:DiG-Flowdetects and suppresses shortcut learning through transport-guided gating.Flow matching transforms noise into actions, and multiple solutions can achieve low training loss. Some of these solutions correspond to semantically meaningful alignments between observations and actions (bluedistribution), while others exploit spurious correlations or shortcuts (reddistribution).DiG-Flowmeasures the Wasserstein distanceDDbetween observation and action features to distinguish these pathways. The gateg=ϕ​(D)g=\\phi(D)selectively modulates learning:Green path(DlowD_{\\text{low}}): semantically aligned features with low transport distance receive strong gates, reinforcing robust behavior;Yellow path(DmidD_{\\text{mid}}): intermediate features receive moderate gating;Red path(DhighD_{\\text{high}}): shortcut-like patterns with high transport distance are down-weighted, discouraging spurious solutions.\nThis geometric reweighting complements the flow-matching loss and helps steer optimization toward representations that remain stable under distribution shift. In this way,DiG-Flowpushes more intelligence toward the foundation model, making VLAs generate more robust actions for general manipulation.",
+                "position": 659
+            }
+        ]
+    },
+    {
+        "header": "6Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.01715/x4.png",
+                "caption": "Figure 4:(a)Real robot hardware setup (single-arm + dexterous hand.(b)Examples of real robot tasks. The two rows correspond to the two camera views.",
+                "position": 1180
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01715/x5.png",
+                "caption": "Figure 5:Real robot rollouts on four manipulation tasks.Each row shows a successful execution byπ0.5\\pi_{0.5}-DiG from left to right.(a)Stack-Bowls: the robot sequentially grasps and stacks three bowls into a stable tower.(b)Spray-Plant: the robot picks up a spray bottle and waters the plant along its foliage.(c)Wipe-Whiteboard: the robot wipes away pen marks on the board using a cloth.(d)Sort-Into-Drawer: the robot picks and places three objects into a drawer, a long-horizon task that compounds errors across steps.\nThese qualitative rollouts illustrate thatDiG-Flowenables stable multi-step behaviours across diverse contact-rich settings.",
+                "position": 1223
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01715/x6.png",
+                "caption": "Figure 6:Unseen and interfered real-world settings.We evaluate robustness under(a)Background Shifts, where table textures, cloths, and distractor objects are changed for Stack-Bowls and Sort-Into-Drawer, and(b)Human Interference, where a human hand moves the plant or writes on the whiteboard during wiping.\nThese perturbations introduce visual and dynamic distribution shifts beyond the training data and correspond to the robustness results in Table5.",
+                "position": 1304
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01715/fig/adamu-setup.jpg",
+                "caption": "Figure 7:High-DoF humanoid setup.Our 31-DoF humanoid platform with dual dexterous hands and an actively controlled head. The head mounts dual RGB cameras, while the torso and arms provide upper-body motion. The task is to clear 1-3 objects from the table into the box. This setting requires the policy to jointly coordinate head, body, and hands, rather than controlling only a low-DoF gripper from a fixed camera.",
+                "position": 1342
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01715/x7.png",
+                "caption": "Figure 8:Egocentric active-view rollouts.Example sequence from the head-mounted camera during a clean-up episode. The humanoid first adjusts its viewpoint to obtain a clear observation of the workspace, then successively grasps objects with its dexterous hands and places them into the box.DiG-Flowhelps maintain robust observation–action alignment under camera motion and self-occlusions.",
+                "position": 1353
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01715/x8.png",
+                "caption": "Figure 9:Effect of refinement stepsNrefineN_{\\text{refine}}on LIBERO.We vary the number of refinement iterations at inference time while keeping the training setup fixed.\nEven without refinement (Nrefine=0N_{\\text{refine}}{=}0), the discrepancy-guided flow model already surpasses the backbone policy. Adding a small number of refinement steps further improves performance and quickly saturates aroundNrefine=3N_{\\text{refine}}{=}3.",
+                "position": 1562
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01715/x9.png",
+                "caption": "Figure 10:Hyperparameter sensitivity ofDiG-Flow.(a)Success rate as a function of the number of sliced projectionsKKused for approximating the Wasserstein discrepancy.\nPerformance improves steadily from very smallKKand saturates onceK≈28K\\approx 28–3232, indicating that a moderate number of projections is sufficient for a stable transport estimate.(b)Joint effect of the residual strengthλ\\lambda(in Eq.11) and the temperatureτ\\tauing=max⁡{gmin,exp⁡(−τ​D)}g=\\max\\{g_{\\min},\\exp(-\\tau D)\\}.\nWe observe a broad plateau around(λ,τ)≈(0.4,1.0)(\\lambda,\\tau)\\approx(0.4,1.0)and an elongated ridge roughly followingλ​τ≈0.4\\lambda\\tau\\approx 0.4, showing that the two hyperparameters jointly control an effective gating strength while still providing some flexibility: increasingλ\\lambdacan be partially compensated by decreasingτ\\tau, and vice versa, but moving too far from the ridge degrades performance.",
+                "position": 1606
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01715/x10.png",
+                "caption": "Figure 11:Dynamics of the transport discrepancyD​(μH,μZ)D(\\mu_{H},\\mu_{Z})during training.We plot the average slicedW22W_{2}^{2}between observation and action embeddings over training\niterations (shaded region indicates variability across batches). The cost decreases steadily in the\nearly phase and then stabilizes in a medium range, instead of collapsing to zero, matching the\nintended role ofDDas a discriminative geometric signal rather than a pure minimization target.",
+                "position": 1634
+            }
+        ]
+    },
+    {
+        "header": "7Conclusions and Limitations",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "8Full Proofs and Further Discussions",
+        "images": []
+    }
+]

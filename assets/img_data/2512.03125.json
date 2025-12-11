@@ -1,0 +1,258 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.03125/x1.png",
+                "caption": "Figure 1:(a) illustrates catastrophic forgetting during naive sequential instruction tuning. Continual instruction tuning starts with the Chameleon[3]model on tasks ScienceQA→\\rightarrowTextVQA→\\rightarrowImageNet→\\rightarrowGQA→\\rightarrowVizWiz. “Start” refers to the performance immediately after the model has been tuned on a task, while “End” denotes performance after completing all tasks. A larger gap between the two bars indicates more severe forgetting.\n(b) visualizes forgetting in both multimodal generation tasks (inred, representing inter-modal forgetting) and multimodal understanding tasks (ingreen, representing intra-modal forgetting). Our proposed MoDE mitigates both types of forgetting, preserving performance across modalities.",
+                "position": 128
+            }
+        ]
+    },
+    {
+        "header": "2Related work",
+        "images": []
+    },
+    {
+        "header": "3Inter-modal Catastrophic Forgetting in UMGMs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.03125/x2.png",
+                "caption": "Figure 2:Inter-modal catastrophic forgetting during continual instruction tuning across three VQA tasks. The pre-trained UMGM serves as the upper bound for image generation quality. CLIP scores under each sample reflect text-image alignment in CLIP feature space.Red bounding boxeshighlight regions with degraded image quality and low CLIP scores, indicating increasing misalignment between prompts and generated images. For instance, the image generated for the prompt “A photo of a car” depicts a building instead of a car (VQA task #3).",
+                "position": 203
+            }
+        ]
+    },
+    {
+        "header": "4Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.03125/x3.png",
+                "caption": "Figure 3:An autoregressive UMGM with our proposed MoDE integrated into its linear layers (MLPs).V-Adapter(Visual LoRA, in the light blue box): LoRA specialized for both the generation and understanding of image tokens.T-MoE Adapters(Text Mixture-of-Experts LoRA, in the light brown box): MoE-LoRA designed for text tokens, supporting continual learning of multimodal understanding tasks.T-routercomputes the routing weightsgj​(x)g_{j}(x)that determine how much each expert LoRA contributes for a given text token.\nThe circled “+” symbol denotes addition.\nDuring continual instruction tuning, the T-MoE primarily updates for text answers, while the V-Adapter handles image tokens. To preserve the model’s image generation capability and mitigate inter-modal forgetting, we apply a knowledge distillation loss from the original (teacher) UMGM to the new (student) model’s V-Adapter.",
+                "position": 289
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.03125/x4.png",
+                "caption": "Figure 4:Qualitative results of image generation on the Chameleon[3]model. Our method generates more visually coherent and faithful images compared to other baselines (e.g., the realistic dog in the first row, steam in the second row). Additional examples are provided in AppendixC.",
+                "position": 696
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "7Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ATheoretical Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix BModality gradient conflict",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.03125/x5.png",
+                "caption": "Figure 5:Cosine distance distribution between text and image modality gradients in modality-coupled MoE LoRA[44]on the ScienceQA[58]dataset. The y-axis shows the proportion of parameters corresponding to each cosine distance. Lower cosine distance values indicate greater gradient conflict, with 0 denoting orthogonal update directions.",
+                "position": 1459
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/output_only_mode.png",
+                "caption": "Figure 6:Cosine distance distribution between text and image modality gradients in MoDE. Lower cosince distance values indicate greater gradient conflict, with 0 denoting orthogonal directions. In MoDE, all parameters exhibit perfectly orthogonal gradients, confirming the absence of modality gradient conflict.",
+                "position": 1465
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAdditional Qualitative Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/dog/zeroshot.png",
+                "caption": "Table 4:Full qualitative results of our MoDE compared to other baseline methods.",
+                "position": 1477
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/cup/zeroshot.png",
+                "caption": "",
+                "position": 1520
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/barn/zeroshot.png",
+                "caption": "",
+                "position": 1524
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/marigold/zeroshot.png",
+                "caption": "",
+                "position": 1528
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/dog/seqlora.png",
+                "caption": "",
+                "position": 1539
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/cup/seqlora.png",
+                "caption": "",
+                "position": 1543
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/barn/seqlora.png",
+                "caption": "",
+                "position": 1547
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/marigold/seqlora.png",
+                "caption": "",
+                "position": 1551
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/dog/modeltailor.png",
+                "caption": "",
+                "position": 1562
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/cup/modeltailor.png",
+                "caption": "",
+                "position": 1566
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/barn/modeltailor.png",
+                "caption": "",
+                "position": 1570
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/marigold/modeltailor.png",
+                "caption": "",
+                "position": 1574
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/dog/dualprompt.png",
+                "caption": "",
+                "position": 1585
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/cup/dualprompt.png",
+                "caption": "",
+                "position": 1589
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/barn/dualprompt.png",
+                "caption": "",
+                "position": 1593
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/marigold/dualprompt.png",
+                "caption": "",
+                "position": 1597
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/dog/moe.png",
+                "caption": "",
+                "position": 1608
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/cup/moe.png",
+                "caption": "",
+                "position": 1612
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/barn/moe.png",
+                "caption": "",
+                "position": 1616
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/marigold/moe.png",
+                "caption": "",
+                "position": 1620
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/dog/clmoe.png",
+                "caption": "",
+                "position": 1631
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/cup/clmoe.png",
+                "caption": "",
+                "position": 1635
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/barn/clmoe.png",
+                "caption": "",
+                "position": 1639
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/marigold/clmoe.png",
+                "caption": "",
+                "position": 1643
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/dog/ours.png",
+                "caption": "",
+                "position": 1654
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/cup/ours.png",
+                "caption": "",
+                "position": 1658
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/barn/ours.png",
+                "caption": "",
+                "position": 1662
+            },
+            {
+                "img": "https://arxiv.org/html/2512.03125/plots/concept/Fig4-qual_results/marigold/ours.png",
+                "caption": "",
+                "position": 1666
+            }
+        ]
+    },
+    {
+        "header": "Appendix DImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix EAdditional Ablation Results",
+        "images": []
+    },
+    {
+        "header": "Appendix FMultimodal Understanding Forgetting",
+        "images": []
+    },
+    {
+        "header": "Appendix GAdditional Continual Learning Results",
+        "images": []
+    },
+    {
+        "header": "Appendix HComputational Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix IBaseline Settings",
+        "images": []
+    },
+    {
+        "header": "Appendix JEthics Statement",
+        "images": []
+    },
+    {
+        "header": "NeurIPS Paper Checklist",
+        "images": []
+    }
+]

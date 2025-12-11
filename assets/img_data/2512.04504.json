@@ -1,0 +1,339 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/great_demo.jpg",
+                "caption": "Figure 1:Generated results of UltraImage.Starting from the base Qwen-Image model trained at1328​p1328\\text{p}resolution, UltraImage can generate high-quality images up to6​K×6​K6\\text{K}\\times 6\\text{K}without any low-resolution guidance, demonstrating its extreme extrapolation capability. All prompts used in this paper are provided in the Appendix.",
+                "position": 108
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Background",
+        "images": []
+    },
+    {
+        "header": "3Problem Setting and Challenges",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/flux_1024.jpg",
+                "caption": "Figure 2:Challenges of resolution extrapolation in image diffusion transformers.Top row: Flux (training resolution with204822048^{2}). Bottom row: Qwen-Image (training resolution1328​p1328\\text{p}). Both models exhibit typical failure modes:content repetitionandquality degradationat higher resolutions.",
+                "position": 187
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/flux_3200.jpg",
+                "caption": "",
+                "position": 212
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/flux_4096.jpg",
+                "caption": "",
+                "position": 216
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/qwen_1024.jpg",
+                "caption": "",
+                "position": 222
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/qwen3200.jpg",
+                "caption": "",
+                "position": 226
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/qwen4096.jpg",
+                "caption": "",
+                "position": 230
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/3200_1328.jpg",
+                "caption": "Figure 3:Cause of content repetition.Left:(a) Height extrapolation baselines. (b) High-frequency interpolation blurs local textures. (c) The mid-banddominant frequency, whose period aligns with the training heighthh, governs global structure and introduces repetition. (d) Low-frequency components have minimal effect.Right:Validation: repetition appears when the extrapolated heightHH(e) exceeds the dominant periodTkhT_{k}^{h}, and disappears whenH≤TkhH\\leq T_{k}^{h}(f,g).",
+                "position": 243
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/3200_1328_0.jpg",
+                "caption": "",
+                "position": 292
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/3200_1328_8.jpg",
+                "caption": "",
+                "position": 296
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/3200_1328_20.jpg",
+                "caption": "",
+                "position": 300
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/3200_1328_riflex_100.jpg",
+                "caption": "",
+                "position": 304
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/3200_1328_riflex_200.jpg",
+                "caption": "",
+                "position": 308
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/3200_1328_riflex_300.jpg",
+                "caption": "",
+                "position": 312
+            }
+        ]
+    },
+    {
+        "header": "4Understanding and Solving Repetition from Positional Encoding",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/ntk.jpg",
+                "caption": "Figure 4:Failure modes of existing positional extrapolation.NTK suffers from repetition during extrapolation, while PI reduces it but causes over-smoothed textures. In contrast, our method mitigates repetition without sacrificing image fidelity by correctly identifying and adjusting the relevant frequency components.",
+                "position": 373
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/pi.jpg",
+                "caption": "",
+                "position": 398
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/challenge/riflex_ours.jpg",
+                "caption": "",
+                "position": 402
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Fig4/relative_distance_comparison-riflex.jpg",
+                "caption": "Figure 5:Cause of quality degradation.Previous interpolation of a single high frequency (HF) in Fig.3b leads to similar quality loss during extrapolation. (a) Comparing attention maps (b) pre- and (c) post-interpolation, the distribution becomes significantly flattened. Sharpening the attention in (d) restores the lost details, confirming that the degradation originates from reduced attention concentration.",
+                "position": 431
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Fig4/89.jpg",
+                "caption": "",
+                "position": 461
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Fig4/089.jpg",
+                "caption": "",
+                "position": 465
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Fig4/089_1_6.jpg",
+                "caption": "",
+                "position": 469
+            }
+        ]
+    },
+    {
+        "header": "5Understanding and Solving Quality Degradation in Attention",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Fig5/2_1_0_baseline.jpg",
+                "caption": "Figure 6:Trade-off in attention concentration.Increasing the focus factorλ\\lambda(e.g., 1.1) during extrapolation sharpens attention and enhances details, but further increase (e.g., 1.2) leads to spatial inconsistencies despite higher sharpness.",
+                "position": 635
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Fig5/2_1_1.jpg",
+                "caption": "",
+                "position": 660
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Fig5/2_1_2.jpg",
+                "caption": "",
+                "position": 664
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Fig6/3_local_1_23.jpg",
+                "caption": "Figure 7:Effects of the focus factor on different attention patterns.A single factorλ\\lambdamay under-sharpen local attention (top) but over-suppress global attention (bottom), disrupting structural coherence and motivating adaptive focus for each pattern.",
+                "position": 671
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Fig6/local_attnmap.jpg",
+                "caption": "",
+                "position": 702
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Fig6/3_global_1_23.jpg",
+                "caption": "",
+                "position": 713
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Fig6/global_attnmap.jpg",
+                "caption": "",
+                "position": 717
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Fig9/4096_figure9_extrapolation.jpg",
+                "caption": "Figure 8:Ablation studies.Our RDFC effectively mitigates image repetition without compromising quality, while adaptive attention concentration further enhances visual fidelity. See the Appendix for quantitative ablation studies.",
+                "position": 888
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Fig9/4096_figure9_standard.jpg",
+                "caption": "",
+                "position": 913
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Fig9/4096_figure9_ours.jpg",
+                "caption": "",
+                "position": 917
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/quantitive.jpg",
+                "caption": "Figure 9:Qualitative comparison across three generation scenarios.Our method outperforms baselines across all tasks by delivering high visual quality while mitigating content repetition.",
+                "position": 1139
+            }
+        ]
+    },
+    {
+        "header": "6Experiments",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "8Related Work",
+        "images": []
+    },
+    {
+        "header": "9Experiment Setup",
+        "images": []
+    },
+    {
+        "header": "10More Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/func.jpg",
+                "caption": "Figure 10:Visualization ofλ\\lambdawith differentppin Eq. (11)., withλmin=1.0\\lambda_{\\min}=1.0andλmax=1.3\\lambda_{\\max}=1.3. Smallerppproduces stronger and broader attention focusing, while largerppresults in weaker concentration.",
+                "position": 1919
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/x1.png",
+                "caption": "Figure 11:Results of UltraImage at4096×40964096\\times 4096, where training resolution is 1328p.",
+                "position": 1922
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/p_5.0.jpg",
+                "caption": "Figure 12:Ablation onpp.Smallpp(e.g.,0.20.2) causes overly concentrated attention and over-sharpening, while largepp(e.g.,5.05.0) leads to insufficient focus and degraded visual quality. An intermediate value yields the best trade-off.",
+                "position": 1925
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/p_2.0.jpg",
+                "caption": "",
+                "position": 1950
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/p_0.2.jpg",
+                "caption": "",
+                "position": 1954
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/1.0_max.jpeg",
+                "caption": "Figure 13:Ablation onλmax\\lambda_{\\max}.A smallλmax\\lambda_{\\max}(e.g.,1.11.1) yields insufficient concentration and suboptimal quality, while a large value (e.g.,1.61.6) causes over-sharpening. An intermediate setting achieves the best balance.",
+                "position": 1972
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/1.3_max.jpeg",
+                "caption": "",
+                "position": 1997
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/fig12_lamda_max_1.6.jpg",
+                "caption": "",
+                "position": 2001
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/lamda_min_1.0.jpg",
+                "caption": "Figure 14:Ablation onλmin\\lambda_{\\min}.Even a smallλmin\\lambda_{\\min}(e.g.,1.11.1) introduces structural inconsistencies, showing that not all attention patterns should be concentrated and supporting our choice to apply stronger focusing only to local patterns.",
+                "position": 2008
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/lamda_min_1.1.jpg",
+                "caption": "",
+                "position": 2033
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/lamda_min_1.2.jpg",
+                "caption": "",
+                "position": 2037
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Fig5/2_1_0_baseline.jpg",
+                "caption": "Figure 15:Ablation studies.Using a single global concentration factor produces a trade-off: small factors (e.g.,λ=1.0,1.1\\lambda=1.0,1.1) hurt visual quality, while large factors introduce structural inconsistency (e.g.,λ=1.2\\lambda=1.2), and even mild values (e.g.,λ=1.1\\lambda=1.1) cause noticeable mismatches. In contrast, our entropy-guided strategy applies weak focusing to global patterns and stronger focusing to local patterns, achieving both high visual quality and stable structure.",
+                "position": 2044
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/fig14_ours.jpg",
+                "caption": "",
+                "position": 2082
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/1.0_08.jpg",
+                "caption": "",
+                "position": 2088
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/1.1_08.jpg",
+                "caption": "",
+                "position": 2092
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/1.2_08.jpg",
+                "caption": "",
+                "position": 2096
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/ours_08.jpg",
+                "caption": "",
+                "position": 2100
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/1.0_09.jpg",
+                "caption": "",
+                "position": 2106
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/1.1_09.jpg",
+                "caption": "",
+                "position": 2110
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/1.2_09.jpg",
+                "caption": "",
+                "position": 2114
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/images/Supplementary/ours_09.jpg",
+                "caption": "",
+                "position": 2118
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/x2.png",
+                "caption": "Figure 16:Qualitative comparison in direct resolution extrapolation on Flux.Our method outperforms baselines by delivering high visual quality while mitigating content repetition.",
+                "position": 2125
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/x3.png",
+                "caption": "Figure 17:Qualitative comparison on guided resolution extrapolation.Our method outperforms baselines across by delivering high visual quality.",
+                "position": 2128
+            },
+            {
+                "img": "https://arxiv.org/html/2512.04504/x4.png",
+                "caption": "Figure 18:Qualitative comparison on guided view extrapolation.Our method outperforms baselines by delivering high visual quality while mitigating content repetition.",
+                "position": 2131
+            }
+        ]
+    },
+    {
+        "header": "11Ablation Studies",
+        "images": []
+    }
+]
