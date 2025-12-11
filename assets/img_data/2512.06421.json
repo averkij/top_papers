@@ -1,0 +1,79 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.06421/x1.png",
+                "caption": "Figure 1:(a) Training dynamics.Training curves for FlexVAR, SAR trained from scratch, and SAR initialized from a pretrained FlexVAR checkpoint. Within only a few epochs, SAR quickly surpasses the best performance of a fully-trained FlexVAR model.(b) Throughput–FID trade-off.Comparison of throughput, parameter count, and FID across representative generative model families, including Diffusion, Next-token AR, and Next-scale AR.SAR(red) attains thebest overall trade-off:\nthehighest throughput among autoregressive modelsand further imporve next-scale prediction AR model with thelowest FID across all AR baselines.",
+                "position": 115
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Preliminaries",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.06421/x2.png",
+                "caption": "Figure 2:Illustration of training supervision imbalance.Forlatent-space (top) supervision, coarse scales receive ground-truth signals that contain little semantic structure, while their corresponding training inputs are dominated by blurry upsampled artifacts. Consequently, the finest scale must reconstruct nearly all details, causing the hierarchical prediction process to collapse into a single dominant scale and preventing effective coarse-to-fine learning. We could smooth the generation trajectory bydownsampling in image space (bottom), but this causes the earliest scales to capture most semantics and scene structure already, leaving later scales to perform only mild sharpening or super-resolution, and thereby weakening the multiscale factorization of the model.",
+                "position": 226
+            },
+            {
+                "img": "https://arxiv.org/html/2512.06421/x3.png",
+                "caption": "Figure 3:Training–inference divergence caused by scale-wise supervision imbalance (Sec.3.3).Under teacher-forcing (top), the model receives ground-truth latents at all scales; when training converged, the model produces clean generated results because it is evaluated under the same idealized inputs used during training.\nAt inference (bottom), the model must condition on its own coarse-scale predictions.\nWhen generated early-scale latents are imperfect (e.g., 1×\\times1), later scales, which were trained mainly as super-resolution task when using the smoothed up/down-sample image supervision, cannot correct the semantic error, leading to a complete collapse of the generation process.",
+                "position": 234
+            },
+            {
+                "img": "https://arxiv.org/html/2512.06421/figures/hybird.jpg",
+                "caption": "Table 2:Hybrid modeling performance on ImageNet 256×\\times256.Applying MaskGIT-style prediction at the coarsest scales strengthens initial 4×\\times4 representations, but leads to degraded full-resolution FID, indicating that later scales collapse into near super-resolution refinement rather than benefiting from scale-wise autoregression.",
+                "position": 328
+            }
+        ]
+    },
+    {
+        "header": "4Self-Autoregressive Refinement",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.06421/x4.png",
+                "caption": "Figure 4:Illustration of different student forcing training schemas:(a) Teacher Forcing (TF) uses ground-truth latents at all scales during training.(b) Student Forcing (SF) uses predicted latents only, simulating test-time conditions.(c) Hybrid TF & SF applies teacher forcing at early scales and student forcing at later ones.(d) Interleave TF & SF alternates between teacher and student forcing across scales.",
+                "position": 417
+            },
+            {
+                "img": "https://arxiv.org/html/2512.06421/figures/SSR.jpg",
+                "caption": "Figure 5:Illustration of SAR.The image is encoded into multi-scale latents{fi}\\{f_{i}\\}, which condition an autoregressive generator. In the first forward pass, the model performs teacher forcing and predictsf^i(T)\\hat{f}^{(T)}_{i}at all scales. These predictions are then upsampled to form scale-shifted inputsf~i(T)\\tilde{f}^{(T)}_{i}, enabling a second forward pass that produces student-forced predictionsf^i(S)\\hat{f}^{(S)}_{i}. Teacher-forcing loss provides ground-truth supervision, while the contrastive student-forcing loss aligns student-forced outputs with their teacher-forced counterparts. Together, these two passes form the Stagger-Scale Rollout used in SAR.",
+                "position": 613
+            }
+        ]
+    },
+    {
+        "header": "5Experiment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.06421/x5.png",
+                "caption": "Figure 6:Images generated by SAR on ImageNet 256×\\times256.",
+                "position": 1260
+            },
+            {
+                "img": "https://arxiv.org/html/2512.06421/x6.png",
+                "caption": "Figure 7:Comparison of the generation process of SAR and FlexVAR.\nBoth models start from the same4×44\\times 4latent and follow identical scale schedules.\nSAR demonstrates smoother transitions and stronger error correction across scales.",
+                "position": 1267
+            },
+            {
+                "img": "https://arxiv.org/html/2512.06421/x7.png",
+                "caption": "Figure 8:Visualization of student-forcing inputs during training.We show ground-truth latents, teacher-forcing (TF) inputs, student-forcing (SF) inputs, SF predictions, and the corresponding difference maps across two consecutive rollout steps (10→1310\\!\\rightarrow\\!13and13→1613\\!\\rightarrow\\!16).",
+                "position": 1387
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    }
+]

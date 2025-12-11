@@ -1,0 +1,126 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.06628/x1.png",
+                "caption": "Figure 1:Comprehensive comparison of MIND-V against SOTA models for long-horizon robotic video generation.",
+                "position": 101
+            },
+            {
+                "img": "https://arxiv.org/html/2512.06628/x2.png",
+                "caption": "Figure 2:Overview of our hierarchical framework for long-horizon robotic manipulation video generation. Beginning in the cognitive core, the Semantic Reasoning Hub (SRH) decomposes a high-level instruction into atomic sub-tasks and plans a detailed trajectory for each. These plans are then encapsulated into our novel Behavioral Semantic Bridge (BSB), a structured, domain-invariant intermediate representation that serves as a precise blueprint for the Motor Video Generator (MVG). The MVG, a conditional diffusion model, renders photorealistic videos that strictly adhere to the kinematic constraints defined in the BSB. At inference time, Staged Visual Future Rollouts provide a “propose-verify-refine” loop for self-correction, ensuring local optimality at each stage to mitigate error accumulation.",
+                "position": 110
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.06628/x3.png",
+                "caption": "Figure 3:Architecture of the Motor Video Generator (MVG). The MVG utilizes guidance from the BSB to synthesize spatiotemporally precise videos. The process initiates with encoding the BSB’s semantic representation into the (c) Spatiotemporal Guidance Tensor, which embeds the visual features of the active agent along its planned trajectory across frames. This tensor is subsequently processed by the (b) Motion Embedding module to produce a refined motion signal (GG). Finally, this signal is injected into the (a) Latent Diffusion Transformer, conditioning each step of the denoising process to ensure the synthesized video exhibits strict fidelity to the intended motion.",
+                "position": 175
+            },
+            {
+                "img": "https://arxiv.org/html/2512.06628/x4.png",
+                "caption": "Figure 4:Physical Foresight Coherence (PFC) Reward.The PFC leverages a frozen V-JEPA2 world model to predict the latent representation of future Target frames conditioned on past Context frames. The reward is the cosine similarity between this prediction and the ground-truth target latent, which measures the video’s alignment with the world model’s learned physical dynamics.",
+                "position": 257
+            },
+            {
+                "img": "https://arxiv.org/html/2512.06628/x5.png",
+                "caption": "Figure 5:Qualitative comparison of long-horizon robotic manipulation video generation.The baseline models exhibit significant deficiencies, including logical inconsistencies, physical implausibility, and poor semantic grounding. In contrast, MIND-V successfully executes long-horizon instructions with high visual quality and physical fidelity. This validates the efficacy of our hierarchical architecture, which decouples high-level reasoning from pixel-level synthesis to ensure robust long-horizon coherence and spatiotemporal precision.",
+                "position": 355
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.06628/x6.png",
+                "caption": "Figure 6:Visualization of the SRH Planning.",
+                "position": 689
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "6Analysis of Computational Cost and Hyperparameters",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.06628/x7.png",
+                "caption": "Figure 7:Scalability of MIND-V.Total generation time (Y-axis) scales linearly with the number of sub-tasks (X-axis). Circle size represents peak VRAM, which remains constant, demonstrating the memory efficiency of our approach.",
+                "position": 891
+            },
+            {
+                "img": "https://arxiv.org/html/2512.06628/x8.png",
+                "caption": "Figure 8:Analysis of the trade-off for the number of rollout samples (KK).(Left)The performance radar chart shows that the overall performance area expands significantly up to K=3 but exhibits diminishing returns thereafter.(Right)The cost chart shows that both time and Peak VRAM increase steadily with K, with memory cost escalating significantly. K=3 (highlighted) is chosen as the optimal balance.",
+                "position": 894
+            },
+            {
+                "img": "https://arxiv.org/html/2512.06628/x9.png",
+                "caption": "",
+                "position": 897
+            }
+        ]
+    },
+    {
+        "header": "7Dataset Construction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.06628/x10.png",
+                "caption": "Figure 9:Overview of our automated BSB annotation pipeline.A VLM first extracts the target object from the language prompt, which is then used by Grounded SAM2[groundsam]to generate the (1) Object Representation (masks). Concurrently, trajectory tracking is performed on the object and gripper masks. The trajectory is partitioned based on the object’s motion to produce the (2) Decomposed Collaborative Trajectory and (3) Phase Transition Points. These components collectively form the structured BSB annotation used for SFT.",
+                "position": 1047
+            },
+            {
+                "img": "https://arxiv.org/html/2512.06628/x11.png",
+                "caption": "Figure 10:Qualitative comparison on a complex long-horizon task.The model is instructed to first place blue grapes onto a chartreuse plate, and then place a spoon into a metallic pot.(Top)The baseline model, WoW-14B[wow], exhibits a catastrophic failure in long-horizon reasoning. In Sub-task 1, the grapes levitate without being touched, a clear physical violation. In Sub-task 2, it demonstrates severe semantic grounding error by incorrectly interacting with the plate instead of the instructed spoon, resulting in a complete breakdown of logical coherence.(Bottom)In stark contrast, MIND-V successfully executes the full sequence, correctly completing both sub-tasks as instructed. This result validates the efficacy of our hierarchical architecture; the SRH’s explicit planning and the BSB’s structured guidance prevent the semantic drift and error accumulation that plague the baseline, ensuring robust execution of multi-step instructions.",
+                "position": 1053
+            },
+            {
+                "img": "https://arxiv.org/html/2512.06628/x12.png",
+                "caption": "Figure 11:Qualitative comparison on short-horizon tasks.This figure illustrates performance on two distinct single-step instructions.(Top)For “Put the mushrooms into the metal pot,” the baseline (HunyuanVideo[hunyuanvideo]) exhibits physical implausibility, with the mushroom clipping through the pot’s rim. MIND-V, in contrast, generates a physically plausible interaction.(Bottom)For the more abstract instruction “Clean the floor,” the baseline (Wan-14B[wan22]) fails to take any action, demonstrating a lack of semantic grounding. MIND-V correctly interprets the instruction, grasps the cloth, and performs a wiping motion, showcasing its superior planning and reasoning capabilities.",
+                "position": 1115
+            }
+        ]
+    },
+    {
+        "header": "8Additional Visual Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.06628/x13.png",
+                "caption": "Figure 12:GRPO post-training epoch-level dynamics.Visualization of key metrics, averaged at the end of each epoch. The reward signal shows a clear upward trend, while the KL divergence and clip fraction both exhibit stable convergence, indicating an effective and well-behaved optimization process.",
+                "position": 1135
+            },
+            {
+                "img": "https://arxiv.org/html/2512.06628/x14.png",
+                "caption": "Figure 13:Generalization to complex scenarios and diverse manipulation skills.Panel (a) demonstrates the robustness of MIND-V in out-of-distribution (OOD) scenarios. The model accurately isolates and manipulates targets in cluttered environments, such as grabbing bread from a full table or picking a dumpling, as well as in stylistically distinct scenes like picking peaches in an artistic setting. The BSB representation ensures precise control without disturbing the background fidelity. Panel (b) highlights a variety of interactive actions where the model leverages affordance-aware reasoning to execute physics-compliant interactions. This includes manipulating articulated objects like opening a cabinet or closing a microwave, as well as handling deformable materials such as folding a tablecloth.",
+                "position": 1138
+            }
+        ]
+    },
+    {
+        "header": "9Analysis of GRPO Post-Training",
+        "images": []
+    },
+    {
+        "header": "10Network Architecture Details",
+        "images": []
+    },
+    {
+        "header": "11Limitations and Future Work",
+        "images": []
+    }
+]

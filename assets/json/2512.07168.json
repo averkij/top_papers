@@ -1,0 +1,199 @@
+{
+    "paper_title": "JEPA as a Neural Tokenizer: Learning Robust Speech Representations with Density Adaptive Attention",
+    "authors": [
+        "Georgios Ioannides",
+        "Christos Constantinou",
+        "Aman Chadha",
+        "Aaron Elkins",
+        "Linsey Pang",
+        "Ravid Shwartz-Ziv",
+        "Yann LeCun"
+    ],
+    "sections": [
+        {
+            "title": "Abstract",
+            "content": "We introduce a two-stage self-supervised framework that combines the Joint-Embedding Predictive Architecture (JEPA) with a Density Adaptive Attention Mechanism (DAAM) for learning robust speech representations. Stage~1 uses JEPA with DAAM to learn semantic audio features via masked prediction in latent space, fully decoupled from waveform reconstruction. Stage~2 leverages these representations for efficient tokenization using Finite Scalar Quantization (FSQ) and a mixed-radix packing scheme, followed by high-fidelity waveform reconstruction with a HiFi-GAN decoder. By integrating Gaussian mixture-based density-adaptive gating into the JEPA encoder, the model performs adaptive temporal feature selection and discovers hierarchical speech structure at a low frame rate of 2.5~Hz. The resulting tokens (47.5 tokens/sec) provide a reversible, highly compressed, and language-model-friendly representation that is competitive with, and often more efficient than, existing neural audio codecs."
+        },
+        {
+            "title": "Start",
+            "content": "5 2 0 2 8 ] . [ 1 8 6 1 7 0 . 2 1 5 2 : r JEPA as Neural Tokenizer: Learning Robust Speech Representations with Density Adaptive Attention Georgios Ioannides1, Christos Constantinou2, Aman Chadha3, Aaron Elkins4, Linsey Pang5, Ravid Shwartz-Ziv6, and Yann LeCun6 1Carnegie Mellon University, Amazon GenAI, James Silberrad Brown Center for Artificial Intelligence 2University of Bristol, Amazon GenAI, James Silberrad Brown Center for Artificial Intelligence 3Stanford University, Amazon GenAI, James Silberrad Brown Center for Artificial Intelligence 4James Silberrad Brown Center for Artificial Intelligence 5Northeastern University 6New York University October 25, 2025 Abstract We introduce two-stage self-supervised framework that combines the Joint-Embedding Predictive Architecture (JEPA) with Density Adaptive Attention Mechanism (DAAM) for learning robust speech representations. Stage 1 uses JEPA with DAAM to learn semantic audio features via masked prediction in latent space, fully decoupled from waveform reconstruction. Stage 2 leverages these representations for efficient tokenization using Finite Scalar Quantization (FSQ) and mixed-radix packing scheme, followed by high-fidelity waveform reconstruction with HiFi-GAN decoder. By integrating Gaussian mixturebased density-adaptive gating into the JEPA encoder, the model performs adaptive temporal feature selection and discovers hierarchical speech structure at low frame rate of 2.5 Hz. The resulting tokens (47.5 tokens/sec) provide reversible, highly compressed, and language-model-friendly representation that is competitive with, and often more efficient than, existing neural audio codecs."
+        },
+        {
+            "title": "Contents",
+            "content": "1 Hybrid Discrete-Continuous Speech Representations via JEPA with Density Adaptive Attention 1.1 Overview . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 1.2 Motivation: Why JEPA for Speech? . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 2 Stage 1: Self-Supervised JEPA Encoder with DAAM 2.1 JEPA Masking Strategy . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 2.2 Density Adaptive Attention for Temporal Feature Modulation . . . . . . . . . . . . . . . . . . 2.2.1 Mathematical Formulation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 2.3 JEPA Encoder Architecture . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Work does not relate to position at Amazon. Work does not relate to position at Amazon. Work does not relate to position at Amazon. 2 2 3 3 3 4"
+        },
+        {
+            "title": "3.1 Finite Scalar Quantization (FSQ) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n3.1.1 FSQ Formulation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n3.2 Mixed-Radix Token Packing . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n3.2.1 Mixed-Radix Encoding . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n3.2.2 Efficient Iterative Computation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n3.2.3 Padding and Grouping . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n3.2.4 Decoding . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n3.2.5 Comparison to Alternatives . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\nIntegration with Language Models . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n3.2.6\n. . . . . . . . . . . . . . . . . . . . . . .\n3.2.7 Frame Rate Comparison with Neural Codecs\n3.3 HiFi-GAN Decoder . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n3.4.1 Total Loss . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .",
+            "content": "3.4 Stage 2 Training Objective 3.3.1 Decoder Architecture 4 Experimental Setup 4.1 Dataset . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4.2 Data Preprocessing . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4.3 Distributed Training . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Inference Pipeline . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4.4 5 Model Architecture and Efficiency 5.1 Parameter Counts . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5.2 Training Efficiency . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6 Evaluation Metrics 7 Discussion 7.1 Why DAAM Improves JEPA Representations . . . . . . . . . . . . . . . . . . . . . . . . . . . 8 Limitations and Future Work 9 Code Availability 10 Conclusion 6 6 6 6 7 8 8 8 9 9 9 10 10 10 11 11 11 11 11 12 13 13 13 14 14 14 14 14 15 15 15"
+        },
+        {
+            "title": "1 Hybrid Discrete-Continuous Speech Representations via JEPA",
+            "content": "with Density Adaptive Attention"
+        },
+        {
+            "title": "1.1 Overview",
+            "content": "We introduce two-stage self-supervised learning framework that combines the Joint-Embedding Predictive Architecture (JEPA) [Assran et al., 2023] with Density Adaptive Attention Mechanisms (DAAM) for learning robust speech representations. This approach decouples representation learning from reconstruction: Stage 1 employs JEPA with DAAM to learn semantic audio features through masked prediction, while Stage 2 leverages these representations for efficient tokenization via Finite Scalar Quantization (FSQ) [Mentzer et al., 2023] and high-quality reconstruction through HiFi-GAN [Kong et al., 2020]. 2 Key innovation. By integrating Density Adaptive Attention-based gating (Gaussian Mixture gating) [Ioannides et al., 2024] into the JEPA encoder, we achieve adaptive feature selection during self-supervised learning. Combined with mixed-radix packing scheme, the learned representations capture hierarchical speech structuredue to progressive downsampling from layer to layerat low frame rate of 2.5 Hz, enabling efficient speech modeling without labeled data."
+        },
+        {
+            "title": "1.2 Motivation: Why JEPA for Speech?",
+            "content": "Traditional speech codec training couples representation learning with reconstruction objectives, forcing the encoder to prioritize features that minimize waveform-level losses. This conflates two distinct goals: 1. Learning semantically meaningful representations that capture linguistic and acoustic structure. 2. Preserving perceptual quality for high-fidelity reconstruction. JEPA addresses this by separating concerns: the encoder learns to predict masked representations in latent space (Stage 1), then separate decoder learns to map these representations to audio (Stage 2). This architectural separation enables: Better representations: the encoder optimizes for semantic content rather than low-level waveform details. Efficiency: fine-tuning the encoder reduces Stage 2 training cost. Flexibility: the same encoder can support multiple downstream tasks (text-to-speech, voice conversion, automatic speech recognition, etc.). Scalability: Stage 1 can leverage large unlabeled datasets. The integration of DAAM enhances this framework by introducing adaptive attention that learns which temporal regions and features are most informative for prediction, naturally discovering speech-relevant patterns."
+        },
+        {
+            "title": "2.1 JEPA Masking Strategy",
+            "content": "The JEPA framework employs block-based temporal masking to create self-supervised learning objective. For batch of audio sequences with temporal length , binary masks {0, 1}BT are generated, where 1 indicates visible (context) regions and 0 indicates masked (target) regions. Block Masking Algorithm. Given mask ratio ρ [0, 1], minimum span length smin, and maximum span length smax, we construct masks as follows: 1. Initialize: 1BT (all positions visible). 2. For each sample {1, . . . , B}: (a) Compute target: nmask = ρ . (b) Initialize counter: nmasked 0. 3. While nmasked < nmask: (a) Sample span length: ℓ Uniform(smin, smax). (b) Sample start position: tstart Uniform(0, ℓ). (c) Compute end position: tend min(tstart + ℓ, ). (d) Set mask: m[b, t] 0 for all [tstart, tend). 3 Figure 1: The input waveform is processed by three parallel pathways: (1) an online encoder (trainable, green) that processes the full audio and feeds into predictor network (yellow) after feature-space masking with learned mask token, (2) target encoder (purple) updated via EMA that also processes the full audio to generate ztarget, and (3) masking strategy module (blue) that generates binary masks. The MSE loss is computed only on masked regions between zpredicted and ztarget (stop-gradient), with gradients backpropagating only through the online encoder and predictor. The target encoder provides stable representations without receiving gradients directly [Grill et al., 2020]. (e) Update counter: nmasked nmasked + (tend tstart). 4. Return: mask tensor m. This block masking strategy creates contiguous masked spans rather than random individual positions, forcing the model to learn longer-range temporal dependencies and semantic content. Masking hyperparameters. Mask ratio: ρ = 0.5 (50% of timesteps masked). Minimum span: smin = 2 frames. Maximum span: smax = /4 frames (adaptive to sequence length). At 2.5 Hz frame rate, this corresponds to variable spans adapted to the sequence length."
+        },
+        {
+            "title": "2.2 Density Adaptive Attention for Temporal Feature Modulation",
+            "content": "The core innovation integrating stabilized version of the original DAAM into JEPA is the DensityAdaptiveAttention module, which computes adaptive attention gates based on learned Gaussian mixture distributions. Unlike standard self-attention that computes pairwise dot-products between positions, DAAM learns to identify statistically salient temporal regions based on their distributional characteristics. 2.2.1 Mathematical Formulation For input features RBCT (batch size, channels, time), the DAAM module operates along the temporal axis. 4 Step 1: Temporal statistics. For each batch and channel, compute the mean and variance across time: µ = σ2 ="
+        },
+        {
+            "title": "1\nT",
+            "content": "T (cid:88) t=1 x:,:,t RBC1, (cid:88) (x:,:,t µ)2 RBC1. t= (1) (2) Step 2: Learnable Gaussian parameters. For Gaussian components, we maintain learnable parameters: Mean offsets: δ = [δ1, . . . , δK] RK, initialized to δk = 0. Log-scale parameters: ν = [ν1, . . . , νK] RK, initialized to νk = log(0.5). The positive scales are computed via softplus: σk = softplus(νk) + ϵ = log(1 + exp(νk)) + ϵ, with ϵ = 103 for numerical stability. Step 3: Standardized deviations. For each component and timestep t: zk,t = x:,:,t (µ + δk) σ σk + ϵ . Step 4: Log-density under each Gaussian. The log-probability density at each timestep is: log pk(xt) = 1 2 z2 k,t log σk 1 2 log(2π). Step 5: Mixture aggregation via log-sum-exp. To form mixture of Gaussians: log G(xt) = logsumexp({log p1(xt), . . . , log pK(xt)}) log K. Step 6: Attention gate and feature modulation. The final attention gate is and the output features are G(xt) = exp(log G(xt)), yt = xt G(xt), (3) (4) (5) (6) (7) (8) where denotes element-wise multiplication. DAAM operates on learned 1-channel attention projection over time: features are first projected to single channel, the Gaussian mixture gate is computed on that 1D temporal signal, and the resulting gate scales the full feature tensor. Implementation details. All computations in FP32 for numerical stability. Variance clamped: var 106. Softplus ensures positive scales: σk > 0. Number of Gaussians: = 4 across all layers."
+        },
+        {
+            "title": "2.3 JEPA Encoder Architecture",
+            "content": "The JEPA encoder consists of two parallel pathways that share weights but serve different roles. Context encoder (online network). Processes the full audio input. Masking is applied later in feature space by replacing hidden timesteps with learned mask token before the predictor. Parameters are updated via gradient descent. Target encoder (EMA network). Processes the full audio input and provides stable targets for prediction. Parameters are updated via exponential moving average (EMA)."
+        },
+        {
+            "title": "2.3.1 Convolutional–Transformer Hybrid Design",
+            "content": "Downsampling path. The input raw waveform [B, 1, Twav] passes through Conv1D blocks with stride, progressing through channel dimensions 64 128 256 384 512 512. The total stride is 8 8 5 5 6 = 9600 samples/hop at 24 kHz, resulting in latent representation [B, 512, Tz], where Tz corresponds to approximately 2.5 Hz frame rate. Conformer blocks [Gulati et al., 2020]. We use 8 Conformer layers with 16 attention heads. Each layer comprises self-attention, feedforward, convolution, and layer normalization. DAAM gating is applied in the encoder blocks (after the strided convolutions and residual stacks); there is no DAAM after the Conformer blocks in the current implementation. Integration with DAAM. After each Conformer block, features pass through GAttnGateG modules that: 1. Project features to single channel via 1 1 convolution. 2. Compute DAAM gate from projected features. 3. Apply learned scaling where α (initialized to 0.05) controls modulation strength. = (1 + α gate), (9)"
+        },
+        {
+            "title": "2.4 JEPA Predictor Network",
+            "content": "The predictor takes context representations and predicts masked regions. It uses two Conformer blocks with 16 attention heads, processing masked context features and outputting predictions for all temporal positions. The predictor only receives context (visible) regions but must predict features at all positions; the mask is applied to the loss."
+        },
+        {
+            "title": "2.5 Stage 1 Training Objective",
+            "content": "The JEPA training objective is pure self-supervised prediction in latent space. 2.5.1 Loss Function LJEPA = 1 Nmask (cid:88) tM where: = {t : mt = 0} is the set of masked positions, 6 (cid:13) (cid:13)z(t) (cid:13) pred sg(z(t) target) (cid:13) 2 (cid:13) (cid:13) , (10) Figure 2: JEPA online encoder architecture. Input waveform passes through an initial Conv1D layer followed by 5 encoder blocks, each containing Conv1D with stride, SnakeBeta activation, residual blocks, and Gaussian Adaptive Attention gating. Features are projected through bottleneck Conv1D layer and processed by 8 Conformer blocks (each with FNN, multi-head attention with 16 heads, depthwise convolution, and second FNN) to produce the final representation z. The target encoder shares this architecture but is updated via exponential moving average rather than backpropagation. Nmask = M, is the channel dimension, sg() denotes the stop-gradient operation. The loss is computed only on masked regions by weighting squared differences and normalized by the number of masked tokens times channels. 2.5.2 EMA Target Update After each training step, the target encoder parameters are updated via EMA: θtarget τ θtarget + (1 τ )θonline, (11) with momentum coefficient τ = 0.996. Stage 1 hyperparameters. Optimizer: AdamW with β1 = 0.8, β2 = 0.99. Learning rate: 1.5 104. Weight decay: 103. Batch size: 32. Max audio length: 15 @ 24 kHz. Training steps: 24 000. Collapse monitoring. We monitor (without backpropagation) the standard deviation of predictor outputs across batch and temporal dimensions. If the mean standard deviation falls below 0.01, warning is logged. This does not contribute to the loss. 7 Figure 3: JEPA predictor network architecture. The predictor takes masked context features zmasked and processes them through: (1) an expansion Conv1D layer that doubles the channel dimension, (2) two Conformer blocks separated by an intermediate Conv1D for feature refinement, and (3) projection Conv1D that reduces back to the original dimensionality, producing predicted features zpred at all positions including masked regions."
+        },
+        {
+            "title": "GAN Decoder",
+            "content": "After Stage 1 completes, the JEPA encoder weights are fine-tuned and used as feature extractor for Stage 2. Stage 2 introduces quantization and waveform reconstruction."
+        },
+        {
+            "title": "3.1 Finite Scalar Quantization (FSQ)",
+            "content": "FSQ provides efficient discrete tokenization without codebook learning [Mentzer et al., 2023]. Unlike VQVAE, which maintains learnable codebooks, FSQ uses fixed scalar quantization per dimension. Let ze RBCT be encoder features. 3.1.1 FSQ Formulation Projection. = tanh(ze). Quantization. For dimension with level Ld, define boundaries Bd = (cid:26) 2i Ld + 1 Ld : {0, 1, . . . , Ld 1} . (cid:27) The quantization function is The quantized value is zq[d] = qd(z e[d]). qd(x) = arg min bBd b. Configuration. Levels: = [4, 4, 4, 4]. Code dimension: = 128. Temperature: τ = 1.0. 8 (12) (13) (14) Figure 4: Stage 1 JEPA masked prediction loss (MSE) over training steps. JEPA+DAAM (blue) converges faster and to lower final loss ( 0.09) compared to JEPA without DAAM (orange, 0.17), demonstrating that Density Adaptive Attention enables more efficient representation learning. Both models use identical architectures except for DAAM gating. Straight-through estimator. During backpropagation, ze = zq . (15)"
+        },
+        {
+            "title": "3.2 Mixed-Radix Token Packing",
+            "content": "To maximize compression efficiency, we implement mixed-radix packing algorithm that converts FSQ indices into compact integer tokens [Simon, 2024]. Let ZBT denote FSQ indices, with dimension-specific radices = [r1, . . . , rG] for group of dimensions. 3.2.1 Mixed-Radix Encoding Any combination [i1, . . . , iG] is encoded as token = (cid:88) ik (cid:89) rj. k=1 j=k+ Example. For = 7 and = [4, 4, 4, 4, 4, 4, 4] with = [2, 1, 3, 0, 2, 1, 3]: token = 2 46 + 1 45 + 3 44 + 0 43 + 2 42 + 1 41 + 3 40 with maximum value 47 1 = 16383. = 10023, 3.2.2 Efficient Iterative Computation Using Horners method [Knuth, 1997]: (16) (17) (18) implemented right-to-left: token = i1 r2 rG + + iG1 rG + iG, (19)"
+        },
+        {
+            "title": "Approach",
+            "content": "Tokens/sec Reversible"
+        },
+        {
+            "title": "Notes",
+            "content": "No packing (128 dims) Mixed-radix (ours, = 7) VQ codebook 320 47.5 Variable"
+        },
+        {
+            "title": "Yes\nYes\nYes",
+            "content": "Each FSQ dim is token Pack 7 dims/token Requires learned codebook Table 1: Comparison of tokenization approaches. 1. Initialize token = iG. 2. For = 1 down to 1:"
+        },
+        {
+            "title": "3.2.3 Padding and Grouping",
+            "content": "token = ik + token rk. Our FSQ implementation yields = 128 quantized dimensions. We choose group size = 7: Number of groups: 128/7 = 19. Padding: 19 7 128 = 5 dimensions with radix 1. Token rate. Frame rate: Groups per frame: 19. Tokens/sec: = sample rate hop = 24000 9600 = 2.5 Hz. tps = 2.5 19 = 47.5. 3.2.4 Decoding The reverse operation extracts indices: 1. Initialize rem = token. 2. For = 1 to G: prod = (cid:81)G j=k+1 rj. ik = rem/prod. rem = rem mod prod. 3.2.5 Comparison to Alternatives Advantages: Perfect reversibility via modular arithmetic. Near-optimal compression for given radices. No learned codebook (unlike VQ-VAE). Flexible grouping trading vocabulary size versus token rate. Integer-only operations, hardware-friendly. With = 7 and radix 4, the per-token vocabulary is 47 = 16384, comparable to subword vocabularies used in NLP."
+        },
+        {
+            "title": "Frame Rate Notes",
+            "content": "Ours (JEPA+FSQ) U-Codec [Yang et al., 2025] Mimi [or Multiple, 2025] DualCodec [Li et al., 2025] SoundStream (24 kHz) [Zeghidour et al., 2021] EnCodec (24 kHz) [Defossez et al., 2022] DAC (44.1 kHz) [Kumar et al., 2024]"
+        },
+        {
+            "title": "2.5 Hz\n5 Hz\n12.5 Hz",
+            "content": "Mixed-radix packing (19 groups/frame) Ultra-low for LLM-TTS Semantic distillation 12.525 Hz Dual-stream architecture"
+        },
+        {
+            "title": "75 Hz\n75 Hz\n86 Hz",
+            "content": "13.3 ms frames 75 steps/sec @ 24 kHz Stride 512 @ 44.1 kHz Table 2: Frame rate comparison with state-of-the-art neural codecs. 3.2."
+        },
+        {
+            "title": "Integration with Language Models",
+            "content": "The compact tokens enable direct training of decoder-only Transformers for speech generation: Input: discrete token sequence at 47.5 tokens/sec. Output: next-token prediction over 16 384-way vocabulary. Decoding: tokens FSQ indices dequantized features waveform via HiFi-GAN. 3.2.7 Frame Rate Comparison with Neural Codecs"
+        },
+        {
+            "title": "3.3 HiFi-GAN Decoder",
+            "content": "The decoder upsamples quantized representations back to waveform using HiFi-GAN with DAAM gating in residual blocks [Kong et al., 2020]. 3.3.1 Decoder Architecture Quantized features [B, 512, Tz] are upsampled via ConvTranspose1D blocks through channel dimensions with strides 6, 5, 5, 8, 8 (total stride 9600), yielding output waveform [B, 1, Twav]. 512 384 256 128 64, Each block consists of: Upsampling ConvTranspose1D. Multi-receptive-field (MRF) residual blocks with (optionally) DAAM gating. ResBlock with DAAM. Each residual block contains: 1. Leaky ReLU activation. 2. Dilated convolution. 3. Residual connection. Decoder hyperparameters. Upsample kernels: [3, 7, 11, 15, 23, 32]. Residual blocks: 8 per stage."
+        },
+        {
+            "title": "3.4 Stage 2 Training Objective",
+            "content": "Stage 2 optimizes the FSQ quantizer, HiFi-GAN decoder, and JEPA encoder. 11 Figure 5: HiFi-GAN decoder architecture (Stage 2). Quantized features zq are upsampled through bottleneck Conv1D followed by 5 decoder blocks. Each block contains ConvTranspose1D upsampling and MRF residual blocks with different kernel sizes (3, 7, 11, 15, 23, 32) to capture multi-scale temporal patterns. SnakeBeta activations provide periodic inductive bias for high-fidelity audio generation [Ziyin et al., 2020]. 3.4.1 Total Loss 1. Reconstruction loss (L1). Ltotal = Lrec + λstftLstft + λganLgan. Lrec = 1 Twav Twav(cid:88) t=1 ˆxt xt. 2. Multi-resolution STFT loss [Yamamoto et al., 2020]. with spectral convergence and log-magnitude loss Lstft = (cid:88) (cid:16) m= L(m) sc + L(m) mag (cid:17) , L(m) sc = Sm(ˆx) Sm(x)F Sm(x)F , L(m) mag = 1 Nm log Sm(ˆx) log Sm(x)1 . STFT configurations. FFT sizes: [2048, 1024, 512, 256, 128]. Hop sizes: [512, 256, 128, 64, 32]. Window: Hann. 3. GAN loss. We use multi-period and multi-scale discriminators [Kumar et al., 2019]. Generator loss: Lgen = (cid:88) E[(Dd(ˆx) 1)2]. d{MPD,MSD} 12 (20) (21) (22) (23) (24) (25) (26) (27) (28) Feature matching: GAN total: Discriminator loss: Lfeat = (cid:88) Ld(cid:88) d{MPD,MSD} l="
+        },
+        {
+            "title": "1\nNl",
+            "content": "(cid:13) (cid:13)D(l) (cid:13) (x) D(l) (ˆx) (cid:13) (cid:13) (cid:13)1 . Lgan = Lgen + Lfeat. Ldisc = (cid:88) (cid:0)E[(Dd(x) 1)2] + E[Dd(ˆx)2](cid:1) . d{MPD,MSD} Loss weights and training schedule. λstft = 2.0. λgan = 0.1. Discriminator warmup: 5000 steps (disc frozen). After warmup: discriminator updated every step. Stage 2 hyperparameters. Optimizer: AdamW, β1 = 0.8, β2 = 0.99. Learning rate: 1.5 104 (decoder), 0.75 104 (discriminators). Weight decay: 103. Batch size: 8. Training steps: 29 000."
+        },
+        {
+            "title": "4.1 Dataset",
+            "content": "LibriLight (large-scale unlabeled English speech corpus) [Kahn et al., 2020]. Training split: 9000 hours (combined across the two stages). Validation: held-out speakers. Sample rate: 24 kHz. Max audio length: 15 s."
+        },
+        {
+            "title": "4.2 Data Preprocessing",
+            "content": "1. Resample to 24 kHz if needed. 2. Convert to mono by averaging channels. 3. No further preprocessing (normalization handled in-model)."
+        },
+        {
+            "title": "Parameters Notes",
+            "content": "Stage 1: JEPA encoder training Online encoder Target encoder (EMA) Predictor network Stage 1 total 121.7M 118.5M 3.2M"
+        },
+        {
+            "title": "Trainable\nMomentum update\nTrainable",
+            "content": "240.2M 121.7M trainable Stage 2: decoder training JEPA encoder FSQ quantizer HiFi-GAN decoder Stage 2 total Fine-tuned 240.2M 0.01M Trainable Trainable 69.2M 309.5M 69.3M trainable Final model (inference) Encoder only FSQ + decoder Inference total 121.7M 69.3M"
+        },
+        {
+            "title": "Online encoder only",
+            "content": "191.0M Single-pass model Table 3: Model architecture and parameter efficiency."
+        },
+        {
+            "title": "4.3 Distributed Training",
+            "content": "Hardware: 2x NVIDIA A100 (80 GB). Mixed precision: FP16 for forward/backward, FP32 for critical ops. Gradient accumulation: 1 step. Global batch size: 64 (Stage 1), 16 (Stage 2)."
+        },
+        {
+            "title": "4.4 Inference Pipeline",
+            "content": "At inference time: 1. Raw waveform JEPA encoder latent features. 2. Latent features FSQ quantization discrete tokens. 3. Tokens dequantization quantized features. 4. Quantized features HiFi-GAN decoder reconstructed waveform. Token rate: 47.5 tokens/sec (with = 7 packing)."
+        },
+        {
+            "title": "5.2 Training Efficiency",
+            "content": "Key features: Two-stage training: self-supervised pretraining + supervised fine-tuning. Inference efficiency: 191M parameters (no EMA network)."
+        },
+        {
+            "title": "Metric",
+            "content": "Stage 1 (JEPA) Stage 2 (decoder)"
+        },
+        {
+            "title": "Trainable parameters\nTraining steps\nBatch size\nLearning rate",
+            "content": "121.7M (50.7%) 24K 32 1.5 104 69.3M (22.4%) 29K 8 1.5 104 Table 4: Training efficiency of the two stages."
+        },
+        {
+            "title": "6 Evaluation Metrics",
+            "content": "We report qualitative evaluations, as all variants were trained under limited computational budgets and this work presents preliminary findings. Baselines. 1. JEPA baseline: JEPA encoder without DAAM gating. 2. WavLM-Large [Chen et al., 2021]: pre-trained self-supervised model. 3. JEPA+DAAM: JEPA encoder with DAAM gating (ours)."
+        },
+        {
+            "title": "7.1 Why DAAM Improves JEPA Representations",
+            "content": "Integrating Density Adaptive Attention into JEPA provides several advantages. Comparison to standard attention. Standard softmax-based self-attention computes pairwise correlations between positions, answering Which timesteps are similar to this one? DAAM instead computes statistical salience: Which timesteps have unusual or informative statistical properties? via Gaussian mixture modeling of temporal statistics. Because it operates on temporal statistics rather than full pairwise similarity matrices, DAAM can capture salient temporal patterns without the quadratic complexity of full self-attention."
+        },
+        {
+            "title": "8 Limitations and Future Work",
+            "content": "Current limitations and directions for future work include: 1. Fixed masking strategy. Block masking with fixed span distributions may not adapt optimally to varying speech rates or linguistic structure. Future work includes adaptive masking sensitive to acoustic or linguistic boundaries. 2. Monolingual evaluation. Experiments are currently limited to English (LibriLight). Generalization to tonal and morphologically rich languages remains open. 3. Limited data scale. Pretraining has been conducted on relatively modest amounts of data compared to large-scale SSL systems; conclusions are restricted to emerging capabilities. 4. Cross-modal JEPA. Extending to audiovisual or audiotext joint embedding prediction for multimodal representations is promising direction."
+        },
+        {
+            "title": "9 Code Availability",
+            "content": "The complete implementation of the JEPA+DAAM framework, including training scripts, model architectures, and data processing pipelines, is available at: https://github.com/gioannides/Density-Adaptive-JEPA The repository includes: Stage 1 JEPA encoder training with DAAM. Stage 2 decoder training with the encoder. FSQ quantization and mixed-radix packing algorithms. HiFi-GAN decoder with optional DAAM gating. DeepSpeed integration for distributed training."
+        },
+        {
+            "title": "10 Conclusion",
+            "content": "We introduced two-stage self-supervised framework combining Joint-Embedding Predictive Architecture (JEPA) with Density Adaptive Attention Mechanisms (DAAM) for efficient speech representation learning. Stage 1 trains JEPA encoder with DAAM-based gating to learn robust semantic representations via masked prediction using only MSE loss on masked regions. Stage 2 leverages these representations for reconstruction using L1 loss, multi-resolution STFT loss, and adversarial GAN losses, together with FSQ and HiFi-GAN. Our main contributions are: 1. DAAM-enhanced JEPA encoder that uses Gaussian mixture-based attention for adaptive feature selection during self-supervised learning. 2. An efficient tokenization scheme based on mixed-radix FSQ packing, achieving 47.5 tokens/sec, substantially lower than many existing neural audio codecs while remaining reversible. 3. two-stage training paradigm that cleanly separates representation learning from reconstruction, allowing pure self-supervised pretraining followed by reconstruction-focused fine-tuning. These results show that probabilistic attention mechanisms can improve representation learning by dynamically identifying acoustically salient regions during masked prediction, and that JEPA can serve as powerful neural tokenizer for speech, suitable for integration with large language models and other sequence models."
+        },
+        {
+            "title": "References",
+            "content": "Mahmoud Assran, Mathilde Caron, Ishan Misra, Piotr Bojanowski, Armand Joulin, Julien Mairal, Nicolas Ballas, Mike Rabbat, Yann LeCun, and Priya Goyal. Self-supervised learning from images with jointembedding predictive architecture. In CVPR, 2023. URL https://arxiv.org/abs/2301.08243. Sanyuan Chen, Chengyi Wang, Zhengyang Chen, Yu Wu, Shujie Liu, et al. WavLM: Large-scale selfsupervised pre-training for full stack speech processing. arXiv preprint arXiv:2110.13900, 2021. URL https://arxiv.org/abs/2110.13900. Alexandre Defossez, Jade Copet, Gabriel Synnaeve, and Yossi Adi. High fidelity neural audio compression. arXiv preprint arXiv:2210.13438, 2022. URL https://arxiv.org/abs/2210.13438. Jean-Bastien Grill, Florian Strub, Florent Altche, Corentin Tallec, Pierre H. Richemond, et al. Bootstrap your own latent: new approach to self-supervised learning. In NeurIPS, 2020. URL https://arxiv. org/abs/2006.07733. Anmol Gulati, James Qin, Chung-Cheng Chiu, Niki Parmar, Yu Zhang, et al. Conformer: ConvolutionIn INTERSPEECH, 2020. URL https://arxiv.org/ augmented transformer for speech recognition. abs/2005.08100. Georgios Ioannides, Aman Chadha, and Aaron Elkins. Density adaptive attention is all you need: Robust parameter-efficient fine-tuning across multiple modalities. arXiv preprint arXiv:2401.11143, 2024. URL https://arxiv.org/abs/2401.11143. Jacob Kahn, Morgane Riviere, Weiran Zheng, Eugene Kharitonov, et al. Libri-light: benchmark for asr with limited or no supervision. arXiv preprint arXiv:1912.07875, 2020. URL https://arxiv.org/abs/ 1912.07875. Donald E. Knuth. The art of computer programming, vol. 2: Seminumerical algorithms (3rd ed.), 1997. Mixed-radix numeration and Horners rule (pp. 6566, 208209, 290). Jungil Kong, Jaehyeon Kim, and Jaekyoung Bae. HiFi-GAN: Generative adversarial networks for efficient and high fidelity speech synthesis. arXiv preprint arXiv:2010.05646, 2020. URL https://arxiv.org/ abs/2010.05646. Kundan Kumar, Rithesh Kumar, Thibault de Boissiere, et al. Melgan: Generative adversarial networks for conditional waveform synthesis. arXiv preprint arXiv:1910.06711, 2019. URL https://arxiv.org/abs/ 1910.06711. Rithesh Kumar et al. DAC-JAX: jax implementation of the descript audio codec. arXiv preprint arXiv:2405.11554, 2024. URL https://arxiv.org/abs/2405.11554. Token stream rate discussion for 44.1kHz / stride 512. Jiaqi Li, Xiaolong Lin, Zhekai Li, Shixi Huang, Yuancheng Wang, Chaoren Wang, Zhenpeng Zhan, and Zhizheng Wu. Dualcodec: low-frame-rate, semantically-enhanced neural audio codec for speech generation. arXiv preprint arXiv:2505.13000, 2025. URL https://arxiv.org/abs/2505.13000. Fabian Mentzer, David Minnen, Eirikur Agustsson, and Michael Tschannen. Finite scalar quantization: VQVAE made simple. arXiv preprint arXiv:2309.15505, 2023. URL https://arxiv.org/abs/2309.15505. Anonymous or Multiple. Llama-mimi: Speech language models with interleaved semantic and acoustic tokens. arXiv preprint arXiv:2509.14882, 2025. URL https://arxiv.org/abs/2509.14882. Damien Simon. Mixed radix numeration bases: Horners rule, yang-baxter equation and furstenbergs conjecture. arXiv preprint arXiv:2405.19798, 2024. URL https://arxiv.org/abs/2405.19798. Ryuichi Yamamoto, Eunwoo Song, and Jae-Min Kim. Parallel wavegan: fast waveform generation arXiv preprint model based on generative adversarial networks with multi-resolution spectrogram. arXiv:1910.11480, 2020. URL https://arxiv.org/abs/1910.11480. Xuefei Yang et al. Ultra low frame-rate neural speech codec for fast high-fidelity speech synthesis. arXiv preprint arXiv:2510.16718, 2025. URL https://arxiv.org/abs/2510.16718. Neil Zeghidour, Alejandro Luebs, Ahmed Omran, Jan Skoglund, and Marco Tagliasacchi. Soundstream: An end-to-end neural audio codec. arXiv preprint arXiv:2107.03312, 2021. URL https://arxiv.org/abs/ 2107.03312. Liu Ziyin, Tilman Hartwig, and Masahito Ueda. Neural networks fail to learn periodic funcIn NeurIPS, 2020. URL https://papers.nips.cc/paper/2020/hash/ tions and how to fix it. 1160453108d3e537255e9f7b931f4e90-Abstract.html."
+        }
+    ],
+    "affiliations": [
+        "Amazon GenAI",
+        "Carnegie Mellon University",
+        "James Silberrad Brown Center for Artificial Intelligence",
+        "New York University",
+        "Northeastern University",
+        "Stanford University",
+        "University of Bristol"
+    ]
+}

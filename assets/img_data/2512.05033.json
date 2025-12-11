@@ -1,0 +1,183 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05033/x1.png",
+                "caption": "Figure 1:Arbitrageoverview.At each reasoning step, the draft proposes a candidate. The router produces a scorey^\\hat{y}, which is the estimated probability that the target will outperform the draft on this step, andacceptsthe draft ify^≤τ\\hat{y}\\leq\\tau, otherwiseescalatesto the target to regenerate (y^>τ\\hat{y}>\\tau). The selected step is appended to the context. The thresholdτ\\taugoverns the compute–quality trade-off.",
+                "position": 99
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Preliminaries",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05033/x2.png",
+                "caption": "Figure 2:Arbitragevs. baseline step-level SD approaches.Comparison of Reward-guided Speculative Decoding (RSD, top, which we use as a baseline) and ourArbitragealgorithm (bottom).\nRSD accepts or rejects draft steps using an absolute PRM reward threshold: when the PRM score of a draft-generated step falls below this threshold, the step is discarded and the target model is invoked to regenerate it.\nThis absolute criterion can trigger unnecessary target regenerations (e.g., Step 4), where the target does not significantly improve the quality of the step.Arbitrageinstead estimates the expected quality gain fromescalatinga step, i.e., invoking the larger target model to regenerate the step rather than keeping the draft step.\nIt only calls the target when this predicted gain is positive, thereby avoiding wasted target calls (e.g., Steps 1 and 4).",
+                "position": 237
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x3.png",
+                "caption": "Figure 3:Wasted target calls vs. deferral rate.In reward-based step-level speculation, thedeferral rate(x-axis) is the fraction of reasoning steps that are escalated to the target model.\nThewasted deferral rate(y-axis) is the percentage of those escalations where the target’s step isno betterthan the draft (equal or lower PRM score), relative to total number of steps. Wasted compute increases steadily with deferral rate, indicating many unnecessary target invocations under absolute-score rejection.",
+                "position": 245
+            }
+        ]
+    },
+    {
+        "header": "4Method",
+        "images": []
+    },
+    {
+        "header": "5Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05033/x4.png",
+                "caption": "Figure 4:Arbitrageimproves the compute–quality trade-off.Accuracy vs. acceptance rate forArbitrage Oracle,Arbitrage Router, and RSD across two benchmarks (MATH500 and OlympiadBench) and three model configurations.\nThe top row shows results on MATH500 and the bottom row on OlympiadBench.\nColumns (a), (b), and (c) correspond to LLaMA3 (1B/8B), LLaMA3 (8B/70B), and Qwen2.5-Math (3bit-7B/7B), respectively.\nIn all cases,Arbitrageconsistently yields higher accuracy at comparable acceptance rates, demonstrating superior compute–quality efficiency.\nAdditional results are provided in AppendixE.",
+                "position": 516
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x5.png",
+                "caption": "",
+                "position": 520
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x6.png",
+                "caption": "",
+                "position": 526
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x7.png",
+                "caption": "",
+                "position": 526
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x8.png",
+                "caption": "",
+                "position": 532
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x9.png",
+                "caption": "",
+                "position": 532
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x10.png",
+                "caption": "Figure 5:Arbitrageimproves the compute–quality trade-off.Accuracy–time curves forArbitrage Routerand RSD on two LLaMA3 routing configurations.\nSubplot (a) reports results for a quantized-draft / full-precision-target setting (Q4-bit-8B/8B/1.5B) on MATH500, and subplot (b) for a small-draft / large-target setting (1B/8B/1.5B) on OlympiadBench. Across both configurations,Arbitrage Routerconsistently achieves higher accuracy at a given wall-clock time than RSD, yielding a better Pareto frontier.\nEach marker corresponds to a different threshold operating point; moving right indicates increased target-model invocations (and thus higher latency).",
+                "position": 554
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x11.png",
+                "caption": "",
+                "position": 564
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x12.png",
+                "caption": "Figure 6:Qualitative example from MATH500. We first obtain a full solution using RSD and then rescore every step withArbitrage Routerunder the same acceptance budget. Steps kept by RSD are highlighted in blue, those it rejects are in red or orange, and steps regenerated by the target model are shown in green. Notably, steps 2 and 3 (orange) are accepted byArbitrage Routerbut rejected by RSD: their regenerated versions are essentially identical in content and still lead to the correct final answer of270/7270/7. The example shows how RSD’s global reward cutoff can discard valid intermediate reasoning, whereasArbitrage’s advantage-based, relative routing preserves such steps and eliminates redundant regeneration.",
+                "position": 581
+            }
+        ]
+    },
+    {
+        "header": "6Ablations",
+        "images": []
+    },
+    {
+        "header": "7Conclusions",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "Appendix AAnalyzing Compute Wastage in RSD",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05033/x13.png",
+                "caption": "(a)Outcomes among rejected cases vs.τ\\tau",
+                "position": 738
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x13.png",
+                "caption": "(a)Outcomes among rejected cases vs.τ\\tau",
+                "position": 741
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x14.png",
+                "caption": "(b)Reject rate vs.τ\\tau",
+                "position": 747
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x15.png",
+                "caption": "(c)Wasted target calls vs.τ\\tau",
+                "position": 753
+            }
+        ]
+    },
+    {
+        "header": "Appendix BOptimality ofArbitrage Oracle",
+        "images": []
+    },
+    {
+        "header": "Appendix CImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DArbitrageSpeculative Generation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05033/x16.png",
+                "caption": "Figure E.1:Additional compute–quality results.Accuracy versus acceptance rate forArbitrage Oracle,Arbitrage Router, and RSD on\nMath500 (left column) and OlympiadBench (right column) across the LLaMA3\nand Qwen2.5-Math model families. In all settings,Arbitrageachieves higher\naccuracy for a given acceptance rate, indicating a more favorable\ncompute–quality trade-off.",
+                "position": 1039
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x17.png",
+                "caption": "",
+                "position": 1043
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x18.png",
+                "caption": "",
+                "position": 1046
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x19.png",
+                "caption": "",
+                "position": 1047
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x20.png",
+                "caption": "",
+                "position": 1050
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x21.png",
+                "caption": "",
+                "position": 1051
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x22.png",
+                "caption": "",
+                "position": 1054
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05033/x23.png",
+                "caption": "",
+                "position": 1055
+            }
+        ]
+    },
+    {
+        "header": "Appendix EAdditional Results",
+        "images": []
+    }
+]
