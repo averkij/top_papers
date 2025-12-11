@@ -1,0 +1,81 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.08923/x1.png",
+                "caption": "Figure 1:Latency Scaling over Token Slots:We plot the latency of Qwen3-32B decoding on NVIDIA H100 with batch size=1 and Flash Attention 2[15]over different prefix lengths. Latency stays relatively the same with a certain amount of tokens sent to forward (free + cheap token slots), before transitioning to the compute-bound regime. We leverage this characteristic to achieve almost free parallelled drafting and sampling for TiDAR.",
+                "position": 209
+            }
+        ]
+    },
+    {
+        "header": "2Background and Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.08923/x2.png",
+                "caption": "Figure 2:TiDAR Architecture:TiDAR uses a single model forward to sample drafted tokens from the last step and pre-draft tokens for the next step in parallel. By switching the attention pattern among different parts of the sequence, TiDAR encodes the clean tokens drafted from last step causally and mask tokens block-causally (bidirectional within each block) for one-step diffusion pre-drafting. Upon accepting a prefix, the corresponding pre-drafts (proposal) can be selected. The KV cache for tokens forwarded causally will be stored and later evicted if the corresponding tokens are rejected. We illustrate this with a draft length of 3 and an accepted length of 2. Figure3shows the exact decoding mask for this example.",
+                "position": 357
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08923/x3.png",
+                "caption": "Figure 3:TiDAR Attention Masks:(Left) We apply a special training mask (using block length = 3): mask tokens of the same length are appended to the input tokens where the clean input tokens are self-attended causally and mask tokens within-block bidirectionally along with the prefix. During inference parallel decoding, we use a slice of a pre-initialized mask based on the prefix of the current step (Right). To reuse the mask, we reorder the sampling-draft part (tokens drafted from last step and mask positions for next step pre-drafting) and the clean prefix as illustrated with an example prefix length of 3.",
+                "position": 360
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08923/x4.png",
+                "caption": "Figure 4:Efficiency-Quality Benchmarking:We compare TiDAR on 1.5B and 8B with AR, AR with speculative decoding (EAGLE-3), and Block Diffusion. Points colored the same indicate the same model sizes while markers suggest different methods. On the y-axis we have individual task scores. On the x-axis, we showcase the relative decoding throughput speedup measured in tokens per second, with the baseline being the AR model within the same size group (Qwen2.5 1.5B Base,Qwen3 8B Base andQwen3 8B Instruct). On top of each point, we report the average tokens per NFE. For 1.5B models, we showcase two and three different settings for Block Diffusion (threshold = max, 0.8, illustrated from left to right) and TiDAR (training block size = 4, 8, 16, illustrated from left to right) respectively.",
+                "position": 442
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.08923/x5.png",
+                "caption": "Figure 5:Pareto Frontier of Different Architectures with the Same Recipe:We report the performance-efficiency trade-offs on 1.5B scale among AR model, fine-tuned AR model, Block Diffusion under different decoding thresholds, and TiDAR using different drafting lengths. Our model achieves the best Pareto Frontier compared to Block Diffusion and AR and is approaching the quality of fine-tuned AR with 7x more tokens per NFE.",
+                "position": 906
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08923/x6.png",
+                "caption": "Figure 6:Trusting AR v.s. Diffusion Outputs for Sampling:TiDAR is trained to be highly balanced in the sense that no matter whether we trust the prediction from the diffusion or AR parts, the autoregressive sampling, along with the high drafting model capacity, can guarantee quality under almost the same speedup.",
+                "position": 1012
+            }
+        ]
+    },
+    {
+        "header": "5Limitations",
+        "images": []
+    },
+    {
+        "header": "6Conclusions",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AEvaluation Task Configuration",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.08923/x7.png",
+                "caption": "Figure 7:Prefill Attention Mask:We initialize the mask at the model initialization with (max_seq_len + block_size, max_seq_len + block_size) and slice it based on the current sample length.",
+                "position": 1899
+            }
+        ]
+    },
+    {
+        "header": "Appendix BInference Prefill Mask",
+        "images": []
+    }
+]

@@ -1,0 +1,362 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.08892/x1.png",
+                "caption": "Figure 1:Lumine, the first AI agent to complete hours-long missions in real time within expansive 3D open worlds.",
+                "position": 108
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Environment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.08892/x2.png",
+                "caption": "Figure 2:Overview of the gameplay environment inGenshin Impact.\nThe game combines large-scale open-world exploration and multi-level reasoning challenges within a richly interactive 3D environment. Players can freely traverse diverse regions, glide, swim, dive, and interact with characters while engaging in quests, puzzles, and combat.",
+                "position": 449
+            }
+        ]
+    },
+    {
+        "header": "4The Lumine Model",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.08892/x3.png",
+                "caption": "Figure 3:Overview of the Lumine model. Built upon a VLM, Lumine receives pixel inputs along with historical context, such as previous actions and reasoning, and outputs textual keyboard and mouse actions. It employs a hybrid reasoning strategy, generating new reasoning steps only when necessary; otherwise, it directly produces actions for efficient real-time control.",
+                "position": 510
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/x4.png",
+                "caption": "Figure 4:Overview of Lumine’s three-stage training recipe. In the first pre-training stage, Qwen2-VL-Base is trained on large-scale image–action data to learn fundamental action primitives, resulting in the Lumine-Base model. In the second instruction-following stage, Lumine-Base is further trained on instruction–image–action triplets for language grounding, producing the Lumine-Instruct model. In the final reasoning stage, the instruction input is replaced with a thought, and an optional new thought is prepended before the action sequence, yielding the Lumine-Thinking model.",
+                "position": 616
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/x5.png",
+                "caption": "Figure 5:Overview of the data processing pipeline from raw gameplay recordings to curated datasets for pre-training, instruction following, and reasoning. i) Starting from 2424 hours of synchronized video-action data, we first apply rule-based filtering to produce a 1731-hour dataset for pre-training. ii) A subset of 165 hours is human-annotated for instruction-level activities, used to train a classifier that auto-labels all the raw data, further refined into 200 hours of high-quality instruction following data via GPT-4.1 captioning and action filtering. iii) Meanwhile, 15 hours of manually annotated reasoning data support the training of Lumine’s hybrid thinking. Together, this multi-stage curation pipeline enables scalable, structured curriculum learning from human demonstrations.",
+                "position": 619
+            }
+        ]
+    },
+    {
+        "header": "5Data Curation and Training Recipe",
+        "images": []
+    },
+    {
+        "header": "6Inference",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.08892/x6.png",
+                "caption": "Figure 6:Visualization of the strategy Lumine uses for context management during inference. Lumine maintains a sliding window within the context to preserve image–action pairs across interaction steps, with a maximal window length of 2, as shown in the example. The context begins with the system prompt and previous reasoning, which guide subsequent action generation. When the number of image–action pairs exceeds the threshold, the oldest pair is discarded while retaining the system prompt and reasoning. Upon generating new reasoning, the context is flushed and re-accumulated from that point onward.",
+                "position": 857
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/x7.png",
+                "caption": "Figure 7:Latency breakdown by stage with corresponding ribbons and overall improvement. The figure shows time latency under different strategies for a typical 20-token action without reasoning generation and with the full context of 20 frames. Infra-Opt denotes the remaining infrastructure-level optimizations. The overall optimization yielding a 25.3× speedup compared with the baseline.",
+                "position": 867
+            }
+        ]
+    },
+    {
+        "header": "7Benchmark",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.08892/x8.png",
+                "caption": "Figure 8:Overview of the benchmark comprising 141 tasks across four categories, Collection, Combat, NPC Interaction, and Puzzle. Each category includes simple, hard, and unseen tasks to comprehensively assess agents’ various abilities in open-world gameplay.",
+                "position": 975
+            }
+        ]
+    },
+    {
+        "header": "8Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/pic_update_1025/bc_scaling_loss.png",
+                "caption": "(a)Training dynamics of base models.",
+                "position": 1046
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/pic_update_1025/bc_scaling_loss.png",
+                "caption": "(a)Training dynamics of base models.",
+                "position": 1049
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/pic_update_1025/bc_bmk_user_study.png",
+                "caption": "(b)Capability emergence of 7B base model.",
+                "position": 1054
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/pic_update_1025/vs_baseline.png",
+                "caption": "Figure 10:Average success rate of agents on the benchmark simple tasks by categories. Lumine-Instruct-NonHis achieves over 80% success across all four categories, significantly outperforming its base model and all baseline methods.",
+                "position": 1186
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/pic_update_1025/if_bmk_ablation.png",
+                "caption": "Figure 11:Performance of Lumine-Base, Lumine-Instruct and Lumine-Instruct without pre-training on simple and hard tasks under non-history setting.",
+                "position": 1193
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/pic_update_1025/if_bmk_ablation.png",
+                "caption": "Figure 11:Performance of Lumine-Base, Lumine-Instruct and Lumine-Instruct without pre-training on simple and hard tasks under non-history setting.",
+                "position": 1196
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/pic_update_1025/ood_bmk.png",
+                "caption": "Figure 12:Comparison of Lumine-Instruct-NonHis performance in simple and unseen tasks.",
+                "position": 1201
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/x9.png",
+                "caption": "Figure 13:Case study of the in-context abilities of Lumine-Instruct-NonHis. When provided with additional contextual details that are relevant to the instruction, Lumine demonstrates improved performance and is able to complete previously low-performing tasks more effectively. The instructions given to Lumine were originally in Chinese; their English translations are provided here for reference.",
+                "position": 1217
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/pic_update_1025/his_frames_ablation_lines_row_custom_ylim.png",
+                "caption": "Figure 14:Performance of Lumine-Instruct preserving different lengths of frames in the context as historical information on the full set of benchmark.",
+                "position": 1223
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/pic_update_1025/his_vs_nonhis.png",
+                "caption": "Figure 15:Comparison of Lumine trained under non-history and history settings on the full set of benchmark tasks.",
+                "position": 1226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/x10.png",
+                "caption": "Figure 16:Error analysis of Lumine instruct models trained under non-history and history settings on the full set of benchmark tasks.",
+                "position": 1242
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/x11.png",
+                "caption": "Figure 17:Visualization of the in-domain evaluation mission, the main storyline of Mondstadt,Prologue: Act I - The Outlander Who Caught the Wind, which is divided into five subtasks. The left figure illustrates the agent’s geographical trajectory during task completion. Red lines denote the character’s movement path, while blue lines indicate teleportation jumps between distant locations. The right figure presents the complete trajectory and corresponding timestamps for Lumine-Thinking, who completed the mission in56minutes, compared with fresh human players with an average of78minutes and expert human players with an average of53minutes.",
+                "position": 1263
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/x12.png",
+                "caption": "Figure 18:Error analysis of reasoning quality generated by Lumine during the completion of the entire in-domain mission. We investigate both non-history and history settings.",
+                "position": 1363
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/x13.png",
+                "caption": "Figure 19:The two missions on the left, Acts II and III of Mondstadt’s main storyline, are included in the pre-training data but excluded from the reasoning data. Lumine successfully completed the two acts consecutively within4.7hours, compared to an average of3.6hours for expert human players.\nWhile Liyue’s mission on the right is entirely new to Lumine, it still manages to reach Liyue Harbor and visit the Adeptus dwelling deep within the mountains. Due to space limitations, we are unable to present the full process of Lumine’s journey from Mondstadt’s Windrise to Liyue. The red dashed line indicates a round trip between two locations.",
+                "position": 1372
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/similiar_scenes/2_id.jpg",
+                "caption": "(a)Moving platform (ID)",
+                "position": 1382
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/similiar_scenes/2_id.jpg",
+                "caption": "(a)Moving platform (ID)",
+                "position": 1385
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/similiar_scenes/2_ood.jpg",
+                "caption": "(b)Moving platform (OOD)",
+                "position": 1390
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/similiar_scenes/1_id.jpg",
+                "caption": "(c)Wind current (ID)",
+                "position": 1395
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/similiar_scenes/1_ood.jpg",
+                "caption": "(d)Wind current (OOD)",
+                "position": 1400
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/limited_memory/2_1.jpg",
+                "caption": "(a)Three golden quest markers appear simultaneously, each pointing to a different location. When the agent reaches one region of them, the corresponding marker disappears, leaving the other two active. The agent is often drawn toward these remaining markers and repeatedly moves back and forth among the three regions.",
+                "position": 1444
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/limited_memory/2_1.jpg",
+                "caption": "(a)Three golden quest markers appear simultaneously, each pointing to a different location. When the agent reaches one region of them, the corresponding marker disappears, leaving the other two active. The agent is often drawn toward these remaining markers and repeatedly moves back and forth among the three regions.",
+                "position": 1447
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/limited_memory/2_1.jpg",
+                "caption": "",
+                "position": 1450
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/limited_memory/2_2.jpg",
+                "caption": "",
+                "position": 1454
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/limited_memory/2_3.jpg",
+                "caption": "",
+                "position": 1458
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/limited_memory/2_4.jpg",
+                "caption": "",
+                "position": 1462
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/limited_memory/1_1.jpg",
+                "caption": "(b)When following the golden quest marker directly, the agent encounters a wall and must take a detour using the wind current on the right. Lumine often abandons the detour midway and returns to the starting point, drawn back by the quest marker’s signal since it has forgotten that the direct path is blocked.",
+                "position": 1471
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/limited_memory/1_1.jpg",
+                "caption": "",
+                "position": 1474
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/limited_memory/1_2.jpg",
+                "caption": "",
+                "position": 1478
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/limited_memory/1_3.jpg",
+                "caption": "",
+                "position": 1482
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/limited_memory/1_4.jpg",
+                "caption": "",
+                "position": 1486
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/ood_game_intro/ood_game_4_1.jpg",
+                "caption": "Figure 23:Demonstration of overworld navigation, combat, and UI in four games, Genshin Impact, Wuthering Waves, Honkai: Star Rail, and Black Myth: Wukong. Similar to Genshin Impact, Wuthering Waves is also an open-world ARPG, while Honkai: Star Rail is a turn-based RPG that combines strategic combat with a hub-based world design. Black Myth: Wukong is a hub-based ARPG but features a more realistic visual rendering style.",
+                "position": 1503
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/ood_game_intro/ood_game_4_1.jpg",
+                "caption": "",
+                "position": 1506
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/ood_game_intro/ood_game_4_2.jpg",
+                "caption": "",
+                "position": 1510
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/ood_game_intro/ood_game_4_3.jpg",
+                "caption": "",
+                "position": 1514
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/ood_game_intro/ood_game_1_1_new.jpg",
+                "caption": "",
+                "position": 1519
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/ood_game_intro/ood_game_1_2.jpg",
+                "caption": "",
+                "position": 1523
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/ood_game_intro/ood_game_1_3.jpg",
+                "caption": "",
+                "position": 1527
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/ood_game_intro/ood_game_2_1.jpg",
+                "caption": "",
+                "position": 1532
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/ood_game_intro/ood_game_2_2.jpg",
+                "caption": "",
+                "position": 1536
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/ood_game_intro/ood_game_2_3.jpg",
+                "caption": "",
+                "position": 1540
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/ood_game_intro/ood_game_3_1.jpg",
+                "caption": "",
+                "position": 1545
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/ood_game_intro/ood_game_3_2.jpg",
+                "caption": "",
+                "position": 1549
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/Figure/ood_game_intro/ood_game_3_3.jpg",
+                "caption": "",
+                "position": 1553
+            }
+        ]
+    },
+    {
+        "header": "9Discussion and Future Work",
+        "images": []
+    },
+    {
+        "header": "Ethics Statement",
+        "images": []
+    },
+    {
+        "header": "Acknowledgement",
+        "images": []
+    },
+    {
+        "header": "Contributions",
+        "images": []
+    },
+    {
+        "header": "10Gameplay Collection",
+        "images": []
+    },
+    {
+        "header": "11Instruction Following Data Curation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.08892/x14.png",
+                "caption": "Figure 24:Distribution of gameplay categories in the Instruction Following dataset. A total of 39,055 annotated clips (≈\\approx165 hours) are organized into a three-level hierarchical taxonomy, consisting ofGame Scene,Game Content, and fine-grained activity types. The numbers in parentheses after each category indicate the number of clips and their percentage proportion within the full dataset.",
+                "position": 2011
+            }
+        ]
+    },
+    {
+        "header": "12Reasoning Data Curation",
+        "images": []
+    },
+    {
+        "header": "13Benchmark Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.08892/x15.png",
+                "caption": "",
+                "position": 2201
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/x16.png",
+                "caption": "",
+                "position": 2211
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/x17.png",
+                "caption": "",
+                "position": 2221
+            },
+            {
+                "img": "https://arxiv.org/html/2511.08892/x18.png",
+                "caption": "",
+                "position": 2231
+            }
+        ]
+    },
+    {
+        "header": "14Prompt",
+        "images": []
+    }
+]

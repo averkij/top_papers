@@ -1,0 +1,351 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.07384/x1.png",
+                "caption": "Figure 1:We take layers from pretrained language models and recur a core block.We take early layers to form thepreludeand later layers to form therecurrent blockandcoda, removing the layers in between. After each recurrence, we concatenate the output of the prelude with the output of the recurrent block (or random noise at time zero) and apply a linear adapter.",
+                "position": 100
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Experimental Setup",
+        "images": []
+    },
+    {
+        "header": "4Training Recurrent Language Models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.07384/x2.png",
+                "caption": "Figure 2:Initializing from pretrained Llama layers gives a significant advantage in loss and benchmark accuracy.Left:Loss over training step for120120billion tokens for models initialized from Llama-3.2-1B layers and randomly(Takase et al.,2023). Although starting higher, the model initialized from Llama weights achieves lower losses consistently than the model initialized randomly.Right:Zero shot accuracy on Hellaswag(Zellers et al.,2019)over training step for recurrences[1,2,4,8,16,32][1,2,4,8,16,32]. We see the Llama based model (blue) achieves higher accuracy quicker and leverages recurrence effectively from early training steps. We record accuracy over recurrence for a suite of language modeling benchmarks in AppendixTable˜2.",
+                "position": 278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x3.png",
+                "caption": "Figure 3:Scheduling the mean of the depth distribution is efficient in terms ofbothdata and compute.We report validation loss over multiple recurrent depths in terms on steps (i.e. data) on the left and in terms of FLOPs on the right.\nWe see that linearly scheduling the number of recurrences up to the final mean(32)(32)over a long period of training decreases the validation loss, hence the curriculum is both data and compute efficient.\nAlternative length curricula and more test recurrent depths are shown in AppendixFigure˜17.",
+                "position": 307
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x4.png",
+                "caption": "Figure 4:Muon improves over AdamW when training recurrent models.Left:Loss vs. step for multiple training runs on the same data order with different optimizers, using a learning rate of5​e−55e^{-5}for AdamW and0.0010.001for Muon. Muon is the most stable and achieves the lowest loss for recurrent models. Note, the AdamW line ends early as the loss spikes and becomesNaN.Right:Loss (smoothed over5050steps) vs. step for AdamW and Muon. For the non-recurrent TinyLlama model there is minimal difference between optimizers.",
+                "position": 331
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x5.png",
+                "caption": "",
+                "position": 340
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x6.png",
+                "caption": "Figure 5:Recurrence improves reasoning on GSM8K for TinyLlama, even when controlling for FLOPs.We train(4,8,4)(4,8,4)and non-recurrent models for approximately5050billion tokens of Nemotron-CC-Math-v1 data.Left:We plot accuracy over the number of FLOPs used during training. We see that recurrent models, trained with scheduling, can efficiently outperform the non-recurrent baseline.Right:We plot accuracy over the number of recurrences for inference. We see the recurrent models are competitive with the fixed depth baseline and can outperform it by using more recurrences and therefore more FLOPs. We plot each individual models accuracy over training step and recurrence in full inSection˜C.3.1, including for training recurrence88and3232. Evaluations on the final checkpoint over tasks shown inTable˜1are in AppendixTable˜3. We also provide identical experiments for OLMo and Llama inSection˜C.3.",
+                "position": 377
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x7.png",
+                "caption": "Figure 6:Recurrence efficiently improves reasoning on MATH for OLMo.Left:We plot accuracy over the number of FLOPs used during training. We see that recurrent models, trained with scheduling, can efficiently outperform the non-recurrent baseline when trained on the same tokens.Right:We plot accuracy over the number of recurrences used for inference. We see the recurrent models are competitive with the fixed depth baseline (green horizontal line) and can outperform it by using more recurrences and therefore more FLOPs. We plot each individual models accuracy over training and recurrence in full inSection˜C.3.2, including for training recurrence88and3232. Evaluations on the final checkpoint over tasks shown inTable˜1are in AppendixTable˜4.We also provide identical experiments for TinyLlama and Llama inSection˜C.3.",
+                "position": 409
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x8.png",
+                "caption": "Figure 7:Recurrent models achieve higher final checkpoint accuracy on GSM8K and MATH.We plot the final checkpoint accuracy on GSM8K and MATH for the non-recurrent baseline and multiple training recurrences for TinyLlama, Llama and OLMo, using test recurrence3232for all recurrent models.\nFull accuracies including recurrences1,2,4,81,2,4,8and1616can be seen in Tables3,4and5.",
+                "position": 414
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x9.png",
+                "caption": "Figure 8:High quality data and curricula improve recurrent model performance on non-reasoning benchmarks.Left:We plot accuracy on Arc-Challenge over training for the2626billion tokens on FineWeb-Edu and Nemotron-SFT data, i.e. after healing for two phase training. We see the training accuracy of the non-recurrent model does not differ significantly between single or two phase training. For the depth-recurrent model, two phase training outperforms single phase by5%5\\%suggesting the healing period helps the model recover language modeling ability after surgery.Right:Accuracy over multiple recurrences at the end of training. We see the depth-recurrent model with two phase training can use recurrence to extend its accuracy to37.7%37.7\\%by utilizing more FLOPs during inference. We repeat our Arc-Challenge accuracies inTable˜1for clarity at test recurrences11and3232.",
+                "position": 444
+            }
+        ]
+    },
+    {
+        "header": "5Discussion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix AExtended Related Works",
+        "images": []
+    },
+    {
+        "header": "Appendix BAdditional Technical Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CAdditional Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.07384/x10.png",
+                "caption": "Figure 9:Training loss for models initialized from Llama layers and Randomly.Here we extendFigure˜2including the linear extrapolations in log-log space. We note this is more than likely an underestimate of the point of intersection as there is still curvature in the loss curves.",
+                "position": 1897
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x11.png",
+                "caption": "Figure 10:Training loss for models initialized from Llama layers and Randomly.Here, we extendFigure˜2by including a cooldown for12​b12badditional tokens, taking this to a total of132​b132btokens.",
+                "position": 1900
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x12.png",
+                "caption": "Figure 11:Training loss for models initialized Randomly with different embedding scales over120120billion tokens.We followGeiping et al. (2025)when initializing models with scaled embeddings. However, we also ablate how much the scale impacts by using the same embedding scale from Huginn-0125 in this much smaller model, we find there to be minimal impact.",
+                "position": 1903
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x13.png",
+                "caption": "Figure 12:We ablate which layers to select from Llama-1b.We measure the training loss on Fineweb-Edu with different layer selections from Llama-1b. We find taking early layers for the prelude, and later layers for the recurrent block and coda to be best.",
+                "position": 2074
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x14.png",
+                "caption": "Figure 13:Comparison to prior methods for decreasing depth.We use the ShortGPT pruning method proposed byMen et al. (2024)to decrease the depth of the TinyLlama model. We train two non-recurrent models with this pruning method, reducing TinyLlama’s depth to88and1616. We also train a(4,8,4)(4,8,4)model using our layer selection (SeeTable˜9and a model using the layers prescribed by ShortGPT. We train on the nemotron dataset for approximately2525billion tokens and find our layer selection to be better in terms of loss.",
+                "position": 2077
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x15.png",
+                "caption": "Figure 14:We ablate different layer selections and architectural choices for TinyLlama.We show the accuracy on evaluations at3232recurrences after training on Fineweb-Edu. We ablate(2,4,2)(2,4,2),(4,8,4)(4,8,4)and(6,10,6)(6,10,6)models with(6,10,6)(6,10,6)keeping all of the layers of the depth2222TinyLlama model. It is clear to see that increasing the number of layers in the recurrent block allows for the model to achieve higher accuracy, consistently beating the fixed depth model. However, having a larger recurrent block does significantly increase the FLOPs used by the model. We also ablate swapping the linear adapter used byGeiping et al. (2025)and in our main results for an addition adapter (“Add”). We find that although training loss is higher the evaluation accuracy is approximately the same.",
+                "position": 2080
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x16.png",
+                "caption": "Figure 15:Extending the prelude and coda leads to minimal performance improvements.We train(4,8,4)(4,8,4)and(7,8,7)(7,8,7)TinyLlama models with a25%25\\%linear curriculum. We see that adding an additional66layers leads to minimal final performance improvement for the additional FLOPs used.Left:Performance over training FLOPs on GSM8K.Right:Performance over training FLOPs on MATH.",
+                "position": 2083
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x17.png",
+                "caption": "",
+                "position": 2086
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x18.png",
+                "caption": "Figure 16:Visualization of our curriculum over training steps.We visualize a curriculum with31253125steps over a training period of62506250steps with a final mean recurrence of3232. We show both alinearand1​-sqrt1\\text{-sqrt}schedules.flinear​(tgt_depth,current_step)=c​e​i​l​(tgt_depth∗(current_step/num_warmup_steps))f_{\\text{linear}}(\\text{tgt\\_depth},\\text{current\\_step})=ceil(\\text{tgt\\_depth}*(\\text{current\\_step}/\\text{num\\_warmup\\_steps}))f1-sqrt​(tgt_depth,current_step)=c​e​i​l​(tgt_depth∗(1−s​q​r​t​(1−current_step/num_warmup_steps)))f_{\\text{1-sqrt}}(\\text{tgt\\_depth},\\text{current\\_step})=ceil(\\text{tgt\\_depth}*(1-sqrt(1-\\text{current\\_step}/\\text{num\\_warmup\\_steps})))In the legend we include the number of recurrences used during the curriculum period, seeing the1​-sqrt1\\text{-sqrt}schedule uses fewer recurrences.",
+                "position": 2100
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x19.png",
+                "caption": "Figure 17:Scheduling the mean of the depth distribution is efficient in terms of data and compute.We extendFigure˜3, showing more curriculum lengths on the left and more test recurrences on the right. We see the same as inFigure˜3, that it is efficient in terms of data (steps) and compute to schedule the mean of the depth distribution.",
+                "position": 2106
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x20.png",
+                "caption": "Figure 18:Validation loss of models with schedules maximum backpropagation depth.We see that scheduling the maximum backpropagation is efficient in terms of FLOPs spent but does lead to worse models in terms of steps.",
+                "position": 2109
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x21.png",
+                "caption": "Figure 19:1​-sqrt1\\text{-sqrt}vs. linear curricula for TinyLlama. We see there is little separating the curricula on a per FLOP basis and therefor choose75%75\\%1​-sqrt1\\text{-sqrt}for our experiments in Figures5and6as it efficient while spending25%25\\%of training at the maximum mean number of recurrences.Left:We plot accuracy over FLOPs for GSM8K.Right:We plot accuracy over FLOPs for MATH.",
+                "position": 2112
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x22.png",
+                "caption": "",
+                "position": 2115
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x23.png",
+                "caption": "Figure 20:Recurrence efficiently improves reasoning on GSM8K for TinyLlama.We train(4,8,4)(4,8,4)and non-recurrent models for approximately5050billion tokens of Nemotron-CC-Math-v1 data, extendingFigure˜5.Left:We plot accuracy over the number of FLOPs used during training. We see that recurrent models can efficiently outperform the non-recurrent baseline.Right:We plot accuracy over the number of recurrences for inference. We see the recurrent models are competitive with the fixed depth baseline and can outperform it by using more FLOPs.We plot each individual models accuracy over training and recurrence in full inFigure˜23andFigure˜24. Evaluations on the final checkpoint over tasks shown inTable˜1are in AppendixTable˜3.",
+                "position": 2139
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x24.png",
+                "caption": "Figure 21:Recurrence efficiently improves reasoning on MATH for TinyLlama.Left:We plot accuracy over the number of FLOPs used during training. We see that recurrent models can efficiently outperform the non-recurrent baseline.Right:We plot accuracy over the number of recurrences for inference. We see the recurrent models are competitive with the fixed depth baseline and can outperform it by using more FLOPs.We plot each individual models accuracy over training and recurrence in full inFigure˜26andFigure˜27. Evaluations on the final checkpoint over tasks shown inTable˜1are in AppendixTable˜3.",
+                "position": 2146
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x25.png",
+                "caption": "Figure 22:Recurrent models are competitive in terms of inference FLOPs for GSM8K.This is the same data as in Right of Figures5and20but replotted with an effective parameters x-axis, which can be viewed as proportional to FLOPs required for inference.",
+                "position": 2151
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x26.png",
+                "caption": "Figure 23:Recurrence efficiently improves reasoning.Left: GSM8K accuracy over training step for train recurrence equal to44model.Right: GSM8K accuracy over training step for train recurrence equal to88model.",
+                "position": 2154
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x27.png",
+                "caption": "",
+                "position": 2157
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x28.png",
+                "caption": "Figure 24:Recurrence efficiently improves reasoning. Left: GSM8K accuracy over training step for train recurrence equal to1616model.Right: GSM8K accuracy over training step for train recurrence equal to3232model.",
+                "position": 2161
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x29.png",
+                "caption": "",
+                "position": 2164
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x30.png",
+                "caption": "Figure 25:Recurrent models are competitive in terms of inference FLOPs for MATH.This is the same data as in21but replotted with an effective parameters x-axis, which can be viewed as proportional to FLOPs required for inference.",
+                "position": 2168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x31.png",
+                "caption": "Figure 26:Recurrence efficiently improves reasoning.Left: MATH accuracy over training step for train recurrence equal to44model.Right: MATH accuracy over training step for train recurrence equal to88model.",
+                "position": 2171
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x32.png",
+                "caption": "",
+                "position": 2174
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x33.png",
+                "caption": "Figure 27:Recurrence efficiently improves reasoning. Left: MATH accuracy over training step for train recurrence equal to1616model.Right: MATH accuracy over training step for train recurrence equal to3232model.",
+                "position": 2178
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x34.png",
+                "caption": "",
+                "position": 2181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x35.png",
+                "caption": "Figure 28:Recurrence efficiently improves reasoning on GSM8K for OLMo.We train(4,8,4)(4,8,4)and non-recurrent models for approximately5050billion tokens of Nemotron-CC-Math-v1 data.Left:We plot accuracy over the number of FLOPs used during training. We see that recurrent models can efficiently outperform the non-recurrent baseline.Right:We plot accuracy over the number of recurrences for inference. We see the recurrent models are competitive with the fixed depth baseline and can outperform it by using more FLOPs.We plot each individual models accuracy over training and recurrence in full inFigure˜31andFigure˜32. Evaluations on the final checkpoint over tasks shown inTable˜1are in AppendixTable˜4.",
+                "position": 2551
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x36.png",
+                "caption": "Figure 29:Recurrence efficiently improves reasoning on MATH for OLMo.We train(4,8,4)(4,8,4)and non-recurrent models for approximately5050billion tokens of Nemotron-CC-Math-v1 data, extendingFigure˜6.Left:We plot accuracy over the number of FLOPs used during training. We see that recurrent models can efficiently outperform the non-recurrent baseline.Right:We plot accuracy over the number of recurrences for inference. We see the recurrent models are competitive with the fixed depth baseline and can outperform it by using more FLOPs.We plot each individual models accuracy over training and recurrence in full inFigure˜34andFigure˜35. Evaluations on the final checkpoint over tasks shown inTable˜1are in AppendixTable˜4.",
+                "position": 2558
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x37.png",
+                "caption": "Figure 30:Recurrent models are competitive in terms of inference FLOPs for GSM8K.This is the same data as in28but replotted with an effective parameters x-axis, which can be viewed as proportional to FLOPs required for inference.",
+                "position": 2565
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x38.png",
+                "caption": "Figure 31:Recurrence efficiently improves reasoning.Left: GSM8K accuracy over training step for train recurrence equal to44model.Right: GSM8K accuracy over training step for train recurrence equal to88model.",
+                "position": 2568
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x39.png",
+                "caption": "",
+                "position": 2571
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x40.png",
+                "caption": "Figure 32:Recurrence efficiently improves reasoning. Left: GSM8K accuracy over training step for train recurrence equal to1616model.Right: GSM8K accuracy over training step for train recurrence equal to3232model.",
+                "position": 2575
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x41.png",
+                "caption": "",
+                "position": 2578
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x42.png",
+                "caption": "Figure 33:Recurrent models are competitive in terms of inference FLOPs for MATH.This is the same data as in29but replotted with an effective parameters x-axis, which can be viewed as proportional to FLOPs required for inference.",
+                "position": 2582
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x43.png",
+                "caption": "Figure 34:Recurrence efficiently improves reasoning.Left: MATH accuracy over training step for train recurrence equal to44model.Right: MATH accuracy over training step for train recurrence equal to88model.",
+                "position": 2585
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x44.png",
+                "caption": "",
+                "position": 2588
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x45.png",
+                "caption": "Figure 35:Recurrence efficiently improves reasoning. Left: MATH accuracy over training step for train recurrence equal to1616model.Right: MATH accuracy over training step for train recurrence equal to3232model.",
+                "position": 2592
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x46.png",
+                "caption": "",
+                "position": 2595
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x47.png",
+                "caption": "Figure 36:Recurrence efficiently improves reasoning on GSM8K for Llama.We train(4,6,4)(4,6,4)and non-recurrent models for approximately5050billion tokens of Nemotron-CC-Math-v1 data.Left:We plot accuracy over the number of FLOPs used during training. We see that recurrent models can efficiently outperform the non-recurrent baseline.Right:We plot accuracy over the number of recurrences for inference. We see the recurrent models are competitive with the fixed depth baseline and can outperform it by using more FLOPs.We plot each individual models accuracy over training and recurrence in full inFigure˜39andFigure˜40. Evaluations on the final checkpoint over tasks shown inTable˜1are in AppendixTable˜5.",
+                "position": 2970
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x48.png",
+                "caption": "Figure 37:Recurrence efficiently improves reasoning on MATH for Llama.We train(4,6,4)(4,6,4)and non-recurrent models for approximately5050billion tokens of Nemotron-CC-Math-v1 data.Left:We plot accuracy over the number of FLOPs used during training. We see that recurrent models can efficiently outperform the non-recurrent baseline.Right:We plot accuracy over the number of recurrences for inference. We see the recurrent models are competitive with the fixed depth baseline and can outperform it by using more FLOPs.We plot each individual models accuracy over training and recurrence in full inFigure˜42andFigure˜43. Evaluations on the final checkpoint over tasks shown inTable˜1are in AppendixTable˜5.",
+                "position": 2977
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x49.png",
+                "caption": "Figure 38:Recurrent models are competitive in terms of inference FLOPs for GSM8K.This is the same data as in Right ofFigure˜36but replotted with an effective parameters x-axis, which can be viewed as proportional to FLOPs required for inference.",
+                "position": 2984
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x50.png",
+                "caption": "Figure 39:Recurrence efficiently improves reasoning.Left: GSM8K accuracy over training step for train recurrence equal to44model.Right: GSM8K accuracy over training step for train recurrence equal to88model.",
+                "position": 2987
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x51.png",
+                "caption": "",
+                "position": 2990
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x52.png",
+                "caption": "Figure 40:Recurrence efficiently improves reasoning.Left: GSM8K accuracy over training step for train recurrence equal to1616model.Right: GSM8K accuracy over training step for train recurrence equal to3232model.",
+                "position": 2994
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x53.png",
+                "caption": "",
+                "position": 2997
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x54.png",
+                "caption": "Figure 41:Recurrent models are competitive in terms of inference FLOPs for MATH.This is the same data as in37but replotted with an effective parameters x-axis, which can be viewed as proportional to FLOPs required for inference.",
+                "position": 3001
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x55.png",
+                "caption": "Figure 42:Recurrence efficiently improves reasoning.Left: MATH accuracy over training step for train recurrence equal to44model.Right: MATH accuracy over training step for train recurrence equal to88model.",
+                "position": 3004
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x56.png",
+                "caption": "",
+                "position": 3007
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x57.png",
+                "caption": "Figure 43:Recurrence efficiently improves reasoning.Left: MATH accuracy over training step for train recurrence equal to1616model.Right: MATH accuracy over training step for train recurrence equal to3232model.",
+                "position": 3011
+            },
+            {
+                "img": "https://arxiv.org/html/2511.07384/x58.png",
+                "caption": "",
+                "position": 3014
+            }
+        ]
+    },
+    {
+        "header": "Appendix DHyperparameters",
+        "images": []
+    },
+    {
+        "header": "Appendix EParameter Counts",
+        "images": []
+    }
+]
