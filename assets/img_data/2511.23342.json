@@ -1,0 +1,150 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.23342/x1.png",
+                "caption": "Figure 1:Re-Meanflow (Ours) leverages the synergy of trajectory rectification and mean-velocity modeling, achieving the best compute–quality trade-off—reaching strong FID. This synergy yields efficiency and quality that neither rectification nor mean-velocity modeling can achieve alone. All methods are initialized with pretrained EDM2-S[23].",
+                "position": 114
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Works",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.23342/x2.png",
+                "caption": "Figure 2:Why trajectory rectification and mean-velocity modeling reinforce each other.(a)A 1-rectified flow () still follows highly curved trajectories, requiring many ODE steps.\nApplying two rounds of rectification () straightens the paths and reduces NFEs, but one-step sampling () remains unreliable unless trajectories are nearly straight.(b)MeanFlow estimates the average velocityu​(𝐳t,r,t)u(\\mathbf{z}_{t},r,t)over all intervals(r,t)(r,t), which in principle avoids the need for straight paths.\nHowever, when the underlying velocity field is highly curved, the induced averages become complex and hard to learn.(c)Training MeanFlow on trajectories from a 2-rectified flow yields a significantly smoother average-velocity field, making estimation easier and enabling faster convergence and high-quality one-step generation.",
+                "position": 152
+            },
+            {
+                "img": "https://arxiv.org/html/2511.23342/imgs/r1.png",
+                "caption": "",
+                "position": 154
+            },
+            {
+                "img": "https://arxiv.org/html/2511.23342/imgs/r2.png",
+                "caption": "",
+                "position": 155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.23342/imgs/r21.png",
+                "caption": "",
+                "position": 155
+            }
+        ]
+    },
+    {
+        "header": "3Preliminaries",
+        "images": []
+    },
+    {
+        "header": "4Methods",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.23342/x3.png",
+                "caption": "Figure 3:A Class-imbalanced 2D Toy Example.We consider a controlled 2D setup where a flow model transports a balanced two-component Gaussian mixture on the left to an imbalanced mixture on the right (weights0.40.4for the upper mode and0.60.6for the lower mode).Panels (a-c):(a)Linear interpolation of independently sampled couplingsp𝐱×p𝐳p_{\\mathbf{x}}\\times p_{\\mathbf{z}}, which serve as the training signal\nfor the first velocity model.(b)The resulting 1-rectified flow learned from these independent\ncouplings; the learned velocity field remains noticeably curved.(c)Using the velocity field from (b), we generate a new set of\ncouplings and train a second velocity model on their linear interpolations,\nyielding the 2-rectified flow.Panel (d):Due to imperfect straightening, one-step Euler sampling on the 2-rectified flow still yields noticeable outliers.Panel (e):MeanFlow trained directly on independent couplings fails to converge within the training budget because high-variance conditional velocities destabilize learning.Panel (f):Re-Meanflow combines trajectory rectification with MeanFlow, eliminating most outliers and achieving more accurate one-step generation.",
+                "position": 226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.23342/x4.png",
+                "caption": "Figure 4:Distance-Error Correlation.Histogram of data-noiseℓ2\\ell_{2}distances on ImageNet5122512^{2}, colored by angular error (computed asarccos⁡(⟨𝐳−𝐱,uθ​(𝐳,0,1)⟩‖𝐳−𝐱‖2​‖uθ​(𝐳,0,1)‖2)\\arccos\\big(\\tfrac{\\langle\\mathbf{z}-\\mathbf{x},\\;u_{\\theta}(\\mathbf{z},0,1)\\rangle}{\\|\\mathbf{z}-\\mathbf{x}\\|_{2}\\,\\|u_{\\theta}(\\mathbf{z},0,1)\\|_{2}}\\big), the angle between the predicted and ground-truth velocities). Errors are computed using a MeanFlow model trained onuntruncated1-rectified couplings (config (d) in Tab.3). A clear high-distance high-error tail (90th percentile marked) motivates our Distance Truncation.",
+                "position": 324
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.23342/x5.png",
+                "caption": "Figure 5:Qualitative results for Re-Meanflow (NFE=1) on ImageNet64264^{2}(Left),2562256^{2}(Middle), and5122512^{2}(Right).",
+                "position": 611
+            },
+            {
+                "img": "https://arxiv.org/html/2511.23342/x6.png",
+                "caption": "",
+                "position": 620
+            },
+            {
+                "img": "https://arxiv.org/html/2511.23342/x7.png",
+                "caption": "",
+                "position": 625
+            },
+            {
+                "img": "https://arxiv.org/html/2511.23342/x8.png",
+                "caption": "Figure 6:Comparison of convergence on ImageNet-2562256^{2}.Re-Meanflow achieves the best FID under the same training budget.",
+                "position": 641
+            },
+            {
+                "img": "https://arxiv.org/html/2511.23342/x9.png",
+                "caption": "Figure 7:Comparison of total computational cost on ImageNet-64264^{2}in EFLOPs (left) and GPU hours (right).Each bar is decomposed into the training cost (solid red) and the reflow sampling cost (blue hatched).\nRe-Meanflow (ours) is used as the computational baseline.\nNumbers above the bars indicate a multiplicative factor relative to Re-Meanflow (1.0×\\times).",
+                "position": 659
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix AMore Discussion",
+        "images": []
+    },
+    {
+        "header": "Appendix BImplementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.23342/x10.png",
+                "caption": "Figure 8:Heatmaps of the mean loss (left) and the standard deviation of the loss (right)for a trained Re-Meanflow model on ImageNet-5122512^{2}under configuration (c).",
+                "position": 2012
+            }
+        ]
+    },
+    {
+        "header": "Appendix CMore Experiment Details and Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.23342/x11.png",
+                "caption": "Figure 9:Distance-Error Correlation.Histogram of data-noiseℓ2\\ell_{2}distances on ImageNet2562256^{2}(Left) and ImageNet64264^{2}(Right), analogous to Fig.4. Similar high-distance, high-error tails (90th percentile marked) are observed.",
+                "position": 2250
+            }
+        ]
+    },
+    {
+        "header": "Appendix DAlgorithm for Re-Meanflow",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.23342/x12.png",
+                "caption": "Figure 10:Selected qualitative results for Re-Meanflow (NFE=1) on ImageNet64264^{2}.",
+                "position": 2375
+            },
+            {
+                "img": "https://arxiv.org/html/2511.23342/x13.png",
+                "caption": "Figure 11:Selected qualitative results for Re-Meanflow (NFE=1) on ImageNet2562256^{2}.",
+                "position": 2384
+            },
+            {
+                "img": "https://arxiv.org/html/2511.23342/x14.png",
+                "caption": "Figure 12:Selected qualitative results for Re-Meanflow (NFE=1) on ImageNet5122512^{2}.",
+                "position": 2393
+            }
+        ]
+    },
+    {
+        "header": "Appendix EMore Qualitative Results",
+        "images": []
+    }
+]

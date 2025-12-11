@@ -1,0 +1,123 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.01030/x1.png",
+                "caption": "",
+                "position": 90
+            }
+        ]
+    },
+    {
+        "header": "IIntroduction",
+        "images": []
+    },
+    {
+        "header": "IIRelated Work",
+        "images": []
+    },
+    {
+        "header": "IIIPreliminaries",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.01030/x2.png",
+                "caption": "Figure 2:Adaptation protocol of stochastic formulation (Stochastic-DA).This framework models a conditional generative flow by estimating the velocity field from a random noise latentϵ\\mathbf{\\epsilon}to the annotation latent𝐳𝐲\\mathbf{z^{y}}, conditioned on the image latent𝐳𝐱\\mathbf{z^{x}}. The target velocity vector is𝐯=ϵ−𝐳𝐲\\mathbf{v}=\\mathbf{\\epsilon}-\\mathbf{z^{y}}. This inherent reliance on noise initialization inherently leads to non-deterministic variance in deterministic geometric prediction.",
+                "position": 350
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01030/x3.png",
+                "caption": "Figure 3:Adaptation protocol of deterministic formulation (Deterministic-DA).This architecture shifts the paradigm to a noise-free rectified-flow formulation. It directly estimates the velocity field from the source image latent𝐳𝐱\\mathbf{z^{x}}to the target annotation latent𝐳𝐲\\mathbf{z^{y}}, where the target velocity vector is𝐯=𝐳𝐱−𝐳𝐲\\mathbf{v}=\\mathbf{z^{x}}-\\mathbf{z^{y}}. This deterministic setup ensures the stability and structurally consistency for geometric dense prediction.",
+                "position": 353
+            }
+        ]
+    },
+    {
+        "header": "IVLotus-2",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.01030/x4.png",
+                "caption": "Figure 4:Comparison between stochastic and deterministic formulation.The figure visualizes the iterative inference process fromt=1t=1tot=0t=0. The stochastic formulation (Stochastic-DA) exhibits significant structural variance: distinct random noise initializations yield inconsistent geometric structures across the entire inference process (highlighted inred circles). While averaging is employed to mitigate the variance, the final prediction remains compromised by the blending of conflicting structural hypotheses. In contrast, the deterministic formulation (Deterministic-DA) ensures a noise-free and stable trajectory, preventing structural variance and improving geometric coherence and prediction accuracy.",
+                "position": 375
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01030/x5.png",
+                "caption": "Figure 5:Adaptation protocol of the core predictor in Lotus-2.It adopts a single-step formulation (t=1t=1) with clean-data prediction to efficiently exploit the world priors of pre-trained FLUX model, where input latent𝐳𝐭\\mathbf{z_{t}}is equivalent to the image latent𝐳𝐱\\mathbf{z^{x}},i.e,𝐳𝐭=𝐳𝟏=𝐳𝐱\\mathbf{z_{t}}=\\mathbf{z_{1}}=\\mathbf{z^{x}}according to the Eq.11. In addition, there is a pair of Pack-Unpack operations around the diffusion Transformerfθf_{\\theta}inherited from FLUX, a local continuity module (LCM)Λ\\Lambdais employed to mitigate grid artifacts caused by this Unpack operation.",
+                "position": 438
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01030/x6.png",
+                "caption": "Figure 6:Comparisons among various training time-steps and data scalesevaluated on NYUv2 in depth estimation. During inference, if the number of training time-stepsT>50T>50, the inference time-steps are fixed atTinf=50T_{\\text{inf}}=50; otherwise,Tinf=TT_{\\text{inf}}=T.\nThe results show that, when adapting the pre-trained rectified-flow model to dense prediction, reducing the number of training time-steps leads to improved performance. In particular, the single-step formulation (T=1T=1) achieves the best performance across all data scales.",
+                "position": 441
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01030/x7.png",
+                "caption": "Figure 7:Predictions under Different Model Parameterization Types.Red circleshighlight regions with obvious appearance artifacts when residual prediction is used. In contrast, clean-data prediction produces more accurate predictions without interference from image appearance.",
+                "position": 479
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01030/x8.png",
+                "caption": "Figure 8:The effects of different strategies for eliminating grid-like artifacts.“w/ow/oLCM” refers to only single-step formulation with clean-data prediction, which produces noticeable grid-like artifacts due to the discontinuity introduced by Pack-Unpack. Removing Pack-Unpack entirely alleviates this issue but compromises both accuracy and efficiency. In contrast, LCM effectively resolves the artifacts while improving accuracy and preserving model efficiency. (Zoom in for clearer observation.)",
+                "position": 505
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01030/x9.png",
+                "caption": "Figure 9:The training pipeline of detail sharpener.Starting from a structurally correct but coarse annotation predicted by the core predictor, the detail sharpener learns the transition from coarse to fine-grained annotation via a constrained multi-step rectified-flow within the manifold defined by the core predictor.",
+                "position": 544
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01030/x10.png",
+                "caption": "Figure 10:The inference pipeline of Lotus-2.It is a decoupled, two-stage deterministic pipeline that bridges the regression and geometric refinement. First, the core predictor produces stable and structurally consistent prediction via single-step regression. The detail sharpener then employs a constrained multi-step rectified-flow formulation to iteratively refinement without any stochastic noise. The refinement usesTinf′≤10T_{\\text{inf}}^{\\prime}\\leq 10steps, adjustable based on the desired level of sharpness. This design ensures both structural consistency and fine-grained fidelity in minimal steps.",
+                "position": 548
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01030/x11.png",
+                "caption": "Figure 11:Comparisons in Detail Sharpness.“w/ow/oSharpener” denotes predictions directly obtained by the core predictor, which suffer from blurry and coarse details. The “w/w/Sharpener” cases demonstrate that the detail sharpener noticeably enhances the sharpness of fine-grained structures, particularly along boundaries, while avoiding the geometric hallucinations observed in Deterministic-DA, such as the misaligned chair backrest and stair railing.",
+                "position": 551
+            }
+        ]
+    },
+    {
+        "header": "VExperiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.01030/x12.png",
+                "caption": "Figure 12:Spectral analysis of high-fidelity refinement.This plot compares the average log-power (y-axis) across spatial frequencies (x-axis) on NYUv2 dataset to validate the contribution of detail sharpener. The decay of the core predictor (w/ow/osharpener) curve confirms its coarse nature, while the Lotus-2 (w/w/sharpener) curve shows recovery of high-frequency power.",
+                "position": 1629
+            }
+        ]
+    },
+    {
+        "header": "VIConclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.01030/imgs/authors/hj.jpg",
+                "caption": "",
+                "position": 2200
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01030/imgs/authors/lhd.jpg",
+                "caption": "",
+                "position": 2212
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01030/x13.jpg",
+                "caption": "",
+                "position": 2224
+            },
+            {
+                "img": "https://arxiv.org/html/2512.01030/imgs/authors/cyc.jpg",
+                "caption": "",
+                "position": 2236
+            }
+        ]
+    },
+    {
+        "header": "VIIBiography Section",
+        "images": []
+    }
+]

@@ -1,0 +1,128 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.02015/x1.png",
+                "caption": "",
+                "position": 107
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.02015/x2.png",
+                "caption": "Figure 2:Limitations of existing methods.We demonstrate joint camera and object motion editing on an input video (first row)—changing both the camera viewpoint and the person’s falling location—using frames warped by the edited motion as reference (second row).\nThe prior camera-controlled V2V approach[84]inpaints from the warped input video but fails to correct secondary effects (e.g., splashes) caused by the edited object motion.\nThe track-conditioned I2V method[99]loses input scene context by conditioning only on the first frame.\nIn contrast, our approach edits both camera and object motion while preserving the input context and maintaining coherent causal effects (third row).",
+                "position": 156
+            },
+            {
+                "img": "https://arxiv.org/html/2512.02015/x3.png",
+                "caption": "Figure 3:Edit-by-Track framework.Given a videoVsrcV_{\\mathrm{src}}, we estimate camera poses and 3D tracks using off-the-shelf models[117,129].\nUsers then edit the poses and tracks to form pairs of source and target screen-projected tracks, which serve as the motion condition.\nTo preserve the original visual context, the source video is encoded by a VAE and patchifier into source tokensνsrc\\nu_{\\mathrm{src}}, which are concatenated with noisy target tokensνtgt\\nu_{\\mathrm{tgt}}.\nFor motion control, our 3D track conditioner (Fig.4) processes the track pairs into tokens[τsrc,τtgt][\\uptau_{\\mathrm{src}},\\uptau_{\\mathrm{tgt}}], which are added to the paired video tokens[νsrc,νtgt][\\nu_{\\mathrm{src}},\\nu_{\\mathrm{tgt}}].\nThese motion-conditioned tokens are then fed into DiT blocks to denoiseνtgt\\nu_{\\mathrm{tgt}}.",
+                "position": 164
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.02015/x4.png",
+                "caption": "Figure 4:3D track conditioner.GivenNNtrack pairs,(𝒯srcproj,𝒯tgtproj)∈ℝ2×f×N×3(\\mathcal{T}_{\\mathrm{src}}^{\\mathrm{proj}},\\mathcal{T}_{\\mathrm{tgt}}^{\\mathrm{proj}})\\in\\mathbb{R}^{2\\times f\\times N\\times 3}, consisting of 2D screen coordinatesx​yxyand normalized disparityzz, the conditioner first uses cross-attention to adaptively sample per-track context from source video tokensνsrc\\nu_{\\mathrm{src}}.\nA second cross-attention then splats the sampled tokens,τsrcsampled\\uptau^{\\mathrm{sampled}}_{\\mathrm{src}}, via the source and target tracks into the respective frame spaces, yielding[τsrc,τtgt]∈ℝ2​f​h​w×d[\\uptau_{\\mathrm{src}},\\uptau_{\\mathrm{tgt}}]\\in\\mathbb{R}^{2fhw\\times d}aligned with the paired video tokens[νsrc,νtgt][\\nu_{\\mathrm{src}},\\nu_{\\mathrm{tgt}}].\nWe use different token orientations to represent the corresponding dimensions.",
+                "position": 265
+            },
+            {
+                "img": "https://arxiv.org/html/2512.02015/x5.png",
+                "caption": "Figure 5:Training data.(a) Our model is first fine-tuned on the synthetic data with ground-truth point tracks to learn motion control. Each video pair shares the same objects and background scenes but differs in object actions and camera motions.\n(b) We continue fine-tuning on real data by sampling two non-contiguous clips from a monocular video, leveraging its natural motion to scalably simulate joint camera and object motion changes.",
+                "position": 335
+            },
+            {
+                "img": "https://arxiv.org/html/2512.02015/x6.png",
+                "caption": "Figure 6:Joint camera and object motion editing.Our method enables the editing of camera and/or object motion using edited camera poses and 3D point tracks (visualized in corner insets).",
+                "position": 341
+            },
+            {
+                "img": "https://arxiv.org/html/2512.02015/x7.png",
+                "caption": "Figure 7:Additional applications.Our model leverages flexibly manipulated 3D tracks for diverse editing tasks.\n(a) We achieve complex multi-dancer synchronization by transferring human poses via SMPL-X[79].\nThe point tracks also enables (b) shape deformation for general objects, while (c) object removal and (d) duplication are accomplished by moving tracks off-screen or repeating them, respectively.",
+                "position": 346
+            },
+            {
+                "img": "https://arxiv.org/html/2512.02015/x8.png",
+                "caption": "Figure 8:Handling partial tracks.By specifying only the body motion (moving right) via a bounding box and removing leg tracks,\nour model synthesizes correct leg motion without explicit controls on the legs. Background tracks are hidden for clarity.",
+                "position": 353
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.02015/x9.png",
+                "caption": "Figure 9:Visual comparisons on video editing.We edit a DAVIS[80]video with a 3D object rotation, using the target motion-warped as reference.\nI2V methods[99,27]lose context outside of the input first frame (corner insets).\nGEN3C[84]inputs the warped video but fails to correct the shadow of the edited object (red arrow).\nSee SM for additional in-the-wild results.",
+                "position": 820
+            }
+        ]
+    },
+    {
+        "header": "5Discussion and Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AMethod Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.02015/x10.png",
+                "caption": "Figure 10:Analysis on the sparsity of track inputs.We evaluate End-Point Error (EPE) using 100 in-the-wild videos from MiraData[42]to test performance with different numbers of point tracks. All evaluations are run on the same final model, which was trained once using a random number of tracks between 500 and 1000.",
+                "position": 3094
+            },
+            {
+                "img": "https://arxiv.org/html/2512.02015/x11.png",
+                "caption": "Figure 11:Robustness to noisy track inputs.Our final model, trained with track perturbation (Sec.A.4), is compared to an ablated model trained without it.\nBoth are tested with varying levels of Gaussian noise on the target tracks. Our model handles 4-pixel noise with only a 1.26-pixel increase in error, demonstrating its robustness.",
+                "position": 3099
+            }
+        ]
+    },
+    {
+        "header": "Appendix BModel Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.02015/x12.png",
+                "caption": "Figure 12:Effects of text prompts.The text prompt serves as a supplementary context to help generate unseen regions revealed in the novel viewpoints. As shown in the example, the right-half regions without tracks overlayed are the unseen regions.",
+                "position": 3164
+            },
+            {
+                "img": "https://arxiv.org/html/2512.02015/x13.png",
+                "caption": "Figure 13:Effects of different random seeds.Random seeds introduce generation variations, especially in newly revealed areas (red arrows). Please note that all other examples and evaluations utilize the same fixed seed (0) for consistency.",
+                "position": 3176
+            },
+            {
+                "img": "https://arxiv.org/html/2512.02015/x14.png",
+                "caption": "Figure 14:Limitations.Our model shows limitations in two main areas: (a) small objects with large motion changes (e.g., a 270° front-flip) can suffer from distortion when their tracks are densely-clustered and noisy; and (b) complex, motion-dependent physical effects (e.g., liquid dynamics) are not synthesized correctly, such as the failure to blend coffee and milk.",
+                "position": 3189
+            },
+            {
+                "img": "https://arxiv.org/html/2512.02015/x15.png",
+                "caption": "Figure 15:Visual comparison of joint motion editing on DyCheck[23].Our method handles large, joint camera and object motion changes, aligning with the (pseudo) ground-truth video.\nMethods marked with∗use the flow estimation between input and ground-truth videos to warp the input.\nThe results of TrajAttn∗are generated with the extension of NVS-Solver[126]to take the warped video input.",
+                "position": 3354
+            },
+            {
+                "img": "https://arxiv.org/html/2512.02015/x16.png",
+                "caption": "Figure 16:Human perceptual evaluation.We present the preference percentages from 42 subjects in comparison with representative methods, including track-conditioned I2V, DaS[27]and ATI[99], and inpainting-based V2V, GEN3C[84].",
+                "position": 3579
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAdditional Comparisons",
+        "images": []
+    }
+]
