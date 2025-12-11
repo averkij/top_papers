@@ -202,7 +202,7 @@ class ArxivParser:
                 if start:
                     acc += section['content'] + " "
 
-            affiliations = get_affiliations(acc[:2000], api="openai", model="gpt-4o-mini")
+            affiliations = get_affiliations(acc[:2000], api="claude", model="claude-haiku-4-5")
 
             #fallback
             if "error" in affiliations:

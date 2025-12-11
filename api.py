@@ -489,7 +489,7 @@ Paper text to classify:\n\n"{text}"
     return categories
 
 
-def get_categories_additional(text):
+def get_categories_additional(text, api="claude", model="claude-haiku-4-5"):
     prompt_cls = f"""You are an expert classifier of machine learning research papers. Analyze the following research paper text and classify it into one or more relevant categories from the list below.
 
 Categories:
@@ -504,7 +504,7 @@ Return only JSON with flat array of categories that match the given text. If no 
 Paper text to classify:\n\n"{text}"
 """
     categories = get_json(
-        prompt_cls, api="openai", model="gpt-4o-mini", temperature=0.0
+        prompt_cls, api=api, model=model, temperature=0.0
     )
     categories = [x for x in categories if x not in con.EXCLUDE_CATS]
     categories = [
