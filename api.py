@@ -484,7 +484,12 @@ Paper text to classify:\n\n"{text}"
     #     if c in CAT_MAPPING:
     #         res.append(CAT_MAPPING[c])
 
-    categories = list(set(categories_1 + categories_2))
+    # Make sure we always operate on lists, even if get_json returned a dict
+    if isinstance(categories_1, dict):
+        categories_1 = categories_1.get("categories") or categories_1.get("topics") or []
+    if isinstance(categories_2, dict):
+        categories_2 = categories_2.get("categories") or categories_2.get("topics") or []
+    categories = list(set((categories_1 or []) + (categories_2 or [])))
 
     return categories
 
@@ -506,6 +511,17 @@ Paper text to classify:\n\n"{text}"
     categories = get_json(
         prompt_cls, api=api, model=model, temperature=0.0
     )
+    # Normalize possible dict outputs into a flat list
+    if isinstance(categories, dict):
+        for key in ("categories", "topics", "tags", "data", "result"):
+            if key in categories and isinstance(categories[key], list):
+                categories = categories[key]
+                break
+        else:
+            categories = []
+    elif not isinstance(categories, list):
+        categories = []
+
     categories = [x for x in categories if x not in con.EXCLUDE_CATS]
     categories = [
         x if x not in con.RENAME_CATS else con.RENAME_CATS[x] for x in categories
