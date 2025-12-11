@@ -237,7 +237,7 @@ def generate_image_for_paper(paper, img_name):
     generate_and_save_image(name=img_name, img_dir=img_dir, prompt=img_prompt)
 
 
-def get_categories(text, api="openai", model="gpt-4o-mini"):
+def get_categories(text, api="claude", model="claude-haiku-4-5"):
     prompt_cls_1 = f"""Analyze the following research paper text and classify it into one or more relevant topics from the list below. Consider only information from the provided text. Don't add a tag if the topic is not directly related to the article.
 
 Topics:
