@@ -1,0 +1,4578 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.13720/x1.png",
+                "caption": "Figure 1:The Manifold Assumption[Chapelle2006SemiSupervised]hypothesizes that natural images lie on a low-dimensional manifold within the high-dimensional pixel space.\nWhile a clean image𝒙\\bm{x}can be modeled as on-manifold, the noiseϵ\\bm{\\epsilon}or flow velocity𝒗\\bm{v}(e.g.,𝒗=𝒙−ϵ\\bm{v}=\\bm{x}-\\bm{\\epsilon}) is inherently off-manifold. Training a neural network to\npredict a clean image (i.e.,𝒙\\bm{x}-prediction) isfundamentally differentfrom training it to predict noise or a noised quantity (i.e.,ϵ\\bm{\\epsilon}/𝒗\\bm{v}-prediction).",
+                "position": 138
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3On Prediction Outputs of Diffusion Models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gt_HD2.png",
+                "caption": "Figure 2:Toy Experiment:dd-dimensional (d=2d=2) underlying data is “buried” in aDD-dimensional space, by a fixed, random, column-orthogonal projection matrix.\nIn theDD-dim space, we train a simple generative model (5-layer ReLU MLP with 256-dim hidden units). The projection matrix is unknown to the model, and we only use it for visualizing the output.\nIn this toy experiment,with the observed dimensionDDincreasing, only𝐱\\bm{x}-predictioncan produce reasonable results.",
+                "position": 492
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gen_HD2_x.png",
+                "caption": "",
+                "position": 529
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gen_HD2_eps.png",
+                "caption": "",
+                "position": 533
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gen_HD2_v.png",
+                "caption": "",
+                "position": 537
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gt_HD8.png",
+                "caption": "",
+                "position": 548
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gen_HD8_x.png",
+                "caption": "",
+                "position": 552
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gen_HD8_eps.png",
+                "caption": "",
+                "position": 556
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gen_HD8_v.png",
+                "caption": "",
+                "position": 560
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gt_HD16.png",
+                "caption": "",
+                "position": 571
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gen_HD16_x.png",
+                "caption": "",
+                "position": 575
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gen_HD16_eps.png",
+                "caption": "",
+                "position": 579
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gen_HD16_v.png",
+                "caption": "",
+                "position": 583
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gt_HD512.png",
+                "caption": "",
+                "position": 594
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gen_HD512_x.png",
+                "caption": "",
+                "position": 598
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gen_HD512_eps.png",
+                "caption": "",
+                "position": 602
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/toy/gen_HD512_v.png",
+                "caption": "",
+                "position": 606
+            }
+        ]
+    },
+    {
+        "header": "4“Just Image Transformers” for Diffusion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.13720/x2.png",
+                "caption": "Figure 3:The “Just image Transformer” (JiT) architecture:\nsimply a plain ViT[Dosovitskiy2021]on patches of pixels for𝒙\\bm{x}-prediction.",
+                "position": 671
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/x3.png",
+                "caption": "Figure 4:Bottleneck linear embedding.Results are forJiT-B/16on ImageNet 256×\\times256. A raw patch is 768-dim (16×16×316{\\times}16{\\times}3) and is embedded by two sequential linear layers with an intermediate bottleneck dimensiond′d^{\\prime}(d′<768d^{\\prime}<768). Here,bottleneck embedding is generally beneficial, and our𝒙\\bm{x}-prediction model can work decently even with aggressive bottlenecks as small as 32 or 16.\nSettings (the same asTab.3): 200 epochs, with CFG.",
+                "position": 1097
+            }
+        ]
+    },
+    {
+        "header": "5Comparisons",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/021947.png",
+                "caption": "Figure 5:Qualitative Results.Selected examples on ImageNet 512×\\times512 using JiT-H/32. More uncurated results are in appendix.",
+                "position": 1534
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/012006.png",
+                "caption": "",
+                "position": 1537
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/003315.png",
+                "caption": "",
+                "position": 1539
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/032547.png",
+                "caption": "",
+                "position": 1540
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/029936.png",
+                "caption": "",
+                "position": 1542
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/006270.png",
+                "caption": "",
+                "position": 1544
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/017324.png",
+                "caption": "",
+                "position": 1545
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/048538.png",
+                "caption": "",
+                "position": 1547
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/017145.png",
+                "caption": "",
+                "position": 1548
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/024599.png",
+                "caption": "",
+                "position": 1550
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/032092.png",
+                "caption": "",
+                "position": 1552
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/028289.png",
+                "caption": "",
+                "position": 1553
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/036549.png",
+                "caption": "",
+                "position": 1555
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/040393.png",
+                "caption": "",
+                "position": 1556
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/046967.png",
+                "caption": "",
+                "position": 1558
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/022950.png",
+                "caption": "",
+                "position": 1560
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/018511.png",
+                "caption": "",
+                "position": 1561
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/042108.png",
+                "caption": "",
+                "position": 1563
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/004966.png",
+                "caption": "",
+                "position": 1564
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/046905.png",
+                "caption": "",
+                "position": 1566
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/034540.png",
+                "caption": "",
+                "position": 1568
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/027985.png",
+                "caption": "",
+                "position": 1569
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/007815.png",
+                "caption": "",
+                "position": 1571
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/019109.png",
+                "caption": "",
+                "position": 1572
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/012563.png",
+                "caption": "",
+                "position": 1574
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/047928.png",
+                "caption": "",
+                "position": 1576
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/040013.png",
+                "caption": "",
+                "position": 1577
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/012937.png",
+                "caption": "",
+                "position": 1579
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/011003.png",
+                "caption": "",
+                "position": 1580
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/selected_images/035301.png",
+                "caption": "",
+                "position": 1582
+            }
+        ]
+    },
+    {
+        "header": "6Discussion and Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix AImplementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.13720/x4.png",
+                "caption": "Figure 6:The influence of CFG, without and with CFG interval (for JiT-L/16 on ImageNet 256×\\times256, 600 epochs).",
+                "position": 2388
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAdditional Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.13720/x5.png",
+                "caption": "Figure 7:(Top):Training lossof𝒙\\bm{x}- and𝒗\\bm{v}-prediction, using the same loss space of𝒗\\bm{v}-loss (Tab.2(a), third row). We plot the loss averaged per pixel per channel.(Bottom):Denoised imagesfrom𝒙\\bm{x}- and𝒗\\bm{v}-prediction, where𝒗\\bm{v}-prediction’s denoised output is visualized according toTab.1(c)(1). The denoised image from𝒗\\bm{v}-prediction has noticeable artifacts, as reflected by the higher loss.",
+                "position": 2430
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/denoise/x-pred/inputs_001.png",
+                "caption": "",
+                "position": 2472
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/denoise/x-pred/inputs_002.png",
+                "caption": "",
+                "position": 2476
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/denoise/x-pred/inputs_003.png",
+                "caption": "",
+                "position": 2480
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/denoise/x-pred/inputs_004.png",
+                "caption": "",
+                "position": 2484
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/denoise/x-pred/inputs_005.png",
+                "caption": "",
+                "position": 2488
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/denoise/x-pred/outputs_001.png",
+                "caption": "",
+                "position": 2500
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/denoise/x-pred/outputs_002.png",
+                "caption": "",
+                "position": 2504
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/denoise/x-pred/outputs_003.png",
+                "caption": "",
+                "position": 2508
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/denoise/x-pred/outputs_004.png",
+                "caption": "",
+                "position": 2512
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/denoise/x-pred/outputs_005.png",
+                "caption": "",
+                "position": 2516
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/denoise/v-pred/outputs_001.png",
+                "caption": "",
+                "position": 2528
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/denoise/v-pred/outputs_002.png",
+                "caption": "",
+                "position": 2532
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/denoise/v-pred/outputs_003.png",
+                "caption": "",
+                "position": 2536
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/denoise/v-pred/outputs_004.png",
+                "caption": "",
+                "position": 2540
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/figures/denoise/v-pred/outputs_005.png",
+                "caption": "",
+                "position": 2544
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/000012.jpg",
+                "caption": "Figure 8:Uncuratedsamples on ImageNet 256×\\times256 using JiT-G/16 conditioned on the specified classes. Unlike the common practice of visualizing with a higher CFG, here we show images using the CFG value (2.2) that achieves the reported FID of 1.82.",
+                "position": 3035
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/001012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/002012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/003012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/004012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/005012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/006012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/007012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/008012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/009012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/010012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/011012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/012012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/013012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/014012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/015012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/016012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/017012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/018012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/019012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls012/020012.jpg",
+                "caption": "",
+                "position": 3039
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/000014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/001014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/002014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/003014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/004014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/005014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/006014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/007014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/008014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/009014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/010014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/011014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/012014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/013014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/014014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/015014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/016014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/017014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/018014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/019014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls014/020014.jpg",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/000042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/001042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/002042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/003042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/004042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/005042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/006042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/007042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/008042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/009042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/010042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/011042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/012042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/013042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/014042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/015042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/016042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/017042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/018042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/019042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls042/020042.jpg",
+                "caption": "",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/000081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/001081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/002081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/003081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/004081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/005081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/006081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/007081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/008081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/009081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/010081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/011081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/012081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/013081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/014081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/015081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/016081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/017081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/018081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/019081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls081/020081.jpg",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/000107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/001107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/002107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/003107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/004107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/005107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/006107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/007107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/008107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/009107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/010107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/011107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/012107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/013107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/014107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/015107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/016107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/017107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/018107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/019107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls107/020107.jpg",
+                "caption": "",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/000108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/001108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/002108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/003108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/004108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/005108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/006108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/007108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/008108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/009108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/010108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/011108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/012108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/013108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/014108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/015108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/016108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/017108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/018108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/019108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls108/020108.jpg",
+                "caption": "",
+                "position": 3071
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/000110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/001110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/002110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/003110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/004110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/005110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/006110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/007110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/008110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/009110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/010110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/011110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/012110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/013110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/014110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/015110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/016110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/017110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/018110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/019110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls110/020110.jpg",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/000117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/001117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/002117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/003117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/004117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/005117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/006117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/007117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/008117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/009117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/010117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/011117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/012117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/013117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/014117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/015117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/016117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/017117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/018117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/019117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls117/020117.jpg",
+                "caption": "",
+                "position": 3084
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/000130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/001130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/002130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/003130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/004130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/005130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/006130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/007130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/008130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/009130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/010130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/011130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/012130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/013130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/014130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/015130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/016130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/017130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/018130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/019130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls130/020130.jpg",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/000279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/001279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/002279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/003279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/004279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/005279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/006279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/007279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/008279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/009279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/010279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/011279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/012279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/013279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/014279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/015279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/016279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/017279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/018279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/019279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls279/020279.jpg",
+                "caption": "",
+                "position": 3097
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/000288.jpg",
+                "caption": "Figure 9:Uncuratedsamples on ImageNet 256×\\times256 using JiT-G/16 conditioned on the specified classes. Unlike the common practice of visualizing with a higher CFG, here we show images using the CFG value (2.2) that achieves the reported FID of 1.82.",
+                "position": 3106
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/001288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/002288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/003288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/004288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/005288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/006288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/007288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/008288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/009288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/010288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/011288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/012288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/013288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/014288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/015288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/016288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/017288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/018288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/019288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls288/020288.jpg",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/000309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/001309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/002309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/003309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/004309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/005309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/006309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/007309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/008309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/009309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/010309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/011309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/012309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/013309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/014309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/015309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/016309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/017309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/018309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/019309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls309/020309.jpg",
+                "caption": "",
+                "position": 3116
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/000349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/001349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/002349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/003349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/004349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/005349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/006349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/007349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/008349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/009349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/010349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/011349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/012349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/013349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/014349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/015349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/016349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/017349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/018349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/019349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls349/020349.jpg",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/000397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/001397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/002397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/003397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/004397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/005397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/006397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/007397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/008397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/009397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/010397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/011397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/012397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/013397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/014397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/015397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/016397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/017397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/018397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/019397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls397/020397.jpg",
+                "caption": "",
+                "position": 3129
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/000425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/001425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/002425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/003425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/004425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/005425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/006425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/007425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/008425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/009425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/010425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/011425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/012425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/013425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/014425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/015425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/016425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/017425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/018425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/019425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls425/020425.jpg",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/000448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/001448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/002448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/003448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/004448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/005448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/006448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/007448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/008448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/009448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/010448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/011448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/012448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/013448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/014448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/015448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/016448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/017448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/018448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/019448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls448/020448.jpg",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/000453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/001453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/002453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/003453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/004453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/005453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/006453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/007453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/008453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/009453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/010453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/011453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/012453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/013453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/014453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/015453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/016453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/017453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/018453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/019453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls453/020453.jpg",
+                "caption": "",
+                "position": 3149
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/000458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/001458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/002458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/003458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/004458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/005458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/006458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/007458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/008458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/009458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/010458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/011458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/012458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/013458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/014458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/015458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/016458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/017458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/018458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/019458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls458/020458.jpg",
+                "caption": "",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/000495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/001495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/002495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/003495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/004495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/005495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/006495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/007495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/008495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/009495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/010495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/011495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/012495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/013495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/014495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/015495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/016495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/017495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/018495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/019495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls495/020495.jpg",
+                "caption": "",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/000500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/001500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/002500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/003500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/004500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/005500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/006500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/007500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/008500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/009500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/010500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/011500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/012500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/013500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/014500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/015500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/016500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/017500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/018500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/019500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls500/020500.jpg",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/000658.jpg",
+                "caption": "Figure 10:Uncuratedsamples on ImageNet 256×\\times256 using JiT-G/16 conditioned on the specified classes. Unlike the common practice of visualizing with a higher CFG, here we show images using the CFG value (2.2) that achieves the reported FID of 1.82.",
+                "position": 3177
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/001658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/002658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/003658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/004658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/005658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/006658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/007658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/008658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/009658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/010658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/011658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/012658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/013658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/014658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/015658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/016658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/017658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/018658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/019658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls658/020658.jpg",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/000661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/001661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/002661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/003661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/004661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/005661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/006661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/007661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/008661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/009661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/010661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/011661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/012661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/013661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/014661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/015661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/016661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/017661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/018661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/019661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls661/020661.jpg",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/000718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/001718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/002718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/003718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/004718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/005718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/006718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/007718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/008718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/009718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/010718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/011718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/012718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/013718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/014718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/015718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/016718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/017718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/018718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/019718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls718/020718.jpg",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/000724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/001724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/002724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/003724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/004724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/005724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/006724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/007724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/008724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/009724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/010724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/011724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/012724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/013724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/014724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/015724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/016724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/017724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/018724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/019724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls724/020724.jpg",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/000725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/001725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/002725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/003725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/004725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/005725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/006725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/007725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/008725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/009725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/010725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/011725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/012725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/013725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/014725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/015725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/016725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/017725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/018725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/019725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls725/020725.jpg",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/000757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/001757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/002757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/003757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/004757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/005757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/006757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/007757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/008757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/009757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/010757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/011757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/012757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/013757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/014757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/015757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/016757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/017757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/018757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/019757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls757/020757.jpg",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/000779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/001779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/002779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/003779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/004779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/005779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/006779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/007779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/008779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/009779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/010779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/011779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/012779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/013779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/014779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/015779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/016779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/017779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/018779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/019779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls779/020779.jpg",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/000780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/001780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/002780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/003780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/004780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/005780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/006780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/007780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/008780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/009780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/010780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/011780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/012780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/013780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/014780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/015780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/016780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/017780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/018780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/019780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls780/020780.jpg",
+                "caption": "",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/000829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/001829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/002829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/003829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/004829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/005829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/006829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/007829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/008829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/009829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/010829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/011829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/012829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/013829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/014829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/015829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/016829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/017829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/018829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/019829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls829/020829.jpg",
+                "caption": "",
+                "position": 3233
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/000853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/001853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/002853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/003853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/004853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/005853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/006853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/007853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/008853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/009853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/010853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/011853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/012853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/013853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/014853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/015853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/016853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/017853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/018853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/019853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls853/020853.jpg",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/000873.jpg",
+                "caption": "Figure 11:Uncuratedsamples on ImageNet 256×\\times256 using JiT-G/16 conditioned on the specified classes. Unlike the common practice of visualizing with a higher CFG, here we show images using the CFG value (2.2) that achieves the reported FID of 1.82.",
+                "position": 3248
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/001873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/002873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/003873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/004873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/005873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/006873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/007873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/008873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/009873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/010873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/011873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/012873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/013873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/014873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/015873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/016873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/017873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/018873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/019873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls873/020873.jpg",
+                "caption": "",
+                "position": 3252
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/000900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/001900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/002900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/003900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/004900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/005900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/006900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/007900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/008900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/009900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/010900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/011900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/012900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/013900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/014900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/015900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/016900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/017900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/018900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/019900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls900/020900.jpg",
+                "caption": "",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/000911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/001911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/002911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/003911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/004911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/005911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/006911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/007911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/008911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/009911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/010911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/011911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/012911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/013911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/014911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/015911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/016911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/017911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/018911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/019911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls911/020911.jpg",
+                "caption": "",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/000913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/001913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/002913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/003913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/004913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/005913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/006913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/007913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/008913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/009913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/010913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/011913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/012913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/013913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/014913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/015913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/016913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/017913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/018913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/019913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls913/020913.jpg",
+                "caption": "",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/000927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/001927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/002927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/003927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/004927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/005927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/006927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/007927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/008927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/009927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/010927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/011927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/012927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/013927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/014927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/015927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/016927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/017927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/018927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/019927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls927/020927.jpg",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/000930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/001930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/002930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/003930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/004930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/005930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/006930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/007930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/008930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/009930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/010930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/011930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/012930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/013930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/014930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/015930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/016930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/017930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/018930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/019930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls930/020930.jpg",
+                "caption": "",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/000946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/001946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/002946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/003946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/004946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/005946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/006946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/007946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/008946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/009946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/010946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/011946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/012946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/013946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/014946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/015946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/016946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/017946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/018946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/019946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls946/020946.jpg",
+                "caption": "",
+                "position": 3291
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/000947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/001947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/002947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/003947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/004947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/005947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/006947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/007947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/008947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/009947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/010947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/011947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/012947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/013947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/014947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/015947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/016947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/017947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/018947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/019947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls947/020947.jpg",
+                "caption": "",
+                "position": 3297
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/000975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/001975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/002975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/003975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/004975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/005975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/006975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/007975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/008975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/009975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/010975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/011975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/012975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/013975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/014975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/015975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/016975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/017975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/018975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/019975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls975/020975.jpg",
+                "caption": "",
+                "position": 3304
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/000989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/001989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/002989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/003989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/004989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/005989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/006989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/007989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/008989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/009989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/010989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/011989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/012989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/013989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/014989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/015989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/016989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/017989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/018989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/019989.jpg",
+                "caption": "",
+                "position": 3310
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13720/samples256_cfg2.2_jpg/cls989/020989.jpg",
+                "caption": "",
+                "position": 3310
+            }
+        ]
+    },
+    {
+        "header": "Appendix CQualitative Results",
+        "images": []
+    }
+]

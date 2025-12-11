@@ -1,0 +1,83 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.13288/img/aqlogo.jpg",
+                "caption": "",
+                "position": 72
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.13288/img/workflow.png",
+                "caption": "Figure 1:System workflow with coordinated main and sub-agents.A user query is fed to the main agentℳ\\mathcal{M}, which plans, reasons, and delegates subtasks to specialized sub-agents{𝒮i}\\{\\mathcal{S}_{i}\\}if needed (e.g., visit/browsing and search tools).\nSub-agents return structured feedback toℳ\\mathcal{M}, which integrates evidence, performs verification, and produces the final answer.\nBothℳ\\mathcal{M}and𝒮i\\mathcal{S}_{i}may iterate via self-verification loops before feedback outputs toℳ\\mathcal{M}.",
+                "position": 106
+            }
+        ]
+    },
+    {
+        "header": "2Related work",
+        "images": []
+    },
+    {
+        "header": "3Problem setup",
+        "images": []
+    },
+    {
+        "header": "4Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.13288/img/rollout.png",
+                "caption": "Figure 2:One rollout with nestedℳ→𝒮\\mathcal{M}\\!\\to\\!\\mathcal{S}interactions.The main agentℳ\\mathcal{M}follows trajectoryτℳ\\tau_{\\mathcal{M}}(red) and may distribute subtasks by invoking the sub-agent𝒮\\mathcal{S}multiple times (e.g.,aℳ1a_{\\mathcal{M}}^{1}andaℳ3a_{\\mathcal{M}}^{3}).\nEach invocation generates a sub-trajectoryτ𝒮i\\tau_{\\mathcal{S}_{i}}(blue) that performs tool-use steps and returns a summarized messageo𝒮io_{\\mathcal{S}_{i}}toℳ\\mathcal{M}.\nThe main trajectory integrates these intermediate results and finally outputs the answeroℳo_{\\mathcal{M}}.",
+                "position": 342
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13288/img/workflow_detail_v1.png",
+                "caption": "Figure 3:Workflow of the decoupled two-agent architecture with M-GRPO.The Main agent (left) and Sub agent (right) each generate rollouts via their SGL router/server. Main agent logs trajectories and rewards to a shared Database. Sub agent extracts the required rewards from the database and calculates its own rewards for training. A central Agent Controller (middle) coordinates multi-turn interactions, assigns subtasks to the sub agent, and aggregates returned results. Tool calls (reason/search/visit) are executed through a Tool Server. The sub-agent side maintains a cache for sample synchronization. Arrows indicate data and control flow.",
+                "position": 516
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13288/img/trajectory_alignment.png",
+                "caption": "Figure 4:Trajectory alignment for batch training with variable sub-agent invocations.For each query, we sampleKKrollouts. Every rollout yields one main-trajectoryτℳ\\tau_{\\mathcal{M}}and a variable number of sub-agent trajectories{τ𝒮i}\\{\\tau_{\\mathcal{S}_{i}}\\}.\nBecause the number of sub-invocationsdkd_{k}differs across rollouts, we fix a targetdd(e.g.,88) and randomly duplicate or dropτ𝒮\\tau_{\\mathcal{S}}samples so that each batch contains a consistent count ofτ𝒮\\tau_{\\mathcal{S}}(while keeping a fixed number ofτℳ\\tau_{\\mathcal{M}}, e.g.,88).\nThis alignment produces uniform tensor shapes for policy-gradient updates.",
+                "position": 519
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.13288/img/article_stage1.png",
+                "caption": "Figure 5:Reward curve during Stage 1 RL training on simple data. The system shows stable improvement from zero to high rewards, demonstrating effective format acquisition.",
+                "position": 593
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13288/img/article_inference.png",
+                "caption": "Figure 6:Benchmark performance during Stage 2 training (averaged over three runs). Co-training both agents (blue) consistently outperforms main-only training (purple) across GAIA, XBench-DeepSearch, and WebWalkerQA benchmarks, demonstrating that learned collaborative behaviors transfer to diverse real-world tasks.",
+                "position": 609
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13288/img/article_stage2_compare.png",
+                "caption": "Figure 7:Stage 2 RL learning curves on challenging data comparing three training configurations. Raw rewards and EMA-smoothed trends are shown. Co-training both agents achieves the highest rewards, followed by main-only training, with single-agent baseline showing the lowest performance.",
+                "position": 647
+            },
+            {
+                "img": "https://arxiv.org/html/2511.13288/img/article_stage2_sync_compare.png",
+                "caption": "Figure 8:Stage 2 RL learning curves comparing implementations with and without trajectory synchronization. Raw rewards (lighter lines) and EMA-smoothed trends (darker lines) are shown. The synchronized version (blue) outperforms the unsynchronized version (orange), validating the benefit of maintaining more on-policy training dynamics.",
+                "position": 679
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]

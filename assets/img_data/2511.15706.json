@@ -1,0 +1,589 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.15706/x1.png",
+                "caption": "Figure 1:Radar chart of performance on benchmarks.RoMa v2 outperforms previous dense matchers on a wide range of pose estimation and dense matching tasks. Further details on these experiments can be found inSection4.",
+                "position": 152
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/qual/00014786_0.png_00014786_1.png.jpg",
+                "caption": "Figure 2:Qualitative results.RoMa v2 excels at matching in diverse scenarios. We show a snapshot of results from different benchmarks. Below each image pair we visualize the dense warp by coloring each pixel by the RGB value from its estimated corresponding location in the opposite image. Brighter values mean lower warp confidence as output by the model.",
+                "position": 160
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/qual/DSC09064.JPG_DSC09158.JPG.jpg",
+                "caption": "",
+                "position": 163
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/qual/frame_00000.jpg_frame_00470.jpg.jpg",
+                "caption": "",
+                "position": 164
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/qual/frame_00100.jpg_frame_00200.jpg.jpg",
+                "caption": "",
+                "position": 165
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/qual/maidan_01.png_02.png.jpg",
+                "caption": "",
+                "position": 167
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/qual/n008-2018-05-21-11-06-59-0400__CAM_FRONT__1526915299762465.jpg_n008-2018-05-21-11-06-59-0400__CAM_FRONT__1526915302362465.jpg.jpg",
+                "caption": "",
+                "position": 168
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/qual/silasveta2_01.png_02.png.jpg",
+                "caption": "",
+                "position": 169
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/qual/stadium_01.png_02.png.jpg",
+                "caption": "",
+                "position": 170
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.15706/x2.png",
+                "caption": "Figure 3:Overview of RoMa v2.We estimate bidirectional dense image warps𝐖={𝐖A↦B∈ℝH×W×2,𝐖B↦A∈ℝH×W×2}\\mathbf{W}=\\{\\mathbf{W}^{A\\mapsto B}\\in\\mathbb{R}^{H\\times W\\times 2},\\mathbf{W}^{B\\mapsto A}\\in\\mathbb{R}^{H\\times W\\times 2}\\}and warp confidences𝐩={𝐩A↦B∈ℝH×W×1,𝐩B↦A∈ℝH×W×1}\\mathbf{p}=\\{\\mathbf{p}^{A\\mapsto B}\\in\\mathbb{R}^{H\\times W\\times 1},\\mathbf{p}^{B\\mapsto A}\\in\\mathbb{R}^{H\\times W\\times 1}\\}between two input images using a two-stage pipeline consisting of a matching and refinement stage.\nDifferent from recent SotA dense matchers, we additionally predict a precision matrix𝚺−1={(𝚺−1)A↦B∈ℝH×W×2×2,(𝚺−1)B↦A∈ℝH×W×2×2}\\mathbf{\\Sigma}^{-1}=\\{(\\mathbf{\\Sigma}^{-1})^{A\\mapsto B}\\in\\mathbb{R}^{H\\times W\\times 2\\times 2},(\\mathbf{\\Sigma}^{-1})^{B\\mapsto A}\\in\\mathbb{R}^{H\\times W\\times 2\\times 2}\\}.\nThecoarse matcheris a Multi-view Transformer, that takes in frozen DINOv3[siméoni2025dinov3]foundation model features from image𝐈A∈ℝH×W×3\\mathbf{I}^{A}\\in\\mathbb{R}^{H\\times W\\times 3}and𝐈B∈ℝH×W×3\\mathbf{I}^{B}\\in\\mathbb{R}^{H\\times W\\times 3}. Its internals are further illustrated inFigure4, and explained in detail inSection3.2.\nTherefinersare fine-grained UNet-like CNN models that, conditioned on the previous warp and confidence, produce displacements and delta confidences.\nBesides this, they additionally predict a full2×22\\times 2precision matrix per-pixel, which is visualized as|𝚺−1|−1/4\\big\\lvert\\mathbf{\\Sigma}^{-1}\\big\\rvert^{-1/4}.\nThe refiners are further illustrated inFigure5and explained in more detail inSection3.3.",
+                "position": 242
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.15706/x3.png",
+                "caption": "Figure 4:Coarse matcher.We use a frozen DINOv3 feature extractor in the coarse matching stage. DINOv3 features from both input images are input to a Multi-view Transformer utilizing alternating Attention. Dense Prediction Transformer (DPT)[ranftl2021vision]heads output coarse warps𝐖\\mathbf{W}between the images and confidences𝐩\\mathbf{p}for 4x downsampled resolution.",
+                "position": 289
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/x4.png",
+                "caption": "Figure 5:Refiner internals.The coarse matcher predicts at a resolution 4x smaller than the original image size. The refiners output at the original resolution.",
+                "position": 412
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/x5.png",
+                "caption": "(a)Before EMA",
+                "position": 495
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/x5.png",
+                "caption": "(a)Before EMA",
+                "position": 498
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/x6.png",
+                "caption": "(b)After EMA",
+                "position": 504
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/comparisons/v1/0006.png_0007.png.jpg",
+                "caption": "Figure 7:Finegrained objects in warp.Left:RoMa warp for small baseline pair. Note the missing warp for the guitar in the bottom right.Right:RoMa v2 warp. RoMa v2 is significantly better at capturing small objects with dynamic motion.",
+                "position": 570
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/comparisons/v2/0006.png_0007.png.jpg",
+                "caption": "",
+                "position": 574
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/comparisons/v1/0006.png_0007.png_flow_AtoB.jpg",
+                "caption": "",
+                "position": 576
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/comparisons/v1/0006.png_0007.png_flow_BtoA.jpg",
+                "caption": "",
+                "position": 578
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/comparisons/v2/0006.png_0007.png_flow_AtoB.jpg",
+                "caption": "",
+                "position": 580
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/comparisons/v2/0006.png_0007.png_flow_BtoA.jpg",
+                "caption": "",
+                "position": 582
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/comparisons/v1/n015-2018-08-01-17-13-57+0800__CAM_FRONT__1533115169762460.jpg_n015-2018-08-01-17-13-57+0800__CAM_FRONT__1533115183512460.jpg.jpg",
+                "caption": "Figure 8:Better texture-poor geometry prediction.Left:RoMa warp for large-baseline pair with texture-poor road surfaces, with warp missing for almost the entire road.Right:RoMa v2 warp. RoMa v2 predicts accurately for covisible road.",
+                "position": 586
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/comparisons/v2/n015-2018-08-01-17-13-57+0800__CAM_FRONT__1533115169762460.jpg_n015-2018-08-01-17-13-57+0800__CAM_FRONT__1533115183512460.jpg.jpg",
+                "caption": "",
+                "position": 590
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/comparisons/v1/n015-2018-08-01-17-13-57+0800__CAM_FRONT__1533115169762460.jpg_n015-2018-08-01-17-13-57+0800__CAM_FRONT__1533115183512460.jpg_flow_AtoB.jpg",
+                "caption": "",
+                "position": 592
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/comparisons/v2/n015-2018-08-01-17-13-57+0800__CAM_FRONT__1533115169762460.jpg_n015-2018-08-01-17-13-57+0800__CAM_FRONT__1533115183512460.jpg_flow_AtoB.jpg",
+                "caption": "",
+                "position": 594
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/comparisons/v1/n015-2018-08-01-17-13-57+0800__CAM_FRONT__1533115169762460.jpg_n015-2018-08-01-17-13-57+0800__CAM_FRONT__1533115183512460.jpg_flow_BtoA.jpg",
+                "caption": "",
+                "position": 596
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/comparisons/v2/n015-2018-08-01-17-13-57+0800__CAM_FRONT__1533115169762460.jpg_n015-2018-08-01-17-13-57+0800__CAM_FRONT__1533115183512460.jpg_flow_BtoA.jpg",
+                "caption": "",
+                "position": 598
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/covariance/covariance_multiple.png",
+                "caption": "Figure 9:Qualitative example of covariances.We plot the predicted covariance for randomly sampled keypoints.\nIn the right image, we have applied a linear kernel to simulate motion blur, yielding larger covariances, especially in the blur direction.",
+                "position": 1340
+            }
+        ]
+    },
+    {
+        "header": "5Limitations and Future Work",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "Appendix AArchitectural Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BFurther Details on Datasets",
+        "images": []
+    },
+    {
+        "header": "Appendix CFurther Details on Training Data",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_0.jpg",
+                "caption": "Figure 10:Visualization of training batch.Our data mixures is diverse and challenging, covering many types of scenes.",
+                "position": 1650
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_0.jpg",
+                "caption": "",
+                "position": 1653
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_0.jpg",
+                "caption": "",
+                "position": 1657
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_0.jpg",
+                "caption": "",
+                "position": 1659
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_0.jpg",
+                "caption": "",
+                "position": 1661
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_1.jpg",
+                "caption": "",
+                "position": 1663
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_1.jpg",
+                "caption": "",
+                "position": 1665
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_1.jpg",
+                "caption": "",
+                "position": 1667
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_1.jpg",
+                "caption": "",
+                "position": 1669
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_2.jpg",
+                "caption": "",
+                "position": 1671
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_2.jpg",
+                "caption": "",
+                "position": 1673
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_2.jpg",
+                "caption": "",
+                "position": 1675
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_2.jpg",
+                "caption": "",
+                "position": 1677
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_3.jpg",
+                "caption": "",
+                "position": 1679
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_3.jpg",
+                "caption": "",
+                "position": 1681
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_3.jpg",
+                "caption": "",
+                "position": 1683
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_3.jpg",
+                "caption": "",
+                "position": 1685
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_4.jpg",
+                "caption": "",
+                "position": 1687
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_4.jpg",
+                "caption": "",
+                "position": 1689
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_4.jpg",
+                "caption": "",
+                "position": 1691
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_4.jpg",
+                "caption": "",
+                "position": 1693
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_5.jpg",
+                "caption": "",
+                "position": 1695
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_5.jpg",
+                "caption": "",
+                "position": 1697
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_5.jpg",
+                "caption": "",
+                "position": 1699
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_5.jpg",
+                "caption": "",
+                "position": 1701
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_6.jpg",
+                "caption": "",
+                "position": 1703
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_6.jpg",
+                "caption": "",
+                "position": 1705
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_6.jpg",
+                "caption": "",
+                "position": 1707
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_6.jpg",
+                "caption": "",
+                "position": 1709
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_7.jpg",
+                "caption": "",
+                "position": 1711
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_7.jpg",
+                "caption": "",
+                "position": 1713
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_7.jpg",
+                "caption": "",
+                "position": 1715
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_7.jpg",
+                "caption": "",
+                "position": 1717
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_8.jpg",
+                "caption": "",
+                "position": 1722
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_8.jpg",
+                "caption": "",
+                "position": 1726
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_8.jpg",
+                "caption": "",
+                "position": 1728
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_8.jpg",
+                "caption": "",
+                "position": 1730
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_9.jpg",
+                "caption": "",
+                "position": 1732
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_9.jpg",
+                "caption": "",
+                "position": 1734
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_9.jpg",
+                "caption": "",
+                "position": 1736
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_9.jpg",
+                "caption": "",
+                "position": 1738
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_10.jpg",
+                "caption": "",
+                "position": 1740
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_10.jpg",
+                "caption": "",
+                "position": 1742
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_10.jpg",
+                "caption": "",
+                "position": 1744
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_10.jpg",
+                "caption": "",
+                "position": 1746
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_11.jpg",
+                "caption": "",
+                "position": 1748
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_11.jpg",
+                "caption": "",
+                "position": 1750
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_11.jpg",
+                "caption": "",
+                "position": 1752
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_11.jpg",
+                "caption": "",
+                "position": 1754
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_12.jpg",
+                "caption": "",
+                "position": 1756
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_12.jpg",
+                "caption": "",
+                "position": 1758
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_12.jpg",
+                "caption": "",
+                "position": 1760
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_12.jpg",
+                "caption": "",
+                "position": 1762
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_13.jpg",
+                "caption": "",
+                "position": 1764
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_13.jpg",
+                "caption": "",
+                "position": 1766
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_13.jpg",
+                "caption": "",
+                "position": 1768
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_13.jpg",
+                "caption": "",
+                "position": 1770
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_14.jpg",
+                "caption": "",
+                "position": 1772
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_14.jpg",
+                "caption": "",
+                "position": 1774
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_14.jpg",
+                "caption": "",
+                "position": 1776
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_14.jpg",
+                "caption": "",
+                "position": 1778
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_A_15.jpg",
+                "caption": "",
+                "position": 1780
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_img_B_15.jpg",
+                "caption": "",
+                "position": 1782
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_overlap_15.jpg",
+                "caption": "",
+                "position": 1784
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/train_batch/train_batch_warp_15.jpg",
+                "caption": "",
+                "position": 1786
+            }
+        ]
+    },
+    {
+        "header": "Appendix DFurther Details on Benchmarks",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/satast/annotation_ISS064-E-51351_correspondences_iter_1_original_view.jpg",
+                "caption": "Figure 11:Annotation of correspondences for SatAst:1) We annotate four initial approximate correspondences. 2) We warp the satellite image using the homography obtained from the previous step and annotate ten accurate correspondences. 3) Visualization of the warp obtained by estimating a homography from the ten accurate annotations. 4) The ten accurate correspondences visualized in the original images, where we score the homographies obtained from the dense matchers. Step 2) is sometimes repeated several times until a warp that is deemed good enough is obtained.",
+                "position": 1842
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/satast/annotation_ISS064-E-51351_correspondences_iter_3_interim_warped_view.jpg",
+                "caption": "",
+                "position": 1846
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/satast/annotation_ISS064-E-51351_correspondences_iter_3_final_warped_view.jpg",
+                "caption": "",
+                "position": 1848
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/satast/annotation_ISS064-E-51351_correspondences_iter_3_original_view.jpg",
+                "caption": "",
+                "position": 1850
+            }
+        ]
+    },
+    {
+        "header": "Appendix EFurther Details on Predictive Covariance Experiment",
+        "images": []
+    },
+    {
+        "header": "Appendix FRelative Pose Estimation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/toronto_A.jpg",
+                "caption": "Figure 13:Visualization of RoMa v2 warp.Note that the model puts some confidence erroneously in sky pixels (see top-left). This may be due to bias stemming from AerialMegaDepth.",
+                "position": 1913
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/toronto_B.jpg",
+                "caption": "",
+                "position": 1917
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/roma_warp_toronto.jpg",
+                "caption": "",
+                "position": 1919
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/aerial/aerialmegadepth_img_A_10.jpg",
+                "caption": "Figure 14:Spurious depth estimates in AerialMegaDepth.Depth from the scene leaks into the sky, causing some skypixels to be multi-view consistent. This possibly leaks into the warp estimate of RoMa v2.",
+                "position": 1926
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/aerial/aerialmegadepth_img_B_10.jpg",
+                "caption": "",
+                "position": 1930
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/aerial/aerialmegadepth_overlap_10.jpg",
+                "caption": "",
+                "position": 1932
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15706/figures/aerial/aerialmegadepth_warp_10.jpg",
+                "caption": "",
+                "position": 1934
+            }
+        ]
+    },
+    {
+        "header": "Appendix GBias In AerialMegaDepth",
+        "images": []
+    }
+]
