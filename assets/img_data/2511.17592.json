@@ -1,0 +1,57 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2System Design",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.17592/gigaevo_scheme_v2.png",
+                "caption": "Figure 1:GigaEvo system architecture.The framework comprises four core components (highlighted in green): (i)Redis Database— a Redis storage for evolutionary units, which contain UUID, source code, lifecycle state, metrics, and lineage information, supporting concurrent access via optimistic concurrency control; (ii)DAG Execution Engine— an asyncio-based pipeline processing programs through configurable stages (execution, validation, complexity analysis, LLM inference); (iii)Evolution Engine— an asynchronous loop implementing MAP-Elites quality-diversity algorithm that maps programs to behavior space cells (fitness × validity), performs fitness-proportional selection of elites, and supports single-island and multi-island configurations with periodic migration; and (iv)Mutation Operator— a LangGraph-based agent that constructs prompts from task descriptions, parent code, metrics, insights, and lineage analyses, then invokes LLMs to generate offspring programs using rewrite-based or diff-based mutation modes with multi-model routing support. All components interact through the Redis storage layer, enabling modular, concurrent evolutionary search.",
+                "position": 139
+            }
+        ]
+    },
+    {
+        "header": "3Experimental setup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.17592/sample-ui.png",
+                "caption": "Figure 2:Part of the DAG pipeline in the GUI used to process programs in our experiments.\nPrograms are first validated (ValidateCodeStage), executed (CallProgramFunction), and evaluated via a problem-specific validator (CallValidatorFunction).\nComplexity metrics (ComputeComplexityStage) are merged with validation metrics (MergeMetricsStage) and ensured complete viaEnsureMetricsStage.\nIndividual program insights are generated (InsightsStage), while lineage analysis proceeds through multiple stages:LineageStagecomputes parent→\\tocurrent transition analyses;AncestorProgramIdsandDescendantProgramIdsselect relevant relatives;LineagesFromAncestorsandLineagesToDescendantsgather bidirectional lineage insights.\nFinally,MutationContextStageassembles all information into a structured context for the mutation operator.\nThe framework supports arbitrary DAG topologies through declarative configuration.",
+                "position": 254
+            }
+        ]
+    },
+    {
+        "header": "4Benchmark problems",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.17592/heilbronn_results.png",
+                "caption": "Figure 3:Heilbronn triangle problem results forn=11n=11points.Left:Point configuration discovered by GigaEvo, maximizing the minimum triangle area formed by any three points in a unit-area equilateral triangle.\nThe evolved program places points both on the boundary and in the interior, exploiting geometric symmetries while avoiding near-collinear triplets.Right:Fitness evolution over 20 evolution generations, showing rapid initial progress followed by refinement.\nThe dashed lines indicate benchmark results: AlphaEvolve achieved0.03650.0365(green), while the previous best(friedman_main_website)was approximately0.0360.036(red).\nGigaEvo achieved a fitness of0.03640.0364, which is10−410^{-4}below the reported AlphaEvolve result.\nBy visual inspection (fig. 26 left panel ingeorgiev2025mathematical), the point configurations are nearly identical, suggesting GigaEvo successfully reproduced the AlphaEvolve solution.\nThe small fitness difference could be eliminated with additional computational budget for fine-tuning the simulated annealing parameters in the final optimization phase. This demonstrates that our implementation captures the essential algorithmic principles underlying AlphaEvolve’s success.",
+                "position": 294
+            },
+            {
+                "img": "https://arxiv.org/html/2511.17592/70a36915-f491-4c7c-94f2-3d27113f7989_99156_visualization.png",
+                "caption": "Figure 4:Circle packing in unit square forn=26n=26circles.Optimal configuration discovered by GigaEvo, maximizing the sum of radii∑i=126ri\\sum_{i=1}^{26}r_{i}of disjoint circles packed within the unit square.\nGigaEvo achieved a total radius sum of2.6362.636, slightly surpassing the AlphaEvolve result of2.6352.635reported innovikov2025alphaevolve.\nVisual comparison with the AlphaEvolve solution (fig. 28 ingeorgiev2025mathematical) reveals nearly identical qualitative structure, with minor improvements likely attributable to refined local optimization of centers and radii.\nThis demonstrates that our implementation successfully reproduces and marginally improves upon AlphaEvolve’s results through effective exploration of the constrained geometric optimization landscape.",
+                "position": 323
+            }
+        ]
+    },
+    {
+        "header": "5Conclusions",
+        "images": []
+    },
+    {
+        "header": "Appendix AHeilbronn Triangle Problem: Task Description and Evolved Solution",
+        "images": []
+    },
+    {
+        "header": "Appendix BPrompt And Agent Evolution Results",
+        "images": []
+    }
+]
