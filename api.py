@@ -497,7 +497,7 @@ Categories:
 2. LONG_CONTEXT: Papers about long context handling, including techniques to extend context length
 3. SYNTHETIC: Papers about using synthetic data for training, including methods for generating and leveraging artificial data
 4. TRANSLATION: Papers about machine translation, including techniques, data and applications for translating between languages
-5. TRAINING: Papers about machine translation, including techniques, data and applications for translating between languages
+5. TRAINING: Papers about improving model training or fine-tuning methods, including optimization techniques, training strategies, and related methodologies
 
 Return only JSON with flat array of categories that match the given text. If no category fit return empty list.
 
