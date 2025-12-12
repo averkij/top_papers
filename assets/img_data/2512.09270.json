@@ -1,0 +1,118 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.09270/x1.png",
+                "caption": "Figure 1:Approaches for modeling long-range 4D Motion.(a) The all-at-once training experiences memory overflow and even suffers from limited representational capacity. (b) The chunk-based training mitigates the memory overflow but causes temporal flickering at chunk boundaries, substantially degrading visual quality. In contrast, (c) our Anchor Relay-based Bidirectional Blending (ARBB) approach successfully maintains both representation quality and temporal consistency by smoothly transiting the influence of each Key-frame Anchor (KfA). The rendered patches, frame-wise tOF[chu2018temporally], and temporal profile provide strong evidence for the effectiveness of our method.",
+                "position": 106
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.09270/x2.png",
+                "caption": "Figure 2:Conceptual comparison of existing 4DGS methods in modeling long-range 4D motion.(a) All-at-once approaches suffer from high memory usage, while (b) chunk-based methods inevitably fail to maintain temporal consistency. Even advanced variants struggle with system applicability such as a random accessibility. Our ARBB framework resolves all these issues, achieving bounded memory and temporally coherent long-range modeling.",
+                "position": 121
+            }
+        ]
+    },
+    {
+        "header": "2Related Works",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.09270/x3.png",
+                "caption": "Figure 3:Overview of MoRel framework.To efficiently model long-range 4D motion with bounded memory and temporal consistency, MoRel adopts the Anchor Relay-based Bidirectional Blending (ARBB) strategy composed of four training stages which are organized into two phase.\nIn the Anchor Relay phase (Sec.3.2), a GCA is first trained on entire frames with a single point cloud. Next, each KfA is derived around its key-frame time index, while its spatial detail is enhanced through FHD (Sec.3.4).\nIn the Bidirectional Blending phase (Sec.3.3), PWD training stage is executed to learn bidirectional deformation fields within local temporal windows to ensure robust motion modeling of each anchor.\nFinally, in IFB training stage, each pair of neighboring anchors are fused through a learnable temporal opacity control, that smoothly transitions anchor influence over time, eliminating temporal flickering across chunks.",
+                "position": 150
+            }
+        ]
+    },
+    {
+        "header": "3Proposed Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.09270/x4.png",
+                "caption": "Figure 4:Comparison of training strategies for modeling long-range 4D motion with bidirectional deformation. (a) All-at-once training suffers from memory overflow. (b) Chunk-wise training reduces memory cost but causes inter-chunk interference. (c) Our Bidirectional Blending (PWD + IFB) maintains bounded memory and prevents inter-chunk interference.",
+                "position": 215
+            },
+            {
+                "img": "https://arxiv.org/html/2512.09270/x5.png",
+                "caption": "Figure 5:Overview of Feature-variance-guided Hierarchical Densification.(a) Variance-based Leveling: After GCA training, we assign a level to each anchor-point guided by the feature-variance. (b) Level-wise Densification: During the KfA and PWD trainings, gradients for KfA densification are modulated by level-specific weights, enabling early low-frequency stabilization and late high-frequency refinement.",
+                "position": 237
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.09270/x6.png",
+                "caption": "Figure 6:Qualitative comparison on SelfCapLR{}_{\\text{LR}}.OurMoReldemonstrates superior visual fidelity in long-range motion modeling compared to existing SOTA methods, thanks to its ARBB mechanism that effectively handles long-range 4D motion.",
+                "position": 698
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix ANotation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.09270/x7.png",
+                "caption": "Figure 7:Overview of processing pipeline including the relationship among notations.",
+                "position": 1138
+            }
+        ]
+    },
+    {
+        "header": "Appendix BPreliminary",
+        "images": []
+    },
+    {
+        "header": "Appendix CDataset",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.09270/x8.png",
+                "caption": "Figure 8:Dataset visualization.For the datasets analyzed in Tab.4and Sec.C.1, (a) we visualize frames sampled every 0.5 seconds over a 1-second duration. The size of each frame is scaled according to its relative resolution, and OFps shown below each sequence name indicates the average optical flow magnitude per second. We also show (b) the distance between the closest pair of cameras. As can be seen from the visualizations, SelfCapLR{}_{\\text{LR}}exhibits high resolution, fast motion within a unit time, and a large camera parallax on wide spatial extent.",
+                "position": 1394
+            }
+        ]
+    },
+    {
+        "header": "Appendix DAdditional Results",
+        "images": []
+    },
+    {
+        "header": "Appendix EFurther Analysis and Ablations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.09270/x9.png",
+                "caption": "Figure 9:FHD Visualization and Frequency Analysis.\n(a–c) Level-specific renderings that retain only Gaussians associated with Level 0–2 anchor-points under FHD. (d–f) 2D FFT magnitudes of the corresponding renderings, showing increasingly dominant high-frequency components at higher levels.",
+                "position": 1682
+            },
+            {
+                "img": "https://arxiv.org/html/2512.09270/x10.png",
+                "caption": "Figure 10:FHD level-wise rendering comparison.(a) Result trained without FHD, using all anchor-points and thus the largest anchor-point set. (b–d) Renderings that retain only Gaussians attached to Level 0–2 anchor-points, where higher levels progressively capture high-frequency and dynamic regions. (e) Combining Levels 0 and 1 reconstructs most static content with a small number of anchor-points. (f) Combining all levels merges the dynamic regions from higher levels into the final reconstruction.",
+                "position": 1790
+            },
+            {
+                "img": "https://arxiv.org/html/2512.09270/x11.png",
+                "caption": "Figure 11:Backward contamination.Example visualization and rendered patches illustrating the backward contamination issue in naïve chunk-wise training of bidirectional deformation.",
+                "position": 1793
+            },
+            {
+                "img": "https://arxiv.org/html/2512.09270/x12.png",
+                "caption": "Figure 12:Temporal profile visualization.(a) Unidirectional deformation produces visibly distinguishable chunk boundaries, whereas (b) our bidirectional deformation yields smooth temporal continuity.",
+                "position": 1831
+            }
+        ]
+    },
+    {
+        "header": "Appendix FLimitation and Future Works",
+        "images": []
+    }
+]
