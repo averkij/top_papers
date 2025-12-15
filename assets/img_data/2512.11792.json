@@ -1,0 +1,935 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/girl/cogvideox/1.png",
+                "caption": "Figure 1:We present a training algorithm to distill structure-preserving motion priors from SAM2 into a video diffusion model to improve motion accuracy and smoothness in generated videos. Compared to advanced image-to-video models CogVideoX[yang2024cogvideox]and HunyuanVid[li2024hunyuan], ourSAM2VideoXproduces videos with superior or highly competitive fidelity, despite HunyuanVid having more than twice number of parameters (13B vs. our 5B).",
+                "position": 80
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/girl/cogvideox/2.png",
+                "caption": "",
+                "position": 90
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/girl/cogvideox/3.png",
+                "caption": "",
+                "position": 91
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/boy/cogvideox/1.png",
+                "caption": "",
+                "position": 92
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/boy/cogvideox/2.png",
+                "caption": "",
+                "position": 93
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/boy/cogvideox/3.png",
+                "caption": "",
+                "position": 94
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/girl/hunyuan/1.png",
+                "caption": "",
+                "position": 102
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/girl/hunyuan/2.png",
+                "caption": "",
+                "position": 103
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/girl/hunyuan/3.png",
+                "caption": "",
+                "position": 104
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/boy/hunyuan/1.png",
+                "caption": "",
+                "position": 105
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/boy/hunyuan/2.png",
+                "caption": "",
+                "position": 106
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/boy/hunyuan/3.png",
+                "caption": "",
+                "position": 107
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/girl/ours/1.png",
+                "caption": "",
+                "position": 115
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/girl/ours/2.png",
+                "caption": "",
+                "position": 116
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/girl/ours/3.png",
+                "caption": "",
+                "position": 117
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/boy/ours/1.png",
+                "caption": "",
+                "position": 118
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/boy/ours/2.png",
+                "caption": "",
+                "position": 119
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/fig1/boy/ours/3.png",
+                "caption": "",
+                "position": 120
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/main_figure.png",
+                "caption": "Figure 2:Method overview.The framework consists of two parallel branches:(Top)TheMotion Prior Extractionbranch extracts forward and backward memory features (𝐅memfwd,𝐅membwd\\mathbf{F}^{\\mathrm{fwd}}_{\\mathrm{mem}},\\mathbf{F}^{\\mathrm{bwd}}_{\\mathrm{mem}}) from SAM2 given a clean video, and fuses them into a bidirectional teacher representation.(Bottom)TheVideo Generation Backbonetakes noisy latents as input, and the intermediate DiT features𝐅diff\\mathbf{F}_{\\mathrm{diff}}are projected into the SAM2 space as𝐅^diff\\mathbf{\\hat{F}}_{\\mathrm{diff}}. Then the proposedLocal Gram Flow loss(ℒfeat\\mathcal{L}_{\\mathrm{feat}}) is used to align the spatio-temporal structure of the projected student features with the teacher priors.",
+                "position": 193
+            }
+        ]
+    },
+    {
+        "header": "3Preliminaries",
+        "images": []
+    },
+    {
+        "header": "4Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/local_gram_flow.png",
+                "caption": "Figure 3:Illustration of the Local Gram Flow (LGF) Loss.The LGF operator captures motion structure by computing similarities between a token at framettand its 7x7 spatial neighborhood in the subsequent framet+1t+1. Instead of matching absolute values (e.g.,ℓ2\\ell_{2}), we convert the resulting similarity vectors (Pt,i,Qt,iP_{\\mathrm{t,i}},Q_{\\mathrm{t,i}}) into probability distributions and align them using the KL Divergence. This forces the model to learn relative motion patterns, not just feature values.",
+                "position": 280
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/base/1.png",
+                "caption": "Figure 4:Qualitative comparison on articulated motion.The blue box indicates the input image. Red boxes highlight common failure modes in baselines, including structural distortion (cyclist’s legs) and physical implausibility (three-legged lion, inconsistent leg motion). In contrast, our method (SAM2VideoX) consistently maintains structural integrity. ”+ Fine-tuning” is the LoRA fine-tuning baseline; ”+ Mask sup.” is the mask supervision baseline. We recommend viewing the supplementary videos.",
+                "position": 358
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/base/2.png",
+                "caption": "",
+                "position": 368
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/base/3.png",
+                "caption": "",
+                "position": 369
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/base/4.png",
+                "caption": "",
+                "position": 370
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/base/5.png",
+                "caption": "",
+                "position": 371
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/lora/1.png",
+                "caption": "",
+                "position": 379
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/lora/2.png",
+                "caption": "",
+                "position": 380
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/lora/3.png",
+                "caption": "",
+                "position": 381
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/lora/4.png",
+                "caption": "",
+                "position": 382
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/lora/5.png",
+                "caption": "",
+                "position": 383
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/mask/1.png",
+                "caption": "",
+                "position": 391
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/mask/2.png",
+                "caption": "",
+                "position": 392
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/mask/3.png",
+                "caption": "",
+                "position": 393
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/mask/4.png",
+                "caption": "",
+                "position": 394
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/mask/5.png",
+                "caption": "",
+                "position": 395
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/bidirectional/1.png",
+                "caption": "",
+                "position": 403
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/bidirectional/2.png",
+                "caption": "",
+                "position": 404
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/bidirectional/3.png",
+                "caption": "",
+                "position": 405
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/bidirectional/4.png",
+                "caption": "",
+                "position": 406
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/cyclist/bidirectional/5.png",
+                "caption": "",
+                "position": 407
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/base/1.png",
+                "caption": "",
+                "position": 415
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/base/2.png",
+                "caption": "",
+                "position": 416
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/base/3.png",
+                "caption": "",
+                "position": 417
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/base/4.png",
+                "caption": "",
+                "position": 418
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/base/5.png",
+                "caption": "",
+                "position": 419
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/lora/1.png",
+                "caption": "",
+                "position": 427
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/lora/2.png",
+                "caption": "",
+                "position": 428
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/lora/3.png",
+                "caption": "",
+                "position": 429
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/lora/4.png",
+                "caption": "",
+                "position": 430
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/lora/5.png",
+                "caption": "",
+                "position": 431
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/mask/1.png",
+                "caption": "",
+                "position": 439
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/mask/2.png",
+                "caption": "",
+                "position": 440
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/mask/3.png",
+                "caption": "",
+                "position": 441
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/mask/4.png",
+                "caption": "",
+                "position": 442
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/mask/5.png",
+                "caption": "",
+                "position": 443
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/bidirectional/1.png",
+                "caption": "",
+                "position": 451
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/bidirectional/2.png",
+                "caption": "",
+                "position": 452
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/bidirectional/3.png",
+                "caption": "",
+                "position": 453
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/bidirectional/4.png",
+                "caption": "",
+                "position": 454
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/baselines/lion/bidirectional/5.png",
+                "caption": "",
+                "position": 455
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/x1.png",
+                "caption": "Figure 5:Human preference win rates.Participants were shown pairwise comparisons and asked to select the video with ’superior limb consistency and fewer motion artifacts’. Our method was strongly preferred (>64%>64\\%) over all baselines, confirming its superior ability to generate plausible, artifact-free motion.",
+                "position": 539
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/loss/l2/0038.png",
+                "caption": "Figure 6:Qualitative ablation of our LGF-KL Loss.(Top) Using a standardℓ2\\ell_{2}loss (’w/o LGF Loss’) on raw features results in visible temporal jitter (note the flickering in the arm). (Bottom) Our full method (’w/ LGF Loss’) produces a visibly smoother and more stable motion, validating the design of aligning relational distributions (LGF-KL) over absolute values (ℓ2\\ell_{2}).",
+                "position": 631
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/loss/l2/0042.png",
+                "caption": "",
+                "position": 641
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/loss/l2/0046.png",
+                "caption": "",
+                "position": 642
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/loss/local_gram_loss/0038.png",
+                "caption": "",
+                "position": 649
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/loss/local_gram_loss/0042.png",
+                "caption": "",
+                "position": 651
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/loss/local_gram_loss/0046.png",
+                "caption": "",
+                "position": 652
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/bidirectional_fusion/wo/0020.png",
+                "caption": "Figure 7:Qualitative ablation of our bidirectional LGF fusion.(Top) The forward-only teacher (”w/ Fwd-Only”) produces artifacts, like the ballerina’s arm ’folding’ incorrectly (red box). (Middle) ”Feat-Space Fusion” causes structural tearing. (Bottom) Our ”LGF Fusion” correctly preserves the limb’s topological structure, highlighting the necessity of both bidirectional information and a robust fusion strategy.",
+                "position": 660
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/bidirectional_fusion/wo/0025.png",
+                "caption": "",
+                "position": 670
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/bidirectional_fusion/wo/0030.png",
+                "caption": "",
+                "position": 671
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/bidirectional_fusion/feature/0020.png",
+                "caption": "",
+                "position": 678
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/bidirectional_fusion/feature/0025.png",
+                "caption": "",
+                "position": 680
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/bidirectional_fusion/feature/0030.png",
+                "caption": "",
+                "position": 681
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/bidirectional_fusion/w/0020.png",
+                "caption": "",
+                "position": 688
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/bidirectional_fusion/w/0025.png",
+                "caption": "",
+                "position": 690
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/ablation/bidirectional_fusion/w/0030.png",
+                "caption": "",
+                "position": 691
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix AImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BAdditional Experiments",
+        "images": []
+    },
+    {
+        "header": "Appendix CAdditional Qualitative Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/base/0001.png",
+                "caption": "Figure 8:Extended Visual Comparisons with Baselines.The blue box indicates the conditioning input image, while red boxes highlight structural failure modes observed in baseline methods.",
+                "position": 876
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/base/0013.png",
+                "caption": "",
+                "position": 886
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/base/0025.png",
+                "caption": "",
+                "position": 887
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/base/0037.png",
+                "caption": "",
+                "position": 888
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/base/0049.png",
+                "caption": "",
+                "position": 889
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/lora/0001.png",
+                "caption": "",
+                "position": 897
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/lora/0013.png",
+                "caption": "",
+                "position": 898
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/lora/0025.png",
+                "caption": "",
+                "position": 899
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/lora/0037.png",
+                "caption": "",
+                "position": 900
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/lora/0049.png",
+                "caption": "",
+                "position": 901
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/mask/0001.png",
+                "caption": "",
+                "position": 909
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/mask/0013.png",
+                "caption": "",
+                "position": 910
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/mask/0025.png",
+                "caption": "",
+                "position": 911
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/mask/0037.png",
+                "caption": "",
+                "position": 912
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/mask/0049.png",
+                "caption": "",
+                "position": 913
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/ours/0001.png",
+                "caption": "",
+                "position": 921
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/ours/0013.png",
+                "caption": "",
+                "position": 922
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/ours/0025.png",
+                "caption": "",
+                "position": 923
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/ours/0037.png",
+                "caption": "",
+                "position": 924
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/man_yoga/ours/0049.png",
+                "caption": "",
+                "position": 925
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/base/1.jpeg",
+                "caption": "",
+                "position": 933
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/base/2.jpeg",
+                "caption": "",
+                "position": 934
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/base/3.jpeg",
+                "caption": "",
+                "position": 935
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/base/4.jpeg",
+                "caption": "",
+                "position": 936
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/base/5.jpeg",
+                "caption": "",
+                "position": 937
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/lora/1.jpeg",
+                "caption": "",
+                "position": 945
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/lora/2.jpeg",
+                "caption": "",
+                "position": 946
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/lora/3.jpeg",
+                "caption": "",
+                "position": 947
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/lora/4.jpeg",
+                "caption": "",
+                "position": 948
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/lora/5.jpeg",
+                "caption": "",
+                "position": 949
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/mask/1.jpeg",
+                "caption": "",
+                "position": 957
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/mask/2.jpeg",
+                "caption": "",
+                "position": 958
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/mask/3.jpeg",
+                "caption": "",
+                "position": 959
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/mask/4.jpeg",
+                "caption": "",
+                "position": 960
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/mask/5.jpeg",
+                "caption": "",
+                "position": 961
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/ours/1.jpeg",
+                "caption": "",
+                "position": 969
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/ours/2.jpeg",
+                "caption": "",
+                "position": 970
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/ours/3.jpeg",
+                "caption": "",
+                "position": 971
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/ours/4.jpeg",
+                "caption": "",
+                "position": 972
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/bear/ours/5.jpeg",
+                "caption": "",
+                "position": 973
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/woman_yoga/cogvideox/0001.png",
+                "caption": "Figure 9:Visual Comparison with State-of-the-Art Open-Source Models.Notably, despite HunyuanVid[li2024hunyuan]possessing 13B parameters, ourSAM2VideoX(5B) achieves comparable generation quality.",
+                "position": 979
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/woman_yoga/cogvideox/0013.png",
+                "caption": "",
+                "position": 989
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/woman_yoga/cogvideox/0025.png",
+                "caption": "",
+                "position": 990
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/woman_yoga/cogvideox/0037.png",
+                "caption": "",
+                "position": 991
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/woman_yoga/cogvideox/0049.png",
+                "caption": "",
+                "position": 992
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/woman_yoga/hunyuan/0001.png",
+                "caption": "",
+                "position": 1000
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/woman_yoga/hunyuan/0013.png",
+                "caption": "",
+                "position": 1001
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/woman_yoga/hunyuan/0025.png",
+                "caption": "",
+                "position": 1002
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/woman_yoga/hunyuan/0037.png",
+                "caption": "",
+                "position": 1003
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/woman_yoga/hunyuan/0049.png",
+                "caption": "",
+                "position": 1004
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/woman_yoga/ours/0001.png",
+                "caption": "",
+                "position": 1012
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/woman_yoga/ours/0013.png",
+                "caption": "",
+                "position": 1013
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/woman_yoga/ours/0025.png",
+                "caption": "",
+                "position": 1014
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/woman_yoga/ours/0037.png",
+                "caption": "",
+                "position": 1015
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/woman_yoga/ours/0049.png",
+                "caption": "",
+                "position": 1016
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/rope/cogvideox/frame_001.png",
+                "caption": "",
+                "position": 1024
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/rope/cogvideox/frame_013.png",
+                "caption": "",
+                "position": 1025
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/rope/cogvideox/frame_025.png",
+                "caption": "",
+                "position": 1026
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/rope/cogvideox/frame_037.png",
+                "caption": "",
+                "position": 1027
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/rope/cogvideox/frame_049.png",
+                "caption": "",
+                "position": 1028
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/rope/hunyuan/frame_001.png",
+                "caption": "",
+                "position": 1036
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/rope/hunyuan/frame_013.png",
+                "caption": "",
+                "position": 1037
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/rope/hunyuan/frame_025.png",
+                "caption": "",
+                "position": 1038
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/rope/hunyuan/frame_037.png",
+                "caption": "",
+                "position": 1039
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/rope/hunyuan/frame_049.png",
+                "caption": "",
+                "position": 1040
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/rope/ours/frame_001.png",
+                "caption": "",
+                "position": 1048
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/rope/ours/frame_013.png",
+                "caption": "",
+                "position": 1049
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/rope/ours/frame_025.png",
+                "caption": "",
+                "position": 1050
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/rope/ours/frame_037.png",
+                "caption": "",
+                "position": 1051
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/rope/ours/frame_049.png",
+                "caption": "",
+                "position": 1052
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/pushup/1.jpeg",
+                "caption": "Figure 10:Additional Qualitative Results.OurSAM2VideoXmaintains robust structural consistency across a diverse range of motion dynamics.",
+                "position": 1058
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/pushup/2.jpeg",
+                "caption": "",
+                "position": 1063
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/pushup/3.jpeg",
+                "caption": "",
+                "position": 1064
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/pushup/4.jpeg",
+                "caption": "",
+                "position": 1065
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/pushup/5.jpeg",
+                "caption": "",
+                "position": 1066
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/barbell/0001.png",
+                "caption": "",
+                "position": 1069
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/barbell/0013.png",
+                "caption": "",
+                "position": 1070
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/barbell/0025.png",
+                "caption": "",
+                "position": 1071
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/barbell/0037.png",
+                "caption": "",
+                "position": 1072
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/barbell/0049.png",
+                "caption": "",
+                "position": 1073
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/walk/1.jpeg",
+                "caption": "",
+                "position": 1076
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/walk/2.jpeg",
+                "caption": "",
+                "position": 1077
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/walk/3.jpeg",
+                "caption": "",
+                "position": 1078
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/walk/4.jpeg",
+                "caption": "",
+                "position": 1079
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/walk/5.jpeg",
+                "caption": "",
+                "position": 1080
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/moose/1.jpeg",
+                "caption": "",
+                "position": 1083
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/moose/2.jpeg",
+                "caption": "",
+                "position": 1084
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/moose/3.jpeg",
+                "caption": "",
+                "position": 1085
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/moose/4.jpeg",
+                "caption": "",
+                "position": 1086
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/moose/5.jpeg",
+                "caption": "",
+                "position": 1087
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/stationary/0001.png",
+                "caption": "",
+                "position": 1090
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/stationary/0013.png",
+                "caption": "",
+                "position": 1091
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/stationary/0025.png",
+                "caption": "",
+                "position": 1092
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/stationary/0037.png",
+                "caption": "",
+                "position": 1093
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/stationary/0049.png",
+                "caption": "",
+                "position": 1094
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/pushup2/1.jpeg",
+                "caption": "",
+                "position": 1097
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/pushup2/2.jpeg",
+                "caption": "",
+                "position": 1098
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/pushup2/3.jpeg",
+                "caption": "",
+                "position": 1099
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/pushup2/4.jpeg",
+                "caption": "",
+                "position": 1100
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11792/images/supp/pushup2/5.jpeg",
+                "caption": "",
+                "position": 1101
+            }
+        ]
+    },
+    {
+        "header": "Appendix DTheoretical Analysis of Feature Fusion",
+        "images": []
+    },
+    {
+        "header": "Appendix ELimitations and Future Work",
+        "images": []
+    }
+]

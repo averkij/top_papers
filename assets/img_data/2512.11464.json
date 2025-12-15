@@ -1,0 +1,223 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.11464/x1.png",
+                "caption": "Figure 1:Overview of the MetaCanvas framework.MetaCanvas tokenizes the text and encodes it using the MLLM’s text embedder, while user-provided images and videos are encoded using both the MLLM’s visual encoder and the VAE encoder. The text embeddings produced by the MLLM are passed through a lightweight MLP connector and used as conditioning for the DiT. In addition, we append a set of learnable multidimensional canvas tokens to the MLLM input, which are processed using multimodal RoPE(Bai et al.,2025b). The resulting canvas embeddings are then fused with the noisy latents through a lightweight transformer-based connector with two blocks. Connector details are illustrated inFigure˜2.Greentokens represent media context tokens,bluetokens represent text context tokens, andpurpletokens represent the canvas tokens.",
+                "position": 217
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3MetaCanvas",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.11464/x2.png",
+                "caption": "Figure 2:MetaCanvas connector design details.The connector comprises a vanilla Transformer block and a Diffusion Transformer (DiT) block. The vanilla Transformer block transforms the learnable canvas tokens to align them with the DiT latent space. The second DiT block adopts a ControlNet-style design, where the transformed canvas tokens and the noisy latents are first combined and then passed through a DiT block with Adaptive LayerNorm(Perez et al.,2018). We adopt Linear-Attn and Mix-FFN design from(Xie et al.,2024a)to reduce memory usage. The outputs of both blocks are followed by a zero-initialized linear projection layer, ensuring that at the beginning of training, the learnable canvas tokens have no influence on the DiT’s latent inputs.",
+                "position": 255
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x3.png",
+                "caption": "Figure 3:MetaCanvas keyframes and reference/condition frames injection strategy for video tasks.We modify the input layer of Wan2.2-5B(Wan et al.,2025)to concatenate reference and condition latents with noisy latents along the channel dimension. The resulting tensor is then passed through the patch embedding layer and combined with MetaCanvas keyframes after interpolation. Light purple tokens represent interpolated keyframe canvas. Note that we do not apply MetaCanvas keyframe latents to reference frames for video tasks.",
+                "position": 280
+            }
+        ]
+    },
+    {
+        "header": "4Experiment Setup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.11464/x4.png",
+                "caption": "Figure 4:Left:Comparison of MetaCanvas with MetaQuery(Pan et al.,2025)and text conditioning.Right:Comparison of MetaCanvas with and without additional text conditioning.",
+                "position": 416
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x5.png",
+                "caption": "Figure 5:Visualization of canvas features (1st row) and generated images (2nd row)using only canvas tokens without extra text conditioning in DiT.We train SANA(Xie et al.,2024a)from scratchusing only canvas tokens from Qwen2.5-VL(Wang et al.,2024a)as the conditioning input,with no text signals provided to the DiT. Following(Tumanyan et al.,2023), we apply PCA to the features produced by the MetaCanvas connector.\nCanvas tokens output from MLLM can serve as reasonable visual planning sketches to effectively guide the final image synthesis in the DiT.",
+                "position": 422
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x6.png",
+                "caption": "Figure 6:Comparison of training loss and GEdit-Bench(Liu et al.,2025)scores for the baseline method without canvas tokens and MetaCanvas. Both models are fine-tuned on the same training dataset.",
+                "position": 673
+            }
+        ]
+    },
+    {
+        "header": "5Results and Discussion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.11464/x7.png",
+                "caption": "Figure 7:Visualization on video editing task. MetaCanvas demonstrates strong prompt understanding and effective grounding of the editing regions, achieving better spatial alignment and improved preservation of both foreground and background details.",
+                "position": 952
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x8.png",
+                "caption": "Figure 8:Visualization of in-context video generation.MetaCanvas accurately generates the video by composing reference images in accordance with the text prompt.",
+                "position": 1133
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ABackground",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.11464/x9.png",
+                "caption": "Figure 9:Visualizations of the architectures for the comparison variants inFigure˜4.",
+                "position": 2431
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x10.png",
+                "caption": "Figure 10:Ablation study on MetaCanvas connector architecture design. Corresponding quantitative results are shown inFigure˜2.Note that our focus here is to demonstrate the effectiveness of canvas tokens; therefore, we keep the T5 text encoder in SANA instead of replacing it with text embeddings from MLLMs. We later replace the text encoder with the output multimodal embeddings from the MLLM in the image editing and video tasks inSection˜5.2andSection˜5.3.",
+                "position": 2436
+            }
+        ]
+    },
+    {
+        "header": "Appendix BExploratory T2I Generation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.11464/x11.png",
+                "caption": "Figure 11:Comparison between MetaCanvas with query-based architecture (i.e., BLIP-3o(Chen et al.,2025a)) on GenEval(Ghosh et al.,2023)prompts.",
+                "position": 2544
+            }
+        ]
+    },
+    {
+        "header": "Appendix CImage Editing Task",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.11464/x12.png",
+                "caption": "Figure 12:MetaCanvas implemented with MMDiT and cross-attention-based architectures.",
+                "position": 2728
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x13.png",
+                "caption": "Figure 13:MetaCanvas implementation architecture details inSection˜5.2.We adopt FLUX.1-Kontext-Dev(Batifol et al.,2025)as the MMDiT and Qwen2.5-VL-7B(Bai et al.,2025b)as the MLLM. The trainable components include the vision branch, the LoRA in the MLLM, as well as the canvas tokens and the corresponding lightweight canvas connector.",
+                "position": 2733
+            }
+        ]
+    },
+    {
+        "header": "Appendix DMetaCanvas Architecture Design for Video Tasks",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.11464/x14.png",
+                "caption": "Figure 14:Visualization of the first 8 channels of Wan2.2 VAE after encoding astaticvideo of 81 frames (21 latent frames).",
+                "position": 3375
+            }
+        ]
+    },
+    {
+        "header": "Appendix EText/Image-to-Video Generation Tasks",
+        "images": []
+    },
+    {
+        "header": "Appendix FVideo Editing Task",
+        "images": []
+    },
+    {
+        "header": "Appendix GIn-Context Video Generation Task",
+        "images": []
+    },
+    {
+        "header": "Appendix HVideo Tasks Training Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.11464/x15.png",
+                "caption": "Figure 15:MetaCanvas implementation architecture details inSection˜5.3.We adopt Wan2.2-5B(Wan et al.,2025)as the DiT and Qwen2.5-VL-7B(Bai et al.,2025b)as the MLLM. We illustrate the trainable components in each training stage respectively.",
+                "position": 3689
+            }
+        ]
+    },
+    {
+        "header": "Appendix IVisualizations",
+        "images": []
+    },
+    {
+        "header": "Appendix JSimplified Code Implementation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.11464/x16.png",
+                "caption": "Figure 16:Visualization of thePCA feature maps of the 3 canvas keyframesfor thetext-to-video generationand image-to-video generation tasks.Note that for the image-to-video generation task, because the first frame is assignedt=0t=0during inference with Wan2.2-5B, we omit the visualization for the first canvas keyframe.\nInterpretation of the canvas map visualization is discussed inAppendix˜I.",
+                "position": 3989
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x17.png",
+                "caption": "Figure 17:Visualization of thePCA feature maps of the 3 canvas keyframesfor thevideo editingtask.Interpretation of the canvas map visualization is discussed inAppendix˜I.",
+                "position": 3995
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x18.png",
+                "caption": "Figure 18:Visualization ontext-to-video generationtask.The input prompts are sourced from VBench(Huang et al.,2024a). Multi-task training in Stage 3 enables MetaCanvas to better understand stylistic variations in prompts.",
+                "position": 3999
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x19.png",
+                "caption": "Figure 19:Visualization on image-to-video generation task.The input images and prompts are sourced from VBench(Huang et al.,2024b). Compared with the base model, MetaCanvas better understands instructions involving camera motions.",
+                "position": 4004
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x20.png",
+                "caption": "Figure 20:Visualization for thevideo local editingtask (part 1/3).MetaCanvas achieves more precise grounding of the target objects.",
+                "position": 4009
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x21.png",
+                "caption": "Figure 21:Visualization for thevideo local editingtask (part 2/3).MetaCanvas achieves more precise grounding of the target objects.",
+                "position": 4014
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x22.png",
+                "caption": "Figure 22:Visualization for thevideo local editingtask (part 3/3).MetaCanvas achieves more precise grounding of the target objects.",
+                "position": 4019
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x23.png",
+                "caption": "Figure 23:Visualization for thevideo background editingtask.MetaCanvas achieves more precise instruction following and grounding of the target background.",
+                "position": 4024
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x24.png",
+                "caption": "Figure 24:Visualization for thevideo global style editingtask.MetaCanvas achieves results comparable to Ditto(Bai et al.,2025a), whereas Lucy-Edit-Dev-v1.1(Team,2025)fails on this task.",
+                "position": 4029
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x25.png",
+                "caption": "Figure 25:Visualization for the  in-context video generation task with single character or object.MetaCanvas demonstrates improved prompt understanding and more accurately places the specified character or object in the appropriate scene, whereas VACE(Jiang et al.,2025)incorrectly adheres too closely to the background of the reference image.",
+                "position": 4034
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x26.png",
+                "caption": "Figure 26:Visualization for the  in-context video generation task with multiple characters and/or objects.MetaCanvas demonstrates an improved ability to naturally compose the reference images into the appropriate scene, whereas VACE(Jiang et al.,2025)either adheres too closely to the background of the reference images or fails to compose both reference images correctly.",
+                "position": 4039
+            },
+            {
+                "img": "https://arxiv.org/html/2512.11464/x27.png",
+                "caption": "Figure 27:Visualization for the  in-context video generation task with character and/or object in a scene.MetaCanvas demonstrates improved prompt understanding and naturally composes the reference images into the appropriate scene. However, both methods produce imperfect videos when the number of reference images increases to three.",
+                "position": 4044
+            }
+        ]
+    },
+    {
+        "header": "Appendix KLimitations and Future Works",
+        "images": []
+    }
+]
