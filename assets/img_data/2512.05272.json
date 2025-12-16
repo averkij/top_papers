@@ -1,0 +1,2186 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05272/x1.png",
+                "caption": "Figure 1:Given a single video (bottom), our method reconstructs the entire 3D scene along with the individual dynamic objects (A), while maintaining spatial and temporal consistency through spatio-temporal attention mixing (C). The silhouettes (purplefor human andorangefor dog) correspond to the beginning of dynamic sequences. Our user study (for spatial correctness and temporal coherence) shows that the reconstructions obtained using the proposed attention mixing mechanism are clearly preferred over the baseline without mixing (B).",
+                "position": 101
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Works",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05272/x2.png",
+                "caption": "Figure 2:Our attention parsing and mixing strategy. A single DiT model with shared weights is trained jointly on two datasets. (Top) During training with samples from DeformingThings[42], odd-indexed blocks perform multi-frame attention to capture temporal dynamics. (Bottom) When training with samples from 3D-FRONT[19], even-indexed blocks perform multi-instance attention to model spatial part decomposition. At inference, the same model applies an attention mixing mechanism. In each layer, spatial blocks (even-indexed) aggregate all latents from a single frame and process them jointly, conditioned on the full-scene imageyyat that timestep. Temporal blocks (odd-indexed) then operate over all frames of each dynamic object separately, conditioned on their corresponding masked images. Masks are extracted from the video for each dynamic object using SAM[36], enabling temporally consistent object-specific reasoning.",
+                "position": 182
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/date/000022.jpg",
+                "caption": "Figure 3:Qualitative results on temporal sequences. Top rows show input frames; bottom rows show our generated reconstructions from two vertically stacked camera views. The examples shown are from content produced by ChatGPT[58]and animated with Wan[78], the CMU Panoptic dataset[32](sequences160401_ian3and160906_ian2), and the PROX dataset[24](N3OpenArea_00158_02). Our method maintains temporal consistency and spatial realism across both real and synthetic sources.",
+                "position": 300
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/date/000054.jpg",
+                "caption": "",
+                "position": 313
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/date/000067.jpg",
+                "caption": "",
+                "position": 314
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/date/000079.jpg",
+                "caption": "",
+                "position": 315
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/living_room_new/0.png",
+                "caption": "",
+                "position": 322
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/living_room_new/1.png",
+                "caption": "",
+                "position": 323
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/living_room_new/2.png",
+                "caption": "",
+                "position": 324
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/living_room_new/3.png",
+                "caption": "",
+                "position": 325
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/date/dynamic_scene_frame_000_00.png",
+                "caption": "",
+                "position": 342
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/date/dynamic_scene_frame_000_180.png",
+                "caption": "",
+                "position": 345
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/date/dynamic_scene_frame_012_00.png",
+                "caption": "",
+                "position": 352
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/date/dynamic_scene_frame_012_180.png",
+                "caption": "",
+                "position": 355
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/date/dynamic_scene_frame_018_00.png",
+                "caption": "",
+                "position": 362
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/date/dynamic_scene_frame_018_180.png",
+                "caption": "",
+                "position": 365
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/date/dynamic_scene_frame_023_00.png",
+                "caption": "",
+                "position": 372
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/date/dynamic_scene_frame_023_180.png",
+                "caption": "",
+                "position": 375
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/living_room_new/mixing_045deg/0.png",
+                "caption": "",
+                "position": 388
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/living_room_new/mixing_145deg/0.png",
+                "caption": "",
+                "position": 391
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/living_room_new/mixing_045deg/1.png",
+                "caption": "",
+                "position": 398
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/living_room_new/mixing_145deg/1.png",
+                "caption": "",
+                "position": 401
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/living_room_new/mixing_045deg/2.png",
+                "caption": "",
+                "position": 408
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/living_room_new/mixing_145deg/2.png",
+                "caption": "",
+                "position": 411
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/living_room_new/mixing_045deg/3.png",
+                "caption": "",
+                "position": 418
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/living_room_new/mixing_145deg/3.png",
+                "caption": "",
+                "position": 421
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/ian_combined/1_1.png",
+                "caption": "",
+                "position": 438
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/ian_combined/1_2.png",
+                "caption": "",
+                "position": 439
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/ian_combined/2_1.png",
+                "caption": "",
+                "position": 440
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/ian_combined/2_2.png",
+                "caption": "",
+                "position": 441
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/cat/000002.jpg",
+                "caption": "",
+                "position": 448
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/cat/000026.jpg",
+                "caption": "",
+                "position": 449
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/cat/000038.jpg",
+                "caption": "",
+                "position": 450
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/cat/000056.jpg",
+                "caption": "",
+                "position": 451
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/ian_combined/1_mixing_000deg/1_1.png",
+                "caption": "",
+                "position": 468
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/ian_combined/1_mixing_315deg/1_1.png",
+                "caption": "",
+                "position": 471
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/ian_combined/1_mixing_000deg/1_2.png",
+                "caption": "",
+                "position": 478
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/ian_combined/1_mixing_315deg/1_2.png",
+                "caption": "",
+                "position": 481
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/ian_combined/2_mixing_030deg/2_1.png",
+                "caption": "",
+                "position": 488
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/ian_combined/2_mixing_210deg/2_1.png",
+                "caption": "",
+                "position": 491
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/ian_combined/2_mixing_030deg/2_2.png",
+                "caption": "",
+                "position": 498
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ours/ian_combined/2_mixing_210deg/2_2.png",
+                "caption": "",
+                "position": 501
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ablations/panoptic/ian_no_mixing_1180.png",
+                "caption": "Figure 4:Visualizations with and without our Attention Mixing strategy. Results are for160401_ian3at frame 1180 (starting frame: 1100) and170915_office1at frame 670 (starting frame: 590). Gray points denote ground truth.",
+                "position": 630
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ablations/panoptic/ian_mixing_1180.png",
+                "caption": "",
+                "position": 641
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ablations/panoptic/office_no_mixing_670.png",
+                "caption": "",
+                "position": 642
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ablations/panoptic/office_mixing_670.png",
+                "caption": "",
+                "position": 643
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x3.png",
+                "caption": "Figure 5:Qualitative 4D generation comparisons for two subjects (top two rows: Ninja, bottom two rows: Amy) at two time steps. The first column shows the input frames, and subsequent columns show a fixed pose rendered view from each method. V2M4 fails in a few samples,e.g., the last row input.",
+                "position": 656
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x4.png",
+                "caption": "",
+                "position": 671
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x5.png",
+                "caption": "",
+                "position": 672
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x6.png",
+                "caption": "",
+                "position": 673
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x7.png",
+                "caption": "",
+                "position": 674
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x8.png",
+                "caption": "",
+                "position": 675
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x9.png",
+                "caption": "",
+                "position": 678
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x10.png",
+                "caption": "",
+                "position": 679
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x11.png",
+                "caption": "",
+                "position": 680
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x12.png",
+                "caption": "",
+                "position": 681
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x13.png",
+                "caption": "",
+                "position": 682
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x14.png",
+                "caption": "",
+                "position": 683
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x15.png",
+                "caption": "",
+                "position": 686
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x16.png",
+                "caption": "",
+                "position": 687
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x17.png",
+                "caption": "",
+                "position": 688
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x18.png",
+                "caption": "",
+                "position": 689
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x19.png",
+                "caption": "",
+                "position": 690
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x20.png",
+                "caption": "",
+                "position": 691
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x21.png",
+                "caption": "",
+                "position": 694
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x22.png",
+                "caption": "",
+                "position": 695
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x23.png",
+                "caption": "",
+                "position": 696
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x24.png",
+                "caption": "",
+                "position": 697
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x25.png",
+                "caption": "",
+                "position": 698
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x26.png",
+                "caption": "",
+                "position": 699
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/comparisons/3d/00180__e7ea961c-5f0d-437a-9cdc-4b4488f62675__SecondBedroom-18851/input.png",
+                "caption": "Figure 6:Qualitative comparison across methods.\nOur approach generates more consistent and detailed structures compared to PartCrafter[47]and MIDI[29].",
+                "position": 872
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/comparisons/3d/00180__e7ea961c-5f0d-437a-9cdc-4b4488f62675__SecondBedroom-18851/ours/file_270.png",
+                "caption": "",
+                "position": 885
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/comparisons/3d/00180__e7ea961c-5f0d-437a-9cdc-4b4488f62675__SecondBedroom-18851/partcrafter/file_270.png",
+                "caption": "",
+                "position": 886
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/comparisons/3d/00180__e7ea961c-5f0d-437a-9cdc-4b4488f62675__SecondBedroom-18851/midi/file_270.png",
+                "caption": "",
+                "position": 887
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/comparisons/3d/00252__eb2abbb1-9a02-4614-aaad-d94a203d12f7__MasterBedroom-16104/input.png",
+                "caption": "",
+                "position": 890
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/comparisons/3d/00252__eb2abbb1-9a02-4614-aaad-d94a203d12f7__MasterBedroom-16104/ours/file_270.png",
+                "caption": "",
+                "position": 891
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/comparisons/3d/00252__eb2abbb1-9a02-4614-aaad-d94a203d12f7__MasterBedroom-16104/partcrafter/file_270.png",
+                "caption": "",
+                "position": 892
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/comparisons/3d/00252__eb2abbb1-9a02-4614-aaad-d94a203d12f7__MasterBedroom-16104/midi/file_270.png",
+                "caption": "",
+                "position": 893
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ablations/dog_human/2.png",
+                "caption": "Figure 7:Qualitative comparisons on Attention Mixing. Mixing (right) provides far better static-dynamic compositions compared to without Mixing (middle).",
+                "position": 993
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x27.png",
+                "caption": "",
+                "position": 1003
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x28.png",
+                "caption": "",
+                "position": 1004
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ablations/cat/000048.jpg",
+                "caption": "",
+                "position": 1007
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x29.png",
+                "caption": "",
+                "position": 1008
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x30.png",
+                "caption": "",
+                "position": 1009
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/ablations/living_room/000215.jpg",
+                "caption": "",
+                "position": 1012
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x31.png",
+                "caption": "",
+                "position": 1013
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x32.png",
+                "caption": "",
+                "position": 1014
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "ATraining Details",
+        "images": []
+    },
+    {
+        "header": "BUser Study Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/user_study/study.png",
+                "caption": "Figure 8:Our user study interface, run on Google Forms.Participants viewed a 2D input sequence (top) and two 3D results (middle, bottom), then rated their preference on a 5-point scale.",
+                "position": 2353
+            }
+        ]
+    },
+    {
+        "header": "CEvaluation on CMU Panoptic Dataset",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/toddler_ian_video_00000780.png",
+                "caption": "Figure 9:Ablation study on mixing components across five time steps in the CMU Panoptic[32]sample. The top row shows the ground truth frames, followed by two views with our mixing strategy and two views without. Gray points denote the ground truth point cloud.",
+                "position": 2401
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/toddler_ian_video_00000785.png",
+                "caption": "",
+                "position": 2411
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/toddler_ian_video_00000790.png",
+                "caption": "",
+                "position": 2412
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/toddler_ian_video_00000800.png",
+                "caption": "",
+                "position": 2413
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/toddler_ian_video_00000805.png",
+                "caption": "",
+                "position": 2414
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/mixing/toddler_ian_aligned_mixing_00000720_00.png",
+                "caption": "",
+                "position": 2422
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/mixing/toddler_ian_aligned_mixing_00000730_00.png",
+                "caption": "",
+                "position": 2423
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/mixing/toddler_ian_aligned_mixing_00000735_00.png",
+                "caption": "",
+                "position": 2424
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/mixing/toddler_ian_aligned_mixing_00000740_00.png",
+                "caption": "",
+                "position": 2425
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/mixing/toddler_ian_aligned_mixing_00000745_00.png",
+                "caption": "",
+                "position": 2426
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/mixing/toddler_ian_aligned_mixing_00000720_180.png",
+                "caption": "",
+                "position": 2430
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/mixing/toddler_ian_aligned_mixing_00000730_180.png",
+                "caption": "",
+                "position": 2431
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/mixing/toddler_ian_aligned_mixing_00000735_180.png",
+                "caption": "",
+                "position": 2432
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/mixing/toddler_ian_aligned_mixing_00000740_180.png",
+                "caption": "",
+                "position": 2433
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/mixing/toddler_ian_aligned_mixing_00000745_180.png",
+                "caption": "",
+                "position": 2434
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/no_mixing/toddler_ian_aligned_no_mixing_00000720_00.png",
+                "caption": "",
+                "position": 2442
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/no_mixing/toddler_ian_aligned_no_mixing_00000730_00.png",
+                "caption": "",
+                "position": 2443
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/no_mixing/toddler_ian_aligned_no_mixing_00000735_00.png",
+                "caption": "",
+                "position": 2444
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/no_mixing/toddler_ian_aligned_no_mixing_00000740_00.png",
+                "caption": "",
+                "position": 2445
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/no_mixing/toddler_ian_aligned_no_mixing_00000745_00.png",
+                "caption": "",
+                "position": 2446
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/no_mixing/toddler_ian_aligned_no_mixing_00000720_180.png",
+                "caption": "",
+                "position": 2450
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/no_mixing/toddler_ian_aligned_no_mixing_00000730_180.png",
+                "caption": "",
+                "position": 2451
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/no_mixing/toddler_ian_aligned_no_mixing_00000735_180.png",
+                "caption": "",
+                "position": 2452
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/no_mixing/toddler_ian_aligned_no_mixing_00000740_180.png",
+                "caption": "",
+                "position": 2453
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/toddler_ian/no_mixing/toddler_ian_aligned_no_mixing_00000745_180.png",
+                "caption": "",
+                "position": 2454
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/ian_look_3_video_00001140.png",
+                "caption": "Figure 10:Ablation study on mixing components across five time steps. The top row shows the ground truth frames, followed by two views with our mixing strategy and two views without. Gray points denote the ground truth point cloud.",
+                "position": 2462
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/ian_look_3_video_00001160.png",
+                "caption": "",
+                "position": 2472
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/ian_look_3_video_00001220.png",
+                "caption": "",
+                "position": 2473
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/ian_look_3_video_00001240.png",
+                "caption": "",
+                "position": 2474
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/ian_look_3_video_00001290.png",
+                "caption": "",
+                "position": 2475
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/mixing/ian_look_3_aligned_mixing_00001100_00.png",
+                "caption": "",
+                "position": 2483
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/mixing/ian_look_3_aligned_mixing_00001120_00.png",
+                "caption": "",
+                "position": 2484
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/mixing/ian_look_3_aligned_mixing_00001180_00.png",
+                "caption": "",
+                "position": 2485
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/mixing/ian_look_3_aligned_mixing_00001220_00.png",
+                "caption": "",
+                "position": 2486
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/mixing/ian_look_3_aligned_mixing_00001240_00.png",
+                "caption": "",
+                "position": 2487
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/mixing/ian_look_3_aligned_mixing_00001100_90.png",
+                "caption": "",
+                "position": 2491
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/mixing/ian_look_3_aligned_mixing_00001120_90.png",
+                "caption": "",
+                "position": 2492
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/mixing/ian_look_3_aligned_mixing_00001180_90.png",
+                "caption": "",
+                "position": 2493
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/mixing/ian_look_3_aligned_mixing_00001220_90.png",
+                "caption": "",
+                "position": 2494
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/mixing/ian_look_3_aligned_mixing_00001240_90.png",
+                "caption": "",
+                "position": 2495
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/no_mixing/ian_look_3_aligned_no_mixing_00001100_00.png",
+                "caption": "",
+                "position": 2503
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/no_mixing/ian_look_3_aligned_no_mixing_00001120_00.png",
+                "caption": "",
+                "position": 2504
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/no_mixing/ian_look_3_aligned_no_mixing_00001180_00.png",
+                "caption": "",
+                "position": 2505
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/no_mixing/ian_look_3_aligned_no_mixing_00001220_00.png",
+                "caption": "",
+                "position": 2506
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/no_mixing/ian_look_3_aligned_no_mixing_00001240_00.png",
+                "caption": "",
+                "position": 2507
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/no_mixing/ian_look_3_aligned_no_mixing_00001100_90.png",
+                "caption": "",
+                "position": 2511
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/no_mixing/ian_look_3_aligned_no_mixing_00001120_90.png",
+                "caption": "",
+                "position": 2512
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/no_mixing/ian_look_3_aligned_no_mixing_00001180_90.png",
+                "caption": "",
+                "position": 2513
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/no_mixing/ian_look_3_aligned_no_mixing_00001220_90.png",
+                "caption": "",
+                "position": 2514
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/ian_look_3/no_mixing/ian_look_3_aligned_no_mixing_00001240_90.png",
+                "caption": "",
+                "position": 2515
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/office_sample_video_00000625.png",
+                "caption": "Figure 11:Ablation study on mixing components across five time steps. The top row shows the ground truth frames, followed by two views with our mixing strategy and two views without. Gray points denote the ground truth point cloud.",
+                "position": 2523
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/office_sample_video_00000630.png",
+                "caption": "",
+                "position": 2533
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/office_sample_video_00000640.png",
+                "caption": "",
+                "position": 2534
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/office_sample_video_00000650.png",
+                "caption": "",
+                "position": 2535
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/office_sample_video_00000670.png",
+                "caption": "",
+                "position": 2536
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/mixing/office_sample_aligned_mixing_00000625_00.png",
+                "caption": "",
+                "position": 2544
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/mixing/office_sample_aligned_mixing_00000630_00.png",
+                "caption": "",
+                "position": 2545
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/mixing/office_sample_aligned_mixing_00000640_00.png",
+                "caption": "",
+                "position": 2546
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/mixing/office_sample_aligned_mixing_00000650_00.png",
+                "caption": "",
+                "position": 2547
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/mixing/office_sample_aligned_mixing_00000670_00.png",
+                "caption": "",
+                "position": 2548
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/mixing/office_sample_aligned_mixing_00000625_90.png",
+                "caption": "",
+                "position": 2552
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/mixing/office_sample_aligned_mixing_00000630_90.png",
+                "caption": "",
+                "position": 2553
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/mixing/office_sample_aligned_mixing_00000640_90.png",
+                "caption": "",
+                "position": 2554
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/mixing/office_sample_aligned_mixing_00000650_90.png",
+                "caption": "",
+                "position": 2555
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/mixing/office_sample_aligned_mixing_00000670_90.png",
+                "caption": "",
+                "position": 2556
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/no_mixing/office_sample_aligned_no_mixing_00000625_00.png",
+                "caption": "",
+                "position": 2564
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/no_mixing/office_sample_aligned_no_mixing_00000630_00.png",
+                "caption": "",
+                "position": 2565
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/no_mixing/office_sample_aligned_no_mixing_00000640_00.png",
+                "caption": "",
+                "position": 2566
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/no_mixing/office_sample_aligned_no_mixing_00000650_00.png",
+                "caption": "",
+                "position": 2567
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/no_mixing/office_sample_aligned_no_mixing_00000670_00.png",
+                "caption": "",
+                "position": 2568
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/no_mixing/office_sample_aligned_no_mixing_00000625_90.png",
+                "caption": "",
+                "position": 2572
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/no_mixing/office_sample_aligned_no_mixing_00000630_90.png",
+                "caption": "",
+                "position": 2573
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/no_mixing/office_sample_aligned_no_mixing_00000640_90.png",
+                "caption": "",
+                "position": 2574
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/no_mixing/office_sample_aligned_no_mixing_00000650_90.png",
+                "caption": "",
+                "position": 2575
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/cmu/office_sample/no_mixing/office_sample_aligned_no_mixing_00000670_90.png",
+                "caption": "",
+                "position": 2576
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/camping/input/0.png",
+                "caption": "Figure 12:Ablation study on mixing components for various sequences. For each sample, we show input frames, results with our mixing strategy, and results without. In particular, the chair pose and the interaction between the dynamics (the lady shaking hands with the man) and the dynamic and static (lady and the chair) are captured incorrectly without mixing.",
+                "position": 2586
+            }
+        ]
+    },
+    {
+        "header": "DAdditional Qualitative Results on Compositional 4D",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/camping/input/1.png",
+                "caption": "",
+                "position": 2600
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/camping/input/2.png",
+                "caption": "",
+                "position": 2601
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/camping/mixing/0.png",
+                "caption": "",
+                "position": 2609
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/camping/mixing/1.png",
+                "caption": "",
+                "position": 2610
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/camping/mixing/2.png",
+                "caption": "",
+                "position": 2611
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/camping/no_mixing/0.png",
+                "caption": "",
+                "position": 2619
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/camping/no_mixing/1.png",
+                "caption": "",
+                "position": 2620
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/camping/no_mixing/2.png",
+                "caption": "",
+                "position": 2621
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/date/input/0.jpg",
+                "caption": "",
+                "position": 2629
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/date/input/1.jpg",
+                "caption": "",
+                "position": 2630
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/date/input/2.jpg",
+                "caption": "",
+                "position": 2631
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/date/mixing/0.png",
+                "caption": "",
+                "position": 2639
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/date/mixing/1.png",
+                "caption": "",
+                "position": 2640
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/date/mixing/2.png",
+                "caption": "",
+                "position": 2641
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/date/no_mixing/0.png",
+                "caption": "",
+                "position": 2649
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/date/no_mixing/1.png",
+                "caption": "",
+                "position": 2650
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/ablation/other/date/no_mixing/2.png",
+                "caption": "",
+                "position": 2651
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x33.png",
+                "caption": "Figure 13:Qualitative 4D generation comparisons from Objaverse[15]showing three subjects at two time steps. For each model, we show the reconstructed input view (top) and a rendered novel view (bottom). We display the ground truth novel view in the bottom left.",
+                "position": 2661
+            }
+        ]
+    },
+    {
+        "header": "EAdditional Qualitative Results on 4D Object Reconstruction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.05272/x34.png",
+                "caption": "",
+                "position": 2687
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x35.png",
+                "caption": "",
+                "position": 2688
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x36.png",
+                "caption": "",
+                "position": 2689
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x37.png",
+                "caption": "",
+                "position": 2690
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x38.png",
+                "caption": "",
+                "position": 2691
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x39.png",
+                "caption": "",
+                "position": 2698
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x40.png",
+                "caption": "",
+                "position": 2699
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x41.png",
+                "caption": "",
+                "position": 2700
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x42.png",
+                "caption": "",
+                "position": 2701
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x43.png",
+                "caption": "",
+                "position": 2702
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x44.png",
+                "caption": "",
+                "position": 2703
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x45.png",
+                "caption": "",
+                "position": 2710
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x46.png",
+                "caption": "",
+                "position": 2711
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x47.png",
+                "caption": "",
+                "position": 2712
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x48.png",
+                "caption": "",
+                "position": 2713
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x49.png",
+                "caption": "",
+                "position": 2714
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x50.png",
+                "caption": "",
+                "position": 2715
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x51.png",
+                "caption": "",
+                "position": 2722
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x52.png",
+                "caption": "",
+                "position": 2723
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x53.png",
+                "caption": "",
+                "position": 2724
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x54.png",
+                "caption": "",
+                "position": 2725
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x55.png",
+                "caption": "",
+                "position": 2726
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x56.png",
+                "caption": "",
+                "position": 2727
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x57.png",
+                "caption": "",
+                "position": 2734
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x58.png",
+                "caption": "",
+                "position": 2735
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x59.png",
+                "caption": "",
+                "position": 2736
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x60.png",
+                "caption": "",
+                "position": 2737
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x61.png",
+                "caption": "",
+                "position": 2738
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x62.png",
+                "caption": "",
+                "position": 2739
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x63.png",
+                "caption": "",
+                "position": 2746
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x64.png",
+                "caption": "",
+                "position": 2747
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x65.png",
+                "caption": "",
+                "position": 2748
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x66.png",
+                "caption": "",
+                "position": 2749
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x67.png",
+                "caption": "",
+                "position": 2750
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x68.png",
+                "caption": "",
+                "position": 2751
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x69.png",
+                "caption": "",
+                "position": 2758
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x70.png",
+                "caption": "",
+                "position": 2759
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x71.png",
+                "caption": "",
+                "position": 2760
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x72.png",
+                "caption": "",
+                "position": 2761
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x73.png",
+                "caption": "",
+                "position": 2762
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x74.png",
+                "caption": "",
+                "position": 2763
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x75.png",
+                "caption": "",
+                "position": 2770
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x76.png",
+                "caption": "",
+                "position": 2771
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x77.png",
+                "caption": "",
+                "position": 2772
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x78.png",
+                "caption": "",
+                "position": 2773
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x79.png",
+                "caption": "",
+                "position": 2774
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x80.png",
+                "caption": "",
+                "position": 2775
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x81.png",
+                "caption": "",
+                "position": 2782
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x82.png",
+                "caption": "",
+                "position": 2783
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x83.png",
+                "caption": "",
+                "position": 2784
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x84.png",
+                "caption": "",
+                "position": 2785
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x85.png",
+                "caption": "",
+                "position": 2786
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x86.png",
+                "caption": "",
+                "position": 2787
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x87.png",
+                "caption": "",
+                "position": 2794
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x88.png",
+                "caption": "",
+                "position": 2795
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x89.png",
+                "caption": "",
+                "position": 2796
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x90.png",
+                "caption": "",
+                "position": 2797
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x91.png",
+                "caption": "",
+                "position": 2798
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x92.png",
+                "caption": "",
+                "position": 2799
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x93.png",
+                "caption": "",
+                "position": 2806
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x94.png",
+                "caption": "",
+                "position": 2807
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x95.png",
+                "caption": "",
+                "position": 2808
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x96.png",
+                "caption": "",
+                "position": 2809
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x97.png",
+                "caption": "",
+                "position": 2810
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x98.png",
+                "caption": "",
+                "position": 2811
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/",
+                "caption": "",
+                "position": 2818
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x100.png",
+                "caption": "",
+                "position": 2819
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x101.png",
+                "caption": "",
+                "position": 2820
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x102.png",
+                "caption": "",
+                "position": 2821
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x103.png",
+                "caption": "",
+                "position": 2822
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x104.png",
+                "caption": "",
+                "position": 2823
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x105.png",
+                "caption": "Figure 14:Further qualitative 4D generation comparisons from Objaverse[15]showing two subjects of Objaverse[15], at three time steps. For each model, we show the reconstructed input view (top) and a rendered novel view (bottom). We display the ground truth novel view in the bottom left. The novel view in particular highlights the discrepancies of the methods’ outputs from the ground truth. Both TripoSG and V2M4 show moderate and consistent misalignment. Similar misalignment, particularly in rotation and skeletal pose is apparent in GVFD, while L4GM often fails to provide good novel views. Typically, our method shows far less shape or pose misalignment, as reflected in the quantitative metrics.",
+                "position": 2833
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x106.png",
+                "caption": "",
+                "position": 2851
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x107.png",
+                "caption": "",
+                "position": 2852
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x108.png",
+                "caption": "",
+                "position": 2853
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x109.png",
+                "caption": "",
+                "position": 2854
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x110.png",
+                "caption": "",
+                "position": 2855
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x111.png",
+                "caption": "",
+                "position": 2862
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x112.png",
+                "caption": "",
+                "position": 2863
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x113.png",
+                "caption": "",
+                "position": 2864
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x114.png",
+                "caption": "",
+                "position": 2865
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x115.png",
+                "caption": "",
+                "position": 2866
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x116.png",
+                "caption": "",
+                "position": 2867
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x117.png",
+                "caption": "",
+                "position": 2874
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x118.png",
+                "caption": "",
+                "position": 2875
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x119.png",
+                "caption": "",
+                "position": 2876
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x120.png",
+                "caption": "",
+                "position": 2877
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x121.png",
+                "caption": "",
+                "position": 2878
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x122.png",
+                "caption": "",
+                "position": 2879
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x123.png",
+                "caption": "",
+                "position": 2886
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x124.png",
+                "caption": "",
+                "position": 2887
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x125.png",
+                "caption": "",
+                "position": 2888
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x126.png",
+                "caption": "",
+                "position": 2889
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x127.png",
+                "caption": "",
+                "position": 2890
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x128.png",
+                "caption": "",
+                "position": 2891
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x129.png",
+                "caption": "",
+                "position": 2898
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x130.png",
+                "caption": "",
+                "position": 2899
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x131.png",
+                "caption": "",
+                "position": 2900
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x132.png",
+                "caption": "",
+                "position": 2901
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x133.png",
+                "caption": "",
+                "position": 2902
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x134.png",
+                "caption": "",
+                "position": 2903
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x135.png",
+                "caption": "",
+                "position": 2910
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x136.png",
+                "caption": "",
+                "position": 2911
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x137.png",
+                "caption": "",
+                "position": 2912
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x138.png",
+                "caption": "",
+                "position": 2913
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x139.png",
+                "caption": "",
+                "position": 2914
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x140.png",
+                "caption": "",
+                "position": 2915
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x141.png",
+                "caption": "",
+                "position": 2922
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x142.png",
+                "caption": "",
+                "position": 2923
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x143.png",
+                "caption": "",
+                "position": 2924
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x144.png",
+                "caption": "",
+                "position": 2925
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x145.png",
+                "caption": "",
+                "position": 2926
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x146.png",
+                "caption": "",
+                "position": 2927
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x147.png",
+                "caption": "",
+                "position": 2934
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x148.png",
+                "caption": "",
+                "position": 2935
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x149.png",
+                "caption": "",
+                "position": 2936
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x150.png",
+                "caption": "",
+                "position": 2937
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x151.png",
+                "caption": "",
+                "position": 2938
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x152.png",
+                "caption": "",
+                "position": 2939
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x153.png",
+                "caption": "",
+                "position": 2946
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x154.png",
+                "caption": "",
+                "position": 2947
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x155.png",
+                "caption": "",
+                "position": 2948
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x156.png",
+                "caption": "",
+                "position": 2949
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x157.png",
+                "caption": "",
+                "position": 2950
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x158.png",
+                "caption": "",
+                "position": 2951
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x159.png",
+                "caption": "",
+                "position": 2958
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x160.png",
+                "caption": "",
+                "position": 2959
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x161.png",
+                "caption": "",
+                "position": 2960
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x162.png",
+                "caption": "",
+                "position": 2961
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x163.png",
+                "caption": "",
+                "position": 2962
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x164.png",
+                "caption": "",
+                "position": 2963
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x165.png",
+                "caption": "",
+                "position": 2970
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x166.png",
+                "caption": "",
+                "position": 2971
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x167.png",
+                "caption": "",
+                "position": 2972
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x168.png",
+                "caption": "",
+                "position": 2973
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x169.png",
+                "caption": "",
+                "position": 2974
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x170.png",
+                "caption": "",
+                "position": 2975
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x171.png",
+                "caption": "",
+                "position": 2982
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x172.png",
+                "caption": "",
+                "position": 2983
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x173.png",
+                "caption": "",
+                "position": 2984
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x174.png",
+                "caption": "",
+                "position": 2985
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x175.png",
+                "caption": "",
+                "position": 2986
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x176.png",
+                "caption": "",
+                "position": 2987
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x177.png",
+                "caption": "Figure 15:Qualitative 4D generation comparisons from DeformingThings[42]on two subjects at three time steps. For each model, we show the reconstructed input view (top) and a rendered novel view (bottom). We display the ground truth novel view in the bottom left. Compared toFig.14, the sequences contain stronger motion thus showing even larger difference in performances of our method. In particular, V2M4 fails completely due to the large motion.",
+                "position": 2995
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x178.png",
+                "caption": "",
+                "position": 3012
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x179.png",
+                "caption": "",
+                "position": 3013
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x180.png",
+                "caption": "",
+                "position": 3014
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x181.png",
+                "caption": "",
+                "position": 3015
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x182.png",
+                "caption": "",
+                "position": 3022
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x183.png",
+                "caption": "",
+                "position": 3023
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x184.png",
+                "caption": "",
+                "position": 3024
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x185.png",
+                "caption": "",
+                "position": 3025
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x186.png",
+                "caption": "",
+                "position": 3026
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x187.png",
+                "caption": "",
+                "position": 3033
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x188.png",
+                "caption": "",
+                "position": 3034
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x189.png",
+                "caption": "",
+                "position": 3035
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x190.png",
+                "caption": "",
+                "position": 3036
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x191.png",
+                "caption": "",
+                "position": 3037
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x192.png",
+                "caption": "",
+                "position": 3044
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x193.png",
+                "caption": "",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x194.png",
+                "caption": "",
+                "position": 3046
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x195.png",
+                "caption": "",
+                "position": 3047
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x196.png",
+                "caption": "",
+                "position": 3048
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x197.png",
+                "caption": "",
+                "position": 3055
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x198.png",
+                "caption": "",
+                "position": 3056
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x199.png",
+                "caption": "",
+                "position": 3057
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x200.png",
+                "caption": "",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x201.png",
+                "caption": "",
+                "position": 3059
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x202.png",
+                "caption": "",
+                "position": 3066
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x203.png",
+                "caption": "",
+                "position": 3067
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x204.png",
+                "caption": "",
+                "position": 3068
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x205.png",
+                "caption": "",
+                "position": 3069
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x206.png",
+                "caption": "",
+                "position": 3070
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x207.png",
+                "caption": "",
+                "position": 3077
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x208.png",
+                "caption": "",
+                "position": 3078
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x209.png",
+                "caption": "",
+                "position": 3079
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x210.png",
+                "caption": "",
+                "position": 3080
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x211.png",
+                "caption": "",
+                "position": 3081
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x212.png",
+                "caption": "",
+                "position": 3088
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x213.png",
+                "caption": "",
+                "position": 3089
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x214.png",
+                "caption": "",
+                "position": 3090
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x215.png",
+                "caption": "",
+                "position": 3091
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x216.png",
+                "caption": "",
+                "position": 3092
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x217.png",
+                "caption": "",
+                "position": 3099
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x218.png",
+                "caption": "",
+                "position": 3100
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x219.png",
+                "caption": "",
+                "position": 3101
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x220.png",
+                "caption": "",
+                "position": 3102
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x221.png",
+                "caption": "",
+                "position": 3103
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x222.png",
+                "caption": "",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x223.png",
+                "caption": "",
+                "position": 3111
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x224.png",
+                "caption": "",
+                "position": 3112
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x225.png",
+                "caption": "",
+                "position": 3113
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x226.png",
+                "caption": "",
+                "position": 3114
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x227.png",
+                "caption": "",
+                "position": 3121
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x228.png",
+                "caption": "",
+                "position": 3122
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x229.png",
+                "caption": "",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x230.png",
+                "caption": "",
+                "position": 3124
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x231.png",
+                "caption": "",
+                "position": 3125
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x232.png",
+                "caption": "",
+                "position": 3132
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x233.png",
+                "caption": "",
+                "position": 3133
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x234.png",
+                "caption": "",
+                "position": 3134
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x235.png",
+                "caption": "",
+                "position": 3135
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/x236.png",
+                "caption": "",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/comparisons/3d/00337__f108224b-4b3f-4919-9ca1-7b4306523f17__MasterBedroom-13063/input.png",
+                "caption": "Figure 16:Qualitative comparison across ours, PartCrafter[47]and MIDI[29]. We show qualitatively how our method shows better performance, as shown by the quantitative metrics. Largely, this is due to the consistent reconstruction of all parts and their accurate composition. Both PartCrafter[47]and MIDI[29]often miss large objects,e.g., the bed.",
+                "position": 3144
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/comparisons/3d/00337__f108224b-4b3f-4919-9ca1-7b4306523f17__MasterBedroom-13063/ours/file_00.png",
+                "caption": "",
+                "position": 3163
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/comparisons/3d/00337__f108224b-4b3f-4919-9ca1-7b4306523f17__MasterBedroom-13063/partcrafter/file_00.png",
+                "caption": "",
+                "position": 3164
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/comparisons/3d/00337__f108224b-4b3f-4919-9ca1-7b4306523f17__MasterBedroom-13063/midi/file_00.png",
+                "caption": "",
+                "position": 3165
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00064__e2f3aa79-e130-445e-8773-b697ab77d9b8__MasterBedroom-45873/folder_90/input.png",
+                "caption": "",
+                "position": 3168
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00064__e2f3aa79-e130-445e-8773-b697ab77d9b8__MasterBedroom-45873/folder_90/ours.png",
+                "caption": "",
+                "position": 3169
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00064__e2f3aa79-e130-445e-8773-b697ab77d9b8__MasterBedroom-45873/folder_90/partcrafter.png",
+                "caption": "",
+                "position": 3170
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00064__e2f3aa79-e130-445e-8773-b697ab77d9b8__MasterBedroom-45873/folder_90/midi.png",
+                "caption": "",
+                "position": 3171
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00100__e4d49144-ac70-482d-ac0a-607f68160dca__SecondBedroom-15120/folder_180/input.png",
+                "caption": "",
+                "position": 3174
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00100__e4d49144-ac70-482d-ac0a-607f68160dca__SecondBedroom-15120/folder_180/ours.png",
+                "caption": "",
+                "position": 3175
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00100__e4d49144-ac70-482d-ac0a-607f68160dca__SecondBedroom-15120/folder_180/partcrafter.png",
+                "caption": "",
+                "position": 3176
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00100__e4d49144-ac70-482d-ac0a-607f68160dca__SecondBedroom-15120/folder_180/midi.png",
+                "caption": "",
+                "position": 3177
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00116__e534fb8b-1a40-48a6-a895-07ea15c5e3fe__Bedroom-130367/folder_90/input.png",
+                "caption": "",
+                "position": 3180
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00116__e534fb8b-1a40-48a6-a895-07ea15c5e3fe__Bedroom-130367/folder_90/ours.png",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00116__e534fb8b-1a40-48a6-a895-07ea15c5e3fe__Bedroom-130367/folder_90/partcrafter.png",
+                "caption": "",
+                "position": 3182
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00116__e534fb8b-1a40-48a6-a895-07ea15c5e3fe__Bedroom-130367/folder_90/midi.png",
+                "caption": "",
+                "position": 3183
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00169__e76ebb28-f9f8-40d6-a1e6-5fa1420191fb__MasterBedroom-2303/folder_90/input.png",
+                "caption": "",
+                "position": 3186
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00169__e76ebb28-f9f8-40d6-a1e6-5fa1420191fb__MasterBedroom-2303/folder_90/ours.png",
+                "caption": "",
+                "position": 3187
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00169__e76ebb28-f9f8-40d6-a1e6-5fa1420191fb__MasterBedroom-2303/folder_90/partcrafter.png",
+                "caption": "",
+                "position": 3188
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00169__e76ebb28-f9f8-40d6-a1e6-5fa1420191fb__MasterBedroom-2303/folder_90/midi.png",
+                "caption": "",
+                "position": 3189
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00180__e7ea961c-5f0d-437a-9cdc-4b4488f62675__SecondBedroom-18851/folder_90/input.png",
+                "caption": "",
+                "position": 3192
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00180__e7ea961c-5f0d-437a-9cdc-4b4488f62675__SecondBedroom-18851/folder_90/ours.png",
+                "caption": "",
+                "position": 3193
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00180__e7ea961c-5f0d-437a-9cdc-4b4488f62675__SecondBedroom-18851/folder_90/partcrafter.png",
+                "caption": "",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00180__e7ea961c-5f0d-437a-9cdc-4b4488f62675__SecondBedroom-18851/folder_90/midi.png",
+                "caption": "",
+                "position": 3195
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00231__e9ebe917-5812-429a-9154-913dcacb49ff__SecondBedroom-33190/folder_90/input.png",
+                "caption": "",
+                "position": 3198
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00231__e9ebe917-5812-429a-9154-913dcacb49ff__SecondBedroom-33190/folder_90/ours.png",
+                "caption": "",
+                "position": 3199
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00231__e9ebe917-5812-429a-9154-913dcacb49ff__SecondBedroom-33190/folder_90/partcrafter.png",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00231__e9ebe917-5812-429a-9154-913dcacb49ff__SecondBedroom-33190/folder_90/midi.png",
+                "caption": "",
+                "position": 3201
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00245__eb014623-6b94-4fb0-b33d-39773cb0cd8c__KidsRoom-77034/folder_00/input.png",
+                "caption": "",
+                "position": 3204
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00245__eb014623-6b94-4fb0-b33d-39773cb0cd8c__KidsRoom-77034/folder_00/ours.png",
+                "caption": "",
+                "position": 3205
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00245__eb014623-6b94-4fb0-b33d-39773cb0cd8c__KidsRoom-77034/folder_00/partcrafter.png",
+                "caption": "",
+                "position": 3206
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00245__eb014623-6b94-4fb0-b33d-39773cb0cd8c__KidsRoom-77034/folder_00/midi.png",
+                "caption": "",
+                "position": 3207
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00252__eb2abbb1-9a02-4614-aaad-d94a203d12f7__MasterBedroom-16104/folder_270/input.png",
+                "caption": "",
+                "position": 3210
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00252__eb2abbb1-9a02-4614-aaad-d94a203d12f7__MasterBedroom-16104/folder_270/ours.png",
+                "caption": "",
+                "position": 3211
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00252__eb2abbb1-9a02-4614-aaad-d94a203d12f7__MasterBedroom-16104/folder_270/partcrafter.png",
+                "caption": "",
+                "position": 3212
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00252__eb2abbb1-9a02-4614-aaad-d94a203d12f7__MasterBedroom-16104/folder_270/midi.png",
+                "caption": "",
+                "position": 3213
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00542__fd164bcb-6083-40e6-81b5-a29bd400c7d3__Bedroom-377735/folder_90/input.png",
+                "caption": "",
+                "position": 3216
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00542__fd164bcb-6083-40e6-81b5-a29bd400c7d3__Bedroom-377735/folder_90/ours.png",
+                "caption": "",
+                "position": 3217
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00542__fd164bcb-6083-40e6-81b5-a29bd400c7d3__Bedroom-377735/folder_90/partcrafter.png",
+                "caption": "",
+                "position": 3218
+            },
+            {
+                "img": "https://arxiv.org/html/2512.05272/figures/appendix/comparisons/3d/00542__fd164bcb-6083-40e6-81b5-a29bd400c7d3__Bedroom-377735/folder_90/midi.png",
+                "caption": "",
+                "position": 3219
+            }
+        ]
+    },
+    {
+        "header": "FAdditional Qualitative Results on 3D Scene Generation",
+        "images": []
+    }
+]
