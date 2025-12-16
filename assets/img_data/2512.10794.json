@@ -1,0 +1,432 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/teaser-v2.png",
+                "caption": "Figure 1:What matters for representation alignment?Left:Correlation analysis across 27 diverse vision encoders. Surprisingly, contrary to the prevailing wisdom, we find that spatial structure, rather than global performance (measured by linear probing accuracy), drives the generation performance of a target representation.Right:We further study this by introducing two simple modifications to accentuate the transfer of spatial features from target representation to diffusion model. Our simple approach consistently improves the convergence speed of REPA across diverse settings.",
+                "position": 109
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.10794/x1.png",
+                "caption": "Figure 2:Motivating examples — spatial structure matters.Metrics comparison showing inverse relationship between ImageNet accuracy and generation quality.Left:PE\\mathrm{PE}-G, despite having significantly higher validation accuracy (82.8% vs. 53.1%), shows worse generation quality compared toSpatialPE\\mathrm{SpatialPE}-B(Bolya et al.,2025).Right:Similarly, WebSSL-1B(Fan et al.,2025)also shows much better global performance (76.0% vs. 53.1%), but worse generation.Spatial Self-Similarity:We find that spatial structure instead provides a better predictor of generation quality than global performance. See §3for spatial structure metric.\nAll results reported at 100K using SiT-XL/2 and REPA.",
+                "position": 118
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/x1.png",
+                "caption": "",
+                "position": 121
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/x2.png",
+                "caption": "",
+                "position": 125
+            }
+        ]
+    },
+    {
+        "header": "2Motivation: Global Information Matters Less",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.10794/x3.png",
+                "caption": "(a)SAM2 vs “better” encoders.",
+                "position": 198
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/x3.png",
+                "caption": "",
+                "position": 201
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/x4.png",
+                "caption": "",
+                "position": 205
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/x5.png",
+                "caption": "",
+                "position": 209
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/x6.png",
+                "caption": "(a)SAM2 vs “better” encoders.",
+                "position": 214
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/x7.png",
+                "caption": "(b)Larger models but worse gFID.",
+                "position": 219
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/x8.png",
+                "caption": "(c)Adding global info. hurts FID.",
+                "position": 224
+            }
+        ]
+    },
+    {
+        "header": "3Spatial Structure Matters More",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/spatial_metrics_comparison-sit-xl-2.png",
+                "caption": "Figure 4:Spatial structure shows higher correlation with generation quality than linear probing.Correlation analysis across 27 diverse vision encoders, SiT-XL/2 and REPA. Linear probing shows weak correlation with FID (Pearson|r|=0.260|r|=0.260), while all spatial structure metrics: LDS (|r|=0.852|r|=0.852), SRSS (|r|=0.885|r|=0.885), CDS (|r|=0.847|r|=0.847), and RMSC (|r|=0.888|r|=0.888), demonstrate much stronger correlation with generation performance. See Fig.10for detailed plots with encoder labels.",
+                "position": 323
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/gfid_sift_hog.png",
+                "caption": "",
+                "position": 357
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/ssm-explains-repa.png",
+                "caption": "",
+                "position": 362
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/correlation_across_modelsizes.png",
+                "caption": "Figure 5:Correlation analysis across model scales.Across different model scales, we find that spatial structure (right) consistently shows higher correlation with gFID than linear probing (left).",
+                "position": 367
+            }
+        ]
+    },
+    {
+        "header": "4iREPA: Improving Representation Alignment by Accentuating what Matters",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/viz-simplerproj-layer8.png",
+                "caption": "(a)Simpler projection layer for REPA.Standard MLP projection layer in REPA (middle) loses spatial information while transferring features from target representation (left) to diffusion features. Instead using a simpler convolution layer leads to better spatial information transfer (right).",
+                "position": 447
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/viz-simplerproj-layer8.png",
+                "caption": "(a)Simpler projection layer for REPA.Standard MLP projection layer in REPA (middle) loses spatial information while transferring features from target representation (left) to diffusion features. Instead using a simpler convolution layer leads to better spatial information transfer (right).",
+                "position": 450
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/x9.png",
+                "caption": "(b)Spatial normalization layer.Patch tokens of pretrained vision encoders have a global component which limits spatial contrast. This causes the tokens in one semantic region (e.g., tomato) to show quite decent cosine similarity with unrelated tokens (e.g., background or cucumber). We hypothesize that we can sacrifice this global information to improve the spatial contrast between patch tokens - leading to better generation performance.",
+                "position": 457
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/viz-irepa-comparison-layer8.png",
+                "caption": "(c)Overall impactof improved training recipe (iREPA) on spatial structure of diffusion features.",
+                "position": 463
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/convergence_fid_v2.png",
+                "caption": "Figure 7:Accentuating spatial features helps consistently improve convergence speed.",
+                "position": 689
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/var-encoders-gfid-sit-xl-2-enc8.png",
+                "caption": "Figure 8:Variation in target representation. Across all 27 vision encoders, we find that accentuating transfer of spatial features from target representation to diffusion features (iREPA) leads to consistent improvements in convergence speed. See AppendixCfor more results across diverse settings.",
+                "position": 693
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets-discussion/convergence_fid_repa_vs_irepa_jit-b16-v2.png",
+                "caption": "Figure 9:Convergence comparison with pixel-space diffusion (JiT).FID convergence curves comparing REPA vs iREPA with pixel space JiT(Li & He,2025b)across different vision encoders. Accentuating transfer of spatial structure helps consistently improve the convergence speed of across different vision encoders for pixel-space diffusion models.\nAll results are reported with JiTB/16(Li & He,2025b), 256 batch size and without classifier-free guidance. Refer Table10for further results.",
+                "position": 698
+            }
+        ]
+    },
+    {
+        "header": "5Related Work",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgement",
+        "images": []
+    },
+    {
+        "header": "Reproducibility Statement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADetailed Correlation Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/sit-xl-2_lp_vs_fid_100K_appendix.png",
+                "caption": "(a)Linear Probing vs FID (SiT-XL-2)",
+                "position": 2292
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/sit-xl-2_lp_vs_fid_100K_appendix.png",
+                "caption": "(a)Linear Probing vs FID (SiT-XL-2)",
+                "position": 2295
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/sit-b-2_lp_vs_fid_100K_appendix.png",
+                "caption": "(b)Linear Probing vs FID (SiT-B-2)",
+                "position": 2300
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/sit-xl-2_lds_vs_fid_100K_appendix.png",
+                "caption": "(c)Spatial Structure vs FID (SiT-XL-2)",
+                "position": 2306
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/sit-b-2_lds_vs_fid_100K_appendix.png",
+                "caption": "(d)Spatial Structure vs FID (SiT-B-2)",
+                "position": 2311
+            }
+        ]
+    },
+    {
+        "header": "Appendix BSpatial self-similarity metrics",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/spatial_metric_explanation.png",
+                "caption": "Figure 11:Explaining semantic region self-similarity (SRSS) metric.Visual explanation of SRSS metric: For each image, we compute a mask using SAM2 and select anchor-positive-negative triplets. The SSM measures the difference in cosine similarity between anchor-positive pairs (within mask) and anchor-negative pairs (outside mask). Intuitively, larger values indicate that patches on the same semantic region are more similar than patches on unrelated regions — indicating better spatial structure preservation.",
+                "position": 2328
+            }
+        ]
+    },
+    {
+        "header": "Appendix CVision Encoder Variation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/var-encoders-gfid-sit-b-2-enc6.png",
+                "caption": "(a)SiT-B-2 (130M parameters)",
+                "position": 2421
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/var-encoders-gfid-sit-b-2-enc6.png",
+                "caption": "(a)SiT-B-2 (130M parameters)",
+                "position": 2424
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/var-encoders-gfid-sit-l-2-enc8.png",
+                "caption": "(b)SiT-L-2 (458M parameters)",
+                "position": 2430
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/var-encoders-gfid-sit-xl-2-enc8_show_values.png",
+                "caption": "(c)SiT-XL-2 (675M parameters)",
+                "position": 2436
+            }
+        ]
+    },
+    {
+        "header": "Appendix DEncoder Depth Variation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/var-encoders-gfid-sit-b-2-enc6.png",
+                "caption": "(a)SiT-B-2 with 6 encoder layers",
+                "position": 2450
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/var-encoders-gfid-sit-b-2-enc6.png",
+                "caption": "(a)SiT-B-2 with 6 encoder layers",
+                "position": 2453
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/var-encoders-gfid-sit-b-2-enc8.png",
+                "caption": "(b)SiT-B-2 with 8 encoder layers",
+                "position": 2459
+            }
+        ]
+    },
+    {
+        "header": "Appendix EComprehensive Results Across Vision Encoders",
+        "images": []
+    },
+    {
+        "header": "Appendix FAdditional Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/lp_accuracy_grouped.png",
+                "caption": "Figure 14:Global information in mean patch tokens.We find that in addition to [CLS] token, mean of patch tokens also contains substantial global semantic information.\nWhile this helps improve global performance, it reduces the contrast between individual patch tokens, potentially hindering spatial structure transfer. We find that we can remove some of this global information (through mean of patch tokens) to improve spatial structure transfer during representation alignment (§4).",
+                "position": 2902
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/convergence_fid.png",
+                "caption": "Figure 15:Accentuating spatial features helps consistently improve convergence speed.Results for SiT-XL/2 with REPA and iREPA.",
+                "position": 2986
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/viz-spatialnorm-simplerproj-layer8.png",
+                "caption": "Figure 16:Visualizing the impact of two straightforward improvements to enhance spatial feature transfer.First,we find that standard MLP projection layer (top-left) losses spatial information while transferring features from the pretrained encoder (after projection) to diffusion model (before projection). Instead using a simpler convolution layer better preserves the spatial information transfer (top-right).Second,we observe that vision encoder features often have limited spatial contrast (§2. This causes the tokens in one semantic region (e.g., dog) to show quite decent cosine similarity with unrelated tokens (e.g., background). We address this with a simple spatial regularization layer, which accentuates the spatial contrast in the learned representation — leading to better generation performance. Best results are obtained while using both (refer Table2).",
+                "position": 2990
+            }
+        ]
+    },
+    {
+        "header": "Appendix GImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix HMore Discussion on Related Work",
+        "images": []
+    },
+    {
+        "header": "Appendix INote on LLM Usage",
+        "images": []
+    },
+    {
+        "header": "Appendix JAdditional Discussion on Spatial Structure Metrics",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/bridging_representation_gap.png",
+                "caption": "Figure 17:Representation alignment as bridging the spatial feature gap.a)We find that representation alignment can also be seen as bridging the spatial feature gap between diffusion and vision encoder patch features.b)iREPA (§4) accentuates the spatial features of the vision encoder (at cost of some global information) — helping achieve better generation performance.c)iREPA helps consistently improve performance across different vision encoders.d)Spatial structure improvements scale with model size.\nAll results are reported with SiT-XL/2 at 400k iterations.",
+                "position": 3056
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/sit-xl-2_lp_vs_fid_100K.png",
+                "caption": "Figure 18:Spatial structure better correlates with generation quality than linear probing.Correlation analysis across 27 vision encoders.Left two:Linear probing accuracy vs FID for SiT-XL-2 (Pearsonr=−0.26r=-0.26) and SiT-B-2 (r=−0.12r=-0.12) shows weak correlation.Right two:Spatial structure (LDS) vs FID for SiT-XL-2 (r=−0.85r=-0.85) and SiT-B-2 (r=−0.89r=-0.89) shows strong correlation.\nSee Figure10in Appendix for detailed plots with encoder labels.",
+                "position": 3065
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/sit-xl-2_lp_vs_fid_100K.png",
+                "caption": "",
+                "position": 3068
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/sit-b-2_lp_vs_fid_100K.png",
+                "caption": "",
+                "position": 3072
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/sit-xl-2_lds_vs_fid_100K.png",
+                "caption": "",
+                "position": 3076
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/sit-b-2_lds_vs_fid_100K.png",
+                "caption": "",
+                "position": 3080
+            }
+        ]
+    },
+    {
+        "header": "Appendix KAdditional Anecdotal Comparisons",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/comparison_pe_g_vs_spatialpe_g_metrics.png",
+                "caption": "Figure 19:Motivating anecdotes from recent SSL encoders — spatial structure matters.Top row:Metrics comparison showing inverse relationship between ImageNet accuracy and generation quality.Left:PE-g achieves higher accuracy (82.8% vs 72.4%) but worse FID (32.3 vs 22.0) than Spatial-PE-g, with much lower spatial structure (LDS: 0.1 vs 0.4).Right:WebSSL-dino1b shows higher accuracy (76.0% vs 71.7%) but worse FID (26.1 vs 19.3) than DINOv2-b, with weaker spatial structure (LDS: 0.2 vs 0.4).Bottom row:Spatial cosine similarity visualizations confirm that encoders with better generation (Spatial-PE-g, DINOv2-b) maintain clear spatial coherence, while those optimized for classification (PE-g, WebSSL) lose spatial structure.",
+                "position": 3096
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/comparison_pe_g_vs_spatialpe_g_metrics.png",
+                "caption": "",
+                "position": 3099
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/comparison_webssl_dino1b_vs_dinov2_b_metrics.png",
+                "caption": "",
+                "position": 3103
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/comparison_pe_g_vs_spatialpe_g_spatial.png",
+                "caption": "",
+                "position": 3108
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/comparison_webssl_dino1b_vs_dinov2_b_spatial.png",
+                "caption": "",
+                "position": 3112
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/comparison_pe_g_vs_spatialpe_b_metrics.png",
+                "caption": "Figure 20:Motivating examples — spatial structure matters.Top:Metrics comparison showing inverse relationship between ImageNet accuracy and generation quality.Left:PEcore\\mathrm{PE_{core}}-G, despite having significantly higher validation accuracy (82.8% vs. 53.1%), shows worse generation quality compared toPESpatial\\mathrm{PE_{Spatial}}-B(Bolya et al.,2025).Right:Similarly, WebSSL-1B(Fan et al.,2025)also shows much better global performance (76.0% vs. 53.1%), but worse generation.Bottom:We find that spatial structure instead provides a better predictor of generation quality than global performance. See §3for spatial structure metric.\nAll results reported at 100K using SiT-XL/2 and REPA.",
+                "position": 3123
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/comparison_pe_g_vs_spatialpe_b_metrics.png",
+                "caption": "",
+                "position": 3126
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/comparison_webssl_dino1b_vs_spatialpe_b_metrics.png",
+                "caption": "",
+                "position": 3130
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/comparison_pe_g_vs_spatialpe_b_spatial.png",
+                "caption": "",
+                "position": 3135
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets/comparison_webssl_1b_vs_spatialpe_b_spatial.png",
+                "caption": "",
+                "position": 3139
+            }
+        ]
+    },
+    {
+        "header": "Appendix LFurther Discussion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.10794/x10.png",
+                "caption": "Figure 21:Visualizing impact of spatial normalization (Example 1). The heatmaps show token similarity patterns before and after spatial normalization. Without normalization (left), global components create high correlations across unrelated regions. With spatial normalization (right), local spatial structure is enhanced while reducing global interference, resulting in more distinct semantic boundaries.",
+                "position": 3163
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/x11.png",
+                "caption": "Figure 22:Visualizing impact of spatial normalization (Example 3). The heatmaps show token similarity patterns before and after spatial normalization. Without normalization (left), global components create high correlations across unrelated regions. With spatial normalization (right), local spatial structure is enhanced while reducing global interference, resulting in more distinct semantic boundaries.",
+                "position": 3166
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/x12.png",
+                "caption": "Figure 23:Visualizing impact of spatial normalization (Example 2). Feature similarity maps demonstrate how spatial normalization improves spatial contrast. The original features (left) exhibit a global overlay that reduces distinction between foreground and background regions. After normalization (right), spatial tokens become more locally coherent, with clearer separation between different semantic regions.",
+                "position": 3169
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/x13.png",
+                "caption": "Figure 24:Visualizing impact of spatial normalization(Example 4). The heatmaps show token similarity patterns before and after spatial normalization. Without normalization (left), global components create high correlations across unrelated regions. With spatial normalization (right), local spatial structure is enhanced while reducing global interference, resulting in more distinct semantic boundaries.",
+                "position": 3172
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets-discussion/res512-nfe50-convergence_fid_rebuttal.png",
+                "caption": "Figure 25:Convergence results at 512x512 resolution. Accentuating spatial features helps consistently improve convergence speed across different resolutions for both Imagenet 256 (Figure7) and Imagenet 512 (above).",
+                "position": 3191
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets-discussion/var-encoders-gfid-t2i-ema-ode-0150000.png",
+                "caption": "Figure 26:Text-to-image generation across encoder variants. Accentuating transfer of spatial features from the target representation to the diffusion features consistently improves\nconvergence speed for both imagenet (refer §4) and multimodal T2I tasks (above).\nFurthermore, consistent gains are observed across different choice of pretrained encoders (DINOv2, CLIP, WebSSL, PE, etc.).",
+                "position": 3209
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets-discussion/correlation_across_modelsizes-wo-outliers.png",
+                "caption": "Figure 27:Correlation analysis without outliers.\nAcross all model sizes (B, L, XL) spatial structure still shows much higher correlation (Pearson|r|>0.85|r|>0.85) with generation performance over linear probing accuracy (Pearson|r|<0.38|r|<0.38) after removing the outliers (MoCOv3-L and MAE-L).\nInterestingly, after removing the outliers linear probing actually shows a small positive correlation with gFID (i.e., as linear probing performance increases, the generation becomes worse).\nThis trend is consistent with the observations discussed in Sec.2, wherein often target representations with higher global semantic performance (linear probing accuracy) show similar or worse generation performance with representation alignment (REPA).",
+                "position": 3226
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/x14.png",
+                "caption": "Figure 28:Additional Qualitative Resultscomparing generation outputs before and after application of spatial improvements with REPA. All results are reported using PE-G(Bolya et al.,2025)as the pretrained vision encoder, 400K steps (80 epochs) and with classifier-free guidance scale of 4.0. Similar to quantitative improvements (§4), we also observe that spatial improvements (iREPA) also help improve the visual quality and coherence of the generated outputs.",
+                "position": 3238
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets-discussion/spatial_metrics_comparison-cmmd-sit-b-2.png",
+                "caption": "Figure 29:Correlation analysis with CMMD metric.\nWe repeat the correlation analysis from §3with CMMD metric(Jayasumana et al.,2024)instead of gFID.\nAll results are reported using SiT-B/2 (100K steps) and REPA.\nAll spatial metrics show much higher correlation (Pearson|r|>0.88|r|>0.88) with generation performance (CMMD) than linear probing (Pearson|r|=0.074|r|=0.074).\nThis demonstrates that key empirical findings from §3are robust to the choice of evaluation metric.",
+                "position": 3259
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets-discussion/viz-spatialnorm-main-v12.png",
+                "caption": "Figure 30:Impact of spatial normalization on SAM2.\nWe observe that for SAM2, while use of spatial normalization layer does help enhance the spatial contrast, the improvements can be marginal.\nThis is because spatial normalization (§4) relies on removing the global component (mean of patch tokens) to enhance spatial contrast. Since SAM2 already has little to no global information (validation accuracy<24%<24\\%), spatial normalization only slightly improves the spatial contrast.",
+                "position": 3632
+            },
+            {
+                "img": "https://arxiv.org/html/2512.10794/assets-discussion/spatial_metrics_comparison-fullft.png",
+                "caption": "Figure 31:Correlation analysis with full-finetuning accuracy instead of linear probing accuracy.\nWe repeat the correlation analysis from §3with the validation accuracy after full-finetuning instead of linear probing.\nAll results are reported using SiT-XL/2 (100K steps) and REPA.\nAll spatial metrics show much higher correlation with generation performance than full-finetuning accuracy.\nInterestingly, gFID actually shows a weak positive correlation with the validation accuracy after full-finetuning (Pearsonr=0.317r=0.317), i.e., as validation accuracy increases, the gfid increases, and generation performance becomes worse.\nThis is consistent with the observations discussed in §2, wherein often target representations with higher global semantic performance show similar or worse generation performance with representation alignment (REPA).",
+                "position": 3701
+            }
+        ]
+    },
+    {
+        "header": "Appendix MAdditional Results",
+        "images": []
+    }
+]
