@@ -1,0 +1,240 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.16923/x1.png",
+                "caption": "Figure 2:Pipeline Overview.Our method decomposes single-image refocusing into two stages:(a) Defocus Deblurringand(b) Shallow Depth-of-Field Synthesis. Given a blurry input imageIinI_{\\text{in}}, we optionally apply a pre-deblurring method[DRBNet]to obtain a conservative estimateIsynI_{\\text{syn}}, then feed bothIinI_{\\text{in}}andIsynI_{\\text{syn}}into DeblurNet to recover a high-quality all-in-focus imageIaifI_{\\text{aif}}. The VAE encoderℰ\\mathcal{E}and decoder𝒟\\mathcal{D}convert images to latent representations for processing by the DiT backbone. In the second stage, BokehNet takes the all-in-focus imageIaifI_{\\text{aif}}, the defocus mapDdefD_{\\text{def}}, and optionally a specific aperture shape as inputs to synthesize the refocused output. The defocus mapDdefD_{\\text{def}}is computed based on the estimated depth mapDD[Bochkovskiy2025DepthPro], along with both the user-specified focus planeS1S_{1}and bokeh levelKK.",
+                "position": 268
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.16923/x2.png",
+                "caption": "Figure 3:Training data generation.Each training sample consists of the following five components:\n(i) a bokeh image,\n(ii) an all-in-focus (AIF) image,\n(iii) a depth mapDD,\n(iv) a bokeh levelKK, and\n(v) a focus planeS1S_{1}.\nWe construct these samples via three routes:\n(a)Synthetic paired data.Given real AIF images and depth mapsDD, we compute a defocus mapDdefD_{\\text{def}}parameterized by a specified bokeh levelKKand focus planeS1S_{1}, and feed it into a bokeh renderer[BokehMe]to synthesize corresponding bokeh images.\n(b)Real unpaired data.Given real bokeh images, DeblurNet recovers an AIF image.\nWe then estimate depth and extract a foreground mask[Zheng2024BiRefNet]to define the focus planeS1S_{1}.\nThe bokeh levelKKis computed from the EXIF metadata following the formulation in[Fortes2025BokehDiffusion].\n(c)Real paired data without EXIF.For real pairs lacking EXIF, we obtain a pseudo-AIF image andS1S_{1}as in (b), and follow Eq. (2) to estimate the bokeh levelKK.",
+                "position": 337
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/x3.png",
+                "caption": "Figure 4:Qualitative comparison on defocus deblurring.Visual results on(a)RealDOF[IFANet]and(b)DPDD[DPDD]datasets.Blueboxes on the left indicate cropped regions shown in detail. Our DeblurNet faithfully recovers fine text details (“NEW YORK”) in (a) where competing methods produce blurry or distorted results. In the challenging example (b) with severe defocus blur, other methods either fail to recover structure (AIFNet[AIFNet], DRBNet[DRBNet], INIKNet[INIKNet]) or introduce artifacts in the background (IFANet[IFANet], Restormer[Restormer]), while our method reconstructs geometrically consistent, visually compelling content by leveraging diffusion priors guided by the pre-deblurred input.",
+                "position": 626
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/bokeh_visual/IMG_5683__IMG_5683_ap1_02_INPUT_zoom.jpg",
+                "caption": "Figure 5:Qualitative comparison on bokeh synthesis benchmark.Results onLF-Bokehwith zoomed patches (blueandorangeboxes) highlighting detail quality. Our BokehNet synthesizes bokeh effects that better match ground truth with realistic blur gradients and natural occlusion handling. Baselines show various artifacts: BokehMe[BokehMe]exhibits simulator bias, Bokehlicious[Bokehlicious]over-smooths details, and BokehDiff[BokehDiff]produces inconsistent defocus. Our semi-supervised training on real bokeh images enables the capture of authentic lens characteristics.",
+                "position": 677
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/bokeh_visual/IMG_5683__IMG_5683_ap1_02_GT_zoom.jpg",
+                "caption": "",
+                "position": 683
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/bokeh_visual/IMG_5683__IMG_5683_ap1_02_BokehMe_zoom.jpg",
+                "caption": "",
+                "position": 684
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/bokeh_visual/IMG_5683__IMG_5683_ap1_02_Bokehlicious_zoom.jpg",
+                "caption": "",
+                "position": 685
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/bokeh_visual/IMG_5683__IMG_5683_ap1_02_BokehDiff_zoom.jpg",
+                "caption": "",
+                "position": 686
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/bokeh_visual/IMG_5683__IMG_5683_ap1_02_Ours_zoom.jpg",
+                "caption": "",
+                "position": 687
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/bokeh_visual/IMG_3778__IMG_3778_ap2_00_INPUT_zoom.jpg",
+                "caption": "",
+                "position": 690
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/bokeh_visual/IMG_3778__IMG_3778_ap2_00_GT_zoom.jpg",
+                "caption": "",
+                "position": 691
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/bokeh_visual/IMG_3778__IMG_3778_ap2_00_BokehMe_zoom.jpg",
+                "caption": "",
+                "position": 692
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/bokeh_visual/IMG_3778__IMG_3778_ap2_00_Bokehlicious_zoom.jpg",
+                "caption": "",
+                "position": 693
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/bokeh_visual/IMG_3778__IMG_3778_ap2_00_BokehDiff_zoom.jpg",
+                "caption": "",
+                "position": 694
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/bokeh_visual/IMG_3778__IMG_3778_ap2_00_Ours_zoom.jpg",
+                "caption": "",
+                "position": 695
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/visual/10/IMG_5359_ap1_00_input_zoom.jpg",
+                "caption": "Figure 6:Qualitative comparison on refocusing benchmark.Results onLF-Refocuscomparing our end-to-end trained pipeline against baseline combinations of existing deblurring[DRBNet,Restormer]and bokeh synthesis[BokehMe,BokehDiff]methods. Zoomed patches (blueandorangeboxes) highlight focal and defocused regions. Baselines struggle with accurate focus-plane placement and produce inconsistent or overly smooth blur. Our method achieves sharp refocusing at the target plane while synthesizing photorealistic bokeh, closely matching ground truth across diverse scenes.",
+                "position": 926
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/visual/10/IMG_5359__IMG_5359_ap1_00.png__IMG_5359_ap1_04_GT_zoom.jpg",
+                "caption": "",
+                "position": 932
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/visual/10/IMG_5359__IMG_5359_ap1_00.png__IMG_5359_ap1_04_DRBNetXbokehme_zoom.jpg",
+                "caption": "",
+                "position": 933
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/visual/10/IMG_5359__IMG_5359_ap1_00.png__IMG_5359_ap1_04_DRBNetXbokehdiff_zoom.jpg",
+                "caption": "",
+                "position": 934
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/visual/10/IMG_5359__IMG_5359_ap1_00.png__IMG_5359_ap1_04_RestformerXbokehme_zoom.jpg",
+                "caption": "",
+                "position": 935
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/visual/10/IMG_5359__IMG_5359_ap1_00.png__IMG_5359_ap1_04_RestformerXbokehdiff_zoom.jpg",
+                "caption": "",
+                "position": 936
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/visual/10/IMG_5359__IMG_5359_ap1_00.png__IMG_5359_ap1_04_ours_zoom.jpg",
+                "caption": "",
+                "position": 937
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/visual/25/IMG_6245_ap2_01_input_zoom.jpg",
+                "caption": "",
+                "position": 940
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/visual/25/IMG_6245__IMG_6245_ap2_01.png__IMG_6245_ap1_04_GT_zoom.jpg",
+                "caption": "",
+                "position": 941
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/visual/25/IMG_6245__IMG_6245_ap2_01.png__IMG_6245_ap1_04_DRBNetXbokehme_zoom.jpg",
+                "caption": "",
+                "position": 942
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/visual/25/IMG_6245__IMG_6245_ap2_01.png__IMG_6245_ap1_04_DRBNetXbokehdiff_zoom.jpg",
+                "caption": "",
+                "position": 943
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/visual/25/IMG_6245__IMG_6245_ap2_01.png__IMG_6245_ap1_04_RestformerXbokehme_zoom.jpg",
+                "caption": "",
+                "position": 944
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/visual/25/IMG_6245__IMG_6245_ap2_01.png__IMG_6245_ap1_04_RestformerXbokehdiff_zoom.jpg",
+                "caption": "",
+                "position": 945
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/visual/25/IMG_6245__IMG_6245_ap2_01.png__IMG_6245_ap1_04_ours_zoom.jpg",
+                "caption": "",
+                "position": 946
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/shape/shape_input.jpg",
+                "caption": "Figure 7:Controllable aperture shape synthesis.Given an input image, our BokehNet can synthesize bokeh effects with custom aperture shapes (triangle, heart, star) by conditioning on shape exemplars. Background point lights exhibit the specified aperture geometry while maintaining scene consistency.",
+                "position": 1098
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/shape/shape_tri.jpg",
+                "caption": "",
+                "position": 1104
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/shape/shape_heart.jpg",
+                "caption": "",
+                "position": 1105
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/figures/shape/shape_star.jpg",
+                "caption": "",
+                "position": 1106
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/x4.png",
+                "caption": "Figure 8:Text-guided deblurring.DeblurNet uses optional text prompts to guide reconstruction of severely blurred text.\nWith prompts, we correct hallucinations (red: “DESION”→\\rightarrow“DESIGN”) and recover accurate text (green: “yeurs”→\\rightarrow“years”), matching GT.\nWithout guidance, it hallucinates incorrect content.",
+                "position": 1121
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix Overview",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.16923/x5.png",
+                "caption": "Figure 9:Comparison with VLM model.Qualitative refocusing results comparing our Generative Refocusing framework withGemini 3 Nano Banana Pro[googledeepmind_gemini_overview_2025]given prompt ”focus on the man on the right”.",
+                "position": 1152
+            }
+        ]
+    },
+    {
+        "header": "Appendix BVisual Comparison for BokehNet Training Ablation",
+        "images": []
+    },
+    {
+        "header": "Appendix CTraining Datasets",
+        "images": []
+    },
+    {
+        "header": "Appendix DPointLight-1K Collection Pipeline",
+        "images": []
+    },
+    {
+        "header": "Appendix EComparison with VLM model",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.16923/x6.png",
+                "caption": "Figure 10:Visual Comparison for BokehNet Training Ablation.",
+                "position": 1244
+            },
+            {
+                "img": "https://arxiv.org/html/2512.16923/x7.png",
+                "caption": "Figure 11:Failure case.Due to the severely blurred input, the model hallucinates an incorrect time, changing 11:30 a.m. to 12:30 a.m.",
+                "position": 1256
+            }
+        ]
+    },
+    {
+        "header": "Appendix FFailure Cases",
+        "images": []
+    }
+]
