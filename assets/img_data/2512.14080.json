@@ -1,0 +1,212 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.14080/x1.png",
+                "caption": "Figure 1:SonicMoE’s per-layer activation memory footprint (left) stays constant even when expert granularity (d/nd/nwhereddis the embedding dimension andnnis the expert intermediate dimension) increases, and is 0.20-1.59x more memory-efficient than other baselines. SonicMoE’s forward computation throughput (right) reaches an average of 88% (max 91%, min 86%) of the upper bound (cuBLAS BMM + activation + cuBLAS BMM + aggregation on H100). Note that the cuBLAS upper bound baseline doesnotinclude the router computation. Here we use a 30B MoE configuration with microbatch size of 32768 tokens, and we vary the activated experts / total number of experts as 2/32, 4/64, 8/128, and 16/256 from left to right.",
+                "position": 209
+            }
+        ]
+    },
+    {
+        "header": "2Background",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.14080/x2.png",
+                "caption": "Algorithm 1MoE forward with Grouped GEMM",
+                "position": 386
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x2.png",
+                "caption": "Figure 2:MoE computation often requires a Grouped GEMM. Each expert gathers inputs from different positions on an input tensor (top) or reads a contiguous chunk on a grouped input array (bottom). This figure is adapted from[tan2024scattered]’s Figure 2.",
+                "position": 439
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x3.png",
+                "caption": "Figure 3:IO cost of MoE’s forward pass for one layer w.r.t. expert granularity across MoE configurations under iso-FLOPs training from 1.4B to 120B (configurations in Table9(a)). We keep MoE activation ratioρ=K/E\\rho=K/Eand the number of parameters of each MoE layer3​d​n​E3dnEconstant. When we scale up expert granularityd/nd/n, we scale down expert intermediate sizennwhile keeping bothn​EnEandn​KnKconstant.",
+                "position": 459
+            }
+        ]
+    },
+    {
+        "header": "3Memory-efficient MoE algorithm",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.14080/x4.png",
+                "caption": "Figure 4:Computational workflow of SonicMoE’s 8 launched kernels, grouped by yellow boxes. 3 and 5 kernels are launched during forward and backward computation respectively. The incoming arrows to a yellow circle indicate a variable loaded from HBM to SRAM, and an outgoing arrow represents a variable stored to HBM. We color the boxes of all variables on HBM, with purple boxes indicating the output of forward and backward while blue boxes indicate intermediate variables or weights (W1W_{1},W2W_{2}). We color all cached activationsXX,HH,π\\pi,SSin red. Algorithm2formally describes SonicMoE’s forward pass, and Algorithm3and5describe the backward pass.",
+                "position": 538
+            }
+        ]
+    },
+    {
+        "header": "4IO-aware kernel design",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.14080/x5.png",
+                "caption": "Figure 5:Pipeline structure for gather fusion withcp.async\\mathrm{cp.async}on Blackwell GPUs using 2-CTA clusters.",
+                "position": 866
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x6.png",
+                "caption": "Figure 6:Runtime breakdown of different MoE kernels (ms↓\\downarrow) on the 7B MoE training with(T,d,n,E,K)=(24576,1536,256,128,8)(T,d,n,E,K)=(24576,1536,256,128,8)on H100. We annotate the model memory bandwidth (TB/s↑\\uparrow) for memory-bound kernels (gather, SwiGLU/dSwiGLU, and expert aggregation kernel) and compute throughput (TFLOPS↑\\uparrow, abbr as TF/s in the figure) for grouped GEMM kernels. Note that this profile is grouped by kernel runtime semantics and one block can contain multiple actual kernel timing results. For example, the “router related” on left subfigure includes both router GEMM and routing metadata computation time. In addition, we do not consider the CUDA stream bubble time across kernels in this figure. We use theGroupedMLP\\mathrm{GroupedMLP}for Megatron, andParallelDroplessMLP\\mathrm{ParallelDroplessMLP}for MegaBlocks. DeepGEMM doesnotprovide an efficient router implementation, gather and expert aggregation kernels during the forward pass, where we use a standard PyTorch implementation (“DeepGEMM-pt”) or our highly optimized kernels (“DeepGEMM++”) for them. During the backward pass, both “DeepGEMM++” and “DeepGEMM-pt” use the same computational path as SonicMoE, except we launch separate kernel(s) that computed​SdS,A′A^{\\prime}, anddSwiGLU\\mathrm{dSwiGLU}together. DeepGEMM++ is effectively the best possible MoE implementation built on top of DeepGEMM SM90 BF16 Grouped GEMM kernels without modifying DeepGEMM’s source code.",
+                "position": 872
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x7.png",
+                "caption": "Figure 7:SonicMoE’s Ping-Pong warpgroup scheduling on Hopper GPUs. The green arrows indicate that a consumer warpgroup signals the start of the epilogue and the other consumer warpgroup can proceed with the MMA. Once this step is complete, the roles of 2 consumer warpgroups is switched. SonicMoE mainly uses Ping-Pong for forward down-projYYkernel and backward down-proj activation gradientd​HdHkernel as they both have heavy epilogue. Ind​HdHkernel, SonicMoE has an asynchronous TMA load during epilogue, and producer warps need to issuecp.async\\mathrm{cp.async}for gatheringd​OdOand load expert weights with TMA. This figure is adapted from[torch_cutlass_pingpong]’s blog on Ping-Pong scheduling.",
+                "position": 912
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x8.png",
+                "caption": "Figure 8:Illustration to show asynchronous TMA store (top) has higher memory bandwidth and can naturally overlap with TensorCore MMA while synchronousst.global\\mathrm{st.global}(bottom) PTX instruction, necessary for scatter fusion on Hopper GPUs, blocks the execution of next Tensor Core MMA tile and leads to longer kernel runtime. This figure is supported by the 20.1% speedup on average of ”SonicMoE (gemm + gth w. sum)” (TMA store) over ”SonicMoE (gemm w. sct + sum)” (st.global\\mathrm{st.global}) in Figure22’s transparent bars. As a result, SonicMoE does not fuse scatter with HBM store and instead, lets each token gather the expert results in the expert aggregation kernel. Both ScatterMoE and MoMoE do not adopt such design and SonicMoE can achieve 1.75x and 3.11x speedup respectively on average during forward down-proj kernel in Figure6.",
+                "position": 943
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x9.png",
+                "caption": "Figure 9:Possible strategies for storing the results and aggregating the results for each token. SonicMoE chooses the first strategy (left) in which each expert directly stores contiguously-packed outputs via TMA in the GEMM epilogue. In the expert aggregation kernel, each token gathers and sums over activated expert outputs. ScatterMoE and MoMoE (middle) choose to fuse HBM store with scatter in epilogue and launch a summation kernel afterwards. We note that each token gathering (left) the Grouped GEMM result is equivalent to each expert scattering (middle) the Grouped GEMM outputs. In Figure22, we implement both strategies on SonicMoE and observe the left strategy can have 17% speedup over the middle strategy. It is also possible to fuse atomic add in the epilogue to circumvent the requirement of an expert aggregation kernel as the right subfigure illustrated. However, this atomic add operation creates new issues like non-determinism[determinism]and numerical accuracy (for BF16 atomic add). This figure is adapted from[tan2024scattered]’s Figure 2.",
+                "position": 952
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x10.png",
+                "caption": "Figure 10:The sorting is conducted over values after we pack the column index bits into lower mantissa bits. This value format ensures a stable sorting result. Triton’s official top-KKkernel follows a similar format.",
+                "position": 966
+            }
+        ]
+    },
+    {
+        "header": "5Token rounding routing",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.14080/x11.png",
+                "caption": "Algorithm 4Token rounding routing",
+                "position": 986
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x11.png",
+                "caption": "Figure 11:Wasted FLOPs by padding during MoE forward & backward pass withT=16​kT=16k,d=4​kd=4k,n=1​kn=1k,K=4K=4as illustrated in the bottom right 2 subfigures of Figure16.",
+                "position": 1073
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x12.png",
+                "caption": "",
+                "position": 1086
+            }
+        ]
+    },
+    {
+        "header": "6Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.14080/x13.png",
+                "caption": "Figure 13:Peak activation memory usage per layer across different model scales (1.4B–120B). MegaBlocks does not support smallnn. The benchmark configurations are listed in Table9(b). We only cacheXX, gatheredXeX_{e},HeH_{e}for each experteeand routing metadata which is the minimum amount of activation memory required for backward computation without GEMM recomputation.",
+                "position": 1136
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x14.png",
+                "caption": "Figure 14:Forward & backward TFLOPS for different MoE kernels on H100. DeepGEMM does not provide an efficient router implementation, gather and expert aggregation kernels, where we use a standard PyTorch implementation (“DeepGEMM-pt”) or our highly optimized kernels (“DeepGEMM++”) for them. During the backward pass, both “DeepGEMM++” and “DeepGEMM-pt” use the same computational path as SonicMoE, except we launch separate kernel(s) that computed​SdS,A′A^{\\prime}, anddSwiGLU\\mathrm{dSwiGLU}together. The MoE configurations are the same as in Figure13.",
+                "position": 1161
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x15.png",
+                "caption": "Figure 15:Forward & backward TFLOPS of a single MoE layer for different MoE kernels for different configurations ranging from 7B to 685B parameters on H100. The MoE configurations from left to right adopt the model size ofOLMoE-1B-7B-0125[muennighoff2024olmoe],gpt-oss-20b[openai2025gptoss120bgptoss20bmodel],Kimi-Linear-48B-A3B-Base[team2025kimi],Qwen3-Next-80B-A3B-Thinking[qwen3technicalreport],Qwen3-235B-A22B-Thinking-2507[qwen3technicalreport], andDeepSeek-V3.2-Exp[deepseekai2024deepseekv32]. For fair comparison, we do not consider shared experts and expert biases, and we always use TC top-KKrouter with softmax scores. ScatterMoE, MoMoE, DeepGEMM-pt, and DeepGEMM++ all fail to run (either due to index overflow or CUDA OOM errors) for the DeepSeek-V3.2-Exp configuration.",
+                "position": 1167
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x16.png",
+                "caption": "Figure 16:Forward & backward model TFLOPS for SonicMoE MoE kernels with different routing methods. We compare TR equipped with “nearest rounding toMtileM_{\\mathrm{tile}}-multiples via expert frequency” subroutine against TC top-KKrouting. Configuration details are in AppendixG.",
+                "position": 1961
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x17.png",
+                "caption": "Figure 17:Forward & backward TFLOPS of a single MoE layer of SonicMoE equipped with different routing methods for different configurations ranging from 7B to 685B parameters on H100. The MoE configurations from left to right adopt the model size ofOLMoE-1B-7B-0125,gpt-oss-20b,Kimi-Linear-48B-A3B-Base,Qwen3-Next-80B-A3B-Thinking,Qwen3-235B-A22B-Thinking-2507, andDeepSeek-V3.2-Exp(configurations identical to Figure15). We compare TR equipped with “nearest rounding toMtileM_{\\mathrm{tile}}-multiples via expert frequency” subroutine against TC top-KKrouting.",
+                "position": 1977
+            }
+        ]
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgment",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix ANotations",
+        "images": []
+    },
+    {
+        "header": "Appendix BSonicMoE’s comparison with existing MoE kernel design",
+        "images": []
+    },
+    {
+        "header": "Appendix CGradient computation",
+        "images": []
+    },
+    {
+        "header": "Appendix DSonicMoE algorithm",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.14080/x18.png",
+                "caption": "Figure 18:Index prefetching strategies for gathering on𝐌\\mathbf{M}dim of varlen-𝐌\\mathbf{M}Grouped GEMM (left) and𝐊\\mathbf{K}dim of varlen-𝐊\\mathbf{K}Grouped GEMM (right) on H100 GPU. For gather on𝐌\\mathbf{M}dim (left), we let each thread independently prefetch indices to their own registers before the mainloop. For gather on𝐊\\mathbf{K}dim (right), we create a buffer on SMEM and let 4 producer warps cooperatively prefetch indices to SMEM and each producer thread read from this SMEM buffer to their registers.",
+                "position": 2749
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/figures/varlen-K.png",
+                "caption": "",
+                "position": 2752
+            }
+        ]
+    },
+    {
+        "header": "Appendix ESonicMoE’s ablation study on kernel-level throughput",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.14080/x19.png",
+                "caption": "Figure 19:Varlen-𝐌\\mathbf{M}Grouped GEMM with contiguously-packed inputs to up and down-proj during forward pass on H100 GPU. We use the same configurations as in Figure13. “cuBLAS BMM” is adenseBMM baseline equivalent to all expert receiving equal number of tokens (perfectly load balanced), whose TFLOPS can be considered as anupper boundfor any Grouped GEMM kernel.",
+                "position": 2843
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x20.png",
+                "caption": "Figure 20:Forward pass up-proj (gather on𝐌\\mathbf{M}dim) and backward up-proj weight gradientd​W1dW_{1}(gather on𝐊\\mathbf{K}dim) kernel on H100 GPU. SonicMoE supports both inputs gathered from different positions (opaque bars) and contiguously-packed inputs (transparent bars). ScatterMoE and MoMoE both have gather fusion for varlen-𝐌\\mathbf{M}but not varlen-𝐊\\mathbf{K}, so we benchmark their gather with varlen-𝐊\\mathbf{K}Grouped GEMM time (opaque bar) by adding up the time of their contiguously-packed weight gradient kernel (transparent bar) with the time of their gather kernel. DeepGEMM does not have gather fusion for both varlen-𝐌\\mathbf{M}and varlen-𝐊\\mathbf{K}Grouped GEMM, so we provide an optimized gather kernel in both cases. We also provide a “cuBLAS dense BMM” (transparent bar) baseline and the gather with GEMM time (opaque bar) by adding up the time with a heavily-tuned gather kernel’s time with the same input shape, which can be considered as the upper bound TFLOPS foranyGrouped GEMM kernel without gather fusion.",
+                "position": 2849
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x21.png",
+                "caption": "Figure 21:Expert aggregation kernels (OOkernel) during forward pass of MoE. Same configurations as in Figure13. “ScatterMoE (contig.YY)” is the expert aggregation strategy employed by ScatterMoE. The implementation usestorch.bmm\\mathrm{torch.bmm}call to reduce overKK, “MoMoE (contig.YY)” is atorch.sum\\mathrm{torch.sum}call for MoMoE. We take the maximum bandwidth between PyTorch eager and PyTorch compile on default mode with PyTorch 2.9.0. We also implement an optimized triton kernel for summing over contiguously-packedYYinputs with Triton 3.3.1 as “triton sum (contig.YY)”.",
+                "position": 2876
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x22.png",
+                "caption": "Figure 22:Throughput of Grouped GEMM and expert aggregation kernel on H100. “SonicMoE (gemm + gth w. sum)” is the final design choice for SonicMoE as illustrated in Figure9left strategy. We compare this design against “SonicMoE (gemm w. sct + sum)” that implements the Figure9middle strategy on SonicMoE. We use identical tile sizes and other GEMM configs for both “SonicMoE (gemm + gth w. sum)” and “SonicMoE (gemm w. sct + sum)”. We also compare with ScatterMoE’s design (fused scatter with GEMM +torch.bmm\\mathrm{torch.bmm}, labeled as “ScatterMoE (gemm w. sct + BMM)”) and MoMoE’s design (fused scatter with GEMM +torch.sum\\mathrm{torch.sum}, labeled as “MoMoE (gemm w. sct + sum)”). For each method, we report the GEMM TFLOPS in transparent bars and TFLOPS of total runtime of GEMM and expert aggregation in the opaque bars.",
+                "position": 2882
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14080/x23.png",
+                "caption": "Figure 23:Top-KKkernels with BF16 inputs (1st1^{\\text{st}}row) and FP32 inputs (2nd2^{\\text{nd}}row) during forward pass of MoE. Same configurations as in Figure13. “torch” is a directtorch.topk\\mathrm{torch.topk}call. “triton” and “tilelang” are taken from their official examples with slight modifications to support BF16 inputs. For the triton official kernel, we remove the unnecessary bit matrix store and disable the softmax fusion in this example for a fair comparison. “RTop-K”[xie2025rtopk]only supports FP32 inputs. We setϵ=0\\epsilon=0and maximum iteration as 8 for RTop-K.",
+                "position": 2892
+            }
+        ]
+    },
+    {
+        "header": "Appendix FMore experiments",
+        "images": []
+    },
+    {
+        "header": "Appendix GActivation memory and training throughput benchmark configurations",
+        "images": []
+    },
+    {
+        "header": "Appendix HHyperparameter details for LM training",
+        "images": []
+    }
+]
