@@ -1,0 +1,173 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/github-mark.png",
+                "caption": "",
+                "position": 206
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/x1.png",
+                "caption": "Figure 1:From Single-Cue to Multi-Evidence Integration.While existing benchmarks like MVBench[li2024mvbench](top) often focus on short-term attributes solvable via single salient frames or language priors,HERBench(bottom) enforces a high Evidential Requirement (ER). In thisTemporal Shot Orderingexample, the model must identify and temporally bind four distinct, non-overlapping visual evidence dispersed across the video to reconstruct the correct sequence. This design ensures that successful answering requires genuine multi-evidence integration rather than reliance on static shortcuts.",
+                "position": 208
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.14870/x2.png",
+                "caption": "Figure 2:Task taxonomy of HERBench.We organize 12 fine-grained compositional tasks into four essential reasoning families:(1) Temporal Reasoning & Chronology,(2) Referring & Tracking,(3) Global Consistency & Verification, and(4) Multi-Entity Aggregation & Numeracy. Unlike existing benchmarks that may allow for single-frame shortcuts, every task in HERBench is constructed to enforce aHigh Evidential Requirement, requiring models to aggregate at least three distinct, temporally separated visual cues (k≥3k\\geq 3) to derive the correct answer.",
+                "position": 268
+            }
+        ]
+    },
+    {
+        "header": "3HERBench: High Evidential Requirement Benchmark",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/bench_gen2.jpg",
+                "caption": "Figure 3:HERBench Data Construction Pipeline.We employ a tripartite pipeline.(Left)Videos are processed through three parallel streams: 1)Object Tracking and Trajectory Analysis(via RF-DETR and DeepSORT) to produce targets to generate disentangled Appearance (A) and Behavior (B) cards; 2)Shot Segmentationusing shot detection with an MLLM description for producing scene descriptions; and 3)Ground Truth Integrationrefining human verified raw event logs.(Middle)These refined data input are controlled via a Manual Review and then input into an Oriented Task Programming module that programmatically compiles the 12 compositional tasks.(Right)The pipeline enforces rigorous quality control through expert Manual Review and a Text-Only Filtering stage to eliminate language priors, ensuring all final Multiple Choice Questions (MCQs) enforce multi-evidence integration.",
+                "position": 313
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/wordcloud.jpg",
+                "caption": "Figure 4:Left:Wordcloud of frequent terms in HERBench queries.Center:Distribution of samples across source datasets.Right:Number of questions per task category.",
+                "position": 407
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/wordcloud.jpg",
+                "caption": "",
+                "position": 410
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/questions_per_dataset_pie.png",
+                "caption": "",
+                "position": 414
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/task_bar_chart.png",
+                "caption": "",
+                "position": 418
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/combined_top1_pred_share.png",
+                "caption": "Figure 5:Top-1 frame share under oracle-only frames.Violin/box plots show the distribution of the maximum normalized frame-importance share across oracle-only frames for three models (InternVL3.5-14B, Ovis-2.5, Qwen3-VL-8B), split byCorrectvs.Incorrectpredictions.\nFor each item, we compute leave-one-out deltas of the log-probability of the model’s predicted option and normalize them to per-frame shares; the plotted statistic is the largest share (Top-1).\nCorrect predictions allocate credit more evenly across frames (typically∼\\sim0.5), whereas errors over-concentrate on a single frame (often∼0.8\\sim 0.8), indicating insufficient multi-evidence fusion even when only evidence-bearing frames are provided.",
+                "position": 932
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "7Implementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/supp/OT_pipeline_v2.png",
+                "caption": "Figure 6:Tracking, post-processing, and ranking pipeline.RF-DETR detections are linked with DeepSORT into raw person tracks, followed by outlier removal, gap interpolation, and Gaussian smoothing. A TrackRanker then scores and selects salient trajectories, which are passed to an MLLM descriptor module to generate temporally decoupled appearance (A) and behavior (B) cards that serve as the scaffold for downstream HERBench tasks.",
+                "position": 1082
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/supp/AB_Cards.png",
+                "caption": "Figure 7:Example of disentangled A- and B-cards.For a single tracked individual (highlighted trajectory in the top-left strip), we show the sampled frames and the corresponding appearance (A-card) and behavior (B-card) descriptions. The A-card captures only static visual attributes (clothing, colors, accessories, physique), while the B-card describes the person’s path, timing, and interactions over time without repeating appearance cues, enforcing the “Look & Separate” principle.",
+                "position": 1110
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/supp/Scene_Cards.png",
+                "caption": "Figure 8:Faithful and perturbed scene cards for SVA.The top card provides a faithful one-sentence description of a shot, mentioning the main actor, appearance, background, and motion. The bottom card is a perturbed variant where 2-5 atomic details (e.g., clothing pattern, background appearance, additional objects) are modified or added while remaining globally plausible. These pairs form positive and negative options in the Scene Verification & Arrangement task, probing fine-grained scene-level sensitivity to small but visually significant details.",
+                "position": 1160
+            }
+        ]
+    },
+    {
+        "header": "8Extended Experimental Results & Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.14870/x3.png",
+                "caption": "Figure 9:Impact of Evidential Requirement on Model Accuracy.We plot the Mean Minimum Required Frame-Set (MRFS) against Full-context Accuracy (k=16k=16), measured using Qwen 2.5 VL 7B, across four video QA benchmarks. The data suggests an inverse trend: as the necessity to aggregate distinct visual cues increases (higher MRFS), model performance tends to decrease. HERBench (green) imposes a higher evidential burden (MRFS​5.49\\text{MRFS}\\ 5.49), highlighting the potential challenges current Video-LLMs face in multi-evidence integration relative to benchmarks with lower requirements like NeXT-QA.",
+                "position": 1387
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/supp/TSO_example.png",
+                "caption": "Figure 10:",
+                "position": 1748
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/supp/MPDR_example.png",
+                "caption": "Figure 11:",
+                "position": 1751
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/supp/ASII_example.png",
+                "caption": "Figure 12:",
+                "position": 1754
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/supp/AGBI_example.png",
+                "caption": "Figure 13:",
+                "position": 1757
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/supp/AGAR_example.png",
+                "caption": "Figure 14:",
+                "position": 1760
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/supp/AGLT_example.png",
+                "caption": "Figure 15:",
+                "position": 1763
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/supp/FAM_example.png",
+                "caption": "Figure 16:",
+                "position": 1766
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/supp/SVA_example.png",
+                "caption": "Figure 17:",
+                "position": 1769
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/supp/FOM_example.png",
+                "caption": "Figure 18:",
+                "position": 1772
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/supp/MEGL_example.png",
+                "caption": "Figure 19:",
+                "position": 1775
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/supp/AC_example.png",
+                "caption": "Figure 20:",
+                "position": 1778
+            },
+            {
+                "img": "https://arxiv.org/html/2512.14870/figures/supp/RLPC_example.png",
+                "caption": "Figure 21:",
+                "position": 1781
+            }
+        ]
+    },
+    {
+        "header": "9Illustrative Examples for All Tasks",
+        "images": []
+    }
+]
