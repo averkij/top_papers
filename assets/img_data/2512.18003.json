@@ -1,0 +1,104 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.18003/x1.png",
+                "caption": "Figure 1.ALIGN-Partsis the first large-scale method to be able to efficiently and semantically segment and name 3D parts of an object, unlike previous methods, which could only do class-agnostic part segmentation. Our method is also feed-forward, and defines 3D parts according to human-oriented, object-specific affordance descriptions.",
+                "position": 79
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.18003/x2.png",
+                "caption": "Figure 2.ALIGN-Parts segments and names 3D parts, unlike PartField(liu2025partfield), which only segments. Our method is100×100\\times(post data pre-processing) faster at generating these segments along with names compared to PartField.",
+                "position": 248
+            }
+        ]
+    },
+    {
+        "header": "2.Related Work",
+        "images": []
+    },
+    {
+        "header": "3.Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.18003/x3.png",
+                "caption": "Figure 3.ALIGN-Parts.Overview of the ALIGN-Parts framework for language-grounded 3D part segmentation and naming.Top: training.Given a 3D from our semantically unified 3D parts data, geometry features are extracted with PartField and appearance features with DINOv2 from multi-view renderings; these are fused by the BiCo Fusion module using efficient bi-directional cross-attention on localk=16k{=}16nearest-neighbor graphs in 3D space, reducing complexity from𝒪​(N2)\\mathcal{O}(N^{2})to𝒪​(N​k)\\mathcal{O}(Nk)and yielding enriched point features. A decoder then learnsKKpart-level “Partlet” representations that aggregate the fused features, with segmentation supervision provided at the Partlet level. To semantically ground Partlets, an LLM generates affordance-aware descriptions for each possible part (e.g., “structural supports that elevate the sofa” for sofa legs), which are embedded by a pretrained MPNet encoder; Sinkhorn matching establishes a bipartite assignment between Partlet and text embeddings, and an InfoNCE loss further aligns them in a shared representation space while a classifier predicts the object category.Bottom: inference.At test time, ALIGN-Parts operates in both closed-vocabulary (object categories similar to those seen in training) and open-vocabulary (novel object categories) settings: in the closed-vocabulary case, the trained 3D classifier predicts the object class and retrieves its candidate part list, whereas in the open-vocabulary case an LLM proposes an overcomplete set of plausible parts for the queried object. Given these candidate part texts, their MPNet embeddings are bipartite-matched to the predicted Partlets, which jointly produce 3D part segmentation masks and corresponding part names.",
+                "position": 331
+            },
+            {
+                "img": "https://arxiv.org/html/2512.18003/x4.png",
+                "caption": "Figure 4.Pairwise cosine similarity heatmaps between\ntext embeddings for MPNet (left) and SigLiP (right). (Zoom in for labels)",
+                "position": 924
+            }
+        ]
+    },
+    {
+        "header": "4.Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.18003/x5.png",
+                "caption": "Figure 5.Qualitative Results.ALIGN-Parts segments and names 3D parts robustly in a single feed-forward pass (rightmost column). Find3D(ma2024find)(first column) fails despite ground-truth part names, unable to segment the laptop in Figure5(bottom row). PartField(liu2025partfield)(second column) also fails: it requires ground-truth part counts for clustering, missegments bed bunks (top row), and misses refrigerator handles (second-to-last row). Our strong baseline without Partlets (third column) exhibits similar errors. In contrast, ALIGN-Parts correctly segments tiny parts, such as handles, and groups semantically similar instances (e.g., all ceiling fan blades into a single cluster).",
+                "position": 959
+            },
+            {
+                "img": "https://arxiv.org/html/2512.18003/figures/mioucorr.png",
+                "caption": "Figure 6.Proposed Metrics Correlation Analysis.Correlation analysis between our proposed label-aware mIoU metrics (strict/relaxed) and class-agnostic mIoU, computed on segmentation results from our ALIGN-Parts model. The strict label-aware metric (left) shows moderate agreement with class-agnostic mIoU (Pearsonr=0.739r=0.739, Spearmanρ=0.730\\rho=0.730,N=206N=206), while the relaxed variant (right) demonstrates near-perfect correlation (Pearsonr=0.978r=0.978, Spearmanρ=0.974\\rho=0.974,N=206N=206). These findings indicate that our model achieves strong semantic and quantitative consistency, further supporting the use of the relaxed metric as a robust evaluation protocol for semantic 3D part segmentation.",
+                "position": 968
+            },
+            {
+                "img": "https://arxiv.org/html/2512.18003/figures/miou_delta_vs_mismatches.png",
+                "caption": "Figure 7.Label Mismatches and Metric Robustness.Distribution of test objects according to the number of label mismatches (x-axis) and the resulting increase in mIoU from strict to relaxed label-aware matching (y-axis), colored by class-agnostic mIoU. Most objects with low mismatches exhibit small or moderate increases in mIoU, while objects with higher mismatch counts still do not show large outliers in metric difference, supporting the robustness of our evaluation protocol. The absence of extreme discrepancies suggests that the relaxed metric yields a stable and meaningful improvement, even for challenging cases, confirming its reliability for assessing semantic part segmentation on our test set.",
+                "position": 971
+            },
+            {
+                "img": "https://arxiv.org/html/2512.18003/x6.png",
+                "caption": "Figure 8.ALIGN-Parts correctly segments the tiny screw despite training with sparser points (10k vs. 100k).",
+                "position": 1414
+            },
+            {
+                "img": "https://arxiv.org/html/2512.18003/x7.png",
+                "caption": "Figure 9.Ablation (Qualitative results).Results improve from left to right as components are added sequentially, with ground truth in the final column. The first five columns result in significant misalignments and segmentation leakage. Neither geometric-only features nor naive DINO concatenation improves performance. Major gains arise from Partlets (see sixth and seventh columns) and the coverage loss, which refine fine details and are consistent with quantitative metrics in Table3.",
+                "position": 1417
+            },
+            {
+                "img": "https://arxiv.org/html/2512.18003/x8.png",
+                "caption": "Figure 10.Inference-time Ablations.We assess two additional inference modes in our ALIGN-Parts model. TheClustering+Part numbermode disregards text vocabularies and applies k-means to the fused geometric and appearance features, generating class-agnostic clusters and probing how well raw feature representations alone support meaningful part segmentation. The+Part numbermode uses the true part count for each shape, activating exactlyMMpartlets with the highest saliency scores - computed by combining partness confidence and average mask coverage - and assigning every point to its best matching mask; this tests whether supplying ground-truth cardinality adds value compared to dynamic, data-driven part discovery. Both setups are compared to the default dynamic activation (No Part number) and the ground truth, highlighting that ALIGN-Parts robustly estimates part cardinality and produces accurate segmentations even without explicit part label or count supervision.",
+                "position": 1555
+            },
+            {
+                "img": "https://arxiv.org/html/2512.18003/x9.png",
+                "caption": "Figure 11.3D Shape Co-Segmentation Analysis.Left: clustering-based co-segmentation.Prior methods such as PartField performdependent clusteringby first segmenting a source shape via feature clustering and then using the resulting cluster means to initialize K-means on a target shape, implicitly enforcing part correspondence; this can break when the target has a different part count or geometry, causing errors such as the red backrest region bleeding into the seat on the target chair. Using the same dependent co-segmentation strategy with our fused BiCo features (BiCo Feature Dependent Clustering) yields improved transfers on moderately similar targets (Target A), but performance degrades on more challenging targets with greater variation in part structure (Target B). As an alternative, we applyindependent clusteringto Target C, where the target is segmented with source initialization and clusters are matched post hoc by comparing source and target cluster centers, which proves more reliable for difficult co-segmentation cases.Middle and right: feedforward ALIGN-Parts.In contrast to all clustering-based variants, the proposed feedforward ALIGN-Parts model (middle) directly predicts part segmentation and names, achieving robust results across shapes with differing part counts and topologies, and eliminating any dependence on source shapes or explicit co-segmentation.",
+                "position": 1561
+            },
+            {
+                "img": "https://arxiv.org/html/2512.18003/x10.png",
+                "caption": "Figure 12.TexParts Dataset.We demonstrate human-in-the-loop annotation of Texverse(zhang2025texverse)using ALIGN-Parts, enabling scalable dense 3D part segmentation.",
+                "position": 1581
+            }
+        ]
+    },
+    {
+        "header": "5.Limitations and Future Work",
+        "images": []
+    },
+    {
+        "header": "6.Discussion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.18003/x11.png",
+                "caption": "Figure 13.Part Retrieval Comparison with Find3D.We demonstrate text-driven part retrieval on two representative objects (airplane and motorbike) from Objaverse-General. Given natural language part queries (e.g., “body”, “wing”, “gas tank”, “wheel”), ALIGN-Parts identifies and retrieves spatially coherent point groups corresponding to each part. Compared to Find3D (left), our method produces more semantically and spatially consistent part retrievals by leveraging the hierarchical point→\\rightarrowpartlet→\\rightarrowpart label decomposition. This design encourages the discovery of well-connected, semantically meaningful regions rather than fragmented point clusters. Ground truth part segmentations (right) show the target labels. ALIGN-Parts achieves results that closely align with ground truth, validating the effectiveness of our partlet-based formulation for open-vocabulary part localization and retrieval.",
+                "position": 1642
+            }
+        ]
+    },
+    {
+        "header": "Appendix AExperiments and Analysis",
+        "images": []
+    }
+]
