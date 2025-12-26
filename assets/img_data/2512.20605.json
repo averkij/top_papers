@@ -1,0 +1,148 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.20605/x1.png",
+                "caption": "Figure 1:Research overview.(a) We let a metacontroller steer the residual stream activations of a pretrained autoregressive model. Through self-supervised next-action prediction, the metacontroller discovers how to generate sequences of simple (linear) internal controllers that change sparsely in time, following a dynamic switching unitβt∈[0,1]\\beta_{t}\\in[0,1]. In hierarchically-structured tasks, each internal controller corresponds to a temporally-abstract action that leads the base autoregressive model to achieve a meaningful elementary goal. (b) We perform RL internally – in the abstract space discovered by the metacontroller – by subsuming the autoregressive model into the environment and acting in the residual stream on a contracted timescale.",
+                "position": 257
+            }
+        ]
+    },
+    {
+        "header": "Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.20605/x2.png",
+                "caption": "Figure 2:Environment and task design.(a) To complete a task, an agent must visit in sequence a number of subgoal locations, each marked with a specific color. The tasks are performed either in a discrete grid world or in a continuous motor control environment, illustrated above, where a quadrupedal robot (the ‘ant’) must be actuated at joint level. A task can be described as an abstract action sequence (the subgoal locations that must be visited), or as a sequence of low-level motor commands. (b) We pretrain autoregressive action models and metacontrollers on unlabeled behavioral datasets containing observation-action sequences of expert agents performing different tasks. These sequences do not contain rewards or subgoal labels. We then test the ability of the models to learn with RL tasks that comprise longer subgoal sequences, combined in new orders not seen during pretraining and metacontroller training.",
+                "position": 321
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x3.png",
+                "caption": "Figure 3:Internal belief distributions over abstract actions, according to a linear probe.Decoding performance of linear classifiers trained to predict groundtruth abstract actions from instantaneous residual stream activation vectors increases until mid-depth (layer 4) and remains strong up until the final embedding vectoret,Le_{t,L}(hereL=6)L=6).",
+                "position": 338
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x4.png",
+                "caption": "",
+                "position": 342
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x5.png",
+                "caption": "",
+                "position": 344
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x6.png",
+                "caption": "",
+                "position": 346
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x7.png",
+                "caption": "",
+                "position": 348
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x8.png",
+                "caption": "",
+                "position": 350
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x9.png",
+                "caption": "Figure 4:Mid-depth linear internal controllers achieve length and compositional generalization.Both panels analyze success rate (the fraction of rewarded trials in which the full sequence of elementary goals defining a given task is completed) as a function of base model depth (the number of autoregressive model layers) and controlled layer (the layer at which the internal controller is inserted, with 0 corresponding to the middle of the base model). In both grid world (a) and ant (b) environments, inserting the controller near the middle layer results in better controllability, as measured by the success rate on the post-training tasks, which require both length and compositional generalization. To produce this analysis, we trained one controller per subgoal using groundtruth labels; to evaluate success rates we activated the controllers in correct order, again using groundtruth subgoal labels. Results averaged over 5 seeds.",
+                "position": 370
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x10.png",
+                "caption": "Figure 5:Details of the metacontroller architecture and the different modules at play.The metacontroller learns in a self-supervised way to generate sequences of internal controllers. Candidate controller codesz~t\\tilde{z}_{t}are sampled from a Gaussian with context-dependent mean and covariance, and are integrated at a continuous, time-varying rateβt\\beta_{t}, dynamically determined by a switching unit. Values ofβt\\beta_{t}close to zero ignore new controller candidates; conversely, values close to unity lead to switching to a new controller. This mechanism is key for achieving temporal abstraction. The metacontroller features another key design element, a future-conditioned encoder: during self-supervised learning, the metacontroller is non-causal, and has access to the entire sequence of residual stream activations through a sequence embeddings​(e1:T)s(e_{1:T}).",
+                "position": 394
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x11.png",
+                "caption": "Figure 6:Self-supervised metacontroller discovers temporally-abstract actions within pretrained autoregressive model.Three example trajectories from the ant control environment showing the switchβt\\beta_{t}used for temporal integration at each timestep, and the groundtruth abstract action being performed (color-coded). Switching (βt≈1\\beta_{t}\\approx 1) coincides with a change in the abstract action being performed.",
+                "position": 430
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x12.png",
+                "caption": "Figure 7:A rate-distortion analysis reveals the importance of the controlled, pretrained autoregressive model being frozen for the discovery of temporally-abstract actions.We compare our standard metacontroller, which steers a frozen base model (left column;a,c), with a metacontroller that is co-trained with the base model it is steering (right column;b,d). The x-axis represents action prediction loss (the distortion, or negative log-likelihood; NLL) and the y-axis represents the KL divergence to the prior (the rate). As the trade-off hyperparameterα\\alphainEq.˜3is swept over to trace the rate-distortion curve, it reveals a range of values for which correct subgoal switching representations develop (marked with a⋆\\star) when the base model is frozen, but not for the co-training regime.\nThis holds similarly for grid world (top row;a,b) and the ant environment (bottom row;c,d).",
+                "position": 443
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x13.png",
+                "caption": "Figure 8:Internal reinforcement learning solves sparse-reward compositional tasks where standard methods fail.RL curves for various methods that leverage a pretrained autoregressive sequence model for the (a) discrete grid world environment, and (b) the ant continuous control environment. We compare our full-blown internal RL algorithm to a number of baselines: standard (raw action) RL finetuning; CompILE[kipf_compile_2019], a hierarchical RL method that also learns from unlabeled demonstrations, like ours; internal RL applied to a metacontroller that has been trained without a temporal integration unit (forced switching at every timestep,∀tβt=1\\forall_{t}\\;\\beta_{t}=1); and internal RL applied to a metacontroller that has been co-trained from scratch with an autoregressive action model, sidestepping the pretraining phase (see main text for more details). All baselines fail to learn within a million episodes. Lines and shaded area resp. report median and the spread between the25th25^{\\text{th}}and75th75^{\\text{th}}quantiles computed over 30 runs (3 metacontrollers trained for each of 10 pretrained models). We provide this figure in log-scale in Appendix Fig.A5for a more detailed analysis of the failure modes of the baselines.",
+                "position": 466
+            }
+        ]
+    },
+    {
+        "header": "Discussion",
+        "images": []
+    },
+    {
+        "header": "Appendix AEnvironment details",
+        "images": []
+    },
+    {
+        "header": "Appendix BAdditional experimental results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.20605/x14.png",
+                "caption": "Figure A1:Belief state probing at different network layers and base model training steps.The latent goals governing the behavior of the data forced through a frozen pretrained sequence model become linearly decodable from residual stream activations deep in the network. Here, we display the final accuracy of linear probes trained to predict the latent goals from the residual stream activations of a frozen 6 layer transformer. We vary the training steps of the backbone and the layer at which the probe is plugged into the sequence model and report the mean performance over 10 backbone seeds.",
+                "position": 771
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x15.png",
+                "caption": "Figure A2:Effect of sequence model training step (left), weight decay (center left), auxiliary observation loss (center right), and expert suboptimalityϵ\\epsilon(right) during pretraining on the controllers’ compositional generalization.The solid line represents the median performance over 10 runs, 1 seed for each of the 10 pretrained models, and the shaded area indicates the spread between the25th25^{\\text{th}}and75th75^{\\text{th}}quantiles.",
+                "position": 781
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x16.png",
+                "caption": "",
+                "position": 790
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x17.png",
+                "caption": "",
+                "position": 795
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x18.png",
+                "caption": "",
+                "position": 800
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x19.png",
+                "caption": "Figure A3:Self-supervised metacontroller discovers temporally-abstract actions, gridworld-pinpad.Three example trajectories from the gridworld-pinpad control environment showing the switchβt\\beta_{t}used for temporal integration at each timestep, and the groundtruth abstract action being performed (color-coded). Switching (βt≈1\\beta_{t}\\approx 1) coincides with a change in the abstract action being performed.",
+                "position": 844
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x20.png",
+                "caption": "Figure A4:Controller latent codes implement abstract actions.Here, we illustrate the effect of a latent controller code implementing the abstract action “go to blue” in ant-pinpad, when forcing a switch at an arbitrary time. The three pairs display a trajectory without intervention by the metacontroller (left) vs. the one with the metacontroller running on a latent code corresponding to “go to blue” (right) respectively. The same controller latent code successfully steers the ant towards the desired color in different context, and regardless of the timing at which it is activated. Some trajectories demonstrate backtracking behavior when the control is applied.",
+                "position": 893
+            },
+            {
+                "img": "https://arxiv.org/html/2512.20605/x21.png",
+                "caption": "Figure A5:Internal reinforcement learning solves sparse-reward compositional tasks where standard methods fail.While some baselines see non-zero success rates at some time during RL training they fail to translate these successes into a policy maximizing reward. In turn, internal RL manages to successfully optimize the reward throughout training.",
+                "position": 903
+            }
+        ]
+    },
+    {
+        "header": "Appendix CExperimental details",
+        "images": []
+    },
+    {
+        "header": "Appendix DArchitecture details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.20605/x22.png",
+                "caption": "Figure A6:Metacontroller architecture(same as Fig.5).",
+                "position": 3042
+            }
+        ]
+    },
+    {
+        "header": "Appendix EAdditional discussions",
+        "images": []
+    }
+]
