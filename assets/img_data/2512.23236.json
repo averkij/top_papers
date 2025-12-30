@@ -1,0 +1,219 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.23236/x1.png",
+                "caption": "Figure 1:Meta’s MTIA (Meta Training and Inference Accelerator) is a custom-designed chip optimized for AI workloads. The figure illustrates the MTIA hardware from four perspectives: its integration within a data center or server farm, highlighting the overall facility layout and environment; its deployment within a rack-mounted system for high-bandwidth applications; a close-up of the chip’s circuitry and board connections; and a detailed view of the chip core. Together, these images highlight MTIA’s advanced design, connectivity, and its role in enhancing the performance and efficiency of AI tasks across Meta’s platforms.",
+                "position": 411
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x2.png",
+                "caption": "Table 1:Examples of some production models distribution at Meta.†Transformer-based sequence models require significantly higher computational complexity at∼\\sim80 GFLOPS/request, representing a 10-100× increase over traditional dense ranking models.",
+                "position": 421
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x2.png",
+                "caption": "Table 2:Latency comparison of monolithic versus disaggregated serving paradigms for a production MTIA model. Paradigm 1 executes preprocessing client-side, achieving 61ms P99 latency with direct client→\\rightarrowremote MTIA communication. Paradigm 2 introduces a dedicated CPU tier for preprocessing scalability, incurring additional network hops that increase P99 latency to 97ms. The extra network latency (δ=α−β−γ≈10∼20\\delta=\\alpha-\\beta-\\gamma\\approx 10\\sim 20ms) represents pure architectural overhead with no computational benefit, demonstrating the cost of disaggregated serving when preprocessing operators lack native accelerator implementations.",
+                "position": 442
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x2.png",
+                "caption": "Figure 2:Triton multi-target compilation architecture. Source code transforms through progressive MLIR lowering stages—platform-independent Triton-MLIR, hardware-specific GPU/AMDGPU/MTIA dialects, LLVM-IR—generating native binaries for NVIDIA (PTX/CUBIN), AMD (AMDGCN/HSACO) [Zhang and Wang (2025)], and MTIA (RISC-V) platforms.",
+                "position": 470
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x3.png",
+                "caption": "Figure 3:Triton overtakes CUDA as dominant kernel programming model at Meta. Left: Triton has grown to over 8,000 kernels, surpassing CUDA’s stagnant legacy codebase, while emerging DSLs (CuTe, TLX, Helion) remain under 600. Right: Growth trajectories show Triton’s 60% expansion rate driving this transition, with CuTe at 50% following November deployment. This shift toward higher-level DSLs—while maintaining legacy CUDA and introducing new abstraction (TLX)—creates programming model fragmentation across 5+ languages, motivatingKernelEvolve’s automated synthesis approach.",
+                "position": 484
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x4.png",
+                "caption": "Figure 4:KernelEvolveachieves 1.25-17× speedups across Meta LLMs and production use cases, spanning convolutional Transformers, data preprocessing operators, and recommendation systems, over heterogeneous AI hardware.",
+                "position": 502
+            }
+        ]
+    },
+    {
+        "header": "2Background",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.23236/x5.png",
+                "caption": "Figure 5:KernelEvolveSystem Architecture (top) and Execution Workflow (down).KernelEvolveemploys a self-improving state machine with tree search to explore and validate kernel optimizations. The system integrates evaluation tooling (accuracy, performance, profiling), specialized sub-agents for context management and deep search, and AI hardware interpreters for MTIA, GPU, and AMD platforms. An LLM synthesizer generates dynamic prompts, which are then used by external (Claude 4.5, GPT-5) or internal (Meta’s CWM) LLM backends to generate Triton kernel candidates. Persistent storage includes a metadata store tracking execution scores and parent-child relationships in the search tree (connected to the object store via path references), an object store for kernel files, and a knowledge base that serves as a retrieval system for hardware constraints and optimization guidance to support LLM context augmentation.",
+                "position": 572
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x5.png",
+                "caption": "",
+                "position": 575
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x6.png",
+                "caption": "",
+                "position": 580
+            }
+        ]
+    },
+    {
+        "header": "3System Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.23236/x7.png",
+                "caption": "Figure 6:Universal operator’s agentic kernel generation workflow for Swish activation. Agent iteratively reads, analyzes, modifies, and validates code through tool invocations (read_file, write_to_file, replace_in_file, lint), guided by LLM reasoning at each step. The workflow completes after 20 steps, producing lint-free optimized Triton kernel with autotune configurations.",
+                "position": 647
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x8.png",
+                "caption": "Figure 7:MTIA 2i architecture featuring an 8×8 processing element (PE) array interconnected via network-on-chip. Each PE contains dual RISC-V cores and specialized fixed-function units: Memory Layout Unit (MLU) for data transformation, Dot Product Engine (DPE) for matrix operations, Reduction Engine (RE) for aggregations, SIMD Engine (SE) for vector operations, and Command Processor (CP) for control flow (more details can be found in Section 3 of [Coburn et al. (2025)]).",
+                "position": 787
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x9.png",
+                "caption": "Figure 8:Continuous deployment pipeline forKernelEvolveinterpreter environments via Meta’s Conveyor system. The pipeline monitors dependency updates across Triton compiler backends, hardware runtime libraries, and build systems, automatically triggering daily rebuilds and deployments. Green checkmarks indicate successful releases, red crosses denote failed builds, and yellow warnings flag non-critical issues. Thebento_kernel_meta_kernel_mtia_interpreternode shows regular deployment cadence with occasional build failures, demonstrating automated recovery and continuous integration across multiple release candidates (R54, R53, etc.).",
+                "position": 846
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x10.png",
+                "caption": "Figure 9:End-to-end evaluation pipeline. Tree search generates kernel candidates with standardized dual implementations (PyTorch baseline, Triton optimized), executed on hardware interpreters (GPU, AMD, MTIA) collecting platform-specific profiling metrics via TritonBench, NCU, MPP, and MTIA Insight. Profiling feedback guides subsequent search iterations.",
+                "position": 864
+            }
+        ]
+    },
+    {
+        "header": "4OSS Operator Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.23236/x11.png",
+                "caption": "Figure 10:Fitness score trajectories duringKernelEvolve’s tree search optimization for 6 representative ATen operators. The x-axis denotes search steps (50 total), and the y-axis shows the fitness score defined as the speedup ratio of the generated Triton kernel over the PyTorch baseline. The first 10 steps correspond to the draft phase (repeated sampling without memory context), while subsequent steps represent tree expansion with execution feedback.",
+                "position": 933
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x11.png",
+                "caption": "",
+                "position": 936
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x12.png",
+                "caption": "",
+                "position": 940
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x13.png",
+                "caption": "",
+                "position": 945
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x14.png",
+                "caption": "",
+                "position": 949
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x15.png",
+                "caption": "",
+                "position": 954
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x16.png",
+                "caption": "",
+                "position": 958
+            }
+        ]
+    },
+    {
+        "header": "5Monetization Case Study",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.23236/x17.png",
+                "caption": "Figure 11:Profiling traces comparing conv1d implementations on production shape. PyTorch conv1d (top) launches five separate kernels including layout transformations and GEMM. PyTorch conv2d (middle) reduces to four kernels via optimized NHWC paths.KernelEvolve(bottom) fuses operations into two kernels with cross-operation fusion. Note that durations shown in the profiling trace include profiling overhead and do not represent actual kernel latency.",
+                "position": 1240
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/arxiv/img/conv1d_300_steps.png",
+                "caption": "Figure 12:Search tree visualization forconv1dkernel generation over 300 steps. Green: successful generation; Red: compilation/correctness failures.",
+                "position": 1363
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x18.png",
+                "caption": "Figure 13:KernelEvolve-generated kernels compared against PyTorch conv1d and optimized conv2d baselines, demonstrating up to 6.22× speedup across NVIDIA, AMD, and MTIA architectures.",
+                "position": 1385
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x19.png",
+                "caption": "Figure 14:Optimized FM speedup on production shapes. Left: Performance across batch sizes for three representative(N,D,K)(N,D,K)configurations extracted from deployed Wukong models. Right: Speedup variation with output dimensionKKat fixed batch sizeB=1024B=1024, showing strong performance for small-to-medium feature counts (N≤64N\\leq 64) and degradation for largerNNwhere tiling overhead dominates.",
+                "position": 1422
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x19.png",
+                "caption": "",
+                "position": 1425
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x20.png",
+                "caption": "",
+                "position": 1429
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x21.png",
+                "caption": "Figure 15:PFFN speedup on production shapes. Left: Speedup as a function of batch sizeBBfor five production(N,D,K)(N,D,K)configurations, showing peak performance of 2.0-2.4× at small batch sizes converging to 1.2-1.4× at large batches as kernel launch overhead amortization reduces fusion advantages. Right: Speedup variation with input dimensionDDat fixedB=1024,K=256B=1024,K=256across sequence lengthsN∈[150,400]N\\in[150,400], exhibiting non-monotonic behavior arising from tile size and SRAM capacity interactions.",
+                "position": 1470
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x21.png",
+                "caption": "",
+                "position": 1473
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x22.png",
+                "caption": "",
+                "position": 1477
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x23.png",
+                "caption": "Figure 17:MBDT kernel latency comparison. Configuration format: Batch × Features × Borders.KernelEvolveachieves 2.94–9.25× speedup on v2i and 2.31–3.09× on v3, with larger speedups at higher batch sizes.",
+                "position": 1924
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x23.png",
+                "caption": "",
+                "position": 1927
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23236/x24.png",
+                "caption": "",
+                "position": 1931
+            }
+        ]
+    },
+    {
+        "header": "6Future Directions",
+        "images": []
+    },
+    {
+        "header": "7Related Work",
+        "images": []
+    },
+    {
+        "header": "8Conclusion",
+        "images": []
+    },
+    {
+        "header": "9Contributors",
+        "images": []
+    },
+    {
+        "header": "10Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "111D Convolution",
+        "images": []
+    }
+]
