@@ -1,0 +1,120 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.23703/x1.png",
+                "caption": "",
+                "position": 160
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.23703/x2.png",
+                "caption": "Figure 2:The overview of our method.Our framework is composed of two core components: (a) Dopamine-Reward Modeling Method and (b) Dopamine-RL Training Framework.(a)At the heart of our reward modeling is to build the General Reward Model (GRM), a vision-language model that is prompted with a task description and conditioned on multi-view images of initial, goal, “before,” and “after” states to predict a relative progress or regress hop. To ensure a stable and accurate signal, we employ Multi-Perspective Progress Fusion, which combines incremental, forward-anchored, and backward-anchored predictions into a final fused reward.(b)The Dopamine-RL framework first adapts the pre-trained GRM to a novel task using a single demonstration (One-Shot GRM Adaptation). Subsequently, it uses a theoretically-sound Policy-Invariant Reward Shaping method to convert the GRM’s dense output into a reward signal that accelerates learning without altering the optimal policy. This approach is universally compatible with a wide range of RL algorithms.",
+                "position": 243
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23703/x3.png",
+                "caption": "Figure 3:Reward profiles on a challenging real-world rollout.We plot the reference reward from human annotations, the VLAC baseline, and our GRM along the same trajectory. Our GRM tracks the reference signal more faithfully, sharply penalizing incorrect insertions, low positions, and misalignments, and only assigning high reward near successful task completion.",
+                "position": 367
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23703/x4.png",
+                "caption": "Figure 4:Real-world tasks and hardware setup.Left: eight representative long-horizon manipulation tasks used to evaluate Dopamine-Reward and Dopamine-RL, including insertion, circuit completion, folding, pick-and-place, and assembly tasks. Right: our multi-view hardware platform with the Pika teleoperation system and calibrated ZED cameras, providing synchronized wrist and third-person observations for GRM training and policy learning.",
+                "position": 371
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.23703/x5.png",
+                "caption": "Table 5:Ablation Study Results (Average Success Rate %).Each component of the Dopamine-Reward framework is shown to be critical for achieving maximum performance.",
+                "position": 1051
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix AProof",
+        "images": []
+    },
+    {
+        "header": "Appendix BDetails of GRM Training Data",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.23703/x5.png",
+                "caption": "Figure 5:Overview of GRM training data.(Left)The hierarchical composition of our 35M-sample training corpus. The dataset is derived from episodes spanning Real-World Robotics, Simulation, and Human-Centric domains, and is further expanded via multi-view augmentation.(Right)The long-tail distribution of task categories sorted by episode count (log scale). The dataset covers a broad spectrum of manipulation skills, ranging from atomic primitives (e.g.,pick, push) to complex, multi-stage horizons (e.g.,assemble, fold).",
+                "position": 2572
+            }
+        ]
+    },
+    {
+        "header": "Appendix CExperiment Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.23703/x6.png",
+                "caption": "Figure 6:Overview of GRM model structure.The GRM is built upon the Qwen2.5-VL architecture. It processes a multimodal interleaved input sequence consisting of task text instructions and multi-view images: the initial state (si​n​i​ts_{init}), the goal state (sg​o​a​ls_{goal}), and the paired “BEFORE” (sp​r​es_{pre}) and “AFTER” (sp​o​s​ts_{post}) observation sets. The visual signals are processed by a shared Vision Encoder and Projector, then fed into the LLM Decoder, which autoregressively predicts a quantized relative progress token (e.g.,<score>+15%</score>) or a regress token (e.g.,<score>-4%</score>).",
+                "position": 2897
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23703/images/success_rate_libero.png",
+                "caption": "Figure 7:Training Curve on LIBERO-Goal.The success rate of our ReinFlow agent fine-tuned with GRM-based reward shaping. The agent demonstrates stable convergence and achieves an average success rate of over 80% across the benchmark tasks.",
+                "position": 3072
+            }
+        ]
+    },
+    {
+        "header": "Appendix DMore Qualitative Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.23703/x7.png",
+                "caption": "Figure 8:User Prompt for General Reward Model (GRM).",
+                "position": 3389
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23703/x8.png",
+                "caption": "Figure 9:GRM Progress Predictions across Diverse Tasks.We visualize the frame-wiseHop(instantaneous change) and accumulatedProgresspredicted by GRM on unseen validation tasks.",
+                "position": 3392
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23703/x9.png",
+                "caption": "Figure 10:Progress Estimation Consistency across Sampling Intervals.We plot the reconstructed progress curves for the same trajectory using different frame strides (10, 25, 50, and 100 frames). The high overlap between curves demonstrates that our GRM is robust to temporal granularity and does not simply overfit to a specific frame rate.",
+                "position": 3395
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23703/x10.png",
+                "caption": "Figure 11:Robustness to Artificial Disturbance during Real-World Execution.We visualize a rollout of the converged policy (success rate>95%>95\\%) under human interference. Each sub-figure shows the third-person view, the ego-centric view, and the real-time GRM inference (Top:Hop, Bottom:Progress).(a) Artificial Disturbance Position:A human hand intervenes and shifts the target board while the robot attempts to approach.(b) Fall Into Misalignment:The robot misses the new position. Note that the GRMProgresscurve drops significantly (indicated by the red dot in the bottom inset), reflecting the failure state.(c) Misalignment Recovery:The policy reacts to the visual feedback and the drop in reward, adjusting the end-effector position.(d) Move to the top:The robot realigns directly above the target slot.(e) Align with the Slot:Precise fine-tuning before insertion.(f) Successful Insertion:The task is completed, with the progress estimation reaching its peak.",
+                "position": 3398
+            }
+        ]
+    },
+    {
+        "header": "Appendix EFuture Work",
+        "images": []
+    }
+]
