@@ -1,0 +1,114 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.23675/x1.png",
+                "caption": "Figure 1:Scaling with context length, in terms of test loss (left) and latency (right).Left:Our method (TTT-E2E) turns the worst line (green) into the best (blue) at 128K context length.\nLoss  (↓\\downarrow), theyy-value, is computed as\n(loss of the reported method)−-(loss of Transformer with full attention), so loss  of full attention itself (orange) is the flat line aty=0y=0.\nWhile other methods produce worse loss  in longer context, TTT-E2E maintains the same advantage over full attention.\nAll models have 3B parameters and are trained with 164B tokens.Right:Similar to SWA and the RNN baselines, TTT-E2E has constant inference latency regardless of context length, making it2.7×2.7\\timesfaster than full attention for 128K context on an H100.",
+                "position": 133
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23675/x2.png",
+                "caption": "",
+                "position": 136
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.23675/x3.png",
+                "caption": "Figure 2:Toy example.Left:Givenx1x_{1}andx2x_{2}as context, we want to predict the unknownx3x_{3}.\nOur toy baseline, a Transformer without self-attention (using only the upward arrows), is effectively a bigram since it has no memory ofx1x_{1}.\nTTT (using all the arrows) first tries to predictx2x_{2}fromx1x_{1}as an exercise: It computes the lossℓ2\\ell_{2}betweenx2x_{2}and the predictionp^2\\hat{p}_{2}, then takes a gradient step onℓ2\\ell_{2}.\nNow information ofx1x_{1}is stored in the updated MLPs (blue).Right:Token-level test lossℓt\\ell_{t}for various methods in our toy example, as discussed in Subsection2.2, except for TTT-E2Eb=16b=16discussed in Subsection2.3.\nIn particular, TTT-E2Eb=1b=1turns the green line (our toy baseline) into the blue line, which performs almost as well as orange (using full attention).",
+                "position": 200
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23675/x4.png",
+                "caption": "",
+                "position": 203
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23675/x5.png",
+                "caption": "Figure 3:Computation graphs following the setup in Figure2:\nGivenx1x_{1}andx2x_{2}as context, we want to predict the unknownx3x_{3}.Left:Our main method with the sliding-window attention layers and the implementation details discussed in Subsection2.3.\nFor ease of notation, our illustration uses online gradient descent (b=1b=1).\nThe lowest downward arrow is disconnected to the MLP below, since gradients pass through the lastL/4L/4blocks but not further down.Right:The first step of our alternative derivation in Subsection2.4:\na simplified version of TTT-KVB in prior work[zhang2025test,sun2024learning].",
+                "position": 377
+            }
+        ]
+    },
+    {
+        "header": "3Main Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.23675/x6.png",
+                "caption": "Figure 4:Ablations on three hyper-parameters: sliding window sizekk, mini-batch sizebb, and the number of layers updated during TTT; see details in Subsection3.2.\nGiven the trends in these ablations, we setk=8k=8K,b=1b=1K, and we update 1/4 the total number of layers.\nLoss  (↓\\downarrow), theyy-value in the rightmost panel, is the same as in Figure1. It is computed as (loss of the reported method)−-(loss of Transformer with full attention), so loss  of full attention itself (orange) is the flat line aty=0y=0.\nGDN stands for Gated DeltaNet[yang2023gated].",
+                "position": 731
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23675/x7.png",
+                "caption": "Figure 5:Scaling with training compute in two axes: model size (left) and number of training tokens (right);\nsee details in Subsection3.3.\nOverall, TTT-E2E exhibits a similar trend to full attention under a large training budget (right of the dotted line).\nWe report results both on DCLM at 8K context length after pre-training (a, c) and on Books at 32K after fine-tuning with the same context length (b, d).\nLoss  (↓\\downarrow), theyy-value, is the same as in Figure1and4.\nThe legend in the leftmost panel is shared across all panels.",
+                "position": 819
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23675/x8.png",
+                "caption": "",
+                "position": 822
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23675/x9.png",
+                "caption": "Figure 6:Loss breakdown by token index, for context length 32K (left) and 128K (right), following the same process as when we produced the right panel of Figure2;\nsee details in Subsection3.4.\nOverall, TTT-E2E is the only method that always achieves lower losses than full attention throughout the entire context length,\nand its aggregated advantage mostly comes from the earlier tokens.",
+                "position": 903
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23675/x10.png",
+                "caption": "Figure 7:Decoding long sequences, using Qwen-8B as the evaluator;\nsee details in Subsection3.6.\nFor each method, we prefill its context window with 8K tokens from Books, decode another 8K tokens as continuation, and then plot the loss of Qwen-8B by token index, averaged over 512 sequences.\nThe dotted line marks the boundary between prefill and decode.\nThis plot is in linear scale instead of log scale.",
+                "position": 1167
+            },
+            {
+                "img": "https://arxiv.org/html/2512.23675/x11.png",
+                "caption": "Figure 8:Training efficiency, in terms of latency on an H200 (left) and FLOPs (right);\nsee details in Subsection3.3.\nOverall, training latency is still a significant limitation of our current implementation.\nThe legend is shared across both panels.",
+                "position": 1234
+            }
+        ]
+    },
+    {
+        "header": "4Related Work",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Author Contributions",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "Appendix ARecipe for the Toy Example",
+        "images": []
+    },
+    {
+        "header": "Appendix BBasic Recipe",
+        "images": []
+    },
+    {
+        "header": "Appendix CImprovements to the Baselines",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.23675/x12.png",
+                "caption": "Figure 9:Scaling with context length. We use the same results as in the left panel of Figure1, but directly plot the loss values instead of the loss s.\nLonger context length improves loss for full attention and hybrid SWA and full across all the context lengths.\nIt also improves loss for every method up to 32K.\nHowever, for SWA, Mamba 2, Gated DeltaNet and TTT-KVB, longer context length hurts loss after 32K.\nThis trend arises because for longer context, there are fewer training sequences per (outer-loop) mini-batch during extension fine-tuning, so the gradients have higher variance; at the same time, these methods cannot effectively leverage the benefit of longer context, so the harm of the higher variance outweighs the benefit.",
+                "position": 1685
+            }
+        ]
+    },
+    {
+        "header": "Appendix DAdditional Details for Decoding Evaluation",
+        "images": []
+    }
+]
