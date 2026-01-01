@@ -1,0 +1,139 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25073/x1.png",
+                "caption": "",
+                "position": 120
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25073/x2.png",
+                "caption": "Figure 2:Motivation: Outpainting vs. novel view generation.Using multi-view diffusion[3], we train\n3DGS[28]with three strategies: interpolated novel views (green), 3-view baseline (blue),\nand outpainting (orange).Top:Visual comparison shows interpolating additional novel views\n(3–11 total) introduces inconsistencies and artifacts.Bottom:Quantitative metrics (SSIM, LPIPS) show that adding novel views degrades quality due to inconsistencies, while outpainting consistently improves both geometric and perceptual quality.",
+                "position": 172
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Preliminaries",
+        "images": []
+    },
+    {
+        "header": "4Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25073/x3.png",
+                "caption": "Figure 3:Overview of Our Pipeline.Given sparse input views, our method follows a three-stage process.(a) Coarse 3D Initialization:We obtain geometry priors from initial 3D reconstruction, including an opacity mask and coarse render that provide essential structural cues.(b) GaMO: Geometry-aware Multi-view Outpainter:Using the geometry priors, GaMO generates outpainted views with enlarged FOV via a multi-view diffusion model.(c) Refined Reconstruction:The outpainted views are used to refine the 3D reconstruction, resulting in improved completeness and consistency.",
+                "position": 269
+            },
+            {
+                "img": "https://arxiv.org/html/2512.25073/x4.png",
+                "caption": "Figure 4:Overview of GaMO (Geometry-aware Multi-view Diffusion Outpainter).(a) Multi-view Diffusion Conditioning: Sparse input views are encoded into clean latents and combined with multi-view conditions, including Plücker ray embeddings for input views (𝒫r\\mathcal{P}_{r}) and the target view with enlarged FOV (𝒫t∗\\mathcal{P}_{t}^{*}), along with original and augmented Canonical Coordinate Map (CCM) and RGB, to provide both geometric and appearance cues for diffusion model conditioning.\n(b) Denoising Process: Coarse geometry priors (opacity mask and coarse render) guide the denoising through mask latent blending performed at multiple timesteps (t1,t2,…,tNt_{1},t_{2},...,t_{N}) with progressive dilation and noise resampling, generating outpainted views with enlarged FOV (c).",
+                "position": 278
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25073/x5.png",
+                "caption": "Figure 5:Qualitative comparison on Replica[63]and ScanNet++[102]datasets with 6 sparse views.3DGS-based methods use DUSt3R[75]initialization, while InstantSplat uses MASt3R[32].\nOur method produces better coverage (fewer black holes), better geometric consistency (less ghosting), and fewer artifacts compared to baselines.\nWhite boxes highlight challenging regions. Best viewed zoomed in.",
+                "position": 710
+            },
+            {
+                "img": "https://arxiv.org/html/2512.25073/x6.png",
+                "caption": "Figure 6:Qualitative ablation on outpainting components.(a) Augmented conditioning aligns outpainted and known regions. (b) Mask latent blending provides essential geometric guidance. (c) Hard masks provide more accurate boundary information than soft masks. (d) Noise resampling eliminates blending boundary artifacts. Red circles highlight problem regions. White boxes show zoom-ins. Corresponds toTab.2",
+                "position": 936
+            },
+            {
+                "img": "https://arxiv.org/html/2512.25073/x7.png",
+                "caption": "Figure 7:Ablation on mask blending scheduling strategies.(a) Comparing mask blending at different timesteps: single steptkt_{k}, multi-stept1→tNt_{1\\to t_{N}}, and all iterations. (b) Our Iterative Mask Scheduling (IMS) progressively shrinks the region requiring outpainting, producing more plausible and coherent details with better alignment. Corresponds toTab.3.",
+                "position": 1106
+            },
+            {
+                "img": "https://arxiv.org/html/2512.25073/x8.png",
+                "caption": "Figure 8:Qualitative ablation on 3DGS refinement.(a) Point cloud re-initialization from outpainted views enables successful Gaussian generation in outpainted regions. (b) Perceptual loss enhances detail recovery in outpainted regions. White boxes show zoom-ins. Corresponds toTab.4.",
+                "position": 1196
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AOverview",
+        "images": []
+    },
+    {
+        "header": "Appendix BIterative Mask Scheduling Implementation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25073/x9.png",
+                "caption": "Figure 9:Iterative Mask Scheduling visualization.Top: coarse render and opacity mask derived from coarse 3D initialization.\nBottom: progressive mask shrinking at three denoising steps (t=35,25,15t=35,25,15) with 2, 1, and 0 dilation iterations, respectively.",
+                "position": 2786
+            },
+            {
+                "img": "https://arxiv.org/html/2512.25073/x10.png",
+                "caption": "Figure 10:Qualitative comparison on Replica[63]and ScanNet++[102]with 3, 6, and 9 sparse views.Our method produces better coverage, geometric consistency, and fewer artifacts compared to baselines.\nWhite boxes highlight challenging regions. Best viewed zoomed in.",
+                "position": 2953
+            }
+        ]
+    },
+    {
+        "header": "Appendix CMore Quantitative Comparison",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25073/x11.png",
+                "caption": "Figure 11:Comparison of outpainting using adapted multi-view diffusion models.Top: input views.\nMiddle: outpainted views generated by adapted SEVA[116], MVGenMaster[3], and our GaMO.\nBottom: novel views after 3DGS refinement using the generated outpainted views.\nAdapted multi-view diffusion models suffer from multi-view inconsistency, resulting in noisy reconstructions, while our method produces consistent outpainted views that improve reconstruction quality.",
+                "position": 2975
+            }
+        ]
+    },
+    {
+        "header": "Appendix DMore Qualitative Comparison",
+        "images": []
+    },
+    {
+        "header": "Appendix EEvaluation on Mip-NeRF 360",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25073/x12.png",
+                "caption": "Figure 12:Qualitative results on Mip-NeRF 360.360-degree scenes pose significant challenges for GuidedVD-3DGS due to wide view coverage\nand large unobserved regions. In contrast, our method consistently produces more complete and geometrically coherent\nreconstructions across both outdoor and indoor scenes, demonstrating stronger robustness\nto diverse scene layouts and scales.",
+                "position": 3075
+            }
+        ]
+    },
+    {
+        "header": "Appendix FOutpainting Comparison Using Multi-View Diffusion Models",
+        "images": []
+    },
+    {
+        "header": "Appendix GRuntime Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25073/x13.png",
+                "caption": "Figure 13:Failure cases in heavily occluded regions.Due to severe occlusions in the scene, certain regions are never observed across all input views. Both outpainting (ours) and novel view generation\nmethods struggle to reconstruct these completely unobserved areas. Red boxes highlight the occluded regions where reconstruction fails.",
+                "position": 3195
+            }
+        ]
+    },
+    {
+        "header": "Appendix HFailure Cases",
+        "images": []
+    }
+]
