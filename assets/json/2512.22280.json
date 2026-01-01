@@ -1,0 +1,116 @@
+{
+    "paper_title": "Valori: A Deterministic Memory Substrate for AI Systems",
+    "authors": [
+        "Varshith Gudur"
+    ],
+    "sections": [
+        {
+            "title": "Abstract",
+            "content": "Modern AI systems rely on vector embeddings stored and searched using floating-point arithmetic. While effective for approximate similarity search, this design introduces fundamental non-determinism: identical models, inputs, and code can produce different memory states and retrieval results across hardware architectures (e.g., x86 vs. ARM). This prevents replayability and safe deployment, leading to silent data divergence that prevents post-hoc verification and compromises audit trails in regulated sectors. We present Valori, a deterministic AI memory substrate that replaces floating-point memory operations with fixed-point arithmetic (Q16.16) and models memory as a replayable state machine. Valori guarantees bit-identical memory states, snapshots, and search results across platforms. We demonstrate that non-determinism arises before indexing or retrieval and show how Valori enforces determinism at the memory boundary. Our results suggest that deterministic memory is a necessary primitive for trustworthy AI systems. The reference implementation is open-source and available at https://github.com/varshith-Git/Valori-Kernel (archived at https://zenodo.org/records/18022660)."
+        },
+        {
+            "title": "Start",
+            "content": "5 2 0 2 5 2 ] . [ 1 0 8 2 2 2 . 2 1 5 2 : r Valori: Deterministic Memory Substrate for AI Systems Varshith Gudur varshith.gudur17@gmail.com Valori Kernel Project Independent Researcher December 30, 2025 Abstract Modern AI systems rely on vector embeddings stored and searched using floating-point arithmetic. While effective for approximate similarity search, this design introduces fundamental nondeterminism: identical models, inputs, and code can produce different memory states and retrieval results across hardware architectures (e.g., x86 vs. ARM). This prevents replayability and safe deployment, leading to silent data divergence that prevents post-hoc verification and compromises audit trails in regulated sectors. We present Valori, deterministic AI memory substrate that replaces floating-point memory operations with fixed-point arithmetic (Q16.16) and models memory as replayable state machine. Valori guarantees bit-identical memory states, snapshots, and search results across platforms. We demonstrate that non-determinism arises before indexing or retrieval and show how Valori enforces determinism at the memory boundary. Our results suggest that deterministic memory is necessary primitive for trustworthy AI systems. The reference implementation is open-source and available at https://github.com/varshith-Git/Valori-Kernel (archived at https://zenodo.org/records/18022660). Keywords: Deterministic AI, AI Memory, Vector Databases, Fixed-Point Arithmetic, Reproducible Computation, Approximate Nearest Neighbor Search, State Machines, Auditability, Systems for AI"
+        },
+        {
+            "title": "1 Introduction",
+            "content": "Artificial Intelligence systems increasingly rely on long-term memory to retrieve context, ground generation (RAG), and maintain state in agentic workflows. In these systems, memory is assumed to be if an agent stores fact today, it should be retrievable tomorrow, regardless of stable foundation: component upgrades or server migrations. However, in reality, modern AI memory is not replayable. The reliance on standard floating-point arithmetic (IEEE 754) for storing and indexing vector embeddings introduces subtle, hardware-dependent variations. vector computed and stored on an x86 server may have different bit-level representation than the supposedly identical vector on an ARM-based edge device. These discrepancies propagate through the indexing and retrieval pipeline, leading to divergent search results and non-reproducible system behavior. This non-determinism is not widely acknowledged as critical failure mode, often being dismissed as negligible floating-point error. Yet, in safety-critical applicationssuch as robotics, defense, and financial auditingbit-level reproducibility is correctness requirement, not an optional feature. This paper argues that determinism must be enforced at the AI memory layer. We introduce Valori, memory kernel designed to provide mathematically rigorous, hardware-agnostic foundation for AI state."
+        },
+        {
+            "title": "2 Background & Motivation",
+            "content": "The root cause of memory non-determinism lies in the nature of floating-point arithmetic itself."
+        },
+        {
+            "title": "2.1 Floating-Point Non-Determinism",
+            "content": "The IEEE 754 standard for floating-point arithmetic allows for implementation-defined behavior in operations such as Fused Multiply-Add (FMA) and the ordering of parallel reductions (e.g., SIMD instructions). Compilers and hardware architectures (x86 64 with AVX vs. ARM64 with NEON) optimize these operations differently. FMA: + can be computed with single rounding step (FMA) or two (Multiply then Add). These yield slightly different results. Associativity: Floating-point addition is not associative ((a + b) + = + (b + c)). Parallel reduction strategies change the order of operations, altering the final sum. SIMD and Auto-Vectorization: Compilers often auto-vectorize reduction loops using hardwarespecific instructions (e.g., AVX2, AVX-512, NEON). These instruction sets have different register widths and association orders, causing the biggest source of non-determinism in vector databases today even when source code is identical."
+        },
+        {
+            "title": "2.2 The Embedding Pipeline",
+            "content": "In typical RAG or agent pipeline, neural network (e.g., Transformer) generates high-dimensional vector (embedding) from an input text. This vector is assumed to be the semantic address of the data. However, because inference runs on floating-point hardware, non-determinism enters the system at embedding generation, before indexing or retrieval. As we show in Section 4, the same model on different chips produces different raw bits for the same input."
+        },
+        {
+            "title": "3 Problem Definition",
+            "content": "We define the requirements for trustworthy memory system using the formalism of state machine."
+        },
+        {
+            "title": "3.1 Memory State and Replayability",
+            "content": "Let St be the state of the memory system at logical time t. Let Ct be command applied to the memory (e.g., insert(vec), delete(id), link(a, b)). The transition function defines the next state: St+1 = (St, Ct) Deterministic Memory requires that for any valid initial state S0 and any sequence of commands C1, ..., CN , the final state SN is identical regardless of the computing environment (CPU architecture, OS, compiler version). EnvA, EnvB : Apply(S0, {Ci})A Apply(S0, {Ci})B Typical vector databases using f32 violate this property because the transition function (specifically distance calculations and index updates) depends on hardware-specific floating-point behavior."
+        },
+        {
+            "title": "4 Empirical Evidence of Non-Determinism",
+            "content": "To quantify the divergence, we conducted controlled experiment generating embeddings on two standard developer machines: 1. x86: Windows PC, x86 64 architecture. 2. ARM: MacBook Pro, ARM64 (Apple Silicon). Both machines ran the exact same Python code, using sentence-transformers (v2.6.1) to encode standard input text list. The scripts used to reproduce this experiment are provided below."
+        },
+        {
+            "title": "4.1 Reproduction Setup",
+            "content": "First, we generate embeddings for fixed set of sentences. This script uses deterministic seed for the model initialization (handled by the library), but the floating-point interference occurs during the forward pass. import numpy as np from se te e_t sf ormer import SentenceTransformer Listing 1: Generation Script (embed.py) model = enten ceT an former ( \" sentence - transformers / all - MiniLM - L6 - v2 \" ) texts = [ \" Revenue for April \" , \" What is the profit in April ? \" , \" April financial summary \" , \" Total earnings last month \" , \" Completely unrelated sentence \" ] embeddings = model . encode ( texts , normalize_embeddings = False ) np . save ( \" embeddings . npy \" , embeddings ) Next, we inspect the raw hexadecimal representation of the floating-point values to detect bit-level differences that standard printing would hide. Listing 2: Inspection Script (inspect.py) import numpy as np emb = np . load ( \" embeddings . npy \" ) # Print the hex representation of the first 5 floats of vector 0 for in range (5) : print ( hex ( emb [0][ ]. view ( np . uint32 ) ) )"
+        },
+        {
+            "title": "4.2 Results",
+            "content": "We inspected the raw bits of the generated floating-point embeddings produced by the scripts above. The results are shown in Table 1. Table 1: Bit-Level Divergence of Identical Embeddings (First 5 Dimensions) Dimension x86 Value (Hex) ARM Value (Hex) 0 1 2 3 4 0xbd8276f8 0x3d6bb481 0x3d1dcdf1 0xbd601d21 0x3b761ffb 0xbd8276fc 0x3d6bb470 0x3d1dcdf9 0xbd601d16 0x3b762229 As shown in Table 1, the binary representation differs in every single dimension examined. While the cosine similarity between these divergent vectors remains extremely high (> 0.9999), the bit-level difference breaks state replicability guarantees. This confirms that memory state acts as forking path from the moment of creation. These discrepancies alter distance rankings, as the L2 distance between query and document will vary slightly, potentially changing the set of retrieved results (k-NN) and causing the agents behavior to diverge depending on the server it runs on."
+        },
+        {
+            "title": "5 Valori Design",
+            "content": "Valori solves this problem by enforcing strict determinism boundary. Valori does not attempt to make neural inference deterministic; instead, it defines strict boundary at which non3 deterministic model outputs are normalized into deterministic memory state. It is architected as no std Rust kernel that can run on bare metal, WASM, or standard operating systems."
+        },
+        {
+            "title": "5.1 Fixed-Point Arithmetic (Q16.16)",
+            "content": "Valori replaces all f32/f64 operations with Q16.16 fixed-point arithmetic as the initial default. Format: 32-bit signed integers, where the lower 16 bits represent the fractional part. Range: [32768, 32767]. Resolution: 0.000015. Rationale: Q16.16 was selected for the reference implementation because it offers balance of efficient execution on 32-bit embedded MCUs and sufficient precision for normalized embeddings (typically [1, 1]). It is not hard logical limit; the kernel design supports higher precision contracts (e.g., Q32.32) for future enterprise applications. Operations: Addition and subtraction are integer ops. Accumulators use i64 (or wider) intermediates during the dot product summation to prevent overflow before narrowing back to the stored Q16.16 format. Determinism: Since Q16.16 relies on standard integer ALU instructions (which are consistent across architectures), numerical results are guaranteed bit-identical on x86, ARM, RISC-V, and WASM."
+        },
+        {
+            "title": "5.2 Memory as a State Machine",
+            "content": "The kernel is pure state machine implemented without standard library IO no std. Inputs: Commands (Insert, Link, Delete) must be serialized and deterministic. State: The Kernel struct encapsulates all vector data, graph selection, and metadata. Snapshot/Restore: Because the state is deterministic, the entire memory can be serialized to snapshot file. Restoring this snapshot on different machine guarantees an exact replica of the memory state, down to the last bit."
+        },
+        {
+            "title": "5.3 Architecture Separation",
+            "content": "The Valori Kernel acts as deterministic execution environment for memory operations. All external inputswhether originating from Python, HTTP clients, or distributed nodesare normalized at the kernel boundary into fixed-point representation with well-defined precision contract (e.g., Q16.16). Once inside the kernel, memory updates are applied through pure state-machine transition function, ensuring that identical command sequences produce bit-identical memory states across architectures. Index structures, snapshotting, and restoration are implemented entirely within this deterministic domain. The system is logically divided into: Kernel no std: The core logic. Validates inputs, converts floats to fixed-point immediately at the boundary, and performs all indexing math. Node (std): An outer layer (Axum/Tokio) that provides HTTP APIs, persistence, and networking. It wraps the kernel but does not alter its logic."
+        },
+        {
+            "title": "6 Precision as a Configurable Memory Contract",
+            "content": "Valori does not assume single numeric representation for all deployments. Instead, it treats numeric precision as memory contract, selected based on operational constraints. This design choice elevates Valori from using simple fixed-point trick to operating as robust memory OS. The key insight is that determinism is preserved independently of the precision choice. Whether using Q16.16 for speed or Q64.64 for precision, the mathematical operations remain integer-associative and thus hardware-agnostic. This allows system architects to trade off precision for performance without sacrificing correctness or replayability. 4 Figure 1: Valori Architecture: The Kernel operates as pure deterministic core, wrapped by interface layers (Python FFI or Node HTTP) handling I/O."
+        },
+        {
+            "title": "Indexing and Determinism",
+            "content": "Indexing structures like HNSW (Hierarchical Navigable Small World) graphs are traditionally stochastic. Valori adapts them for strict determinism: 1. Fixed Ordering: When inserting batch data, items are processed in verified, sorted order (usually by ID) to prevent race conditions or insertion-order dependencies. 2. Data-Dependent Ordering: Valori removes stochasticity from index construction by replacing randomized decisions with stable, data-dependent ordering functions. For example, HNSW entry points are fixed to the first inserted node (ID 0), eliminating randomness during graph traversal initialization. 3. Graph Construction: The neighbor selection algorithm uses fixed-point distance metrics, ensuring the graph topology is identical across runs. Thus, Valori proves that approximate nearest neighbor search can be implemented deterministically."
+        },
+        {
+            "title": "8 Evaluation",
+            "content": "We evaluated Valori on the correctness of its determinism and its raw performance."
+        },
+        {
+            "title": "8.1 Cross-Platform Consistency",
+            "content": "We performed Snapshot Transfer test: 5 Format Use Case Rationale Table 2: Precision Layers as Configurable Contracts Q16.16 Q32.32 (Future) Q64.64 / Q128 (Future) Drones, embedded systems, robotics Enterprise AI agents Scientific computing, defense systems Deterministic, low power, bounded error Higher dynamic range, auditability Long-horizon numerical stability 1. Initialize Kernel on Machine (x86). Insert 10,000 vectors. 2. Snapshot state to file Hash HA. 3. Transfer snapshot to Machine (ARM). 4. Load snapshot. Verify internal Hash HB. Result: HA HB. The memory state is perfectly preserved. We additionally verified that k-NN result ordering remained identical after restore across platforms. Standard f32 vector stores usually fail this due to serialization differences or internal precision drifts. Valori guarantees identical result ordering and scores for fixed query and memory state; it does not claim equivalence with floating-point recall, only internal consistency."
+        },
+        {
+            "title": "8.2 Performance",
+            "content": "While fixed-point math introduces overhead (checking for saturation), Valoris no std optimizations keep latency low. In local benchmarks (MacBook Pro M3), raw retrieval latency is < 500µs for typical k-NN queries, which is sufficient for real-time agentic applications."
+        },
+        {
+            "title": "8.3 Semantic Fidelity Under Fixed-Point Quantization",
+            "content": "A natural concern is whether enforcing determinism via fixed-point arithmetic degrades semantic retrieval quality. To evaluate this trade-off, we measured the recall overlap between standard floating-point ANN index and Valoris Q16.16 deterministic index. We generated embeddings using the sentence-transformers/all-MiniLM-L6-v2 model and constructed two indices with identical parameters and insertion order: one using standard f32 arithmetic, and one using Valoris fixed-point kernel. For each query, we compared the Top-10 nearest neighbors returned by both systems. Recall@10 was defined as the fraction of overlapping results between the floating-point baseline and the fixed-point index. Both indices were constructed using identical insertion order, identical HNSW configuration parameters, and the same dataset partition, ensuring that recall differences arise only from numerical representation rather than indexing strategy. Across all queries, Valori achieved mean Recall@10 of 99.8%, indicating that deterministic fixed-point normalization preserves the semantic structure of the embedding space with negligible retrieval impact. We do not claim universal recall preservation across all embedding models or dataset distributions; rather, this result demonstrates that fixed-point determinism can retain practical semantic fidelity in widely-used real-world configuration, establishing an existence proof rather than general performance theorem. Table 3: Recall@10 Comparison Between Floating-Point and Q16.16 Indices Index Type Recall@10 Float32 HNSW Valori Q16.16 HNSW 1.000 0.998 These results demonstrate that Valoris determinism is not achieved at the cost of semantic fidelity. Fixed-point normalization acts as stability boundary rather than distortion of the learned representation."
+        },
+        {
+            "title": "9 Applications",
+            "content": "Deterministic memory enables new classes of AI deployment: Robotics & Drones: drone trained in simulation can load the exact same memory kernel onto its embedded hardware without behavior shift. Regulatory Compliance: Financial and medical AI agents can be audited by replaying their entire command log to verify why decision was reached. Decentralized AI: Nodes in distributed network can verify they hold the same truth by comparing memory state hashes. Consensus Systems: An emerging application domain is consensus-driven systems, such as blockchains or decentralized AI networks, where all nodes must converge to an identical state after processing the same inputs. Floating-point memory systems violate this requirement, whereas Valoris deterministic state machine satisfies it by construction."
+        },
+        {
+            "title": "10 Related Work",
+            "content": "Vector Databases: Systems like FAISS [6], Milvus, and Qdrant optimize for maximum recall and throughput using hardware acceleration (AVX-512, GPUs). They accept floating-point non-determinism as tradeoff for speed. Valori prioritizes correctness and reproducibility. Numerical Reproducibility: The challenge of floating-point determinism is well-known in scientific computing (Goldberg [1]) and game simulation. Valori applies these rigorous standards to the domain of high-dimensional vector search."
+        },
+        {
+            "title": "11 Limitations & Future Work",
+            "content": "Precision: Q16.16 has limited dynamic range compared to f32. Extremely small or large vector components may suffer quantization error. However, for normalized embedding vectors (typically in [1, 1]), the precision is adequate. Performance: Software-based fixed-point arithmetic is slower than hardware-accelerated float ops. Future work involves utilizing SIMD integer instructions where safe. Boundary: Valori ensures determinism after the vector enters the kernel. The non-determinism of the embedding model itself (the Neural Network) remains an open problem for the broader field. Future work may explore deterministic inference or model-side quantization, but this is orthogonal to the memory guarantees Valori provides."
+        },
+        {
+            "title": "12 Conclusion",
+            "content": "Valori demonstrates that AI memory does not have to be fuzzy, non-reproducible store. By adopting integer-based fixed-point arithmetic and state-machine architecture, we can build memory systems that are completely deterministic, auditable, and safe. As AI moves from creative demos to mission-critical infrastructure, deterministic memory will become an essential system primitive."
+        },
+        {
+            "title": "References",
+            "content": "[1] David Goldberg. What Every Computer Scientist Should Know About Floating-Point Arithmetic. ACM Computing Surveys, 1991. [2] IEEE Computer Society. IEEE Standard for Floating-Point Arithmetic. IEEE 754-2019, 2019. [3] Yu A. Malkov and D. A. Yashunin. Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs. TPAMI, 2018. [4] Nils Reimers and Iryna Gurevych. Sentence-BERT: Sentence Embeddings using Siamese BERTNetworks. EMNLP, 2019. 7 [5] James Demmel et al. Reproducible Numerical Computation. EECS Department, UC Berkeley, 2013. [6] Jeff Johnson, Matthijs Douze, and Herve Jegou. Billion-scale similarity search with GPUs. IEEE Big Data, 2019."
+        }
+    ],
+    "affiliations": [
+        "Independent Researcher",
+        "Valori Kernel Project"
+    ]
+}
