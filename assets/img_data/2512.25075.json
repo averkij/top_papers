@@ -1,0 +1,138 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25075/figures/src_files/logo-no-text.jpg",
+                "caption": "",
+                "position": 71
+            },
+            {
+                "img": "https://arxiv.org/html/2512.25075/x1.png",
+                "caption": "",
+                "position": 92
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25075/x2.png",
+                "caption": "Figure 2:Space–time controllability across methods.Blue cells denote the input video/views, while arrows and dots indicate generated continuous videos or sparse frames.\nCamera-control V2V models[Bai2025,vanhoorick2024gcd]modify only the camera trajectory while keeping time strictly monotonic.\n4D multi-view models[Wu2024,liang2024diffusion4d]synthesize discrete sparse views conditioned on space and time, but do not generate continuous video sequences.SpaceTimePilotenables free movement along both the camera and time axes with full control over direction and speed, supporting bullet-time, slow-motion, reverse playback, and mixed space–time trajectories.",
+                "position": 113
+            }
+        ]
+    },
+    {
+        "header": "2Related work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25075/x3.png",
+                "caption": "Figure 3:Temporal Wrapping for Spatiotemporal Disentanglement.(Top) For multi-view dynamic scene datasets[Bai2025], a set of temporal warping operations (e.g.  reverse playback, zigzag motion, slow motion, and freeze) are applied to the target video, with the source video kept as the standard forward reference, providing explicit supervision for temporal control .\n(Bottom) Compared with existing camera-control[vanhoorick2024gcd,Bai2025]and joint-dataset training strategies[Wu2024,watson2025controllingspacetimediffusion], which rely on monotonic time progression and static-scene videos to demonstrate temporal differences, Temporal Wrapping provide much more diverse and explicit signals of temporal variation, leading to disentanglement of space and time.",
+                "position": 243
+            },
+            {
+                "img": "https://arxiv.org/html/2512.25075/x4.png",
+                "caption": "Figure 4:Cam×\\timesTimedataset visualization. (Top) A space-time grid defined by a camera trajectory𝐜=[c1,…,cF]\\mathbf{c}=[c_{1},...,c_{F}]and animation status𝐭=[t1,…,tF]\\mathbf{t}=[t_{1},...,t_{F}].Cam×\\timesTimerenders images for all(c,t)(c,t)pairs, covering the full grid for learning disentangled spatial and temporal control. Any two sampled sequences ofFFframes from the grid can form a source-target pair. (Bottom) One typical choice of source videos is taking the diagonal cells in green.",
+                "position": 374
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25075/x5.png",
+                "caption": "Figure 5:Qualitative results of SpaceTimePilot.Our model enables fully disentangled control over camera motion and temporal dynamics.\nEach row shows a different combination of camera trajectory (left icons) and temporal warping (right icons). SpaceTimePilot produces coherent videos under diverse controls, including normal playback, reverse playback, bullet-time, slow-motion, replay motion, and complex camera paths (pan, tilt, zoom, and vertical motion).",
+                "position": 534
+            },
+            {
+                "img": "https://arxiv.org/html/2512.25075/x6.png",
+                "caption": "Figure 6:Qualitative comparison of disentangled camera-time control.In this example, we apply reverse playback (time) and a pan-right camera motion starting from the first-frame pose to a source video (top), whose original camera motion is dolly-in (red to blue). SpaceTimePilot, by explicitly disentangling space and time, achieves correct camera control (red boxes) together with accurate temporal control (green boxes). For TrajectoryCrafter, it first reverses the frames and then apply their method for viewpoint control, resulting in incorrect camera motion. ReCamMaster (with joint-dataset training) is unable to perform temporal control, leading to failure cases.",
+                "position": 788
+            },
+            {
+                "img": "https://arxiv.org/html/2512.25075/x7.png",
+                "caption": "Figure 7:Temporal compression ablation.Comparing uniform resampling, MLP, and 1D-Conv compressors under tilt-down and pan-right bullet-time controls,𝐭trg=[40,…,40]\\mathbf{t}_{\\text{trg}}=[40,\\dots,40].",
+                "position": 792
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "6Acknowledgement",
+        "images": []
+    },
+    {
+        "header": "Appendix ANetwork Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25075/x8.png",
+                "caption": "Figure 8:Architecture ofSpaceTimePilot.Our model jointly conditions on camera trajectories and temporal control signals via space–time attention, enabling non-monotonic motion generation such as reversals, repeats, accelerations, and zigzag time.",
+                "position": 864
+            },
+            {
+                "img": "https://arxiv.org/html/2512.25075/x9.png",
+                "caption": "Figure 9:Overview of the multi-turn autoregressive inference scheme.The model first generates an 81-frame segment conditioned on the source video and a chosen space–time trajectory. The resulting output is then reused as a secondary source video for subsequent iterations, each with its own camera and temporal trajectory. By chaining these iterations and stitching the outputs,SpaceTimePilotproduces a long, coherent video that follows an arbitrary space–time path.",
+                "position": 869
+            }
+        ]
+    },
+    {
+        "header": "Appendix BLonger Space-Time Exploration Video with Disentangled Controls",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25075/figures/src_files/ar_demo.jpg",
+                "caption": "Figure 10:Multi-turn autoregressive generation withSpaceTimePilot.Top row: source video frames.\nRows 2–4: Turn-1, Turn-2, and Turn-3 generations.\nAt each turn,SpaceTimePilotjointly conditions on (1) the original source video and (2) the previously generated chunk, ensuring temporal continuity, stable motion progression, and consistent camera geometry.\nThis dual-conditioning design enables viewpoint changes far beyond the input video—such as rotating to the rear of the tiger or transitioning from a low-angle shot to a high bird’s-eye view—while preserving visual and motion coherence. Please refer to section “AR Demos” in the website for videos.",
+                "position": 918
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAdditional Details on the ProposedCam×\\timesTimeDataset.",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25075/figures/src_files/data_demo.jpg",
+                "caption": "Figure 11:Example ofCam×\\timesTime.\nMulti-view, densely sampled sequences from theCam×\\timesTimedataset. Each row shows frames from one camera trajectory, and each column samples different timesteps (0–120). The dataset provides diverse environments, human motions, and four camera paths per scene with full 120-frame temporal coverage.",
+                "position": 949
+            },
+            {
+                "img": "https://arxiv.org/html/2512.25075/figures/src_files/sampling_example.jpg",
+                "caption": "Figure 12:Sampling fromCam×\\timesTime.By sampling from theCam×\\timesTimedataset, we can extract frames corresponding to arbitrary combinations of camera viewpoints and temporal positions, forming source-target pairs with rich camera and temporal control signals.",
+                "position": 954
+            },
+            {
+                "img": "https://arxiv.org/html/2512.25075/x10.png",
+                "caption": "Figure 13:More Qualitative results.Our model provides fully disentangled control over camera motion and temporal dynamics. Each row illustrates a different combination of temporal control inputs (top-left icon) and camera trajectories.SpaceTimePilotconsistently produces coherent videos across a wide range of controls, including normal and reverse playback, bullet-time, slow motion, replay motion, and complex camera paths such as panning, tilting, zooming, and vertical motion.",
+                "position": 960
+            }
+        ]
+    },
+    {
+        "header": "Appendix DAdditional Ablation Studies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.25075/x11.png",
+                "caption": "Figure 14:Ablation study.(Top) Using[Bai2025,bai2024syncammaster]as default datasets, we compare the influence of adding static-scene datasets[zhou2018stereo,li2019mannequin]vs. just doing temporal warping (TW) augmentation (Sec. 3.2.2 in the main paper). Temporal warping definitely provide more variety of time control signals, allowing models to learn better camera-time disentanglement.\n(Bottom) We further compare different configurations of warping, where we show freezing temporal warping (3rdrow) leads to better results than those trained without freezing temporal warping.",
+                "position": 973
+            },
+            {
+                "img": "https://arxiv.org/html/2512.25075/x12.png",
+                "caption": "Figure 15:Ablation study.(Top) We verify the efficacy of the proposedCam×\\timesTimedataset. Considering[Bai2025,bai2024syncammaster]as default datasets, we compare the impact of different datasets on the generated videos. One can clearly see artifacts in baselines without any extra data or augmented with static-scene data, whereas training additionally withCam×\\timesTimeleads to no artifacts, confirming the usefulness of our dataset.\n(Bottom) We compare several time-embedding strategies. The MLP fails to lock the temporal state (red boxes), while RoPE(f′f^{\\prime}) correctly freezes the scene dynamics at𝐭\\mathbf{t}=40 but unintentionally locks the camera motion too. Conditioning on the latent framef′f^{\\prime}(with uniform sampling) introduces noticeable artifacts. In contrast, the proposed 1D-Conv embedding allowsSpaceTimePilotto both freeze the scene dynamics at𝐭\\mathbf{t}=40 and produce intended camera motion. IncorporatingCam×\\timesTimeduring training further improves performance.",
+                "position": 998
+            }
+        ]
+    },
+    {
+        "header": "Appendix EAdditional Qualitative Visualizations",
+        "images": []
+    }
+]
