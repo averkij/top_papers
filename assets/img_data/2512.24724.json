@@ -1,0 +1,155 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related work",
+        "images": []
+    },
+    {
+        "header": "3Stage-aware multi-model sampling",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.24724/x1.png",
+                "caption": "Figure 2:Effect of model capacity during early denoising stage.Comparison of WAN-2.1 sampling schedules (L = 14B, S = 1.3B).\nLSS (large only in early steps) closely matches LLL (large-only) in structure and motion,\nwhile SSS (small-only) exhibits temporal inconsistency and semantic misalignment. SLL (small only in early steps) likewise produces structure and motion patterns highly similar to SSS.\nThis shows that the early stages are crucial for establishing global semantic and structural attributes.",
+                "position": 253
+            },
+            {
+                "img": "https://arxiv.org/html/2512.24724/x2.png",
+                "caption": "Figure 3:Late stage ablation: LLL vs. LSS vs. LSL.LSS preserves global structure similar to LLL but exhibits some artifacts.\nReintroducing the large model only during the late stage (LSL) restores detail and reduces flicker,\ndemonstrating that the late denoising stage is capacity-sensitive.\nNotably, the LSL schedule attains quality nearly indistinguishable from LLL while retaining the efficiency benefits of using the small model for most of the trajectory. Please zoom in to view the figures in detail.",
+                "position": 280
+            }
+        ]
+    },
+    {
+        "header": "4Experiment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.24724/x3.png",
+                "caption": "Figure 4:DINO-based identification of the early stage boundary.We measure the frame-wise DINO similarity between schedules that switch from the large to the small model (L→SL\\rightarrow S) at different early stage boundaries and the large-only baseline (LLL).\nA sharp decline in similarity emerges beyond a specific point in the curve.\nBoundaries chosen just before this drop (typically above∼\\sim96% similarity) preserve global structure and motion.",
+                "position": 385
+            },
+            {
+                "img": "https://arxiv.org/html/2512.24724/x4.png",
+                "caption": "Figure 5:FID-based identification of the late stage boundary.We fix the early stage boundary identified in Section4.2and vary only the late stage boundary.\nThe resulting FID curve exhibits a V-shape, where the minimum corresponds to the optimal late stage boundary used in our LSL schedule.\nThis trend consistently appears in both WAN and LTX-Video, demonstrating that a properly chosen late boundary yields the best sweet spot with detail refinement and artifact suppression.",
+                "position": 416
+            }
+        ]
+    },
+    {
+        "header": "5Extended analyses",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.24724/x5.png",
+                "caption": "Figure 6:Velocity divergence across diffusion steps.We compute cosine andℓ2\\ell_{2}distances between velocities𝐯t(L)\\mathbf{v}^{(L)}_{t}and𝐯t(S)\\mathbf{v}^{(S)}_{t}across timesteps.\nDivergence is lowest in the intermediate stage, indicating that the small model can reliably denoise there.\nEarly stage exhibits high variance (structure formation), while late stage shows high mean divergence (detail refinement).\nThis supports allocating the large model to the early and late stages.",
+                "position": 690
+            },
+            {
+                "img": "https://arxiv.org/html/2512.24724/x6.png",
+                "caption": "Figure 7:FID vs. FLOPs across schedule configurations.Schedules beginning with S (SXX) show significantly degraded quality.\nSchedules using the large model in the early stage (LXX) achieve substantially better performance.\nOur selected early and late boundaries (yellow dots), and especially the full stage-aware schedule (yellow star), lie on the Pareto frontier, achieving LLL-level quality with lower FLOPs.",
+                "position": 708
+            }
+        ]
+    },
+    {
+        "header": "6Compatibility with other acceleration methods",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.24724/x7.png",
+                "caption": "Figure 8:Compatibility with DPM++ solver.Ours (LSL) is compatible with DPM++ solvers, reproducing similar videos to the videos using only the large model (LLL). Please zoom in to view the figures in detail.",
+                "position": 777
+            },
+            {
+                "img": "https://arxiv.org/html/2512.24724/x8.png",
+                "caption": "Figure 9:Compatibility with step distillation model.The step distillation model (D) with small capacity can replace the original small model (S). As done with the original small model, LDL reproduces the results with LLL. In contrast, DDD does not. Please zoom in to view the figures in detail.",
+                "position": 781
+            }
+        ]
+    },
+    {
+        "header": "7Discussion and conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix AExperimental Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BMore ablation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.24724/fig/more_abl_early_ltx.png",
+                "caption": "Figure A1:LTX-Video: Experiments for choosing early stage boundary.\nThe star sign represents our choice of the early stage boundary. The X-axis is the small model introduction point (%), where the small model follows the large model. We present the results for CLIP, LPIPs, PSNR, and SSIM in order.",
+                "position": 977
+            },
+            {
+                "img": "https://arxiv.org/html/2512.24724/fig/more_abl_early_wan.png",
+                "caption": "Figure A2:WAN 2.1: Experiments for choosing early stage boundary.The star sign represents our choice of the early stage boundary. The X-axis is the small model introduction point (%), where the small model follows the large model. We present the results for CLIP, LPIPs, PSNR, and SSIM in order.",
+                "position": 983
+            },
+            {
+                "img": "https://arxiv.org/html/2512.24724/fig/more_abl_late_ltx.png",
+                "caption": "Figure A3:LTX-Video: Experiments for choosing late stage boundary.The star sign represents our choice of the late stage boundary. The star sign represents the large model reintroduction points (% from end). We measure Subject Consistency, Background Consistency, Temporal Flickering, Motion Smoothness, Dynamic Degree, Aesthetic Quality, Image Quality, FID, and FVD.",
+                "position": 1089
+            },
+            {
+                "img": "https://arxiv.org/html/2512.24724/fig/more_abl_late_wan.png",
+                "caption": "Figure A4:WAN 2.1: Experiments for choosing late stage boundary.The star sign represents our choice of the late stage boundary. The star sign represents the large model reintroduction points (% from end). We measure Subject Consistency, Background Consistency, Temporal Flickering, Motion Smoothness, Dynamic Degree, Aesthetic Quality, Image Quality, FID, and FVD.",
+                "position": 1094
+            }
+        ]
+    },
+    {
+        "header": "Appendix CU-shaped divergence curve",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.24724/fig/u_shape.png",
+                "caption": "Figure A5:Velocity divergence across diffusion steps.We measure the divergence between the velocity predictions of the small and large models at every denoising step for LTX-Video and WAN2.1.\n(a) uses the large model as the main stream, while (b) uses the small model as the main stream.\nFor each timestep, we compare the velocity predicted with the conditional input (cond) and the null input (uncond), corresponding to the CFG-conditioned and unconditioned branches, respectively.\nDivergence is lowest in the intermediate stage, indicating that the small model denoises reliably there, whereas the early and late stages show higher divergence due to structure formation and detail refinement.",
+                "position": 1133
+            },
+            {
+                "img": "https://arxiv.org/html/2512.24724/fig/u_shape_explain.png",
+                "caption": "Figure A6:Illustration of velocity divergence across diffusion steps.We follow the sampling trajectory of the main-stream model (blue) and feed its intermediate outputs into both the large and small models at each timestep.\nThe divergence between their velocity predictions is then computed using cosine distance and L2 distance.\nThis procedure is applied identically to LTX-Video and WAN2.1, using the official inference settings of each model.",
+                "position": 1142
+            }
+        ]
+    },
+    {
+        "header": "Appendix DComprehensive schedule sweep",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2512.24724/fig/all_ablation_fig_pe_ltx.png",
+                "caption": "Figure A7:LTX-Video: Comprehensive schedule sweep on the PV dataset.We evaluate all combinations of small–large scheduling for LTX-Video on the PV dataset and sort the results in ascending order of FID. Our LSL configuration consistently ranks near the top, demonstrating strong performance across both FID and FVD. Other metrics also exhibit a similar overall trend.",
+                "position": 1164
+            },
+            {
+                "img": "https://arxiv.org/html/2512.24724/fig/all_ablation_fig_vbench_ltx.png",
+                "caption": "Figure A8:LTX-Video: VBench evaluation under the same schedule ordering.Using the ordering derived from the PV dataset sweep, we evaluate LTX-Video on VBench metrics. The relative ranking remains consistent, and the LSL configuration again shows robust performance across diverse quality dimensions. Other metrics also exhibit a similar overall trend.",
+                "position": 1170
+            },
+            {
+                "img": "https://arxiv.org/html/2512.24724/fig/all_ablation_fig_pe_wan.png",
+                "caption": "Figure A9:WAN 2.1: Comprehensive schedule sweep on the PV dataset.We apply the same exhaustive combination sweep to WAN 2.1 and sort all configurations by FID. Similar to LTX-Video, the LSL strategy consistently outperforms other schedules across both FID. Other metrics also exhibit a similar overall trend.",
+                "position": 1176
+            },
+            {
+                "img": "https://arxiv.org/html/2512.24724/fig/all_ablation_fig_vbench_wan.png",
+                "caption": "Figure A10:WAN 2.1: VBench evaluation under the same schedule ordering.Using the schedule ordering obtained from the PV dataset, we report WAN 2.1 performance on VBench. The LSL schedule again provides strong performance across multiple VBench dimensions, confirming its general effectiveness.",
+                "position": 1182
+            }
+        ]
+    },
+    {
+        "header": "Appendix EQualitative results",
+        "images": []
+    },
+    {
+        "header": "Appendix FMore Related Work",
+        "images": []
+    }
+]
