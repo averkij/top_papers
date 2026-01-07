@@ -1,0 +1,152 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.02989/x1.png",
+                "caption": "Figure 1:System-1 vs. System-2 counting performance as a function of problem size.\nSystem-1 performance degrades rapidly and collapses beyond approximately 30 items, reflecting the bounded capacity of the model’s internal counter.\nIn contrast, System-2 counting maintains high accuracy across the entire range by decomposing the task into small solvable sub-problems and aggregating the results.",
+                "position": 134
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/x2.png",
+                "caption": "Figure 2:Internal mechanism of System-2 test-time counting in LLMs.A large counting task is divided into smaller partitions using an external separator (|). Within each partition, the model performs implicit System-1 counting, where count information accumulates token-by-token and is localized at the final item or separator token (gray blocks). The final count information is transferred via residual streams (green arrows) and stored in the middle-to-late layers (green blocks). These partition-level counts (e.g., 4, 2, 3) are then transferred (orange arrows) through attention pathways to explicit reasoning tokens that report intermediate results (orange blocks). Finally, the intermediate counts are aggregated (purple arrows) to produce the final answer. By keeping each sub-task within the model’s reliable counting range, this System-2 procedure removes the upper bound imposed by the model’s architectural limitations.",
+                "position": 141
+            }
+        ]
+    },
+    {
+        "header": "2Problem Setup and Methodology",
+        "images": []
+    },
+    {
+        "header": "3Behavioral Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.02989/x3.png",
+                "caption": "Figure 3:Decoded output probabilities for the unstructured baseline method on Qwen2.5 7B.\nThe heatmap shows the decoded probabilities of model outputs, averaged over different item types, for target counts ranging from 1 to 25. As the count increases beyond 10, the diagonal entries gradually fade, indicating reduced model confidence.",
+                "position": 494
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/x4.png",
+                "caption": "(a)Attention of generated tokens to input tokens.",
+                "position": 511
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/x4.png",
+                "caption": "(a)Attention of generated tokens to input tokens.",
+                "position": 514
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/x5.png",
+                "caption": "(b)Attention of generated tokens to generated tokens.",
+                "position": 520
+            }
+        ]
+    },
+    {
+        "header": "4Attention Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.02989/x6.png",
+                "caption": "Figure 5:Average attention of correctly generated intermediate counts to the final item of their partition, alongside attention of the final answer to partition-level counts, across layers. Higher attention values are observed from layer 19 to 23 for both paths.",
+                "position": 531
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/x7.png",
+                "caption": "Figure 6:Heatmap of average attention to final items of partitions across layers and heads for intermediate counting steps. Layers and heads responsible for transferring numerical information from input partitions to intermediate counts appear with higher intensity.",
+                "position": 536
+            }
+        ]
+    },
+    {
+        "header": "5Causal Mediation Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.02989/x8.png",
+                "caption": "Figure 7:Ground-truth probabilities across different tokens of partitions decoded by CountScope.\nProbabilities are averaged over different item types and configurations (3 to 9 items per partition).",
+                "position": 566
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/x9.png",
+                "caption": "Figure 8:Average ground-truth probability drop after masking the final item and comma (e.g., ‘, apple’) from each partition, showing the effect on the target count for digit sizes ranging from 3 to 9.",
+                "position": 587
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/figs/attention_knockout_layers_heads.png",
+                "caption": "Figure 9:Heatmap of the average probability drop after attention knockout across layers and heads for intermediate (top) and final counting steps (bottom). Attention knockout is applied only to the identified effective tokens from the input context and intermediate steps.",
+                "position": 602
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/x10.png",
+                "caption": "Figure 10:Average log probabilities of the first and second contexts before (left) and after (right) activation patching. The first and second columns correspond to the predicted outputs (total sums) of the first and second contexts. After swapping the layer embeddings of the selected tokens from a given partition between the two contexts, the output no longer follows the original total sum and instead reflects the transferred number. Values are averaged across different configurations (selected partitions, partition sizes, and item types).",
+                "position": 619
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Limitations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.02989/x11.png",
+                "caption": "(a)Average attention weights across layers for Llama 3.2 8B. We report attention from selected output tokens to both input and output tokens. Attention to the key partition-related tokens peaks consistently between layers 13 and 18, motivating our choice of this interval for full attention visualization.",
+                "position": 886
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/x11.png",
+                "caption": "(a)Average attention weights across layers for Llama 3.2 8B. We report attention from selected output tokens to both input and output tokens. Attention to the key partition-related tokens peaks consistently between layers 13 and 18, motivating our choice of this interval for full attention visualization.",
+                "position": 889
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/x12.png",
+                "caption": "(b)Average attention weights across layers for Gemma 3 4B. We report attention from selected output tokens to both input and output tokens (as defined in Fig.4(a)). Attention magnitude peaks between layers 21 and 23.",
+                "position": 895
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/x13.png",
+                "caption": "Figure 12:Full attention map for Qwen2.5-7B. The x-axis corresponds to output tokens and the y-axis to input tokens. The token immediately preceding the generated number of parts exhibits the strongest attention toward the final item and trailing comma of each partition matches its own segment.",
+                "position": 902
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/x14.png",
+                "caption": "Figure 13:Full attention map for Llama 3.2 8B. The x-axis corresponds to output tokens and the y-axis to input tokens. The token immediately preceding the generated number of parts exhibits the strongest attention toward the final item and trailing comma of each partition matches its own segment.",
+                "position": 905
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/x15.png",
+                "caption": "Figure 14:Full attention map for Gemma 3 4B. The x-axis corresponds to output tokens and the y-axis to input tokens. The token immediately preceding the generated partition-level count exhibits the strongest attention toward the final item and trailing comma of each partition matches its own segment.",
+                "position": 908
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/x16.png",
+                "caption": "(a)",
+                "position": 976
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/x16.png",
+                "caption": "(a)",
+                "position": 979
+            },
+            {
+                "img": "https://arxiv.org/html/2601.02989/x17.png",
+                "caption": "(b)",
+                "position": 985
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]
