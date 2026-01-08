@@ -1,0 +1,308 @@
+{
+    "paper_title": "Benchmark^2: Systematic Evaluation of LLM Benchmarks",
+    "authors": [
+        "Qi Qian",
+        "Chengsong Huang",
+        "Jingwen Xu",
+        "Changze Lv",
+        "Muling Wu",
+        "Wenhao Liu",
+        "Xiaohua Wang",
+        "Zhenghua Wang",
+        "Zisu Huang",
+        "Muzhao Tian",
+        "Jianhan Xu",
+        "Kun Hu",
+        "He-Da Wang",
+        "Yao Hu",
+        "Xuanjing Huang",
+        "Xiaoqing Zheng"
+    ],
+    "sections": [
+        {
+            "title": "Abstract",
+            "content": "The rapid proliferation of benchmarks for evaluating large language models (LLMs) has created an urgent need for systematic methods to assess benchmark quality itself. We propose Benchmark^2, a comprehensive framework comprising three complementary metrics: (1) Cross-Benchmark Ranking Consistency, measuring whether a benchmark produces model rankings aligned with peer benchmarks; (2) Discriminability Score, quantifying a benchmark's ability to differentiate between models; and (3) Capability Alignment Deviation, identifying problematic instances where stronger models fail but weaker models succeed within the same model family. We conduct extensive experiments across 15 benchmarks spanning mathematics, reasoning, and knowledge domains, evaluating 11 LLMs across four model families. Our analysis reveals significant quality variations among existing benchmarks and demonstrates that selective benchmark construction based on our metrics can achieve comparable evaluation performance with substantially reduced test sets."
+        },
+        {
+            "title": "Start",
+            "content": "Benchmark2: Systematic Evaluation of LLM Benchmarks Qi Qian1 Chengsong Huang2 Xiaohua Wang1 Zhenghua Wang1 Zisu Huang1 Muzhao Tian1 Jingwen Xu1 Changze Lv1 Muling Wu1 Wenhao Liu3 Jianhan Xu3 Kun Hu3 He-Da Wang3 Yao Hu3 Xuanjing Huang1 Xiaoqing Zheng1 1College of Computer Science and Artificial Intelligence, Fudan University 2Washington University in St. Louis 3Xiaohongshu Inc. qqian23@m.fudan.edu.cn chengsong@wustl.edu {zhengxq, xjhuang}@fudan.edu.cn 6 2 0 2 ] . [ 1 6 8 9 3 0 . 1 0 6 2 : r a"
+        },
+        {
+            "title": "Abstract",
+            "content": "The rapid proliferation of benchmarks for evaluating large language models (LLMs) has created an urgent need for systematic methods to assess benchmark quality itself. We propose BENCHMARK2, comprehensive framework comprising three complementary metrics: (1) Cross-Benchmark Ranking Consistency, measuring whether benchmark produces model rankings aligned with peer benchmarks; (2) Discriminability Score, quantifying benchmarks ability to differentiate between models; and (3) Capability Alignment Deviation, identifying problematic instances where stronger models fail but weaker models succeed within the same model family. We conduct extensive experiments across 15 benchmarks spanning mathematics, reasoning, and knowledge domains, evaluating 11 LLMs across four model families. Our analysis reveals significant quality variations among existing benchmarks and demonstrates that selective benchmark construction based on our metrics can achieve comparable evaluation performance with substantially reduced test sets."
+        },
+        {
+            "title": "Introduction",
+            "content": "The evaluation of large language models (LLMs) has become increasingly important as these models are deployed across diverse real-world applications. Benchmarks serve as the primary instruments for measuring model capabilities, guiding both research directions and practical deployment decisions. However, the explosive growth in the number of benchmarkswith hundreds now available across domains such as mathematics, reasoning, instruction following, and knowledge understandingraises fundamental question: How do we know if benchmark itself is good? Although benchmarks serve an important role in the field, surprisingly little attention has been paid to the benchmark quality. Current practice often treats benchmarks as ground truth without questioning their reliability or validity. This oversight can lead to several problems, as illustrated in Figure 1: (1) Ranking Inconsistencydifferent benchmarks may produce conflicting model rankings, making it unclear which benchmark to trust; (2) Low Discriminative Powersome benchmarks fail to differentiate between models of varying capabilities, clustering all models within narrow performance range; and (3) RankInconsistent Itemsindividual test instances may exhibit counter-intuitive behavior where stronger models fail but weaker models succeed. Consider concrete example: if Benchmark ranks Model above Model in mathematical reasoning, while Benchmarks and consistently show the opposite ranking, should we trust Benchmark A? Similarly, if benchmark shows minimal performance differences between state-of-the-art model and much smaller model, does this indicate that these two models have similar capabilities, or does it suggest that the benchmark cannot effectively distinguish between them? To address these challenges, we propose BENCHMARK2, novel framework for evaluating benchmark quality through three complementary metrics (Figure 1, bottom row): Cross-Benchmark Ranking Consistency (CBRC), which measures ranking correlation with external domain benchmarks, Discriminability Score (DS), which measures the benchmarks ability to distinguish between models of varying capabilities; and Capability Alignment Deviation (CAD), which penalizes counterintuitive instances where weaker models outperform stronger ones within the same family, ensuring hierarchical consistency. We conduct comprehensive experiments across 15 widely-used benchmarks spanning three major domains (mathematics, general reasoning, and knowledge & understanding), evaluating 11 LLMs across four model families with clear capability hierarchies. Our analysis reveals substantial quality Figure 1: Overview of BENCHMARK2 framework. Top row: Three key problems with existing LLM benchmarksranking inconsistency across benchmarks, low discriminative power of performance gaps, and prevalence of rank-inconsistent test items. Bottom row: Our three complementary metrics addressing each problemCrossBenchmark Ranking Consistency (CBRC) measures alignment with peer benchmarks, Discriminability Score (DS) quantifies performance gap magnitudes, and Capability Alignment Deviation (CAD) identifies items violating expected capability hierarchies within model families. variations among existing benchmarks and identifies specific characteristics that distinguish highquality benchmarks from problematic ones. Beyond benchmark quality assessment, we demonstrate practical application of our framework: selective benchmark construction. By identifying high-quality test instances based on our metrics, we construct reduced benchmark versions that achieve comparable evaluation performance to full benchmarks while providing greater efficiency. Our contributions are summarized as follows: We formalize the problem of benchmark quality assessment and propose three complementary metrics that capture different aspects of benchmark reliability. We conduct the first large-scale systematic evaluation of benchmark quality across 15 benchmarks and 11 models spanning four families, providing empirical insights into the state of LLM evaluation. We show that filtering instances via quality metrics achieves comparable evaluation performance using only 35% of the original data."
+        },
+        {
+            "title": "2.1 LLM Benchmarks",
+            "content": "The landscape of LLM evaluation has expanded dramatically. General-purpose benchmarks such as MMLU (Hendrycks et al., 2021a), BBH (Suzgun et al., 2023), and ARC (Clark et al., 2018) measure broad capabilities across multiple domains. Domain-specific benchmarks have emerged for mathematics (MATH-500, AIME, OlympiadBench), reasoning and comprehension (DROP (Dua et al., 2019), CommonsenseQA (Talmor et al., 2019)), and knowledge understanding (IFEval(Zhou et al., 2023), SuperGPQA (M-A-P Team et al., 2025)). More challenging benchmarks have been introduced to address ceiling effects, including OmniMath (Gao et al., 2024) for advanced mathematics. However, this proliferation has occurred largely without systematic quality assessment."
+        },
+        {
+            "title": "2.2 Benchmark Quality Analysis",
+            "content": "Several studies have examined issues with existing benchmarks. Bowman and Dahl (2021) discussed dangers of benchmark-driven research and the need for more robust evaluation practices. Data contamination, where LLMs inadvertently encounter test data during training, has been identified as significant concern (Xu et al., 2024; Sainz et al., 2023). Benchmark saturation has motivated dynamic benchmarks (Kiela et al., 2021). Research on evaluation methodology has addressed statistical significance in model comparisons (Dror et al., 2018) and limitations of single-number metrics (Ethayarajh and Jurafsky, 2020). Liang et al. (2023) introduced HELM for holistic evaluation across multiple dimensions. all models achieve similar scores regardless of their actual ability differences, the benchmark provides limited useful information. Our work complements these efforts by providing metrics specifically designed for benchmark quality assessment. Unlike prior work that focuses on identifying specific issues or proposing new evaluation paradigms, our framework provides systematic, quantitative metrics for assessing benchmark reliability, discriminability, and capability alignment."
+        },
+        {
+            "title": "3 Methodology",
+            "content": "In this section, we present BENCHMARK2, our Forframework for benchmark evaluation. mally, consider set of benchmarks = {B1, B2, . . . , Bn} and set of candidate models = {M1, M2, . . . , Mm}. Let sij denote the performance score of model Mj evaluated on benchmark Bi. Based on this formulation, we propose three complementary approaches to assess benchmark quality: Definition. We define the Discriminability Score (DS) based on the normalized score spread and the statistical significance of pairwise differences: DS(Bi) = σi si (cid:115) (cid:80) j<k 1[sij sik > ϵ] m(m 1)/2 (2) where σi is the standard deviation of scores on benchmark Bi, si is the mean score, and the second term represents the proportion of model pairs with practically significant differences (we set ϵ = 0.02 as the minimum meaningful difference). Interpretation. Higher DS values indicate better discriminability. We empirically find that benchmarks with DS > 0.4 provide good differentiation, while those with DS < 0.2 offer minimal discrimination between models."
+        },
+        {
+            "title": "3.3 Capability Alignment Deviation",
+            "content": "Cross-Benchmark Ranking Consistency (CBRC) evaluates whether benchmarks ranking corroborates with others in the same domain. The underlying rationale is that effective benchmarks measuring similar capabilities should produce highly correlated model rankings. This metric operates at the instance level, identifying individual test questions that may be problematic. The key insight is that if question is well-designed, stronger models should generally outperform weaker models on it, maintaining alignment with expected capability hierarchies. Definition. For benchmark Bi, we compute its ranking consistency as the average Kendalls τ correlation with other benchmarks in the same domain: CBRC(Bi) = 1 1 (cid:88) j=i τ (ri, rj) (1) where ri denotes the ranking of models induced by benchmark Bi, and τ (, ) is Kendalls tau correlation coefficient. Interpretation. CBRC values range from -1 to 1, where 1 indicates perfect agreement with other benchmarks, 0 indicates no correlation, and negative values indicate inverse rankings. We consider CBRC > 0.7 as indicating high consistency, 0.4 0.7 as moderate, and < 0.4 as low."
+        },
+        {
+            "title": "3.2 Discriminability Score",
+            "content": "Model Family Hierarchy. Rather than establishing global ordering across all modelswhich can be unreliable due to different training data and optimization objectives across model familieswe leverage the natural capability hierarchy within model families. For model family (e.g., Qwen2.5-Instruct), we define an ordering based on parameter count: = {M1 M2 Mk} (3) where M1 has the most parameters and Mk has the fewest. This within-family ordering is more reliable than cross-family comparisons. Definition. For benchmark Bi, we first compute the raw inversion rate by aggregating inversions across all model families {F1, F2, . . . , FF }: high-quality benchmark should effectively differentiate between models of varying capabilities. If inv_rate(Bi) = (cid:80)F =1 invFf (Bi) (Bi) =1 compFf (cid:80)F (4) For each family = {M1 M2 Mk}, an inversion on question occurs when stronger model fails but weaker model succeeds: invF (Bi) = (cid:88) (cid:88) qQi j<l 1[cjq clq] (5) where Qi is the set of questions in benchmark Bi, cjq indicates whether model Mj correctly answers question q. We then apply an exponential transformation to convert the inversion rate to score where higher values indicate better alignment:"
+        },
+        {
+            "title": "3.5 Benchmark Quality Score",
+            "content": "We also provide combined score for overall assessment: BQS(Bi) = α (cid:94)CBRC(Bi) + β DS(Bi) + γ CAD(Bi) (8) where (cid:94)CBRC denotes the normalized CBRC score, and α, β, γ are weighting parameters. Details on normalization and weight selection are provided in Appendix C. CAD(Bi) = eλinv_rate(Bi) (6)"
+        },
+        {
+            "title": "4 Experimental Setup",
+            "content": "where λ > 0 is scaling parameter that controls the sensitivity of the transformation. In our experiments, we set λ = 12 based on empirical analysis to ensure meaningful differentiation across the observed range of inversion rates. Interpretation. CAD ranges from 0 to 1, where 1 indicates perfect alignment (no inversions) and values approaching 0 indicate severe capability hierarchy violations. We consider CAD > 0.6 as indicating good quality, 0.40.6 as acceptable, and < 0.4 as indicating significant quality issues."
+        },
+        {
+            "title": "3.4 Stability Score",
+            "content": "To assess the reliability of selective benchmark evaluation, we introduce the Stability Score, which measures the consistency of model rankings across multiple sampling iterations. Definition. For selective benchmark Bs with selection ratio r, we perform bootstrap sampling iterations (we use = 100). In each iteration k, we sample instances and compute the resulting model ranking rk. The Stability Score is defined as the average pairwise ranking correlation: Stability(Bs) ="
+        },
+        {
+            "title": "2\nK(K − 1)",
+            "content": "(cid:88) i<j τ (ri, rj) (7) where τ (, ) is Kendalls tau correlation coefficient between rankings from different bootstrap samples. Interpretation. Stability Score ranges from -1 to 1, where 1 indicates that the selective benchmark produces identical rankings regardless of which specific instances are sampled, and lower values indicate higher variance in rankings. We consider Stability > 0.7 as high, 0.50.7 as moderate, and < 0.5 as low."
+        },
+        {
+            "title": "4.1 Benchmarks",
+            "content": "To demonstrate the broad applicability of our framework, we select diverse set of 15 benchmarks across three major domains: Mathematics (5 benchmarks). AIME 2024 (Mathematical Association of America, 2024a), OmniMath (Gao et al., 2024) for advanced mathematical problem solving, OlympiadBench (He et al., 2024), AMC (Mathematical Association of America, 2024b) and MATH-500 (Hendrycks et al., 2021b). General Reasoning (5 benchmarks). BigBench Hard (BBH) (Suzgun et al., 2023) for challenging tasks, DROP (Dua et al., 2019) for reading comprehension, ARC (Clark et al., 2018) for scientific reasoning, CommonsenseQA (Talmor et al., 2019) for commonsense reasoning and SIQA (Sap et al., 2019) for social intelligence. Knowledge & Understanding (5 benchmarks). SuperGPQA (M-A-P Team et al., 2025) for graduate-level reasoning, MMLU-Pro (Wang et al., 2024) , IFBench (Pyatkin et al., 2025) and IFEval (Zhou et al., 2023) for instruction following capabilities and EQ-Bench (Paech, 2023) for emotional intelligence."
+        },
+        {
+            "title": "4.2 Models",
+            "content": "We evaluate 11 models across four families with clear capability hierarchies based on model size: DeepSeek-R1-Distill-Qwen (DeepSeek-AI, 2025): 1.5B, 7B, 32B Llama-3.1-Instruct 2024): 8B, 70B (Grattafiori et al., Qwen2.5-Instruct (Yang et al., 2024): 1.5B, 7B, 72B Qwen3 (Yang et al., 2025): 1.7B, 8B, 32B"
+        },
+        {
+            "title": "CBRC",
+            "content": "DS"
+        },
+        {
+            "title": "CAD",
+            "content": "Score σ Score Range σ Score σ AIME 2024 OmniMath OlympiadBench AMC 22-24 MATH-500 ARC BBH DROP CommonsenseQA SIQA IFEval EQ-Bench IFBench SuperGPQA MMLU-Pro 0.52 0.76 0.75 0.70 0.70 0.79 0.75 0.71 0.75 0. 0.75 0.75 0.71 0.79 0."
+        },
+        {
+            "title": "Mathematics",
+            "content": "0.74 0.79 0.76 0.36 0.16 053 062 064 1667"
+        },
+        {
+            "title": "General Reasoning",
+            "content": "0.11 0.25 0.20 0.17 0.17 5695 3089 4187 3785 2453 0.10 0.13 0.12 0.18 0.18 0.03 0.02 0.08 0.07 0.05 0.22 0.27 0.32 0.11 0.07 0.07 0.12 0.05 0.11 0. Knowledge & Understanding 0.11 0.08 0.11 0.05 0.10 0.23 0.27 0.31 0.34 0.40 3787 1782 1132 940 2771 0.10 0.17 0.08 0.08 0.17 0.85 0.61 0.61 0.46 0. 0.87 0.66 0.61 0.57 0.23 0.63 0.53 0.51 0.43 0.36 0.13 0.22 0.23 0.09 0.10 0.05 0.05 0.07 0.02 0.03 0.10 0.07 0.07 0.07 0."
+        },
+        {
+            "title": "BQS",
+            "content": "0.79 0.75 0.73 0.55 0.55 0.65 0.60 0.56 0.54 0.40 0.58 0.56 0.55 0.55 0.51 Table 1: Comprehensive benchmark quality metrics across three domains. CBRC: Cross-Benchmark Ranking Consistency (Kendalls τ with peer benchmarks). DS: Discriminability Score; Range shows model performance spread (minmax %). CAD: Capability Alignment Deviation (higher is better). BQS: Combined Benchmark Quality Score. σ denotes standard deviation. Selection Rationale. To ensure architectural diversity and enable reliable CAD computation across multiple scales, we selected models from four distinct development lineages. This strategy mitigates the risk of family-specific bias while providing 13 comparison pairs within each family, yielding total of 10 pairs per benchmark instance. Held-Out Validation. To verify that our metrics generalize beyond the models used in their computation, we additionally evaluate on Qwen2.5-Base (1.5B, 7B, 32B)base models that share the same architecture as Qwen2.5-Instruct but were not used in metric computation and have fundamentally different training (no instruction tuning)."
+        },
+        {
+            "title": "4.3 Evaluation Protocol",
+            "content": "For each model-benchmark pair, we use standardized prompting templates following the original benchmark specifications where available. We use greedy decoding for reproducibility and evaluate using exact match or execution-based metrics as appropriate for each benchmark."
+        },
+        {
+            "title": "5.1 Comprehensive Quality Analysis",
+            "content": "Table 1 reveals distinct quality profiles across domains. Mathematics exhibits the widest quality variation (BQS: 0.550.79). AIME 2024 achieves exceptional discriminability (DS = 0.74) and capability alignment (CAD = 0.85), while MATH-500 shows potential ceiling effects with low discriminability (DS = 0.16). presents"
+        },
+        {
+            "title": "General Reasoning",
+            "content": "qualitydiscriminability trade-off. ARC achieves the highest capability alignment (CAD = 0.87) but limited discriminability (DS = 0.11), whereas BBH maximizes discriminability (DS = 0.25) at the cost of alignment (CAD = 0.66). SIQA exhibits problematic quality across all model families (CAD = 0.23). Knowledge & Understanding shows the most consistent quality profile (BQS: 0.510.58), with IFEval and SuperGPQA achieving strong crossbenchmark consistency (CBRC 0.75). Two patterns emerge: (1) high discriminability and high capability alignment rarely co-occur, and (2) benchmarks with objective evaluation criteria consistently achieve higher CAD scores."
+        },
+        {
+            "title": "5.2 Model Performance Analysis",
+            "content": "Table 2 reveals clear capability hierarchies within each model family, validating our within-family CAD computation approach. Within the DeepSeek family, performance scales consistently from"
+        },
+        {
+            "title": "Model",
+            "content": "32B 7B 1.5B 70B 8B 72B 7B 1.5B 32B 8B 1.7B"
+        },
+        {
+            "title": "General",
+            "content": "K&U"
+        },
+        {
+            "title": "Avg",
+            "content": "F Rk Rk Rk Rk DeepSeek-R1-Distill-Qwen 57.5 80.1 +22.6 42.8 57.7 +14.9 -0.9 26.9 26. 33 55 1010 38.3 13.5 -24.8 1313 20.4 6.1 78.8 85.5 +6.7 63.9 47.7 -16.2 1010 36.6 22.1 -14.5 1011 47.8 42.5 43 89 -14.3 1313 28.5 15.2 -13.3 1313 63.1 77.7 +14.6 -5.3 52.8 67.5 +14.7 3 54 Llama-3.1-Instruct 30.1 32.1 +2.0 -9.1 13.3 4.2 89 79.8 86.5 +6.7 1313 67.9 56.6 -11.3 22 89 60.9 79.8 +18.9 47.5 54.2 +6. 33 78 56.9 66.1 +9.2 -4.6 42.9 38.3 55 1010 Qwen2.5-Instruct 49.4 79.3 +29.9 29.5 37.7 +8.2 -7.5 13.7 6.2 44 78.7 85.0 +6.3 98 -3.9 73.3 69.4 1212 54.3 30.0 -24.3 1112 29.8 20. 62.0 81.3 +19.3 51.4 58.3 +6.9 -9.7 44 66 32 12 63.4 81.9 +18.5 66 66 51.4 55.1 +3.7 1112 32.6 18.8 -13.8 1112 63.5 97.1 +33.6 58.4 82.9 +24.5 34.9 49.7 +14.8 11 22 66 81.7 94.2 +12.5 78.3 82.9 +4.6 69.6 57.5 -12. 11 55 78 61.9 85.7 +23.8 56.3 60.6 +4.3 -7.6 44.8 37.2 21 45 89 69.1 92.3 +23.2 64.3 75.5 +11.2 -1.7 49.8 48.1 11 24 78 Qwen τ Stability 0.96 0.76 0.96 0.73 0.85 0.58 0.93 0.69 Table 2: Model performance comparison between full benchmarks (F) and selective evaluation (S). = score difference, Rk = rank change among all 14 models (FullSelective). Bottom rows show ranking consistency (Kendalls τ ) and stability score per domain."
+        },
+        {
+            "title": "Model",
+            "content": "32B 7B 1.5B"
+        },
+        {
+            "title": "General",
+            "content": "K&U"
+        },
+        {
+            "title": "Avg",
+            "content": "F Rk Rk Rk Rk 34.5 45.0 +10.5 -8.8 15.2 6.4 -0.4 1.1 1.5 67.5 61.6 -5. 77 97 39.7 56.7 +17.0 1111 52.8 42.8 -10.0 1211 23.8 30.4 +6.6 1210 30.6 26.5 -4.1 1211 4.7 +0.8 1414 1414 5.8 5.3 7.8 +2.0 1414 4.2 +1.1 1414 3.9 47.2 54.4 +7.2 97 9 Avg Rk 0.0 1.0 1.3 1.0 Table 3: Held-out model validation using Qwen2.5-Base family (1.5B, 7B, 32B). These base models were not used in computing CAD, DS, or CBRC metrics, which were derived exclusively from instruction-tuned models. = Full benchmark score (%), = Selective evaluation score (%), = score difference, Rk = rank among all 14 models (FullSelective). Avg Rk shows the average absolute rank change for held-out models (lower is better). 28.5% (1.5B) to 47.8% (7B) to 63.1% (32B) average. Similar patterns hold for Llama (42.9% to 56.9%), Qwen2.5 (32.6% to 51.4% to 63.4%), and Qwen3 (49.8% to 64.3% to 69.1%). The selective evaluation results demonstrate that our quality-based instance selection maintains strong ranking consistency with full benchmarks. The average Kendalls τ of 0.93 indicates that selective evaluation preserves the relative ordering of models while using only 35% of the original instances. Notably, larger models within each family consistently show positive values on selective benchmarks, confirming that high-quality instances better differentiate capable models. The rank change column (Rk) shows that most models maintain similar rankings between full and selective evaluation, with only minor position shifts occurring primarily among mid-tier models."
+        },
+        {
+            "title": "5.3 Held-Out Model Validation",
+            "content": "To validate that our metrics generalize beyond the models used in their computation, we evaluate on held-out models that were not included in computing CAD, DS, or CBRC metrics. Specifically, we use Qwen2.5-Base (1.5B, 7B, 32B), which are base models without instruction tuning. Table 3 presents these results. The held-out validation demonstrates strong generalization of our selective benchmark approach. Mathematics shows perfect rank preservation (Avg Rk = 0.0), indicating that selective evaluation ranks held-out models identically to full benchmarks in this domain. General Reasoning and Average scores show moderate variation (1.0), while"
+        },
+        {
+            "title": "Method",
+            "content": "Level Rank τ Stability DS"
+        },
+        {
+            "title": "Single Metric",
+            "content": "CAD only (score > 0.15) DS only (top 35%) CBRC only (top-2) Inst Inst Bench"
+        },
+        {
+            "title": "Two Metrics",
+            "content": "CAD + DS (ours) CAD + CBRC DS + CBRC"
+        },
+        {
+            "title": "Inst\nMix\nMix",
+            "content": "0.93 0.95 0.62 0.93 0.67 0."
+        },
+        {
+            "title": "Three Metrics",
+            "content": "CAD + DS + CBRC Full benchmark Mix 0.65 1. 0.61 0.50 0.62 0.69 0.78 0.58 0.76 0.59 0.32 0.48 0.28 0.47 0.25 0. 0.29 0.34 Table 4: Metric combination ablation. Level: Inst=Instance, Bench=Benchmark. Our CAD+DS combination (bold) achieves the best balance."
+        },
+        {
+            "title": "Threshold Retained",
+            "content": "τ Stab. 0.40 0.15 0.05 0.01 None 58% 84% 95% 98% 100% 0.87 0.93 0.96 0.98 0.95 1.00 0.69 0.55 0.52 0. Table 5: CAD threshold sensitivity analysis. Higher threshold is more restrictive (fewer instances retained). CAD alone provides good stability. Filtering by CAD alone (score > 0.15) yields good ranking consistency (0.93) and reasonable stability (0.61) by removing noisy instances, but reduces discriminability (0.32). DS alone maximizes discriminability. Selecting high-discriminability instances preserves the best discriminability (0.48) but provides lower stability (0.50). Combined approach balances objectives. Our CAD+DS combination achieves strong ranking consistency (0.93) and improved stability (0.69) compared to the full benchmark (0.59), while maintaining good discriminability (0.47)."
+        },
+        {
+            "title": "5.4.3 Threshold Sensitivity Analysis",
+            "content": "Table 5 presents results for different CAD threshold values. The threshold analysis reveals trade-off between ranking consistency and stability. very restrictive threshold (0.40) achieves perfect stability (1.00) but lower ranking consistency (0.87) due to insufficient instances. The threshold of 0.15 provides an optimal balance, achieving strong ranking consistency (0.93) and good stability (0.69) while retaining 84% of instances. Figure 2: Effect of selection ratio on benchmark quality metrics. The optimal point at 35% (marked) achieves good balance between ranking consistency (τ = 0.93), stability (0.69), and discriminability (DS = 0.47). Knowledge & Understanding shows slightly higher variation (1.3). Notably, the extreme-performing 1.5B model maintains its 14th rank consistently across all domains, demonstrating that our selection method is particularly reliable at the capability distribution tails."
+        },
+        {
+            "title": "5.4 Selective Benchmark Construction",
+            "content": "We select test instances with high CAD scores (indicating low inversion rates) and high discriminability contributions, creating filtered benchmarks containing approximately 35% of the original instances."
+        },
+        {
+            "title": "5.4.1 Selection Ratio Analysis",
+            "content": "Figure 2 illustrates the effect of selection ratio on benchmark quality metrics. As the selection ratio increases from 10% to 100%, we observe distinct patterns across the three metrics. Ranking consistency (τ ) increases rapidly from 0.88 at 10% to 0.93 at 35%, then plateaus near 0.99 for higher ratios. Stability shows an inverse pattern, starting high at low selection ratios (where only the most reliable instances are included) and gradually decreasing as more instances are added. DS decreases steadily as selection ratio increases, as the most discriminative instances are selected first. The optimal point at 35% achieves balanced trade-off: ranking τ of 0.93, stability of 0.69, and DS of 0.47substantially better than the full benchmarks stability of 0.59 while maintaining comparable ranking consistency."
+        },
+        {
+            "title": "5.4.2 Metric Combination Ablation",
+            "content": "Table 4 compares metric combinations for instance selection. Key findings from the ablation study:"
+        },
+        {
+            "title": "Strategy",
+            "content": "Rank τ"
+        },
+        {
+            "title": "Stability",
+            "content": "DS"
+        },
+        {
+            "title": "6 Discussion and Future Directions",
+            "content": "Random selection 0.91 0.04 0.59 0.02 0.34 0.02 High accuracy Low accuracy Medium difficulty Longest instances Shortest instances 0.33 0.26 0.47 0.34 0.31 0.68 0.61 0.51 0.59 0.62 0.87 0.79 0.93 0.89 0.76 CAD + DS (ours) Full benchmark 0.93 1. 0.69 0.59 0.47 0.34 Table 6: Comparison of selection strategies. High/Low accuracy: instances where most models succeed/fail. Medium difficulty: moderate average accuracy. Longest/Shortest: most/fewest tokens."
+        },
+        {
+            "title": "6.1 What Makes a High-Quality Benchmark?",
+            "content": "Our analysis identifies three key characteristics: (1) High discriminabilitytop benchmarks (AIME, OmniMath, OlympiadBench) achieve DS > 0.7 with wide score ranges; (2) Strong capability alignmentbenchmarks with CAD > 0.6 respect withinfamily hierarchies and feature objective evaluation; (3) Balanced quality profilethe highest BQS scores emerge from benchmarks balancing multiple dimensions, as exemplified by AIME 2024 (BQS = 0.79)."
+        },
+        {
+            "title": "Benchmark",
+            "content": "DeepSeek Llama Qwen2.5 Qwen"
+        },
+        {
+            "title": "6.2 Implications for Benchmark Development",
+            "content": "MATH-500 AIME 2024 AMC 22-24 OlympiadBench OmniMath DROP ARC BBH SIQA CommonsenseQA IFEval IFBench EQ-Bench SuperGPQA MMLU-Pro 0.48 0.67 0.37 0.54 0.61 0.58 0.80 0.75 0.24 0.57 0.49 0.62 0.60 0.54 0.57 0.58 1.00 0.58 0.93 0.98 0.76 0.92 0.63 0.21 0.54 0.72 0.52 0.61 0.39 0.51 0.74 1.00 0.57 0.91 0.84 0.58 0.87 0.62 0.20 0.59 0.75 0.49 0.54 0.35 0.55 0.67 0.88 0.43 0.39 0.39 0.62 0.93 0.62 0.27 0.55 0.66 0.44 0.43 0.44 0.54 Table 7: CAD breakdown by model family (transformed scores, higher is better). Values represent eλinv_rate with λ = 12, where 1.0 indicates perfect alignment."
+        },
+        {
+            "title": "5.4.4 Baseline Comparison",
+            "content": "Table 6 compares our selection against baselines. High-accuracy selection provides good stability (0.68) but lower ranking consistency (0.87). Medium-difficulty achieves comparable discriminability (0.47) but lower stability (0.51). Our approach achieves the best balance of stability (0.69) and discriminability (0.47) while maintaining strong ranking consistency (0.93)."
+        },
+        {
+            "title": "5.5 CAD Breakdown by Model Family",
+            "content": "Table 7 reveals family-specific patterns. Llama achieves near-perfect CAD on several benchmarks (AIME: 1.00, OmniMath: 0.98), while Qwen3 shows higher variation across benchmarks (OlympiadBench: 0.39, EQ-Bench: 0.43). SIQA exhibits consistently low CAD across all families (0.200.27), indicating inherent design issues. We recommend that benchmark developers: (1) target DS > 0.2 and CAD > 0.6 as minimum thresholds; (2) prefer objective evaluation criteria; (3) consider selective construction using CAD+DS metrics; and (4) monitor family-specific CAD variation as an indicator of potential biases."
+        },
+        {
+            "title": "6.3 Methodological Considerations",
+            "content": "On CBRC and circularity. Using benchmarks to evaluate benchmarks raises circularity concerns. We mitigate this by selecting widely-adopted reference benchmarks, aggregating across multiple benchmarks, and complementing CBRC with two reference-independent metrics (CAD and DS). On model and CAD scope. Our evaluation spans four model families, with held-out validation confirming generalization. CAD requires multiple model sizes within family, limiting applicability to single-variant proprietary models, but ensures reliable capability ordering."
+        },
+        {
+            "title": "7 Conclusion",
+            "content": "We presented BENCHMARK2, framework for evaluating LLM benchmark quality through three complementary metrics: Cross-Benchmark Ranking Consistency, Discriminability Score, and Capability Alignment Deviation. Our evaluation across 15 benchmarks and 11 models reveals significant quality variations among widely-used benchmarks, and demonstrates that selective construction can maintain evaluation fidelity using only 35% of original instances. We hope this framework helps practitioners assess benchmark reliability. Future directions include extending to generation-based evaluations with LLM-as-judge and developing dynamic quality monitoring for benchmark degradation."
+        },
+        {
+            "title": "Limitations",
+            "content": "Our study has several limitations that suggest directions for future research. First, our evaluation focuses on three domains (mathematics, reasoning, and knowledge understanding); although our metrics are domain-agnostic by design, extending validation to additional domains such as code generation, machine translation, and dialogue systems remains important future work. Second, our analysis is restricted to text-based LLM benchmarks; as multimodal large language models become increasingly prevalent, extending our framework to vision-language, audio-language, and video understanding benchmarks represents natural next step. Third, while our evaluation spans 11 models across four diverse families, incorporating broader range of models including proprietary systems would enhance generalizability."
+        },
+        {
+            "title": "Ethics Statement",
+            "content": "This work involves evaluation of existing public benchmarks and models, and does not introduce new data collection or human subjects research. We use only publicly available benchmarks and evaluate models through their official APIs or publicly released weights. Our framework is intended to improve benchmark quality and thereby contribute to more reliable AI evaluation."
+        },
+        {
+            "title": "References",
+            "content": "Samuel Bowman and George Dahl. 2021. What will it take to fix benchmarking in natural language understanding? arXiv preprint arXiv:2104.02145. Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot, Ashish Sabharwal, Carissa Schoenick, and Oyvind Tafjord. 2018. Think you have solved question answering? try arc, the ai2 reasoning challenge. arXiv preprint arXiv:1803.05457. DeepSeek-AI. 2025. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning. Preprint, arXiv:2501.12948. Rotem Dror, Gili Baumer, Segev Shlomov, and Roi Reichart. 2018. The hitchhikers guide to testing statistical significance in natural language processing. In Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics, pages 13831392. Dheeru Dua, Yizhong Wang, Pradeep Dasigi, Gabriel Stanovsky, Sameer Singh, and Matt Gardner. 2019. DROP: reading comprehension benchmark requiring discrete reasoning over paragraphs. In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, pages 23682378. Kawin Ethayarajh and Dan Jurafsky. 2020. Utility is in the eye of the user: critique of nlp leaderboards. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing, pages 48464853. Bofei Gao, Feifan Song, Zhe Yang, Zefan Cai, Yibo Miao, Qingxiu Dong, Lei Li, Chenghao Ma, Liang Chen, Runxin Xu, Zhengyang Tang, Benyou Wang, Daoguang Zan, Shanghaoran Quan, Ge Zhang, Lei Sha, Yichang Zhang, Xuancheng Ren, Tianyu Liu, and Baobao Chang. 2024. Omni-MATH: universal olympiad level mathematic benchmark for large language models. arXiv preprint arXiv:2410.07985. Aaron Grattafiori, Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, Abhishek Kadian, Ahmad AlDahle, Aiesha Letman, Akhil Mathur, Alan Schelten, Alex Vaughan, and 1 others. 2024. The llama 3 herd of models. arXiv preprint arXiv:2407.21783. Chaoqun He, Renjie Luo, Yuzhuo Bai, Shengding Hu, Zhen Leng Thai, Junhao Shen, Jinyi Hu, Xu Han, Yujie Huang, Yuxiang Zhang, Jie Liu, Lei Qi, Zhiyuan Liu, and Maosong Sun. 2024. OlympiadBench: challenging benchmark for promoting AGI with olympiad-level bilingual multimodal scientific problems. In Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 38283850. Dan Hendrycks, Collin Burns, Steven Basart, Andy Zou, Mantas Mazeika, Dawn Song, and Jacob Steinhardt. 2021a. Measuring massive multitask language understanding. In Proceedings of the International Conference on Learning Representations (ICLR). Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, and Jacob Steinhardt. 2021b. Measuring mathematical problem solving with the math dataset. arXiv preprint arXiv:2103.03874. Douwe Kiela, Max Bartolo, Yixin Nie, Divyansh Kaushik, Atticus Geiger, Zhengxuan Wu, Bertie Vidgen, Grusha Prasad, Amanpreet Singh, Pratik Ringshia, and 1 others. 2021. Dynabench: RearXiv preprint thinking benchmarking in nlp. arXiv:2104.14337. Woosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, Joseph Gonzalez, Hao Zhang, and Ion Stoica. 2023. vLLM: Efficient memory management for large language model serving with pagedattention. In Proceedings of the 29th Symposium on Operating Systems Principles, pages 611626. Percy Liang, Rishi Bommasani, Tony Lee, Dimitris Tsipras, Dilara Soylu, Michihiro Yasunaga, Yian Zhang, Deepak Narayanan, Yuhuai Wu, Ananya Kumar, and 1 others. 2023. Holistic evaluation of language models. Transactions on Machine Learning Research. Yubo Wang, Xueguang Ma, Ge Zhang, Yuansheng Ni, Abhranil Chandra, Shiguang Guo, Weiming Ren, Aaran Arulraj, Xuan He, Ziyan Jiang, and 1 others. 2024. MMLU-Pro: more robust and challenging multi-task language understanding benchmark. arXiv preprint arXiv:2406.01574. M-A-P Team, Xinrun Du, Yifan Yao, Kaijing Ma, Bingli Wang, Tianyu Zheng, King Zhu, Minghao Liu, Yiming Liang, Xiaolong Jin, and 1 others. 2025. SuperGPQA: Scaling LLM evaluation across 285 graduate disciplines. arXiv preprint arXiv:2502.14739. Ruijie Xu, Zengzhi Luo, Siyuan Chen, Jing He, Junhe Duan, Fengzhe Wu, Qi Zhang, and Xuanjing Xu. 2024. Benchmarking benchmark leakage in large language models. arXiv preprint arXiv:2404.18824. Association AIME 2024: Mathematical 2024a. tional mathematics //www.maa.org/math-competitions/ aime-american-invitational-mathematics-examination. America. American invitahttps: examination. of An Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Gao, Chengen Huang, Chenxu Lv, and 1 others. arXiv preprint 2025. Qwen3 technical report. arXiv:2505.09388."
+        },
+        {
+            "title": "Mathematical Association",
+            "content": "2024b. AMC 10/12: American mathematics compehttps://www.maa.org/ titions 2022-2024. math-competitions/amc-1012. of America. ModelScope Team. 2024. EvalScope: Evaluation framework for large models. https://github.com/ modelscope/evalscope. Samuel J. Paech. 2023. EQ-Bench: An emotional intelligence benchmark for large language models. arXiv preprint arXiv:2312.06281. Valentina Pyatkin, Saumya Malik, Victoria Graf, Hamish Ivison, Shengyi Huang, Pradeep Dasigi, Nathan Lambert, and Hannaneh Hajishirzi. 2025. Generalizing verifiable instruction following. In Advances in Neural Information Processing Systems, volume 38. Oscar Sainz, Jon Ander Campos, Iker García-Ferrero, Julen Etxaniz, Oier Lopez de Lacalle, and Eneko Agirre. 2023. Nlp evaluation in trouble: On the need to measure llm data contamination for each benchIn Findings of the Association for Compumark. tational Linguistics: EMNLP 2023, pages 10776 10787. Maarten Sap, Hannah Rashkin, Derek Chen, Ronan LeBras, and Yejin Choi. 2019. Social IQA: Commonsense reasoning about social interactions. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing, pages 44634473. Mirac Suzgun, Nathan Scales, Nathanael Schärli, Sebastian Gehrmann, Yi Tay, Hyung Won Chung, Aakanksha Chowdhery, Quoc Le, Ed Chi, Denny Zhou, and Jason Wei. 2023. Challenging big-bench tasks and whether chain-of-thought can solve them. arXiv preprint arXiv:2210.09261. Alon Talmor, Jonathan Herzig, Nicholas Lourie, and Jonathan Berant. 2019. CommonsenseQA: question answering challenge targeting commonsense knowledge. In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, pages 41494158. Qwen An Yang, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chengyuan Li, Dayiheng Liu, Fei Huang, Guanting Dong, Haoran Wei, Huan Lin, Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Yang, Jiaxin Yang, Jingren Zhou, Junyang Lin, and 25 others. 2024. Qwen2.5 technical report. ArXiv, abs/2412.15115. Jeffrey Zhou, Tianjian Lu, Swaroop Mishra, Siddhartha Brahma, Sujoy Basu, Yi Luan, Denny Zhou, Instruction-following evaluand Le Hou. 2023. ation for large language models. arXiv preprint arXiv:2311.07911."
+        },
+        {
+            "title": "A Experimental Setup Details",
+            "content": "We conduct all experiments using the EvalScope framework (ModelScope Team, 2024), an opensource evaluation toolkit that provides standardized benchmark implementations and consistent evaluation protocols. For model deployment and inference, we utilize the vLLM framework (Kwon et al., 2023), high-throughput serving engine optimized for large language models. Table 8 summarizes the key inference parameters used across all experiments. We use greedy decoding for reproducibility and set the maximum new tokens to 16384 to accommodate long-form reasoning outputs. All experiments were conducted on NVIDIA A100 80GB GPUs, with smaller models (1.5B8B parameters) evaluated using single-GPU deployment and larger models (32B72B parameters) utilizing multi-GPU tensor parallelism. The complete evaluation across all 15 benchmarks and 14 models required approximately 500 GPU-hours."
+        },
+        {
+            "title": "B CAD Transform Parameter Selection",
+            "content": "The Capability Alignment Deviation (CAD) metric applies an exponential transformation to convert raw inversion rates into interpretable scores:"
+        },
+        {
+            "title": "Value",
+            "content": "Temperature Top-p Max new tokens Tensor parallelism GPU memory utilization 0.7 0.8 16384 Model-dependent 0.90 Table 8: Inference configuration for all model evaluations using vLLM framework. CAD(Bi) = eλinv_rate(Bi). The choice of λ affects the sensitivity of the transformed scores to variations in raw inversion rates. We conduct systematic analysis to select an appropriate value based on five criteria: (1) Median Mappingthe median raw inversion rate should map to score in the range [0.15, 0.35]; (2) Quality Separation different quality levels should exhibit meaningful score differences; (3) Excellent Quality Reward benchmarks with low inversion rates (raw_cad < 0.03) should receive high scores (> 0.65); (4) Poor Quality Penaltybenchmarks with high inversion rates (raw_cad > 0.25) should receive low scores (< 0.10); and (5) Dynamic Rangethe transformation should preserve meaningful variation across the main data distribution. Table 9 presents the evaluation of candidate λ values against these criteria. Based on this analysis, we select λ = 12 as it achieves the highest total score (0.68) by providing strong quality separation (0.93), perfect reward for excellent benchmarks (1.00), full penalty for poor benchmarks (1.00), and complete dynamic range preservation (1.00). Table 10 shows how raw inversion rates translate to CAD scores with λ = 12, providing practitioners with concrete reference points for interpreting CAD values in practice."
+        },
+        {
+            "title": "C BQS Weight and Normalization Details",
+            "content": "The Benchmark Quality Score (BQS) combines three metrics with different native scales. To ensure meaningful aggregation, we apply normalization and empirically-tuned weights. CBRC Normalization. CBRC (Kendalls τ ) ranges from 1 to 1, while DS and CAD both range from 0 to 1. To align scales, we normalize CBRC using linear transformation: (cid:94)CBRC(Bi) = CBRC(Bi) + 1 2 (9) This maps the CBRC range [1, 1] to [0, 1], where 0 indicates perfect negative correlation, 0.5 indicates no correlation, and 1 indicates perfect positive correlation. Weight Selection. We assign weights α = 0.3, β = 0.3, and γ = 0.4 based on the following considerations: CAD receives the highest weight (0.4) because it operates at the instance level and directly measures whether individual test items respect capability hierarchiesa fundamental property of well-designed benchmarks. CBRC and DS receive equal weights (0.3 each) as they capture complementary benchmark-level properties: external consistency (CBRC) and internal discriminative power (DS). Final Formula. The complete BQS formula is: BQS(Bi) = 0.3 CBRC(Bi) + 1 2 + 0.3 DS(Bi) + 0.4 CAD(Bi) (10)"
+        },
+        {
+            "title": "D Detailed Model Performance",
+            "content": "This section presents the complete performance matrix for all 14 models across the 15 benchmarks, organized by domain. In the Mathematics domain  (Table 11)  , DeepSeek-R1-Distill-Qwen-32B shows strong performance on competition-style benchmarks, achieving the highest score on AIME 2024 (53.3%). The Qwen3 family demonstrates consistently strong results across all mathematics benchmarks, with Qwen3-32B achieving the highest scores on MATH-500 (87.0%) and AMC 22-24 (67.2%). In General Reasoning  (Table 12)  , Qwen3-32B achieves the highest scores on DROP (85.7%) and ARC (95.0%). The results show clear capability hierarchies across model families, with larger models consistently outperforming their smaller counterparts. λ Median Separation Excellent Poor Range Total 3 6 9 12 15 18 24 30 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 1.00 1.00 1.00 0.93 0.72 0.54 0.30 0.17 1.00 1.00 1.00 1.00 0.70 0.70 0.97 0.81 0.00 0.38 0.70 1.00 1.00 1.00 1.00 1. 0.90 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.54 0.61 0.66 0.68 0.57 0.53 0.52 0.45 Table 9: Lambda parameter selection analysis. Median: median raw_cad maps to 0.150.35 score range; Separation: quality level separation; Excellent: excellent quality (raw_cad < 0.03) receives high score; Poor: poor quality (raw_cad > 0.25) receives low score; Range: dynamic range in main data distribution. The weighted total uses coefficients 0.30, 0.25, 0.20, 0.15, 0.10 respectively."
+        },
+        {
+            "title": "Raw CAD Transformed Score",
+            "content": "0.00 0.02 0.03 0.05 0.08 0.10 0.12 0.15 0.20 0.25 0.30 0.40 1.000 0.787 0.698 0.549 0.383 0.301 0.237 0.165 0.091 0.050 0.027 0.008 Table 10: Raw CAD to transformed score mapping with λ = 12. Quality levels: Excellent (raw_cad < 0.03), Good (0.030.08), Acceptable (0.080.15), Concerning (0.150.25), Poor (> 0.25). For Knowledge & Understanding  (Table 13)  , the larger instruction-tuned models generally achieve higher performance, with IFEval and EQ-Bench showing clearer capability hierarchies across model families."
+        },
+        {
+            "title": "E Statistical Reliability Analysis",
+            "content": "We compute 95% confidence intervals for all metrics using bootstrap sampling with 1000 iterations. Table 14 presents these intervals across all benchmarks. The results reveal that CBRC estimates show moderate uncertainty (typical CI width of 0.30.5), while CAD estimates are notably more stable (typical CI width < 0.1). This stability arises because CAD aggregates over many instance-level comparisons, reducing variance. The DS metric shows higher variability, particularly for smaller benchmarks like AIME 2024 (CI: [0.54, 1.19]), reflecting sensitivity to the specific model set evaluated. Cross-Benchmark Correlation Analysis We compute pairwise Kendalls τ correlations between benchmarks within each domain to understand the consistency of model rankings across different evaluation instruments. In Mathematics  (Table 15)  , we observe high correlations among most benchmarks. MATH-500 and AMC 22-24 show strong correlation (τ = 0.88), while OlympiadBench and OmniMath form nearly perfectly correlated pair (τ = 0.99). AIME 2024 shows moderate correlations with other benchmarks (τ 0.620.71), reflecting its unique difficulty level. In General Reasoning  (Table 16)  , DROP and BBH show the highest correlation (τ = 0.85), both requiring complex reasoning. SIQA and CommonsenseQA show strong alignment (τ = 0.80), as both focus on social and commonsense understanding. The Knowledge & Understanding domain  (Table 17)  exhibits relatively uniform correlation structure, with IFEval and EQ-Bench showing strong alignment (τ = 0.80)."
+        },
+        {
+            "title": "Model",
+            "content": "MATH-500 AIME 2024 AMC 22-24 OlympiadBench OmniMath DeepSeek-R1-Distill-Qwen-1.5B DeepSeek-R1-Distill-Qwen-7B DeepSeek-R1-Distill-Qwen-32B Llama-3.1-Instruct-8B Llama-3.1-Instruct-70B Qwen2.5-Instruct-1.5B Qwen2.5-Instruct-7B Qwen2.5-Instruct-72B Qwen3-1.7B Qwen3-8B Qwen3-32B 68.4 73.6 74.6 49.4 68.2 49.8 75.2 83.4 72.2 84.6 87.0 16.7 16.7 53.3 0.0 23.3 0.0 13.3 16.7 10.0 26.7 36.7 35.8 39.6 41.8 16.4 26.9 18.7 40.3 50.7 40.3 61.9 67.2 6.8 49.4 61.8 0.7 18.3 0.0 8.1 52.2 28.9 61.8 64. 6.7 34.8 56.2 0.2 13.9 0.0 10.4 44.1 22.9 57.1 62.0 Table 11: Mathematics domain: Model performance (%) on each benchmark."
+        },
+        {
+            "title": "DROP ARC BBH SIQA CommonsenseQA",
+            "content": "DeepSeek-R1-Distill-Qwen-1.5B DeepSeek-R1-Distill-Qwen-7B DeepSeek-R1-Distill-Qwen-32B Llama-3.1-Instruct-8B Llama-3.1-Instruct-70B Qwen2.5-Instruct-1.5B Qwen2.5-Instruct-7B Qwen2.5-Instruct-72B Qwen3-1.7B Qwen3-8B Qwen3-32B 42.0 66.2 76.6 66.8 87.9 45.9 70.2 73.7 67.6 82.0 85.7 56.7 83.9 93.2 86.3 93.9 78.1 90.6 94.2 89.0 94.1 95.0 30.8 69.4 89.6 67.5 85.3 39.7 71.1 87.3 72.8 83.5 89.9 24.9 37.6 51.4 42.3 49.6 41.5 52.2 52.8 45.9 48.9 53.7 37.3 62.4 83.1 76.7 82.5 66.5 82.4 85.4 72.7 83.0 84. Table 12: General Reasoning domain: Model performance (%) on each benchmark."
+        },
+        {
+            "title": "IFBench",
+            "content": "EQ-Bench SuperGPQA MMLU-Pro DeepSeek-R1-Distill-Qwen-1.5B DeepSeek-R1-Distill-Qwen-7B DeepSeek-R1-Distill-Qwen-32B Llama-3.1-Instruct-8B Llama-3.1-Instruct-70B Qwen2.5-Instruct-1.5B Qwen2.5-Instruct-7B Qwen2.5-Instruct-72B Qwen3-1.7B Qwen3-8B Qwen3-32B 37.1 58.1 73.6 76.7 87.2 41.1 74.2 86.6 70.6 84.5 86.6 11.0 13.1 19.0 25.6 32.2 14.5 23.6 32.7 22.5 30.6 32.4 17.1 49.8 76.8 66.7 82.1 48.2 72.9 78.4 63.0 76.6 80. 9.8 18.0 31.7 20.8 35.5 17.3 28.9 40.5 20.5 28.0 39.4 27.1 43.8 63.0 47.6 67.4 27.8 57.3 71.9 47.4 61.7 71.0 Table 13: Knowledge & Understanding domain: Model performance (%) on each benchmark."
+        },
+        {
+            "title": "Benchmark",
+            "content": "MATH-500 AIME 2024 AMC 22-24 OlympiadBench OmniMath DROP ARC BBH SIQA CommonsenseQA IFEval IFBench EQ-Bench SuperGPQA MMLU-Pro"
+        },
+        {
+            "title": "CBRC",
+            "content": "DS"
+        },
+        {
+            "title": "CAD",
+            "content": "Mean 95% CI σ Mean 95% CI σ Mean 95% CI 0.76 0.66 0.72 0.79 0.78 0.68 0.73 0.70 0.70 0.68 0.69 0.55 0.70 0.65 0.59 [0.55, 0.91] [0.39, 0.88] [0.51, 0.88] [0.61, 0.91] [0.61, 0.90] [0.39, 0.90] [0.51, 0.90] [0.43, 0.90] [0.43, 0.90] [0.42, 0.88] [0.47, 0.85] [0.22, 0.80] [0.54, 0.85] [0.39, 0.83] [0.21, 0.85] 0.09 0.13 0.09 0.08 0.07 0.13 0.10 0.12 0.12 0.12 0.09 0.15 0.08 0.11 0.17 0.27 0.84 0.43 0.82 0. 0.30 0.27 0.31 0.29 0.28 0.31 0.32 0.35 0.39 0.44 [0.09, 0.52] [0.54, 1.19] [0.24, 0.65] [0.51, 1.15] [0.58, 1.16] [0.11, 0.54] [0.06, 0.51] [0.17, 0.46] [0.10, 0.52] [0.07, 0.51] [0.19, 0.45] [0.23, 0.39] [0.12, 0.61] [0.22, 0.57] [0.25, 0.64] 0.12 0.16 0.11 0.16 0. 0.12 0.12 0.08 0.11 0.12 0.07 0.04 0.12 0.09 0.10 0.80 0.92 0.69 0.77 0.78 0.80 0.94 0.82 0.49 0.79 0.79 0.74 0.77 0.67 0.54 [0.76, 0.83] [0.83, 1.00] [0.62, 0.75] [0.75, 0.79] [0.75, 0.80] [0.80, 0.81] [0.93, 0.95] [0.82, 0.83] [0.47, 0.51] [0.77, 0.81] [0.76, 0.82] [0.69, 0.78] [0.71, 0.83] [0.67, 0.68] [0.53, 0.54] σ 0.02 0.04 0.03 0.01 0.01 0.00 0.00 0.00 0.01 0.01 0.02 0.02 0.03 0.00 0. Table 14: Bootstrap 95% confidence intervals for all metrics across benchmarks (1000 iterations). MATH-500 AIME 2024 AMC 22-24 OlympiadBench OmniMath MATH-500 AIME 2024 AMC 22-24 OlympiadBench OmniMath 1.00 0.65 1.00 0.88 0.62 1.00 0.75 0.71 0.70 1.00 0.75 0.69 0.70 0.99 1.00 Table 15: Mathematics domain: Pairwise Kendalls τ correlation between benchmarks."
+        },
+        {
+            "title": "DROP\nARC\nBBH\nSIQA\nCommonsenseQA",
+            "content": "1.00 0.74 1.00 0.85 0.71 1.00 0.58 0.76 0.65 1.00 0.56 0.74 0.63 0.80 1.00 Table 16: General Reasoning domain: Pairwise Kendalls τ correlation between benchmarks."
+        },
+        {
+            "title": "IFBench",
+            "content": "EQ-Bench SuperGPQA MMLU-Pro IFEval IFBench EQ-Bench SuperGPQA MMLU-Pro 1.00 0.75 1.00 0.80 0.54 1.00 0.62 0.47 0.80 1.00 0.57 0.43 0.67 0.69 1.00 Table 17: Knowledge & Understanding domain: Pairwise Kendalls τ correlation between benchmarks."
+        }
+    ],
+    "affiliations": [
+        "College of Computer Science and Artificial Intelligence, Fudan University",
+        "Washington University in St. Louis",
+        "Xiaohongshu Inc."
+    ]
+}
