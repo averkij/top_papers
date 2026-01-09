@@ -1,0 +1,136 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.05138/x1.png",
+                "caption": "Figure 1:VerseCrafterenables precise control of camera motion and multi-object motion via a 4D Geometric Control representation built from a static background point cloud and per-object 3D Gaussian trajectories, producing videos that better follow the desired motion than Yume[61]and Uni3C[11]and closely match the ground-truth video.",
+                "position": 84
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Works",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.05138/x2.png",
+                "caption": "Figure 2:Framework of VerseCrafter.Given an input image and a text prompt, we first estimate depth and obtain user-specified object masks to construct a 4D Geometric Control state consisting of a static background point cloud and per-object 3D Gaussian trajectories in a shared world frame.\nThis state is rendered into background RGB/depth, 3D Gaussian trajectory RGB/depth, and a soft control mask for each frame, forming multi-channel 4D control maps.\nThe control maps are encoded and fed into the proposed GeoAdapter, which conditions a frozen Wan2.1-14B video diffusion backbone together with text embeddings from umT5, enabling geometry-consistent video generation with precise control over camera and multi-object motion.",
+                "position": 168
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.05138/x3.png",
+                "caption": "Figure 3:Starting from Sekai-Real-HQ and SpatialVID-HQ, we obtain 81-frame clips extraction, followed by quality filtering.\nFor each retained clip, Qwen2.5-VL-72B, Grounded-SAM2, and MegaSAM provide captions, object masks, depth, and camera poses, which are lifted into background/object point clouds, fitted with 3D Gaussian trajectories, and rendered as background/trajectory maps plus a merged mask that constitute our 4D Geometric Control.",
+                "position": 284
+            }
+        ]
+    },
+    {
+        "header": "4VerseControl4D Dataset",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.05138/x4.png",
+                "caption": "Figure 4:Qualitative comparison of joint camera and object motion control.Perception-as-Control often yields low-fidelity frames with inaccurate camera motion, Yume roughly follows the text-described motion but lacks precise control, and Uni3C is limited to human motion.\nVerseCrafter more faithfully follows both the camera trajectory and multi-object motion while maintaining sharp appearance and geometrically consistent backgrounds.",
+                "position": 315
+            },
+            {
+                "img": "https://arxiv.org/html/2601.05138/x5.png",
+                "caption": "Figure 5:Qualitative comparison of camera-only motion control on static scenes.ViewCrafter, Voyager, and FlashWorld often exhibit distorted facades, drifting structures, or inconsistent parallax along the camera path.\nVerseCrafter better follows the target trajectory while preserving sharp details and globally consistent 3D geometry.",
+                "position": 320
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.05138/x6.png",
+                "caption": "Figure 6:Ablation on object-motion representations.We compare controlling objects with3D point trajectory(top),3D bounding boxe(middle), and3D Gaussian trajectory(fourth).\n3D point trajectory and 3D bounding boxe often cause scale drift and misaligned motion (red boxes), whereas 3D Gaussian trajectory track the intended camera trajectory and preserve plausible shapes and background interactions.",
+                "position": 524
+            },
+            {
+                "img": "https://arxiv.org/html/2601.05138/x7.png",
+                "caption": "Figure 7:Ablation on depth-aware control.We compare VerseCrafter without depth inputs (Ours (w/o depth), top) and with RGB+depth control (middle) under the same camera trajectorym.\nWithout depth, the model often misorders foreground and background, e.g., lampposts are pulled in front of distant buildings—and occlusion boundaries drift over time (red boxes).\nAdding depth restores consistent parallax and occlusion, producing geometry much closer to the ground truth.",
+                "position": 916
+            },
+            {
+                "img": "https://arxiv.org/html/2601.05138/x8.png",
+                "caption": "Figure 8:Ablation on decoupled background / foreground controls.We compare merging background and foreground controls into a single map (Ours (BG & FG Controls Merged), top) with our default decoupled design (middle).\nWhen controls are merged, object motion control performance significantly degrades (red box), while the separation design preserves the static background and produces sharper, more stable object motion.",
+                "position": 933
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix APreliminary: Video Diffusion Models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.05138/x9.png",
+                "caption": "Figure 9:Detailed architecture of VerseCrafter.Background RGB & depth and 3D Gaussian trajectory RGB & depth are first encoded by the frozen 3D VAE.\nThe soft control mask is rearranged into latent-aligned channels, and all geometry latents are then concatenated along the channel dimension to form a unified spatio-temporal geometry feature.\nThis feature is patchified into tokens and processed by the GeoAdapter branch.\nAt selected Wan-DiT blocks, GeoAdapter outputs are passed through zero-initialized linear layers and added as residual modulations to the backbone tokens, enabling 4D geometry-consistent camera and object control.",
+                "position": 2535
+            }
+        ]
+    },
+    {
+        "header": "Appendix BModel Architecture Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CVerseControl4D Dataset Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DEvaluation Metrics",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.05138/x10.png",
+                "caption": "Figure 10:VerseControl4D dataset examples.For each clip, we visualize the input image and target camera trajectory (left),\nfollowed by several frames of ground-truth video and our rendered control signals (right):\nbackground RGB/depth, 3D Gaussian trajectory RGB/depth for controlled objects, and the final merged mask.\nThese signals are automatically derived by our annotation pipeline in main paper.",
+                "position": 2864
+            }
+        ]
+    },
+    {
+        "header": "Appendix EAdditional Qualitative Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.05138/x11.png",
+                "caption": "Figure 11:Additional qualitative comparison of joint camera and object motion control on dynamic scenes.Perception-as-Control often produces low-fidelity frames with inaccurate camera motion; Yume roughly follows text-described motion but lacks precise geometric control; Uni3C is mainly limited to human-centric motion.\nVerseCrafter more faithfully follows both the target camera trajectory and multi-object motions while maintaining sharp appearance and geometrically consistent backgrounds.",
+                "position": 2890
+            },
+            {
+                "img": "https://arxiv.org/html/2601.05138/x12.png",
+                "caption": "Figure 12:Additional qualitative comparison of joint camera and object motion control on dynamic scenes.Across diverse real-world cases, baselines frequently suffer from camera drift, motion misalignment, or object identity/shape inconsistency.\nVerseCrafter preserves scene geometry and object coherence over time, yielding accurate multi-object 3D motion along the specified camera path.",
+                "position": 2896
+            },
+            {
+                "img": "https://arxiv.org/html/2601.05138/x13.png",
+                "caption": "Figure 13:Additional qualitative comparison of camera-only motion control on static scenes.ViewCrafter, Voyager, and FlashWorld often exhibit distorted facades, drifting structures, or inconsistent parallax along the camera path.\nVerseCrafter better follows the target trajectory while preserving sharp details and globally consistent 3D geometry.",
+                "position": 2902
+            },
+            {
+                "img": "https://arxiv.org/html/2601.05138/x14.png",
+                "caption": "Figure 14:Additional qualitative comparison of camera-only motion control on static scenes.Baselines may introduce structural warping, background flicker, or unstable depth cues when exploring long camera paths.\nVerseCrafter maintains stable parallax and texture consistency, producing smooth camera motion with faithful 3D scene structure.",
+                "position": 2908
+            }
+        ]
+    },
+    {
+        "header": "Appendix FLimitations and Future Work",
+        "images": []
+    }
+]
