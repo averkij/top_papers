@@ -1,0 +1,188 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.11516/x1.png",
+                "caption": "Figure 1:We improve over prior activation probing work by improving probe architectures and training to achieve better performance than language models at over 10,000×\\timeslower cost. “Selected Probe”\nrefers to our Max of Rolling Means Attention Probe (Section˜3.2). Deferring to an LLM such as Gemini 2.5 Flash 8% of the time further decreases error rate to a lower value than what can be achieved by solely using a probe or an LLM, by trusting the probe at extreme scores and delegating to the LLM in between (seeSection˜5.2.2, though note wide error bars).*As described inSection˜4.1, for each method we select the decision threshold on a validation set by minimizing a weighted combination of FPR and FNR (i.e. error rate), with overtriggering FPR weighted most heavily. We report the same weighted error computed on test data. SeeAppendix˜Jfor error bar methodology. The two points not on the Pareto frontier (Selected Probe and AlphaEvolve) have their costs artificially increased by 1.25×\\timesfor visual separation; the costs of these three probes are in practice almost identical.",
+                "position": 277
+            }
+        ]
+    },
+    {
+        "header": "2Setup and Notation",
+        "images": []
+    },
+    {
+        "header": "3Our Classifiers",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.11516/figures/artifacts_cleared.png",
+                "caption": "Figure 2:Different probing classifiers that we compare inSection˜3. All our probing classifiers can be composed into six states 1) – 6) as illustrated. Residual stream activations of undergo a 2)Transformationper-position. These are then processed via 4) – 5)Aggregationwhich ends up producing a single scalar score at step 6). Many existing probing classifiers such as linear probes, exponential moving average aggregation probes and attention probes fit into this framework.",
+                "position": 329
+            }
+        ]
+    },
+    {
+        "header": "4Datasets and Metrics",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.11516/x2.png",
+                "caption": "Figure 3:Effect of seed selection on test loss. Arrows show improvement from median (gray) to best-validation-selected (coral star) test loss. Green diamonds show the oracle (best possible seed). Some MultiMax aggregations have very large IQR and are shown inFigure˜8to not distort this figure.",
+                "position": 792
+            }
+        ]
+    },
+    {
+        "header": "5Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.11516/x3.png",
+                "caption": "(a)Test error comparison",
+                "position": 840
+            },
+            {
+                "img": "https://arxiv.org/html/2601.11516/x3.png",
+                "caption": "(a)Test error comparison",
+                "position": 843
+            },
+            {
+                "img": "https://arxiv.org/html/2601.11516/x4.png",
+                "caption": "(b)Cost comparison",
+                "position": 848
+            },
+            {
+                "img": "https://arxiv.org/html/2601.11516/x5.png",
+                "caption": "(c)Long context FNR/FPR",
+                "position": 854
+            },
+            {
+                "img": "https://arxiv.org/html/2601.11516/x6.png",
+                "caption": "(d)Pre-existing jailbreaks FNR",
+                "position": 859
+            },
+            {
+                "img": "https://arxiv.org/html/2601.11516/x7.png",
+                "caption": "Figure 5:Cost plotted against test error (Equation˜12). The curves show the optimal frontier for cascading classifiers that combine cheap probes with expensive LLMs. Error bars (seeAppendix˜J) indicate substantial uncertainty: most operating points have overlapping confidence intervals, so the apparent ordering between methods should be interpreted cautiously. The cascade global minima (circles) represent optimal operating points for each LLM; further deferring to LLMs past these points increases the error rate.",
+                "position": 1273
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "8Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "9Author Contributions",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix ARunning our findings on other datasets and models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.11516/x8.png",
+                "caption": "Figure 6:Median AUROC across 100 seeds for each architecture-dataset pair. Green indicates higher (better) AUROC values. Architectures (rows) and datasets (columns) are sorted by their overall median performance.",
+                "position": 1445
+            },
+            {
+                "img": "https://arxiv.org/html/2601.11516/x9.png",
+                "caption": "Figure 7:Best seed AUROC (out of 100 seeds) for each architecture-dataset pair. The ordering matchesFigure˜6to facilitate comparison.",
+                "position": 1448
+            }
+        ]
+    },
+    {
+        "header": "Appendix BDataset Statistics",
+        "images": []
+    },
+    {
+        "header": "Appendix CGeneral Training Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DSeed Selection Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.11516/x10.png",
+                "caption": "Figure 8:Effect of seed selection on test loss for high-variance architectures. Same format asFigure˜3, but showing architectures with MultiMax aggregation that have large IQR across seeds.",
+                "position": 1860
+            }
+        ]
+    },
+    {
+        "header": "Appendix EEfficiently finding the Threshold-Randomization-Optimal cascading policy",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.11516/x11.png",
+                "caption": "Figure 9:Illustration of the Minkowski sum algorithm for computing the optimal cascading frontier.Left:The two independent savings curvesL~\\tilde{L}andR~\\tilde{R}, representing the added error from having the probe handle samples from the left and right tails respectively.Right:The combined Pareto frontier of the Minkowski Sum of the two curves, constructed by merging edge segments sorted by slope. Segments are colored by their source (blue from left, orange from right). The vertical line marks the dataset size limit; beyond this point, savings are unachievable.",
+                "position": 2057
+            }
+        ]
+    },
+    {
+        "header": "Appendix FAlphaEvolve",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.11516/x12.png",
+                "caption": "Figure 10:Weighted validation and test errors for best probe architecture over the course of the AlphaEvolve run. The process successfully closed approximately 50% of the test error gap between the attention probe baseline and perfect probe performance.",
+                "position": 2175
+            }
+        ]
+    },
+    {
+        "header": "Appendix GPrompt Optimization Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.11516/x13.png",
+                "caption": "Figure 11:Different prompts trade off onFPRSC[OT]\\texttt{FPR}_{\\texttt{SC[OT]}}andFNRSC[A]\\texttt{FNR}_{\\texttt{SC[A]}}(results are shown on the training set of these datasets). The prompts that we try are labeled by the order we created them; the original prompt is in orange. Prompts that lie along the pareto frontier are solid.",
+                "position": 2183
+            }
+        ]
+    },
+    {
+        "header": "Appendix HAutomated Red Teaming Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.11516/x14.png",
+                "caption": "Figure 12:Multiple adaptive red teaming steps do not help jailbreak success compared to simply repeating the first step.",
+                "position": 2198
+            }
+        ]
+    },
+    {
+        "header": "Appendix IInfrastructure Recommendations",
+        "images": []
+    },
+    {
+        "header": "Appendix JError Bar Methodology forFigure˜1",
+        "images": []
+    },
+    {
+        "header": "Appendix KDiscusssion and results from weightingEquation˜12differently",
+        "images": []
+    },
+    {
+        "header": "Appendix LAttention Probe Inference",
+        "images": []
+    }
+]
