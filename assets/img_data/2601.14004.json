@@ -1,0 +1,116 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.14004/x1.png",
+                "caption": "",
+                "position": 259
+            }
+        ]
+    },
+    {
+        "header": "Paper Outline",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.14004/x2.png",
+                "caption": "Figure 1:Overview of the paper structure. We begin by defining the core interpretable objects (§2) that form the foundation of our analysis. We then introduce a range of methods, ranging from localization (§3) to steering(§4). Finally, we illustrate how these methods can be applied to improve models (§5).",
+                "position": 339
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Core Interpretable Objects of LLMs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.14004/x3.png",
+                "caption": "Figure 2:The schematic of information flow within a standard Transformer block. The residual stream (𝐱l\\mathbf{x}_{l}) serves as the backbone, while MHA and FFN act as additive branches that read from and write to this stream. Based on the figure from(ferrando2024primer).",
+                "position": 448
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14004/x4.png",
+                "caption": "Figure 3:The framework of Sparse Autoencoders (SAEs). The SAE acts as an independent module attached to a frozen LLM, expanding dense representations into a sparse, overcomplete set of interpretable features via an encoder-decoder architecture. Based on the figure from(shu-etal-2025-survey).",
+                "position": 548
+            }
+        ]
+    },
+    {
+        "header": "3Localizing Methods",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.14004/x5.png",
+                "caption": "Figure 4:Localization via Magnitude Analysis.(a)Discovery of SAE reasoning features(galichin2025have): SAE features are scored usingReasonScore, which aggregates activation magnitude and frequency during reasoning steps, isolating sparse features that encode cognitive behaviors like uncertainty or reflection.(b)Identification of Style-Specific Neurons(lai-etal-2024-style): Neurons are ranked by their average activation magnitude on style-specific corpora, revealing clusters that selectively activate for distinct linguistic styles.",
+                "position": 776
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14004/x6.png",
+                "caption": "Figure 5:Overview ofCausal Tracing. The method identifies critical internal states by creating a corrupted run (noising the subject “Space Needle”) and systematically restoring clean states to see which ones recover the prediction “Seattle”. The heatmap results reveal that factual information is processed in early MLP layers at the subject position and later transferred to the final token via attention. Based on the figure frommeng2022ccs.",
+                "position": 864
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14004/x7.png",
+                "caption": "Figure 6:Neuron-level gradient-based localization for mitigating knowledge conflicts.First calculates theIntegrated Gradientsscore for each neuron to measure its contribution to processing the context. It then identifies context-aware neurons by taking the intersection of neurons with the highest scores. Subsequently, the identified neurons are reweighted to guide the model to be more aligned with the contextual knowledge, ensuring greater fidelity to the context. Based on the figure fromircan_neurips2024.",
+                "position": 966
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14004/x8.png",
+                "caption": "Figure 7:Layer-wise probing pipeline for context knowledge.An example end-to-end procedure: construct probing evidence for a target knowledge claim (including factual and counterfactual variants), run the evidence through the LLM under analysis, extractresidual stream stateacross layers, and trainprobingclassifiers to quantify where the target signal becomes most decodable. Based on the figure fromjuprobing_coling2024.",
+                "position": 1065
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14004/x9.png",
+                "caption": "Figure 8:(a) Projecting residual stream states reveals the layer-wise evolution of latent concepts, showing an English-centric bottleneck in multilingual settings(wendler2024llamas). (b) Projecting SAE decoder weights identifies the semantic meaning of sparse features (e.g., a “food” feature) by identifying top-ranked tokens(shu-etal-2025-survey). Based on figures from(wendler2024llamas)and(shu-etal-2025-survey).",
+                "position": 1140
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14004/x10.png",
+                "caption": "Figure 9:Knowledge circuit example.A sparse cross-layer circuit supporting the factual completion “The official language of France is French” in GPT-2-Medium. Left: A simplifiedcircuit. Here, L15H0 means the first attention head in the 15th layer and MLP12 means the FFN block in the 13th layer. Right: Behavior of several special heads. The left matrix shows each head’s attention pattern, and the right heatmap shows output logits mapped to the vocabulary space. Based on the figure fromyao2024circuits.",
+                "position": 1230
+            }
+        ]
+    },
+    {
+        "header": "4Steering Methods",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.14004/x11.png",
+                "caption": "Figure 10:Examples of Steering via Amplitude Manipulation.(a) Ablation for Language Steering:tang-etal-2024-languagedeactivate (zero out) “Chinese-specific neurons” to suppress model’s ability to generate Chinese, successfully forcing the model to switch its output to English.(b) Patching for Demographic Steering:ahsanElucidatingMechanismsDemographic2025inject a “Male Patch” into the model’s internal representation. This intervention not only changes the gender pronouns in the output (“Ms.”→\\rightarrow“Mr.”) but also causally alters the clinical decision regarding depression risk (“Yes”→\\rightarrow“No”), demonstrating the deep impact of internal demographic representations.",
+                "position": 1348
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14004/x12.png",
+                "caption": "Figure 11:A representativeTargeted Optimizationpipeline. The method first identifies language-pair-relevant layers, then scores neuron language-awareness, and finally routes gradient updates to a small subset of language-aware neurons for selective fine-tuning. This illustrates howTargeted Optimizationenforces locality via an object maskMMin Eq.20. Based on the figure fromzhu-etal-2024-landermt.",
+                "position": 1422
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14004/x13.png",
+                "caption": "Figure 12:The pipeline for steering LLMs using SAE features. (a)Steering Vector Extraction: The target steering vector is derived by analyzing a set of prompts to identify features that distinguish a concept-rich state𝐳′\\mathbf{z}^{\\prime}from a neutral state𝐳\\mathbf{z}. The steering vector is computed as the weighted sum of these identified SAE features (i.e., decoder columns). (b)Steering LLM Behavior: This aggregated vector is injected into the Transformer’s residual stream state𝐱l\\mathbf{x}^{l}via vector addition. (c)Steered Output Example: Empirical results showing how steering specific features (e.g., Happiness, Confusion) drastically alters the model’s generation style even when the original prompt implies a negative sentiment. Based on the figure fromshu-etal-2025-survey.",
+                "position": 1536
+            }
+        ]
+    },
+    {
+        "header": "5Applications",
+        "images": []
+    },
+    {
+        "header": "6Challenges and Future Directions",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Limitation",
+        "images": []
+    },
+    {
+        "header": "Appendix ASummary of Surveyed Papers",
+        "images": []
+    }
+]

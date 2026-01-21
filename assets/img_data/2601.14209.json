@@ -1,0 +1,207 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.14209/x1.png",
+                "caption": "Figure 1:Intervention training (InT) for improving credit assignment.InTproposessingle-stepinterventions to replace incorrect intermediate steps in reasoning traces (1). Conditioned on these localized corrections, the model can generate counterfactual continuations that succeed where the original failed (2). We then perform supervised fine-tuning on these interventions, enabling effective credit assignment by upweighting the likelihood of the interventions in place of the mistakes.",
+                "position": 137
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Preliminaries, Notation, and Problem Statement",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.14209/x2.png",
+                "caption": "Figure 2:Location of first occurring mistakes in incorrect trajectories.Incorrect rollouts often do not begin with mistakes and may contain a significant number of correct preceding steps/tokens. Detected by Gemini 2.5 Pro with PromptA.",
+                "position": 222
+            }
+        ]
+    },
+    {
+        "header": "3Credit Assignment via Self-Proposed Interventions",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.14209/x3.png",
+                "caption": "Figure 3:Example mistakes encountered by Qwen3-4B-Instruct and proposed interventions.By correcting the mistakes with interventions, the rollouts lead to correct final answers as opposed to originally incorrect ones.",
+                "position": 246
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x4.png",
+                "caption": "Figure 4:Performance comparison of interventions.Continuing the rollout by concatenating the proposed intervention step𝐲~t∗\\tilde{\\mathbf{y}}_{t^{*}}to the prefix𝐲<t∗\\mathbf{y}_{<t^{*}}yields substantially higher accuracy (left) and a larger number of unique problems solved (right) than either continuing with the original erroneous step𝐲t∗\\mathbf{y}_{t^{*}}or continuing directly from the prefix without any intervention (−-).",
+                "position": 411
+            }
+        ]
+    },
+    {
+        "header": "4InT: Intervention Training for Credit Assignment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.14209/x5.png",
+                "caption": "Figure 5:Intervention training (InT).InTverifies incorrect rollouts against reference solutions to identify the stept∗t^{*}at which the first error𝐲t∗){\\mathbf{y}}_{t^{*}})occurs, proposes alternative step𝐲~t∗)\\tilde{\\mathbf{y}}_{t^{*}}), and performs SFT on these steps before RL.",
+                "position": 530
+            }
+        ]
+    },
+    {
+        "header": "5Experimental Evaluation ofInT",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.14209/x6.png",
+                "caption": "Figure 6:Performance of the patched model.Supervised fine-tuning (SFT) on interventions increases pass@kkon both the training set and IMO-AnswerBench fork=16,32,…,1024k=16,32,\\ldots,1024. We evaluate on 32 randomly sampled problems from each split. To match the RL training setup, we sample with temperature=1.0=1.0, top_p=1.0=1.0, and top_k=−1=-1.",
+                "position": 613
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x7.png",
+                "caption": "Figure 7:Average probability of intervention tokens.Intervention tokens receive higher probability under the trained model vs. the base model on both the training and test sets, indicating that SFT causes the model to learn to produce intervention-like steps even on unseen test problems.",
+                "position": 628
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x8.png",
+                "caption": "Figure 8:Entropy of the next-token distributionfor various models. Fine-tuning on highly off-policy traces leads to elevated entropy, while intervention-based SFT preserves a low-entropy distribution closer to the base model, yielding more stable initialization for subsequent RL.",
+                "position": 639
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x9.png",
+                "caption": "Figure 9:InTtrains on tokens that are more likely under the base model and attains highest performance on both train and test problems.(left)Average negative log-likelihood (NLL) computed over 64 sampled traces.Ref. Sol.denotes reference solutions written by humans or the Gemini-2.5-Pro model.R1 ThinkandR1 Summarycorrespond to content inside and after the DeepSeek-R1<think>tags, respectively.Self-reflectrefers to the self-reflection baseline in which the model is prompted to rewrite entire incorrect solutions given a reference solution.InTtrains on the most on-policy traces as it exhibits the lowest NLL.(middle)Train pass@kkon 64 sampled training problems.InTachieves the highest pass@kkacross all values ofkk.(right)Test pass@kkon IMO-Bench, AMO-Bench, and Apex Shortlist.InTagain attains the best performance across allkk.",
+                "position": 647
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x10.png",
+                "caption": "",
+                "position": 650
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x11.png",
+                "caption": "",
+                "position": 651
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x12.png",
+                "caption": "Figure 10:Interventions are short.Top:Intervention are typically under 200 tokens.Bottom:full rollouts are nearly 7k tokens on average.",
+                "position": 662
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x13.png",
+                "caption": "Figure 11:Training reward and zero-advantage ratio during RL.Left: Average reward over RL training iterations on the hard training set.Right: Zero-advantage ratio, defined as the fraction of problems for which the model never produces a correct rollout.\nInitializing RL from the intervention-patched SFT checkpoint (InT) yields both higher reward and a substantially lower zero-advantage ratio, indicating that intervention training reduces persistent failure modes and enables effective learning from problems that previously yielded no signal. The next best approach is Self-Reflection SFT + RL, but as we show in Table4, this approach leads to much weaker test performance.",
+                "position": 679
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x14.png",
+                "caption": "",
+                "position": 682
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x15.png",
+                "caption": "Figure 12:Pass@kkacross RL training iterations on test problems.We plot pass@kkfrom 0 to 400 RL iterations for three model initializations: (i) the base model patched withInT, (ii) the base model fine-tuned on reference solutions directly via SFT, and (iii) the base model itself. Across all values ofkk,InTachieves the highest pass@kkthrough training (right).",
+                "position": 699
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Discussion and Perspectives on Future Work",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix APrompts",
+        "images": []
+    },
+    {
+        "header": "Appendix BIntervention Examples",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.14209/x16.png",
+                "caption": "Figure 13:Example error of Qwen3-4B-Instruct and generated intervention.",
+                "position": 1399
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x17.png",
+                "caption": "Figure 14:Example error of Qwen3-4B-Instruct and generated intervention.",
+                "position": 1402
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x18.png",
+                "caption": "Figure 15:Example error of Qwen3-4B-Instruct and generated intervention.",
+                "position": 1405
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x19.png",
+                "caption": "Figure 16:Example error of Qwen3-4B-Instruct and generated intervention.",
+                "position": 1408
+            }
+        ]
+    },
+    {
+        "header": "Appendix CEvaluation Configuration",
+        "images": []
+    },
+    {
+        "header": "Appendix DTraining Hyperparameters forInT",
+        "images": []
+    },
+    {
+        "header": "Appendix ESelf-Reflection Baseline",
+        "images": []
+    },
+    {
+        "header": "Appendix FAre Interventions Memorized?",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.14209/x20.png",
+                "caption": "Figure 17:Diverging Solution Paths betweenInTand base models on IMO Shortlist 2024, C1.",
+                "position": 1550
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x21.png",
+                "caption": "Figure 18:Diverging Solution Paths betweenInTand base models on IMO Shortlist 2024, C2.",
+                "position": 1553
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x22.png",
+                "caption": "Figure 19:Pass@kkacross RL training iterations:We plot pass@kkperformance from 0 to 150 RL iterations for three initializations: (i) base model patched with InT; (ii) base model distilled on oracle traces; and (iii) directly the base model. Int patched model improves pass@k consistently while others mainly sharpen.",
+                "position": 1565
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x23.png",
+                "caption": "(a)(a)",
+                "position": 1632
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x23.png",
+                "caption": "(a)(a)",
+                "position": 1635
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x24.png",
+                "caption": "(b)(b)",
+                "position": 1640
+            },
+            {
+                "img": "https://arxiv.org/html/2601.14209/x25.png",
+                "caption": "(c)(c)",
+                "position": 1645
+            }
+        ]
+    },
+    {
+        "header": "Appendix GInTwith Interventions From a Stronger Model (Gemini 2.5 Pro)",
+        "images": []
+    }
+]
