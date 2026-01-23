@@ -1,0 +1,171 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.15224/figures/icon.png",
+                "caption": "",
+                "position": 200
+            },
+            {
+                "img": "https://arxiv.org/html/2601.15224/x1.png",
+                "caption": "Figure 1:Given a task demonstration and a single observation, the goal is to estimatehow much of the task has already been completed.\nDirect prediction can often judge whether the task is unfinished, but struggles to assign a well-calibrated progress score.\nProgress reasoning instead follows a coarse-to-fine process:\nit first performsepisodic retrievalto coarsely locate the observation along the demonstrated task,\nthen appliesmental simulationto imagine the transition from the retrieved anchor to the current observation, enabling a fine-grained estimate ofcompleted progress, which enables accurate and interpretable progress estimation.",
+                "position": 225
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.15224/x2.png",
+                "caption": "Figure 2:Overview ofProgress-Benchconstruction.\n(a)Demonstration setup: tasks are presented as either vision-based demonstrations with key frames or text-based ones with step-wise actions, each annotated with progress scores.\n(b)Observation sampling: observations are sampled from intermediate or boundary positions between demonstration steps, with progress labels assigned by interpolation; vision-based settings further include same-view and cross-view demonstration–observation correspondence.\n(c)Answerability augmentation: unanswerable cases are created by introducing semantic mismatches between demonstrations and observations.",
+                "position": 301
+            }
+        ]
+    },
+    {
+        "header": "2Progress-Bench",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.15224/x3.png",
+                "caption": "Figure 3:Data statistics ofProgress-BenchandProgressLM-45K(25K for SFT while 20K for RL).\nTraj and Samp denote the numbers of task trajectories and sampled observations to be estimated, respectively.\nThe upper-right panel shows the four distinct robotic embodiments included, while the lower-right panel visualizes the diversity of objects involved in task interactions.",
+                "position": 394
+            }
+        ]
+    },
+    {
+        "header": "3Towards Progress Reasoning in VLMs",
+        "images": []
+    },
+    {
+        "header": "4Evaluation onProgress-Bench",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.15224/x4.png",
+                "caption": "Figure 4:Unanswerable Detection Accuracy (UDA) across models under two settings.",
+                "position": 1318
+            },
+            {
+                "img": "https://arxiv.org/html/2601.15224/x5.png",
+                "caption": "Figure 5:Distribution of predicted progress scores.\nSome models exhibit collapsed or clustered distributions at extreme or discrete values,\nindicating reliance on heuristic anchors rather than continuous progress modeling.\nIn contrast, GPT-5 andProgressLM(3B-SFT and 3B-RL) produce smoother distributions,\nreflecting improved sensitivity to intermediate task progress.",
+                "position": 1344
+            }
+        ]
+    },
+    {
+        "header": "5Further Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.15224/x6.png",
+                "caption": "Figure 6:Raincloud plots of per-sample normalized score prediction error across models and settings.\nEach plot combines jittered samples, box plots, and kernel density estimates.\nSmaller models exhibit highly dispersed and heavy-tailed error distributions, while larger and our models show more concentrated errors with fewer extreme outliers.",
+                "position": 1377
+            },
+            {
+                "img": "https://arxiv.org/html/2601.15224/x7.png",
+                "caption": "Figure 7:Coupling between the two stages progress reasoning ofProgressLM.\nA diagonal concentration indicates that the anchor selected duringepisodic retrievalconsistently constrains second-stagemental simulation.",
+                "position": 1407
+            },
+            {
+                "img": "https://arxiv.org/html/2601.15224/x8.png",
+                "caption": "Figure 8:Illustration of implicit state accumulation required by text-based demonstrations.\nAlthough Step 1 (purple) and Step 4 (green) appear action-wise similar that interact with the pot lid, they differ in whether the pumpkin has already been placed on the plate (red box).\nCorrectly identifying the current progress stage therefore requires integrating intervening steps to recover the accumulated state.",
+                "position": 1427
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix AData Construction Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.15224/x9.png",
+                "caption": "Figure 9:Data distribution statistics across Benchmark, SFT, and RL splits.This figure shows the distribution of samples produced by our data construction pipeline across Benchmark, Supervised Fine-Tuning (SFT), and Reinforcement Learning (RL) stages. Samples are organized by demonstration–observation setting (Vision Same-View, Vision Cross-View, Text, Vision Unanswerable, Text Unanswerable), with stacked bars denoting different robot platforms. Our constructed dataset spans four heterogeneous robotic platforms, including single-arm robot (Franka Emika Panda, UR5e), dual-arm robot (AgileX Cobot Magic V2.0), and humanoid robot (X-Humanoid Tien Kung), enabling evaluation and training across diverse embodiments.",
+                "position": 2060
+            },
+            {
+                "img": "https://arxiv.org/html/2601.15224/x10.png",
+                "caption": "Figure 10:Data construction pipeline.This Sankey diagram illustrates how raw manipulation trajectories from four heterogeneous robotic platforms (Franka, AgileX, Humanoid, and UR5e) are transformed through our data construction process. Demonstrations are first organized into vision and text modalities, then further expanded into multiple demonstration–observation settings, including vision same-view, vision cross-view, text, as well as vision and text unanswerable cases. The resulting data are finally allocated toProgressLM-45Kfor model training andProgressLM-Benchfor evaluation, highlighting the unified yet diversified pipeline that supports generalizable progress reasoning across embodiments, modalities, and answerability conditions.",
+                "position": 2063
+            },
+            {
+                "img": "https://arxiv.org/html/2601.15224/x11.png",
+                "caption": "Figure 11:Case Visualization of vision-based unanswerable samples construction via Image Editing. To test whether models can recognize ill-defined progress, we construct visual unanswerable samples by breaking the semantic consistency between demonstrations and observations while preserving realism. Given an image at a specific manipulation step, we edit the key object using three strategies: (a) Color Change, altering object appearance; (b) Object Removal, eliminating the critical object; and (c) Object Replacement, substituting it with an incompatible one. As shown across diverse manipulation scenarios, these edits invalidate progress estimation and require models to correctly output N/A rather than relying on superficial visual matching.",
+                "position": 2066
+            },
+            {
+                "img": "https://arxiv.org/html/2601.15224/x12.png",
+                "caption": "Figure 12:Diagnostic analysis of coupled progress reasoning.Heatmaps show the relationship between the episodic retrieval anchor index (x-axis) and the score-aligned demonstration index (y-axis) under Vision Same-View, Vision Cross-View, and Text settings. A strong diagonal indicates tight coupling between episodic retrieval and progress estimation. While coupling is strongest in the same-view setting and gradually weakens under cross-view and text conditions, the persistent diagonal structure across all settings demonstrates that progress estimation is consistently anchored to episodic retrieval rather than performed as direct regression.",
+                "position": 2112
+            },
+            {
+                "img": "https://arxiv.org/html/2601.15224/x13.png",
+                "caption": "Figure 13:Unanswerable Detection Accuracy (UDA) across models with and without training-free thinking.This figure compares unanswerable detection accuracy under Vision-based and Text-based demonstrations, contrasting standard inference (NoThink) with training-free explicit reasoning (Think). Across both modalities, enabling training-free thinking consistently improves UDA for most models, with particularly pronounced gains in text-based settings where semantic mismatch is harder to identify. The results highlight that explicit reasoning at inference time enhances models’ ability to recognize ill-defined progress and correctly abstain, complementing the benefits brought by our training-based coupled reasoning approach.",
+                "position": 2115
+            }
+        ]
+    },
+    {
+        "header": "Appendix BExperimental Settings",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.15224/x14.png",
+                "caption": "Figure 14:Vision-Based Case Visualization (Same-View). This example illustrates how the model performs progress estimation by coupling episodic retrieval with mental simulation. Given a current observation (right), the model retrieves the most semantically aligned demonstration step (No. 7) from the visual demo sequence (left), where the plates are nearly stacked. Based on this retrieved anchor, the model estimates the relative progress by comparing fine-grained state differences, yielding a progress prediction of 76% against a ground-truth of 80%. The intermediate reasoning explicitly shows how reference selection and score estimation are jointly grounded in the demonstration sequence.",
+                "position": 2212
+            },
+            {
+                "img": "https://arxiv.org/html/2601.15224/x15.png",
+                "caption": "Figure 15:Vision-Based Case Visualization (Cross-View). This example demonstrates cross-view progress estimation under viewpoint mismatch between the demonstration sequence shown at the top and the current observation shown at the bottom left. Given the current state image captured from a different camera perspective, the model retrieves the most semantically aligned demonstration step No. 5 at 80 percent progress, corresponding to a near-completion stage where the blue cube has been stacked on top of the pink cube while the robot arm remains in contact. To bridge the viewpoint discrepancy, the model internally simulates the expected task state progression and constructs a latent representation of the current scene that is aligned with the demonstration trajectory. By comparing the simulated task state with the retrieved anchor and the observed image, the model reasons over fine-grained differences such as object alignment and gripper presence, and estimates the task progress as 76 percent, closely matching the ground-truth progress of 73 percent. This case highlights the model’s ability to performimplicit mental simulationandinternal task modelingfor robust episodic retrieval and progress estimation under cross-view variations.",
+                "position": 2216
+            },
+            {
+                "img": "https://arxiv.org/html/2601.15224/x16.png",
+                "caption": "Figure 16:Text-Based Demonstration Case Visualization. This example illustrates progress estimation using text-based demonstrations. Given the current visual observation, the model retrieves the most semantically aligned textual instruction Step 3 by grounding language-described action semantics to the observed object state, where the plate is lifted and held above the rack but not yet placed. To bridge the gap between symbolic language steps and continuous visual observations, the modelinternally simulates the expected task state implied by the textual instruction and constructs an implicit task progression model over object interactions. By comparing the simulated intermediate state with the observed scene, the model reasons that the placement action is partially completed and estimates the task progress as 50 percent, which exactly matches the ground-truth progress of 50 percent. This case demonstrates the model’s ability to perform mental simulation and internal task modeling for progress estimationeven when demonstrations are provided purely in language.",
+                "position": 2220
+            }
+        ]
+    },
+    {
+        "header": "Appendix CSupplementary Results and Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.15224/x17.png",
+                "caption": "Figure 17:Vision-based Demonstration Unanswerable Case Visualization. This example illustrates a visual unanswerable scenario where the current observation is semantically inconsistent with the given demonstration. While the demonstration depicts a task of stacking a blue block on a pink block, the observed state shows the robot holding an unrelated white block that does not appear in any demonstration step. As no valid episodic anchor can be retrieved and progress estimation is ill-defined, the model correctly abstains by predicting N/A. This case highlights the model’s ability to detect semantic mismatch and avoid spurious progress estimation.",
+                "position": 2530
+            },
+            {
+                "img": "https://arxiv.org/html/2601.15224/x18.png",
+                "caption": "Figure 18:Text-based Demonstration Unanswerable Case Visualization. This example illustrates a text unanswerable scenario where the current visual observation is semantically incompatible with the textual demonstration. While the task goal and instructions describe stacking bowls on a bowl holder, the observed state contains a stack of cups on the floor, involving different object categories and spatial configurations. As the observation cannot be aligned with any textual step in the demonstration, episodic retrieval fails and progress estimation becomes ill-defined, leading the model to correctly output N/A. This case highlights the model’s ability to detect cross-modal semantic mismatch and abstain from spurious progress predictions.",
+                "position": 2534
+            },
+            {
+                "img": "https://arxiv.org/html/2601.15224/x19.png",
+                "caption": "Figure 19:In-the-wild Generalization on Human Activities. This example demonstrates the model’s ability to generalize coupled progress reasoning beyond robotic manipulation to human-performed activities. Given a sequence of demonstration frames depicting the step-by-step process of opening a jar and pouring its contents, the model retrieves the most semantically aligned demonstration step (No. 3) for the current observation and estimates the task progress by comparing subtle state differences. The predicted progress (43%) closely matches the ground truth (41%), illustrating that episodic retrieval and progress estimation remain effective in unconstrained, real-world human activity scenarios.",
+                "position": 2634
+            },
+            {
+                "img": "https://arxiv.org/html/2601.15224/figures/edit_label_plat.png",
+                "caption": "Figure 20:Gradio-based Human Filtering Platform for Visual Unanswerable Data Generation.We employ a Gradio-based annotation interface to manually verify the quality of edited images used for visual unanswerable construction. Annotators are presented with the original and edited images alongside the task goal, step-level demonstrations, editing strategy, and prompt. Each edited sample is retained only if it simultaneously violates the intended manipulation step and preserves visual realism, ensuring high-quality and reliable visual unanswerable data.",
+                "position": 2675
+            }
+        ]
+    },
+    {
+        "header": "Appendix DPrompts",
+        "images": []
+    }
+]
