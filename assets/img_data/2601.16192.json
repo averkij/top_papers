@@ -1,0 +1,166 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.16192/x1.png",
+                "caption": "Figure 1:360Anythinglifts arbitrary perspective images (row 1) and videos (row 2) to seamless, gravity-aligned 360∘{}^{\\circ}\\!panoramas.\nModel inputs and their projected regions are highlighted inredorgreen.\nBelow each panorama, we show four perspective projections facing left, front, right, and back.\nWithout using explicit camera information,360Anythinghandles images with varying Field-of-View and videos with large object and camera motion.\nThe generated consistent panoramas enable 3D scene reconstruction via 3D Gaussian Splatting (row 3).\nPlease see ourproject pagefor results in 360∘{}^{\\circ}\\!viewers.",
+                "position": 119
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x1.png",
+                "caption": "",
+                "position": 122
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x2.png",
+                "caption": "",
+                "position": 127
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x3.png",
+                "caption": "",
+                "position": 132
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.16192/x4.png",
+                "caption": "Figure 2:360Anythingpipeline.Given a raw 360∘{}^{\\circ}\\!training video with arbitrary camera orientations, we first estimate per-frame camera poses and rotate frames to align with the first frame.\nWe then estimate the video’s gravity direction and align it with the vertical axis.\nWith such acanonicalized360∘{}^{\\circ}\\!video, we project it to a perspective video using randomly sampled camera intrinsics and poses (Sec.˜4.2).\nWe then encode both the conditioning and target videos to latent tokens.\nCritically, we employCircular Latent Encodingfor the target 360∘{}^{\\circ}\\!video to avoid seam artifacts in the latent representation.\nThe conditioning tokens (orange) and noisy target tokens (green) are concatenated along thesequence dimensionand fed into a diffusion transformer (DiT).\nThe denoised tokens can be decoded back to a 360∘{}^{\\circ}\\!video via circular latent decoding.",
+                "position": 293
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x5.png",
+                "caption": "(a)Naive VAE encoding of the panorama image leads to boundary discontinuities in the latent space.",
+                "position": 345
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x5.png",
+                "caption": "(a)Naive VAE encoding of the panorama image leads to boundary discontinuities in the latent space.",
+                "position": 348
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x6.png",
+                "caption": "(b)Our Circular Latent Encoding leads to seam-free latent representations.",
+                "position": 355
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.16192/x7.png",
+                "caption": "Figure 4:Qualitative results of perspective-to-360∘{}^{\\circ}\\!image generation.We show multiple perspective views projected from the panorama, where the image with thegreen borderis the conditioning image.\nDue to the use of a cubemap representation, CubeDiff sometimes generates seams between faces (left).\nIn addition, CubeDiff always assumes the input image has a 90∘{}^{\\circ}\\!FoV; yet when the actual FoV is smaller, it has to stretch the objects at the image boundary.\nThis leads to distorted object structure, e.g., the balloons (middle) and the mushroom (right).\nIn contrast,360Anythingestimates the correct camera FoV and orientation of the input as shown by the green box on the panorama image, and thus produces much less distorted objects.\nPlease check out ourproject pageto view the generated panorama images interactively.",
+                "position": 541
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x8.png",
+                "caption": "Figure 5:Qualitative results of perspective-to-360∘{}^{\\circ}\\!video generation.Regions corresponding to the input conditioning video are highlighted inred.\nBoth Imagine360 and Argus exhibit low visual quality and distortions.\nViewPoint always places the conditioning video at the center of the output, and thus generates a rotated image when the video contains large camera motion, leading to distortions (e.g., people and buildings).\nIn contrast,360Anythinggenerates stablycanonicalizedpanorama videos, and accurately follows the text prompt to outpaint a person holding the camera.\nPlease see ourproject pagefor better visual comparisons in the video format.",
+                "position": 765
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x9.png",
+                "caption": "Figure 6:Qualitative results of 3D scene reconstruction.Given an input monocular video (left),360Anythingoutpaints the whole 360∘{}^{\\circ}\\!viewpoint (middle), from which we can optimize a 3DGS (right).\nThis allows fly-through exploration of the entire 3D scene.\nPlease check out ourproject pageto view 360∘{}^{\\circ}\\!rendering of the 3DGS.",
+                "position": 789
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x10.png",
+                "caption": "Figure 7:Qualitative evaluation of various seam elimination techniques.For ease of visualization, we shift the generated panorama by 180∘{}^{\\circ}\\!to show the concatenation of its left and right boundaries.\nWithout any intervention (left), there are clear seams.\nBlended Decoding[Argus](middle) “blurs” the seam to remove discontinuities; yet, it introduces gray line-like artifacts.\nOur technique (right) eliminates boundary artifacts entirely.\nWe recommend zooming-in to evaluate these differences appropriately.",
+                "position": 1083
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgment",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.ADetailed Experimental Setup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.16192/x11.png",
+                "caption": "Figure 8:Visualization of the video canonicalization pipeline.Top: Raw panorama frames exhibit varying elevation angles, causing the horizon to fluctuate relative to the reference line (reddashed).Middle: After stabilization, inter-frame rotation is removed, resulting in a temporally consistent horizon height across all frames.Bottom: After aligning the gravity direction to the vertical axis, the horizon is rectified to a straight line parallel to the image boundaries, ensuring an upright orientation.\nPlease refer to ourproject pagefor better comparisons in video format.",
+                "position": 1393
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x12.png",
+                "caption": "Figure 9:More perspective-to-360∘{}^{\\circ}\\!image generation results from360Anything.We test on out-of-distribution images, such as AI-generated ones.\nThe conditioning perspective images are shown at the middle.",
+                "position": 1510
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.BMore Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.16192/x13.png",
+                "caption": "Figure 10:Qualitative results of 3D scene reconstruction.Given an input monocular video (left),360Anythingoutpaints the whole 360∘{}^{\\circ}\\!viewpoint (middle), from which we can optimize a 3DGS (right).\nThis allows fly-through exploration of the entire 3D scene.",
+                "position": 1544
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x14.png",
+                "caption": "Figure 11:Panorama video generation given large motion videos.Regions corresponding to the input conditioning video are highlighted inred.\nWe test on perspective videos with large object or camera motion.",
+                "position": 1570
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x15.png",
+                "caption": "Figure 12:Panorama video generation on AI generated videos.Regions corresponding to the input conditioning video are highlighted inred.\nWe test on perspective videos generated by other video models.",
+                "position": 1577
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x16.png",
+                "caption": "Figure 13:Ablation on real-world camera trajectories.360Anythinguses both simulated and real-world camera trajectories to crop perspective videos in model training.\nModels without this setup generate panorama frames with changing gravity directions, fail to produce canonicalized videos and may suffer from broken structure.",
+                "position": 1606
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x17.png",
+                "caption": "Figure 14:Perspective-to-360∘{}^{\\circ}\\!video generation on challenging input videos.MegaSaM[MegaSaM]fails to predict the correct camera poses (first two examples) or FoV (last example), leading to degraded generation results from Argus.\nIn contrast, our method runs end-to-end without a projection stage and thus generalizes well.",
+                "position": 1638
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x18.png",
+                "caption": "Figure 15:Qualitative comparisons of perspective-to-360∘{}^{\\circ}\\!video generation.",
+                "position": 1645
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x18.png",
+                "caption": "",
+                "position": 1648
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x19.png",
+                "caption": "",
+                "position": 1653
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16192/x20.png",
+                "caption": "",
+                "position": 1658
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.CLimitations and Future Work",
+        "images": []
+    }
+]
