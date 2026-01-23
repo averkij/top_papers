@@ -1,0 +1,111 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.16163/fig/cosmos_policy_figure1.jpeg",
+                "caption": "Figure 1:We present Cosmos Policy, a state-of-the-art robot policy fine-tuned from the NVIDIA Cosmos-Predict2-2B video foundation model. Cosmos Policy handles multimodal inputs and multi-view camera images and predicts (1) a robot action chunk, (2) future state (represented by robot proprioception and image observations), and (3) value (expected rewards-to-go at the future state). No architectural changes are made to the base video model, and all modalities are jointly modeled through the video diffusion learning objective.",
+                "position": 100
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Preliminaries",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.16163/fig/cosmos_policy_diffusion_sequence_v2_main_version.001.jpeg",
+                "caption": "Figure 2:The latent diffusion sequence of Cosmos Policy.We illustratelatent frame injection—the primary mechanism for adapting the pretrained Cosmos-Predict2 into a policy that can predict robot actions, future states, and values without architectural changes. First, raw images are tokenized into latent frames (first row). Then, additional modalities are inserted directly into the latent frame sequence of the video diffusion model (second row). The model is then tasked to denoise the noised latent frames conditioned on the clean frames (third row). See Section4.1for more details. (Note: For simplicity, this figure does not depict certain implementation details; see Figure8for a more detailed visualization.)",
+                "position": 163
+            }
+        ]
+    },
+    {
+        "header": "4Cosmos Policy: Adapting Video Model for Control & Planning",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.16163/fig/cosmos_policy_aloha_rollouts.001.jpeg",
+                "caption": "Figure 3:Cosmos Policy in the ALOHA robot tasks.Cosmos Policy can successfully execute real-world robotic control tasks that require long-horizon, high-precision manipulation and have high action multimodality.",
+                "position": 224
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.16163/fig/aloha_task_performance_results_v2.001.jpeg",
+                "caption": "Figure 4:Real-world ALOHA robot evaluation results.We evaluate state-of-the-art policies on a suite of four tasks and measure the score, which represents average percent completion of each task. Cosmos Policy achieves highest overall score, outperforming all other methods in three of four tasks.",
+                "position": 489
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16163/fig/pi05_openvlaoft_aloha_rollouts.001.jpeg",
+                "caption": "Figure 5:Common failure modes ofπ0.5\\pi_{0.5}and OpenVLA-OFT+ on two challenging ALOHA robot tasks.Left:π0.5\\pi_{0.5}struggles to execute a high-precision grasp and loses grip of the ziploc bag.Right:OpenVLA-OFT+ reaches between two candies rather than towards one, suggesting difficulty with modeling the highly multimodal action distribution.",
+                "position": 493
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16163/fig/cosmos_policy_planning_rollouts.001.jpeg",
+                "caption": "Figure 6:World model predictions: base Cosmos Policy vs. fine-tuned checkpoint.Top:The base Cosmos Policy’s world model may fail to predict errors such as losing grasp of the ziploc bag slider, as it is only trained on demonstrations.Bottom:After fine-tuning on policy rollout data, the world model more accurately predicts the resulting state, enabling more effective planning and eventual episode success.",
+                "position": 497
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16163/fig/planning_results.001.jpeg",
+                "caption": "Figure 7:Model-based planning results.We evaluate the base Cosmos Policy on challenging initial states for the last two ALOHA robot tasks, and compare it with two planning variants (model-based and model-free). We find that the model-based variant (V​(s′)V(s^{\\prime})) leads to highest overall performance.",
+                "position": 524
+            }
+        ]
+    },
+    {
+        "header": "6Discussion",
+        "images": []
+    },
+    {
+        "header": "7Reproducibility Statement",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.16163/fig/cosmos_policy_diffusion_sequence_v2_detailed_for_appendix.001.jpeg",
+                "caption": "Figure 8:Detailed view of the latent diffusion sequence of Cosmos Policy.This is a more detailed version of Figure2which shows implementation details. As illustrated in the top row, blank (all zero) images are inserted into the input image sequence, and these images are encoded into latent frames by the VAE tokenizer. Then, in the middle row, these placeholder latent frames are completely overwritten by latent injection of new modalities (robot proprioception, actions, and value). Note that a placeholder image is set apart at the beginning of the sequence due to the video model’s tokenization scheme, which encodes the first image by itself while the rest of the images are temporally compressed in groups of four (as discussed in Section3). Therefore, to ensure that current timestep observations and future timestep observations have similarly structured latent representations, we place them after the blank first latent frame in the video diffusion sequence. In addition, since we wish to have one latent frame for each modality and camera viewpoint, we construct four identical copies of each image, as shown in the top row. Each group of four identical images corresponds to a single timestep rather than four timesteps).",
+                "position": 1209
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16163/fig/noise_schedules_figure.001.jpeg",
+                "caption": "Figure 9:Base model noise distribution vs. Cosmos Policy’s adjusted noise distribution.We change the base Cosmos-Predict2 video model’s log-normal noise distribution (left) into a hybrid log-normal-uniform distribution (right) with more weight on higher noise levels. This modification empirically leads to more accurate generations at test time. See a detailed explanation in AppendixA.2.1.",
+                "position": 1232
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16163/fig/iid_initial_positions.jpeg",
+                "caption": "Figure 10:In-distribution initial conditions for ALOHA robot evaluations.Here we show sample initial positions used for evaluating policies in conditions similar to the training demonstrations.",
+                "position": 1306
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16163/fig/ood_initial_positions.jpeg",
+                "caption": "Figure 11:Out-of-distribution initial conditions for ALOHA robot evaluations.Here we show sample initial positions used for evaluating policies in unseen test conditions.",
+                "position": 1310
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16163/fig/balanced_batches_figure.001.jpeg",
+                "caption": "Figure 12:Cosmos Policy balanced batches training scheme.We illustrate the joint objectives training scheme discussed in Section4.2. While each batch of training samples is split 50/25/25 for policy, world model, and value function training, respectively, the full latent diffusion sequence remains fixed, and the conditioning scheme determines which of the three functions is being optimized. During training, the model is tasked to denoise the target noised latent frames conditioned on the clean latent frames. Note that the above depicts the initial base policy training scheme. When optionally refining the world model and value function on policy rollouts (in preparation for model-based planning), we mask out the current state and action during value function training so that the value predictions are only a function of the future states′s^{\\prime}. Separately, to train a Q-value function, we can instead mask out the future state so that the value predictions are only a function of the current state and action,(s,a)(s,a); this variant can be used for model-free planning (though we find that the model-based planning variant performs better, as shown in Figure7).",
+                "position": 1557
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]
