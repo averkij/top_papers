@@ -1,0 +1,115 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.16093/bytedance/figs/logo.png",
+                "caption": "",
+                "position": 60
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.16093/x1.png",
+                "caption": "Figure 1:SAMTokprovides a simple yet unified mask-token interface for MLLMs.(Left)SAMTok compresses region masks into two discrete tokens and faithfully reconstructs them across diverse visual domains.(Middle)Injecting these mask tokens into MLLMs enables a wide range of region-level mask generation and understanding tasks.(Right)The text-based representation of region masks allows a purely textual answer-matching reward for the GRPO of the mask generation task.",
+                "position": 143
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16093/x2.png",
+                "caption": "Figure 2:Our SAMTok architecture(Left)and mask reconstruction examples(Right). SAMTok has a encoderfencf_{\\text{enc}}, a vector quantizer with codebook𝒞\\mathcal{C}, and a decoderfdecf_{\\text{dec}}. Bothfencf_{\\text{enc}}andfdecf_{\\text{dec}}are instantiated with a SAM model, which includes an image backbonefimgf_{\\text{img}}, a prompt encoderfprmf_{\\text{prm}}, and a mask decoderfmskf_{\\text{msk}}.\nGiven an input imageℐ\\mathcal{I}and a regionℳ\\mathcal{M}(e.g., the area outlined in purple), the SAMTok encoderfencf_{\\text{enc}}first encodes the 2D mask into a mask embedding𝐳\\mathbf{z}, then performs two-stage quantization to obtain a discrete mask embedding[𝐞1,𝐞2][\\mathbf{e}_{1},\\mathbf{e}_{2}].\nThe SAMTok decoderfdecf_{\\text{dec}}reconstructs the 2D maskℳ^\\hat{\\mathcal{M}}from the original image and the region’s discrete mask embeddings.",
+                "position": 218
+            }
+        ]
+    },
+    {
+        "header": "2Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.16093/x3.png",
+                "caption": "Figure 3:Unified mask-token interface for MLLMs. For the mask understanding task (left to right), SAMTok first tokenizes region masks into quantization codes, then formats them into mask words, which are used in the MLLM prompt to refer to the corresponding image regions.\nFor the mask generation task (right-to-left), the MLLM first produces mask words according to the instruction, then maps them to quantization codes, after which SAMTok reconstructs the 2D masks.",
+                "position": 322
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16093/x4.png",
+                "caption": "Figure 4:Overview of dataset used to train the SAMTok (left) and MLLM (right). We use 209M masks to train SAMTok, and 5M conversations to fine tune MLLMs.",
+                "position": 388
+            }
+        ]
+    },
+    {
+        "header": "3Experiment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.16093/x5.png",
+                "caption": "Figure 5:Qualitative examples of SAMTok on diverse downstream tasks, including panoptic scene graph generation (top-left), generalized referring expression segmentation (bottom-left), region captioning (top-right), and grounded conversation generation (bottom-right).",
+                "position": 1509
+            }
+        ]
+    },
+    {
+        "header": "4Related Work",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix AOverview",
+        "images": []
+    },
+    {
+        "header": "Appendix BImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CAdditional model experiments",
+        "images": []
+    },
+    {
+        "header": "Appendix DAblation Study",
+        "images": []
+    },
+    {
+        "header": "Appendix EVisualization",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.16093/x6.png",
+                "caption": "Figure 6:SFT vs. RL. Examples are sampled from the GRES benchmark. RL finds more target objects, localizes relative positions better, and produces cleaner masks than SFT across diverse scenes.",
+                "position": 1946
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16093/x7.png",
+                "caption": "Figure 7:Region mask reconstruction examples. For each region, the ground-truth mask is tokenized into two discrete codes, and SAMTok reconstructs the mask solely from the original image and the quantized mask tokens. SAMTok preserves fine structures for small, thin, or irregular objects even under challenging lighting or clutter. Since SAMTok is fully decoupled from the MLLM, its reconstruction quality remains stable regardless of downstream model training—unlike joint-training mask tokenizers that tend to collapse to elliptical or blurred masks.",
+                "position": 1950
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16093/x8.png",
+                "caption": "Figure 8:Panoptic scene graph generation(PSG) examples. The model predicts subject–relation–object triplets where both subject and object categories are paired with their corresponding segmentation masks, represented through mask tokens. SAMTok’s interface allows the MLLM to generate consistent object masks and relational descriptions simultaneously, demonstrating strong alignment between textual predicates and pixel-grounded regions.",
+                "position": 1954
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16093/x9.png",
+                "caption": "Figure 9:GRES examples. Given a natural-language referring expression, the MLLM outputs two mask tokens that decode into the final segmentation mask. SAMTok enables precise grounding for expressions involving fine attributes, part-level targets, or contextual reasoning. The examples show robustness to ambiguous descriptions, occlusion, and multi-object scenes.",
+                "position": 1958
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16093/x10.png",
+                "caption": "Figure 10:Region Caption examples. Each visualization shows a region mask input (tokenized as two mask tokens) and the model’s generated description. SAMTok provides unambiguous spatial grounding, enabling the MLLM to generate accurate and context-aware region descriptions about attributes, roles, and interactions.",
+                "position": 1962
+            },
+            {
+                "img": "https://arxiv.org/html/2601.16093/x11.png",
+                "caption": "Figure 11:GCG examples. The model simultaneously describes the scene and produces region masks for phrases mentioned in the caption. For each highlighted phrase, SAMTok decodes the predicted mask tokens into segmentation masks. SAMTok’s compact representation (two tokens per mask) enables efficient, aligned text–mask generation with consistent grounding across multiple phrases within long captions.",
+                "position": 1966
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
