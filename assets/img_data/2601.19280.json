@@ -1,0 +1,108 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.19280/figures/frontpage_beyond_uniform_4b_60_percentile.png",
+                "caption": "Figure 1:Beyond Uniform Reasoning—A Multi-Adversary Post-Training Framework.Plots on the right represent training steps tail averages (≥\\geq60th percentile) capturing the curriculum.\n(Left) Our framework significantly outperforms the standard GRPO baseline across mathematical reasoning benchmarks via dynamic adaptation.\n(Center)Prompt-GDRO:The adversary learns a non-uniform curriculum. Instead of uniform sampling (dashed line), probability mass (purple bars) shifts to the “reasoning frontier” (bins 6–8), targeting the specific difficulty level where learning is most efficient.\n(Right)Rollout-GDRO:The adversary optimizes compute utility. Under a fixed global budget (dashed line), it reallocates rollouts (orange bars) from solved tasks (bin 0) to high-variance tasks, scaling exploration with difficulty. Note: Bars represent rollout count per prompt (policy intensity).",
+                "position": 257
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.19280/figures/gdro-grpo-illustration.png",
+                "caption": "Figure 2:Conceptual Illustration: Static Uniformity vs. Multi-Adversary GDRO (Dynamic).(Left) Standard GRPO samples prompts uniformly (q=1/Bq=1/B) and assigns a fixed number of rollouts (schematicallyN=16N=16), causing it to overfit easy tasks while under-exploring the frontier. (Right) Our framework employs anOnline Difficulty Classifierto dynamically partition prompts based on real-time pass@k. It introduces twoindependentadversarial feedback loops (not coupled): (1)Prompt-GDRO(Data Distributor) uses an EMA-debiased scorer to shift the sampling distribution toward hard bins, creating a “traveling wave” of difficulty; (2)Rollout-GDRO(Resource Allocator) uses a shadow priceμ\\muto solve a constrained optimization problem, allocating discrete rollout arms (nmin​…​nmaxn_{\\min}\\dots n_{\\max}) to maximize gradient variance reduction on high-uncertainty tasks.",
+                "position": 267
+            }
+        ]
+    },
+    {
+        "header": "2Preliminaries",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": []
+    },
+    {
+        "header": "4Analysis",
+        "images": []
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.19280/figures/gdro_class_fraction_weight_reward.png",
+                "caption": "Figure 3:The Causal Chain of Curriculum.A triptych comparing thePrompt Distribution(Left),Adversarial Weights(Middle), andRealized Reward(Right) for 1.7B, 4B, and 8B models. This visualizes the mechanism: even when hard bins are rare in the data (dark regions in Left), the adversary applies disproportionate pressure (bright bands in Middle), forcing the model to eventually crack these problems and yield positive rewards (emergence of red/blue bands in Right). This effectively proves that Prompt-GDRO decouples the learning signal from dataset frequency.",
+                "position": 1251
+            },
+            {
+                "img": "https://arxiv.org/html/2601.19280/figures/gdro_class_scalar_summaries.png",
+                "caption": "Figure 4:Training Dynamics Quantified (Prompt-GDRO).(Top) The Mean Accuracy Bin Index tracks the rising difficulty of targeted prompts. (Middle) The fraction of prompts in difficulty bands≥3\\geq 3(solid) and≥8\\geq 8(dashed) highlights scaling laws: 1.7B struggles to clear the≥3\\geq 3bar, while 8B rapidly saturates even the≥8\\geq 8band. (Bottom) Entropy metrics confirm that the adversary maintains a diverse portfolio of difficulty, preventing mode collapse to a single bin.",
+                "position": 1279
+            },
+            {
+                "img": "https://arxiv.org/html/2601.19280/figures/gdro_class_snapshots.png",
+                "caption": "Figure 5:Snapshots of the Learning Distribution.The probability mass of the training set across difficulty bins at four distinct training stages (Start, Early-Mid, Late-Mid, End). These publication-friendly checkpoints reveal the exact shape of the curriculum: note how the 4B model (Middle Row) transitions from a uniform start to a heavy emphasis onaccbin_5–accbin_7by mid-training, whereas the 8B model (Bottom Row) shifts almost its entire mass to the hardest bins by the final step.",
+                "position": 1282
+            },
+            {
+                "img": "https://arxiv.org/html/2601.19280/figures/gdro_lead_lag.png",
+                "caption": "(a)Prompt-GDRO lead–lag proxy.Δ​μ​(t)=μweight​(t)−μdata​(t)\\Delta\\mu(t)=\\mu_{\\mathrm{weight}}(t)-\\mu_{\\mathrm{data}}(t), whereμdata​(t)=∑bb​qt​(b)\\mu_{\\mathrm{data}}(t)=\\sum_{b}b\\,q_{t}(b)andμweight​(t)=∑bb​w^t​(b)\\mu_{\\mathrm{weight}}(t)=\\sum_{b}b\\,\\hat{w}_{t}(b).",
+                "position": 1334
+            },
+            {
+                "img": "https://arxiv.org/html/2601.19280/figures/gdro_lead_lag.png",
+                "caption": "(a)Prompt-GDRO lead–lag proxy.Δ​μ​(t)=μweight​(t)−μdata​(t)\\Delta\\mu(t)=\\mu_{\\mathrm{weight}}(t)-\\mu_{\\mathrm{data}}(t), whereμdata​(t)=∑bb​qt​(b)\\mu_{\\mathrm{data}}(t)=\\sum_{b}b\\,q_{t}(b)andμweight​(t)=∑bb​w^t​(b)\\mu_{\\mathrm{weight}}(t)=\\sum_{b}b\\,\\hat{w}_{t}(b).",
+                "position": 1337
+            },
+            {
+                "img": "https://arxiv.org/html/2601.19280/figures/rollout_se_timeseries.png",
+                "caption": "(b)Rollout-GDRO weighted SE proxy.WSE​(t)=∑bqt​(b)​σ^b/nb​(t)\\mathrm{WSE}(t)=\\sum_{b}q_{t}(b)\\hat{\\sigma}_{b}/\\sqrt{n_{b}(t)}compared to a compute-matched uniform baseline.",
+                "position": 1342
+            },
+            {
+                "img": "https://arxiv.org/html/2601.19280/figures/rollout_share_vs_budget.png",
+                "caption": "Figure 7:The Budget Frontier.A comparison of the dataset’s natural difficulty distribution (Left) versus the adversarial rollout allocation (Right) for 1.7B, 4B, and 8B models. The color intensity in the Right column represents the number of rollouts assigned per prompt (from purple≈2\\approx 2to yellow≈12\\approx 12). Note how the budgeter shifts compute intensity to the “transition zone,” decoupling resource allocation from data frequency: even when hard bins are rare (dark left), they receive maximum compute (bright right).",
+                "position": 1372
+            },
+            {
+                "img": "https://arxiv.org/html/2601.19280/figures/rollout_scalar_summaries.png",
+                "caption": "Figure 8:Macro-Level Allocation Dynamics (Rollout-GDRO).(Top) The Mean Accuracy Bin Index tracks the rising difficulty of targeted prompts. (Middle) The “Mass in High Bins” trace serves as quantitative evidence of the rollout adversary: it shows the dual variable mechanism keeping the total budget fixed while aggressively reweighting toward hard groups (≥accbin_8\\geq\\texttt{accbin\\_8}). (Bottom) Entropy metrics confirm that the 8B model (green) sustains a diverse allocation strategy even as it conquers lower difficulties, contrasting with the slower migration of the 1.7B model (blue).",
+                "position": 1385
+            },
+            {
+                "img": "https://arxiv.org/html/2601.19280/figures/rollout_snapshots.png",
+                "caption": "Figure 9:Snapshots of the Allocation Economy.Paired bars at four canonical steps showing the dataset share (dark blue) versus the normalized rollout budget (light blue) for each bin. This visualizes the“Multiplier Effect”: by Step 300, the 4B model allocates>80%>80\\%of its budget toaccbin_5+, even though these bins contain<20%<20\\%of the data. This explicitly demonstrates how Rollout-GDRO amplifies the signal from rare, high-value prompts.",
+                "position": 1415
+            }
+        ]
+    },
+    {
+        "header": "6Additional Related Work",
+        "images": []
+    },
+    {
+        "header": "7Limitations and Future Work",
+        "images": []
+    },
+    {
+        "header": "8Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AExperiment Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BMain Theoretical Results: A Game-and-Variance View",
+        "images": []
+    }
+]
