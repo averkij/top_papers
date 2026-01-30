@@ -1,0 +1,213 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.21571/assets/github.png",
+                "caption": "",
+                "position": 173
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.21571/x1.png",
+                "caption": "Figure 1:Token-level data filtering gets more effective with scale.We plot relative scaling laws that show the effective compute required to train a Transformer on filtered data that matches the loss on a baseline trained on completely unfiltered data. Larger models require proportionally more compute, i.e. filtering ismore effectivefor larger models. For 1.8B parameter models trained on token filtered data, we see a7000×7000\\timescompute slowdown on theforgetdomain (medicine).",
+                "position": 184
+            }
+        ]
+    },
+    {
+        "header": "2Motivation and related work",
+        "images": []
+    },
+    {
+        "header": "3Setting and approach",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.21571/x2.png",
+                "caption": "Figure 2:Operationalizing token filtering.After labeling our pretraining set using a model-based classifier, we removeforgettokens from the Transformer backpass. Whenloss masking, we allow models to seeforgettokens during the forwards pass. We also experiment withremoval, where we additionally replaceforgettokens with<|hidden|>tokens.",
+                "position": 266
+            }
+        ]
+    },
+    {
+        "header": "4Token-level data filtering works and scales",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.21571/x3.png",
+                "caption": "Figure 3:Token filtering Pareto dominates document filtering.We sweep across classifier boundaries for both our token- and document-level classifiers to filter pretraining data for 521M parameter models. We observe that token filtering can consistently achieve the same recall (i.e. equalmedicalloss) at higher precision (i.e. lowerbiologyloss) than document filtering.",
+                "position": 318
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x4.png",
+                "caption": "Figure 4:Token filtering scales better than document filtering.We plotforgetvs.retainloss for all model series; each point is a model. We observe that token filtering is close to the ‘frontier,’ achieving highforgetloss for any given level ofretainloss (top left of the plot).",
+                "position": 339
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x5.png",
+                "caption": "Figure 5:Data filtering decreases MCQ performance on theforgetdomain without substantial damage to theretaindomain.On MedMCQA and MedQA-USMLE, models trained with data filtering score near chance. Token filtering slightly reduces capabilities near the classification boundary (biology) but has no effect outside (STEM, non-STEM). The models trained with token filtering are weaker than the one trained with document filtering on MedQA-USMLE and MMLU Medicine, but equivalent onretainevaluations.",
+                "position": 342
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x6.png",
+                "caption": "Figure 6:Token filtering decreases free response quality in theforgetdomain.Responses to open-ended questions from theforgetdomain (HealthSearchQA) are judged by Claude Sonnet 4. Comparing different filtering methods, we see that token filtering decreases correctness up to20×20\\times, and relevance and coherence3×3\\times, relative to the baseline. Document filtering also degrades response quality, but to a lesser extent.",
+                "position": 357
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x7.png",
+                "caption": "Figure 7:Data filtering scales more robustly than unlearning.Larger models need fewer adversarial finetuning samples to achieve baseline performance (as a proportion of pretraining compute), but the RMU curve is steeper; in other words, as pretraining compute scales, the robustness gap between RMU and data filtering will greaten.",
+                "position": 382
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x8.png",
+                "caption": "Figure 8:Models trained with data filtering can reliably distinguish theforgetdomain.We fit a linear probe to each model to classifyforgetvs.retaintokens using the same setup assection5. Though small models trained with token filtering are worse at classification, the gap closes with scale. We include the performance of the pretraining filter (trained on4×4\\timesas many tokens) as a baseline.",
+                "position": 403
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x9.png",
+                "caption": "Figure 9:Token-level removal makesforgetset alignment easier.We train models to refuse queries from HealthSearchQA, but not queries from Alpaca. We observe that models trained with token filtering generalize as well as or better than the baseline, while the model trained with document filtering generalizes poorly.",
+                "position": 420
+            }
+        ]
+    },
+    {
+        "header": "5How to train your classifier",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.21571/x10.png",
+                "caption": "Figure 10:Ground-truth labels for three randomly selected classifier training documents.Highlighted tokens are labeled asforget, unhighlighted tokens areretain. Token labels are mostly good at identifying related tokens and ignoring benign ones, but there is still some noise.",
+                "position": 475
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x11.png",
+                "caption": "Figure 11:Classifier predictions for three randomly selected FineWeb-Edu documents.Annotations are from the classifier trained atop the 224M biLM, representingp​(medical)p(\\text{{\\color[rgb]{0.73046875,0.0703125,0}\\definecolor[named]{pgfstrokecolor}{rgb}{0.73046875,0.0703125,0}{{medical}}}})ranging fromlowtohighbased on the F1-maximizing threshold.",
+                "position": 561
+            }
+        ]
+    },
+    {
+        "header": "6How bad are bad labels?",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.21571/x12.png",
+                "caption": "Figure 12:Artificially noising labels makes filtering substantially worse.We simulate classifier error by randomly flipping labels (forget↔\\leftrightarrowretain) with a given probability. For classifier accuracya=0.89a=0.89and flip raterr, we plot error rate1−a​(1−r)−r​(1−a)1-a(1-r)-r(1-a). Note that the error rate is in terms of SAE-generated ground truth labels, so our best performing classifier still has an error rate of 11%.",
+                "position": 585
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x13.png",
+                "caption": "Figure 13:Scaling aggressively filtered data works.We sweep out the decision boundary of the classifier, ablating the proportion of tokens filtered out. We observe that filtering proportionally more tokens brings models closer to the frontier (top left of the plot), given enough scale. However, filtering a large amount of tokens also incurs a larger hit to retain loss.",
+                "position": 604
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x14.png",
+                "caption": "Figure 14:Classifiers trained on finer-grained labels are better filters.We filter our pretraining set with token-level classifierstrainedon labels of different granularities. We observe that while classifiers trained on token labeled data are slightly closer to the highforget/ lowretainloss frontier, classifiers trained on coarser labels are not substantially worse; in other words, they generalize well to token-level classification.",
+                "position": 617
+            }
+        ]
+    },
+    {
+        "header": "7Wrapping up",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.21571/x15.png",
+                "caption": "Figure 15:Token-level classifiers generalize from weak labels, document-level classifiers do not.We train weak token- and document-level probes on top of a 13M parameter biLM using various amounts of training data. We use these to label another subset of tokens, which we use to train a probe on top of a 224M parameter biLM. We observe that the strong token-level probe exhibits weak-to-strong generalization, whereas the strong document-level probe is consistently worse than its weak counterpart.",
+                "position": 640
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AImplementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.21571/x16.png",
+                "caption": "Figure 16:Raw compute-to-loss plots for all four model series across all three domains. We see in particular that token filtering achieves consistently highermedicalloss than document filtering and the baseline. We also observe that the slope of the scaling law for models trained with data filtering is lower in magnitude on theforget(compared to the baseline).",
+                "position": 3014
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x17.png",
+                "caption": "Figure 17:Free-response performance on a 3k-question subset of Alpaca, judged by Claude Sonnet 4. We generally see comparable performance between all models, though data filtering does lead to very slight degradation (but also note that these results are from a single random seed).",
+                "position": 3032
+            }
+        ]
+    },
+    {
+        "header": "Appendix BEvaluation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.21571/x18.png",
+                "caption": "Figure 18:Cloze accuracy on MCQ evaluations, using base models. We see generally the same trends: models trained with data filtering score around chance onforgetevaluations but generally match the baseline onretainquestions.",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x19.png",
+                "caption": "Figure 19:Calculating loss-matched baseline compute. We interpolate the compute-to-loss curve for the baseline models, then use this to estimate the required compute to train a baseline model that achieves the same loss as a target model.",
+                "position": 3062
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x20.png",
+                "caption": "Figure 20:Alignment generalization with refusal tokens. We see broadly the same effect as we do inFigure9: models trained with token removal generalize substantially better than the baseline. Notice here however that we see slightly better generalization with document filtering than in the general case (low refusal rate on Alpaca).",
+                "position": 3125
+            }
+        ]
+    },
+    {
+        "header": "Appendix CClassifier Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2601.21571/x21.png",
+                "caption": "Figure 21:Models trained with token filtering struggle on withinforgetdomain classification.We train linear probes on top of 61M parameter models to classify documents between subdomains of medRxiv; we report average accuracy after sweeping across layers. We see that while models are approximately equivalent onsubdomainvs.non-medicalclassification, models trained with token filtering are substantially worse than the baseline (and models trained with document filtering) at distinguishing between subdomains.",
+                "position": 3257
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x22.png",
+                "caption": "Figure 22:Delaying filtering by 40% makes filtering around an order of magnitude less effective.",
+                "position": 3260
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x23.png",
+                "caption": "Figure 23:Filtering early matters.We train model series up to 521M parameters and ablate the point during training at which we start applying loss masking. We see large gains from filtering earlier in training.",
+                "position": 3270
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x24.png",
+                "caption": "Figure 24:Histogram of the % of tokens in each document that our classifier labels as medical. We see that a number of documents have a nonzero but sub-25% number of medical tokens. Document-level classification would either have to throw out a very large number of documents (sacrificing precision) or allow for a large amount of leakage (sacrificing recall) in order to match token-level performance.",
+                "position": 3273
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x25.png",
+                "caption": "Figure 25:Classifiers trained on coarse labels perform only marginally worse than those trained on token-level labels. We train token-level probes on top of the 61M biLM using token, sentence, and document-level labels, and evaluate them on token-level ground truth labels (generated by our SAE pipeline). We observe good generalization from the probes trained on coarse labels.",
+                "position": 3276
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x26.png",
+                "caption": "Figure 26:Models trained with data filtering show more gradual changes than RMU under adversarial finetuning.Though RMU starts at a test loss3×3\\timeshigher than token removal (10.7310.73), it steeply improves in just a couple steps of finetuning. Models trained on filtered data see more consistent and gradual decreases in loss.",
+                "position": 3279
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x27.png",
+                "caption": "Figure 27:Loss frontiers for model series trained on data filtered by the classifiers we developed insection5.",
+                "position": 3286
+            },
+            {
+                "img": "https://arxiv.org/html/2601.21571/x28.png",
+                "caption": "Figure 28:Better classifiers are better filters.We see that better classifiers (i.e., those with a higher AUROC) generally have a higher normalized AUC relative to the baseline.",
+                "position": 3289
+            }
+        ]
+    },
+    {
+        "header": "Appendix DExample responses to free-response medical questions",
+        "images": []
+    },
+    {
+        "header": "Appendix EPrompts",
+        "images": []
+    }
+]
