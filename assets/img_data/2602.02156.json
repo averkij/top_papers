@@ -1,0 +1,94 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02156/x1.png",
+                "caption": "Figure 1:Acc-Params comparisons with recurrent and vision methods. The vertical axis is accuracy (ARC-AGI-1); the horizontal axis is Parameters (memory cost). Our Loop-ViT outperforms previous methods while requiring significantly cheaper Params.",
+                "position": 98
+            },
+            {
+                "img": "https://arxiv.org/html/2602.02156/x2.png",
+                "caption": "Figure 2:Illustration of ARC-AGI-1 and ARC-AGI-2 benchmarks.The left two columns display tasks from ARC-AGI-1, characterized by visual priors such as “Object Cohesion” and “Pattern Completion”. These tasks primarily test perceptual generalization. The right column showcases an ARC-AGI-2 task, exemplifying higher-order algorithmic challenges such as “Symbolic Interpretation”, “Compositional Reasoning”, and “Contextual Rule Application”. For each task, the top rows show the few-shot demonstrations (Training) used to infer the rule, and the bottom row shows the query input (Inference).",
+                "position": 117
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02156/x3.png",
+                "caption": "Figure 3:Comparison of input representations and inference\nparadigms for ARC.(A) LLMs operate on a 1D textual token\nsequence obtained by serializing the ARC grids into a prompt\n(e.g., JSON/ASCII). (B) Recurrent token models also take a 1D\nsequence, but with a discrete grid-tokenization that pads the grid to\na fixed canvas and inserts special boundary tokens (e.g., PAD/EOS),\nyielding a fixed-length token stream. (C) VARC follows a vision\nformulation, encoding the grid as a 2D spatial input processed\nin a single forward pass. (D) Ours combines the vision input\nwith looped/iterative inference, repeatedly refining internal repre-\nsentations and predictions across multiple steps, bridging spatial\ninductive bias and recurrent computation.",
+                "position": 149
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02156/x4.png",
+                "caption": "Figure 4:The overall pipeline of the proposed LoopViT.(A) Comparison of the standard VARC pipeline versus our Loop-ViT pipeline. Loop-ViT introduces iterative state refinement through a weight-tied core. (B) Detailed unrolled view of the Loop-ViT recurrence, where the stateztz_{t}acts as a dynamic memory. (C) Structure of the Hybrid Transformer Block, employing RMSNorm and Rotary Positional Embeddings. (D) The Heterogeneous Feed-Forward Network (ConvGLU), which splits processing pathways to apply depth-wise convolution solely to image tokens while preserving task tokens, reconciling local spatial updates with global rule induction.",
+                "position": 167
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02156/x5.png",
+                "caption": "Figure 5:Iterative Prediction Refinement in Loop-ViT.(Top) The model’s output progressively approaches the ground truth through successive iterations.\n(Middle) Pixel-wise difference maps between consecutive steps show decreasing prediction volatility.\n(Bottom) Entropy measurements demonstrate the stabilization of the model’s confidence.\nThis “crystallization effect” reveals how recurrent processing enables gradual convergence to logically consistent solutions.",
+                "position": 353
+            },
+            {
+                "img": "https://arxiv.org/html/2602.02156/x6.png",
+                "caption": "Table 1:Performance comparison on ARC-AGI benchmark.Loop-ViTdemonstrates superior parameter efficiency, with a modest 11.2M parameters outperforming a 73M-parameter ensemble. Best results arebold, the second results areunderlined.",
+                "position": 368
+            },
+            {
+                "img": "https://arxiv.org/html/2602.02156/x6.png",
+                "caption": "Figure 6:Joint scaling of core block depth (BB) and loop steps (TT) onARC-AGI-1.We vary the number of layers in the recurrent core (BB) and the number of unrolled iterations (TT). Each line represents a fixed core depth. The performance multiplier provided by recurrence is most evident in lower-capacity core models (e.g.,B=2B=2), where increasingTTfrom 1 to 6 yields a massive performance leap. Performance continues to scale withTTeven for deeper cores, demonstrating that computational time can effectively compensate for limited parameter space.",
+                "position": 540
+            },
+            {
+                "img": "https://arxiv.org/html/2602.02156/x7.png",
+                "caption": "Figure 7:Ablation of Inductive Bias: Hybrid vs. Vanilla Coreacross different core block depths (BB) onARC-AGI-1. We compare our Hybrid architecture (incorporating depth-wise convolutions in the FFN) against a standard Vanilla Transformer core. The Hybrid core consistently maintains a significant accuracy gap over the Vanilla baseline across all depths. This persistent advantage indicates that injecting local spatial priors is essential for grounding abstract reasoning in the image domain, and this requirement is not diminished by simply increasing model depth.",
+                "position": 550
+            },
+            {
+                "img": "https://arxiv.org/html/2602.02156/x8.png",
+                "caption": "Figure 8:Accuracy–Compute–Params comparisons.The horizontal axis is total inference compute, the vertical axis is Accuracy, and the circle radius corresponds to model Parameters. For Loop-ViT, GFLOPs accounts for unrolled recurrence and is computed using theaverage executed stepsunder entropy-based halting. Our Entropy Early Exit strategy (orange) consistently surpasses the fixed-step baselines (grey) across all model scales (BB=2, 4, 6), establishing a stronger accuracy–compute Pareto frontier. Feed-forward VARC baselines are included for comparison.",
+                "position": 554
+            },
+            {
+                "img": "https://arxiv.org/html/2602.02156/x9.png",
+                "caption": "Figure 9:Quantitative Diagnostics of Recurrent Convergence.We monitor the evolution of (top) theL2L_{2}-normalized differenceδt\\delta_{t}and (bottom) the average pixel-wise Shannon entropyℋt\\mathcal{H}_{t}across Loop-ViT iterations. Solid lines and shaded regions represent the mean and variance across the validation set, respectively. The synchronized decay of both prediction volatility and information uncertainty confirms that the model’s internal state adheres to a stable trajectory toward a deterministic logical attractor, empirically validating our dynamic exit criterion.",
+                "position": 557
+            },
+            {
+                "img": "https://arxiv.org/html/2602.02156/x10.png",
+                "caption": "Figure 10:Efficiency vs. Task Difficulty Analysis.Using the Loop-ViT variant (B=2B=2), we stratify the test set by the number of inference steps Loop-ViT requires before exiting. “Early Exit” (Step 5) samples achieve significantly higher accuracy (83.33%) compared to those requiring the full depth (Step 8, 45.80%). This confirms that the dynamic exit mechanism successfully identifies and solves simpler instances with minimal compute, while allocating more resources to harder tasks.",
+                "position": 560
+            },
+            {
+                "img": "https://arxiv.org/html/2602.02156/x11.png",
+                "caption": "Figure 11:Evolution of Attention Patterns Across Processing Steps.We visualize the average self-attention maps across Loop-ViT’s recurrent steps.\nEarly steps exhibit broad attention that analyzes the full input context.\nLater steps develop focused, sparse patterns that precisely track the algorithmic operations needed to solve the ARC task.\nThis shift from global scanning to localized execution mirrors human reasoning strategies.",
+                "position": 563
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]

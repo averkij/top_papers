@@ -1,0 +1,111 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.01801/x1.png",
+                "caption": "Figure 1:Our method substantially acceleratespre-trainedautoregressive video diffusion models and autoregressive world models while maintaining high visual quality, by introducing a new KV-cache compression with self- and cross-attention sparsification. On a single H100 GPU, it achieves5×5\\times–10×10\\timesspeedups for multi-minute video generation, without further training/optimization, and keeps peak GPU memory nearly constant over long rollouts.",
+                "position": 101
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Auto-regressive Video Diffusion Models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.01801/x2.png",
+                "caption": "Figure 2:Attention sparsity in autoregressive video diffusion.Attention recall vs. density on Rolling-Forcing(Liu et al.,2025b), averaged over transformer blocks (shaded: std). Density is induced by keeping only the highest-attention entries. This achieves high recall, e.g.,≈\\approx85% at 30% density, indicating substantial sparsity.",
+                "position": 163
+            },
+            {
+                "img": "https://arxiv.org/html/2602.01801/x3.png",
+                "caption": "Figure 3:Semantic structure and temporal redundancy in self-attention features.PCA of self-attention queriesQQand cached keysK^\\hat{K}across frames (similar colors denote nearby embeddings) for a generated video of a cat walking toward the camera. The features exhibit semantic clustering (foreground vs. background) and strong key repetition across frames, motivating KV-cache compression.",
+                "position": 168
+            }
+        ]
+    },
+    {
+        "header": "4Motivation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.01801/x4.png",
+                "caption": "Figure 4:Cross-attention is frame-selective.Input prompt (top) with Per-token cross-attention maps (bottom) for “cat”, “van”, and “dog” across frames. Attention concentrates on the tokens relevant to the current content (cat early, van during occlusion, dog after transformation), suggesting that pruning irrelevant prompt tokens per frame can reduce cross-attention compute.",
+                "position": 190
+            }
+        ]
+    },
+    {
+        "header": "5Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.01801/figures/temporal_correspondance.png",
+                "caption": "Figure 5:Temporal correspondence for KV compression.Many key features persist across frames and can be matched using temporal correspondence (colored dots/arrows). Correspondences are recovered by selecting, for each current-frame query, the most related key in a previous frame(Nam et al.,2025)",
+                "position": 255
+            }
+        ]
+    },
+    {
+        "header": "6Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.01801/x5.png",
+                "caption": "Figure 6:Scaling with generation length in Rolling-Forcing.(a)Throughput.As context grows, Dense FA3 slows substantially, and prior sparsification baselines (SVG1/2, RadialAttention) fail to maintain throughput due to heavy per-block preprocessing repeated across blocks, timesteps, and frames. Our method sustains nearly constant FPS over a 3K-frame rollout, keeping attention cost effectively independent of cache length.\n(b)Peak memory.FA3 and baselines exhibit increasing GPU memory as the KV cache expands, while our memory remains flat, consistent with a bounded cache.",
+                "position": 571
+            },
+            {
+                "img": "https://arxiv.org/html/2602.01801/x6.png",
+                "caption": "Figure 7:Qualitative results on long-video generation with Rolling-Forcing.Our approach preserves the visual fidelity and temporal consistency of Dense FA3 across diverse prompts, while current sparsification baselines (SVG1/2) often exhibit artifacts and drift; RadialAttention is more stable but still degrades in challenging scenes.",
+                "position": 576
+            }
+        ]
+    },
+    {
+        "header": "7Results",
+        "images": []
+    },
+    {
+        "header": "8Summary",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AProof of Lemma5.1",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.01801/x7.png",
+                "caption": "Figure 8:Scaling with generation length in LonVie2.(a)Throughput.As the context grows, dense FA3 slows down, and existing sparsification baselines (SVG1/2, RadialAttention) do not sustain throughput due to substantial per-block preprocessing repeated across transformer blocks, diffusion timesteps, and frames. Our method keeps FPS nearly constant over a 3K-frame rollout, making attention cost effectively independent of cache length.\n(b)Peak memory.FA3 and baselines show rising GPU memory with the expanding KV cache, whereas our memory stays flat, consistent with a bounded cache.",
+                "position": 1305
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAdditional Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.01801/x8.png",
+                "caption": "Figure 9:Qualitative results on video world-model LongVie2.Our TempCache+ANN sparsification preserves the visual fidelity and temporal consistency of dense FlashAttention-3 across diverse prompts, while offline-designed sparsification baselines (SVG1/2) often exhibit artifacts and drift; RadialAttention is more stable but still degrades in challenging scenes. full videos and additional results can be found in the supplementary material.",
+                "position": 1699
+            },
+            {
+                "img": "https://arxiv.org/html/2602.01801/x9.png",
+                "caption": "Figure 10:Ablations on TempCache and quantized ANN.(a) TempCache KV compression trades accuracy for compression: lowering the key-similarity threshold increases merging but reduces attention recall.\n(b) Quantization bit-width vs. recall: higher precision improves ANN matching quality.\n(c) Quantization bit-width vs. throughput: lower precision yields higher FPS, highlighting the accuracy–speed trade-off.",
+                "position": 1728
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAblation Study",
+        "images": []
+    }
+]

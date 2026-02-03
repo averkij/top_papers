@@ -1,0 +1,124 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02472/hwemoji-assets.pdf",
+                "caption": "",
+                "position": 94
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3RMS Scale Consistency of Activation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02472/x1.png",
+                "caption": "Figure 1:RMS-preserving rescaling consistently improves late-stage convergence under MoE expert inner-dimension expansion.We expand the expert inner dimension from512→1024512\\to 1024at100100B tokens and plotreference-loss(relative to the pre-expansion reference) over the remaining training tokens.(a)–(e)sweep five (up_proj–down_proj init) pairs.\nIn every case,Naive Init, No Scaledyields a smaller immediate loss gap, whileRMS-Preserved Scaledovertakes later and converges to a lower final loss.(f)compares the RMS-preserved late-stage results and highlights a notable pattern:both-sides copiedsignificantly underperforms other RMS-preserved strategies.",
+                "position": 497
+            }
+        ]
+    },
+    {
+        "header": "4Breaking the Symmetry Lock",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02472/x2.png",
+                "caption": "Figure 2:Optimizer-state handling under copy-based expansion.\nSymmetric treatments (Drop/Copy) exhibit a symmetry lock, yielding slower recovery and higher loss.\nOur asymmetric reset avoids this bottleneck, while state scaling provides no additional gain.",
+                "position": 642
+            },
+            {
+                "img": "https://arxiv.org/html/2602.02472/x3.png",
+                "caption": "Figure 3:Asymmetric re-warmup consistently improves convergence under mid-stage width expansion.Across Inner2×2\\times, Hidden2×2\\times, and joint expansion, re-warmup lowers the final loss for both RMS-preserved copy-copy and zero-copy.\nCopy-copy benefits most, achieving the best final loss, effectively mitigating copy-induced symmetry lock.",
+                "position": 722
+            }
+        ]
+    },
+    {
+        "header": "5Discussions",
+        "images": []
+    },
+    {
+        "header": "6Conclusion and Future Work",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "7Derivations",
+        "images": []
+    },
+    {
+        "header": "8Detailed Experimental Setup",
+        "images": []
+    },
+    {
+        "header": "9RMS Scale Under Zero Initialization",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02472/x4.png",
+                "caption": "Figure 4:Under zero initialization, RMS-preserved scaling enables the post-expansion activation RMS scale to quickly recover toward the original baseline, indicating that zero initialization should be treated as random under RMS-preserving expansion.",
+                "position": 1522
+            }
+        ]
+    },
+    {
+        "header": "10Hidden-Dimension Expansion: RMS-Preserved Scaling",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02472/x5.png",
+                "caption": "Figure 5:Hidden-dimension expansion mirrors expert-inner growth.We repeat the RMS-preserving scaling comparison under hidden-dimension2×2\\timesexpansion (1024→20481024\\!\\rightarrow\\!2048at100100B tokens). Across initialization pairs, RMS-preserved rescaling consistently improves late-stage convergence relative to naive unscaled expansion, exhibiting the same pattern observed for expert-inner growth in Sec.3.3.",
+                "position": 1532
+            }
+        ]
+    },
+    {
+        "header": "11A Sample Asymmetric Re-warmup Learning Rate Curve",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02472/x6.png",
+                "caption": "Figure 6:A sample asymmetric learning rate re-warmup curve.\nAt the expansion steptet_{e}, the learning rate of the original parameters remains on the baseline cosine schedule, whereas the newly introduced parameters are re-warmed from the instantaneous rateηe=η​(te)\\eta_{e}=\\eta(t_{e})to a higher peakη^max=ρ​ηe\\hat{\\eta}_{\\max}=\\rho\\,\\eta_{e}overτw\\tau_{w}steps, and then decay with the same cosine tail towardηmin\\eta_{\\min}, as specified in Eq. (28).",
+                "position": 1543
+            }
+        ]
+    },
+    {
+        "header": "12Hyperparameter Search for Asymmetric Re-warmup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02472/x7.png",
+                "caption": "Figure 7:Hyperparameter search for asymmetric re-warmup.Under the expert-inner2×2\\timesexpansion setting,ρ≈1.25\\rho\\approx 1.25–1.31.3,τw≈0\\tau_{w}\\approx 0–250250, yields the lowest final loss and we adoptρ=1.3\\rho=1.3,τw=250\\tau_{w}=250as the default re-warmup configuration in all experiments involving re-warmup.",
+                "position": 1559
+            }
+        ]
+    },
+    {
+        "header": "13Effectiveness Under Muon",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02472/x8.png",
+                "caption": "Figure 8:Effectiveness under Muon.We repeat the expert-inner expansion experiment (512→\\rightarrow1024 at 100B tokens) using Muon and plot reference-loss versus training tokens.(a)RMS-preserved scaling consistently improves late-stage convergence compared to naive unscaled initialization.(b)With RMS-preserved scaling and asymmetric state reset applied, asymmetric learning rate re-warmup further lowers the final loss, confirming that our framework remains effective under Muon.",
+                "position": 1582
+            },
+            {
+                "img": "https://arxiv.org/html/2602.02472/x9.png",
+                "caption": "Figure 9:Under expert-inner copy-copy expansion, we compare three alternatives against our framework: (i) Uneven Splitting (fixed1:21\\!:\\!2or randomizedr:(1−r)r\\!:\\!(1-r)withr∈[0.1,0.5]r\\in[0.1,0.5]) and (ii) symmetric±\\pmperturbation that cancels in the forward pass, and (iii) globally re-warmup all parameters.\nAll alternatives converge to a higher final loss, underperforming our framework.\nInsets highlight the post-expansion dynamics: our method exhibits a brief loss increase followed by rapid recovery, consistent with more effective symmetry breaking in the newly added capacity.",
+                "position": 1585
+            }
+        ]
+    },
+    {
+        "header": "14Comparison to Prior Function-Preserving Symmetry-Breaking Heuristics",
+        "images": []
+    }
+]
