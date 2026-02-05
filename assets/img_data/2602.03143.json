@@ -1,0 +1,113 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.03143/x1.png",
+                "caption": "Figure 1:An overview of our proposed method, SAGE. When an LLM can’t sample any correct trajectory for a prompt, the LLMself-generateshint from the reference solution of the prompt. The hint is then used together with the difficult prompt as input to the LLM, avoiding advantage collapse and ensuring the sampling of correct trajectories to update the policy model.",
+                "position": 126
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.03143/x2.png",
+                "caption": "Figure 2:The percentage of prompts whose correct trajectories have NEVER been sampled w.r.t. the training step. Here we train on 64k prompts, and sample 8 traces per prompt per step. A large number of prompts is wasted during RL, especially for a weaker LLM, since they don’t offer any signal for training.",
+                "position": 156
+            }
+        ]
+    },
+    {
+        "header": "2RL with Privileged Hinting",
+        "images": []
+    },
+    {
+        "header": "3Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.03143/x3.png",
+                "caption": "Figure 3:Average accuracy on Qwen3-4B-Instruct over 6 benchmarks. The 4.5k training prompts here are extremely hard, whose correct trajectories have never been sampled during training as Figure2. The number of rollouts per prompt per step here is set to 32 to encourage exploration.Left: Performance on various hints. Training without hint only slightly improves the performance, since the reward signal from the hard prompts is sparse. However, training with any hint boosts the performance. Among all methods, online self-hinting consistently achieves the best performance across different hint levels.Right: Average accuracy w.r.t. the training steps for hint levell=2l=2. Training without any hint even degrades the performance as the training goes, since the reward signal is too sparse, making it overfit to a few solvable prompts. However, online self-hinting boosts the performance steadily. Refer to TableC.1for detailed number.",
+                "position": 363
+            },
+            {
+                "img": "https://arxiv.org/html/2602.03143/x3.png",
+                "caption": "",
+                "position": 366
+            },
+            {
+                "img": "https://arxiv.org/html/2602.03143/x4.png",
+                "caption": "",
+                "position": 370
+            }
+        ]
+    },
+    {
+        "header": "4Design of SAGE",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.03143/x5.png",
+                "caption": "Figure 4:The training dynamics of different methods. For the training rewards, one should focus on the trend instead of the value, since adding hint (SAGEand Scaf-GRPO) modifies the prompt difficulty, and using a correct off-policy trajectory (LUFFY) increases the reward. (1) LUFFY shows the most instability, with a very high entropy for Llama and a very low reward at the beginning of training for Qwen3, because it imitates the off-policy trajectory whose distribution might not be aligned with the policy model. (2) Scaf-GRPO shows the lowest entropy, implying less exploration. (3)SAGEretains the on-policy characteristic, has a mild entropy and shows a stable growth in response length, which normally implies a better reasoning pattern.",
+                "position": 1038
+            }
+        ]
+    },
+    {
+        "header": "5Empirical Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.03143/x6.png",
+                "caption": "Figure 5:Ablation studies on Qwen3-4B-Instruct trained with the same prompt set as Figure3.",
+                "position": 1158
+            },
+            {
+                "img": "https://arxiv.org/html/2602.03143/x7.png",
+                "caption": "Figure 6:Number of prompts uses hint during training on Llama-3.2-3B-Instruct. Batch size is 128. The model use less hint w.r.t. the training step, indicating that the model becomes more powerful.",
+                "position": 1161
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "Impact Statements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AIllustration of Privileged Hinting",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.03143/x8.png",
+                "caption": "Figure A.1:Example of privileged hinting for a single prompt.\nGiven a math promptxx, a hint generatorqϕq_{\\phi}uses the reference solutionτ⋆\\tau^{\\star}during training to produce a procedural hint (h) that summarizes intermediate reasoning without revealing the final answer. Rolling out the policyπθ\\pi_{\\theta}on the original prompt can yield an incorrect solution with zero reward, while conditioning on(x,h)(x,h)shifts the rollout distribution and enables a correct solution with positive reward. The task return is unchanged, and at deployment the hint is removed so the model runs on the original prompt only.",
+                "position": 1599
+            }
+        ]
+    },
+    {
+        "header": "Appendix BPrompt for hint generation and the usage of hint",
+        "images": []
+    },
+    {
+        "header": "Appendix CDetailed implementation settings",
+        "images": []
+    },
+    {
+        "header": "Appendix DProofs",
+        "images": []
+    }
+]
