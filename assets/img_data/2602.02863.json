@@ -1,0 +1,176 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02863/figures/Fig1.png",
+                "caption": "Figure 1:Inference-time dynamic instability as a diagnostic signal.\nConceptual overview of an inference-time diagnostic for dynamic instability in large language model reasoning.A: At each decoding steptt, we observe only the renormalized top-kknext-token distributionp~t\\tilde{p}_{t}, which is accessible as a black-box inference-time signal; no hidden states, gradients, or training access are required.B: An instability event is characterized by an abrupt reshuffling of probability mass among high-probability candidates, accompanied by increased uncertainty (higher entropy) between consecutive steps.C: We define a diagnostic instability signalIt=Dt+λ​HtI_{t}=D_{t}+\\lambda H_{t}, combining distributional shiftDt=JSD​(p~t,p~t−1)D_{t}=\\mathrm{JSD}(\\tilde{p}_{t},\\tilde{p}_{t-1})and uncertaintyHtH_{t}. All quantities are computed solely fromp~t\\tilde{p}_{t}at inference time, with overall instability strength summarized asS=maxt⁡ItS=\\max_{t}I_{t}.D: Instability strengthSSis associated with increased failure risk, while the peak location (relative positionρ\\rho) provides complementary information, separating earlier (more recoverable/corrective) from later (less recoverable/destructive) instability episodes.",
+                "position": 214
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02863/figures/Fig2.png",
+                "caption": "Figure 2:Timing-dependent regimes of inference-time instability.\nRepresentative decoding traces illustrating how thetimingof instability, rather than its\nmagnitude alone, is associated with different reasoning outcomes.A: A representative trace with an early instability peak (recoverable / corrective). Although the\ninstability signalItI_{t}reaches a high value, it occurs sufficiently early in decoding for the model\nto recover, resulting in a correct final answer.B: A representative trace with a late instability peak (unrecoverable / destructive). Despite\ncomparable instability strength, the peak occurs near the end of decoding, leaving limited\nopportunity for recovery and resulting in an incorrect final answer.C: A controlled comparison with instability signals normalized to comparable peak strength,\ndemonstrating that magnitude alone is insufficient: similar instability strength can correspond to\ndifferent outcomes depending on peak timing. All curves show representative (not averaged) decoding\ntrajectories, with instability defined asIt=Dt+λ​HtI_{t}=D_{t}+\\lambda H_{t}.",
+                "position": 288
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": []
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02863/x1.png",
+                "caption": "Figure 3:Monotonic bucket trends for Llama-3.2-1B-Instruct across temperature settings\n(τ∈{0.0,0.3,0.7}\\tau\\in\\{0.0,0.3,0.7\\}). Higher instability buckets consistently show lower accuracy,\nconfirming the predictive value of the instability signal.",
+                "position": 811
+            }
+        ]
+    },
+    {
+        "header": "6Corrective vs. Destructive Instability",
+        "images": []
+    },
+    {
+        "header": "7Discussion",
+        "images": []
+    },
+    {
+        "header": "8Limitations",
+        "images": []
+    },
+    {
+        "header": "9Conclusion",
+        "images": []
+    },
+    {
+        "header": "Impact Statement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix: Additional Figures",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02863/x2.png",
+                "caption": "Figure 4:Accuracy by peak instability position on the 100-trace held-out baseline run (same setting asTable2). Early peaks allow recovery and yield higher accuracy; late peaks\nleave insufficient time to recover.",
+                "position": 1614
+            },
+            {
+                "img": "https://arxiv.org/html/2602.02863/x3.png",
+                "caption": "Figure 5:Failure-mode distribution on GSM8K (300 examples) for Llama-3.2-1B-Instruct greedy.\nWe partition wrong traces into three disjoint categories for interpretability:stable wrong(wrong traces in the lowest quintile of instability strengthSS),early collapse(wrong traces in the highest quintile of early-window strengthS20=maxt≤20⁡ItS_{20}=\\max_{t\\leq 20}I_{t}), andunstable wrong(the remaining wrong traces).\nThis breakdown highlights that a non-trivial fraction of errors are stable wrong, consistent with\nthe limitation that instability is not a universal explanation of failure.",
+                "position": 1627
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAppendix: Theoretical Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02863/x4.png",
+                "caption": "Figure 6:Theory and experiment alignment on representative Llama-3.2-1B-Instruct GSM8K greedy traces.\nWe plot step-to-step JSDDtD_{t}, entropyHtH_{t}, the local softmax Jacobian curvature proxyκt(k)\\kappa_{t}^{(k)}computed as the smallest non-zero eigenvalue ofdiag​(p~t)−p~t​p~t⊤\\mathrm{diag}(\\tilde{p}_{t})-\\tilde{p}_{t}\\tilde{p}_{t}^{\\top}(equivalently, the minimum eigenvalue on𝟏⟂\\mathbf{1}^{\\perp}) on the renormalized top-kkdistribution,\nand the combined instabilityIt=Dt+HtI_{t}=D_{t}+H_{t}(withλ=1\\lambda=1). The example traces are selected deterministically to illustrate\nan early-peak correct trace and a late-peak wrong trace. Large JSD spikes occur during uncertain\nsegments whereκt(k)\\kappa_{t}^{(k)}is non-negligible, consistent with Lemma2, and\nlate peak position aligns with the recoverability interpretation in Theorem2.",
+                "position": 2008
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAppendix: Proofs",
+        "images": []
+    },
+    {
+        "header": "Appendix DAppendix: Detector Comparison",
+        "images": []
+    },
+    {
+        "header": "Appendix EAppendix: Top-kkSensitivity",
+        "images": []
+    },
+    {
+        "header": "Appendix FAppendix: Early-Window Separability",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02863/x5.png",
+                "caption": "Figure 7:Early-warning separability as a function of prefix window length on GSM8K-300.\nWe report AUC(Sw)wrong{}_{\\text{wrong}}(S_{w})as a function of the window sizeww.\nSeparability emerges with short prefixes and improves with longer windows, supporting that\ninstability is detectable before completion of the full reasoning trace.",
+                "position": 2448
+            }
+        ]
+    },
+    {
+        "header": "Appendix GAppendix: Negative Controls and Alternative Baselines",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02863/x6.png",
+                "caption": "Figure 8:Signal ablation on Llama-3.2-1B-Instruct: comparing JSD-only (λ=0\\lambda=0) vs. JSD+Entropy\n(λ=1\\lambda=1). The entropy component improves discrimination, particularly in lower-instability\nbuckets where pure JSD may saturate.",
+                "position": 2665
+            }
+        ]
+    },
+    {
+        "header": "Appendix HAppendix: Bootstrap Confidence Intervals",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02863/x7.png",
+                "caption": "Figure 9:Bootstrap confidence intervals for bucketed accuracy on GSM8K (300 examples).\nEach curve plots accuracy across five equal-sized instability buckets (B1 to B5), with 95%\nbootstrap confidence intervals over examples (1000 resamples).",
+                "position": 2766
+            }
+        ]
+    },
+    {
+        "header": "Appendix IAppendix: Peak Threshold Sensitivity",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02863/x8.png",
+                "caption": "Figure 10:Accuracy by peak positionρ=t⋆/T\\rho=t^{\\star}/Tin 10 equal-width bins on the 100-trace\nfull-vocabulary baseline run. Bin counts are annotated above each point.",
+                "position": 2876
+            }
+        ]
+    },
+    {
+        "header": "Appendix JAppendix: Mechanistic Interpretation",
+        "images": []
+    },
+    {
+        "header": "Appendix KAppendix: Peak-Step Probes",
+        "images": []
+    },
+    {
+        "header": "Appendix LAppendix: Additional Full-Set Runs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.02863/x9.png",
+                "caption": "Figure 11:Bucketed accuracy trends for the full-set runs intable14.\nEach curve plots accuracy across five equal-sized instability buckets (B1 to B5), showing a\nmonotonic decline as instability increases on both tasks and for all models.",
+                "position": 3172
+            },
+            {
+                "img": "https://arxiv.org/html/2602.02863/x10.png",
+                "caption": "Figure 12:Cross-task validation on a fixed model (Llama-3.2-1B).\nWe plot bucketed accuracy trends (B1 to B5) by instability strength on GSM8K, HotpotQA, and ReClor.\nOn GSM8K and HotpotQA, accuracy declines with instability. On ReClor in this short-answer\nmultiple-choice setting, the trend inverts: most errors are stable-but-wrong, and the rare correct\ntraces exhibit higher instability.",
+                "position": 3177
+            }
+        ]
+    },
+    {
+        "header": "Appendix MAppendix: Peak Position in a Fixed Early Window",
+        "images": []
+    },
+    {
+        "header": "Appendix NAppendix: Reproducibility and Implementation Details",
+        "images": []
+    }
+]
