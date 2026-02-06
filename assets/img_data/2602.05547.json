@@ -1,0 +1,147 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05547/x1.png",
+                "caption": "Figure 1:GRPO assigns uniform task weights and samples without regard to task difficulty or zero-gradient rates. Consequently, easy tasks (Countdown) dominate while harder tasks (ARC, Zebra) lag, and effective gradient flow is skewed by varying zero-gradient rates (⊗\\otimesmarks high zero-gradient rates).\nIn contrast, MT-GRPO adapts task weights to prioritize weaker tasks and uses a ratio-preserving sampler to align effective gradient contributions with target weights, substantially improving ARC and Zebra and yielding more balanced performance.",
+                "position": 108
+            }
+        ]
+    },
+    {
+        "header": "2Problem Formulation",
+        "images": []
+    },
+    {
+        "header": "3Multi-Task Post-Training Objective",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05547/x2.png",
+                "caption": "Figure 2:In strict worst-task optimization (ε=0\\varepsilon=0), task weights rapidly collapse to the current worst task and oscillate as the worst task shifts, resulting in near-zero weighting of Countdown.",
+                "position": 325
+            }
+        ]
+    },
+    {
+        "header": "4Algorithm",
+        "images": []
+    },
+    {
+        "header": "5Practical Findings and Solutions",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05547/x3.png",
+                "caption": "Figure 3:Ratios of zero-gradient prompts across tasks observed during training. ARC exhibits a substantially higher proportion of zero-gradient prompts than Zebra.",
+                "position": 436
+            }
+        ]
+    },
+    {
+        "header": "6Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05547/x4.png",
+                "caption": "Figure 4:Experiment 1: MT-GRPO substantially outperforms all baselines in terms of worst-task accuracy by6%6\\%or more without conceding on average accuracy. Moreover, it achieves higher average per-task relative change, reflecting stronger improvements on weaker tasks.",
+                "position": 463
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05547/x5.png",
+                "caption": "Figure 5:MT-GRPO reaches target worst-task accuracy thresholds substantially faster (50%50\\%fewer training steps) than baselines; striped bars indicate the threshold was not reached.",
+                "position": 503
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05547/x6.png",
+                "caption": "Figure 6:Experiment 1:Top plots:Task-wise accuracies.Bottom plots:MT-GRPO reallocates weights toward the under-performing tasks. In contrast, baselines continue to prioritize high-performing Countdown, leading to weaker performance on Zebra or ARC and only marginal gains on Countdown. ARC is typically underrepresented in training batches relative to its task weight (middle vs right).RP samplerensures alignment of realized batch proportions with intended task weights and facilitates higher ARC performance.",
+                "position": 513
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05547/x7.png",
+                "caption": "Figure 7:Experiment 2:Top plots:Increasingλ\\lambdaimproves worst-task accuracy of MT-GRPO but reduces average accuracy, highlighting a trade-off controlled byλ\\lambda.λ=0.1\\lambda=0.1yields the highest average per-task relative change, showing stronger gains on weaker tasks.Bottom plots:For smallerλ\\lambda(0.1,0.30.1,0.3), MT-GRPO prioritizes slower-improving tasks, yielding larger gains on hard tasks while sacrificing easy ones. For largerλ\\lambda, gains concentrate on the lowest-performing task, increasing worst-task accuracy but reducing average relative change.",
+                "position": 522
+            }
+        ]
+    },
+    {
+        "header": "7Related Work",
+        "images": []
+    },
+    {
+        "header": "8Conclusion",
+        "images": []
+    },
+    {
+        "header": "9Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ABackground",
+        "images": []
+    },
+    {
+        "header": "Appendix BProofs and Theoretical Insights",
+        "images": []
+    },
+    {
+        "header": "Appendix CPractical Implementation and Additional Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05547/x8.png",
+                "caption": "Figure 8:Experiment 1 (3-tasks):Left:Comparison between MT-GRPO with and withoutRP sampler(RPS). In the absence of RPS, MT-GRPO increases the weight assigned to ARC in an attempt to compensate for the mismatch between target weights and effective batch representation. However, the effective ARC representation still remains lower than with RPS, highlighting the benefit ofRP sampler.Right:Comparison between MT-GRPO with and without Acceptance Aware Sampling (AAS). Removing AAS increases the average number of resampling rounds (curve smoothed for readability).",
+                "position": 2195
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05547/x8.png",
+                "caption": "",
+                "position": 2198
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05547/x9.png",
+                "caption": "",
+                "position": 2203
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05547/x10.png",
+                "caption": "Figure 9:Left:Task weights assigned to Zebra across methods in Experiment 1. (SeeFigure˜6for full task performance and weights across other tasks.)Right:Number of training steps required to reach specified worst-task accuracy thresholds in Experiment 2. Bars reaching the maximum indicate that the method did not reach the threshold within the training budget. Our method consistently reaches thresholds in fewer steps than baselines.",
+                "position": 2209
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05547/x10.png",
+                "caption": "",
+                "position": 2212
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05547/x11.png",
+                "caption": "",
+                "position": 2217
+            }
+        ]
+    },
+    {
+        "header": "Appendix DExperimental Details and Reproducibility",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05547/x12.png",
+                "caption": "Figure 10:Experiment 1 (3 tasks): Comparison of improvement-aware updates (Subroutine˜1) and regularized task-weight updates (Subroutine˜2). With regularization1​e−21e-2, the regularized task-weight update achieves similar worst-task accuracy but higher average accuracy, largely driven by gains on Countdown. However, improvement-aware updates achieve stronger performance on the harder task (ARC).",
+                "position": 2459
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05547/x13.png",
+                "caption": "Figure 11:Experiment 2 (9 tasks): Comparison between improvement-aware updates (Subroutine˜1) and regularized task-weight updates (Subroutine˜2). Moderate regularization (η=5​e−4\\eta=5e-4) improves worst-task accuracy over baselines but underperforms improvement-aware updates on both worst-task accuracy and average relative change on hard tasks. Stronger regularization (η=1​e−2\\eta=1e-2) reduces worst-task accuracy below DAPO and yields only modest gains in average accuracy (still below DAPO), driven primarily by improvements on easy and medium tasks rather than hard tasks.",
+                "position": 2462
+            }
+        ]
+    },
+    {
+        "header": "Appendix EStabilizing Task-weight Updates through Regularization",
+        "images": []
+    }
+]
