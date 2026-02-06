@@ -1,0 +1,181 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05885/x1.png",
+                "caption": "Figure 1:Rate of generated kernels achieving at least a1.2×1.2\\timesspeedup over the Torch reference on KernelBench across three level subsets.Dr. Kernel-14B is competitive with Claude-4.5-Sonnet and GPT-5, and applying sequential test-time scaling further improvesDr. Kernel-14B, surpassing both models on two of the three subsets.",
+                "position": 145
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05885/x2.png",
+                "caption": "Figure 2:Left: The plot uses a dual y-axis to compare two metrics. We report results from two models: Fast@1 of the model trained without reward hacking check (§3.3) (w/o hacking check), and Fast@1 / Fast@1.2 of the model trained with hacking check enabled. Evaluation is done using the same standard for all variants with hacking check. Multi-turn RL is run on Qwen3-8B-Base after cold-start SFT, using TRLOO for advantage estimation (§4.2) andKernelGymas the execution environment (§3).Right: Representative cases illustrating reward hacking and lazy optimization. InHacked_Kernel.py, the model emits a Triton kernel to satisfy the “@triton.jit” heuristic but never calls it, and additionally skips the real computation under the default training mode, inflating the measured speedup. InLazy_Optimization.py, the model replaces only a trivial sub-operation (channel summation) with a kernel while leaving the remaining computation in Torch, missing the larger gains from fusion.",
+                "position": 153
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05885/x3.png",
+                "caption": "",
+                "position": 162
+            }
+        ]
+    },
+    {
+        "header": "2Pitfalls in Kernel Generation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05885/x4.png",
+                "caption": "Figure 3:Overview ofKernelGymand our training framework.Left:We study RL training methods for kernel generation, including multi-turn RL with TRLOO, profiling-based rewards (PR), and profiling-based rejection sampling (PRS).Right:The architecture ofKernelGym: a server-worker split distributed design. The server side (interface + task manager) receives evaluation jobs and schedules to registered distributed GPU workers; each job runs in an isolated subprocess; toolkits produce structured signals for training, parallel evaluation and data collections.",
+                "position": 184
+            }
+        ]
+    },
+    {
+        "header": "3KernelGym: A Gym for Kernel Generations",
+        "images": []
+    },
+    {
+        "header": "4Multi-Turn RL withKernelGym",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05885/x5.png",
+                "caption": "Figure 4:Fast@1 on KernelBench Level 2.Left: Fast@1 at turn 3 over training steps.Right: Fast@1 across turns (evaluated at the selected checkpoint). Since all methods besides AutoTriton achieve their best performance at turn 3, we select checkpoints based on turn 3 performance. For AutoTriton we use their released model.",
+                "position": 269
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05885/x6.png",
+                "caption": "",
+                "position": 278
+            }
+        ]
+    },
+    {
+        "header": "5From Stability to Effectiveness: Overcoming Lazy Optimization",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05885/x7.png",
+                "caption": "Figure 5:Left: Fast@1.2 at turn 3 over training steps. While MRS stabilizes training, profiling-based methods (PR and PRS) are required to significantly improve the stricter Fast@1.2 metric.Right: Entropy over training steps. While MRS improves training stability, PR and PRS further enhance stability on top of MRS. Additional training dynamics are shown in Figure7.",
+                "position": 405
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05885/x8.png",
+                "caption": "",
+                "position": 414
+            }
+        ]
+    },
+    {
+        "header": "6Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05885/x9.png",
+                "caption": "Figure 6:Test-time scaling withDr. Kernel-14B. We report Fast@1.2 for thelast turn(left) andbest-of-history(right). Vanilla extrapolation increases the number of turns by appending all previous turns to the prompt. Context management stores the full history externally, but only includes the top-wwturns (by reward,w=4w{=}4) in the prompt to fit context length.",
+                "position": 773
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05885/x10.png",
+                "caption": "",
+                "position": 782
+            }
+        ]
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "8Limitations and Future Work",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADerivation: Self-Inclusion Causes a Scaled Gradient in GRPO",
+        "images": []
+    },
+    {
+        "header": "Appendix BTraining Dynamics",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05885/x11.png",
+                "caption": "Figure 7:The training dynamics of TRLOO, TRLOO + Mismatch Rejection Sampling (MRS), TRLOO + MRS + Profiling-based Reward (PR) and TRLOO + MRS + PR + Profiling-based Rejection Sampling (PRS). We analyze the training dynamics via the lens of entropy, gradient norm, VLLM-PPL, and FSDP-PPL, which are also monitored byLiu et al. (2025).",
+                "position": 1286
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05885/x12.png",
+                "caption": "",
+                "position": 1295
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05885/x13.png",
+                "caption": "",
+                "position": 1301
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05885/x14.png",
+                "caption": "",
+                "position": 1306
+            }
+        ]
+    },
+    {
+        "header": "Appendix CHacking Ratio",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05885/x15.png",
+                "caption": "Figure 8:The hacking ratio ofDr. Kernel-14B. With the hacking check inKernelGym, the hacking ratio decreases from approximately 20% at the start to only around 3% in the Kernelbench level-2 subset.",
+                "position": 1319
+            }
+        ]
+    },
+    {
+        "header": "Appendix DAblations of PRS",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05885/x16.png",
+                "caption": "Figure 9:Comparison ofDr. Kernelwith and without softness in PRS.Dr. Kerneloutperforms the variantw/ossin PRS, while both variants show better stability compared to the baselinew/o PR & PRS.",
+                "position": 1335
+            }
+        ]
+    },
+    {
+        "header": "Appendix ECases Studies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05885/x17.png",
+                "caption": "Figure 10:Profiling feedback for cases with lazy optimization and better fusion. We omit some profiling items for brevity. The original code forProfiling_Lazy_Optimization.jsonis shown in Figure2(right), and the original code forProfiling_Better_Fusion.jsoncan be found in AppendixE.3. In the lazy optimization case, where only a trivial summation operation is replaced, the model-generated kernel accounts for only0.014%0.014\\%(i.eP​R=0.00014PR=0.00014) of the total CUDA execution time. In contrast, with better fusion, the model generates more meaningful kernels, achieving significantly better speedup and increasing the CUDA runtime fraction to86.15%86.15\\%i.eP​R=0.8615PR=0.8615of the total runtime.",
+                "position": 1351
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05885/x18.png",
+                "caption": "Figure 11:The case study ofDr. Kernel-14B in LayerNorm operation from Kernelbench Level-1 subset. The speedup of the three turns are1.041.04,1.211.21, and1.451.45, respectively. In this case,Dr. Kernel-14B effectively handles basic kernel writing and adapts to environmental feedback over multiple turns.",
+                "position": 1365
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05885/x19.png",
+                "caption": "Figure 12:The case study of better fusion fromDr. Kernel-8B, which corresponds to the profiling feedback in Figure10(right).",
+                "position": 1378
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05885/x20.png",
+                "caption": "Figure 13:The prompt template for cold-start data distillation.",
+                "position": 1395
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05885/x21.png",
+                "caption": "Figure 14:The prompt template for both SFT and RL. The task instruction, example code and reference code are shown in the first-turn prompt. And for the later turns, prompt asks model to refine the kernel implementaion based on all hisotory information andKernelGymfeedbacks.",
+                "position": 1408
+            }
+        ]
+    },
+    {
+        "header": "Appendix FPrompt Template",
+        "images": []
+    }
+]
