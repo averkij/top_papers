@@ -1,0 +1,209 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.06079/x1.png",
+                "caption": "Figure 1:Comparison of Data Parallelism (DP) Partitioning Strategies.(Left) DP-SC:One way that can be directly used by those optimizers is DDP, which replicates optimizer states on all ranks, resulting inRedundant Computewhere every rank performs identical matrix-based operations (synchronous).(Right) DP-ASC:Eliminates redundancy by partitioning states.Equal Chunk (Standard ZeRO-1,Gray Arrow and Line):Standard partitioning (e.g., forAdamW) slices the buffer into uniform shards (|B|/R|B|/R). This arbitrary slicing (dashed lines) violates the atomicity required by matrix-based optimizers.Ours (Static Partitioning,Orange/GreenArrow):We enforce parameter atomicity by respecting tensor boundaries.Load Imbalance (Orange Arrow, Line, and Box):A naive atomic assignment leads to significant computational stragglers and communication bubbles (dashed box) due to varying parameter costs.Load Balance (Green Arrow, Line, and Box):Ourα\\alpha-Balanced algorithm optimizes the static layout, redistributing whole parameters to equalize the workload across ranks.Note:In this figure, the blocks labeledPPrepresent theoptimizer statesand the associatedupdate computationfor those parameters. The parameters themselves remain replicated across ranks during the forward and backward passes (following the ZeRO-1 protocol).",
+                "position": 179
+            }
+        ]
+    },
+    {
+        "header": "2Preliminary",
+        "images": []
+    },
+    {
+        "header": "3Load-Balanced Asynchronous Compute for Data Parallelism Matrix-based Optimizer",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.06079/x2.png",
+                "caption": "Figure 2:Optimizer Update Workflow Comparison of Tensor Parallelism (TP) Strategies.(Left) TP-SC:An intuitive approach that relies on synchronous collective communication (All-Gather) and redundant computation (performing the same tensor operations on all TP ranks), which limits scalability and efficiency.(Right) TP-ASC:Our proposed strategy utilizingMicro-Group Scheduling.Micro Gradient Group:Gradients are aggregated into micro groups (labeled asGGin the figure) to saturate theAll-to-All(dashed box) communication bandwidth, replacing the inefficient small-kernel calls.Load Balancing:Instead of fixed assignments, these groups are dynamically scheduled to Host Ranks. The distinct block lengths in the ”Compute” phase illustrate our algorithm’s ability to handle varying computational costs, minimizing the overall execution makespan.",
+                "position": 449
+            }
+        ]
+    },
+    {
+        "header": "4Tensor Parallelism with Load-Balanced Asynchronous Compute",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.06079/x3.png",
+                "caption": "(a)Efficiency Comparison",
+                "position": 615
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x3.png",
+                "caption": "(a)Efficiency Comparison",
+                "position": 618
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x4.png",
+                "caption": "(b)Tensor Parallelism Load Balancing Analysis",
+                "position": 623
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x5.png",
+                "caption": "(c)Data Parallelism Load Balancing Analysis",
+                "position": 629
+            }
+        ]
+    },
+    {
+        "header": "5Experiment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.06079/x6.png",
+                "caption": "Figure 4:End-to-End Iteration Time Comparison:Our framework significantly outperformslayerwise_optimizer.\nThe performance advantage is driven by two factors: (1) the elimination of runtime communication during the optimizer step via our decoupled design, and (2) the preservation of the ZeRO-1 Geometric Constraint mentioned in AppendixD.2.",
+                "position": 673
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x7.png",
+                "caption": "Figure 5:Precision Verification:SC Baseline & LB-ASC (Ours)",
+                "position": 690
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ASummary of Notations",
+        "images": []
+    },
+    {
+        "header": "Appendix BExtended Preliminary",
+        "images": []
+    },
+    {
+        "header": "Appendix CMore Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.06079/x8.png",
+                "caption": "Figure 6:End-to-End Performance Comparison with NVIDIAlayerwise_optimizer. We compare the breakdown of step latency betweenlayerwise_optimizer(NV-layerwise) and our proposed framework across the Qwen3 model family (ranging from 1.7B to 32B parameters) under various parallelism configurations. (Top Row) Results for smaller models (1.7B, 4B) showing consistent latency reduction. (Bottom Row) Results for larger models (14B, 32B) where the computational complexity of the optimizer increases. Our method demonstrates robust scalability, with the performance gap widening as the model size and optimizer complexity grow, primarily due to the significant reduction in Optimizer Time (Purple bar).",
+                "position": 1429
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x9.png",
+                "caption": "Figure 7:Verification of Communication Efficiency in Forward-Backward Pass.We compare the Fwd-Bwd step latency of our framework and the NV-layerwise against two controlled baselines: AdamW withAll-Reduce(simulating the heavy communication volume necessitated by layer-wise partitioning) andReduce-Scatter(representing the optimal ZeRO-1 communication volume). The results show that the NV-layerwise (blue) consistently aligns with the AdamWAll-Reducebaseline (teal solid), confirming that its performance is bottlenecked by the 2x communication volume ofAll-Reduceoperations despite overlapping. Conversely, our method (orange) closely tracks the AdamWReduce-Scatterbaseline (teal hatched), confirming that our static partitioning strategy successfully preserves the efficient communication capabilities of the underlying Megatron framework.",
+                "position": 1489
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x10.png",
+                "caption": "(a)Data Parallelism Size Scaling Analysis (Fix TP=4)",
+                "position": 1506
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x10.png",
+                "caption": "(a)Data Parallelism Size Scaling Analysis (Fix TP=4)",
+                "position": 1509
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x11.png",
+                "caption": "(b)Tensor Parallelism Size Scaling Analysis (Fix PP=4 and DP=4)",
+                "position": 1515
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x12.png",
+                "caption": "(a)Model Size Scaling with DP-load-balance Analysis",
+                "position": 1523
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x12.png",
+                "caption": "(a)Model Size Scaling with DP-load-balance Analysis",
+                "position": 1526
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x13.png",
+                "caption": "(b)Model Size Scaling with TP-load-balance Analysis",
+                "position": 1532
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x14.png",
+                "caption": "(a)Efficiency Validation with Qwen3-14B",
+                "position": 1587
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x14.png",
+                "caption": "(a)Efficiency Validation with Qwen3-14B",
+                "position": 1590
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x15.png",
+                "caption": "(b)Precision Validation with Qwen3-1.7B",
+                "position": 1595
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x16.png",
+                "caption": "(a)Efficiency Validation with Qwen3-14B",
+                "position": 1602
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x16.png",
+                "caption": "(a)Efficiency Validation with Qwen3-14B",
+                "position": 1605
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x17.png",
+                "caption": "(b)Precision Validation with Qwen3-1.7B",
+                "position": 1610
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x18.png",
+                "caption": "(a)Data Parallelism Load Balance Ratio",
+                "position": 1637
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x18.png",
+                "caption": "(a)Data Parallelism Load Balance Ratio",
+                "position": 1640
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x19.png",
+                "caption": "(b)Tensor Parallelism Load Balance Ratio",
+                "position": 1646
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x20.png",
+                "caption": "Figure 13:Sensitivity to DP Load-Balance Factorα\\alpha.We analyze the impact of the control parameterα\\alpha(ranging from 0.0 to 1.0) on the total step latency for Qwen3-32B.α=0\\alpha=0prioritizes communication size uniformity, whileα=1\\alpha=1prioritizes optimizer computational load balance. The results indicate that settingα=1.0\\alpha=1.0yields the lowest total time, suggesting that computational stragglers in the optimizer step are the dominant bottleneck, while communication imbalance in the Fwd-Bwd pass is effectively hidden by overlap.",
+                "position": 1658
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x21.png",
+                "caption": "Figure 14:TP Micro-Group Fusion.We evaluate the impact of fusing tensor updates into Micro Groups with varying capacity constraints (Cm​a​xC_{max}). ”No-Fuse” represents treating each tensor individually. The results demonstrate that fusing communication significantly reduces optimizer time by saturating All-to-All bandwidth. Performance plateaus onceCm​a​xC_{max}exceeds 1024MB, indicating the optimal granularity for overlap.",
+                "position": 1675
+            }
+        ]
+    },
+    {
+        "header": "Appendix DSupplementary Explanation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.06079/x22.png",
+                "caption": "Figure 15:Visualization of Geometric Incompatibility.(Left) Ours:Our approach respects both Atomicity and the strict Geometric Constraints of ZeRO-1 primitives. By optimizing slice sizes (shifting boundaries) inside bucket without scrambling the physical parameter sequence, we preserve the contiguous bucket abstraction. This alignment enables the use of the optimalReduce-Scatterprimitive.(Right) Layer-wise:Strategies relying on Global Load Balancing (e.g., Global LPT) assign tasks purely by weight (e.g., assigning heavy parameterP3P_{3}to DP1) regardless of their physical location. ThisData-Task Mismatch(visualized by the interleaved DP1/DP2 assignments in the bucket view) breaks bucket coalescing. Consequently, under Megatron ZeRO-1’s fixed geometric slicing and bucket coalescing assumption, the system must abandon bucket-basedReduce-Scatterin favor of bucket-basedAll-Reduceor per-parameter-basedReduce-Scatter, incurring2x communication volumeand higher latency. (Note: The visualization of the third bucket (P6,P7,P8,P9P_{6},P_{7},P_{8},P_{9}) in the right sub-figure is omitted here because its load-based assignment (P6∈DP1,{P7,P8,P9}∈DP2P_{6}\\in\\text{DP1},\\{P_{7},P_{8},P_{9}\\}\\in\\text{DP2}) coincidentally aligns with the geometric rank order (monotonic), thus not violating the ZeRO-1 Geometric Constraint.)",
+                "position": 1700
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06079/x23.png",
+                "caption": "Figure 16:Cost Metric Ablation.Comparison of Muon step latency using Numel vs. exact FLOPs cost function. The difference is negligible (≈10−4\\approx 10^{-4}s).",
+                "position": 2063
+            }
+        ]
+    },
+    {
+        "header": "Appendix EExtended Related Work",
+        "images": []
+    }
+]
