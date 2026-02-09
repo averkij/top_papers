@@ -1,0 +1,85 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05711/x1.png",
+                "caption": "Figure 1:Activation Patterns and System Optimization.(a) Coarse-grained MoE activates large experts, inevitably involving redundant parameters and wasting computation. (b) Fine-grained MoE improves parameter efficiency, but suffers from bandwidth bottlenecks due to scattered, fragmented memory accesses. (c) Our OmniMoE employs a universally activated shared dense MLP, and uses expert-centric scheduling to reorganize fine-grained expert fetches into contiguous, coalesced memory accesses, achieving both high parameter efficiency and hardware-efficient execution.",
+                "position": 92
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05711/x2.png",
+                "caption": "Figure 2:Overview of the OmniMoE Architecture.The framework operates via two parallel pathways to balance efficiency and expressivity.(a) Dynamic Expert Assembly (Top):ForLongtail Knowledge Retrievalobjective, we employ aCartesian Product Router(decomposed into Row/Column routers) to efficiently compute routing scores𝐠x\\mathbf{g}_{x}and identify the top-KKexpert indicesℐx\\mathcal{I}_{x}.\nThen the system dynamically retrieves specific parameter slices from the global matricesW,VW,Vto assemble compact, token-dependent parameter blockswx,vxw_{x},v_{x}for the final gated projection.(b) Shared Expert (Bottom):A dense MLP which is always active to handlingGeneral Semantics.\nThe final output is obtained by aggregating the outputs from the sparse, routed branch and the shared dense branch.",
+                "position": 129
+            }
+        ]
+    },
+    {
+        "header": "2Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05711/x3.png",
+                "caption": "Figure 3:Comparison of Execution Paradigms: Token-Centric vs. Expert-Centric Scheduling.(a) Conventional:Tokens independently fetch parameters from scattered experts, leading to random memory accesses (high load overhead) and fragmented vector-vector computations that underutilize on-chip SMs.(b) Our Approach:We invert the execution order using expert-centric scheduling.Left-to-Right:First, tasks are reordered: we compress active experts into dense groups (e.g., experts 0–3 are grouped into Group 1) and sort tasks by Token ID within each group.Matrix Fusion:This reorganization allows us to merge individual token-expert pairs into dense tensors.\nInstead of scattered ops, the GPU executes efficientGrouped GEMMkernels (rightmost block), where a block of expert weights is loaded once and reused across stacked tokens, maximizing Tensor Core utilization and memory bandwidth.",
+                "position": 320
+            }
+        ]
+    },
+    {
+        "header": "3Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05711/x4.png",
+                "caption": "Figure 4:End-to-End Efficiency Comparison.(a, b) Inference latency and (c, d) peak memory versus activated parameters (left column) and input token count (right column). Baselines include Dense, Gshard, DeepSeekMoE, PKM, and PEER. OmniMoE achieves consistently lower latency than DeepSeekMoE and fine-grained baselines (PKM/PEER), while maintaining a peak memory footprint comparable to coarse-grained MoEs.",
+                "position": 524
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05711/x5.png",
+                "caption": "Figure 5:Scaling Laws.Validation perplexity (lower is better) versus (a) training FLOPs and (b) activated parameters.\nOmniMoE consistently outperforms all baselines, achieving the best trade-off between model quality and computational cost.",
+                "position": 529
+            }
+        ]
+    },
+    {
+        "header": "4Related Work",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Impact Statement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AComplexity Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix BExperimental Setup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.05711/x6.png",
+                "caption": "Figure A:Communication overhead vs. Number of Experts.The communication latency and memory usage saturates and remains constant as the number of experts increases beyond the activation count.",
+                "position": 1957
+            },
+            {
+                "img": "https://arxiv.org/html/2602.05711/x7.png",
+                "caption": "Figure B:Communication overhead vs. Sequence Length.Communication volume scales linearly with sequence length.",
+                "position": 1960
+            }
+        ]
+    },
+    {
+        "header": "Appendix CExpert Parallelism Communication Overhead",
+        "images": []
+    }
+]
