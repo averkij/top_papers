@@ -1,0 +1,97 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.03998/x1.png",
+                "caption": "Figure 1:Overview of the AtlasPatch pipeline, dataset curation, and efficient finetuning of the tissue detection model.A.AtlasPatch slide-preprocessing pipeline. Following the acquisition of diagnostic WSIs as multi-resolution pyramids, AtlasPatch utilizes the thumbnail for tissue detection using the finetuned SAM2 model, then extrapolates the resulting contour into the desired high resolution. This is followed by computing patch coordinates for downstream patch image export or feature embeddings.B.Diverse dataset curation and semi-manual annotation for training the tissue detector. The model in AtlasPatch is finetuned on a heterogeneous multi-organ corpus combining multiple public cohorts as well as private in-house WSIs. Slides from each dataset are curated, and annotators performed semi-manual boundary tracing of tissue on WSI thumbnails under a standardized protocol using Labelbox, yielding a large annotated dataset (∼\\sim30k pairs) of tissue-versus-background masks.C.Thumbnail-based efficient finetuning of SAM2. The segmentation model is trained on the curated thumbnails dataset by only finetuning the normalization layers of the SAM2 model, which represent approximately 0.076% of the parameters in the hiera-tiny variant of SAM2.",
+                "position": 199
+            }
+        ]
+    },
+    {
+        "header": "2Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.03998/x2.png",
+                "caption": "Figure 2:a.Composition of the∼\\sim36,000 WSI thumbnail corpus across four cohorts (CHUM in-house, TCGA, Radboud UMC and Karolinska), illustrating multi-institutional and multi-organ coverage.b.Example thumbnails ordered along key axes of variation, highlighting challenging edge cases for tissue detection.c.Quantitative characterization of this variability via Lab chroma maps and slide-level statistics, showing broad distributions.d.Semi-automatic annotation pipeline in Labelbox, where pre-segmentation is refined by annotators with quality control, yielding high-quality tissue-versus-background masks for SAM2 finetuning and evaluation. An example illustrates the inefficiency of the automated segmentation features in such tools, and the need for semi-manual annotations.",
+                "position": 218
+            },
+            {
+                "img": "https://arxiv.org/html/2602.03998/x3.png",
+                "caption": "Figure 3:Qualitative examples of annotated masks as well as AtlasPatch tissue masks across datasets and artifacts. Representative WSI thumbnails from multiple sources are shown alongside their annotated ground-truth tissue masks, AtlasPatch predictions, and mask overlays. Ground-truth tissue is displayed in green, model predictions in red, and overlapping regions in brown, illustrating close agreement between AtlasPatch and annotations across organs and cohorts. The bottom row shows challenging cases with scanner or preparation artifacts, where AtlasPatch masks largely follow true tissue while ignoring non-tissue structures. These samples come from a testing set that was not seen by the model during training. More examples are available in Extended Data Figs. 1-2 showing different cohorts and IHC stained samples.",
+                "position": 231
+            },
+            {
+                "img": "https://arxiv.org/html/2602.03998/x4.png",
+                "caption": "Figure 4:Quantitative and qualitative analysis of AtlasPatch tissue detection against existing slide-preprocessing tools. Representative WSI thumbnails are shown from diverse tissue features and artifact conditions, with tissue masks predicted by thresholding methods (TIAToolbox, CLAM) and deep learning methods (pretrained ”non-finetuned” SAM2 model, Trident-GrandQC, Trident-Hest, and AtlasPatch), highlighting differences in boundary detection, artifact suppression, and handling of fragmented tissue (more tools are shown in Extended Data Figs. 3-5). Tissue detection performance is also shown on the held-out test set, highlighting that AtlasPatch matches or exceeds the other methods. The segmentation complexity–performance trade-off shows F1-score against segmentation runtime (per 100 WSIs), shows AtlasPatch achieves high performance with substantially lower wall-clock time than patch-based methods, underscoring its suitability for large-scale WSI preprocessing.",
+                "position": 241
+            },
+            {
+                "img": "https://arxiv.org/html/2602.03998/x5.png",
+                "caption": "Figure 5:Multiple experiments to validate the importance of data diversity in the curated dataset. A. Effect of restricted/unvaried training sets. Subsets of the original dataset are created for varying conditions (machines, tissue brightness, object count, etc). For each subset, the SAM2 model is finetuned on the given data, and tested on the remainder of the dataset. Results show training on a restricted set with no diversity cannot generalize to larger heterogeneous data, as shown by the six examples. B. Model performance across varying test sets. The model finetuned on the full heterogeneous training set is tested on stratified subsets (unseen during training), each covering a certain level of a given feature. Results show more adaptability and robustness to variance.",
+                "position": 257
+            },
+            {
+                "img": "https://arxiv.org/html/2602.03998/x6.png",
+                "caption": "Figure 6:Ablative study on the tissue detection component in AtlasPatch under different training configurations and backbone size. Tissue detection performance is reported while varying key design choices, including input thumbnail resolution, training batch size, learning rate and the underlying SAM2 backbone variant. Across all tested settings, AtlasPatch maintains consistently high performance with only minor fluctuations, indicating that the method is robust to reasonable hyperparameter changes and that even lighter SAM2 backbones achieve competitive results, allowing practitioners to trade off memory and runtime against only marginal differences in segmentation quality.",
+                "position": 267
+            },
+            {
+                "img": "https://arxiv.org/html/2602.03998/x7.png",
+                "caption": "Figure 7:Downstream MIL performance and complexity of several end-to-end WSI preprocessing tools on 6 different tasks: colorectal cancer invasiveness (in-house), dysplasia level (in-house), breast carcinoma subtyping (TCGA-BRCA IDC vs ILC), renal cell carcinoma subtyping (TCGA-KIRC vs KIRP), lung adenocarcinoma versus squamous carcinoma (TCGA LUAD vs LUSC) and prostate cancer grading (PANDA). The table reports slide-level metrics and the average number of patch embeddings per WSI. For each task, we train several MIL methods on the patches extracted from each tool, and report the average results (more details in Appendix). The scatter plots show complexity–accuracy trade-offs for each task. Across all datasets, AtlasPatch achieves comparable or better downstream performance while using fewer embeddings on average and substantially lower runtime. Note: for the PANDA dataset, we exclude CLAM because it fails to detect tissue in∼\\sim54% of the slides.",
+                "position": 280
+            }
+        ]
+    },
+    {
+        "header": "3Discussion",
+        "images": []
+    },
+    {
+        "header": "4Methods",
+        "images": []
+    },
+    {
+        "header": "5Data Availability",
+        "images": []
+    },
+    {
+        "header": "6Code Availability",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.03998/x8.png",
+                "caption": "Extended Data Fig. 1: More qualitative examples to support Fig.3, showing original slide thumbnails along with the ground truth annotation mask (overlayed on the slide in green), the model’s predicted mask (overlayed in red), and an overlay of both masks to show intersection.",
+                "position": 459
+            },
+            {
+                "img": "https://arxiv.org/html/2602.03998/x9.png",
+                "caption": "Extended Data Fig. 2: More qualitative examples to support Fig.3, specifically for samples with IHC staining, showing the generalization capability of the tissue detector in AtlasPatch.",
+                "position": 462
+            },
+            {
+                "img": "https://arxiv.org/html/2602.03998/x10.png",
+                "caption": "Extended Data Fig. 3: More qualitative examples to support Fig.4, showing original slide thumbnails along with the predicted masks of three thresholding tools, in addition to AtlasPatch.",
+                "position": 465
+            },
+            {
+                "img": "https://arxiv.org/html/2602.03998/x11.png",
+                "caption": "Extended Data Fig. 4: More qualitative examples to support Fig.4for thresholding-based methods in comparison with AtlasPatch.",
+                "position": 468
+            },
+            {
+                "img": "https://arxiv.org/html/2602.03998/x12.png",
+                "caption": "Extended Data Fig. 5: More qualitative examples to support Fig.4for AI-based methods in comparison with AtlasPatch.",
+                "position": 471
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
