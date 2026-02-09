@@ -1,0 +1,140 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/pipeline_final.png",
+                "caption": "Figure 1:Overview of the SPARC framework. We decouple the VLM inference process into two distinct functional circuits. Stage 1 (Perception): The What and Where Circuits perform Implicit Relevance Detection (IRD), taking the image and question as input to output relevant crop coordinates (e.g., localizing the woman’s ear). Stage 2 (Reasoning): The “Prefrontal Cortex Circuit” synthesizes a CoT by reasoning over the high-resolution crops identified in the first stage and outputs the final answer (“blue”). This separation enables independent optimization and robust, efficient test-time scaling.",
+                "position": 115
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Test-time scaling of perception",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/crop_overlap_ratio_scarf.png",
+                "caption": "Figure 2:The plot shows downstream reasoning accuracy against the crop overlap ratio. While performance generally degrades as overlap decreases, this effect is most pronounced for lower resolutions. Crucially, at high overlap ratios, the 256px model converges to the performance of the full-resolution model. This demonstrates that accurate perceptual guidance can fully compensate for the loss of global visual detail, allowing for highly efficient inference.",
+                "position": 207
+            }
+        ]
+    },
+    {
+        "header": "4Two-stage Architecture: decoupling Perception and Reasoning",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/pareto_4k.png",
+                "caption": "Figure 3:SPARC outperforms the “thinking with images” paradigm of Qwen3VL-4B, providing a more robust and efficient inference paradigm. This advantage is particularly pronounced in perceptually demanding scenarios, where SPARC achieves superior localization and reasoning with significantly fewer tokens.",
+                "position": 409
+            }
+        ]
+    },
+    {
+        "header": "5Scaling via Perceptual Consistency",
+        "images": []
+    },
+    {
+        "header": "6Fine-Tuning for Pure Perception",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Impact Statement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/molmo_performance_overlap.png",
+                "caption": "Figure 4:We extend our analysis to the Molmo2 architecture, plotting accuracy against crop overlap ratio. Consistent with our findings on Qwen3VL, the low-resolution variants exhibit a steep performance recovery as crop precision improves. Notably, high-quality crops allow the efficient 256px and 512px models to approach the performance upper bound of the Full-resolution baseline, further supporting the motivation of the SPARC pipeline.",
+                "position": 1439
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/scale_accuracy_plot_dotted.png",
+                "caption": "Figure 5:We measure reasoning accuracy as a function of crop expansion factor (up to100×100\\timesthe original box area). While moderate expansion (scales2×2\\times–4×4\\times) improves performance by providing necessary context, excessive scaling leads to a sharp decline for resolution-constrained models.",
+                "position": 1449
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/rollout_8_256.png",
+                "caption": "Table 6:Qualitative comparison across resolutions (256, 512, Full) for 8 Rollouts WBF, and Ground Truth.",
+                "position": 1723
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/Rollout_8_256_WBF.png",
+                "caption": "",
+                "position": 1739
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/GT_256.png",
+                "caption": "",
+                "position": 1740
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/Rollout_8_512.png",
+                "caption": "",
+                "position": 1748
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/Rollout_8_512_WBF.png",
+                "caption": "",
+                "position": 1749
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/GT_512.png",
+                "caption": "",
+                "position": 1750
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/Rollout_8_Full.png",
+                "caption": "",
+                "position": 1758
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/Rollout_8_Full_WBF.png",
+                "caption": "",
+                "position": 1759
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/GT_Full.png",
+                "caption": "",
+                "position": 1760
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/shovel.png",
+                "caption": "Figure 6:While both models answer correctly,Thinking with Images(left) relies on a dense, unstructured chain-of-thought, consuming a large token budget to plan and describe the scene. On the other handSPARC(right) isolates the target object and answers instantly with significantly lower computational cost.",
+                "position": 2675
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/trashcan.png",
+                "caption": "Figure 7:On the left,Thinking with Imagesinitially isolates the correct crop but misinterprets the visual content due to a deceptive text description. This misalignment triggers a series of wasteful search steps, leading the model to confuse a stone lamp post base for a trash can. Consequently, it hallucinates ‘metallic’ and ‘reflective’ properties, resulting in an incorrect ‘Silver’ prediction. On the right,SPARCcorrectly localizes the actual black bin immediately, avoiding the reasoning trap and returning the correct answer in a single step.",
+                "position": 2678
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/clock.png",
+                "caption": "Figure 8:Thinking with Imagescorrectly spots the green clock but hallucinates that it must be ‘large and functional,’ causing it to discard valid visual evidence, a classic example of how reasoning errors cascade in monolithic models. On the right,SPARCsucceeds by decoupling perception: it explicitly localizes the clock first via visual search, isolating the relevant region before reasoning begins, effectively preventing prior bias and arriving at the correct answer with significantly fewer tokens.",
+                "position": 2681
+            },
+            {
+                "img": "https://arxiv.org/html/2602.06566/images/scarf.png",
+                "caption": "Figure 9:Thinking with Imagesconcentrates on the most prominent foreground subject, correctly reasoning that this person has no scarf, but failing to scan the background for the actual target. On the right,SPARCdemonstrates the benefit of explicit visual search. It successfully localizes the smaller background figure wearing the green scarf.",
+                "position": 2684
+            }
+        ]
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    }
+]
