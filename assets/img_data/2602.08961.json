@@ -1,0 +1,110 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.08961/x1.png",
+                "caption": "",
+                "position": 175
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.08961/x2.png",
+                "caption": "Figure 2:Overview of MotionCrafter.\nWe first train a novel4D VAE(bottom-right), consisting of aGeometry VAEand aMotion VAE.\nThese two components jointly encode the point map and scene flow into a unified 4D latent representation.\nWithin the Diffusion Unet, we leverage the pretrained VAE from SVD (Stable Video Diffusion) to encode video latents as conditional inputs,\nwhich are then channel-wise concatenated with our 4D latent to guide the denoising process. We only add noise to the 4D latents during model training for the Diffusion version.\nNote that we do not enforce the 4D latent distribution to strictly align with the original SVD VAE latent distribution.\nAnd we find that this relaxed training strategy consistently improves the generalization performance of both the VAE and the Diffusion Unet.",
+                "position": 273
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.08961/x3.png",
+                "caption": "Figure 3:Geometry and Motion representation.For a pixelpip_{i}in frame𝑰i\\bm{I}_{i},𝑿i\\bm{X}_{i}is its corresponding 3D point.\nAs this 3D point moves,\nwe use𝑿id\\bm{X}_{i}^{d}to represent the moved point and𝑽i=(Δ​x,Δ​y,Δ​z)\\bm{V}_{i}=(\\Delta x,\\Delta y,\\Delta z)to represent the motion.\nIdeally,𝑿id\\bm{X}_{i}^{d}should align with a matching point𝑿i+1\\bm{X}_{i+1}in next frame𝑰i+1\\bm{I}_{i+1}.\nHowever, their pixel indexes are totally different (pip_{i}vs.pi+1p_{i+1}) andpi+1p_{i+1}might even be out of view due to camera/object motion,\nmaking it impossible to build one-to-one correspondence between𝑿id\\bm{X}_{i}^{d}and𝑿i+1\\bm{X}_{i+1}.",
+                "position": 470
+            },
+            {
+                "img": "https://arxiv.org/html/2602.08961/x4.png",
+                "caption": "Figure 4:Results of different normalization and VAE training strategies.\nFor outdoor scenes with significant variations in depth (the second row),\ntheoriginal VAEfails to recover the scene structure.\nEven with decoder fine-tuning,\nthe reconstruction quality remains poor.\nOur proposedmeannormalization and VAE training strategy significantly improve reconstruction quality.",
+                "position": 511
+            },
+            {
+                "img": "https://arxiv.org/html/2602.08961/x5.png",
+                "caption": "Figure 5:Qualitative comparison with Zero-MSF[54].Zoom in for the details. Compared to Zero-MSF, we have a more reasonable scene structure and better geometric details. More importantly, our predicted 3D scene flow has a more accurate direction of motion.",
+                "position": 962
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.08961/x6.png",
+                "caption": "Figure 6:Qualitative comparison with ST4RTrack[14].In the first case, the pixel trajectory shows that we yield cleaner scene flow, while ST4RTrack suffers from noisy drift.\nIn the second case, the deformed point map (with darker color) shows that our method predicts more temporally consistent geometry and motion.",
+                "position": 1165
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "AData Processing",
+        "images": []
+    },
+    {
+        "header": "BAdditional Ablations",
+        "images": []
+    },
+    {
+        "header": "CImplementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.08961/x7.png",
+                "caption": "Figure 7:The examples of our training set.We randomly sample video frames from these datasets. In geometric training, we set a random stride to sample the video at different intervals. In motion training, we always keep the stride at 1 to continuously sample frames.",
+                "position": 4060
+            },
+            {
+                "img": "https://arxiv.org/html/2602.08961/x8.png",
+                "caption": "Figure 8:Zero-shot results on Davis[66]dataset.Despite the very limited number of samples used for training scene flow estimation, our method generalizes well across different scene types. Thanks to our end-to-end model design and unified definitions of geometry and motion in the world coordinate system, all results are directly output by the model without any post-optimization. See the video visualization for a more intuitive understanding of the dynamics.",
+                "position": 4063
+            },
+            {
+                "img": "https://arxiv.org/html/2602.08961/x9.png",
+                "caption": "Figure 9:Qualitative comparison with the state-of-the-art methods Zero-MSF[54]and DELTA[64].In the first case, our method demonstrates scene flow estimation accuracy comparable to Zero-MSF, even without training on the dynamic replica dataset like it. In the other cases, our method significantly outperforms existing methods in both geometric structure and motion pattern estimation.",
+                "position": 4066
+            },
+            {
+                "img": "https://arxiv.org/html/2602.08961/x10.png",
+                "caption": "Figure 10:Qualitative geometric comparison with VGGT[89], Geo4D[34], and ST4RTrack[14].For moving objects, such as the finger in the first case, our method estimates more accurate scale and motion changes. For outdoor scenes, our method estimates a more accurate scene structure. Notably, our method, like VGGT, can directly output point clouds in world coordinates without requiring post-optimization steps such as Geo4D. Furthermore, our method has a much smaller training scale than VGGT, yet exhibits good robustness in dynamic scenes. We attribute this to pre-training knowledge of video diffusion and our proposed training strategy.",
+                "position": 4069
+            },
+            {
+                "img": "https://arxiv.org/html/2602.08961/x11.png",
+                "caption": "Figure 11:Qualitative geometric comparison with ST4RTrack[14]on zero-shot generalization.Compared with ST4RTrack, our results show better multi-view consistency, smoother Geometry, and fewer stray spots.",
+                "position": 4072
+            }
+        ]
+    },
+    {
+        "header": "DMore Visualization Results",
+        "images": []
+    }
+]
