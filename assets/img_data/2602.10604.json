@@ -1,0 +1,132 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.10604/x1.png",
+                "caption": "",
+                "position": 399
+            },
+            {
+                "img": "https://arxiv.org/html/2602.10604/x2.png",
+                "caption": "",
+                "position": 399
+            },
+            {
+                "img": "https://arxiv.org/html/2602.10604/x3.png",
+                "caption": "",
+                "position": 399
+            },
+            {
+                "img": "https://arxiv.org/html/2602.10604/x4.png",
+                "caption": "Figure 1:Step 3.5 Flash achieves frontier-level intelligence with only 11B active parameters (196B MoE), comparable to leading closed and open-source models.",
+                "position": 410
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.10604/x5.png",
+                "caption": "Figure 2:Illustration of Step 3.5 Flash.\nThe model uses head-wise gated attention[qiu2025gatedattentionlargelanguage]with a leading Full Attention layer followed byL=11L=11Hybrid Blocks, each interleaving 3 Sliding Window Attention (SWA) layers with one Full Attention layer (for visual clarity, the first layer is omitted in the figure).\nWe apply zero-centered RMSNorm[gemmateam2024gemmaopenmodelsbased]throughout.\nThe first three blocks use dense FFNs; later blocks employ sparse MoE FFNs.\nMTP modules use SWA and dense FFNs. To limit overhead, only MTP module 1 is trained during main training; MTP modules 2–3 are cloned from it and jointly fine-tuned in a lightweight final phase.",
+                "position": 677
+            }
+        ]
+    },
+    {
+        "header": "3Infrastructure",
+        "images": []
+    },
+    {
+        "header": "4Pre-Training and Mid-Training",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.10604/x6.png",
+                "caption": "Figure 3:Per-step training loss of Step 3.5 Flash, plottedwithout smoothing or sub-sampling. We observe merelyoneisolated loss spike across the full training duration. The initial training steps are omitted for clarity. Markers①–③indicate batch size increases to 8,192, 12,288, and 16,384, respectively. Marker④denotes the activation of the loss mask on meta tokens (see AppendixA.3for details).",
+                "position": 1012
+            },
+            {
+                "img": "https://arxiv.org/html/2602.10604/x7.png",
+                "caption": "Figure 4:Analysis of expert activation stability and mitigation strategies.\nIn Panels (b)–(c), solid lines represent the maximum expert output norm, while dashed lines represent the median.\n(1) Depth-Dependent Instability: While training loss appears identical across methods (Panel a) and middle layers remain stable (e.g., Layer 38 in Panel b), the final layers (i.e., Layer 45 in Panel c) suffer from catastrophic norm explosion in theNo clippingbaseline.\n(2) Mitigation:Weight clippingmerely delays this explosion. In contrast,Activation clippingeffectively bounds maximum norms, ensuring stability across all layers.",
+                "position": 1094
+            }
+        ]
+    },
+    {
+        "header": "5Post-Training",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.10604/x8.png",
+                "caption": "Figure 5:Scalability comparison between MIS-PO and PPO on our internal model.(1) Efficiency: MIS-PO demonstrates superior sample efficiency, achieving higher reward plateaus with an accelerated convergence trend.(2) Stability: MIS-PO significantly stabilizes training dynamics by suppressing gradient noise and eliminating the large spikes in the policy gradient norm.(3) Exploration Persistence: MIS-PO exhibits slower entropy decay, enabling a better exploration–exploitation balance.",
+                "position": 1268
+            },
+            {
+                "img": "https://arxiv.org/html/2602.10604/x9.png",
+                "caption": "Figure 6:RL training dynamics and cross-domain improvements of Step 3.5 Flash.RL drives steady reward growth (left) and delivers consistent accuracy boosts across multiple benchmarks (right).",
+                "position": 1337
+            }
+        ]
+    },
+    {
+        "header": "6Evaluations",
+        "images": []
+    },
+    {
+        "header": "7Limitations",
+        "images": []
+    },
+    {
+        "header": "Contributors",
+        "images": []
+    },
+    {
+        "header": "Appendix AArchitecture Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BDetail Analysis of Localized Activation Blow-up",
+        "images": []
+    },
+    {
+        "header": "Appendix CStep Pre-training Data Foundation",
+        "images": []
+    },
+    {
+        "header": "Appendix DPost Training Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.10604/x10.png",
+                "caption": "(a)Comparison on the dense model.While GSPO also effectively reduces the variance of the actor gradient norm, its efficiency is inferior to that of MIS-PO. Under the same iteration budget, MIS-PO achieves higher rewards and all acceptance ratio.",
+                "position": 3929
+            },
+            {
+                "img": "https://arxiv.org/html/2602.10604/x10.png",
+                "caption": "(a)Comparison on the dense model.While GSPO also effectively reduces the variance of the actor gradient norm, its efficiency is inferior to that of MIS-PO. Under the same iteration budget, MIS-PO achieves higher rewards and all acceptance ratio.",
+                "position": 3932
+            },
+            {
+                "img": "https://arxiv.org/html/2602.10604/x11.png",
+                "caption": "(b)Comparison on the MoE model.(1) Efficiency:MIS-PO demonstrates superior sample efficiency, achieving higher rewards with accelerated convergence, whereas GSPO plateaus around iteration 200.(2) Stability:GSPO exhibits an increasing training-inference discrepancy during training, quantified by the density ratioπθold/πθvllm\\pi_{\\theta_{\\text{old}}}/\\pi_{\\theta_{\\text{vllm}}}(whereπθvllm\\pi_{\\theta_{\\text{vllm}}}is the rollout policy in the inference backend andπθold\\pi_{\\theta_{\\text{old}}}is the pre-update policy snapshot in the training backend). Conversely, MIS-PO consistently maintains this discrepancy within a stable range.",
+                "position": 3938
+            },
+            {
+                "img": "https://arxiv.org/html/2602.10604/x12.png",
+                "caption": "Figure 8:Extended training dynamics of MIS-PO on the MoE model.The metrics include Reward (left), Actor Gradient Norm (middle), and Entropy (right). Notably, the middle panel displays the raw gradient norm without smoothing or downsampling to highlight the stability of the optimization.",
+                "position": 3980
+            }
+        ]
+    },
+    {
+        "header": "Appendix EDetailed Evaluation Protocols and Prompts",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
