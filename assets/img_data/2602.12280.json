@@ -1,0 +1,154 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.12280/x1.png",
+                "caption": "",
+                "position": 103
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.12280/x2.png",
+                "caption": "Figure 2:Challenges in progressive illusion sketching.(a) Raster-based methods (e.g., Nano Banana Pro) rely ondestructive editing, modifying the initial structure to fit the final target and thus violating the progressive constraint.\n(b) Vector-based baselines (e.g., SketchDreamer[93]or SketchAgent[110]) employ a greedy strategy, where specific Phase 1 details becomesemantic noiseor clutter in Phase 2.\n(c) Ours achievesdual-semantic coherencyby jointly optimizing for a common structural subspace, ensuring the initial strokes are valid building blocks for both interpretations (e.g., “rabbit”→\\rightarrow“elephant”).",
+                "position": 121
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x3.png",
+                "caption": "Figure 3:Pipeline overview.Our method optimizes a set of learnable stroke parameters, which are divided intoprefix strokesSprefixS_{\\text{prefix}}anddelta strokesSdeltaS_{\\text{delta}}. The optimization process involves two parallel branches. In the top branch, only the prefix strokes are rendered by a differentiable rasterizer to create a partial sketch (e.g., a rabbit). This sketch is then guided by a pre-trained, frozen text-to-image diffusion model using a prompt corresponding to the prefix (“a rabbit”), resulting in the prefix SDS lossℒSDSprefix\\mathcal{L}_{\\text{SDS}}^{\\text{prefix}}. In the bottom branch, thefull set of strokesis rendered to create the complete sketch (e.g., a horse). This is guided by the same diffusion model using a prompt for the full object (“a horse”), resulting in the full SDS lossℒSDSfull\\mathcal{L}_{\\text{SDS}}^{\\text{full}}. The total SDS guidance loss is the sum of these two termsℒSDS=ℒSDSprefix+ℒSDSfull\\mathcal{L}_{\\text{SDS}}=\\mathcal{L}_{\\text{SDS}}^{\\text{prefix}}+\\mathcal{L}_{\\text{SDS}}^{\\text{full}}. Gradients from this total loss are backpropagated to update all learnable stroke parameters.",
+                "position": 132
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.12280/x4.png",
+                "caption": "Figure 4:Motivation and formulation of the overlay loss.(Top) Motivation: Without constraints, redundant strokes (b) occlude the prefix. Hard intersection (c) allows strokes to be placed arbitrarily close, causing crowding.(Bottom) Formulation: We compute asoft overlay loss(f) from blurred maps (d, e). The blur expands the penalty region to create aspatial buffer, forcing new strokes tomaintain sufficient distancefrom the prefix to ensure visual clarity and separation.",
+                "position": 222
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x5.png",
+                "caption": "Figure 5:VLM-based evaluation and ranking pipeline.We employ GPT-4o to assess the quality of illusion sketches.(a) For Phase 1, the model evaluates the recognizability of the prefix sketch (SprefixS_{\\text{prefix}}).(b) For Phase 2, the model evaluates the full sketch (SfullS_{\\text{full}}) while simultaneously comparing it against the delta strokes (SdeltaS_{\\text{delta}}). This comparison ensures that the prefix strokes provideessential structural scaffoldingfor the second concept, rather than being merely overwritten. High scores are awarded only whenSfullS_{\\text{full}}is significantly more recognizable thanSdeltaS_{\\text{delta}}alone.",
+                "position": 276
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x6.png",
+                "caption": "Figure 6:Multi-phase pipeline.We scale toKKphases (e.g., Apple→\\toSheep→\\toEinstein) using cumulative stroke subsets (S1,…,SKS_{1},\\ldots,S_{K}). Parallel branches optimize each cumulative sketchI1:iI_{1:i}against promptpip_{i}.Joint optimizationensures early strokes receive gradients from all subsequent losses (∑ℒSDSi\\sum\\mathcal{L}_{\\text{SDS}}^{i}), creating a structure primed for the entire evolutionary sequence.",
+                "position": 320
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.12280/x7.png",
+                "caption": "Figure 7:Qualitative comparisons.We compare against SketchDreamer[93], SketchAgent[110], and Nano Banana Pro.\n(a) SketchDreamer produces noisy strokes, causing severe visual clutter.\n(b) SketchAgent yields overly abstract results with low recognizability.\n(c) Nano Banana Pro relies ondestructive editing(e.g., overwriting the pig structure to draw an angel), failing the progressive constraint despite high image quality.\n(d) Ours generates clean, structurally consistent sketches where prefix strokes are creatively repurposed (e.g., rabbit whiskers becoming elephant ear).\nWe provide additional video progressive illusion results and visualization of the optimization process in an interactive HTML in the supplementary material.",
+                "position": 386
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x8.png",
+                "caption": "Figure 8:Phase 2 extension with fixed prefix (ours).We evaluate how methods extend a fixed Phase 1 sketch generated by our method.\nInterestingly, baselines produce better Phase 2 results here than in Fig.7(where they generate Phase 1 themselves). This indicates that our Phase 1 strokes inherently embed structural cues for the second concept, validating that our joint optimization successfully finds a versatile common subspace.\nHowever, comparing (a-c) with (d), our method still achieves the highest success rate and structural consistency, asSdeltaS_{\\text{delta}}is jointly optimized with the prefix rather than sequentially appended.",
+                "position": 396
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x9.png",
+                "caption": "Figure 9:User study.(Left) Preference: Participants overwhelmingly favor our method (green) over baselines across both ranking strategies.(Right) Reliability: A high success rate (¿97%) confirms that our pipeline consistently yields valid illusions, ensuring robustness against the inherent stochasticity of the generation process.",
+                "position": 547
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x10.png",
+                "caption": "",
+                "position": 553
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x11.png",
+                "caption": "Figure 10:Ablation on optimization strategy.(a) Sequential generationyields a rigid Phase 1, creating structural conflicts (e.g., the duck’s beak) that fail Phase 2 repurposing.(b) Joint optimization (Ours)identifies acommon structural subspace, yielding a versatile Phase 1 where features serve both interpretations (e.g., the beak doubles as the cow’s ear).",
+                "position": 572
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x12.png",
+                "caption": "Figure 11:Ablation on stroke initialization.(a, d) Scatteredfails to aggregate strokes, resulting in disconnected artifacts.(c, f) Shiftedyields valid sketches, proving thatspatial concentrationis critical for convergence, though it risks boundary cropping.(b, e) Centered (Ours)offers the optimal balance, ensuring structural integrity without clipping.",
+                "position": 585
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x13.png",
+                "caption": "Figure 12:Ablation of overlay loss (ℒoverlay\\mathcal{L}_{\\text{overlay}}).(a) Withoutℒoverlay\\mathcal{L}_{\\text{overlay}}, the model generates redundant strokes atop existing ones to satisfy the semantic target, resulting in visual clutter (red circle) and high intersection artifacts.\n(b) Withℒoverlay\\mathcal{L}_{\\text{overlay}}, the generated strokes (SdeltaS_{\\text{delta}}) become spatially complementary to the prefix (SprefixS_{\\text{prefix}}), avoiding collisions to produce a clean, coherent line drawing.",
+                "position": 599
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x14.png",
+                "caption": "Figure 13:Analysis of stroke count.(Top) Simple concepts (horse) form recognizable silhouettes with minimal strokes (8→\\rightarrow16). (Bottom) While complex concepts (Einstein) require a larger budget (32→\\rightarrow64) to capture essential details. Fewer strokes result in abstraction. Our default (16→\\rightarrow32) balances structural simplicity and semantic fidelity.",
+                "position": 612
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x15.png",
+                "caption": "Figure 14:Additional 2-phase progressive illusion results produced by our method.",
+                "position": 625
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x16.png",
+                "caption": "Figure 15:Additional 3-phase progressive illusion results produced by our method.",
+                "position": 629
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x17.png",
+                "caption": "Figure 16:Additional qualitative comparisons.",
+                "position": 633
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x18.png",
+                "caption": "Figure 17:Metric-based ranking.",
+                "position": 637
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x18.png",
+                "caption": "Figure 17:Metric-based ranking.",
+                "position": 640
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x19.png",
+                "caption": "Figure 18:GPT-based ranking.",
+                "position": 646
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x20.png",
+                "caption": "Figure 19:Extension on variable-width B-spline.",
+                "position": 653
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x20.png",
+                "caption": "Figure 19:Extension on variable-width B-spline.",
+                "position": 656
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x21.png",
+                "caption": "Figure 20:Extension on vector graph.",
+                "position": 661
+            },
+            {
+                "img": "https://arxiv.org/html/2602.12280/x22.png",
+                "caption": "Figure 21:Extension on colored strokes.",
+                "position": 666
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
