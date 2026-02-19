@@ -1,0 +1,782 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.15922/x1.png",
+                "caption": "Figure 1:Overview. By jointly predicting video and action, World Action Models (WAMs) inherit world physics priors that enable 1) effective learning from diverse, non-repetitive data, 2) open-world generalization, 3) cross-embodiment learning from video-only data, and 4) few-shot adaptation to new robots.",
+                "position": 133
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.15922/x2.png",
+                "caption": "Figure 2:Joint Video and Action Prediction.DreamZerojointly generates video and action. We observe that the predicted actions closely align with the generated video. The examples are from totally unseen tasks.",
+                "position": 151
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x3.png",
+                "caption": "Figure 3:Free-form Evaluation.DreamZeroperforms a diverse range of tasks when conditioned on natural language instructions, including object manipulation, tool use, and human-robot interaction.",
+                "position": 202
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.15922/x4.png",
+                "caption": "Figure 4:Model Architecture ofDreamZero.The model takes three inputs: visual context (encoded via a VAE), language instructions (via a text encoder), and proprioceptive state (via a state encoder). These are processed by an autoregressive DiT backbone using flow matching, which jointly predicts future video frames and actions through separate decoders. During training (left), for each chunk, the model denoises noisy video and action latents conditioned on clean video context. During inference (right), predictions are executed asynchronously in the real world, and ground-truth observations are fed back into the KV cache to prevent error accumulation.",
+                "position": 234
+            }
+        ]
+    },
+    {
+        "header": "3DreamZero",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.15922/x5.png",
+                "caption": "Figure 5:Decoupled Noise Schedules.DreamZero(blue) uses coupled noise for video and action (both uniform).DreamZero-Flash (red) biases video toward high-noise states via a Beta distribution while keeping action noise uniform, training the model to predict clean actions from noisy visual context.",
+                "position": 381
+            }
+        ]
+    },
+    {
+        "header": "4Experimental Setup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.15922/x6.png",
+                "caption": "(a)Episode Duration Distribution",
+                "position": 488
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x6.png",
+                "caption": "(a)Episode Duration Distribution",
+                "position": 491
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x7.png",
+                "caption": "(b)Subtask Count Distribution per Episode",
+                "position": 496
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x8.png",
+                "caption": "(c)Skill Distribution",
+                "position": 502
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x9.png",
+                "caption": "Figure 7:AgiBot Evaluation Set-up.We are first-citizens of generalization evals, where the default setting isunseenenvironment andunseenobjects.",
+                "position": 524
+            }
+        ]
+    },
+    {
+        "header": "5Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.15922/x10.png",
+                "caption": "Figure 8:Seen Task Evaluation.DreamZeroeffectively learns from diverse data and generalizes to new environments, outperforming VLAs across all task categories. VLAs trainedfrom scratchachieve near-zero success, whilepretrainedVLAs show modest performance—likely benefiting from embodiment-specific knowledge acquired through repetitive demonstrations during pretraining.",
+                "position": 582
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x11.png",
+                "caption": "Figure 9:Zero-shot Generalization to Unseen Tasks.DreamZeroachieves non-trivial task progress on 10 tasks absent from training, while VLAs struggle across both embodiments.",
+                "position": 599
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x12.png",
+                "caption": "Figure 10:Posttraining Results. WAMs enable stronger post-training results across three tasks, indicating that environment generalization ofDreamZerois retained after post-training.",
+                "position": 617
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x13.png",
+                "caption": "Figure 11:Cross-Embodiment Transfer.We explore robot-to-robot (YAM→\\rightarrowAgiBot) and human-to-robot embodiment transfer to unseen tasks.",
+                "position": 635
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x14.png",
+                "caption": "Figure 12:Few-shot Embodiment Adaptation.We explore few-shot embodiment adaptation by post-training on 30 minutes of new embodimentplaydata and evaluating on pick-and-place variants requiring strong language following.",
+                "position": 681
+            }
+        ]
+    },
+    {
+        "header": "6Discussion and Future Work",
+        "images": []
+    },
+    {
+        "header": "7Acknowledgment",
+        "images": []
+    },
+    {
+        "header": "Appendix AComparison with Alternative World Model Architectures",
+        "images": []
+    },
+    {
+        "header": "Appendix BBidirectional vs. Autoregressive WAMs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.15922/x15.png",
+                "caption": "Figure 13:Bidirectional vs. Autoregressive WAMs.When the sampling point falls mid-task (T=20), bidirectional WAMs must subsample video to align with the language caption, distorting native FPS and degrading video-action alignment. Autoregressive WAMs avoid this trade-off by conditioning on video context, preserving both language-video correspondence and native frame rate.",
+                "position": 928
+            }
+        ]
+    },
+    {
+        "header": "Appendix CModel and Training details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.15922/x16.png",
+                "caption": "Figure 14:Attention startegy ofDreamZero.(a) QKV Self-Attention mask for DreamZero training. Y-axis shows the Query (Q) and X-axis shows the Key/Value (KV). Given conditioning frames (C0, C1, C2), we train the model to predict the velocities of next frames (Z1, Z2, Z3) and actions (Y1, Y2, Y3). (b) During inference, we compute the KV-cache of conditional frames and concatenate them to predict the action and frames. For example, Y3 (action) is able to attend to C0, C1, and C2, taking into account previous visual observations as history to predict the current actions during both training and inference. Note that the C0, C1, and C2 during inference is replaced with the GT observations.",
+                "position": 944
+            }
+        ]
+    },
+    {
+        "header": "Appendix DReal-time Execution Details",
+        "images": []
+    },
+    {
+        "header": "Appendix EAgiBot Diverse Data Collection Strategy",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.15922/x17.png",
+                "caption": "Figure 15:Data Collection Environments.We collect teleoperation data across 22 diverse real-world environments, including offices, laboratories, restaurants, supermarkets, coffee shops, warehouses, homes, hotels, and retail stores. This diversity enablesDreamZeroto generalize to unseen environments without task-specific fine-tuning.",
+                "position": 1253
+            }
+        ]
+    },
+    {
+        "header": "Appendix FAgiBot Evaluation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.15922/x18.png",
+                "caption": "Table 5:Seen Tasks Evaluation Setup for AgiBot G1",
+                "position": 1289
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x19.png",
+                "caption": "",
+                "position": 1364
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x20.png",
+                "caption": "",
+                "position": 1373
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x21.png",
+                "caption": "",
+                "position": 1382
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x22.png",
+                "caption": "",
+                "position": 1405
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x23.png",
+                "caption": "",
+                "position": 1414
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x24.png",
+                "caption": "",
+                "position": 1423
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x25.png",
+                "caption": "",
+                "position": 1432
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x26.png",
+                "caption": "",
+                "position": 1450
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x27.png",
+                "caption": "",
+                "position": 1459
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x28.png",
+                "caption": "",
+                "position": 1468
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x29.png",
+                "caption": "",
+                "position": 1477
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x30.png",
+                "caption": "",
+                "position": 1495
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x31.png",
+                "caption": "",
+                "position": 1504
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x32.png",
+                "caption": "",
+                "position": 1513
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x33.png",
+                "caption": "",
+                "position": 1522
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x34.png",
+                "caption": "",
+                "position": 1548
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x35.png",
+                "caption": "",
+                "position": 1557
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x36.png",
+                "caption": "",
+                "position": 1566
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x37.png",
+                "caption": "",
+                "position": 1575
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x38.png",
+                "caption": "",
+                "position": 1592
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x39.png",
+                "caption": "",
+                "position": 1601
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x40.png",
+                "caption": "",
+                "position": 1610
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x41.png",
+                "caption": "",
+                "position": 1619
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x42.png",
+                "caption": "",
+                "position": 1637
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x43.png",
+                "caption": "",
+                "position": 1646
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x44.png",
+                "caption": "",
+                "position": 1655
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x45.png",
+                "caption": "",
+                "position": 1664
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x46.png",
+                "caption": "",
+                "position": 1682
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x47.png",
+                "caption": "",
+                "position": 1691
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x48.png",
+                "caption": "",
+                "position": 1700
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x49.png",
+                "caption": "",
+                "position": 1709
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x50.png",
+                "caption": "",
+                "position": 1732
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x51.png",
+                "caption": "",
+                "position": 1741
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x52.png",
+                "caption": "",
+                "position": 1750
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x53.png",
+                "caption": "",
+                "position": 1759
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x54.png",
+                "caption": "",
+                "position": 1777
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x55.png",
+                "caption": "",
+                "position": 1786
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x56.png",
+                "caption": "",
+                "position": 1795
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x57.png",
+                "caption": "",
+                "position": 1804
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x58.png",
+                "caption": "Table 6:Unseen Tasks Evaluation Setup for AgiBot G1",
+                "position": 1816
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x59.png",
+                "caption": "",
+                "position": 1886
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x60.png",
+                "caption": "",
+                "position": 1895
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x61.png",
+                "caption": "",
+                "position": 1904
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x62.png",
+                "caption": "",
+                "position": 1922
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x63.png",
+                "caption": "",
+                "position": 1931
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x64.png",
+                "caption": "",
+                "position": 1940
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x65.png",
+                "caption": "",
+                "position": 1949
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x66.png",
+                "caption": "",
+                "position": 1966
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x67.png",
+                "caption": "",
+                "position": 1975
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x68.png",
+                "caption": "",
+                "position": 1984
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x69.png",
+                "caption": "",
+                "position": 1993
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/",
+                "caption": "",
+                "position": 2010
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x71.png",
+                "caption": "",
+                "position": 2019
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x72.png",
+                "caption": "",
+                "position": 2028
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x73.png",
+                "caption": "",
+                "position": 2037
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x74.png",
+                "caption": "",
+                "position": 2054
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x75.png",
+                "caption": "",
+                "position": 2063
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x76.png",
+                "caption": "",
+                "position": 2072
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x77.png",
+                "caption": "",
+                "position": 2081
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x78.png",
+                "caption": "",
+                "position": 2098
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x79.png",
+                "caption": "",
+                "position": 2107
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x80.png",
+                "caption": "",
+                "position": 2116
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x81.png",
+                "caption": "",
+                "position": 2125
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x82.png",
+                "caption": "",
+                "position": 2142
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x83.png",
+                "caption": "",
+                "position": 2151
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x84.png",
+                "caption": "",
+                "position": 2160
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x85.png",
+                "caption": "",
+                "position": 2169
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x86.png",
+                "caption": "",
+                "position": 2186
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x87.png",
+                "caption": "",
+                "position": 2195
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x88.png",
+                "caption": "",
+                "position": 2204
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x89.png",
+                "caption": "",
+                "position": 2213
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x90.png",
+                "caption": "",
+                "position": 2230
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x91.png",
+                "caption": "",
+                "position": 2239
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x92.png",
+                "caption": "",
+                "position": 2248
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x93.png",
+                "caption": "",
+                "position": 2257
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x94.png",
+                "caption": "",
+                "position": 2274
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x95.png",
+                "caption": "",
+                "position": 2283
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x96.png",
+                "caption": "",
+                "position": 2292
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x97.png",
+                "caption": "",
+                "position": 2301
+            }
+        ]
+    },
+    {
+        "header": "Appendix GDROID Evaluation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.15922/x98.png",
+                "caption": "(a)Seen tasks on DROID",
+                "position": 2321
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x98.png",
+                "caption": "(a)Seen tasks on DROID",
+                "position": 2324
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x99.png",
+                "caption": "",
+                "position": 2365
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x100.png",
+                "caption": "",
+                "position": 2377
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x101.png",
+                "caption": "",
+                "position": 2387
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x102.png",
+                "caption": "",
+                "position": 2399
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x103.png",
+                "caption": "",
+                "position": 2409
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x104.png",
+                "caption": "",
+                "position": 2421
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x105.png",
+                "caption": "",
+                "position": 2431
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x106.png",
+                "caption": "",
+                "position": 2443
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x107.png",
+                "caption": "",
+                "position": 2453
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x108.png",
+                "caption": "",
+                "position": 2465
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x109.png",
+                "caption": "",
+                "position": 2475
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x110.png",
+                "caption": "",
+                "position": 2487
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x111.png",
+                "caption": "",
+                "position": 2497
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x112.png",
+                "caption": "",
+                "position": 2509
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x113.png",
+                "caption": "",
+                "position": 2519
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x114.png",
+                "caption": "",
+                "position": 2531
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x115.png",
+                "caption": "",
+                "position": 2541
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x116.png",
+                "caption": "",
+                "position": 2553
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x117.png",
+                "caption": "",
+                "position": 2563
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x118.png",
+                "caption": "(b)Tasks with unseen verbs on DROID",
+                "position": 2577
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x119.png",
+                "caption": "",
+                "position": 2618
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x120.png",
+                "caption": "",
+                "position": 2630
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x121.png",
+                "caption": "",
+                "position": 2640
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x122.png",
+                "caption": "",
+                "position": 2652
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x123.png",
+                "caption": "",
+                "position": 2662
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x124.png",
+                "caption": "",
+                "position": 2674
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x125.png",
+                "caption": "",
+                "position": 2684
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x126.png",
+                "caption": "",
+                "position": 2696
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x127.png",
+                "caption": "",
+                "position": 2706
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x128.png",
+                "caption": "",
+                "position": 2718
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x129.png",
+                "caption": "",
+                "position": 2728
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x130.png",
+                "caption": "",
+                "position": 2740
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x131.png",
+                "caption": "",
+                "position": 2750
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x132.png",
+                "caption": "",
+                "position": 2762
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x133.png",
+                "caption": "",
+                "position": 2772
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x134.png",
+                "caption": "",
+                "position": 2784
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x135.png",
+                "caption": "",
+                "position": 2794
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x136.png",
+                "caption": "",
+                "position": 2806
+            },
+            {
+                "img": "https://arxiv.org/html/2602.15922/x137.png",
+                "caption": "",
+                "position": 2816
+            }
+        ]
+    },
+    {
+        "header": "Appendix HFailure Case Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2602.15922/x138.png",
+                "caption": "Figure 16:Illustration of generated and executed pair.We illustrate the generated video and action execution pair. These two examples show scenarios where the video predictionfailedand the robot followed the failed plan.DreamZerofailed to generate video of the Agibot G1 robot drawing in the whiteboard and failed to generate video of the Franka robot opening the oven first.",
+                "position": 2834
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    }
+]
