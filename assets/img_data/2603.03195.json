@@ -1,0 +1,120 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.03195/2603.03195v1/x1.png",
+                "caption": "Figure 1:Comparison of VLA pretraining strategies.(a)World Model: It predicts future visual frames, leading to redundant background reconstruction.\n(b)Latent Action: It learns the frame-to-frame transition using a visual encoderEE, but lacks temporally continuous reasoning.\n(c)CoWVLA: Our method first uses a video encoderEEto decompose each video segment into motion and structure latents, and then trains the VLM to infer latent motion and predict the terminal frame of the segment given the instruction and the initial frame.",
+                "position": 249
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.03195/2603.03195v1/x2.png",
+                "caption": "Figure 2:Overview of the CoWVLA framework.CoWVLA consists of two core components: a latent motion extractor and a VLA decoder.\nThe latent motion extractor, implemented as a video VAE, disentangles each video segment into a structure latentzsz_{s}and two directional motion latentszmhz_{m}^{h}andzmwz_{m}^{w}, which are concatenated into a unified latent motion vectorzmz_{m}.\nThe VLA decoder performs unified autoregressive modeling over multimodal sequences.\nDuring pre-training, the model takes the instruction and initial frame as input, and uses a learnable motion queryQQto predict the latent motionz^m\\hat{z}_{m}while reconstructing the terminal frame of the video segment.\nDuring co-fine-tuning, the input expands into alternating keyframe–action pairs;QQcontinues to aggregate temporally continuous latent dynamics, guiding multi-step action generation under sparse visual observations.",
+                "position": 333
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": []
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.03195/2603.03195v1/x3.png",
+                "caption": "Figure 3:Visualization of the disentangled motion and structure latents.\nWe select two frames (t1t_{1}andt2t_{2}) and show the original (Orig.) and reconstructed (Recon.) frames.\n“M. Recon.” and “S. Recon.” denote the reconstructions obtained by decoding only the motion latent or only the structure latent, respectively.\nThe structure latent preserves the global scene layout, whereas the motion latent captures motion and fine-grained temporal details.",
+                "position": 861
+            },
+            {
+                "img": "https://arxiv.org/html/2603.03195/2603.03195v1/x4.png",
+                "caption": "Figure 4:Cross-reconstruction visualization.\nWe extract the structure latent from the static video in the first row and the motion latent from the robot-arm motion video in the second row.\nBy combining the two latents, we reconstruct the video shown in the third row.\nWe compute the difference between the cross-reconstructed frames and the static frames to highlight the changed regions, which correspond to the robot arm’s motion.",
+                "position": 915
+            },
+            {
+                "img": "https://arxiv.org/html/2603.03195/2603.03195v1/x5.png",
+                "caption": "Figure 5:Comparative visualization of future-frame prediction strategies.\nThere are two tasks demonstrated: i) pick up the black bowl from the table center and place it on the plate, and ii) sweep into a pile.\n(a) The world-model approach predicts five future frames.\n(b) The single-goal-frame approach predicts one goal frame.\n(c) Our method reasons through a learned motion latentzmz_{m}, producing more reasonable and instruction-aligned frames.",
+                "position": 923
+            },
+            {
+                "img": "https://arxiv.org/html/2603.03195/2603.03195v1/x6.png",
+                "caption": "Figure 6:Comparison of pre-training efficiency and task performance on LIBERO[32]across different methods.\nBlue and orange circles denote world-model and latent-action baselines, respectively, while green circles denote our configurations.\nCircle size indicates training-time GPU memory usage.\nOur method balances pre-training efficiency and performance, achieving a higher success rate with moderate computational efficiency.",
+                "position": 1124
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "6Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "1Implementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.03195/2603.03195v1/x7.png",
+                "caption": "Figure 1:Sensitivity analysis ofNNandlal_{a}on LIBERO.",
+                "position": 2272
+            },
+            {
+                "img": "https://arxiv.org/html/2603.03195/2603.03195v1/x8.png",
+                "caption": "Figure 2:Cross-Recon visualization on LIBERO[32].\nThe first six columns show temporally sampled frames from three rows: Structure (top), Motion (middle), and Cross-Recon (bottom).\nThe Cross-Recon videos are generated by combining the static appearance from the Structure video with the motion representation extracted from the Motion video, revealing the transferred motion patterns.\nEach Cross-Recon frame is overlaid with a motion heatmap to highlight dynamic regions.\nThe last column presents three summary maps: motion heatmaps obtained by averaging and maximizing per-frame absolute differences between Cross-Recon and Structure, and the end-effector trajectory estimated from the motion regions.",
+                "position": 2320
+            },
+            {
+                "img": "https://arxiv.org/html/2603.03195/2603.03195v1/x9.png",
+                "caption": "Figure 3:Cross-Recon visualization on SimplerEnv[30]and Bridgev2[43].",
+                "position": 2328
+            },
+            {
+                "img": "https://arxiv.org/html/2603.03195/2603.03195v1/x10.png",
+                "caption": "Figure 4:Visualization of latent-motion clusters and corresponding video examples.\n(a) Unsupervised clustering results of clip-level motion trajectories. Each subplot shows the average 2D motion trajectory (obtained from the first two PCA components of the accumulated frame-wise motion deltas) for one cluster.\n(b) Representative video examples from clusters.\nCluster 1 and 2 correspond to monotonic downward-like or upward-like motions, whereas Cluster 3 and 4 exhibit rightward-like or leftward-like behaviors.",
+                "position": 2331
+            },
+            {
+                "img": "https://arxiv.org/html/2603.03195/2603.03195v1/x11.png",
+                "caption": "Figure 5:Comparative visualization of future-frame prediction strategies.",
+                "position": 2338
+            }
+        ]
+    },
+    {
+        "header": "2Additional Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.03195/2603.03195v1/figs/robot_and_camera.jpg",
+                "caption": "Figure 6:An Intel RealSense camera and a Realman RM75B robot.",
+                "position": 2424
+            },
+            {
+                "img": "https://arxiv.org/html/2603.03195/2603.03195v1/x12.png",
+                "caption": "Figure 7:Comparison between data collection and real-world deployment during testing.",
+                "position": 2427
+            }
+        ]
+    },
+    {
+        "header": "3Real-Robot Experiments",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

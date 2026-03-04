@@ -1,0 +1,65 @@
+{
+    "paper_title": "Whisper-RIR-Mega: A Paired Clean-Reverberant Speech Benchmark for ASR Robustness to Room Acoustics",
+    "authors": [
+        "Mandip Goswami"
+    ],
+    "sections": [
+        {
+            "title": "Abstract",
+            "content": "We introduce Whisper-RIR-Mega, a benchmark dataset of paired clean and reverberant speech for evaluating automatic speech recognition (ASR) robustness to room acoustics. Each sample pairs a clean LibriSpeech utterance with the same utterance convolved with a real room impulse response from the RIR-Mega corpus, with stratified splits by reverberation time (RT60) and direct-to-reverberant ratio (DRR). We evaluate five Whisper models (tiny through large-v3) on 1600 test samples and report word error rate (WER) and character error rate (CER) under clean and reverberant conditions. Reverberation consistently degrades performance across all model sizes; the reverb penalty in WER ranges from 0.12 to 1.07 percentage points depending on the model. We release the dataset, evaluation code, and baseline results to support reproducible research on robust ASR."
+        },
+        {
+            "title": "Start",
+            "content": "6 2 0 2 7 2 ] . e [ 1 2 5 2 2 0 . 3 0 6 2 : r Whisper-RIR-Mega: Paired Clean-Reverberant Speech Benchmark for ASR Robustness to Room Acoustics Mandip Goswami Acoustics Researcher, WA, USA mandipgoswami@gmail.com February, 2026 Abstract We introduce Whisper-RIR-Mega, benchmark dataset of paired clean and reverberant speech for evaluating automatic speech recognition (ASR) robustness to room acoustics. Each sample pairs clean LibriSpeech utterance with the same utterance convolved with real room impulse response from the RIR-Mega corpus, with stratified splits by reverberation time (RT60) and direct-to-reverberant ratio (DRR). We evaluate five Whisper models (tiny through large-v3) on 1600 test samples and report word error rate (WER) and character error rate (CER) under clean and reverberant conditions. Reverberation consistently degrades performance across all model sizes; the reverb penalty in WER ranges from 0.12 to 1.07 percentage points depending on the model. We release the dataset, evaluation code, and baseline results to support reproducible research on robust ASR."
+        },
+        {
+            "title": "Introduction",
+            "content": "Automatic speech recognition (ASR) systems are often trained and evaluated on relatively clean, close-talk recordings. In real environments, speech is captured in rooms where reflections and reverberation alter the signal and can degrade recognition accuracy. Evaluating ASR under controlled reverberant conditions is necessary to understand robustness and to drive progress in acoustic modeling and dereverberation. Existing benchmarks for reverberant speech either lack paired clean references, use synthetic or limited RIR sets, or do not stratify by acoustic measures such as RT60 and DRR. We present Whisper-RIR-Mega, benchmark that pairs each clean utterance with reverberant version produced by convolving with single real room impulse response (RIR) from the RIR-Mega corpus. Splits are stratified by RT60 (or DRR) when metadata is available, so the test set is balanced across acoustic conditions. This design allows direct comparison of clean versus reverberant WER and clear reverb penalty (delta WER) per model. We run baseline evaluations using five OpenAI Whisper models (tiny, base, small, medium, large-v3) on 1600 test samples. All models show higher WER and CER under reverberant speech; the smallest model (tiny) exhibits the largest reverb penalty in WER, while small and medium show the smallest penalty. We release the dataset on Hugging Face, along with evaluation code and leaderboard, to encourage reproducible benchmarks and further work on robust ASR."
+        },
+        {
+            "title": "2 Related Work",
+            "content": "Reverberation robust ASR has been addressed via multi-condition training, dereverberation front-ends, and end-to-end systems. Benchmark datasets include REVERB [2], CHiME, and others that provide simulated or real reverberant speech. RIR-Mega [4] is large-scale simulated RIR dataset with machine-friendly metadata (RT60, DRR, C50); RIR-Mega-Speech [5] builds 1 reverberant speech corpus from LibriSpeech and RIR-Mega with per-file acoustic annotations and reproducible evaluation. Whisper [6] provides strong open ASR baselines. Our benchmark combines LibriSpeech and RIR-Mega [4] in paired clean-reverb design with stratified splits and public baselines, complementary to [5]."
+        },
+        {
+            "title": "3.1 Speech and RIR Sources",
+            "content": "We use LibriSpeech test-clean (16 kHz) as the speech source. Each utterance is paired with single room impulse response from the RIR-Mega dataset. RIR-Mega provides measured RIRs with metadata including RT60 (reverberation time) and DRR (direct-to-reverberant ratio). We use the train split of RIR-Mega and sample one RIR per utterance. When RT60 (or DRR) metadata is available, we stratify sampling across quantile bins so that the resulting dataset is balanced across acoustic conditions."
+        },
+        {
+            "title": "3.2 Signal Processing",
+            "content": "For each utterance we convolve the clean waveform with the selected RIR at 16 kHz. RIR energy is normalized before convolution, and the output is peak-normalized. No background noise is added. The clean and reverberant signals are stored as 16 kHz FLAC. Each sample is identified by unique sample_id (derived from the LibriSpeech ID and the RIR assignment) and carries the reference transcript (text_ref) and, when available, RIR metadata fields (e.g. rir_RT60_T30_s, rir_DRR_dB)."
+        },
+        {
+            "title": "3.3 Splits",
+            "content": "We build 2000 paired samples in total. deterministic split assigns 20% to validation and 80% to test (no training split in the default configuration). Assignment is stratified by RT60 quantiles when metadata exists, so that validation and test both reflect similar distribution of room acoustics. The benchmark evaluation uses the test split (1600 samples)."
+        },
+        {
+            "title": "4.1 Models",
+            "content": "We evaluate five Whisper models: openai/whisper-tiny, base, small, medium, and openai/whisper-large-v3. Decoding uses beam size 5, best-of 5, temperature 0, and language set to English. All runs are performed on CPU with FP16 disabled for reproducibility."
+        },
+        {
+            "title": "4.2 Metrics",
+            "content": "We report word error rate (WER) and character error rate (CER) using the jiwer library. For each model we compute mean WER and mean CER over the test set under two conditions: clean (original utterance) and reverb (convolved utterance). The reverb penalty is defined as the difference (reverb minus clean) in WER or CER."
+        },
+        {
+            "title": "5 Results",
+            "content": "Table 1 reports mean WER and CER for each model on clean and reverberant test sets (1600 samples each condition). All models achieve similar clean WER (about 98.6101.4%); the high values are consistent with the fact that we do not apply any normalization to the reference 2 Table 1: Mean WER (%) and CER (%) on the test set (1600 samples) for clean and reverberant conditions. WER and CER are reverb minus clean. Model WER (clean) WER (reverb) WER CER (clean) CER (reverb) CER Whisper-tiny Whisper-base Whisper-small Whisper-medium Whisper-large-v 99.30 98.83 98.60 98.60 101.36 100.36 99.41 98.72 98.74 101.90 1.07 0.58 0.12 0.15 0.54 83.47 83.33 83.24 83.24 84.94 84.31 83.70 83.27 83.21 85.91 0.84 0.37 0.04 0.02 0. Figure 1: WER by model: clean (blue) and reverberant (coral). (e.g. casing or punctuation), so differences in capitalization and punctuation between reference and hypothesis can inflate WER. The relative comparison across conditions and models remains valid. Reverberation increases WER for every model. The reverb penalty in WER (delta WER) is largest for Whisper-tiny (1.07 percentage points) and smallest for Whisper-small (0.12) and Whisper-medium (0.15). Whisper-base and Whisper-large-v3 show intermediate penalties (0.58 and 0.54 percentage points). CER follows similar pattern: reverb degrades performance, with the smallest penalty for small and medium and the largest for tiny. Figure 1 illustrates clean versus reverberant WER per model. When RIR metadata (RT60, DRR) is available in the dataset, we also produce plots of WER versus RT60 bin and WER versus DRR bin (reverb condition only); these figures are included in the repository and on the benchmark Space."
+        },
+        {
+            "title": "6 Discussion",
+            "content": "The results show that reverberation hurts ASR performance across all Whisper sizes, but the amount of degradation varies. Smaller models (tiny) are more sensitive to reverb in terms of WER delta; medium and small show the smallest penalty. This suggests that model capacity and training objectives interact with acoustic degradation in non-trivial way and that robustness should be evaluated explicitly on benchmarks like Whisper-RIR-Mega. 3 The benchmark is limited to English (LibriSpeech) and to single RIR per utterance. Extensions could include multiple RIRs per utterance, other languages, or additive noise. We encourage the community to use the dataset and report results on the public leaderboard."
+        },
+        {
+            "title": "7 Conclusion",
+            "content": "We introduced Whisper-RIR-Mega, paired clean-reverberant speech benchmark built from LibriSpeech and RIR-Mega, with stratified splits and baseline results for five Whisper models. Reverberation consistently increases WER and CER, with the reverb penalty varying by model size. The dataset, code, and leaderboard are publicly available to support reproducible research on robust ASR."
+        },
+        {
+            "title": "Data and Code Availability",
+            "content": "The dataset is hosted at https://huggingface.co/datasets/mandipgoswami/whisper-rirmega-bench. Evaluation code and reproduction instructions are in the repository https://github.com/mandip42/ whisper-rirmega-bench. An interactive Space with the leaderboard and submission interface is at https://huggingface.co/spaces/mandipgoswami/whisper-rirmega-benchmark."
+        },
+        {
+            "title": "References",
+            "content": "[1] J. Barker, R. Marxer, E. Vincent, and S. Watanabe. The third CHiME speech separation and recognition challenge: dataset, task and baselines. In Proc. IEEE ASRU, 2015. [2] K. Kinoshita, M. Delcroix, S. Gannot, E. Habets, R. Haeb-Umbach, W. Kellermann, V. Leutnant, R. Maas, T. Nakatani, B. Raj et al. summary of the REVERB challenge: stateof-the-art and remaining challenges in reverberant speech processing research. EURASIP Journal on Advances in Signal Processing, 2016(1):7, 2016. [3] V. Panayotov, G. Chen, D. Povey, and S. Khudanpur. LibriSpeech: an ASR corpus based on public domain audio books. In Proc. IEEE ICASSP, 2015. [4] M. Goswami. RIR-Mega: large-scale simulated room impulse response dataset for machine learning and room acoustics modeling. arXiv:2510.18917 [eess.AS], 2025. https://arxiv. org/abs/2510.18917. [5] M. Goswami. RIR-Mega-Speech: reverberant speech corpus with comprehensive acoustic metadata and reproducible evaluation. arXiv:2601.19949 [eess.AS], 2026. https://arxiv. org/abs/2601.19949. [6] A. Radford, J. W. Kim, T. Xu, G. Brockman, C. McLeavey, and I. Sutskever. Robust speech recognition via large-scale weak supervision. In Proc. ICML, 2023."
+        }
+    ],
+    "affiliations": []
+}
