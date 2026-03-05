@@ -1,0 +1,524 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/teaser-8.png",
+                "caption": "",
+                "position": 236
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Works",
+        "images": []
+    },
+    {
+        "header": "3Preliminaries",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/main.png",
+                "caption": "Figure 2:Overall framework of our EmbodiedSplat.We endow feed-forward 3DGS with semantic understanding capabilities by binding the two types of CLIP features: 1)2D Semantic Featuresare attached to each Gaussian viaSparse Coefficient FieldwithCLIP Global Codebook, effectively reducing memory consumption while preserving semantic generalizability of CLIP. 2)3D Geometric-aware Featuresare produced by aggregating the feature point cloud of 3DGS through 3D U-Net[10]and temporal-aware memory adapter[75]. These two types of features enable mutual compensation between semantic and 3D geometry, which results in superior understanding capabilities compared to the existing baselines.",
+                "position": 358
+            }
+        ]
+    },
+    {
+        "header": "4Our Methods",
+        "images": []
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative.png",
+                "caption": "Figure 3:Quantitative comparisons on 3D semantic segmentation.",
+                "position": 922
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/2d_sem.png",
+                "caption": "Figure 4:2D-rendered object search.",
+                "position": 1315
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/online_sem-3.png",
+                "caption": "Figure 5:Online 3D reasoning for class “Bed”.",
+                "position": 1318
+            }
+        ]
+    },
+    {
+        "header": "6Conclusions",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Table of Contents",
+        "images": []
+    },
+    {
+        "header": "7Additional Explanations.",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/supple_depth_vis.png",
+                "caption": "Figure 6:Depth visualizations with RGB-D inputs.",
+                "position": 2925
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/supple_spc_init.png",
+                "caption": "Figure 7:Toy example of sparse coefficient field initialization atiith pixel.1)We first add index to each instance-level mask. Index starts from 47 since the latest index in global codebook from previous time step is 46.2)Instance-level features extracted from current frame𝐈t\\mathbf{I}^{t}are appended into codebook with attached indices, producing updated codebook𝐂t\\mathbf{C}^{t}.3)We initialize the index cache𝐈lt​(i)\\mathbf{I}^{t}_{l}(i)and weight cacheΩlt​(i)\\Omega^{t}_{l}(i)ofii-th local Gaussian aligned withii-th pixel. Sinceii-th pixel belongs to instance ‘53’, index ‘53’ is added to first entry of𝐈lt​(i)\\mathbf{I}^{t}_{l}(i):𝐈lt​(i,0)=53\\mathbf{I}^{t}_{l}(i,0)=53. Corresponding confidence valueωlt​(i)\\omega^{t}_{l}(i)is further inserted into first entry ofΩlt​(i)\\Omega^{t}_{l}(i).",
+                "position": 2954
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/supple_2dvlm-2.png",
+                "caption": "Figure 8:Multi-view inconsistent masks from FastSam[83].",
+                "position": 3125
+            }
+        ]
+    },
+    {
+        "header": "8Discussions.",
+        "images": []
+    },
+    {
+        "header": "9Additional Experiments.",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/supple_online_fuse_toy.png",
+                "caption": "Figure 9:Toy example of online fusion algorithm with sparse coefficient field.1)Sparse coefficient field of paired Gaussians(i,mi)(i,m_{i})are fused by our online fusion Algorithm.1. The local Gaussians (Green) which do not have valid match with global Gaussians are just appended to the global set without update.2) Line 1 of Algorithm.1:First entry of local index,𝐈it​(i,0)\\mathbf{I}^{t}_{i}(i,0)is inserted to the last entry of global index cache𝐈gt−1​(mi,−1)\\mathbf{I}^{t-1}_{g}(m_{i},-1). In the above example, index 53 is appended to𝐈gt−1​(mi)\\mathbf{I}^{t-1}_{g}(m_{i}), such that𝐈gt−1​(mi,−1)←53\\mathbf{I}^{t-1}_{g}(m_{i},-1)\\leftarrow 53.3-4) Lines 3-4 of Algorithm.1:Both the local weight cacheΩlt​(i)\\Omega^{t}_{l}(i)and global weight cacheΩgt−1​(mi)\\Omega^{t-1}_{g}(m_{i})are updated based on the confidence-weighted average. Specifically, all of the entries inΩgt−1​(mi)\\Omega^{t-1}_{g}(m_{i})are multiplied by 0.75, while the first entry of local weight cacheΩlt​(i,0)\\Omega^{t}_{l}(i,0)is scaled by 0.25. Scaled local weight value0.25⋅Ωlt​(i,0)0.25\\cdot\\Omega^{t}_{l}(i,0)is then inserted to the last entry of global weight cache, such that:Ωgt−1​(mi,−1)←0.25⋅Ωlt​(i,0)\\Omega^{t-1}_{g}(m_{i},-1)\\leftarrow 0.25\\cdot\\Omega^{t}_{l}(i,0). Since both the index cache and weight cache of local GaussianΘ¯lt​(i)\\bar{\\Theta}^{t}_{l}(i)are incorporated into global gaussianΘ¯gt−1​(mi)\\bar{\\Theta}^{t-1}_{g}(m_{i})from the previous stages,Θ¯gt−1​(mi)\\bar{\\Theta}^{t-1}_{g}(m_{i})becomes newmim_{i}-th global Gaussian at steptt:Θ¯gt​(mi)←Θ¯gt−1​(mi)\\bar{\\Theta}^{t}_{g}(m_{i})\\leftarrow\\bar{\\Theta}^{t-1}_{g}(m_{i}).ii-th local Gaussian is simply discarded.5-6) Lines 5-6 of Algorithm.1:We sort both the global weight cache and index cache based on the weight valuesΩgt​(mi)\\Omega^{t}_{g}(m_{i})in descending order. Then, we keep firstL−1=5L-1=5entires and discard the last values by overwriting them with zero:Ωgt​(mi,−1)←0,𝐈gt​(mi,−1)←0\\Omega^{t}_{g}(m_{i},-1)\\leftarrow 0,\\;\\mathbf{I}^{t}_{g}(m_{i},-1)\\leftarrow 0. This keeps each cache size fixed atLLalong the exploration, effectively improving the memory efficiency.",
+                "position": 3985
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0000_01/opengaussian.png",
+                "caption": "(a)OpenGaussian[72]",
+                "position": 3988
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0000_01/opengaussian.png",
+                "caption": "(a)OpenGaussian[72]",
+                "position": 3991
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0000_01/instancegaussian.png",
+                "caption": "(b)InstanceGaussian[43]",
+                "position": 3996
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0000_01/drsplat.png",
+                "caption": "(c)Dr. Splat[30]",
+                "position": 4001
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0000_01/occamlgs.png",
+                "caption": "(d)Occam’s LGS[9]",
+                "position": 4006
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0000_01/embodiedsplat_fast.png",
+                "caption": "(e)EmbodiedSplat-fast",
+                "position": 4012
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0000_01/embodiedsplat.png",
+                "caption": "(f)EmbodiedSplat",
+                "position": 4017
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0000_01/gt.png",
+                "caption": "(g)GT",
+                "position": 4022
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0158_00/opengaussian.png",
+                "caption": "(h)OpenGaussian[72]",
+                "position": 4028
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0158_00/instancegaussian.png",
+                "caption": "(i)InstanceGaussian[43]",
+                "position": 4033
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0158_00/drsplat.png",
+                "caption": "(j)Dr. Splat[30]",
+                "position": 4038
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0158_00/occamlgs.png",
+                "caption": "(k)Occam’s LGS[9]",
+                "position": 4043
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0158_00/embodiedsplat_fast.png",
+                "caption": "(l)EmbodiedSplat-fast",
+                "position": 4049
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0158_00/embodiedsplat.png",
+                "caption": "(m)EmbodiedSplat",
+                "position": 4054
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0158_00/gt.png",
+                "caption": "(n)GT",
+                "position": 4059
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0406_00/opengaussian.png",
+                "caption": "(a)OpenGaussian[72]",
+                "position": 4066
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0406_00/opengaussian.png",
+                "caption": "(a)OpenGaussian[72]",
+                "position": 4069
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0406_00/instancegaussian.png",
+                "caption": "(b)InstanceGaussian[43]",
+                "position": 4074
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0406_00/drsplat.png",
+                "caption": "(c)Dr. Splat[30]",
+                "position": 4079
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0406_00/occamlgs.png",
+                "caption": "(d)Occam’s LGS[9]",
+                "position": 4084
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0406_00/embodiedsplat_fast.png",
+                "caption": "(e)EmbodiedSplat-fast",
+                "position": 4090
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0406_00/embodiedsplat.png",
+                "caption": "(f)EmbodiedSplat",
+                "position": 4095
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0406_00/gt.png",
+                "caption": "(g)GT",
+                "position": 4100
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0521_00/opengaussian.png",
+                "caption": "(h)OpenGaussian[72]",
+                "position": 4106
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0521_00/instancegaussian.png",
+                "caption": "(i)InstanceGaussian[43]",
+                "position": 4111
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0521_00/drsplat.png",
+                "caption": "(j)Dr. Splat[30]",
+                "position": 4116
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0521_00/occamlgs.png",
+                "caption": "(k)Occam’s LGS[9]",
+                "position": 4121
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0521_00/embodiedsplat_fast.png",
+                "caption": "(l)EmbodiedSplat-fast",
+                "position": 4127
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0521_00/embodiedsplat.png",
+                "caption": "(m)EmbodiedSplat",
+                "position": 4132
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/scene0521_00/gt.png",
+                "caption": "(n)GT",
+                "position": 4137
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/2d_seg/stool_1.png",
+                "caption": "Figure 12:Qualitative results on 2D-rendered object search of our EmbodiedSplat.",
+                "position": 4144
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/2d_seg/stool_1.png",
+                "caption": "",
+                "position": 4147
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/2d_seg/stool_2.png",
+                "caption": "",
+                "position": 4151
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/2d_seg/stool_3.png",
+                "caption": "",
+                "position": 4155
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/2d_seg/stool_4.png",
+                "caption": "",
+                "position": 4159
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/2d_seg/stool_5.png",
+                "caption": "",
+                "position": 4163
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/2d_seg/book_1.png",
+                "caption": "",
+                "position": 4168
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/2d_seg/book_2.png",
+                "caption": "",
+                "position": 4172
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/2d_seg/book_3.png",
+                "caption": "",
+                "position": 4176
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/2d_seg/book_4.png",
+                "caption": "",
+                "position": 4180
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/2d_seg/book_5.png",
+                "caption": "",
+                "position": 4184
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/1_rgb.png",
+                "caption": "Figure 13:Qualitative results on novel-view synthesis and depth rendering of our EmbodiedSplat.",
+                "position": 4190
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/1_rgb.png",
+                "caption": "",
+                "position": 4193
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/1_depth.png",
+                "caption": "",
+                "position": 4197
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/2_rgb.png",
+                "caption": "",
+                "position": 4201
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/2_depth.png",
+                "caption": "",
+                "position": 4205
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/3_rgb.png",
+                "caption": "",
+                "position": 4209
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/3_depth.png",
+                "caption": "",
+                "position": 4213
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/4_rgb.png",
+                "caption": "",
+                "position": 4217
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/4_depth.png",
+                "caption": "",
+                "position": 4222
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/5_rgb.png",
+                "caption": "",
+                "position": 4226
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/5_depth.png",
+                "caption": "",
+                "position": 4230
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/6_rgb.png",
+                "caption": "",
+                "position": 4234
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/6_depth.png",
+                "caption": "",
+                "position": 4238
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/7_rgb.png",
+                "caption": "",
+                "position": 4242
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/7_depth.png",
+                "caption": "",
+                "position": 4246
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/8_rgb.png",
+                "caption": "",
+                "position": 4251
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/8_depth.png",
+                "caption": "",
+                "position": 4255
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/9_rgb.png",
+                "caption": "",
+                "position": 4259
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/9_depth.png",
+                "caption": "",
+                "position": 4263
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/10_rgb.png",
+                "caption": "",
+                "position": 4267
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/10_depth.png",
+                "caption": "",
+                "position": 4271
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/11_rgb.png",
+                "caption": "",
+                "position": 4275
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/11_depth.png",
+                "caption": "",
+                "position": 4280
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/12_rgb.png",
+                "caption": "",
+                "position": 4284
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/12_depth.png",
+                "caption": "",
+                "position": 4288
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/13_rgb.png",
+                "caption": "",
+                "position": 4292
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/13_depth.png",
+                "caption": "",
+                "position": 4296
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/14_rgb.png",
+                "caption": "",
+                "position": 4300
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/14_depth.png",
+                "caption": "",
+                "position": 4304
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/15_rgb.png",
+                "caption": "",
+                "position": 4309
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/15_depth.png",
+                "caption": "",
+                "position": 4313
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/16_rgb.png",
+                "caption": "",
+                "position": 4317
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/16_depth.png",
+                "caption": "",
+                "position": 4321
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/17_rgb.png",
+                "caption": "",
+                "position": 4325
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/17_depth.png",
+                "caption": "",
+                "position": 4329
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/18_rgb.png",
+                "caption": "",
+                "position": 4333
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/18_depth.png",
+                "caption": "",
+                "position": 4338
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/19_rgb.png",
+                "caption": "",
+                "position": 4342
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/19_depth.png",
+                "caption": "",
+                "position": 4346
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/20_rgb.png",
+                "caption": "",
+                "position": 4350
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/20_depth.png",
+                "caption": "",
+                "position": 4354
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/21_rgb.png",
+                "caption": "",
+                "position": 4358
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04254/2603.04254v1/fig/qualitative/nvs/21_depth.png",
+                "caption": "",
+                "position": 4362
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
