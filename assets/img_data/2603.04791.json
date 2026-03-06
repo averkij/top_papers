@@ -1,0 +1,133 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x1.png",
+                "caption": "Figure 1:Forecasting into the long term accumulates uncertainty, as the prediction of each step depends on all preceding estimations, which positions time series forecasting as a serial problem[liu2025serial]. Parallel-forecasting models, which predict multiple future steps simultaneously, do not scale with sufficient serial computations to reliably capture the recurrent dependencies. Although autoregressive models mirror the serial nature of the task by \"predicting step by step\", their iterative rolling mechanism over the input still entails significant computational overhead.",
+                "position": 349
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x2.png",
+                "caption": "Figure 2:The Serial Scaling of Timer-S1 is achieved by (a)serial forecasting, which efficiently produces multi-step prediction with serial computations; (b)data scalingwith data augmentation applied to TimeBench[liu2025sundial], a corpus of over one trillion time points; and (c)post-trainingthat comprehensively enhances the capability of the model.",
+                "position": 355
+            }
+        ]
+    },
+    {
+        "header": "2Background",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x3.png",
+                "caption": "Figure 3:A timeline of representative time series forecasting models in recent years. This timeline is established according to the release date of the paper or technical report for a model. Notably, the Timer model is a continuously developed family of time series foundation models that has presents sustained scaling in model size across its generations.",
+                "position": 375
+            }
+        ]
+    },
+    {
+        "header": "3Timer-S1: Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x4.png",
+                "caption": "Figure 4:Overall architecture of Timer-S1. The input time series is re-normalized and divided into patch tokens. These patch embeddings are fed into a decoder-only Transformer. The Transformer backbone consists of a series of TimeMoE blocks, where Pre-RMSNorm and QK-Norm[henry2020query]are adapted for training stability, followed by a sequence of TimeSTP blocks. TimeSTP extends TimeMoE by additionally conditioning on the initial input embeddings, iteratively refining the token embeddings from the previous block, and generating shifted-by-one token predictions. All output embeddings are projected by a shared forecasting head to produce quantile predictions. Timer-S1 enables serial forecasting, where predictions of longer horizons actually undergo more serial computations in the Transformer block.",
+                "position": 398
+            }
+        ]
+    },
+    {
+        "header": "4Training",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x5.png",
+                "caption": "Figure 5:Illustration of the TimeBench dataset and the training pipeline of Timer-S1. TimeBench integrates over one trillion time points from multiple domains, processed through quality-focused preprocessing, predictability assessment, and diversity-enhancing augmentation. TimeBench is loaded in a single-series sequence format for learning univariate patterns. Timer-S1’s training follows a multi-stage design: it is first pre-trained via serial-token prediction with uniform horizon weighting; then it undergoes continued pre-training using a horizon-decay objective to enhance short-term accuracy; and extends its context length from 2880 to 11520 through long-context adaptation.",
+                "position": 661
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x6.png",
+                "caption": "Figure 6:Performance of Timer-S1 on the GIFT-Eval leaderboard.",
+                "position": 810
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x7.png",
+                "caption": "Figure 7:Performance (MASE) on the GIFT-Eval leaderboard, grouped by the term length.",
+                "position": 820
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x8.png",
+                "caption": "Figure 8:Performance (CRPS) on the GIFT-Eval leaderboard, grouped by the term length.",
+                "position": 823
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x9.png",
+                "caption": "Figure 9:Performance of Timer-S1 with different training pipelines on the GIFT-Eval leaderboard.",
+                "position": 835
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x10.png",
+                "caption": "Figure 10:Performance of the Timer model trained by next-token prediction and serial-token prediction.",
+                "position": 860
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x11.png",
+                "caption": "Figure 11:Performance of the Timer model trained by multi-token prediction and serial-token prediction.",
+                "position": 863
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x12.png",
+                "caption": "Figure 12:Inference time of models trained by next-token prediction, multi-token prediction, and serial-token prediction. We set the same backbone configuration except for the training objective. The input sequence length is set to 11520.",
+                "position": 866
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x13.png",
+                "caption": "Figure 13:Performance of the pre-trained Timer-S1 with varying TimeMoE blocks (fixed 16-block TimeSTP).",
+                "position": 869
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x14.png",
+                "caption": "Figure 14:Performance of the pre-trained Timer-S1 with varying TimeSTP blocks (fixed 24-block TimeMoE).",
+                "position": 872
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x15.png",
+                "caption": "Figure 15:Performance of Timer-S1 with TimeSTP variants.",
+                "position": 897
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x16.png",
+                "caption": "Figure 16:Performance of Timer-S1 with and without data augmentation.",
+                "position": 903
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x17.png",
+                "caption": "Figure 17:Performance of of Timer-S1 on different sinusoidal signals.",
+                "position": 913
+            },
+            {
+                "img": "https://arxiv.org/html/2603.04791/2603.04791v1/x18.png",
+                "caption": "Figure 18:Performance of Timer-S1 with and without the pre-training on TimeBench.",
+                "position": 923
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

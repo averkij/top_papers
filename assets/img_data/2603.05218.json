@@ -1,0 +1,240 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x1.png",
+                "caption": "Figure 1:Performance of KARL, with and without test-time compute, compared to state-of-the-art agentic models on KARLBench. The cost–quality and latency–quality Pareto frontiers show that KARL achieves favorable trade-offs over existing models. All while being more cost and latency effective, KARL exceeds the quality of Sonnet 4.6 with three parallel rollouts and matches the best model, Opus 4.6, with ten parallel rollouts. See experiment details inAppendixB.",
+                "position": 426
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "Contents",
+        "images": []
+    },
+    {
+        "header": "2KARLBench",
+        "images": []
+    },
+    {
+        "header": "3Agent Harness",
+        "images": []
+    },
+    {
+        "header": "4Training a Knowledge Agent via Reinforcement Learning (KARL)",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x2.png",
+                "caption": "Figure 2:Stage I:The synthesis pipeline takes as input few-shot examples and the corpus for a task. Then, the Question-Answer Generator Agent explores the corpus via a vector search tool before proposing a possible synthetic question-answer pair that is grounded in the retrieved documents. To ensure no test data leakage, the Deduplication Agent filters out any exact or near-duplicates.",
+                "position": 851
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x3.png",
+                "caption": "Figure 3:Stage II:Multiple instantiations of the Solver Agent independently generate solutions for the synthetic questions produced in Stage I. Generated data at either extremes of difficulty, those solved on nearly all or almost no attempts, are filtered out, retaining only question-answer pairs where learning signal is richest. The Quality Filter Agent screens the remaining data points for ambiguity and incorrect reference answers. Synthetic data that pass both filters serve as inputs to RL training.",
+                "position": 878
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x4.png",
+                "caption": "Figure 4:Parallel thinking method:We first generateNNresponses in the generation phase and then aggregate theNNrollouts. The solver agent and the aggregator agent here are the same modelπ\\pion which we apply TTC.",
+                "position": 972
+            }
+        ]
+    },
+    {
+        "header": "5Scaling KARL via Test-time Compute",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x5.png",
+                "caption": "Figure 5:Value-Guided Search method:Performs tree search, using a value model at each step to score candidate continuations, selecting the highest scoring branch. The search process is repeatedNNtimes followed by aggregation.",
+                "position": 1040
+            }
+        ]
+    },
+    {
+        "header": "6Agent Infrastructure",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x6.png",
+                "caption": "Figure 6:aroll harness architecture.The dispatcher feeds prompts to a strategy, which instantiates environment–agent pairs. The agent owns an LLM client and generates actions at each step; the environment executes tool calls, evaluates rewards, and manages context via lifecycle plugins. The interaction loop between agent and environment yields finished rollouts.",
+                "position": 1057
+            }
+        ]
+    },
+    {
+        "header": "7Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/figures/training_histograms_split.png",
+                "caption": "Figure 7:Distribution of trajectory lengths for KARL Iter. 1 (left) and KARL Iter. 2 across training data for BrowseComp-Plus (top) and TREC-Biogen (bottom). For BrowseComp-Plus, Iter. 2 trajectories are substantially shorter than Iter. 1 (median 20 vs 50 steps), indicating that the model learns to search more efficiently. For TREC-Biogen, Iter. 2\ntrajectories are slightly longer than Iter. 1 (median 6 vs 4 steps), reflecting increased exploration in the second iteration.",
+                "position": 1189
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x7.png",
+                "caption": "Figure 8:Multi-Task Distillation vs Reinforcement Learning:RL yields better out-of-distribution performance than the SFT distilled model, leading to a more general search agent. While SFT distillation benefits from test-time compute in-distribution, it shows negligible out-of-distribution scaling (59.4→\\rightarrow59.6), whereas KARL improves consistently across both regimes.",
+                "position": 1487
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x8.png",
+                "caption": "Figure 9:Multi-Iteration Training: (left)We show how our agent continues to learn with each iteration of training on the in-distribution task.(center, right)We also track the out-of-distribution performance of our TREC-Biogen expert and see consistent improvements across iterations on FreshStack and QAMPARI as well.",
+                "position": 1501
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x9.png",
+                "caption": "Figure 10:Test-time Compute Scaling: (left)Training continues to improve theMax@Krather than only improving theMax@1.(right)Scaling continues to improve TTC strategies like Parallel Thinking beyond the base model.",
+                "position": 1518
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x10.png",
+                "caption": "Figure 11:BrowseComp-Plus Data Flow: (left)Alluvial flow chart tracking a training prompt’s Pass@16 performance from GLM 4.5 Air to KARL-BCP.(right)Transition matrix detailing the shift in prompts. The matrix is row-normalized and shows the majority of the movement goes to a more solved state with minimal degradation.",
+                "position": 1532
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x11.png",
+                "caption": "Figure 12:Search Variations: (left)Varying search horizon from 10 steps to 400 steps.(right)Changing the number of documents returned by a vector search call. With 40 documents retrieved, we flood most of the available context with a single search.",
+                "position": 1579
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x12.png",
+                "caption": "Figure 13:Parallel Thinking:Results spanning all of KARLBench as we scale upNNfrom 5 to 20. We compare KARL against GLM 4.5 Air to isolate the gains from reinforcement learning training. The shaded region highlights that KARL consistently outperforms GLM 4.5 Air across all benchmarks and all values ofNN, with gains atN=20N{=}20ranging from+1.9+1.9(FinanceBench) to+5.9+5.9(TREC-Biogen). Notably, the out-of-distribution improvements observed in the single rollout setting are preserved as we scale parallel thinking, indicating that the generalization benefits from RL training are complementary to test-time compute scaling.",
+                "position": 1625
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x13.png",
+                "caption": "Figure 14:Value-Guided Search:Scaling performance of value-guided search on BrowseComp-Plus using various aggregation methods. Both weighted majority voting and best-of-N use the value model as an outcome reward signal for the final aggregation.",
+                "position": 1680
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x14.png",
+                "caption": "Figure 15:Alluvial flow diagrams for search trajectory lengths when grouped by Pass@16 pass-rates, namely,Unsolved,Partial, andSolved. Specifically, we bin each trajectory into 4 bins according to step counts where the lighter the blue the shorter the bins. For each pass rate category, we see a shortening of the trajectories, with the most dramatic decrease observed for theSolvedcategory (51.1→\\rightarrow36.3). The average trajectory length is shown above each bar.",
+                "position": 1692
+            }
+        ]
+    },
+    {
+        "header": "8Understanding the Impact of RL",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x15.png",
+                "caption": "Figure 16:Alluvial flow diagrams for search trajectory lengths when grouped by trajectory lengths. For each trajectory length category, training shifts more search rollouts towards Partial or Solved.",
+                "position": 1727
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/figures/bcp_trec_search_diversity.png",
+                "caption": "Figure 17:Document exploration diversity across BrowseComp-Plus and TREC-Biogen.The cumulative unique documents retrieved over successive vector search queries for GLM 4.5 Air, KARL Iter. 1, and KARL Iter. 2.\nThe bottom panel shows the relative increase over GLM 4.5 Air for KARL iterations.\nThe KARL model improves its search diversity across RL training iterations for both BrowseComp-Plus (+37%) and TREC-Biogen (+8%).",
+                "position": 1752
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x16.png",
+                "caption": "Figure 18:BrowseComp-Plus accuracy conditioned on document retrieval status.Comparison of BrowseComp-Plus accuracy of GLM 4.5 Air, KARL Iter. 1, and KARL Iter. 2 for the subsets of questions for which all, some, or none of the ground truth documents needed to answer the question are retrieved (raw counts in parentheses). With RL training, the models’ answer accuracy improves over the base GLM 4.5 Air model across all the retrieval conditions.",
+                "position": 1768
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x17.png",
+                "caption": "Figure 19:Impact of improved reasoning on search efficiency, measured across 87 BrowseComp-Plus instances where all three models, namely, GLM 4.5 Air, KARL Iter. 1, and KARL Iter. 2, achieved perfect recall of ground truth documents across two rollouts (174 rollouts per model). The faded bottom segment represents the mean number of searches to first retrieve all required documents (exploration/retrieval phase), while the solid top segment shows additional searches conducted after all necessary information was already available (synthesis phase). Percentages indicate the proportion of rollouts yielding correct vs. incorrect answers. Across iterations, not only does the model accuracy improve (53% → 64% → 71%), but the search efficiency also dramatically improves (91 → 52 → 32), with the largest reductions in unnecessary post-retrieval searches on incorrect instances (134.0→\\rightarrow95.6→\\rightarrow56.5).",
+                "position": 1794
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x18.png",
+                "caption": "Figure 20:Categorization of Various Search Behaviors:Each trajectory is classified into one of six behavioral categories based on LLM-extracted features and rule-based heuristics. Sonnet 4.5 and KARL show similar profiles dominated by Explore then Commit, while GLM 4.5 Air exhibits substantially more Exhaustive Search without convergence and context truncation, suggesting it struggles more to resolve queries within its context budget.",
+                "position": 1860
+            }
+        ]
+    },
+    {
+        "header": "9Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix Contents",
+        "images": []
+    },
+    {
+        "header": "Appendix AAuthors",
+        "images": []
+    },
+    {
+        "header": "Appendix BCost and Latency Experiment Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CDataset Details and Examples",
+        "images": []
+    },
+    {
+        "header": "Appendix DPrompts",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x19.png",
+                "caption": "Figure 37:Annotated data processing pipeline for BrowseComp-Plus (top two) and TREC-Biogen (bottom two) across two training iterations of KARL. Synthetic question-answer pairs are first deduplicated, then passed to a Solver Agent that generates 8 rollouts per question. Outputs are categorized asSolved,Partial, orUnsolved, depending on whether the 8 rollouts are all correct, partially correct, or all incorrect. ThePartialcorrect rollouts are optionally filtered through a Quality Filter Agent (in Iter. 1 of BrowseComp-Plus), and then ultimately used as data for our RL pipeline.",
+                "position": 4581
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x20.png",
+                "caption": "",
+                "position": 4585
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x21.png",
+                "caption": "",
+                "position": 4587
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x22.png",
+                "caption": "",
+                "position": 4589
+            }
+        ]
+    },
+    {
+        "header": "Appendix EQualitative Case Studies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x23.png",
+                "caption": "Figure 40:Accuracy of aggregation rollout versus candidate rollouts: The aggregation rollout is able to effectively combine the correct parts of each candidate rollout, to produce a final, cohesive answer for an open-ended response question from PMBench , asking which companies care about a certain topic, and why.",
+                "position": 6710
+            }
+        ]
+    },
+    {
+        "header": "Appendix FCategorizing Search Behavior",
+        "images": []
+    },
+    {
+        "header": "Appendix GDetails about Compression Behavior",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/x24.png",
+                "caption": "Figure 41:Distribution of context compression steps per question on BrowseComp-Plus (nn= 230). Each point represents the average number of compression events across 2 rollouts for a single sample. The Kernel Density Estimation (KDE) on top reveals a strongly right-skewed distribution: the majority of questions require few compressions (median = 6), while a long tail of harder questions drives the mean to 10.2. Orange points highlight the 47 samples (20%) requiring 20 or more compression steps.",
+                "position": 6863
+            }
+        ]
+    },
+    {
+        "header": "Appendix HEvaluation Infrastructure",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/figures/vibetesting_app.png",
+                "caption": "Figure 42:Testing Suite:A screenshot of our testing app. This app is deployed to gather preferences on real-world queries that users may ask and keep a running scoreboard of preferred models.",
+                "position": 7194
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05218/2603.05218v1/figures/trace_inspector.png",
+                "caption": "Figure 43:Qualitative Analysis Tooling:Light-weight tooling helps us understand behavior patterns and differentiated search strategies between candidate models. For example, we showed inLABEL:tab:search_trajthat models can spend many steps on verification. Our viewer allows us to compare behavior between models, per question, and gain a deeper understanding of time spent grounding, exploring, verifying, etc.",
+                "position": 7200
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
