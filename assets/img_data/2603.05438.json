@@ -1,0 +1,172 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/x1.png",
+                "caption": "Figure 1:Overview of the proposed latent world model formulation (Sec.3.1).(a) An image tokenizer is first trained with a reconstruction objective to map an input image into compact latent tokens𝒛{\\bm{z}}. (Fig.2and Sec.3.2).\n(b) Using the learned tokenizer, latent world modelfϕ​(𝒛t,𝒂t)f_{\\phi}({\\bm{z}}_{t},{\\bm{a}}_{t})is trained to model the conditional distribution of the future statepϕ​(𝒛t+1|𝒛t,𝒂t)p_{\\phi}({\\bm{z}}_{t+1}|{\\bm{z}}_{t},{\\bm{a}}_{t}), where we adopt masked generative modeling (Sec.3.3).\n(c) At test time, the learned latent world model is used fordecision-time planning: An optimization procedure (e.g., MPC with CEM) searches over actions𝒂0:H−1{\\bm{a}}_{0:H-1}to minimize the distance between the predicted final state and a goal image.",
+                "position": 366
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/x2.png",
+                "caption": "Figure 2:A tokenizer architecture detail.During training, only the latent resampler and𝒟compact\\mathcal{D}_{\\textrm{compact}}are updated.ℰψ\\mathcal{E}_{\\psi}produces masked target tokens (training only), while𝒟ψ\\mathcal{D}_{\\psi}is used only during inference for pixel level reconstruction.",
+                "position": 494
+            }
+        ]
+    },
+    {
+        "header": "4Experiment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/x3.png",
+                "caption": "Table 2:Ablation on CompACT tokenizer.rFID is measured on ImageNet[deng2009imagenet]validation split using clean-fid[parmar2022aliased].",
+                "position": 759
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/x3.png",
+                "caption": "Figure 3:CompACT encoderℰcompact\\mathcal{E}_{\\textrm{compact}}architecture variation.(a) ViT (scratch)+ [REG]: Initial latent tokens are concatenated to the input patch tokens. This design follows previous transformer-based image tokenizers[yu2024image,bachmann2025flextok,yu2021vector]. (b) DINOv3[simeoni2025dinov3]+ [REG]: Similar to (a), but encoder is initialized with Dinov3. (c) DINOv3[simeoni2025dinov3]+ latent resampler: latent resampler and Dinov3 initialized encoder. Dino and ViT are updated during training in these variants.",
+                "position": 812
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/x4.png",
+                "caption": "Figure 4:Attention visualization for compact latent token in latent resampler.Brighter the color, higher the attention score.",
+                "position": 836
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/x5.png",
+                "caption": "Figure 5:Qualitative results of planning with the proposed CompACT.Best and Worst 1&2 denote the final rollouts corresponding to the simulated trajectories with the minimum and maximum cost, respectively.",
+                "position": 977
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/x6.png",
+                "caption": "Figure 6:Qualitative results of action-conditioned video generation.Red and green boxes indicate incorrect and correct end-effector positions, respectively.",
+                "position": 1118
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "APlanning sufficiency of compact tokens",
+        "images": []
+    },
+    {
+        "header": "BCross-backbone ablation for CompACT",
+        "images": []
+    },
+    {
+        "header": "CPlanning latency breakdown",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/x7.png",
+                "caption": "Figure 7:Planning latency breakdown.Comparison of rollout and decoding latency between SD-VAE and CompACT on a single RTX 6000 ADA GPU. Note the log scale on thexx-axis.",
+                "position": 1350
+            }
+        ]
+    },
+    {
+        "header": "DClosed-loop robot arm manipulation",
+        "images": []
+    },
+    {
+        "header": "EDetails of CompACT tokenizer",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/fig/mmdit.png",
+                "caption": "Figure 8:𝒟compact\\mathcal{D}_{\\text{compact}}architecture.The proposed𝒟compact\\mathcal{D}_{\\text{compact}}is based on MM-DiT[esser2024scaling], a DiT[peebles2023scalable]variant designed for multimodal input processing.\nThe architecture consists of two parallel processing streams: one for compact latent tokens𝒛{\\bm{z}}and another for target latent tokens𝒛ψ{\\bm{z}}^{\\psi}, which are fused through self attention over the concatenated token sequence. For the overall depiction of CompACT, we refer to Fig. 2 in the main paper.",
+                "position": 1521
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/fig/idm.png",
+                "caption": "Figure 9:Inverse Dynamics Model (IDM) architecture.Consecutive frames are tokenized and processed through a transformer-based frame encoder, which produces a single conditioning vector via average pooling. This vector conditions an action denoiser implemented as a diffusion policy[chi2023diffusionpolicy], which predicts the action taken between the two frames.",
+                "position": 1548
+            }
+        ]
+    },
+    {
+        "header": "FDetails of inverse dynamics model (IDM)",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/fig/ar.png",
+                "caption": "Figure 10:World modelfϕf_{\\phi}architecture for navigation.For navigation tasks, the world model is formulated as an action-conditioned generative model that autoregressively generates the next frame.\nThe model follows the CDiT architecture proposed in NWM[bar2025navigation], where actions are conditioned via adaptive layer normalization and history frames are conditioned via cross-attention.",
+                "position": 1664
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/fig/block_causal.png",
+                "caption": "Figure 11:World modelfϕf_{\\phi}architecture for manipulation.For manipulation tasks, the world model is formulated as a block-causal transformer that enables parallel prediction of multiple future frames conditioned on historical timesteps.\nAction tokens are used to condition the prediction head (AdaLN + linear layer) that unmasks latent tokens at each future timestep.",
+                "position": 1669
+            }
+        ]
+    },
+    {
+        "header": "GWorld model details",
+        "images": []
+    },
+    {
+        "header": "HPlanning with cross-entropy method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/fig/supp_tok_recon.png",
+                "caption": "Figure 12:Qualitative results of reconstruction with CompACT.",
+                "position": 1965
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/fig/supp_qual_tok_attn.png",
+                "caption": "Figure 13:Attention visualization for compact latent tokens in latent resampler.Brighter the color, higher the attention score.",
+                "position": 1968
+            }
+        ]
+    },
+    {
+        "header": "IMore qualitative results",
+        "images": []
+    },
+    {
+        "header": "JPlanning efficiency analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/fig/2d_plot.png",
+                "caption": "Figure 14:Plot for ATE, planning latency, and memory peak usage on RECON[shah2021rapid].Latency and memory usage is mesaured for single trajectory optimization, using a single RTX 6000 ADA GPU.",
+                "position": 1989
+            }
+        ]
+    },
+    {
+        "header": "KScaling up with fewer tokens",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/fig/supp_nav_qual.png",
+                "caption": "Figure 15:Additional qualitative results of navigation planning with the proposed CompACT.Among candidates, worst two action sequences and best action sequences are presented together.",
+                "position": 2003
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05438/2603.05438v1/fig/supp_qual_robonet.png",
+                "caption": "Figure 16:Additional qualitative results of action-conditioned video generation.Red and green boxes indicate incorrect and correct end-effector positions, respectively.",
+                "position": 2007
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
