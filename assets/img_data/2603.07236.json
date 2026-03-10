@@ -1,0 +1,206 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x1.png",
+                "caption": "Figure 1:Failure modes of static adaptationvs.conditional parameter generation.(a) Infeasible sharing.When heterogeneous objectives induce separated feasible regions in parameter space, a single shared update (Shared LoRA or SFT) is forced into compromise, instability, or dominance by high-frequency modes.(b) Over-specialization.Training a separate static adapter per domain avoids direct conflict but collapses into a narrow subspace and generalizes poorly under domain shifts.(c) Conditional generation.A generator routes each instance to an updateΔ​θ​(x)=gϕ​(c​(x))\\Delta\\theta(x)=g_{\\phi}(c(x)), enabling inference over a family of parameter points rather than a single point.",
+                "position": 422
+            }
+        ]
+    },
+    {
+        "header": "2Instantiation (Part I): Text-Guided Image Editing as a Procedural Functional-Memory Stress Test",
+        "images": []
+    },
+    {
+        "header": "3HY-WU Implementation for Text-Guided Image Editing",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x2.png",
+                "caption": "(a)Learning to reconstruct parameters of pre-collected checkpoints.",
+                "position": 898
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x2.png",
+                "caption": "(a)Learning to reconstruct parameters of pre-collected checkpoints.",
+                "position": 901
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x3.png",
+                "caption": "(b)Learning to reconstruct parameters and downstream task loss as auxiliary.",
+                "position": 906
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x4.png",
+                "caption": "(c)On-the-fly optimization with only downstream task loss.",
+                "position": 911
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x5.png",
+                "caption": "Figure 3:Overview of the HY-WU pipeline. The framework extracts conditions from the source image and edit prompt, which are processed by a trainable Neural Network Transformer to synthesize instance-specific parameter tokens. These tokens are then detokenized into LoRA adapters and integrated into a frozen foundation model withθ1​⋯​θL\\theta_{1}\\cdots\\theta_{L}, whereθl\\theta_{l}indicatesll-th layer. The entire pipeline is optimized end-to-end, where the generator is updated via backpropagation of diffusion loss.",
+                "position": 947
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x6.png",
+                "caption": "Figure 4:Parameter tokenization and detokenization. LoRA adapters are reorganized into a unified tensor𝒯w\\mathcal{T}_{w}. The red path reverses this process to reconstruct parameters from a tensor.",
+                "position": 985
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x7.png",
+                "caption": "Figure 5:Architecture of the Neural Network Transformer. The left panel illustrates the overall pipeline, where parameter embeddings and extracted conditions (text/image) are processed throughNNtransformer blocks to generate LoRA parameters𝒯\\mathcal{T}. The right panel details the internal structure of each block, featuring factorized self-attention to capture structural correlations, and cross-attention for condition injection. The final LoRABBprojection is zero-initialized to ensure training stability.",
+                "position": 1054
+            }
+        ]
+    },
+    {
+        "header": "4Model Performance",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x8.png",
+                "caption": "Figure 6:The GSB win-rate comparison of our HY-WU against other baseline models.Each bar reports the pairwise win rate of HY-WU against the corresponding baseline (rates sum to 100%).\nHY-WU demonstrates a significant performance advantage, particularly against established open-source competitors.\nNotably, HY-WU also achieves a clear lead over two closed-source competitors (marked with a lock icon),i.e., Seedream-4.5-2K (55.6%) and GPT-Image-1.5 (55.5%), while remaining highly competitive against the state-of-the-art Nano-Banana series, proving its effectiveness in complex image editing tasks.",
+                "position": 1309
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x9.png",
+                "caption": "Figure 7:Visual comparison on multi-image editing tasks under consistency constraints.Each task requires transferring attributes from a reference image while preserving key invariants of the base image (e.g., identity, pose, background, or lighting).\nCompeting methods often introduce inconsistencies such as identity drift, structural distortion, or imperfect blending.\nIn contrast, HY-WU produces edits that better preserve subject identity, pose, and scene context while faithfully transferring the target attributes.",
+                "position": 1957
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x10.png",
+                "caption": "",
+                "position": 1961
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x11.png",
+                "caption": "",
+                "position": 1963
+            }
+        ]
+    },
+    {
+        "header": "5Analyses and Discussions",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x12.png",
+                "caption": "(a)Restorationvs.Aging.",
+                "position": 2020
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x12.png",
+                "caption": "(a)Restorationvs.Aging.",
+                "position": 2023
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x13.png",
+                "caption": "(b)Deblurringvs.Blurring.",
+                "position": 2029
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x14.png",
+                "caption": "Figure 9:Gradient-Level Conflict Structure across Editing Tasks.(a)Mean cosine similarity among tasks. We cluster similar tasks into C0 - C5 for visualization clarity. Each node represents a mean of gradient similarity among samples from two tasks.(b)Conflict ratio matrix, defined as the proportion of negative cosine values. Lighter color indicates higher conflict ratio.(c)Representative histogram distributions illustrating different modes, including intra-task pair (left) and inter-task pairs (middle and right). These distributions demonstrate clear pattern,e.g., strong positive bias, negative bias, and bimodality alignment.\nTogether, these statistics reveal that heterogeneous editing objectives impose structured and often incompatible optimization directions under shared parameters.",
+                "position": 2097
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x15.png",
+                "caption": "Figure 10:Emergent semantic structure in parameter space learned by PG.Samples are clustered with K-means in multimodal semantic space (image + text embeddings) and color-coded and visualized in LoRA parameter space via t-SNE.\nSemantically related edits form coherent regions in parameter space, with representative examples highlighted.\nNote that clusters may consist of multiple sub-regions, indicating a hierarchical structure, yet remain globally distinct across editing semantics.\nThis suggests that conditional parameter generation induces a structured parameter landscape rather than collapsing into a single shared adapter.",
+                "position": 2278
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x16.png",
+                "caption": "(a)Image embedding similarity distribution.",
+                "position": 2317
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x16.png",
+                "caption": "(a)Image embedding similarity distribution.",
+                "position": 2320
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x17.png",
+                "caption": "(b)Text embedding similarity distribution.",
+                "position": 2325
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x18.png",
+                "caption": "Figure 12:Demonstration of LoRA weights obtained via direct optimization and generated by PG.",
+                "position": 2367
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Open Roadmap: The HY-WU Series and a Memory-First Agenda",
+        "images": []
+    },
+    {
+        "header": "Appendix AProject Contributors",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x19.png",
+                "caption": "Figure 13:This visualization clearly demonstrates the ability of our HY-WU to preserve key invariants and generate high-quality and creative edited images without identity drift.",
+                "position": 2892
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x20.png",
+                "caption": "",
+                "position": 2896
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x21.png",
+                "caption": "Figure 14:This visualization clearly demonstrates the ability of our HY-WU to preserve key invariants and generate high-quality and creative edited images without identity drift.",
+                "position": 2901
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x22.png",
+                "caption": "",
+                "position": 2905
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x23.png",
+                "caption": "Figure 15:This visualization clearly demonstrates the ability of our HY-WU to preserve key invariants and generate high-quality and creative edited images without identity drift.",
+                "position": 2910
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x24.png",
+                "caption": "",
+                "position": 2914
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x25.png",
+                "caption": "Figure 16:This visualization clearly demonstrates the ability of our HY-WU to preserve key invariants and generate high-quality and creative edited images without identity drift.",
+                "position": 2919
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x26.png",
+                "caption": "",
+                "position": 2923
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x27.png",
+                "caption": "Figure 17:This visualization clearly demonstrates the ability of our HY-WU to preserve key invariants and generate high-quality and creative edited images without identity drift.",
+                "position": 2928
+            },
+            {
+                "img": "https://arxiv.org/html/2603.07236/2603.07236v1/x28.png",
+                "caption": "",
+                "position": 2932
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
