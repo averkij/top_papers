@@ -1,0 +1,170 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x1.png",
+                "caption": "Figure 1:Overview ofOpenDev. Work is organized into concurrent sessions, each composed of multiple specialized sub-agents; each agent executes typed workflows (Execution, Thinking, Compaction) that independently bind to a user-configured LLM. This four-level hierarchy (session→\\toagent→\\toworkflow→\\toLLM) enables fine-grained model selection, allowing cost, latency, and capability trade-offs to be optimized per workflow.",
+                "position": 637
+            }
+        ]
+    },
+    {
+        "header": "2System Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x2.png",
+                "caption": "Figure 2:System architecture ofOpenDev, organized into four layers: Entry & UI, Agent, Tool & Context, and Persistence. Arrows indicate primary data-flow directions.",
+                "position": 712
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x3.png",
+                "caption": "Figure 4:The agent harness architecture: a detailed view of the Agent layer fromFigure˜2. The central ReAct loop (six phases: pre-check and compaction, thinking, self-critique, action, tool execution, post-processing) is surrounded by seven supporting subsystems. User messages enter through a message injection queue (top). The Prompt Composition engine assembles modular sections by priority into the system prompt. The Tool Registry dispatches to specialized handlers, with MCP tools discovered lazily. The Safety System enforces multiple independent layers (approval, dangerous command detection, hooks, stale-read detection, plan mode restrictions, doom loop detection, iteration cap, cooperative cancellation). Context Engineering applies five-stage progressive compaction as the conversation grows. Memory and Session services provide persistent strategy memory (playbook), session storage, and per-step undo via git snapshots. Subagent Orchestration spawns isolated agent instances with filtered tool access for parallel exploration or specialized tasks.",
+                "position": 914
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x4.png",
+                "caption": "Figure 5:Dual-mode operation within the Agent layer (Figure˜4). A user prompt enters theMainAgent, which routes to either Plan Mode (left, read-only) or Normal Mode (right, full access). Plan Mode spawns a Planner subagent that explores the codebase, analyzes patterns, and produces a structured plan for user approval. Upon approval, the system transitions to Normal Mode, where the agent executes the planned steps with full tool access. The user can re-enter Plan Mode at any point if unexpected results require re-planning.",
+                "position": 940
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x5.png",
+                "caption": "Figure 6:Sequence diagram of a single conversation turn inOpenDev. A user message enters through one of three interfaces, passes through query processing, and enters the ReAct iteration loop. Each iteration comprises context management, optional thinking, an action LLM call, and tool dispatch through the registry. The loop continues until the agent signals completion or a termination condition is met, after which the conversation state is persisted.",
+                "position": 992
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x6.png",
+                "caption": "Figure 7:Dual-path input dispatch inOpenDev. User input is classified at the REPL boundary: slash commands (top path) are routed through the REPL Command Dispatcher to one of nine registered command handlers, each of which modifies system state directly and returns aCommandResult. Natural language queries (bottom path) pass through the Query Processor into the Agent Loop, which interacts with system state through tool execution. Both paths ultimately produce side effects on shared system state, but through fundamentally different mechanisms: commands execute deterministically without LLM involvement, while queries are processed through the full reasoning loop.",
+                "position": 1047
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x7.png",
+                "caption": "Figure 8:Detailed view of the ReAct loop at the center ofFigure˜4. Each user query passes through an initialization stage that creates anIterationContext, then enters an iteration loop (_run_iteration_inner) consisting of four phases: context management, thinking, action, and decision. The loop continues until the agent produces a final response, explicitly signals completion, or exhausts its iteration budget.",
+                "position": 1142
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x8.png",
+                "caption": "Figure 9:Expanded view of the Tool & Context layer fromFigure˜2. Six subsystems cooperate to fill and maintain the model’s context window across a session. The subsystems are presented in lifecycle order: dynamic system prompt construction initializes behavioral instructions; dual-memory and tool result optimization shape what enters the context; system reminders and error recovery inject targeted guidance at runtime; and adaptive context compaction manages overflow when the token budget nears exhaustion.",
+                "position": 1451
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x9.png",
+                "caption": "Figure 10:Detailed view of the prompt composition subsystem fromFigure˜9. Sections are registered with optional condition predicates and priority values. At agent initialization thePromptComposerevaluates each predicate against the runtime environment, sorts surviving sections by ascending priority, loads their markdown templates, and joins them into the final system prompt. Four logical tiers, Core Identity, Tool Definitions, Safety & Rules, and Dynamic Context, which organize sections by function. Dashed borders indicate conditionally loaded sections that are included only when their predicate is satisfied.",
+                "position": 1501
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x10.png",
+                "caption": "Figure 11:Detailed view of the reminder subsystem fromFigure˜9. Without reminders (left), an agent with one incomplete todo declares completion, forcing the user to intervene and causing a loss of trust. With reminders (right), theReactExecutordetects the unfinished state, injects a targeted user-role message listing the outstanding item, and the agent resumes work and completes the task correctly.",
+                "position": 1657
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x11.png",
+                "caption": "Figure 12:Architecture of the Reminder Injection Layer. After each iteration of the ReAct Executor Loop (top), eight event detectors examine the conversation state. When a detector fires, the corresponding reminder template is resolved viaget_reminder()fromreminders.md(with.txtfallbacks for longer prompts), checked against guardrail counters that cap how many times each reminder can fire, and appended to the message list as arole: usermessage. The next LLM call sees this reminder as the most recent input, maximizing its influence on the model’s next decision.",
+                "position": 1672
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x12.png",
+                "caption": "Figure 13:Detailed view of the compaction subsystem fromFigure˜9. Five stages activate at progressive pressure thresholds (70%, 80%, 85%, 90%, 99%), transitioning observations between active, faded, and archived states before emergency summarization is required.",
+                "position": 1742
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x13.png",
+                "caption": "Figure 14:Detailed view of the memory subsystem fromFigure˜9. Stage 1: the BulletSelector scores playbook bullets by effectiveness, recency, and semantic similarity to the current query, and the selected bullets are injected into the Generator’s system prompt alongside the user query. Stage 2: an episodic memory mechanism triggers the Reflector every five messages of interaction; the Reflector analyzes accumulated experience and produces a reasoning trace, error identification, root-cause analysis, and correct approach. Stage 3: a Curator reads the reflection and plans concrete playbook mutations (add, update, tag, or remove bullets). Stage 4: the mutations are applied to the Playbook’s bullet table and persisted to a session-scoped JSON file.",
+                "position": 1788
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x14.png",
+                "caption": "Figure 15:End-to-end synthesis of the retrieval and context components fromFigure˜9. Four layers transform a user query into a fully assembled LLM API call: (1) retrieval tools gather raw code artifacts, (2) the Code Explorer subagent orchestrates multi-step searches in an isolated context, (3) the context assembler merges retrieved material with conversation history and system instructions, and (4) the context optimizer enforces the token budget through staged compaction before the final API call.",
+                "position": 1800
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x15.png",
+                "caption": "Figure 16:Expanded view of the Tool layer fromFigure˜2.ToolSchemaBuilderassembles JSON schemas from three sources (static built-in definitions, dynamically discovered MCP tools, subagent schemas) and injects them into the LLM prompt.ToolRegistrydispatches tool calls to category-based handlers, each receiving aToolExecutionContextwith cross-cutting services. Pre/post lifecycle hooks intercept calls for safety enforcement and extensibility.",
+                "position": 1866
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x16.png",
+                "caption": "Figure 17:Detailed pipeline for the Process handler (Figure˜16). Commands pass through three safety gates (permission config, allowed-command matching, dangerous pattern blocking), then command preparation (auto-confirm, unbuffered Python), server detection (regex match against 16 patterns for auto-background promotion), execution fork (PTY-based background or piped foreground with process-group isolation), output management (30k char limit with head/tail truncation, 100ms polling), and timeout/interrupt handling (60s idle, 600s absolute,InterruptTokenintegration).",
+                "position": 1993
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x17.png",
+                "caption": "Figure 18:Detailed architecture for the Symbols handler (Figure˜16). The system is organized into four layers: Agent Tool Layer (six symbol tools), Symbol Retriever (unified API), LSP Server Wrapper (language detection, per-language server pool, symbol conversion), and Solid Language Server (two-level cache, file buffer management, LSP protocol operations). The Language Server Handler manages subprocess lifecycle and JSON-RPC 2.0 communication with external language server processes. Language detection maps 30+ file extensions to their respective servers, which are started lazily on first query and reused across subsequent requests.",
+                "position": 2096
+            },
+            {
+                "img": "https://arxiv.org/html/2603.05344/2603.05344v2/x18.png",
+                "caption": "Figure 19:Sequence within the Tool layer (Figure˜16). The LLM issues asearch_toolscall with a natural-language query. TheSearchToolsHandlerbuilds a keyword vocabulary from all registered MCP tool names and descriptions, scores each tool against the query, and returns top matches. TheToolRegistrymarks matched tools as discovered, including their schemas in subsequent LLM calls. Only discovered tools incur schema cost, reducing baseline token overhead of MCP integration to near zero.",
+                "position": 2269
+            }
+        ]
+    },
+    {
+        "header": "3Discussion",
+        "images": []
+    },
+    {
+        "header": "4Related Work",
+        "images": []
+    },
+    {
+        "header": "5Conclusion and Future Directions",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AComplete Tool Catalog",
+        "images": []
+    },
+    {
+        "header": "Appendix BLSP Language Server Matrix",
+        "images": []
+    },
+    {
+        "header": "Appendix CModular System Prompt Composition",
+        "images": []
+    },
+    {
+        "header": "Appendix DEdit Tool Fuzzy Matching Chain",
+        "images": []
+    },
+    {
+        "header": "Appendix EShell Execution Pipeline",
+        "images": []
+    },
+    {
+        "header": "Appendix FSystem Reminder Catalog",
+        "images": []
+    },
+    {
+        "header": "Appendix GSubagent Capability Matrix",
+        "images": []
+    },
+    {
+        "header": "Appendix HConfiguration Schema",
+        "images": []
+    },
+    {
+        "header": "Appendix IImplementation Constants",
+        "images": []
+    },
+    {
+        "header": "Appendix JCLI Command Reference",
+        "images": []
+    },
+    {
+        "header": "Appendix KFull System Prompt Templates",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
