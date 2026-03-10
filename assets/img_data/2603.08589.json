@@ -1,0 +1,128 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.08589/2603.08589v1/x1.png",
+                "caption": "Figure 2:Overview of contextual image editing paradigm. (A) Instruction‑based editing guides modifications via a text prompt𝐓\\mathbf{T}and a base image𝐁\\mathbf{B}. (B) Subject‑based editing uses the base𝐁\\mathbf{B}and a references image𝐑\\mathbf{R}to preserve identity or style.\n(C) CARE‑Edit incorporates all these modalities(𝐓,𝐁,𝐑)(\\mathbf{T},\\mathbf{B},\\mathbf{R})and the user-defined mask𝐌\\mathbf{M}in a diffusion transformer (DiT) backbone with condition‑aware routing of experts.",
+                "position": 388
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.08589/2603.08589v1/x2.png",
+                "caption": "Figure 3:CARE-Edit introduces condition‑aware specialized experts within the frozen DiT backbone.\nGiven multimodal conditions,\ninputs are tokenized and projected to heterogeneous expert branches.\nThe router assigns confidence scores and selects the top‑KKexperts to process each token.\nExpert outputs are normalized, modulated, and fused through the Latent Mixture module,\nyielding denoised representations𝐡′\\mathbf{h}^{\\prime}refined by Mask Repaint.\nOnly lightweight adapters, the router, and fusion layers are trainable.\nThis enables CARE-Edit to dynamically allocate computation, mitigates conflicts between heterogeneous conditions (e.g., text vs mask) and enables high-fidelity, coherent edits.",
+                "position": 419
+            }
+        ]
+    },
+    {
+        "header": "3Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.08589/2603.08589v1/x3.png",
+                "caption": "Figure 4:Qualitative comparison of subject-driven contextual editing.Greenannotations indicate data belonging to the benchmark, whileBlueannotations denote whether mask inputs are provided. CARE-Edit ensures the preservation of subject identity and coherent contexts.",
+                "position": 732
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.08589/2603.08589v1/x4.png",
+                "caption": "Figure 5:Qualitative comparison of instruction-based editing.",
+                "position": 1126
+            },
+            {
+                "img": "https://arxiv.org/html/2603.08589/2603.08589v1/x5.png",
+                "caption": "Figure 6:Visualization of base expert attention map over iterations.",
+                "position": 1181
+            },
+            {
+                "img": "https://arxiv.org/html/2603.08589/2603.08589v1/x6.png",
+                "caption": "Figure 7:Task-Expert Activation Analysis and Loss Curves.",
+                "position": 1184
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion and Discussion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADataset and Implementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.08589/2603.08589v1/figs/Data.png",
+                "caption": "Figure 8:Pipeline for Mask-aware Image-Pair Generation.We use a GPT-Image-1 and VLM-based pipeline to create our training data.\nStarting with a reference subject on a white background, we generate diverse scene descriptions and corresponding images using an image-to-image model.\nThis yields high-quality image pairs with consistent backgrounds but varying foregrounds, annotated with precise segmentation masks (ℳ\\mathcal{M}) and bounding boxes (ℬ\\mathcal{B}).",
+                "position": 2122
+            },
+            {
+                "img": "https://arxiv.org/html/2603.08589/2603.08589v1/x7.png",
+                "caption": "Figure 9:GPT Prompting for Scene Diversity.We explicitly instruct the LLM to generate varied scene descriptions (e.g., “sunny park”) while keeping the subject (e.g., “Koala”) constant. As such, by synthesizing multiple environments for the identical subject entity, we create training data that compels the image editing model to learn robust subject grounding independent of the background correlations.",
+                "position": 2179
+            }
+        ]
+    },
+    {
+        "header": "Appendix BExtended Qualitative Comparisons",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.08589/2603.08589v1/x8.png",
+                "caption": "Figure 10:Task-Specific GPT Prompt Templates.We visualize the templates used to construct training triplets for: (i)Replacement(Top-Left); (ii)Addition(Top-Right); and (iii)Style/Attribute Change(Bottom). By constraining the LLM to modify specific slots (e.g., subject identity) while holding scene descriptions constant, it ensures the resulting image pairs possess consistent backgrounds.",
+                "position": 2371
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAnalysis of Expert Lattent Attention Maps",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.08589/2603.08589v1/x9.png",
+                "caption": "Figure 11:Expert Specialization During Training.We visualize the latent attention maps for theBase,Mask, andReferenceexperts at increasing training iterations (TT).(Top) Base Expert:Maintains consistent, global activation throughout training (T=0→100​KT=0\\rightarrow 100\\mathrm{K}), acting as a foundation to preserve image structure.(Middle) Mask Expert:Learns to progressively suppress background signals, evolving from a noisy initialization to a highly localized, structure-aware attention map that precisely targets the edit region.(Bottom) Reference Expert:Gradually increases engagement in regions requiring semantic or stylistic modification.\nThis distinct separation of concerns confirms that CARE-Edit effectively disentangles conflicting editing signals into specialized processing pathways.",
+                "position": 2465
+            },
+            {
+                "img": "https://arxiv.org/html/2603.08589/2603.08589v1/x10.png",
+                "caption": "Figure 12:Instruction-based Editing on EMU-Edit and MagicBrush.We compare CARE-Edit against existing unified editors[50,45]. Rows exhibit challenging scenarios such as text rendering (“CARE tag”), global style transfer (“Ukiyo-e”), and complex object insertions.(1) Text and Geometric Fidelity (Row 1):The geometric rigidity of the tag and the legibility of the text are paramount. While ACE++ and OmniGen2 correctly interpret the semantic intent, they suffer fromstructural drift, resulting in warped tag boundaries and deformed glyphs. CARE-Edit, particularly the masked variant, utilizes the Mask Expert to enforce spatial constraints, producing orthogonal tag geometry and crisp, readable text.(2) Identity Preservation (Row 2):CARE-Edit preserves the subject’s facial identity and hair texture significantly better than baselines, which tend to over-blend the subject into the crowd (identity dilution) or generate a generic face.(3) Style Disentanglement (Row 4 & 5):In the“Ukiyo-e”and“Painting”style transfer tasks, baselines often hallucinate new objects or flatten the entire scene into a texture map. CARE-Edit disentangles style from structure. TheBase Expertmaintains the complex branching of the cherry blossom tree and the mechanical details of the tractor, whileReference Expertstrictly applies the artistic texture to the environments.",
+                "position": 2472
+            },
+            {
+                "img": "https://arxiv.org/html/2603.08589/2603.08589v1/x11.png",
+                "caption": "Figure 13:Complex Contextual Editing Results.Multi-condition examples requiring harmonization of subject identity, mask constraints, and text prompts.\nCARE-Edit successfully composes subjects into disparate environments while respecting the user-provided spatial layout.",
+                "position": 2476
+            },
+            {
+                "img": "https://arxiv.org/html/2603.08589/2603.08589v1/x12.png",
+                "caption": "Figure 14:Object Removal Results.This task requires the model to remove the foreground object and hallucinate a plausible background (e.g., sofa fabric, wall patterns) that is consistent with surrounding scene context.(i) Top and Middle:CARE-Edit successfully handles stochastic textures, such as natural water ripples and uneven stone surfaces, filling the void with spatially coherent content.(ii) Bottom-Left:A stress test for structural consistency. Removing the television requires reconstructing the rigid grid pattern of the wallpaper. CARE-Edit accurately hallucinates the missing tiles, maintaining the correct perspective and alignment without the blurring or geometric warping.",
+                "position": 2480
+            },
+            {
+                "img": "https://arxiv.org/html/2603.08589/2603.08589v1/x13.png",
+                "caption": "Figure 15:Object Addition and Replacement Results.CARE-Edit demonstrates precise control over scene composition, inserting or swapping objects while rigorously adhering to environmental constraints.(i) Object Addition (Left):CARE-Edit introduces new elements that respect physical laws. Note that how the added rubber duck (middle) is generated with accurate water reflections and surface interaction.(ii) Object Replacement (Right):CARE-Edit handles drastic changes in structure and material while maintaining lighting consistency. In the top-right example, replacing a furry pokemon creature with a pokemon ball (metallic sphere), CARE-Edit correctly renders specular highlights and casts realistic shadows onto the complex dirt terrain, ensuring the newly added object sits naturally within the depth of field.",
+                "position": 2484
+            },
+            {
+                "img": "https://arxiv.org/html/2603.08589/2603.08589v1/x14.png",
+                "caption": "Figure 16:Reference-guided Style Transfer with Structure Preservation.A key advantage of CARE-Edit is the ability to decouple style from structure via expert routing. Unlike holistic transfer methods that often deform the underlying geometry, our approach injects the target aesthetic while strictly anchoring the scene layout.(i) Top:The results show that CARE-Edit’sReference Expertsuccessfully translates the scene into the swirling impasto of Van Gogh or a watercolor wash, yet theBase Expertensures the architectural rigidity of the cabin, preserving the straight lines of the roof and window frames.(ii) Bottom:The subject’s fur texture is re-rendered to match the artistic medium, demonstrating CARE-Edit’s successful fine-grained textural adaptation without distorting the animal’s original silhouette or pose.",
+                "position": 2490
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
