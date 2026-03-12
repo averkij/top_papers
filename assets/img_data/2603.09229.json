@@ -1,0 +1,66 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.09229/2603.09229v1/x1.png",
+                "caption": "Figure 1:Overview of flash-kmeans and Performance Breakdown.\n(a) Inspired by IO-aware attention mechanisms, FlashAssign streams data blocks from HBM to SRAM, fusing distance computation with an online argmin operator to completely bypass the materialization of the massiveN×KN\\times Kdistance matrix.\n(b) Compared to standardk-means implementations, flash-kmeans drastically compresses both the assignment IO bottleneck and the update synchronization bottleneck.",
+                "position": 267
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Preliminary and Motivation",
+        "images": []
+    },
+    {
+        "header": "4Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.09229/2603.09229v1/x2.png",
+                "caption": "Figure 2:Illustration of the centroid update stage and atomic contention.(a) Standard scatter-style update:Tokens are directly scattered to their assigned centroids. The highly irregular mapping leads to severe write-side atomic contention when multiple threads update the same centroid simultaneously.(b) Sort-inverse update:flash-kmeans first sorts the tokens by their cluster IDs and constructs an inverse mapping. This transforms the unstructured scatter into regularized, segment-level localized reductions.(c) Execution timeline comparison:The timeline reveals that the standard approach stalls frequently due to atomic lock contention on HBM, whereas Sort-Inverse Update issues contention-free memory writes, significantly hiding latency and accelerating the reduction phase.",
+                "position": 599
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.09229/2603.09229v1/x3.png",
+                "caption": "Figure 3:End-to-End Latency of flash-kmeans compared to standard baselines. We group the evaluation into four representative regimes. The y-axis is presented in log scale to accommodate magnitude differences. Red×marks denote Out-Of-Memory failures (e.g., standard PyTorch fails to explicitly materialize theN×KN\\times Kdistance matrix in LargeKKworkloads). flash-kmeans delivers consistent and substantial speedups across diverse shapes and handles extreme limits gracefully.",
+                "position": 719
+            },
+            {
+                "img": "https://arxiv.org/html/2603.09229/2603.09229v1/x4.png",
+                "caption": "Figure 4:Kernel-level latency breakdown. Latency comparison of our custom kernels versus standard implementations across diverse extreme workloads (D=128D=128).Left:FlashAssign completely removes HBM distance materialization, scaling up to a 21.2×\\timesspeedup.Right:Sort-Inverse Update replaces per-token scatter atomic adds with sorted localized merges, eliminating atomic contention and achieving up to a 6.3×\\timesspeedup.",
+                "position": 744
+            },
+            {
+                "img": "https://arxiv.org/html/2603.09229/2603.09229v1/x5.png",
+                "caption": "Figure 5:Effectiveness of the cache-aware compile heuristic.Left:Compilation and configuration search time (log scale). The heuristic slashes tuning overhead by up to 175×\\times, entirely bypassing the severe compilation bottleneck of exhaustive auto-tuning.Right:Kernel iteration latency. The heuristic seamlessly matches the optimal performance found by exhaustive search across various shapes, ensuring near-zero runtime degradation.",
+                "position": 760
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
