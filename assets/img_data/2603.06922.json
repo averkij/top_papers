@@ -1,0 +1,426 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x1.png",
+                "caption": "Figure 1:NerVE quantifies nonlinear eigenspectrum dynamics in FFNs of GPT-2. FFN nonlinearity (GELU) regulates information flow by reinjecting variance, reactivating under-utilized directions (post-activation SE↑\\uparrowand PR↑\\uparrow), and flattening the eigenspectrum, less top-heavy (post-activation EEE↓\\downarrow). The JS heatmap shows a depth-localized transition band where redistribution is strongest.",
+                "position": 283
+            }
+        ]
+    },
+    {
+        "header": "2NerVE: A Principled Framework for Eigenspectrum Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x2.png",
+                "caption": "Figure 2:Cumulative variance distribution across a 768-dimensional latent space. Higher values (shown on curves) indicate top-heavy concentration in a few dominant directions, while lower values reflect a more uniform distribution.",
+                "position": 479
+            }
+        ]
+    },
+    {
+        "header": "3Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x3.png",
+                "caption": "Figure 3:Eigenspectrum dynamics illustratehow FFN nonlinearities regulate information flow and reshape the eigenspectrumduring training for GPT-2 (ReLU) on CodeParrot. Pre- and post-activation dynamics are shown for SE, PR, and EEE, highlighting how nonlinearities reinject variance and alter spectral structure. JS heatmaps (rightmost) capture the layer-wise distributional shift induced by nonlinearity. In-panel titles report Pearson correlations (rr) between each metric and evaluation loss.",
+                "position": 561
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x4.png",
+                "caption": "Figure 4:Eigenspectrum dynamics for norm-free GPT-2 (125M) models with GELU (top), ReLU (middle), and learnable-slope Leaky ReLU (bottom). Columns show layer-averaged SE (pre vs. post), PR gain (post to pre), post-activation EEE (yellow regions indicate top-heavy distribution), and JS (yellow regions highlight strong redistribution) across layers and training steps. Norm-free GELU exhibits spectral inertia in layers 0 to 5 (EEE→\\rightarrow1, JS→\\rightarrow0); whereas,ReLU and Leaky ReLU aggressively reinject variance(PR gain>>200×\\times) and flattening the spectrum (EEE<<0.3).",
+                "position": 577
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x5.png",
+                "caption": "Figure 5:Impact of FFN (parametric) normalization in norm-free GPT-2 with learnable-slope leaky ReLU. Eigenspectrum dynamics are quantified by latent capacity (PR_post), spectral regularization and flattening (Δ\\DeltaEEE and EEE_post), and distributional shift (JS). Top to bottom: Weight, Spectral, and Hyperspherical Normalization. Each method exhibits distinct JS localization and spectral patterns, showing different influences on FFN internal dynamics.",
+                "position": 636
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x6.png",
+                "caption": "Figure 6:LayerNorm positioning and FFN width sweep: Post-activation participation ratio is normalized byDDfor PreLN, MixLN, and PostLN configurations. PreLN sustains the highest and most stable utilization of FFN width across the sweep, PostLN incurs diminishing return at higher FFN width, MixLN lies in between but with greater layer-to-layer variability.",
+                "position": 655
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x7.png",
+                "caption": "Figure 7:Layerwise participation ratio (PR) comparison (RoPE vs NoPE) in GPT-2 models trained from scratch on 26B token form openwebtext dataset with 512 context length for 100K steps. RoPE sustains higher PR in the middle and deeper layers, indicating better utilization of latent space and network’s depth.",
+                "position": 788
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x8.png",
+                "caption": "Figure 8:Optimizer-dependent FFN eigenspectrum dynamics in GPT2-350M.\nRows show AdamW (top), Muon (middle), and Dion (bottom). AdamW has large early PR gains and high JS with relatively high EEE_post, indicating optimizer-induced pre-activation collapse followed by aggressive but incomplete nonlinear repair. Muon shows the smallest PR gains, lowest JS, and lowest EEE_post, and flatter post-spectra. Dion is intermediate and falls between these two regimes, improving over AdamW but not matching Muon’s pre-/post-spectral behavior.\nThe perplexity ordering (Muon>>Dion>>AdamW) aligns with post-activation spectral flatness.",
+                "position": 803
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x9.png",
+                "caption": "Figure 9:Layerwise PR_pre (top) over training, and final PR_post per-layer (bottom) for AdamW, Muon, and Dion optimizer. Muon maintains the highest PR_pre across almost all layers, Dion is intermediate, and AdamW shows early-layer collapse. Moreover, Muon concentrates the largest effective dimensionality in middle FFNs.",
+                "position": 816
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x10.png",
+                "caption": "",
+                "position": 820
+            }
+        ]
+    },
+    {
+        "header": "4Related Work",
+        "images": []
+    },
+    {
+        "header": "5Limitations and Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AImplementation Details and Methodological Considerations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x11.png",
+                "caption": "Figure 10:For each FFN layerℓ\\ell, we first collectpre-activation(afterWupW_{\\text{up}}, beforeσ\\sigma) andpost-activation(afterσ\\sigma, beforeWdownW_{\\text{down}}). Then, tokens are flattened intoX∈ℝ(B×S)×DX\\in\\mathbb{R}^{(B\\times S)\\times D}sample matrix, whereBBis the global batch size,SSthe sequence (context) length, andDDthe FFN hidden dimension. Finally, we compute the unbiased sample co-variance of mean-centered activations to get the eigenvalues{λi}i=1D\\{\\lambda_{i}\\}_{i=1}^{D}, and sorted them into descending order.\nThree eigen-metrics are computed on each (pre-/post-) eigenspectrum: spectral entropy (SE) for dispersion, participation ratio (PR) for effective dimensionality, and eigenvalue early enrichment (EEE) for top-heaviness; while Jensen-Shannon Divergence (JS) quantifies the distributional shift between the pre- and post-activation spectra, capturing the geometric restructuring performed by the nonlinearity.",
+                "position": 1431
+            }
+        ]
+    },
+    {
+        "header": "Appendix BEigenspectrum Metrics: Design Principles and Diagnostic Guide",
+        "images": []
+    },
+    {
+        "header": "Appendix CEigenspectral Signature",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x12.png",
+                "caption": "Figure 11:Eigenspectral impact of LayerNorm placement (PreLN, PostLN, MixLN) in GPT-2 and LLaMA variants (70M, 130M). The spectral signatures are shown through post-activation spectral entropy (↑\\uparrow) and participation ratio (↑\\uparrow), and model’s perplexity is shown on top of each plots.\nGPT-2 models trained on CodeParrot and LLaMA variants on C4.",
+                "position": 1841
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x13.png",
+                "caption": "",
+                "position": 1855
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x14.png",
+                "caption": "",
+                "position": 1863
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x15.png",
+                "caption": "Figure 12:Eigenspectral impact of LayerNorm placement (PreLN vs MixLN) in LLaMA-250 and LLaMA-1.3B models, trained from scratch on C4 dataset for 20K iterations with 256 context length. The spectral signatures are shown through SE_post (↑\\uparrow) and PR_post (↑\\uparrow), and model’s perplexity is shown on top of each plots. MixLN variant of LLaMA-1.3B destabilized after 7K iterations.",
+                "position": 1888
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x16.png",
+                "caption": "",
+                "position": 1904
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x17.png",
+                "caption": "Figure 13:Spectral Signature of Positional Encoding (RoPE vs NoPE) in GPT-2 models trained with 512 context size on 26B token form openwebtext dataset",
+                "position": 1934
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x18.png",
+                "caption": "",
+                "position": 1938
+            }
+        ]
+    },
+    {
+        "header": "Appendix DLayerNorm Positioning and FFN Width Sweep",
+        "images": []
+    },
+    {
+        "header": "Appendix ESpectral Signature Across FFN Width Sweeps Baseline Models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x19.png",
+                "caption": "Figure 14:Eigen metrics in GPT-2 (GELU, D=1​d1dto8​d8d) with Pearsonrrto eval loss (rpre,rpostr_{\\mathrm{pre}},r_{\\mathrm{post}})",
+                "position": 2013
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x20.png",
+                "caption": "",
+                "position": 2017
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x21.png",
+                "caption": "Figure 15:Eigen metrics in GPT-2 (ReLU, D=1​d1dto8​d8d) with Pearsonrrto eval loss (rpre,rpostr_{\\mathrm{pre}},r_{\\mathrm{post}})",
+                "position": 2021
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x22.png",
+                "caption": "",
+                "position": 2025
+            }
+        ]
+    },
+    {
+        "header": "Appendix FSpectral Signature Across FFN Width Sweeps in Norm-free",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x23.png",
+                "caption": "Figure 16:SE and PR inNormalization-freeGPT-2 (GELU, D=1​d1dto8​d8d) with Pearson correlation to eval loss (rpre,rpostr_{\\mathrm{pre}},r_{\\mathrm{post}})",
+                "position": 2035
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x24.png",
+                "caption": "",
+                "position": 2039
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x25.png",
+                "caption": "Figure 17:SE and PR inNormalization-freeGPT-2 (ReLU, D=1​d1dto8​d8d) with Pearson correlation to eval loss (rpre,rpostr_{\\mathrm{pre}},r_{\\mathrm{post}})",
+                "position": 2043
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x26.png",
+                "caption": "",
+                "position": 2047
+            }
+        ]
+    },
+    {
+        "header": "Appendix GToken Sub-Sampling and Low-Rank Approximation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x27.png",
+                "caption": "Figure 18:SE and PR in GPT-2 with Pearsonrrto eval loss undersub-sampling(5, 10, 25, 50%)",
+                "position": 2251
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x28.png",
+                "caption": "",
+                "position": 2255
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x29.png",
+                "caption": "Figure 19:SE and PR in GPT-2 with Pearsonrrto eval loss underlow-rank approximation.",
+                "position": 2259
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x30.png",
+                "caption": "",
+                "position": 2263
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x31.png",
+                "caption": "Figure 20:Impact of sampling (10%, 25%, 50%), and low-rank approximation on EEE (GPT-2)",
+                "position": 2267
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x32.png",
+                "caption": "Figure 21:Impact of sampling (10%, 25%, 50%), and low-rank approximation on JS metric (GPT-2)",
+                "position": 2270
+            }
+        ]
+    },
+    {
+        "header": "Appendix HComputational and Memory Efficiency of NerVE",
+        "images": []
+    },
+    {
+        "header": "Appendix IEigenspectrum Dynamics in a Non-Transformer Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x33.png",
+                "caption": "Figure 22:Eigenspectrum dynamics in MLP-Mixer under activation ablations.Rows correspond to the four activation configurations for token-mixing (FFN1) and channel-mixing (FFN2) layers, and columns (from left to right) show spectral entropy (SE), participation ratio (PR), eigenvalue early enrichment (EEE), and Jensen-Shannon divergence (JS) for the channel-mixing FFNs (FFN2). Each panel traces pre- and post-activation metrics over training, showing that ReLU in the channel-mixing MLP (3rd and 4th rows) most strongly increases SE/PR and reduces EEE, i.e., reinjects variance into low-energy directions and flattens the spectrum.",
+                "position": 2615
+            }
+        ]
+    },
+    {
+        "header": "Appendix JToken-Position Effects on FFN Eigenspectrum",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x34.png",
+                "caption": "Figure 23:Sequence-aware FFN eigenspectrum across token positions.For four GPT-2 (125M) variants (rows 1 to 4) and a non-transformer MLP-Mixer (row 5), tokens are grouped by position.Left: pre-activationPRpre\\mathrm{PR}_{\\mathrm{pre}};Middle: post-activationPRpost\\mathrm{PR}_{\\mathrm{post}}; andRight: layer-wisePRpost\\mathrm{PR}_{\\mathrm{post}}. In GPT-2 with baseline, both GELU and ReLU variants, early/middle/late tokens have similarPRpre\\mathrm{PR}_{\\mathrm{pre}}butdiverge stronglyinPRpost\\mathrm{PR}_{\\mathrm{post}}, with late tokens using substantially higher effective dimensionality, mainly visible in deeper layers. However, in the normalization-free GPT-2 variants, these position-conditioned differences are largely suppressed in both pre- and post-activations. On the other hand, in a non-transformer family model, MLP-Mixer trained with SGD optimizer, where we split patches into top vs bottom rows, position effects areweakthroughout.This show that strong position-dependent FFN geometry is a characteristic of LayerNorm-based GPT-2",
+                "position": 2679
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x35.png",
+                "caption": "",
+                "position": 2689
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x36.png",
+                "caption": "",
+                "position": 2690
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x37.png",
+                "caption": "",
+                "position": 2697
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x38.png",
+                "caption": "",
+                "position": 2700
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x39.png",
+                "caption": "",
+                "position": 2701
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x40.png",
+                "caption": "",
+                "position": 2708
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x41.png",
+                "caption": "",
+                "position": 2709
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x42.png",
+                "caption": "",
+                "position": 2710
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x43.png",
+                "caption": "",
+                "position": 2717
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x44.png",
+                "caption": "",
+                "position": 2718
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x45.png",
+                "caption": "",
+                "position": 2719
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x46.png",
+                "caption": "",
+                "position": 2726
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x47.png",
+                "caption": "",
+                "position": 2727
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x48.png",
+                "caption": "",
+                "position": 2728
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x49.png",
+                "caption": "",
+                "position": 2735
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x50.png",
+                "caption": "",
+                "position": 2736
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x51.png",
+                "caption": "",
+                "position": 2738
+            }
+        ]
+    },
+    {
+        "header": "Appendix KFFN Eigenspectrum Dynamics: LayerNorm vs RMSNorm",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x52.png",
+                "caption": "Figure 24:Effect of LayerNorm vs RMSNorm on FFN eigenspectrum.Top row:Post-activation participation ratio (PRpost\\mathrm{PR}_{\\mathrm{post}}) in GPT-2 (125M) for three FFN activations (GELU, ReLU, learnable leaky ReLU), three normalization placements (PreLN, PostLN, MixLN), and two normalization variants. Within each activation-placement pair, the LayerNorm and RMSNorm boxplots substantially overlap, while much larger shifts arise from changing the activation type or the norm placement.Bottom row:Layerwise comparison ofPRpost\\text{PR}_{\\text{post}}under LayerNorm (xx-axis) vs RMSNorm (yy-axis). Each point represents one FFN layer. GELU and ReLU show similar PR ranges but weak layerwise correspondence (R2<0.2R^{2}<0.2), while learnable leaky ReLU exhibits strong alignment (R2≈0.77R^{2}\\approx 0.77).This indicates that FFN eigenspectrum patterns are primarily driven by activation type and are largely robust to the choice of normalization scheme.",
+                "position": 2770
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x53.png",
+                "caption": "",
+                "position": 2774
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x54.png",
+                "caption": "Figure 25:Effect of LayerNorm vs RMSNorm in the MLP-Mixer models. Columns (from left to right) shows post-activation SE, PR, EEE, and finally JS metric trend for LayerNorm and RMSNorm configurations throughout the training when MLP-Mixer models (GELU in both MLPs) are trained from scratch on CIFAR-100 dataset using Adam optimizer. FFN eigenspectrum dynamics remain (qualitatively) stable when LayerNorm is replaced with RMSNorm. However, in the later phases of training, the LayerNorm configuration attains higher effective dimensionality (PR) than RMSNorm, and its spectrum becomes noticeably flatter.",
+                "position": 2802
+            }
+        ]
+    },
+    {
+        "header": "Appendix LOptimizer-Dependent FFN Eigenspectrum Dynamics",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x55.png",
+                "caption": "Figure 26:Optimizer-dependent FFN eigenspectrum dynamics in GPT2-160M (context length 1024).\nRows show AdamW (top), Muon (middle), and Dion (bottom).",
+                "position": 2825
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x56.png",
+                "caption": "Figure 27:Optimizer-dependent FFN eigenspectrum dynamics in GPT2-160M (context length 512).\nRows show AdamW (top), Muon (middle), and Dion (bottom).",
+                "position": 2831
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x57.png",
+                "caption": "Figure 28:Activation-compatibility of pre-activation eigenspectrum. Columns show the effective dimensionality of pre-activation spectrum (PR_pre) when GPT2-160M models are trained from scratch with AdamW (left), Muon (middle), and Dion (right) optimizers, with 512 (top) and 1024 (bottom) context length. Muon exhibits the highest PR_pre across layers, demonstrating well-conditioned pre-activation spectra that place less burden on the FFN nonlinearity to restore representational rank.",
+                "position": 2839
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x58.png",
+                "caption": "",
+                "position": 2855
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x59.png",
+                "caption": "Figure 29:Eigen-metrics (SE, PR, EEE, and JS) illustratehow FFN nonlinearities regulate information flow and reshape the eigenspectrumwhen GPT-2 (125M) models with GELU (top) and ReLU (bottom) are trained from scratch on CodeParrot (2.1B tokens) datasets usingAdafactoroptimizer(Shazeer and Stern,2018). Pre- and post-activation dynamics are shown for SE, PR, and EEE, highlighting how nonlinearities reinject variance and alter spectral structure. JS heatmaps (rightmost) capture the layerwise distributional shift induced by nonlinearity.",
+                "position": 2921
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x60.png",
+                "caption": "",
+                "position": 2925
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x61.png",
+                "caption": "Figure 30:Layerwise post-activation participation ratio (PR_post) comparison for AdamW and Adafactor across four GPT-2 (125M) configurations: baseline (PreLN) with GELU and ReLU (top), and normalization-free GELU and ReLU (bottom). Across settings, Adafactor systematically produces higher PR_post than AdamW, indicating higher FFN latent-space utilization, with the largest gains in the normalization-free ReLU model.",
+                "position": 2933
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x62.png",
+                "caption": "Figure 31:Training dynamics of post-activation participation ratio (PR) for all layers in GPT-2 (125M) across four configurations (columns) and two optimizers (rows). Deeper layers achieve and maintain higher PR_post throughout training, with Adafactor consistently producing larger PR_post than AdamW, especially in the deeper FFNs and in the normalization-free ReLU models.",
+                "position": 2944
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x63.png",
+                "caption": "Figure 32:Training dynamics of FFN-induced spectral flattening in GPT-2 (125M), quantified asΔ\\DeltaEEE = EEEpost{}_{\\text{post}}- EEEpre{}_{\\text{pre}}, under AdamW (top row) and Adafactor (bottom row) optimizer. More negativeΔ\\DeltaEEE indicates stronger suppression of top eigenvalues and a flatter spectrum. Across settings, deeper layers under Adafactor tend to reach more negativeΔ\\DeltaEEE than under AdamW, indicating more aggressive spectral flattening.",
+                "position": 2951
+            },
+            {
+                "img": "https://arxiv.org/html/2603.06922/2603.06922v1/x64.png",
+                "caption": "Figure 33:Optimizer effects in MLP-Mixer (Adam vs. SGD). Columns (from left to right) shows post-activation SE, PR, EEE, and finally JS divergence metric trend when MLP-Mixer baseline model (GELU in both MLPs) is trained from scratch on CIFAR-100 dataset using Adam and SGD optimizer. Right from the epoch 10, the MLP-Mixer with the SGD optimizer starts exhibiting superior SE_post and PR_post showing significantly better utilization of FFN2 latent space.",
+                "position": 2967
+            }
+        ]
+    },
+    {
+        "header": "Appendix MLimitations of NerVE Framework",
+        "images": []
+    },
+    {
+        "header": "Appendix NDiscussion: Why Top-heaviness Over Tail-heaviness",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
