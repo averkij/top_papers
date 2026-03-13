@@ -1,0 +1,685 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/x1.png",
+                "caption": "Figure 1:(a) Schematic of the main effects we observe (see Fig2for a version with real data). Left: Small models live in aneedle in a haystackregime, where good solutions to downstream tasks occupy a tiny fraction of the surrounding weights. In this regime, it is important to have a smart search algorithm, such as gradient descent or other forms of iterative optimization. Right: Large models are surrounded by a veritablethicketof task-specific solutions. In this regime, random sampling is sufficient to quickly land on promising adaptations, which can then be ensembled to yield strong behavior, an approach we callRandOpt. (b) Solution density – i.e. density of task-improving weights in a Gaussian neighborhood of the pretrained weights – scales with model size.\n(c) RandOpt is𝒪​(1)\\mathcal{O}(1)in training steps, FLOP-efficient, and competitive in converged accuracy with GRPO and ES. Results are shown on the Countdown task withOlmo-3-7B-Instruct; RandOpt uses 5000 random weight guesses and ensembles the topKK; K-pass baselines use Test-time Majority Vote (TT-MV). More results are shown in Fig.6and Table4.",
+                "position": 353
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Structure of the Multi-task Loss Landscape Around Pretrained Weights",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/x2.png",
+                "caption": "Figure 2:Accuracy landscapes in weight space across model scales and reasoning tasks. We perturb the pretrained Qwen2.5 models (from 0.5B to 32B) with 1000 random weight perturbations and project the perturbed models into 2D using random projection. Colors show relative accuracy change(acc−base)/base×100(\\mathrm{acc}-\\mathrm{base})/\\mathrm{base}\\times 100(blue: degraded,white: equivalent,red: improved.) Dashed circles indicate the mean perturbation distance and stars mark the best-performing perturbations. Larger models have warmer landscapes, with more high-performing neighborhoods. The last column shows an RGB visualization where GSM8K, Olympiad and Countdown accuracies are mapped to R,G,B channels; richer colors indicate more task experts.",
+                "position": 458
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/x3.png",
+                "caption": "Figure 3:Scaling laws of solution density and diversity (usingQwen-2.5instruction tuned models). (a) Solution density increases with model scale, showing that larger models have a higher fraction of good solutions. (b) Spectral discordance across model scales, measuring solution diversity. Together, these results demonstrate that larger models have both denser and more diverse solution landscapes in the neighborhood around their pretrained weights.",
+                "position": 464
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/x4.png",
+                "caption": "Figure 4:Performance spectra and clustering of random seeds. Sampled vectors possess diverse areas of expertise, with individual seeds specializing in specific tasks. (Left) Performance of 100 random seeds across seven evaluation datasets. Each line represents a specific seed, with four lines highlighted as examples. (Right) PCA visualization of these performance vectors, where seeds with similar behavior cluster together into different groups.",
+                "position": 517
+            }
+        ]
+    },
+    {
+        "header": "3A Minimal Setting In Which Thickets Emerge: Autoregressive Modeling of 1D Signals",
+        "images": []
+    },
+    {
+        "header": "4A Practical Algorithm: Random Guessing & Ensembling (RandOpt)",
+        "images": []
+    },
+    {
+        "header": "5How Does RandOpt Compare to Standard Methods for Post-Training?",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/x5.png",
+                "caption": "Figure 6:RandOpt vs. baselines on post-training LLMs. Marker size represents model scale (0.5-8B), shape indicates task family, and transparency distinguishes benchmarks within each task family. RandOpt matches or exceeds baselines in most settings. RandOpt is run with K=50 and ES+TT-MV also uses 50 test-time samples ensembled via majority vote. 1-pass PPO/GRPO use a single test-time sample; this setting disadvantages the baseline but reflects current standard usage of these models, in which there is no test-time ensembling.\nFull experimental results can be found in Appendix Table4.",
+                "position": 726
+            }
+        ]
+    },
+    {
+        "header": "6Scaling Properties of RandOpt",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/x6.png",
+                "caption": "Figure 7:Heatmap of accuracy across population sizeNNand selection ratioK/NK/N. Accuracy scales with population size. Task: Countdown, Model: Qwen2.5-3B-Inst.",
+                "position": 785
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/x6.png",
+                "caption": "Figure 7:Heatmap of accuracy across population sizeNNand selection ratioK/NK/N. Accuracy scales with population size. Task: Countdown, Model: Qwen2.5-3B-Inst.",
+                "position": 788
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/x7.png",
+                "caption": "Figure 8:Relationship between model scale and RandOpt performance. Good pretrained representations are important for RandOpt start to work. Task: Countdown, N = 3k, K = 50.",
+                "position": 794
+            }
+        ]
+    },
+    {
+        "header": "7Distillation",
+        "images": []
+    },
+    {
+        "header": "8Types of Thickets",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/x8.png",
+                "caption": "Figure 9:Accuracy decomposition on GSM8k using Qwen2.5-3B-Instruct (N=3000, K=50). Grey denotes strictly correct answers (both format and answer correct), light blue denotes the questions originally answered incorrectly that are corrected after training, and purple denotes the gains are just from fixing format. For both GRPO and RandOpt, a large portion of the gains come from format correction, while another portion is from solving the problem correctly.",
+                "position": 908
+            }
+        ]
+    },
+    {
+        "header": "9Related Work",
+        "images": []
+    },
+    {
+        "header": "10Implications",
+        "images": []
+    },
+    {
+        "header": "11Limitations",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AModels",
+        "images": []
+    },
+    {
+        "header": "Appendix BDatasets",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/x9.png",
+                "caption": "Figure 10:Scaling curves for population sizeKKand ensemble sizeNNon Countdown task.",
+                "position": 1938
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/x10.png",
+                "caption": "Figure 11:Model performance comparison on Countdown, GSM8k, MATH-500, and OlympiadBench using the Qwen2.5-1.5B-Instruct model. More results for additional models and baselines can be found in Appendix Table4.",
+                "position": 1942
+            }
+        ]
+    },
+    {
+        "header": "Appendix CBaseline Methods",
+        "images": []
+    },
+    {
+        "header": "Appendix DAdditional Experimental Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/x11.png",
+                "caption": "Figure 12:Performance distributions of 500 randomly perturbed models relative to base model accuracy on the math reasoning task GSM8k (left) and Countdown (right). The fraction of perturbations matching or exceeding base performance (shaded region) increases with model size:0%→64%0\\%\\to 64\\%on GSM8K and8%→60%8\\%\\to 60\\%on Countdown as model size grows from 0.5B to 32B parameters. Note: x-axis shows relative performance; longer tails in smaller models do not equate to higher absolute accuracy.",
+                "position": 2004
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/x12.png",
+                "caption": "Figure 13:Batch/group size vs. accuracy under one-step training. Scaling baseline parallelism does not get RandOpt’s performance. Task: GSM8K, Model: Qwen2.5-3B-Instruct, N=5000, K=50)",
+                "position": 2029
+            }
+        ]
+    },
+    {
+        "header": "Appendix EImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix FAdditional Results on 1D Signals",
+        "images": []
+    },
+    {
+        "header": "Appendix GAdditional discussion on Sandbagging",
+        "images": []
+    },
+    {
+        "header": "Appendix HDerivation of Spectral Discordance Bounds",
+        "images": []
+    },
+    {
+        "header": "Appendix IPrompts",
+        "images": []
+    },
+    {
+        "header": "Appendix JColor thickets",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/xavier_one_line_one_line_sample0.png",
+                "caption": "Table 5:RandOpt on 1D signals (approximation).Each cell corresponds to a pretraining–post-training pair. In this experiment we plot results on the same function that we fit to during post-training; this is a test of apprpoximation only, not generalization to new functions. We also compare to Xavier initialization(Glorot & Bengio,2010)and Kaiming initializationHe et al. (2015). For each pretraining method, we pick a perturbation noise scale,σ\\sigmathat is large enough to show functional variation; this value is shown underneath the pretraining method name.",
+                "position": 3672
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/xavier_one_squarewave_one_squarewave_sample1.png",
+                "caption": "",
+                "position": 3710
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/xavier_one_sinusoid_one_sinusoid_sample2.png",
+                "caption": "",
+                "position": 3714
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/kaiming_one_line_one_line_sample0.png",
+                "caption": "",
+                "position": 3730
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/kaiming_one_squarewave_one_squarewave_sample1.png",
+                "caption": "",
+                "position": 3734
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/kaiming_one_sinusoid_one_sinusoid_sample2.png",
+                "caption": "",
+                "position": 3738
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/mixed_one_line_one_line_sample0.png",
+                "caption": "",
+                "position": 3754
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/mixed_one_squarewave_one_squarewave_sample1.png",
+                "caption": "",
+                "position": 3758
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/mixed_one_sinusoid_one_sinusoid_sample2.png",
+                "caption": "",
+                "position": 3762
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/line_one_line_one_line_sample0.png",
+                "caption": "",
+                "position": 3778
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/line_one_squarewave_one_squarewave_sample1.png",
+                "caption": "",
+                "position": 3782
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/line_one_sinusoid_one_sinusoid_sample2.png",
+                "caption": "",
+                "position": 3786
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/mixed_line_line_sample0.png",
+                "caption": "Table 6:RandOpt on 1D signals (generalization).Each row corresponds to a pretraining–post-training pair. For all rows, the test set functions are of the post-trained type, and we show three random test examples. Rightmost column shows the average mean squared error over the entire test set, for each method.",
+                "position": 3793
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/mixed_line_line_sample1.png",
+                "caption": "",
+                "position": 3814
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/mixed_line_line_sample2.png",
+                "caption": "",
+                "position": 3814
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/mixed_line_line_performance.png",
+                "caption": "",
+                "position": 3818
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/mixed_squarewave_squarewave_sample0.png",
+                "caption": "",
+                "position": 3826
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/mixed_squarewave_squarewave_sample1.png",
+                "caption": "",
+                "position": 3826
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/mixed_squarewave_squarewave_sample2.png",
+                "caption": "",
+                "position": 3826
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/mixed_squarewave_squarewave_performance.png",
+                "caption": "",
+                "position": 3830
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/mixed_sinusoid_sinusoid_sample0.png",
+                "caption": "",
+                "position": 3838
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/mixed_sinusoid_sinusoid_sample1.png",
+                "caption": "",
+                "position": 3838
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/mixed_sinusoid_sinusoid_sample2.png",
+                "caption": "",
+                "position": 3838
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/mixed_sinusoid_sinusoid_performance.png",
+                "caption": "",
+                "position": 3842
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/sinusoid_squarewave_squarewave_sample0.png",
+                "caption": "",
+                "position": 3850
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/sinusoid_squarewave_squarewave_sample1.png",
+                "caption": "",
+                "position": 3850
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/sinusoid_squarewave_squarewave_sample2.png",
+                "caption": "",
+                "position": 3850
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/sinusoid_squarewave_squarewave_performance.png",
+                "caption": "",
+                "position": 3854
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/squarewave_squarewave_squarewave_sample0.png",
+                "caption": "",
+                "position": 3862
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/squarewave_squarewave_squarewave_sample1.png",
+                "caption": "",
+                "position": 3862
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/squarewave_squarewave_squarewave_sample2.png",
+                "caption": "",
+                "position": 3862
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/squarewave_squarewave_squarewave_performance.png",
+                "caption": "",
+                "position": 3866
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image1.png",
+                "caption": "Table 7:RandOpt on Text-to-Image models (Train Set).We use the Stable Diffusion XL model(Podell et al.,2023). Images are generated from a text prompt. RandOpt selects the top-K models by scoring generated images with a target text (e.g., “blue”) using GPT-5.2, and performs mean ensembling over the K models at each denoising step.",
+                "position": 3873
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image2.png",
+                "caption": "",
+                "position": 3918
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image3.png",
+                "caption": "",
+                "position": 3923
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image4.png",
+                "caption": "",
+                "position": 3928
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image5.png",
+                "caption": "",
+                "position": 3933
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image6.png",
+                "caption": "",
+                "position": 3948
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image7.png",
+                "caption": "",
+                "position": 3953
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image8.png",
+                "caption": "",
+                "position": 3958
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image9.png",
+                "caption": "",
+                "position": 3963
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image10.png",
+                "caption": "",
+                "position": 3968
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image11.png",
+                "caption": "",
+                "position": 3980
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image12.png",
+                "caption": "",
+                "position": 3985
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image13.png",
+                "caption": "",
+                "position": 3990
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image14.png",
+                "caption": "",
+                "position": 3995
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image15.png",
+                "caption": "",
+                "position": 4000
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image16.png",
+                "caption": "",
+                "position": 4012
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image17.png",
+                "caption": "",
+                "position": 4017
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image18.png",
+                "caption": "",
+                "position": 4022
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image19.png",
+                "caption": "",
+                "position": 4027
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image20.png",
+                "caption": "",
+                "position": 4032
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image21.png",
+                "caption": "",
+                "position": 4047
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image22.png",
+                "caption": "",
+                "position": 4052
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image23.png",
+                "caption": "",
+                "position": 4057
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image24.png",
+                "caption": "",
+                "position": 4062
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image25.png",
+                "caption": "",
+                "position": 4067
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image26.png",
+                "caption": "",
+                "position": 4079
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image27.png",
+                "caption": "",
+                "position": 4084
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image28.png",
+                "caption": "",
+                "position": 4089
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image29.png",
+                "caption": "",
+                "position": 4094
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image30.png",
+                "caption": "",
+                "position": 4099
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image31.png",
+                "caption": "",
+                "position": 4111
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image32.png",
+                "caption": "",
+                "position": 4116
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image33.png",
+                "caption": "",
+                "position": 4121
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image34.png",
+                "caption": "",
+                "position": 4126
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image35.png",
+                "caption": "",
+                "position": 4131
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image36.png",
+                "caption": "Table 8:RandOpt on Text-to-Image models (Test Set).Top-K selected on the training set and evaluated on the test set.",
+                "position": 4138
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image37.png",
+                "caption": "",
+                "position": 4183
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image38.png",
+                "caption": "",
+                "position": 4188
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image39.png",
+                "caption": "",
+                "position": 4193
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image40.png",
+                "caption": "",
+                "position": 4198
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image41.png",
+                "caption": "",
+                "position": 4213
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image42.png",
+                "caption": "",
+                "position": 4218
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image43.png",
+                "caption": "",
+                "position": 4223
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image44.png",
+                "caption": "",
+                "position": 4228
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image45.png",
+                "caption": "",
+                "position": 4233
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image46.png",
+                "caption": "",
+                "position": 4245
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image47.png",
+                "caption": "",
+                "position": 4250
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image48.png",
+                "caption": "",
+                "position": 4255
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image49.png",
+                "caption": "",
+                "position": 4260
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image50.png",
+                "caption": "",
+                "position": 4265
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image51.png",
+                "caption": "",
+                "position": 4277
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image52.png",
+                "caption": "",
+                "position": 4282
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image53.png",
+                "caption": "",
+                "position": 4287
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image54.png",
+                "caption": "",
+                "position": 4292
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image55.png",
+                "caption": "",
+                "position": 4297
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image56.png",
+                "caption": "",
+                "position": 4312
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image57.png",
+                "caption": "",
+                "position": 4317
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image58.png",
+                "caption": "",
+                "position": 4322
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image59.png",
+                "caption": "",
+                "position": 4327
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image60.png",
+                "caption": "",
+                "position": 4332
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image61.png",
+                "caption": "",
+                "position": 4344
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image62.png",
+                "caption": "",
+                "position": 4349
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image63.png",
+                "caption": "",
+                "position": 4354
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image64.png",
+                "caption": "",
+                "position": 4359
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image65.png",
+                "caption": "",
+                "position": 4364
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image66.png",
+                "caption": "",
+                "position": 4376
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image67.png",
+                "caption": "",
+                "position": 4381
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image68.png",
+                "caption": "",
+                "position": 4386
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image69.png",
+                "caption": "",
+                "position": 4391
+            },
+            {
+                "img": "https://arxiv.org/html/2603.12228/2603.12228v1/image70.png",
+                "caption": "",
+                "position": 4396
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
