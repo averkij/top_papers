@@ -1,0 +1,126 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.13875/2603.13875v1/figs/GradMem_overview_short.png",
+                "caption": "Figure 1:GradMem learns to write context into memory via per-sample test-time optimization.Given a context, GradMem performs a few test-time gradient updates on memory state to minimize a self-supervised reconstruction loss (WRITE). The memory initialization is meta-learned so that useful context representations can be written with only a few gradient steps. At inference, the model answers queries using only the optimized memory and the query (READ), without access to the original context.",
+                "position": 240
+            }
+        ]
+    },
+    {
+        "header": "2GradMem",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.13875/2603.13875v1/figs/GradMem_main_figure_v1.drawio.png",
+                "caption": "Figure 2:GradMem overview.(a)Each task sample is represented as contextCC, queryQQ, and targetYY. A context encoderEθE_{\\theta}compressesCCinto a fixed-size memoryℳ^\\hat{\\mathcal{M}}in a WRITE phase, and the model predictsYYfrom[ℳ^;Q][\\hat{\\mathcal{M}};Q]in a READ phase, without access toCC.(b)Meta-learning view: a shared initializationℳ0\\mathcal{M}_{0}and model parametersθ\\thetaare learned across training examples (outer loop), while at test time each contextCiC_{i}adapts its own memoryℳ^​(Ci)\\hat{\\mathcal{M}}(C_{i})via a few gradient steps (dotted trajectory).(c)Test-time gradient descent on memory.\nStarting from the meta-learned initializationℳ0\\mathcal{M}_{0}, GradMem updates the per-sample memory state during WRITE withKKsteps of gradient descent on the context reconstruction lossℒwrite​(ℳ;C)\\mathcal{L}_{\\text{write}}(\\mathcal{M};C).\nAt READ, the model predicts the task target using only[ℳ^;Q][\\hat{\\mathcal{M}};Q].\nDuring training,θ\\thetaandℳ0\\mathcal{M}_{0}are optimized by backpropagating through the WRITE outer loop, so the model learns to use gradient descent as an operation that writes useful information aboutCCinto memory; at inference, only the per-sample memory state is updated.",
+                "position": 291
+            }
+        ]
+    },
+    {
+        "header": "3Experiments and Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.13875/2603.13875v1/x1.png",
+                "caption": "Figure 3:Gradient-based memory updates (GradMem) outperform forward-only updates at the same memory size.With a memory state of 8 vectors, GradMem retrieves any of 16 key–value pairs with 95% accuracy, whereas a forward-only update rule stores only 8 pairs with high accuracy. More gradient steps increases the capacity of the same 8-vector memory to 96 pairs at 88% retrieval accuracy. Transformer with KV-cache as non-compressive memory serves as an upper bound.",
+                "position": 815
+            },
+            {
+                "img": "https://arxiv.org/html/2603.13875/2603.13875v1/x2.png",
+                "caption": "Figure 4:More gradient steps at test-time lead to better performance without fine-tuning.(a)Results forKtrainK_{\\text{train}}values of GradMem setups that could not achieve 99% exact match during fine-tuning. Red dashed lines denote the beginning of extrapolation.(b)Downstream task quality (Exact Match) correlates with WRITE objective in inner loop (reconstruction). Notably, GradMem reconstructsvaluesbetter thankeys, despite the WRITE objective treating them equally. Results on 96-pair KV-retrieval.",
+                "position": 1066
+            },
+            {
+                "img": "https://arxiv.org/html/2603.13875/2603.13875v1/x3.png",
+                "caption": "",
+                "position": 1084
+            }
+        ]
+    },
+    {
+        "header": "4Discussion and Conclusions",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ARelated Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BHyperparameters and training details",
+        "images": []
+    },
+    {
+        "header": "Appendix CAccelerating double backwards through attention.",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.13875/2603.13875v1/x4.png",
+                "caption": "Figure 5:Comparison of speed and memory consumption for attention backwards-over-backwards in GradMem.These results were obtained using an A100 GPU, with GPT-2 as the base model for GradMem with 8 memory tokens, a query size of 24, 1 inner SGD step and a batch size of 16.",
+                "position": 1969
+            },
+            {
+                "img": "https://arxiv.org/html/2603.13875/2603.13875v1/x4.png",
+                "caption": "",
+                "position": 1972
+            },
+            {
+                "img": "https://arxiv.org/html/2603.13875/2603.13875v1/x5.png",
+                "caption": "",
+                "position": 1976
+            },
+            {
+                "img": "https://arxiv.org/html/2603.13875/2603.13875v1/x6.png",
+                "caption": "",
+                "position": 1980
+            }
+        ]
+    },
+    {
+        "header": "Appendix DComputational analysis: when GradMem is compute-efficient",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.13875/2603.13875v1/x7.png",
+                "caption": "Figure 6:Break-even number of queries for GradMem compute efficiency.The curve shows the minimum number of queries per contextNNrequired for GradMem to use less total compute than full-context inference with cached context representations. Estimates use query lengthq=128q{=}128and memory sizem=32m{=}32; points above the curve favor GradMem.",
+                "position": 2049
+            },
+            {
+                "img": "https://arxiv.org/html/2603.13875/2603.13875v1/x8.png",
+                "caption": "Figure 7:GradMem is competitive in latency when the same context is reused across many READ operations.Results obtained on an A100 GPU. WRITE+READ latency is shown for contexts of length 64 (a), 256 (b), and 1024 (c) tokens. The query length is 24 tokens and the batch size is 16. GradMem uses GPT-2 as the base model withK=1K=1. For GPT-2 and Mamba-130M, the WRITE operation corresponds to building the KV-cache and the recurrent state, respectively. The y-axis uses a logarithmic scale; the absolute latency difference (ms) increases with the number of queries per context.",
+                "position": 2063
+            },
+            {
+                "img": "https://arxiv.org/html/2603.13875/2603.13875v1/x9.png",
+                "caption": "",
+                "position": 2070
+            },
+            {
+                "img": "https://arxiv.org/html/2603.13875/2603.13875v1/x10.png",
+                "caption": "",
+                "position": 2074
+            }
+        ]
+    },
+    {
+        "header": "Appendix ERelation between Exact Match and inner loss",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.13875/2603.13875v1/x11.png",
+                "caption": "Figure 8:On KV-retrieval, GradMem learns to decrease inner loss on value tokens only.This figure was obtained for GradMem fine-tuned on 64-pair KV-retrieval withKtrain=2K_{\\text{train}}=2.",
+                "position": 2090
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
