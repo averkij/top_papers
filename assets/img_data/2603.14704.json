@@ -1,0 +1,105 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.14704/2603.14704v1/fig_global.jpg",
+                "caption": "Figure 1:The Paradigm Shift from Fixed Scheduling to Chain-of-Trajectories (CoTj).Top:Comparison of inference mechanisms. Standard diffusion acts as aSystem 1process, relying on a fixed time series that constrains potential. In contrast, CoTj introduces aSystem 2approach via a CoTj-guided Optimal Planner, generating an optimized time series tailored to the input.Bottom:Real-world comparisons across modalities. In text-to-image generation (QwenImage[37], Z-image-Turbo[3]), CoTj achieves superior visual results under limited computational resources. In text-to-video tasks (Wan2.2[35]), our CoTj significantly enhances motion dynamics and realism while maintaining high spatial quality.",
+                "position": 248
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method: Chain-of-Trajectories",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.14704/2603.14704v1/dag.png",
+                "caption": "Figure 2:Super-Node DAG for trajectory planning.Visualization of the dense reverse-time DAG𝒢=(𝒱,ℰ)\\mathcal{G}=(\\mathcal{V},\\mathcal{E}), showing aggregated high-dimensional states as Super-Nodes and possible transitions as edges. The DAG encodes all feasible generative trajectories, allowing the CoTj planner to find globally optimal paths while avoiding regressive or non-convergent regions.",
+                "position": 367
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14704/2603.14704v1/dna_divergence.jpg",
+                "caption": "Figure 3:Entropic divergence patterns reveal intrinsic Diffusion DNA.Profiles of𝒞​(t)\\mathcal{C}(t)expose heterogeneous error-decay dynamics across inputs.\nStructurally constrained, low-entropy visual targets exhibit rapid stabilization,\nwhereas abstract and visually uncertain compositions lead to prolonged refinement phases.\nThe shaded region illustrates the additional computational burden induced by\nentropic complexity, highlighting that generative difficulty is governed primarily\nby intrinsic visual uncertainty rather than surface-level prompt properties\n(e.g., length or linguistic complexity).",
+                "position": 468
+            }
+        ]
+    },
+    {
+        "header": "4Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.14704/2603.14704v1/DNA_cosine_analysis_horizontal.png",
+                "caption": "Figure 4:Statistical landscape of Diffusion DNA.We analyze large-scale structural properties of difficulty profiles\nusing 1,000,000 prompt pairs derived from the PickScore training set.\n(A)DNA cosine similarity distribution:pairwise similarities concentrate in a high-similarity regime,\nsuggesting that diffusion difficulty profiles inhabit a structured\nregion of the generative landscape.\n(B)Semantic–difficulty relationship:the correlation between semantic embedding similarity and DNA similarity\nis low (r=0.046r=0.046), revealing a statistical decoupling between\nsurface-level prompt semantics and intrinsic generative difficulty.",
+                "position": 493
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14704/2603.14704v1/pred_dna.png",
+                "caption": "Figure 5:Predicting Diffusion DNA from condition embeddings.Distribution of pairwise cosine similarities between predicted (𝒟^\\hat{\\mathcal{D}}) and true DNA trajectories. The model effectively captures structural patterns of generative difficulty across low- and high-entropy scenarios, providing a reliable signal for resource-aware, System 2 trajectory planning.",
+                "position": 528
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14704/2603.14704v1/prompt_graph_new.jpg",
+                "caption": "Figure 6:Navigating the Path of Least Action.(Center)Transition cost heatmap visualizing drift penalties and correction costs from Diffusion DNA.(Left)Low-entropy prompt: CoTj-selected trajectory of 8 steps for visualization.(Right)High-entropy prompt: CoTj-selected trajectory of 10 steps for visualization.\nAll baseline trajectories use the same number of steps as the CoTj-selected path for fair comparison.",
+                "position": 788
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14704/2603.14704v1/gain_ration_and_adaptive_steps.png",
+                "caption": "Figure 7:Inference Dynamics: Explained Gain Ratio (ρ\\rho) vs. Adaptive Sampling Steps.Mean adaptive step count as a function of the cumulative trajectory gainρ​(n)\\rho(n)under the Qwen-Image model.\nShaded regions denote the min–max range and standard deviation across 25,432 prompts.\nA clear transition emerges nearρ=0.99\\rho=0.99(red dashed line), beyond which required steps grow super-linearly, indicating diminishing marginal returns.\nThis phase transition justifies our termination criterion, capturing near-optimal reconstruction while avoiding the exponential cost of approachingρ→1\\rho\\rightarrow 1.",
+                "position": 839
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14704/2603.14704v1/CoTj_SideBySide_Analysis.png",
+                "caption": "Figure 8:System 2 Resource Allocation Across 25,432 Prompts (Qwen-Image).(A) Discrete timestep histogram:The Euler baseline (red) uses a uniform, input-agnostic grid, whereas CoTj (blue) adaptively distributes steps, resulting in variable, prompt-specific intervals.(B) Kernel Density Estimation (KDE):The continuous density shows Euler’s uniform placement (dashed red) versus CoTj’s adaptive allocation (solid blue), concentrating computation in early high-curvature regions where global semantic structures emerge and sparsifying late low-gradient intervals.",
+                "position": 848
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14704/2603.14704v1/first-high-oder.jpg",
+                "caption": "Figure 9:Visual Ablation at 5 Steps on Qwen-Image (Prompt: “a photo of an apple”).Top-Left: Baseline shows blurred structure. Top-Right: Baseline + UCGM improves silhouette but lacks texture fidelity. Bottom-Left: CoTj (1st-Order) preserves geometry and lighting. Bottom-Right: CoTj + UCGM yields the highest realism, capturing fine textures and specular highlights.",
+                "position": 921
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14704/2603.14704v1/Trajectory_Condensation.jpg",
+                "caption": "Figure 10:Trajectory Condensation and Structural Reachability.Left:Step-wise L2 norm of latent states over diffusion time. Blue: Euler 50-step reference; gray dashed: Euler 10-step; red dashed: CoTj+Euler 10-step; yellow: CoTj 10-step. CoTj trajectories condense long evolutions into shorter paths while closely tracking the high-fidelity reference.Right:Visual reconstructions corresponding to each trajectory (border colors match curves on the left). Within the same 10-step budget, CoTj preserves fine-grained structures lost under uniform scheduling, showing that detailed latent information can remain accessible when the correct geometric path is followed. Even when condensed, traces of what once existed persist, recoverable by mechanisms that respect the underlying structure.",
+                "position": 1136
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14704/2603.14704v1/wan10steps.jpg",
+                "caption": "Figure 11:Qualitative comparison of 10-step structural grounding.(Top) The baseline UniPC sampler[42]exhibits erroneous motion characterized by color shifts and structural instability beginning from the first frame. (Bottom) CoTj follows a fidelity-first planning strategy, maintaining sharp textures and stable palettes before gradually introducing motion. For the emergence of full 40-step dynamics, refer toFig.1.",
+                "position": 1152
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14704/2603.14704v1/combined_DNA_analysis_final.png",
+                "caption": "Figure 12:Radiographic analysis of denoising dynamics.Curves show the dataset-averaged Diffusion DNA trajectories computed over the PickScore training set (25,432 unique prompts), ensuring consistent cross-model comparison.(Left)DNA magnitude trajectory, representing absolute step-wise reconstruction error (ε\\varepsilon) across diffusion time.(Right)Step-wise reconstruction gain, isolating the temporal derivative of denoising progress.\nQwen-Image exhibits strictly positive and monotonically decaying gain, indicative of stable convergence.\nSD3.5 shows late-stage oscillatory behavior near zero gain, reflecting corrective inefficiencies.\nZ-Image-Turbo displays a pronounced negative gain att=1.0t=1.0and persistently high late-stage gain (red shaded region), revealing structural non-convergence and explaining its susceptibility to over-cooking under extended sampling. The initial negative gain further highlights why the optimal starting point for denoising may not coincide witht=1t=1in SDE-based models, motivating the Super-DAG planning design (Sec.3.2).",
+                "position": 1232
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ATheoretical Foundations of Chain-of-Trajectories",
+        "images": []
+    },
+    {
+        "header": "Appendix BDerivation of the Temporal Levers​(t,k)s(t,k)under Linear Flow",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
