@@ -1,0 +1,123 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.17948/2603.17948v1/x1.png",
+                "caption": "Figure 1:Logarithmic compute scaling with video duration. Video-RLM’s hierarchical grid grows sub-linearly (O​(log⁡T)O(\\log T)), requiring up to 9.7×\\timesfewer tokens than linear-scaling baselines. A uniform VLM maxes out its 256K context trading off sampled frame count with resolution.",
+                "position": 309
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.17948/2603.17948v1/figures/VideoAtlas.png",
+                "caption": "Figure 2:TheVideoAtlas Environment. (Left) The state space is a hierarchical grid stackS0,S1,…,SDS_{0},S_{1},\\ldots,S_{D}, whereS0S_{0}is the root grid covering the entire video of durationTT. Each grid hasK2K^{2}cells. Deeper levelsddprovide finer temporal resolutionΔ​td=T/K2​(d+1)\\Delta t_{d}=T/K^{2(d+1)}. (Top Right) The discrete action space𝒜\\mathcal{A}is divided into navigation (e.g., Expand toSt+1S_{t+1}), perception, and commit actions. (Bottom Right) The visual scratchpad memoryℳ+\\mathcal{M}^{+}accumulates multimodal evidence (images, timestamps, QA pairs) across exploration rounds.",
+                "position": 464
+            }
+        ]
+    },
+    {
+        "header": "3Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.17948/2603.17948v1/figures/grid2.png",
+                "caption": "Figure 3:Video-RLMoverview. The query is converted into a search task. In each roundrr, the Master examines the root gridS0S_{0}(with dead zones masked) and the scratchpadℳ+\\mathcal{M}^{+}, then assigns promising cells to Workers. Each Worker autonomously explores its assigned region via navigation, perception, and commit actions. After all Workers return,ℳ+\\mathcal{M}^{+}andℳ−\\mathcal{M}^{-}are updated. The Master performs an uncertainty analysis: if evidence is sufficient, the final answer is produced. Otherwise, a new round begins.",
+                "position": 490
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.17948/2603.17948v1/x2.png",
+                "caption": "Figure 4:(a) Environment budgeting: accuracy and tokens vs. max depth on subset of LVB-10hr (temporal span annotated). Green: optimal depth (first sub-second layer). (b) Adaptive compute: average tokens scale with evidence spread without ground-truth supervision.",
+                "position": 885
+            },
+            {
+                "img": "https://arxiv.org/html/2603.17948/2603.17948v1/x3.png",
+                "caption": "Figure 5:Wall-clock time (normalized to equal workload) vs. number of workers 30 questions sampled from LVB-10hr. Accuracy (annotated) remains stable across all configurations.",
+                "position": 899
+            }
+        ]
+    },
+    {
+        "header": "5Limitations",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.17948/2603.17948v1/figures/trace_grid_initial.jpg",
+                "caption": "Figure 6:Navigation grid before and after exploration.(a)The Master’s initial 8×\\times8 root grid provides a temporal overview of the full 25-minute video; each cell covers∼\\sim23 s.(b)After 8 DFS rounds, explored regions are blacked out (24 of 64 cells), visually showing the coverage pattern. The system explored 4.7% of total frames.",
+                "position": 1264
+            },
+            {
+                "img": "https://arxiv.org/html/2603.17948/2603.17948v1/figures/trace_grid_round8.jpg",
+                "caption": "",
+                "position": 1275
+            },
+            {
+                "img": "https://arxiv.org/html/2603.17948/2603.17948v1/figures/trace_scratchpad.jpg",
+                "caption": "Figure 7:Final evidence scratchpad.The system’s lossless visual memory after 8 rounds of exploration: 51 collected frames with burned-in labels [A]-[AY], each paired with a timestamp and natural-language description.\nRepresentative entries include“[D] @86.3 s: Referee shows yellow card to Marcus Thuram (Minute 18),”“[O] @371.1 s: Referee gives yellow card to Enzo Fernández (39′),”Not all items are yellow-card events: the scratchpad also captures contextual evidence such as match score overlays, player close-ups, and celebration scenes, enabling the Master to cross-reference events against the full match timeline.\nThis grid image is passed directly to the Master for the final decision.",
+                "position": 1283
+            },
+            {
+                "img": "https://arxiv.org/html/2603.17948/2603.17948v1/figures/reasoning_trace.png",
+                "caption": "Figure 8:Exploration trace.Condensed log of the 8-round DFS exploration. The Master probes the root grid and dispatches 3 parallel Workers (W) per round to the highest-scored Cells (C). Workers useZoom,Investigate,Expand, andBacktrackto drill into their assigned regions and collect evidence viaAdd_to_Scratchpad. After each round, the Master runs an uncertainty analysis to decide whether to continue or declare sufficiency. Evidence grows from 0 to 51 items across 8 rounds (97 VLM calls, 449K tokens), with the Master declaringFinal_Decisionafter identifying 8 distinct yellow card events, which is the correct answer.",
+                "position": 1292
+            }
+        ]
+    },
+    {
+        "header": "ADetailed Error Analysis",
+        "images": []
+    },
+    {
+        "header": "BPer-Category Accuracy Breakdown",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.17948/2603.17948v1/figures/answer_for_position.png",
+                "caption": "Figure 9:Representative backbone failure cases.Top:Perception error: the lightweight backbone cannot perceive a clearly visible host wearing red and concludes the entity does not exist; the stronger backbone identifies both hosts and reasons about their spatial relationship.Bottom:Surface-text latching: the lightweight backbone matches a rhetorical narrator phrase to a candidate answer with high confidence; the stronger backbone synthesizes broader evidence to identify the underlying scientific explanation.\nBoth runs use identical VideoAtlas configurations.",
+                "position": 1670
+            },
+            {
+                "img": "https://arxiv.org/html/2603.17948/2603.17948v1/figures/answer_for_desert.png",
+                "caption": "",
+                "position": 1726
+            }
+        ]
+    },
+    {
+        "header": "CCompute Breakdown",
+        "images": []
+    },
+    {
+        "header": "DPrompt Templates",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
