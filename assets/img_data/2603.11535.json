@@ -1,0 +1,270 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x1.png",
+                "caption": "Figure 1:evaluation loss for Dense, TC, and ET. Compared to TC, ET achieves a 0.067 final loss gap (TC vs ET), or equivalently reaching same performance level with 1.6x few tokens.",
+                "position": 337
+            }
+        ]
+    },
+    {
+        "header": "2Preliminaries: Routing as Constrained Optimization",
+        "images": []
+    },
+    {
+        "header": "3Expert Threshold",
+        "images": []
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x2.png",
+                "caption": "Figure 3:Cutoff stability vs expert usage tradeoff.TopSigned cutoff deviation relative to the EMA for EC at 512k batch size. ET stays at zero because routing uses the cutoff EMA directly.BottomExpert usage for EC at 512k and ET. ET varies around the capacity target while EC remains constant.",
+                "position": 770
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x3.png",
+                "caption": "(a)Per-token expert routing on a GSM8K passage.",
+                "position": 773
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x3.png",
+                "caption": "(a)Per-token expert routing on a GSM8K passage.",
+                "position": 776
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x4.png",
+                "caption": "(b)Expert activation heatmap.Top:EC with batch size 2k shows less specialization.Bottom:ET shows more extreme activation patterns, suggesting more domain-aware routing.",
+                "position": 781
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/figures_v2/analysis/ec_vs_et/activation_dynamics/ec_chunk1_a0999_fanout_vs_position.png",
+                "caption": "Figure 5:Activation dynamics for EC (2k) and ET. Both methods allocate more computation to early positions, with EC (2k) showing a sharper spike. Faint dashed curves show per-layer means and solid red curves show the global mean. When binned by loss, EC (2k) fanout rises monotonically while ET peaks early before declining.",
+                "position": 802
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/figures_v2/analysis/ec_vs_et/activation_dynamics/gec_warmup4000_a0999_fanout_vs_position.png",
+                "caption": "",
+                "position": 807
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/figures_v2/analysis/ec_vs_et/activation_dynamics/ec_chunk1_a0999_fanout_vs_loss_main.png",
+                "caption": "",
+                "position": 814
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/figures_v2/analysis/ec_vs_et/activation_dynamics/gec_warmup4000_a0999_fanout_vs_loss_main.png",
+                "caption": "",
+                "position": 815
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x5.png",
+                "caption": "Figure 6:EC performance across routing batch sizes.Training CE lossdecreases andCORE Eval scoreincreases with larger batches.",
+                "position": 844
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x6.png",
+                "caption": "Figure 7:Train loss EMA and eval loss for EC at different batch sizes and ET. Solid lines show train loss EMA and dashed lines show eval loss. EC (2k) shows a large train-eval discrepancy, while EC (512k) and ET remain closely aligned.",
+                "position": 861
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x7.png",
+                "caption": "Figure 8:Within-family checkpoint-pair routing consistency on a fixed validation stream, measured by weighted Jaccard. ET is consistently more stable than EC 2k and stays close to EC 64k. TC is competitive on nearby checkpoints but degrades more on longer ranges.",
+                "position": 881
+            }
+        ]
+    },
+    {
+        "header": "5Related Work",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "Impact Statement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AFuture Information Leakage for Expert Choice Models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/figures_v2/illustration/encoding.png",
+                "caption": "Figure 9:Illustration of the binary-search encoding strategy. The cutoff valueccpartitions the interval[0,1][0,1]into regions corresponding to different expert selection patterns, enablingNNbits of future information to be encoded in a single real-valued threshold.",
+                "position": 1987
+            }
+        ]
+    },
+    {
+        "header": "Appendix BArchitecture Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CTraining Setup Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DCORE Evaluation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix EAblations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x8.png",
+                "caption": "Figure 10:Effect of TopK warmup on ET training dynamics (first 8k steps). Before 4k steps, ET no warmup exhibits unstable threshold routing: (a) the cutoff-EMA lags behind the actual cutoff, (b) raw expert usage is low, and (c) starvation rate is high as the capacity lower bound is frequently triggered. ET no warmup relies only on the capacity factor during this stage, which is suboptimal because it does not provide a stable threshold estimate or balanced expert learning signal. With warmup, the cutoff-EMA trajectory stabilizes (d), and router outputs show lower variance in both logits (e) and gates (f). Note:ec_shared_bsz512kdoes not log raw usage and underflow metrics, so panels (b) and (c) show only the two ET runs.",
+                "position": 2645
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x9.png",
+                "caption": "",
+                "position": 2650
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x10.png",
+                "caption": "",
+                "position": 2651
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x11.png",
+                "caption": "",
+                "position": 2659
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x12.png",
+                "caption": "",
+                "position": 2660
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x13.png",
+                "caption": "",
+                "position": 2661
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x14.png",
+                "caption": "Figure 11:Layer-1 cutoff-EMA (expert 0) under EC/ET vs DeepSeek loss-free load balancing.",
+                "position": 2680
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x15.png",
+                "caption": "Figure 12:Comparison of evaluation loss with and without normalization. The configuration without normalization (blue) consistently achieves lower loss than the fanout-normalized variant (orange).",
+                "position": 2758
+            }
+        ]
+    },
+    {
+        "header": "Appendix FAdditional Experiment Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x16.png",
+                "caption": "Figure 13:Capacity constraint behavior during ET training (from step 4k onward, after warmup). (a) Raw expert usage before capacity capping. (b) Saturation rate: fraction of selected tokens dropped due to capacity limits. (c) Starvation rate: fraction of unused expert capacity. Both saturation and starvation rates remain low, confirming minimal train-inference mismatch.",
+                "position": 2777
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x17.png",
+                "caption": "Figure 14:Within-family checkpoint-pair routing consistency on a fixed validation stream, measured by joint JSD. Lower values indicate more stable routing. The same broad story remains. ET separates clearly from EC 2k and stays close to EC 64k.",
+                "position": 2888
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/figures_v2/analysis/ec_vs_et/activation_dynamics/ec_chunk1_a0999_fanout_vs_loss_by_layer.png",
+                "caption": "Figure 15:Layerwise mean fanout versus loss bin for the two main runs. EC 2k shows a stronger positive dependence in several layers, while ET remains more mixed across depth.",
+                "position": 2900
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/figures_v2/analysis/ec_vs_et/activation_dynamics/gec_warmup4000_a0999_fanout_vs_loss_by_layer.png",
+                "caption": "",
+                "position": 2905
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/figures_v2/analysis/ec_vs_et/activation_dynamics/ec_chunk4_a0999_fanout_vs_loss_main.png",
+                "caption": "Figure 16:Standalone EC 8k activation dynamics in the same form as the main figure. Faint dashed gray curves show the per-layer means and the solid red curve shows the global mean across layers. Compared with EC 2k, EC 8k is noticeably flatter across the loss range.",
+                "position": 2915
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/figures_v2/analysis/ec_vs_et/activation_dynamics/gec_thresh0_a0999_loss_vs_fanout_by_layer.png",
+                "caption": "Figure 17:Inverse layerwise activation diagnostics for the remaining three runs. Each panel plots mean loss against fanout by layer, highlighting how the loss–fanout relation remains setup dependent across ET no warmup, EC 64k, and EC 512k.",
+                "position": 2918
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/figures_v2/analysis/ec_vs_et/activation_dynamics/gec_normnone_a0999_loss_vs_fanout_by_layer.png",
+                "caption": "",
+                "position": 2923
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/figures_v2/analysis/ec_vs_et/activation_dynamics/gec_normnone_a0999_ep8_loss_vs_fanout_by_layer.png",
+                "caption": "",
+                "position": 2924
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/figures_v2/analysis/ec_vs_et/activation_dynamics/gec_warmup4000_a0999_routing_logits_hist_L1_E0.png",
+                "caption": "Figure 18:Router logit histograms from the warmup ET run. The bulk of the distribution is roughly bell shaped, with a heavier right tail. This asymmetric tail is consistent with activated tokens receiving reinforcing gradient signals that can further increase their logits. We view this figure as a qualitative appendix diagnostic rather than a core result.",
+                "position": 2941
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/figures_v2/analysis/ec_vs_et/activation_dynamics/gec_warmup4000_a0999_routing_logits_hist_L11_E15.png",
+                "caption": "",
+                "position": 2946
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x18.png",
+                "caption": "(a)GSM8K.",
+                "position": 2965
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x18.png",
+                "caption": "(a)GSM8K.",
+                "position": 2968
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x19.png",
+                "caption": "(b)HumanEval.",
+                "position": 2973
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x20.png",
+                "caption": "(a)GSM8K.",
+                "position": 2980
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x20.png",
+                "caption": "(a)GSM8K.",
+                "position": 2983
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x21.png",
+                "caption": "(b)HumanEval.",
+                "position": 2988
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x22.png",
+                "caption": "Figure 21:Token activation intensity on a HumanEval passage. Each token is colored by total fanout (sum of experts activated across all layers). Code-specific tokens (variable names, operators, keywords) receive higher activation than boilerplate text.",
+                "position": 2995
+            },
+            {
+                "img": "https://arxiv.org/html/2603.11535/2603.11535v1/x23.png",
+                "caption": "Figure 22:Expert activation heatmaps across routing configurations. Each row corresponds to a routing variant (EC with batch sizes 2k, 8k, 64k, 512k, and ET). Columns show HumanEval (code) and GSM8K (math) domains. Color intensity indicates expert token ratio. Specialization sharpens with larger EC batch sizes, and ET achieves comparable patterns without batch size dependence.",
+                "position": 3014
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
