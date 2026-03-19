@@ -1,0 +1,909 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/sections/teaser_screenshot_5dice_onlyimg_OLD.png",
+                "caption": "Figure 1:V-JEPA 2.1 unlocks high-quality dense features.We compute PCA on patch features extracted from the same image or video and map the top three components to RGB channels for both V-JEPA 2 (ViT-g) and V-JEPA 2.1 (ViT-G).\nOur novel V-JEPA 2.1 produces dense representations with strong spatial and temporal consistency, learning semantically coherent features where similar objects map to the same PCA components.",
+                "position": 390
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/x1.png",
+                "caption": "Figure 2:V-JEPA 2.1 ViT-G performance across dense and global prediction tasks.We show the relative improvements of V-JEPA 2.1 compared to the previous V-JEPA 2 ViT-g model(Assran et al.,2025). We also report the performance of previous SOTA models using a frozen backbone evaluation: DINOv3(Siméoni et al.,2025)is the reference model for depth estimation, object tracking, semantic segmentation, SSv2 action recognition, and image classification; InternVideo2s(Wang et al.,2024b)for K400 action recognition, STAformer(Mur-Labadia et al.,2024)for short-term object interaction anticipation, and PlausiVL(Mittal et al.,2024)for action anticipation.\nTasks where V-JEPA 2.1 ViT-G obtains SOTA in frozen-backbone evaluation areunderlined.",
+                "position": 414
+            }
+        ]
+    },
+    {
+        "header": "2Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/PCA_methods/imgs/step92_img.png",
+                "caption": "Figure 3:Influence of the context lossℒc​t​x\\mathcal{L}_{ctx}.We show PCA visualizations of the feature map representations learned with V-JEPA 2 and with a model trained using V-JEPA 2 plus ourℒc​t​x\\mathcal{L}_{ctx}loss.\nWhile V-JEPA features only show fragmented local spatial structure, explicitly supervising unmasked regions withℒc​t​x\\mathcal{L}_{ctx}leads to feature maps that exhibit coherent spatial structure. Similar semantic parts (e.g., heads of dogs, wheels of cars) are mapped to the same PCA components.",
+                "position": 494
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/PCA_methods/imgs/step105_img.png",
+                "caption": "",
+                "position": 507
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/PCA_methods/original_vjepa2/step92_features.png",
+                "caption": "",
+                "position": 518
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/PCA_methods/original_vjepa2/step105_features.png",
+                "caption": "",
+                "position": 522
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/PCA_methods/plus_context_loss/step92_features.png",
+                "caption": "",
+                "position": 533
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/PCA_methods/plus_context_loss/step105_features.png",
+                "caption": "",
+                "position": 537
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/diagrams/architecture_vjepa2_1.jpg",
+                "caption": "Figure 4:V-JEPA 2.1 Detailed Architecture.Images and videos are processed by respectively either a 2D or 3D Convolutional patch embedding. Then, 3D Rotational Positional Encoding (RoPE) and learnable modality embedding are added. Thex−x-encoder processes the visible tokens and outputs multi-level embeddings formed by concatenating the normalized output from intermediate encoder blocks. Then, a MLP fuses this multi-level representation and reduces its dimensionality. These context tokens are concatenated with learnable mask tokens carrying spatio-temporal positional information. The predictor processes the combined sequence and produces multi-level predictions for the masked tokens.\nTraining uses two different losses: (i) an L1 loss on masked-token predictions (the original V-JEPA objective), and (ii) a distance-weighted L1 loss on nearby context tokens, both supervised using theyy-encoder multi-level outputs.",
+                "position": 581
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/x2.png",
+                "caption": "Figure 5:Impact of individual components of our novel V-JEPA 2.1 training recipe.The ablation is conducted starting from a ViT-L architecture, on single-image semantic segmentation on ADE20k, and action classification on SSv2. IntroducingWeighted-Context Self-Supervisionwith the context loss significantly improves segmentation, at the cost of classification.Deep Self-Supervisionallows to retrieve the performance, and further improving segmentation. Scaling the image data with VisionMix 163M dataset, combined with aMulti-Modal Tokenizerfurther improve the results. Finally, the recipescaleswith model size and high resolutioncool-down.",
+                "position": 613
+            }
+        ]
+    },
+    {
+        "header": "3Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/STA/sta_diagram.drawio.png",
+                "caption": "Figure 6:Short-Term Anticipation task.Given a video observed up to timett(denotedV:tV_{:t}), the model predicts a set of future object–interaction events. Each prediction includes: (i) a bounding box localizing the object that will be interacted with, (ii) the noun class of that object, (iii) a verb class describing the upcoming interaction, and (iv) the anticipation timeδ\\delta, i.e., the number of seconds between the current frame and the start of the interaction. Ground-truth labels are derived from the contact frameVt+δV_{t+\\delta}, but are expressed in the coordinate frame of the last observed frameVtV_{t}.",
+                "position": 996
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/STA/3b609b23-f91d-43da-9918-ce928181f53f_0007244.jpg",
+                "caption": "Figure 7:Short-Term Anticipation (STA) qualitative results.We compare our model predictions with the ground-truth data. V-JEPA 2.1 predicts multiple scenarios, where the predicted object and verb classes correspond with plausible human-object interactions.",
+                "position": 1303
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/STA/3b609b23-f91d-43da-9918-ce928181f53f_0007244_GT.jpg",
+                "caption": "",
+                "position": 1313
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/STA/5b97f47f-f015-46f3-8879-3fcc2a61a728_0110317.jpg",
+                "caption": "",
+                "position": 1314
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/STA/5b97f47f-f015-46f3-8879-3fcc2a61a728_0110317_GT.jpg",
+                "caption": "",
+                "position": 1315
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/STA/cde41c4f-50d1-4910-9f2a-4c7b6987df92_0001544.jpg",
+                "caption": "",
+                "position": 1318
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/STA/cde41c4f-50d1-4910-9f2a-4c7b6987df92_0001544_GT.jpg",
+                "caption": "",
+                "position": 1319
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/STA/cde41c4f-50d1-4910-9f2a-4c7b6987df92_0003770.jpg",
+                "caption": "",
+                "position": 1320
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/STA/cde41c4f-50d1-4910-9f2a-4c7b6987df92_0003770_GT.jpg",
+                "caption": "",
+                "position": 1321
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/x3.png",
+                "caption": "Figure 8:Zero-shot evaluation of VJEPA 2 and VJEPA 2.1 models on a table-top Franka Panda robot arm with a parallel-jaw gripper, demonstratingGraspof a cup using visual goal specification via model-predictive control.\nVJEPA 2.1 features better encode depth information, leading to an improvement in robot manipulation when grasping the cup involves reasoning over actions along the depth axis of the camera.",
+                "position": 1517
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/x4.png",
+                "caption": "Figure 9:Planning Navigation Trajectories in Latent Space.V-JEPA 2.1 enables10×10\\timesfaster and more accurate navigation planning compared to(Bar et al.,2025). We show PCA visualizations of 8 denoising steps of the planned latent trajectory between a start frame and a goal frame.",
+                "position": 1527
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/depth_paper/imgs/image_337.png",
+                "caption": "Figure 10:Depth estimation comparison on NYU and KITTI datasets.While V-JEPA 2 captures the overall scene geometry, its predictions lack local consistency and precise boundary structure. In contrast, our V-JEPA 2.1 produces sharper, more coherent, and fine-grained depth maps.",
+                "position": 1790
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/depth_paper/imgs/image_385.png",
+                "caption": "",
+                "position": 1803
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/depth_paper/imgs/image_235.png",
+                "caption": "",
+                "position": 1804
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/depth_paper/imgs/image_99.png",
+                "caption": "",
+                "position": 1805
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/depth_paper/vjepa2/pred_337.png",
+                "caption": "",
+                "position": 1812
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/depth_paper/vjepa2/pred_385.png",
+                "caption": "",
+                "position": 1813
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/depth_paper/vjepa2/pred_235.png",
+                "caption": "",
+                "position": 1814
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/depth_paper/vjepa2/pred_99.png",
+                "caption": "",
+                "position": 1815
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/depth_paper/ours/pred_337.png",
+                "caption": "",
+                "position": 1823
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/depth_paper/ours/pred_385.png",
+                "caption": "",
+                "position": 1824
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/depth_paper/ours/pred_235.png",
+                "caption": "",
+                "position": 1825
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/depth_paper/ours/pred_99.png",
+                "caption": "",
+                "position": 1826
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/image_decoder_linear_lr_0_00150000_wd_0_01000000_110.jpg",
+                "caption": "Figure 11:Semantic segmentation qualitative results in VOC12 and Cityscapes datasets.The previous version, V-JEPA 2, produced sparse semantic masks due to the presence noisy feature maps. However, V-JEPA 2.1 achieves competitive performance with state of the art methods such as DINOv3 ViT-H+.",
+                "position": 1831
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/gt_decoder_linear_lr_0_00008000_wd_0_00010000_110.jpg",
+                "caption": "",
+                "position": 1866
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/dino_110.jpg",
+                "caption": "",
+                "position": 1870
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/pred_decoder_linear_lr_0_00008000_wd_0_00010000_110.jpg",
+                "caption": "",
+                "position": 1874
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/ours_110.jpg",
+                "caption": "",
+                "position": 1878
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/image_decoder_linear_lr_0_00150000_wd_0_01000000_23.jpg",
+                "caption": "",
+                "position": 1884
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/gt_decoder_linear_lr_0_00008000_wd_0_00010000_23.jpg",
+                "caption": "",
+                "position": 1888
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/dino_23.jpg",
+                "caption": "",
+                "position": 1892
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/pred_decoder_linear_lr_0_00008000_wd_0_00010000_23.jpg",
+                "caption": "",
+                "position": 1896
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/ours_23.jpg",
+                "caption": "",
+                "position": 1900
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/image_decoder_linear_lr_0_00150000_wd_0_01000000_209.jpg",
+                "caption": "",
+                "position": 1906
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/gt_decoder_linear_lr_0_00008000_wd_0_00010000_209.jpg",
+                "caption": "",
+                "position": 1910
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/dino_209.jpg",
+                "caption": "",
+                "position": 1914
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/pred_decoder_linear_lr_0_00008000_wd_0_00010000_209.jpg",
+                "caption": "",
+                "position": 1918
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/ours_209.jpg",
+                "caption": "",
+                "position": 1922
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/qualitative_cityscapes_semantic_segm/_img1.jpg",
+                "caption": "",
+                "position": 1928
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/qualitative_cityscapes_semantic_segm/_gt2.jpg",
+                "caption": "",
+                "position": 1932
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/qualitative_cityscapes_semantic_segm/_dinov31.jpg",
+                "caption": "",
+                "position": 1936
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/qualitative_cityscapes_semantic_segm/_vjepa_2.jpg",
+                "caption": "",
+                "position": 1940
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/qualitative_cityscapes_semantic_segm/_ours2.jpg",
+                "caption": "",
+                "position": 1944
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/qualitative_cityscapes_semantic_segm/_img0.jpg",
+                "caption": "",
+                "position": 1950
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/qualitative_cityscapes_semantic_segm/_gt0.jpg",
+                "caption": "",
+                "position": 1954
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/qualitative_cityscapes_semantic_segm/_dinov30.jpg",
+                "caption": "",
+                "position": 1958
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/qualitative_cityscapes_semantic_segm/_vjepa_0.jpg",
+                "caption": "",
+                "position": 1962
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/qualitative_cityscapes_semantic_segm/_ours0.jpg",
+                "caption": "",
+                "position": 1966
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/depth_paper/depth_vs_dino.jpg",
+                "caption": "Figure 12:Qualitative comparative of V-JEPA 2.1 ViT-G vs DINOv3 ViT-H++.V-JEPA 2.1 captures fine-grained details (i.e the traffic light contour) and obtains better scale consistency. In the two rightmost columns, DINOv3 mislabel the depth of the green object on the bed, and the TV, and detect them closer to the camera than they are.",
+                "position": 1988
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/DAVIS/gt_3.jpg",
+                "caption": "Figure 13:Video Object Segmentation qualitative examples.Given the ground-truth object masks for the initial frame, we propagate the instance masks to subsequent frames based on patch similarity within the V-JEPA 2.1 embedding space. All videos are processed at a resolution where the shorter side is set to 480 pixels.",
+                "position": 2027
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/DAVIS/davis_3_ours_5.jpg",
+                "caption": "",
+                "position": 2043
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/DAVIS/davis_3_ours_4.jpg",
+                "caption": "",
+                "position": 2047
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/DAVIS/davis_3_ours_3.jpg",
+                "caption": "",
+                "position": 2051
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/DAVIS/davis_3_ours_2.jpg",
+                "caption": "",
+                "position": 2055
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/DAVIS/davis_3_ours_1.jpg",
+                "caption": "",
+                "position": 2059
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/DAVIS/gt_20.jpg",
+                "caption": "",
+                "position": 2065
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/DAVIS/davis_20_ours_5.jpg",
+                "caption": "",
+                "position": 2069
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/DAVIS/davis_20_ours_4.jpg",
+                "caption": "",
+                "position": 2073
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/DAVIS/davis_20_ours_3.jpg",
+                "caption": "",
+                "position": 2077
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/DAVIS/davis_20_ours_2.jpg",
+                "caption": "",
+                "position": 2081
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/qualitative_voc12/DAVIS/davis_20_ours_1.jpg",
+                "caption": "",
+                "position": 2085
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step1_img.jpg",
+                "caption": "Figure 14:Comparison of dense features produced by different SSL methods on a single image.We compare DINOv2 ViT-g(Oquab et al.,2023), DINOv3 ViT-H+(Siméoni et al.,2025)and V-JEPA 2 ViT-g(Assran et al.,2025)against V-JEPA 2.1 ViT-G. Images are resized so that their shorter side is set to 1024 pixels, after which they are processed using the 2D convolution image tokenizer.",
+                "position": 2523
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step1_dinov2.jpg",
+                "caption": "",
+                "position": 2560
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step1_dinov3.jpg",
+                "caption": "",
+                "position": 2565
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step1_vjepa2.jpg",
+                "caption": "",
+                "position": 2570
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step1_ours_210.jpg",
+                "caption": "",
+                "position": 2575
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step6_img.jpg",
+                "caption": "",
+                "position": 2582
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step6_dinov2.jpg",
+                "caption": "",
+                "position": 2587
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step6_dinov3.jpg",
+                "caption": "",
+                "position": 2592
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step6_features.jpg",
+                "caption": "",
+                "position": 2597
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step6_ours.jpg",
+                "caption": "",
+                "position": 2602
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step26_img.jpg",
+                "caption": "",
+                "position": 2609
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step26_dinov2.jpg",
+                "caption": "",
+                "position": 2614
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step26_dinov3.jpg",
+                "caption": "",
+                "position": 2619
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step26_vjepa2.jpg",
+                "caption": "",
+                "position": 2624
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step26_ours.jpg",
+                "caption": "",
+                "position": 2629
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step46_img.jpg",
+                "caption": "",
+                "position": 2636
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step46_dinov2.jpg",
+                "caption": "",
+                "position": 2641
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step46_dinov3.jpg",
+                "caption": "",
+                "position": 2646
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step46_vjepa2.jpg",
+                "caption": "",
+                "position": 2651
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/cityscapes_imgs/step46_ours.jpg",
+                "caption": "",
+                "position": 2656
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step23_img.jpg",
+                "caption": "",
+                "position": 2663
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step23_dinov2.jpg",
+                "caption": "",
+                "position": 2668
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step23_dinov3.jpg",
+                "caption": "",
+                "position": 2673
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step23_vjepa2.jpg",
+                "caption": "",
+                "position": 2678
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step23_ours.jpg",
+                "caption": "",
+                "position": 2683
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step10_img.jpg",
+                "caption": "",
+                "position": 2690
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step10_dinov2.jpg",
+                "caption": "",
+                "position": 2695
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step10_dinov3.jpg",
+                "caption": "",
+                "position": 2700
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step10_vjepa2.jpg",
+                "caption": "",
+                "position": 2705
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step10_ours.jpg",
+                "caption": "",
+                "position": 2710
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step16_img.jpg",
+                "caption": "",
+                "position": 2717
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step16_dinov2.jpg",
+                "caption": "",
+                "position": 2722
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step16_dinov3.jpg",
+                "caption": "",
+                "position": 2727
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step16_vjepa2.jpg",
+                "caption": "",
+                "position": 2732
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step16_ours.jpg",
+                "caption": "",
+                "position": 2737
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step27_img.jpg",
+                "caption": "",
+                "position": 2744
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step27_dinov2.jpg",
+                "caption": "",
+                "position": 2749
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step27_dinov3.jpg",
+                "caption": "",
+                "position": 2754
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step27_vjepa2.jpg",
+                "caption": "",
+                "position": 2759
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step27_ours.jpg",
+                "caption": "",
+                "position": 2764
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step34_img.jpg",
+                "caption": "",
+                "position": 2771
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step34_dinov2.jpg",
+                "caption": "",
+                "position": 2776
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step34_dinov3.jpg",
+                "caption": "",
+                "position": 2781
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step34_vjepa2.jpg",
+                "caption": "",
+                "position": 2786
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step34_ours.jpg",
+                "caption": "",
+                "position": 2791
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step35_img.jpg",
+                "caption": "",
+                "position": 2798
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step35_dinov2.jpg",
+                "caption": "",
+                "position": 2803
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step35_dinov3.jpg",
+                "caption": "",
+                "position": 2808
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step35_vjepa2.jpg",
+                "caption": "",
+                "position": 2813
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/voc12_images/step35_ours.jpg",
+                "caption": "",
+                "position": 2818
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_101/1.jpg",
+                "caption": "Figure 15:V-JEPA 2.1 unlocks dense features from video.Qualitative results on Ego4D (1080px), Cityscapes (1080px), Diving48 (768px), and MOCA (768px) illustrate the strong temporal consistency of the dense features produced by our ViT-G model, particularly on dynamic objects. Since we process entire video sequences, we employ the 3D convolutional video tokenizer.",
+                "position": 2825
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_101/3.jpg",
+                "caption": "",
+                "position": 2828
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_101/5.jpg",
+                "caption": "",
+                "position": 2829
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_101/6.jpg",
+                "caption": "",
+                "position": 2830
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_101/8.jpg",
+                "caption": "",
+                "position": 2831
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_101/1_.jpg",
+                "caption": "",
+                "position": 2833
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_101/3_.jpg",
+                "caption": "",
+                "position": 2834
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_101/5_.jpg",
+                "caption": "",
+                "position": 2835
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_101/6_.jpg",
+                "caption": "",
+                "position": 2836
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_101/8_.jpg",
+                "caption": "",
+                "position": 2837
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_202/1.jpg",
+                "caption": "",
+                "position": 2839
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_202/3.jpg",
+                "caption": "",
+                "position": 2840
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_202/5.jpg",
+                "caption": "",
+                "position": 2841
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_202/6.jpg",
+                "caption": "",
+                "position": 2842
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_202/8.jpg",
+                "caption": "",
+                "position": 2843
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_202/1_.jpg",
+                "caption": "",
+                "position": 2845
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_202/3_.jpg",
+                "caption": "",
+                "position": 2846
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_202/5_.jpg",
+                "caption": "",
+                "position": 2847
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_202/6_.jpg",
+                "caption": "",
+                "position": 2848
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/video_202/8_.jpg",
+                "caption": "",
+                "position": 2849
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/weimar_13/imgs7.jpg",
+                "caption": "",
+                "position": 2851
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/weimar_13/imgs5.jpg",
+                "caption": "",
+                "position": 2852
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/weimar_13/imgs3.jpg",
+                "caption": "",
+                "position": 2853
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/weimar_13/imgs2.jpg",
+                "caption": "",
+                "position": 2854
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/weimar_13/imgs1.jpg",
+                "caption": "",
+                "position": 2855
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/weimar_13/ours11.jpg",
+                "caption": "",
+                "position": 2857
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/weimar_13/ours7.jpg",
+                "caption": "",
+                "position": 2858
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/weimar_13/ours3.jpg",
+                "caption": "",
+                "position": 2859
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/weimar_13/ours2.jpg",
+                "caption": "",
+                "position": 2860
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/weimar_13/ours1.jpg",
+                "caption": "",
+                "position": 2861
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/pez/scorpion_fish1.jpg",
+                "caption": "",
+                "position": 2863
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/pez/scorpion_fish2.jpg",
+                "caption": "",
+                "position": 2864
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/pez/scorpion_fish3.jpg",
+                "caption": "",
+                "position": 2865
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/pez/scorpion_fish4.jpg",
+                "caption": "",
+                "position": 2866
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/pez/scorpion_fish5.jpg",
+                "caption": "",
+                "position": 2867
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/pez/pca_scorpion_fish1.jpg",
+                "caption": "",
+                "position": 2869
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/pez/pca_scorpion_fish2.jpg",
+                "caption": "",
+                "position": 2870
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/pez/pca_scorpion_fish3.jpg",
+                "caption": "",
+                "position": 2871
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/pez/pca_scorpion_fish4.jpg",
+                "caption": "",
+                "position": 2872
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/pez/pca_scorpion_fish5.jpg",
+                "caption": "",
+                "position": 2873
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/diving_4/first_frame.jpg",
+                "caption": "",
+                "position": 2875
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/diving_4/img5.jpg",
+                "caption": "",
+                "position": 2876
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/diving_4/img7.jpg",
+                "caption": "",
+                "position": 2877
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/diving_4/img9.jpg",
+                "caption": "",
+                "position": 2878
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/diving_4/img11.jpg",
+                "caption": "",
+                "position": 2879
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/diving_4/diving_4_pcahres1.jpg",
+                "caption": "",
+                "position": 2881
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/diving_4/diving_4_pcahres2.jpg",
+                "caption": "",
+                "position": 2882
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/diving_4/diving_4_pcahres3.jpg",
+                "caption": "",
+                "position": 2883
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/diving_4/diving_4_pcahres4.jpg",
+                "caption": "",
+                "position": 2884
+            },
+            {
+                "img": "https://arxiv.org/html/2603.14482/2603.14482v2/diving_4/diving_4_pcahres5.jpg",
+                "caption": "",
+                "position": 2885
+            }
+        ]
+    },
+    {
+        "header": "4Related work",
+        "images": []
+    },
+    {
+        "header": "5Conclusion and Future work",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "6Pretraining details",
+        "images": []
+    },
+    {
+        "header": "7Distillation details",
+        "images": []
+    },
+    {
+        "header": "8Evaluation protocols",
+        "images": []
+    },
+    {
+        "header": "9Additional Ablations",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
