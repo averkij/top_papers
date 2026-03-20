@@ -1,0 +1,112 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.18815/2603.18815v1/x1.png",
+                "caption": "Figure 1:Coupled vs. decoupled designs.Left:Existing frameworks often embed the full agentic rollout lifecycle inside the RL training stack.Right:ProRL Agenttreats rollout as an independent HTTP service. The trainer submits rollout requests and receives completed trajectories and rewards, while the rollout server handles environment execution, tool use, evaluation, and inference coordination. This decoupled design improves resource isolation, portability, and extensibility.",
+                "position": 341
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3System Design: Training–Rollout Decoupling",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.18815/2603.18815v1/x2.png",
+                "caption": "Figure 2:Overview of theProRL Agentarchitecture. The system consists of three components.(1) Sandbox Environment: each rollout is executed inside aSingularityRuntimecontainer and orchestrated viaAgentHandler, which exposes three lifecycle methods includinginit(),run(), andeval()for environment setup, multi-turn agent execution, and reward scoring, respectively.(2) ProRL Agent Server: an HTTP service that manages rollouts through a three-stage asynchronous pipeline (INIT→\\toRUN→\\toEVAL) with independent worker pools, and maintains a min-heap LLM backend pool supporting dynamic registration and checkpoint swapping.(3) RL Trainer: any training framework (e.g., veRL, NeMo RL) interacts with the server solely via HTTP, submitting jobs viaPOST processand managing backends viaadd_llm_serverand/cancel; completed trajectories and rewards are returned to the trainer to update the policy.",
+                "position": 464
+            },
+            {
+                "img": "https://arxiv.org/html/2603.18815/2603.18815v1/x3.png",
+                "caption": "Figure 3:Comparison of DAPO implementations (n=4n=4). Our efficient implementation optimizes worker synchronization, significantly reducing the idle time (waiting period) between rollout generations compared to the baseline batch-by-batch approach.",
+                "position": 897
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.18815/2603.18815v1/x4.png",
+                "caption": "(a)STEM agent.",
+                "position": 1040
+            },
+            {
+                "img": "https://arxiv.org/html/2603.18815/2603.18815v1/x4.png",
+                "caption": "(a)STEM agent.",
+                "position": 1043
+            },
+            {
+                "img": "https://arxiv.org/html/2603.18815/2603.18815v1/x5.png",
+                "caption": "(b)Math agent.",
+                "position": 1048
+            },
+            {
+                "img": "https://arxiv.org/html/2603.18815/2603.18815v1/x6.png",
+                "caption": "(c)Code agent.",
+                "position": 1053
+            },
+            {
+                "img": "https://arxiv.org/html/2603.18815/2603.18815v1/figures/fig4_throughput.png",
+                "caption": "Figure 5:Rollout throughput (instances/sec) on software engineering tasks versus the number of compute nodes. The near-linear increase in throughput demonstrates thatProRL Agentscales efficiently with additional compute resources.",
+                "position": 1128
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.18815/2603.18815v1/figures/prorl_agent.png",
+                "caption": "Figure 6:ProRL Agentseparates the full agentic rollout lifecycle, spanning environment management to reward computation, from GPU-intensive training, thereby decoupling I/O-intensive rollout from training.",
+                "position": 1707
+            },
+            {
+                "img": "https://arxiv.org/html/2603.18815/2603.18815v1/figures/sky_rl_agent.png",
+                "caption": "Figure 7:SkyRL-Agent.The training driver runs concurrent trajectory-generation coroutines on a single CPU process. It controls the multi-turn agent loop, queries a remote vLLM server for inference, and interacts with remote environment containers for execution. Although inference and environment execution are offloaded, rollout control remains inside the training driver.",
+                "position": 1710
+            },
+            {
+                "img": "https://arxiv.org/html/2603.18815/2603.18815v1/figures/agent_lightning.png",
+                "caption": "Figure 8:Agent Lightning.Agent Lightning places the training loop, theLightningStoreServer, and all rollout workers within a single process tree. The store runs as a background thread, while rollout workers are spawned as child processes from the trainer. As a result, rollout does not have an independent service lifecycle: if the training process terminates, the store also stops and the rollout workers are disrupted. Thus, rollout remains managed within the training stack rather than being cleanly decoupled.",
+                "position": 1714
+            },
+            {
+                "img": "https://arxiv.org/html/2603.18815/2603.18815v1/figures/verl_tool.png",
+                "caption": "Figure 9:VeRL-Tool.VeRL-Tool extends the standard veRL trainer to support multi-turn agent rollouts. The training system manages the agent loop and trajectory collection, while tool execution is offloaded to a separate CPU-based environment service. In this design, rollout control remains inside the trainer.",
+                "position": 1717
+            },
+            {
+                "img": "https://arxiv.org/html/2603.18815/2603.18815v1/figures/rllm.png",
+                "caption": "Figure 10:rLLM: rollout embedded in a monolithic training driver.rLLM is built on a heavily modified fork of veRL. The agent loop, environment management, and trajectory orchestration all reside within a single driver process. There is no independent rollout service, no persistent trajectory buffer, and no possibility of the rollout surviving independently of the training driver. The full rollout lifecycle remains tightly coupled with the training stack.",
+                "position": 1720
+            },
+            {
+                "img": "https://arxiv.org/html/2603.18815/2603.18815v1/figures/gem.png",
+                "caption": "Figure 11:GEM.GEM keeps environment execution inside the training process. Environments are instantiated as in-memory Python objects, and environment stepping is performed through directenv.step()calls, with parallelism provided only byThreadPoolExecutorthreads in the same address space. A single driver process orchestrates both rollout and training, while GPU workers are accessed remotely via Ray RPC. As a result, the environment and rollout lifecycle remain fully embedded in the training stack.",
+                "position": 1723
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
