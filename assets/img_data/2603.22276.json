@@ -1,0 +1,161 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Factored Norm Computation",
+        "images": []
+    },
+    {
+        "header": "3Fused Triton Kernels",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.22276/2603.22276v1/x1.png",
+                "caption": "Figure 1:The stable compose form achieves3.03.0× lower peak error\nnearg≈1g\\approx 1(bf16,dout=8192d_{\\text{out}}=8192,din=2048d_{\\text{in}}=2048).\nThe naive formg⊙(s⋅lora+base)−baseg\\odot(s\\cdot\\text{lora}+\\text{base})-\\text{base}exhibits catastrophic cancellation; the stable form and fused kernel both\nremain near the bf16 quantization floor. Reference: fp64.",
+                "position": 832
+            }
+        ]
+    },
+    {
+        "header": "4Runtime Dispatch",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.22276/2603.22276v1/x2.png",
+                "caption": "Figure 2:Three-tier dispatch: fused backward for training (Tier 1),\nfused forward for inference (Tier 2), eager fallback for CPU,\nno-Triton, or sub-crossover shapes (Tier 3).",
+                "position": 908
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.22276/2603.22276v1/x3.png",
+                "caption": "Figure 3:Gradient-computation speedup across six VLMs on three GPUs\n(bf16,r=384r\\!=\\!384, seq=4096). (a) Fused vs. the HF PEFT DoRA baseline:1.461.46–1.871.87×. (b) Fused vs. eager:1.181.18–1.241.24×. 32B models OOM on RTX 6000 PRO under all\nconfigurations.",
+                "position": 1351
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22276/2603.22276v1/x4.png",
+                "caption": "Figure 4:Inference speedup:1.51.5–2.02.0× over the HF PEFT DoRA baseline.\nAll six models run on all three GPUs, including 32B on RTX 6000 PRO\n(96 GB) that OOM during gradient computation.",
+                "position": 1358
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22276/2603.22276v1/x5.png",
+                "caption": "Figure 5:Dense (B@A) position in the eager-to-fused gap (0% = eager,\n100% = fused). Negative values: dense (B@A) isslowerthan eager.\nThe benefit is GPU-bandwidth-sensitive; the factored approach is robust.",
+                "position": 1460
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22276/2603.22276v1/x6.png",
+                "caption": "Figure 6:Compose kernel speedup vs. eager (bf16) across six GPUs.\n(a) Forward:1.51.5–4.54.5×. (b) Autograd: gains compound\nwith activation size.",
+                "position": 1479
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22276/2603.22276v1/x7.png",
+                "caption": "Figure 7:Bandwidth utilization (fp32, six GPUs). Fused approaches∼50%{\\sim}50\\%of peak on all architectures; eager values are approximate\nlower bounds.",
+                "position": 1497
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22276/2603.22276v1/x8.png",
+                "caption": "Figure 8:Backward speedup (bf16). Below∼4096×4096{\\sim}4096\\times 4096, launch\noverhead dominates; above∼8192×8192{\\sim}8192\\times 8192, fused wins on all GPUs.",
+                "position": 1519
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22276/2603.22276v1/x9.png",
+                "caption": "Figure 9:Norm memory reduction. (a) Theoretical persistent working set.\n(b) Measured allocator delta. The MoE shape8192×286728192\\times 28672achieves1111× measured reduction.",
+                "position": 1536
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22276/2603.22276v1/x10.png",
+                "caption": "Figure 10:Norm latency vs. rank (RTX 6000 PRO, fp32). The PEFT time is\nconstant inrr; factored scales linearly. Atr≤128r\\leq 128, factored\nmatches the reference due to reduced memory traffic.",
+                "position": 1625
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22276/2603.22276v1/x11.png",
+                "caption": "Figure 11:Memory profile (H200, bf16,d=4096d\\!=\\!4096, bs=4, seq=2048).\n(a) Fused reduces forward peak by 64 MB.\n(b) Savings grow with batch×seq; backward peak is unchanged.",
+                "position": 1643
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22276/2603.22276v1/x12.png",
+                "caption": "Figure 12:Convergence: eager vs. fused are visually indistinguishable\n(Qwen3.5-9B-Base,r=384r\\!=\\!384, seed 3 of 3).\n(a) Training loss (25-step smoothing). (b) Eval loss (200-step intervals).\n(c) Gradient norms.",
+                "position": 1900
+            }
+        ]
+    },
+    {
+        "header": "6Discussion",
+        "images": []
+    },
+    {
+        "header": "7Related Work",
+        "images": []
+    },
+    {
+        "header": "8Conclusion",
+        "images": []
+    },
+    {
+        "header": "Data Availability",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AForward Contract and Execution Semantics",
+        "images": []
+    },
+    {
+        "header": "Appendix BImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CKernel Specifications",
+        "images": []
+    },
+    {
+        "header": "Appendix DReproducibility",
+        "images": []
+    },
+    {
+        "header": "Appendix EFull Model-Level Memory Table",
+        "images": []
+    },
+    {
+        "header": "Appendix FSingle-Layer E2E Decomposition",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.22276/2603.22276v1/x13.png",
+                "caption": "Figure 13:Single-layer E2E overhead decomposition (B200, bf16,d=4096d=4096,\nbs=4, seq=2048). Single-layer E2E does not predict model-level speedup:\ncompose gains compound across∼\\sim500 DoRA modules while per-layer\nbackward overhead is amortized.",
+                "position": 3313
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22276/2603.22276v1/x14.png",
+                "caption": "Figure 14:Single-layer E2E speedup (eager/fused) across six GPUs and ranks\n(bf16,d=4096d=4096, bs=4, seq=2048). All GPUs show consistent improvement.",
+                "position": 3319
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22276/2603.22276v1/x15.png",
+                "caption": "Figure 15:Single-layer E2E speedup vs. hidden dimension (bf16,r=384r=384,\nsix GPUs). The benefit peaks ath=3072h=3072–40964096, corresponding to\ncommon LLM sizes.",
+                "position": 3323
+            }
+        ]
+    },
+    {
+        "header": "Appendix GFramework Survey",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
