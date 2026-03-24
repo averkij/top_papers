@@ -1,0 +1,208 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3From Language to World Models: The Fluid Architecture Lineage",
+        "images": []
+    },
+    {
+        "header": "4Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x1.png",
+                "caption": "Figure 1:FluidWorldarchitecture overview.Top row:The prediction pipeline. An input framextx_{t}(64×\\times64 pixels) is encoded by three PDE-based layers that use Laplacian diffusion to extract spatial features. These features are written into a persistentBeliefField, a 16×\\times16 latent state that accumulates temporal context. The BeliefField evolves via internal PDE dynamics to predict the next state, which the decoder converts back to pixels. During autoregressive rollout, each prediction becomes the next input (purple arrow).Bottom row:Key components. The Laplacian kernel ([1,−2,1][1,-2,1]) provides spatial information propagation atO​(N)O(N)cost without attention. The BeliefField combines GRU-gated writing with PDE evolution and Titans persistent memory. Biologically-inspired mechanisms (lateral inhibition, Hebbian diffusion, synaptic fatigue) promote diverse, structured representations. The entire model uses∼{\\sim}801K parameters (Table1).",
+                "position": 526
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x2.png",
+                "caption": "Figure 2:How Laplacian diffusion enables self-repair.Top row (a–d):The heat equation analogy. A concentrated energy spike (a) spreads via diffusion (b) until reaching equilibrium (c). The Laplacian kernel[1,−2,1][1,-2,1](d) computes the difference between a position and its neighbors; this single operation drives all spatial propagation inFluidWorld.Bottom row (e–h):Application to prediction errors. A clean prediction (e) accumulates noise during autoregressive rollout (f). The Laplacian smooths away high-frequency errors (g), recovering coherent spatial structure. Panel (h) summarizes why this matters: Transformers have no diffusion mechanism (errors compound), ConvLSTMs have only local kernels (slow dissipation), butFluidWorld’s Laplacian provides global error correction at every integration step.",
+                "position": 529
+            }
+        ]
+    },
+    {
+        "header": "5Scaling Experiment: PDE vs Transformer vs ConvLSTM",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x3.png",
+                "caption": "Figure 3:Training dynamics comparison (three-way).(a) Reconstruction loss: PDE and ConvLSTM converge to2×2\\timeslower error than Transformer. (b) Prediction loss: all three converge to comparable values. (c) Spatial Std: PDE maintains the highest spatial structure throughout training. (d) Effective Rank: PDE uses the most representational dimensions. All models have∼\\sim800K parameters, identical data and losses.",
+                "position": 1205
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x4.png",
+                "caption": "Figure 4:Final comparison at step 8,000.Single-step metrics are comparable across all three models (∼\\sim800K parameters each). The PDE achieves the highest spatial structure and effective dimensionality.",
+                "position": 1208
+            }
+        ]
+    },
+    {
+        "header": "6Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x5.png",
+                "caption": "Figure 5:PDE diffusion scalesO​(N)O(N); attention scalesO​(N2)O(N^{2}). At128×128128\\!\\times\\!128the ratio exceeds16,000×16{,}000\\times.",
+                "position": 1290
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x6.png",
+                "caption": "Figure 6:Autoregressive rollout comparison at step 8,000.Ground truth (top row) versus predictions fromFluidWorld(PDE), Transformer, and ConvLSTM, all at∼\\sim800K parameters. The PDE maintains recognizable spatial structure throughh=3h\\!=\\!3while both baselines collapse to mean-color patches or texture noise byh=2h\\!=\\!2. UCF-101,64×6464\\!\\times\\!64.",
+                "position": 1346
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x7.png",
+                "caption": "Figure 7:The key result: PDE-based models self-correct during prediction.SSIM (similarity to ground truth) over 19 autoregressive rollout steps. TheFluidWorldPDE curve (blue, solid,measured on 500 sequences) shows a unique non-monotonic pattern: SSIM drops as errors accumulate, thenrecoversat steps 6–9 as Laplacian diffusion dissipates the errors. The green shaded region marks this recovery zone. In contrast, Transformer and ConvLSTM baselines (dashed lines, schematic curves based on typical behavior from literature, not measured on the same data) show monotonic decay: once errors accumulate, they never recover. This self-correcting property is unique to PDE-based world models and emerges naturally from the physics of diffusion: prediction errors are high-frequency noise, and the Laplacian is a low-pass filter that smooths them away.",
+                "position": 1355
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x8.png",
+                "caption": "Figure 8:Fair ablation: edge/freq losses collapse at equal training.Both models trained from scratch for 30 epochs on the same data. The Laplacian-only model (blue) produces the characteristic oscillatory recovery. The edge/freq model (red) collapses entirely: SSIM==0.013 at step 1 versus 0.778 for Laplacian-only (t=−180.7t=-180.7,p=0.00p=0.00). Compare with Figure12, which shows the unfair comparison (30 vs. 60 epochs) where the edge/freq model avoids collapse but loses the oscillatory pattern.",
+                "position": 1440
+            }
+        ]
+    },
+    {
+        "header": "7Discussion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x9.png",
+                "caption": "Figure 9:Statistical evidence for autopoietic recovery.Top left: mean SSIM over 19 autoregressive steps (N=500N\\!=\\!500rollouts, 95% CI shaded). The red dashed line is an exponential-decay null model fitted on steps 1–5. Between steps 6 and 12, the PDE model exceeds the null (green shaded), peaking at+0.217+0.217above at step 9. Bottom left: MSE trajectory: a sharp spike at step 4 (0.181) dissipates to 0.050 by step 8, mirroring the SSIM recovery. Right: summary statistics. Recovery appears in 66.8% of rollouts (p<10−49p<10^{-49}).",
+                "position": 1539
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x10.png",
+                "caption": "Figure 10:SSIM heatmap across all 500 rollouts.Rows are sequences, columns are rollout steps. Green = high SSIM, red = low. The vertical green band at steps 8–9 appears across all sequences, not just a few. Sequences are sorted by the step of minimum SSIM.",
+                "position": 1542
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x11.png",
+                "caption": "Figure 11:Complementary evidence for autopoietic recovery.(a)Individual rollout traces (80 shown, light blue) overlaid with the population mean (dark blue). The red dashed line shows typical Transformer behavior (monotonic exponential decay). The PDE model’s recovery at steps 8–9 is clearly visible across individual sequences, not an artifact of averaging.(b)Distribution of recovery magnitudes across 500 rollouts. 66.8% of rollouts show measurable recovery (>0.01>0.01SSIM improvement after minimum).(c)Step-by-step SSIM values with comparison to null model. Green-shaded rows indicate steps where the PDE exceeds the exponential-decay null, providing direct evidence of self-repair.",
+                "position": 1545
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x12.png",
+                "caption": "Figure 12:Ablation: Laplacian smoothing enables oscillatory self-repair.Mean SSIM over 19 autoregressive steps (N=500N\\!=\\!500) for two configurations of the same architecture: Laplacian-only (blue, 30 epochs) and Laplacian + edge/freq losses (red, 60 epochs). The Laplacian-only model exhibits the characteristic oscillatory recovery: a sharp SSIM increase from 0.287 to 0.508 between steps 6 and 9 (green shaded region), the dynamical signature of error accumulation followed by diffusion-mediated dissipation. Adding edge-sharpening and frequency losses suppresses this oscillation: the model instead shows a gradual monotonic rise from its minimum. The two models display qualitatively different dynamics, confirming that Laplacian diffusion is the mechanism producing the autopoietic oscillatory pattern. This figure shows the unfair comparison (30 vs. 60 epochs). In the fair comparison (both 30 epochs from scratch), the edge/freq model collapses entirely (SSIM==0.013 at step 1; see §6.4).",
+                "position": 1548
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x13.png",
+                "caption": "Figure 13:The PDE self-repairs after deliberate state corruption.Top:Ground truth (rows 1, 3, 5) and model predictions (rows 2, 4, 6) across 19 autoregressive steps. At step 5 (green border), the BeliefField internal state is deliberately corrupted via spatial shuffling. The predictions immediately degrade (steps 6–7, visible as scrambled patterns), but the PDE’s Laplacian diffusion progressively smooths the corruption and restores coherent predictions by steps 9–11.Bottom:SSIM curves comparing normal rollout (blue) against three corruption types applied at step 6: Gaussian noise (red), channel zeroing (orange), and spatial shuffling (purple). All corrupted trajectories show an initial SSIM drop followed by partial recovery (green shaded zone). This self-repair is impossible for standard Transformers and ConvLSTMs, whose predictions degrade permanently after state corruption. The Laplacian acts as an “immune system”: high-frequency corruption is smoothed away while low-frequency structure (object identity, position) is preserved.",
+                "position": 1551
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x14.png",
+                "caption": "Figure 14:Recovery is robust across corruption intensities.SSIM trajectories after Gaussian noise (left), channel zeroing (center), and spatial shuffling (right) at five intensities (0.1 to 0.9). At low intensities (0.1–0.3), recovery is near-complete. At high intensities (0.7–0.9), the SSIM drop is larger but the model still recovers partially, with no catastrophic failure. This graceful degradation (no cliff effect) is characteristic of dissipative PDE systems: the Laplacian smoothing provides proportional error correction regardless of perturbation magnitude.",
+                "position": 1554
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x15.png",
+                "caption": "Figure 15:JEPA-style latent prediction stability.Cosine similarity between the model’s autonomous latent rollout and the target encoder’s representation of the true future, over 19 steps on Moving MNIST (N=500N\\!=\\!500sequences). TheFluidWorldPDE substrate trained with a JEPA-style latent objective maintains cosine similarity≥0.827\\geq 0.827through step 19, indicating that the PDE dynamics produce stable internal predictions even without any pixel-level supervision. Compare with the Pixel and Random models (near zero, Table5).",
+                "position": 1877
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x16.png",
+                "caption": "Figure 16:Non-linear velocity encoding in JEPA-style representations.Linear probes (left bars) versus MLP probes (right bars) on frozen BeliefField features. The JEPA-style model is theonlyone whose velocityR2R^{2}increaseswith a non-linear probe (from 0.29 to 0.60,Δ=+0.31\\Delta=+0.31), while Pixel and Random bothdecrease. This confirms that the PDE with a JEPA-style objective encodes dynamics in a distributed, non-linearly accessible form, consistent with abstract representations. Linear probes systematically underestimate the JEPA-style model’s encoding of physical dynamics.",
+                "position": 1880
+            }
+        ]
+    },
+    {
+        "header": "8Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AHyperparameter Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BArchitectural Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CAdditional Experimental Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x17.png",
+                "caption": "Figure 17:Gap evolution during training.Spatial Std and Effective Rank advantages narrow as the Transformer learns spatial patterns from data, but reconstruction fidelity gapwidens. The PDE advantage is structural, not merely a convergence artifact.",
+                "position": 2781
+            }
+        ]
+    },
+    {
+        "header": "Appendix DSupplementary Figures from Experimental Notebooks",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x18.png",
+                "caption": "Figure 18:Spatial heatmaps of the BeliefField at successive integration steps, starting from a near-uniform initialization (ϵ=10−4\\epsilon=10^{-4}). Within 10 steps, distinct spatial clusters emerge deterministically. The process is sensitive to initial conditions (different seeds produce different patterns) but fully reproducible given identical seeds.",
+                "position": 2825
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x19.png",
+                "caption": "Figure 19:Quantitative symmetry-breaking metrics. Symmetry index drops from 1.0 to 0.2, spatial entropy rises from 1.7 to 2.7, and KMeans detects 3 emerging clusters. All transitions occur within the first 10 integration steps.",
+                "position": 2828
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x20.png",
+                "caption": "Figure 20:Phase diagram across 225(D,Δ​t)(D,\\Delta t)configurations. The trained operating point (D≈0.25D\\approx 0.25,Δ​t=0.1\\Delta t=0.1) is firmly in the super-critical regime. The only sub-critical region occurs atΔ​t≈0.02\\Delta t\\approx 0.02, where dynamics are effectively frozen.",
+                "position": 2836
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x21.png",
+                "caption": "Figure 21:Energy trajectories from multiple initial conditions. Regardless of initialization (uniform, random, structured gradient), energy converges to the same attractorE∗≈8,640E^{*}\\approx 8{,}640within∼\\sim50 steps, confirming bounded attractor dynamics.",
+                "position": 2839
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x22.png",
+                "caption": "Figure 22:Four-panel energy conservation analysis. The PDE substrate with RMSNorm maintains bounded energy; without RMSNorm, energy diverges exponentially (×7,467\\times 7{,}467over 200 steps). High-frequency components decay to10−810^{-8}by step 200.",
+                "position": 2847
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x23.png",
+                "caption": "Figure 23:Numerical stability across integration timesteps. Oscillatory instabilities appear whenΔ​t>0.10\\Delta t>0.10, confirming the CFL-like stability bound for the discrete Laplacian operator.",
+                "position": 2850
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x24.png",
+                "caption": "Figure 24:Recovery dynamics after 50% corruption of the BeliefField. Three modalities are shown: channel zeroing (instant recovery), Gaussian noise (3-step recovery), and spatial masking (7-step recovery). In all cases the system returns to its pre-corruption trajectory.",
+                "position": 2858
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x25.png",
+                "caption": "Figure 25:Resilience across corruption intensities (10%–90%). Residual MSE remains flat (≈0.034\\approx 0.034) up to 50% corruption, then increases monotonically but without discontinuity. No “cliff effect” at any corruption level.",
+                "position": 2861
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x26.png",
+                "caption": "Figure 26:Memory persistence test. An object is shown for 10 frames, occluded for 20 frames, then revealed. Titans-augmented model achieves SSIM recovery of 0.6 (vs 0.05 for PDE-only). Memory activity|M||M|increases during occlusion (0.018 to 0.035), indicating active information retention despite absent visual input.",
+                "position": 2869
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x27.png",
+                "caption": "Figure 27:Visualization of the BeliefField’s internal state during temporal evolution. The spatial field accumulates structure from successive frames, forming a persistent predictive representation that carries forward through PDE integration.",
+                "position": 2877
+            },
+            {
+                "img": "https://arxiv.org/html/2603.21315/2603.21315v1/x28.png",
+                "caption": "Figure 28:Feature-space analysis of the pixel-trained model. Spatial feature maps show clear semantic encoding of object positions and boundaries. 0 of 128 channels are dead, effective rank is 19.5, confirming healthy representational diversity.",
+                "position": 2885
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
