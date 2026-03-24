@@ -1,0 +1,159 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/worldmodel.png",
+                "caption": "",
+                "position": 323
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/Figures/WorldCache-Teaser-Final-2.jpg",
+                "caption": "Figure 1:Qualitative and quantitative comparison of acceleration methods on video world model generation using Cosmos-Predict2.5-2B.Left:Visual comparison of Baseline (no acceleration), FasterCache, DiCache, and WorldCache (ours) across three representative timesteps (T1,…,TNT_{1},\\ldots,T_{N}) of a driving scene from the City Street domain. FasterCache achieves1.6×1.6\\timesspeedup but introduces severe visual artifacts and scene hallucinations. DiCache (1.3×1.3\\times) better preserves scene fidelity but exhibits noticeable spatial artifacts at later timesteps (red dashed boxes). WorldCache (ours) achieves2.3×2.3\\timesspeedup while faithfully reproducing scene content, motion, and background structure across all timesteps (green dashed boxes).Right:Relative latency reduction (%) over Baseline for Text2World (T2W) and Image2World (I2W) tasks, showing WorldCache achieves up to55.5%55.5\\%reduction compared to40.5%40.5\\%for FasterCache and27.9%27.9\\%for DiCache. All results are reported on a single H200 GPU.",
+                "position": 387
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/x1.png",
+                "caption": "Figure 2:A DiT world model denoises latent video states (ztz_{t}) by running probe blocks (1…\\ldotsk) followed by deep blocks (k+1​…​(N)k{+}1\\ldots(N)). WorldCache inserts a decision gate that skips deep blocks when the saliency-weighted probe drift (δSWD\\delta_{\\mathrm{SWD}}) is below a motion and step-adaptive threshold (τATS​(t)\\tau_{\\mathrm{ATS}}(t)) (computed by CFC+ATS), enabling cache hits. On a cache hit, OFA reuses computation by aligning cached residuals via optimal interpolation and optional motion-compensated warping to approximate (zt(N)z_{t}^{(N)}). On a cache miss, the model executes deep blocks, updates the residual cache in a ping-pong buffer, and continues the denoising loop for (t=1…\\ldotsT).",
+                "position": 571
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/x2.png",
+                "caption": "Figure 3:Saliency overlay (Cosmos-Predict2.5, 2B).Channel-variance saliency from step 40 overlaid on four video frames. High saliency (yellow) marks structurally complex regions where caching errors are most visible; low saliency (purple) marks smooth areas where reuse is safe. SWD reweights drift using this signal to prioritize fidelity on detail-rich content.",
+                "position": 639
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/Figures/ATS.png",
+                "caption": "Figure 4:Comparison of static vs. adaptive caching strategies. (a) A Fixed Threshold (τ=0.12\\tau=0.12) fails to accommodate the naturally increasing drift (δ\\delta) in later denoising steps, resulting in frequent recomputations and a low skip rate (36%). (b) Our Adaptive Threshold (ATS) dynamically scalesτA​T​S\\tau_{ATS}with the expected drift. This allows ATS to capture significantly more cache hits (green bars) in later stages, nearly doubling the overall skip rate (68%) while maintaining generation quality.",
+                "position": 831
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/x3.png",
+                "caption": "Table 1:Text2World (T2W) generation results on PAI-Bench across two model scales.We evaluate four methods, Baseline (no acceleration), DiCache, FasterCache, and WorldCache (ours), on Cosmos-Predict2.5 at both 2B and 14B parameter scales. Domain Score aggregates seven semantic categories (CS: City Street, AV: Aerial View, RO: Road, IN: Indoor, HU: Human, PH: Physics, MI: Mixed), while Quality Score spans eight perceptual and fidelity dimensions (SC: Scene Consistency, BC: Background Consistency, MS: Motion Smoothness, AQ: Aesthetic Quality, IQ: Image Quality, OC: Object Consistency, IS: Imaging Subject, IB: Imaging Background). Avg. denotes the overall score averaged across both Domain and Quality metrics. Lat. reports wall-clock inference latency (seconds), and Speedup is relative to the unaccelerated Baseline.Δ\\Deltarows quantify the per-metric gain of WorldCache over DiCache, the strongest competing method. WorldCache achieves the best accuracy–efficiency trade-off, consistently outperforming DiCache while delivering up to2.10×\\mathbf{2.10\\times}speedup at 2B and2.14×\\mathbf{2.14\\times}at 14B with negligible quality degradation.",
+                "position": 834
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/x3.png",
+                "caption": "Table 2:Image2World (I2W) generation results on PAI-Bench across two model scales.We evaluate four methods: Baseline (no acceleration), DiCache, FasterCache, and WorldCache (ours) on Cosmos-Predict2.5 at both 2B and 14B parameter scales under the Image2World setting, where a conditioning image guides video world generation.Δ\\Deltarows quantify the per-metric gain of WorldCache over DiCache. Compared to the T2W setting, I2W scores are generally higher owing to the additional visual grounding provided by the conditioning image. WorldCache achieves the best accuracy–efficiency trade-off, consistently outperforming DiCache while delivering up to2.3×\\mathbf{2.3\\times}speedup at 2B and2.18×\\mathbf{2.18\\times}at 14B with negligible quality degradation across all domain and quality dimensions.",
+                "position": 1280
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/x3.png",
+                "caption": "Table 3:WAN2.1 results on PAI-Bench.We report Domain Score (Avg), Quality Score (Avg), Overall Score (computed as the mean of Domain Avg and Quality Avg), wall-clock latency (seconds), and speedup relative to the unaccelerated baseline. Best accelerated results per task/column are inbold.",
+                "position": 1656
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/x3.png",
+                "caption": "Figure 5:Qualitative Image2World comparison (PAI-Bench).Given the same conditioning image and text description, we show evenly-spaced frames from the generated rollout for (a) Baseline, (b) DiCache, and (c) WorldCache. DiCache exhibits temporal artifacts under dynamic scene evolution, e.g., object ghosting/deformation and inconsistent motion of vehicle and foreground structures (highlighted withred dashed boxes). WorldCache preserves the scene layout and maintains more coherent object appearance and trajectories over time (highlighted withgreen dashed boxes), while achieving substantial inference acceleration. Better viewed zoomed in.",
+                "position": 1788
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Overview",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.AEvaluation Metrics",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.BImplementation Details and Runtime Setup",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.CMore Baseline Comparison",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/x4.png",
+                "caption": "Table 5:PAI-Bench comparison with EasyCache and TeaCache (Cosmos-2B).We report Domain, Quality, Overall, latency (s), and speedup vs. baseline for both Image2World (I2W) and Text2World (T2W).Boldandunderlinedenote the best and second-bestamong accelerated methods only(excluding Baseline) within each block.",
+                "position": 2361
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.DEvaluation Results on Robotic Manipulation: EgoDex-Eval",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/x4.png",
+                "caption": "Table 6:EgoDex-Eval results (I2V) across backbones.We report frame-level PSNR/SSIM/LPIPS against ground-truth videos, along with end-to-end latency and speedup relative to the unaccelerated baseline.Bolddenotes the best value per block (including Baseline), andunderlinedenotes the bestacceleratedresult (DiCache/WorldCache).",
+                "position": 2519
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.EExtended Technical Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/x4.png",
+                "caption": "Figure 6:Effect of the denoising step budget.End-to-end latency and speedup of WorldCache vs. baselines when varying the number of denoising steps.",
+                "position": 2869
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.FAdditional Ablations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/Figures/Supp./WorldCache-1.jpg",
+                "caption": "Figure 7:Qualitative Image2World comparison on PAI-Bench (Cosmos-2B).The conditioning image (top-left) and text description (top-right) specify a dashcam scene where the ego vehicle slows at a T-intersection as a woman and a child cross in front. We show evenly spaced frames from rollouts generated by (a) Baseline, (b) DiCache, and (c) WorldCache. DiCache exhibits temporal inconsistency on salient, moving entities, e.g., the pedestrians appearance and position become unstable and partially ghosted near the end of the rollout(red dashed box). WorldCache maintains more coherent pedestrian identity and motion while preserving scene layout(green dashed box), producing rollouts closer to the baseline under substantially lower inference latency. Better viewed zoomed in.",
+                "position": 2877
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/Figures/Supp./WorldCache-2.jpg",
+                "caption": "Figure 8:Qualitative Image2World comparison on PAI-Bench (Cosmos-14B).Given the conditioning image (top-left) and description (top-right), we generate a short kitchen rollout in which two people prepare food, where one spreads avocado on a nori sheet while the other holds a plate of vegetables. We visualize evenly spaced frames from (a) the unaccelerated baseline, (b) DiCache, and (c) WorldCache. While the baseline struggles with hand pose and object geometry, DiCache also exhibits noticeable temporal instability in the most salient, high-frequency regions, particularly around the hands and the plate: edges wobble, fine structures deform, and the appearance of the plate/hand region changes inconsistently over time (red dashed boxes). WorldCache largely avoids these artifacts, preserving sharper boundaries and more coherent local motion in the interaction region (green dashed boxes), yielding outputs that are closer to the baseline at substantially reduced latency. Best viewed with zoom.",
+                "position": 2880
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.GAdditional Qualitative Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/Figures/Supp./Qualitative-3.jpg",
+                "caption": "Figure 9:Additional qualitative results.We show representative frames at increasing rollout times(T0→TN)(T_{0}\\rightarrow T_{N})from PAI-Bench (top to bottom). A robot hand interacting with a refrigerator door, an egocentric manipulation scene near a tabletop, and an arm–human interaction setup. Across all examples, the generated videos maintain stable scene layout and consistent object/robot geometry as motion evolves over time, demonstrating that WorldCache preserves temporal continuity in contact-rich and interaction-heavy rollouts. Better viewed with zoom-in.",
+                "position": 2927
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22286/2603.22286v1/Figures/Supp./Qualitative-4.png",
+                "caption": "Figure 10:Additional qualitative results.We show evenly spaced frames from(T0→TN)(T_{0}\\rightarrow T_{N})for three representative scenarios: robotic arm usage for kitchen activities, opening a refrigerator door, and interaction within a cluttered toolbox. The sequences highlight sustained temporal coherence where robot pose, object geometry, and scene layout remain stable as the action unfolds. Better viewed zoom-in.",
+                "position": 2930
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.HLimitations and Future Work",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
