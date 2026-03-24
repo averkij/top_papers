@@ -1,0 +1,222 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x1.png",
+                "caption": "Figure 1:AwaRes overview. Left: Given a low-resolution image, AwaRes uses tool-calling to request only the high-resolution crops needed to answer the query. Right: Accuracy vs. retained visual tokens across six benchmarks. AwaRes performs similarly to native high-resolution (80.3%) while using only 36% of the visual tokens.",
+                "position": 314
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x2.png",
+                "caption": "Figure 2:Overview of the automatic supervision pipeline.Each sample is processed at two resolutions; an LLM judge determines resolution sufficiency by comparing predictions to ground truth. Sufficient cases yield single-turn conversations, while insufficient cases are routed to an oracle for crop localization, producing multi-turn trajectories with tool-calling.",
+                "position": 493
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x3.png",
+                "caption": "Figure 3:Crop annotation example.Left: low-resolution input where text is illegible. Middle: oracle-predicted bounding box localizing the answer region. Right: selected high-resolution crop enabling correct response (best viewed when zoomed in).",
+                "position": 518
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x4.png",
+                "caption": "",
+                "position": 522
+            }
+        ]
+    },
+    {
+        "header": "4Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x5.png",
+                "caption": "Table 2:Agreement on resolution-selection labels.Confusion matrix comparing labels produced byLLaMA-3.3-70BagainstDeepSeek-V3.2and ANLS. We observe high agreement with DeepSeek-V3.2, and low agreement with ANLS metric. Values are reported as percentages (%).",
+                "position": 1027
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x5.png",
+                "caption": "Figure 4:Performance vs. Wall Clock Time.AwaRes achieves sub-second average latency across all benchmarks by encoding resolution decisions in short tool calls, whereas VisionThink’s explicit reasoning traces increase decoding time (e.g., 4.3s vs. 0.6s on ChartQA).",
+                "position": 1070
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x6.png",
+                "caption": "Figure 5:From Over-Using to Looking Where It Matters.The flow of crop selection decisions from Oracle GT (left), SFT-tuned model predictions (middle), and GRPO predictions (right). SFT, designed to introduce the tool-calling protocol, tends to over-use the crop tool as it learns the mechanics of tool usage. The GRPO phase corrects this behavior through the tool-use cost, increasing low-resolution decisions while exploring alternative crop strategies that balance accuracy and efficiency.",
+                "position": 1074
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "6Data Annotation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x7.png",
+                "caption": "Figure 6:Visual examples from our data curation pipeline. Each row shows the low-resolution input image, the oracle-detected bounding boxes (question region in blue, answer region in red), and the selected crop used for training. Top: A Chart example where the oracle correctly localizes the relevant bar and its label. Bottom: A natural image example requiring OCR of a brand banner.",
+                "position": 1586
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x8.png",
+                "caption": "",
+                "position": 1594
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x9.png",
+                "caption": "Figure 7:Failure cases from the automatic data curation pipeline.Top:The oracle grounding model incorrectly localizes the answer region, missing the relevant bar (ZDF’s 14-49 age group value). However, the crop regions helps mitigate such localization errors—the selected crop still contains the correct answer.Bottom:The oracle correctly identifies the question and answer regions but the bounding boxes span nearly the entire image, resulting in a full-image crop selection. While this produces correct supervision, it is inefficient as no resolution savings are achieved.",
+                "position": 1601
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x10.png",
+                "caption": "",
+                "position": 1609
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x11.png",
+                "caption": "Figure 8:Resolution distribution of training datasets. Each point represents an image’s width and height in pixels.",
+                "position": 1624
+            }
+        ]
+    },
+    {
+        "header": "7Benchmark Qualitative Examples",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x12.png",
+                "caption": "Figure 9:Positive examples of AwaRes’s adaptive cropping (1/6).The model isolates the relevant bar segments and axis labels to identify the smallest chart value, zooms into data points along a trend line to compute a median, and focuses on labeled chart categories to read a specific percentage, extracting precise numerical values that are indiscernible in the low-resolution overview alone.",
+                "position": 1645
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x13.png",
+                "caption": "",
+                "position": 1652
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/",
+                "caption": "",
+                "position": 1655
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x15.png",
+                "caption": "Figure 10:Positive examples of AwaRes’s adaptive cropping (2/6).The crops target the top bar and its label to identify the subject with the highest ratio, zoom into line-chart trends and country labels to compare medians across countries, and focus on the top entries of a horizontal bar chart to read demographic rankings. In each case, the high-resolution crop brings the answer-relevant region into sharp focus.",
+                "position": 1661
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x16.png",
+                "caption": "",
+                "position": 1668
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x17.png",
+                "caption": "",
+                "position": 1671
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x18.png",
+                "caption": "Figure 11:Positive examples of AwaRes’s adaptive cropping (3/6).The model crops into table cells of a scanned document to extract a specific weight value, and zooms into a wine bottle label to read the variety name. These examples demonstrate how targeted crops resolve fine-grained text on documents and labels that lack of OCR capabilities at low resolution.",
+                "position": 1677
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x19.png",
+                "caption": "",
+                "position": 1684
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x20.png",
+                "caption": "Figure 12:Positive examples of AwaRes’s adaptive cropping (4/6).The model correctly crops to count pedestrians in a rainy street scene, identify and count traffic cones in a parking lot, and determine the travel direction of a dog in an urban setting. The crops consistently center on the objects referenced by the question, enabling accurate spatial reasoning and counting from the high-resolution view of outdoor scenarios.",
+                "position": 1690
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x21.png",
+                "caption": "",
+                "position": 1697
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x22.png",
+                "caption": "",
+                "position": 1700
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x23.png",
+                "caption": "Figure 13:Positive examples of AwaRes’s adaptive cropping (5/6).The crops focuses on the church building top and detect the dove, zoom into the road next to the boats at a riverfront to resolve a van’s color, and focus on a broom among garden clutter to identify its color. These examples show how AwaRes localizes small or partially occluded objects that the question refers to, enabling fine-grained attribute recognition.",
+                "position": 1706
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x24.png",
+                "caption": "",
+                "position": 1713
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x25.png",
+                "caption": "",
+                "position": 1716
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x26.png",
+                "caption": "Figure 14:Positive examples of AwaRes’s adaptive cropping (6/6).The model focuses on product packaging in a cluttered display to identify a brand name, and crops into the center of a snowy scene to zoom in on a person riding an ATV, resolving the green color of their scarf.",
+                "position": 1722
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x27.png",
+                "caption": "",
+                "position": 1729
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x28.png",
+                "caption": "Figure 15:Failure cases of AwaRes’s adaptive cropping.The crop either target the wrong region due to lack of sufficient context from the question, or produce a crop that targets a plausible region but fail to produce the correct answer. In the first example, the crop isolates the correct line, yet the model skips the value at 2013 and use 2012 instead, yielding the wrong average. In the second, the crop zooms into theNutrition Facts label, instead of the ingredient list and reads “Aspartame” instead of the “NutraSweet”. In the third, the crop focuses on the center, where the phone is located, but the granularity of the crop keep access of information around the object that makes the model misidentify its color.",
+                "position": 1742
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x29.png",
+                "caption": "",
+                "position": 1749
+            },
+            {
+                "img": "https://arxiv.org/html/2603.16932/2603.16932v1/x30.png",
+                "caption": "",
+                "position": 1752
+            }
+        ]
+    },
+    {
+        "header": "8Latency Analysis",
+        "images": []
+    },
+    {
+        "header": "9Additional Cold-Start (SFT) Analysis",
+        "images": []
+    },
+    {
+        "header": "10ANLS-Based Data Curation Analysis",
+        "images": []
+    },
+    {
+        "header": "11Training Details",
+        "images": []
+    },
+    {
+        "header": "12Prompts",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
