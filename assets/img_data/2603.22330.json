@@ -1,0 +1,53 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.22330/2603.22330v1/x1.png",
+                "caption": "Figure 1:Overview of the CHANRG benchmark.a,Architecture–clan–family hierarchy of CHANRG with outer split occupancy across families.b,Structural similarity of CHANRG evaluation splits and widely used legacy benchmark sets relative to the CHANRG training set, showing reduced overlap under CHANRG.c,Sequence and family counts for CHANRG, bpRNA and ArchiveII-derived resources.d,Overall sequence-length distribution of CHANRG, highlighting the strongly long-tailed range of benchmarked RNAs.e,Multistage curation funnel from raw Rfam 15.0 sequences to the final structurally non-redundant benchmark.f,Biological rationale of held-out and out-of-distribution split regimes.g,First benchmark overview across representative methods, splits and structural metrics, showing that held-out leaders do not retain the same advantage across CHANRG out-of-distribution regimes.",
+                "position": 348
+            }
+        ]
+    },
+    {
+        "header": "2Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.22330/2603.22330v1/x2.png",
+                "caption": "Figure 2:Standard held-out leaderboards overestimate generalization.a,Test versus OODmeanbase-pairF1F_{1}for the canonical 17-model cohort. Each point is one model, colored by predictor class (FM, SD, or DL). Dashed guide lines indicate equal performance and 75%, 50%, and 25% retention relative to Test.b,Heatmap of base-pairF1F_{1}across Test, GenA, GenC, and GenF, together with OODmeanand retention (OODmean/Test), for the canonical cohort. Held-out leaders lose their advantage across CHANRG OOD regimes.c,Class-level base-pairF1F_{1}on Test and OODmean. Points denote individual models and error bars denote 95% bootstrap confidence intervals over per-model means.d,Per-sequence base-pairF1F_{1}distributions across Test, GenA, GenC, and GenF for six representative methods: MXFold2 and EternaFold (SD), SPOT-RNA and BPfold (DL), and RiNALMo-Giga and ERNIE-RNA (FM). OODmeandenotes the unweighted mean across GenA, GenC, and GenF.",
+                "position": 406
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22330/2603.22330v1/x3.png",
+                "caption": "Figure 3:The CHANRG generalization gap is not explained by sequence length or model scale.a,Split-specific sequence-length distributions (log-scale x-axis) show that GenA is longer than Test, whereas GenC and GenF are shorter, ruling out a simple “OOD = longer RNAs” explanation.b,Base-pairF1F_{1}heatmap for the canonical 17-model cohort after restricting all splits to RNAs between 50 and 200 nt, with OODmeanand retention columns.c,Class-level base-pairF1F_{1}on the length-matched subset, showing that the held-out/OOD inversion persists after controlling the evaluated length range. Points denote individual models and error bars denote 95% bootstrap confidence intervals over per-model means.d,Change in base-pairF1F_{1}after length matching (F1matched−F1fullF_{1}^{\\mathrm{matched}}-F_{1}^{\\mathrm{full}}) for six representative methods. Length control improves several structured and direct neural baselines on GenA but does not rescue foundation-model transfer on GenC or GenF.e,Scaling within the RiNALMo-U-Net family improves Test performance much more than OOD performance for both base-pairF1F_{1}and topologyF1F_{1}. Horizontal reference lines indicate BPfold, EternaFold, and RNAfold on the corresponding metric. OODmeandenotes the unweighted mean across GenA, GenC, and GenF.",
+                "position": 460
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22330/2603.22330v1/x4.png",
+                "caption": "Figure 4:Hierarchical evaluation reveals coverage failure and helix miswiring.a,Class-level stemF1F_{1}, topologyF1F_{1}, and topology GED on Test and OODmean. Points denote individual models and error bars denote 95% bootstrap confidence intervals over per-model means. Lower topology GED indicates better agreement.b,Precision–recall shift from Test to OODmeanfor structured decoders (SD), direct neural predictors (DL), and foundation-model predictors (FM). Gray contours indicate iso-F1F_{1}values.c,Retention relative to Test for stemF1F_{1}, hairpin-loopF1F_{1}, internal-loopF1F_{1}, multiloopF1F_{1}, external-loopF1F_{1}, and topologyF1F_{1}, stratified by method class. Points denote individual models.d,Motif-specific retention (OODmean/Test) for six representative methods: MXFold2 and EternaFold (SD), SPOT-RNA and BPfold (DL), and RiNALMo-Giga and ERNIE-RNA (FM).e,Two pre-specified case studies localizing OOD errors to global loop–helix organization. Left, Case 1 (GenA, 109 nt; RF01527;LMFL01000010.1_72055-71947) shows moderate contact recovery but incorrect global architecture for RiNALMo-Giga. Right, Case 2 (GenC, 98 nt; RF03162;AE017226.1_854285-854382) shows perfect helix recovery but failed multiloop wiring. Target pairs, true positives (TP), false positives (FP), and false negatives (FN) are shown for each prediction. OODmeandenotes the unweighted mean across GenA, GenC, and GenF.",
+                "position": 532
+            },
+            {
+                "img": "https://arxiv.org/html/2603.22330/2603.22330v1/x5.png",
+                "caption": "Figure 5:Padding-free, symmetry-aware computation enables faithful CHANRG-scale evaluation.a,Comparison of conventional padded-tensor execution and the NestedTensor reference implementation.\nIn conventional dense execution, shorter RNAs are embedded in a largerLmax×LmaxL_{\\max}\\times L_{\\max}contact map, so convolution mixes valid and padded regions and symmetry enforcement by taking the upper triangle discards half of the dense output.\nIn the NestedTensor path, padded positions are excluded from the computation graph and symmetry is enforced at the output level by averaging the predicted contact map with its transpose,o=(y+y⊤)/2o=(y+y^{\\top})/2.b,Contact-map padding ratio across real evaluation-set batch contexts from Test, GenA, GenC, and GenF, stratified by batch size.c,Flipped candidate-pair fraction under dense padded inference across batch sizes for Test, GenA, GenC, and GenF, showing that batch-context dependence persists even at batch size 2.d,Controlled systems benchmark on synthetic batches spanning representative sequence lengths.\nRelative to dense padded tensors, the NestedTensor implementation reduces inference latency by 3.3-fold and allocated GPU memory by 6.7-fold.\nPanelsbandcuse real evaluation-set contexts, whereas panelduses synthetic batches to isolate systems cost.",
+                "position": 596
+            }
+        ]
+    },
+    {
+        "header": "3Discussion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
