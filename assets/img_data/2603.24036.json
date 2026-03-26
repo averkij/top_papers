@@ -1,0 +1,168 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/x1.png",
+                "caption": "Figure 1:SpectralSplats enables robust tracking from zero-overlap initializations.Left:A 3DGS asset is initialized (see transparent overlay) far from some target\npose image (solid image), resulting in strictly zero spatial overlap in the rendered camera view.Right:We compare the optimization progression. Standard photometric tracking (Pixel loss) implicitly requires spatial overlap; without it, directional gradients vanish, causing the optimizer to strand the asset and eventually collapse into spurious local minima. SpectralSplats (Ours) shifts supervision to the frequency domain viaSpectral Moments. This establishes a global basin of attraction, allowing the Gaussians to smoothly flow across the image domain and successfully recover the extreme displacement.",
+                "position": 277
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/x2.png",
+                "caption": "Figure 2:Breaking the Locality Trap: A 1D Optimization Analysis.We simulate the optimization landscape (bottom) for aligning a rendered 1D Gaussian pulse (top, red) to a target (top, green) under a large initial spatial displacement (Θ0=6\\Theta_{0}=6).Standard𝐋𝟐\\mathbf{L_{2}}(Col 1):Photometric objectives implicitly rely on spatial overlap; without it, the gradient strictly vanishes, leaving the optimizer stranded.No Annealing (Col 2):Projecting the loss onto a static, high-frequency spectral basis (k=5k=5) ensures the gradient no longer vanishes globally, but introduces severe phase-wrapping that traps the optimizer in false local minima.Ours (Cols 3-6):Spectral Moment Supervision with Frequency Annealing. By restricting initial supervision to low frequencies, we construct a globally convex basin of attraction that provides a valid, directional gradient from any initialization. As the spatial error strictly decreases, our principled annealing schedule safely expands the active bandwidth, seamlessly transitioning the landscape to achieve high-frequency spatial precision without phase-wrapping.",
+                "position": 401
+            },
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/x3.png",
+                "caption": "Figure 3:A long low-frequency “warm-up” phase (right) leads to loss of high frequency details (tail), compared to a shorter “warm-up” phase (left).",
+                "position": 517
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/x4.png",
+                "caption": "Figure 4:(Left) Effect of initial spatial shift in GART, showing averaged PSNR, SSIM, and LPIPS versus shift radius; pixel-only supervision degrades rapidly, while our method remains stable. (Right) Corresponding results on SC4D[29,12], reporting PSNR for training and novel views; pixel loss deteriorates under misalignment, whereas our method maintains stable performance.",
+                "position": 531
+            },
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/figures/SC4DQualitative.png",
+                "caption": "Figure 5:Qualitative comparison on the SC4D data under initial spatial shift (radius = 0.5). For three characters and animations, we show the initial pose, GT,MLP+OursandMLP+Pixel, both without LPIPS. While pixel-only optimization fails to recover correct pose and may drift the object outside the frame, our method achieves better alignment and more coherent structure in both training and novel views.",
+                "position": 549
+            },
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/x5.png",
+                "caption": "Figure 6:Qualitative comparison under initial spatial misalignment (radius = 0.6) on three frames of two representative dogs from GART. Pixel-only optimization exhibits blur and incorrect alignment, while our method better recovers pose and structure.",
+                "position": 668
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.ADerivation of the Phase-Wrapping Condition",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.BDemo",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/figures/supp_2d_comparison_with_arrow.png",
+                "caption": "Figure 7:2D optimization demo under large spatial misalignment (translation and rotation). Pixel MSE supervision (top) fails to move toward the target, remaining near initialization. Spectral supervision (bottom) produces coherent global motion and successfully converges to the target.",
+                "position": 1473
+            },
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/figures/supp_freq_weights.png",
+                "caption": "Figure 8:Visualization of the frequency annealing schedule. After an initial warm-up phase, the active bandwidthα​(t)\\alpha(t)increases linearly, and higher frequencies gradually fade in via the cosine weightingwk​(t)w_{k}(t), enabling a smooth transition from global alignment to fine-grained refinement.",
+                "position": 1476
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.CTraining Objective",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.DSC4D Experiment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/figures/comparison_all_last_shift0_chars_0_4.zoom_cut.png",
+                "caption": "Figure 9:Qualitative comparison of our method against pixel loss optimization on the final frame without spatial misalignment. The pose initialization is set to the video’s first frame.",
+                "position": 1732
+            },
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/figures/comparison_all_last_shift0.5_chars_1_4_5_7_8.zoom_cut.png",
+                "caption": "Figure 10:Qualitative comparison of our method against pixel loss optimization on the final frame with an initial pose offset of 0.5 from the video’s first frame. Blue X marks empty frames where the optimization resulted with no gaussians present in the train view’s frame.",
+                "position": 1735
+            },
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/figures/shift_experiment_PSNR_combined.png",
+                "caption": "(a)PSNR – Front (training) view",
+                "position": 1748
+            },
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/figures/shift_experiment_PSNR_combined.png",
+                "caption": "(a)PSNR – Front (training) view",
+                "position": 1751
+            },
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/figures/shift_experiment_NV_PSNR_combined.png",
+                "caption": "(b)PSNR – Side (novel) view",
+                "position": 1757
+            },
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/figures/shift_experiment_LPIPS_combined.png",
+                "caption": "(c)LPIPS – Front (training) view",
+                "position": 1763
+            },
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/figures/shift_experiment_NV_LPIPS_combined.png",
+                "caption": "(d)LPIPS – Side (novel) view",
+                "position": 1769
+            },
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/figures/shift_experiment_SSIM_combined.png",
+                "caption": "(e)SSIM – Front (training) view",
+                "position": 1775
+            },
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/figures/shift_experiment_NV_SSIM_combined.png",
+                "caption": "(f)SSIM – Side (novel) view",
+                "position": 1781
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.EGART Experiment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/x6.png",
+                "caption": "Figure 12:Top row: first supervision frame from the input videos. Bottom row: rendering of the reconstructed 3DGS asset in its GART rest pose, used as the initialization for our optimization. Notice the significant discrepancies in pose, outline, and color between the supervision and the initial model. These differences highlight the inherent complexity of this real-world setting.",
+                "position": 1823
+            },
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/x7.png",
+                "caption": "Figure 13:Robustness to initial spatial misalignment on the GART dataset.Top:Per-dog metric curves for PSNR, SSIM, and LPIPS under increasing shift. The performance gap widens as the misalignment increases, demonstrating the stability and robustness of our method.Bottom:Mean performance gain in PSNR, SSIM, and LPIPS across all dogs as a function of the shift radius. The minimum and maximum values for each individual dog are shown as scattered points.",
+                "position": 1837
+            },
+            {
+                "img": "https://arxiv.org/html/2603.24036/2603.24036v1/x8.png",
+                "caption": "Figure 14:LPIPS vs. pixel supervision in the second phase on GART. Due to color discrepancies between the reconstructed 3DGS and the video, LPIPS provides weaker geometric constraints, resulting in blurrier results.",
+                "position": 1849
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.FImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
