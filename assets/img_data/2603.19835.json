@@ -1,0 +1,171 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/pics/tongyi.jpg",
+                "caption": "",
+                "position": 262
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x1.png",
+                "caption": "Figure 1:FIPO vs. Baselines Performance Comparison on AIME2024.FIPO demonstrates thatpure RL training aloneis sufficient to not only outperform other pure RL baselines (the reproduced DAPO and Deepseek-R1-Zero-32B), but also surpass o1-mini. This performance gain is accompanied by the generation of significantly longer responses on average.",
+                "position": 284
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Preliminary",
+        "images": []
+    },
+    {
+        "header": "4FIPO",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x2.png",
+                "caption": "Figure 2:Training instability with vanilla FutureKL.Analysis of the unstable run observed around Step 70.\n(a) A sharp spike in thelow-clip fraction(indicating a drastic shift in the policy distribution driven by negative samples) triggers\n(b) a sudden divergence in Policy KL.\n(c) an immediate explosion in gradient norm and\nThese internal instabilities collectively precipitate\n(d) a catastrophic collapse in response length, confirming that unregulated negative signals destabilize the optimization.",
+                "position": 443
+            }
+        ]
+    },
+    {
+        "header": "5Experiment",
+        "images": []
+    },
+    {
+        "header": "6Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x3.png",
+                "caption": "Figure 3:Dynamics of response length and performance scaling during training.Subplots (a)-(e) show the evolution of response length metrics (Min, Q25, Mean, Median, Q75) over global training steps. Compared to the DAPO baseline, FIPO significantly increases response length, effectively eliciting more extensive Chain-of-Thought reasoning. Subplot (f) demonstrates that this increased length correlates strongly with improved accuracy, suggesting that longer CoT is key to breaking performance barriers.",
+                "position": 623
+            },
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x4.png",
+                "caption": "Figure 4:Analysis of training reward and length-weighted advantages.(a)Mean training rewards.DAPO achieves higher raw scores, which is expected as both methods incorporate an overlong penalty that suppresses the reward of longer responses. (b)Number of Sampled Batches.This metric indicates the sampling redundancy required to maintain a sufficient number ofeffectivebatches. A higher sampling need suggests the model frequently generates non-informative trajectories on the training set, serving as a potential indicator of overfitting. (c)Response length weighted mean advantages.FIPO exhibits a sustained upward trend, establishing a positive reinforcement cycle where longer responses increasingly yield positive advantages. In contrast, DAPO shows a declining trend, suggesting a failure to convert length into effective reasoning gains, which ultimately limits its performance.",
+                "position": 646
+            },
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x5.png",
+                "caption": "Figure 5:Policy evolution and optimization dynamics.(a) Policy KL divergence. (b) Policy Entropy. (c) Gradient Norm. FIPO exhibits a more controlled policy drift and smoother update gradients than DAPO. Notably, FIPO’s rising entropy, paired with the weighted advantage trends in Fig. 4(b), indicates that the model is actively exploring a broader reasoning space where longer CoT paths increasingly correspond to correct solutions.",
+                "position": 660
+            }
+        ]
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "8Limitations and Future Work",
+        "images": []
+    },
+    {
+        "header": "9Contributions",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix Table of Contents",
+        "images": []
+    },
+    {
+        "header": "Appendix AParameter Settings",
+        "images": []
+    },
+    {
+        "header": "Appendix BResult on Qwen2.5 7B Math",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x6.png",
+                "caption": "Figure 6:Analysis of length-weighted advantages and mean response length of Qwen2.5-7B-MATH.(a) Subfigure (a) shows FIPO maintains a stable Length-Weighted Mean Advantage. (b) Subfigure (b) shows the mean response length remains steady around 1200 tokens. This suppressed length growth is likely caused by the 4K context window limit of the base model, and its inherent bias toward concise code-based reasoning, which anchors the generation depth.",
+                "position": 1489
+            },
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x7.png",
+                "caption": "Figure 7:Policy evolution and optimization dynamics of Qwen2.5-7B-MATH.(a) Policy KL and (b) Gradient Norm illustrate the optimization path. (c) Notably, FIPO results in lower entropy compared to DAPO, indicating that the model converges toward more deterministic reasoning traces during the RL process.",
+                "position": 1492
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAblation Studies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x8.png",
+                "caption": "Figure 8:Ablation study on Response Length Control on Qwen2.5-32B-Base.We compare the baseline FIPO with FIPO under cliphigh 1.4 and FIPO with a max resonse length of 25K. (a-d) Increasing the maximum length limit triggers a significant early surge in response length, yet results in lower training efficiency and marginal performance gains. (e) A higher clip ratio causes a sharp escalation in policy entropy, indicating potential training instability. (f) Overall, while both modifications encourage longer responses, they are less effective in improving AIME24 performance compared to the balanced FIPO configuration.",
+                "position": 1508
+            },
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x9.png",
+                "caption": "Figure 9:Ablation Study on Filtering Mechanism in Future-KL on Qwen2.5-7B-MATH.We compare the training stability of FIPO with and without filtering extreme importance sampling (IS) ratios.\n(a) Future-KL influence weights: removing extreme IS ratios results in a significantly more constrained and compact weight range, leading to more stable policy updates.\n(b-c) Clipping statistics: extreme IS ratios rise disproportionate influence weights that drive more aggressive updates. This is reflected in the increased dual clip and policy clip fractions, where a larger proportion of tokens are pushed beyond the trust region when filtering is absent.",
+                "position": 1557
+            },
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x10.png",
+                "caption": "Figure 10:Ablation Study on Influence Weight Clipping on Qwen-2.5-7B-MATH.(a) Similar to 32B, a influence weight with range[1.0,1.2][1.0,1.2]resulted in a continuous growth in entropy, thus encouraging more explorations.\n(b) However, we do not observe any surge in response length as we discussed in the previous section.",
+                "position": 1568
+            },
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x11.png",
+                "caption": "Figure 11:Ablation Study on the Decay Rate Horizon (τ\\tau) on Qwen2.5-7B-MATH.(a) Mean Influence Weight: Extending the decay horizon (e.g.,τ=256\\tau=256) significantly increases weight fluctuations, potentially destabilizing policy updates. Conversely, a highly restrictive horizon (e.g.,τ=8\\tau=8) limits the weights too close to the baseline.\n(b) Influence Weight Clip Ratio: A larger decay horizon results in a higher clipping frequency. This reflects more drastic variations in the raw influence weights, directly corroborating the trends observed in (a).\n(c) Entropy: An intermediate horizon (τ=32\\tau=32) strikes a critical balance. It avoids the excessive volatility induced by larger decay rates, as well as the premature entropy collapse caused by the myopic guidance of shorter horizons, allowing the 7B model to maintain controlled and effective exploration.",
+                "position": 1584
+            }
+        ]
+    },
+    {
+        "header": "Appendix DCase Study",
+        "images": []
+    },
+    {
+        "header": "Appendix EDiscussions on failure trials and reproduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x12.png",
+                "caption": "Figure 12:Training Dynamics and Stability across Mini-batch Sizes on Qwen2.5-32B-Base.(a)Response Length Mean:While a mini-batch size of 32 can occasionally yield strong performance, it suffers from severe reproducibility issues and frequently encounters length stagnation. Notably, simply removing the overlong penalty (w/o Overlong) fails to resolve this bottleneck.\n(b)Policy Clip Fraction:In the successful mini-batch 32 trial, fewer tokens are clipped compared to the failed cases, a phenomenon that aligns with our findings in theclip_highablation study. Because a mini-batch size of 64 is closer to on-policy and suffers less from importance sampling (IS) weight fluctuations, it naturally results in fewer clipped tokens, thereby easing the scaling of response length and performance.\n(c)Gradient Norm:Similarly, the successful mini-batch 32 run maintains a noticeably stabler and slightly lower gradient norm than the failed ones, a critical stabilizing property inherently achieved by the mini-batch 64 baseline.\n(d)Policy Entropy:The successful case sustains higher entropy throughout the training, indicating healthier exploration capabilities.\n(e-f)AIME24 Performance:Benefiting from stable optimization and sustained exploration, the successful mini-batch 32 case reaches a peak Mean@32 ofapproximately 60%and aCons@32 of 70%, which is highly comparable to the final performance of our mini-batch 64 baseline.",
+                "position": 1653
+            }
+        ]
+    },
+    {
+        "header": "Appendix FMore details on Training Cost",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x13.png",
+                "caption": "Figure 13:Stage 1: Superficial Planning (Initial Step).A baseline response from Qwen 2.5 32B. The model generates a \"template-like\" outline of the solution steps but fails to execute any actual mathematical derivation, leading to a hallucinated conclusion.",
+                "position": 1784
+            },
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x14.png",
+                "caption": "Figure 14:Stage 2: Linear Execution (DAPO Convergence, and FIPO early stage).While the model correctly executes a standard Chain-of-Thought (CoT) to reach the ground truth, its reasoning isstrictly linearand terminates immediately upon finding the first result, lacking any self-verification mechanism.",
+                "position": 1787
+            },
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x15.png",
+                "caption": "Figure 15:Stage 3: Emergent Self-Reflection (FIPO Intermediate Stage).A distinct behavioral shift occurs as FIPO training progresses. The model begins to utilize the expanded token budget forspontaneous self-reflection, cross-validating its initial conclusion through alternative mathematical paths.",
+                "position": 1790
+            },
+            {
+                "img": "https://arxiv.org/html/2603.19835/2603.19835v3/x16.png",
+                "caption": "Figure 16:Stage 4: Systematic Deep Reasoning (FIPO Late Stage).In the late stages of training, the model converges on a\"compute-heavy\" strategy. It moves beyond simple reflection to perform rigorousmulti-pass auditing—including symbolic re-derivation and granular arithmetic verification—to ensure better performance in complex reasoning tasks.",
+                "position": 1793
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
