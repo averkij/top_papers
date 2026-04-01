@@ -1,0 +1,678 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x1.png",
+                "caption": "Figure 1:Colon-Bench Annotation Pipeline.Overview of the multi-stage agentic workflow used to build the dataset, from VLM proposal generation through verification, tracking with spatial annotations, AI confirmation, and clinician review. The figure highlights how successive filters reduce false positives while adding dense spatial and textual labels for the retained windows, all easily verified by a physician at the end. The accepted annotations are then used to create a comprehensive Colon-Bench for MLLMs covering multiple video tasks: Visual Quesion Answering (VQA), binary lesion classification, and Open-Vocabulary Video Object Segmentation (OV-VOS).",
+                "position": 347
+            }
+        ]
+    },
+    {
+        "header": "2Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x2.png",
+                "caption": "Figure 2:Lesion Category Distribution.Long-tailed lesion category distribution in Colon-Bench, highlighting the diversity of lesions.",
+                "position": 474
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/144f8236c7f34e94badd9496dfc36886/frame_000000/input.jpg",
+                "caption": "Figure 3:Qualitative Comparisons.The first row shows detection (Sessile Polyp); the remaining rows show segmentation (Sessile Polyp & Erythematous Region). Columns show the input, ground truth, and model outputs. SAM-3 underperforms compared to modern MLLMs when paired with a prompted tracker such as EdgeTAM[28].",
+                "position": 776
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/144f8236c7f34e94badd9496dfc36886/frame_000000/gt.jpg",
+                "caption": "",
+                "position": 867
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/144f8236c7f34e94badd9496dfc36886/frame_000000/gpt-5.2.jpg",
+                "caption": "",
+                "position": 868
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/144f8236c7f34e94badd9496dfc36886/frame_000000/claude-opus-4.6.jpg",
+                "caption": "",
+                "position": 869
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/144f8236c7f34e94badd9496dfc36886/frame_000000/gemini-3-flash-preview.jpg",
+                "caption": "",
+                "position": 870
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/144f8236c7f34e94badd9496dfc36886/frame_000000/qwen3.5-plus.jpg",
+                "caption": "",
+                "position": 871
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/144f8236c7f34e94badd9496dfc36886/frame_000000/qwen-vl-max.jpg",
+                "caption": "",
+                "position": 872
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/144f8236c7f34e94badd9496dfc36886/frame_000000/qwen3-vl-235b.jpg",
+                "caption": "",
+                "position": 873
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/144f8236c7f34e94badd9496dfc36886/frame_000000/input.jpg",
+                "caption": "",
+                "position": 877
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/144f8236c7f34e94badd9496dfc36886/frame_000000/gt.jpg",
+                "caption": "",
+                "position": 878
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/144f8236c7f34e94badd9496dfc36886/frame_000000/gpt-5.2.jpg",
+                "caption": "",
+                "position": 879
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/144f8236c7f34e94badd9496dfc36886/frame_000000/claude-opus-4.6.jpg",
+                "caption": "",
+                "position": 880
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/144f8236c7f34e94badd9496dfc36886/frame_000000/gemini-3-flash-preview.jpg",
+                "caption": "",
+                "position": 881
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/144f8236c7f34e94badd9496dfc36886/frame_000000/qwen3.5-plus.jpg",
+                "caption": "",
+                "position": 882
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/144f8236c7f34e94badd9496dfc36886/frame_000000/qwen-vl-max.jpg",
+                "caption": "",
+                "position": 883
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/144f8236c7f34e94badd9496dfc36886/frame_000000/qwen3-vl-235b.jpg",
+                "caption": "",
+                "position": 884
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/144f8236c7f34e94badd9496dfc36886/frame_000000/facebook_sam3.jpg",
+                "caption": "",
+                "position": 885
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1154f3aa0833463280d8a855bce3425b/frame_000041/gt.jpg",
+                "caption": "",
+                "position": 898
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1154f3aa0833463280d8a855bce3425b/frame_000041/gpt-5.2.jpg",
+                "caption": "",
+                "position": 899
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1154f3aa0833463280d8a855bce3425b/frame_000041/claude-opus-4.6.jpg",
+                "caption": "",
+                "position": 900
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1154f3aa0833463280d8a855bce3425b/frame_000041/gemini-3-flash-preview.jpg",
+                "caption": "",
+                "position": 901
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1154f3aa0833463280d8a855bce3425b/frame_000041/qwen3.5-plus.jpg",
+                "caption": "",
+                "position": 902
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1154f3aa0833463280d8a855bce3425b/frame_000041/qwen-vl-max.jpg",
+                "caption": "",
+                "position": 903
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1154f3aa0833463280d8a855bce3425b/frame_000041/qwen3-vl-235b.jpg",
+                "caption": "",
+                "position": 904
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1154f3aa0833463280d8a855bce3425b/frame_000041/facebook_sam3.jpg",
+                "caption": "",
+                "position": 905
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x3.png",
+                "caption": "Figure 4:Multi-Modal Large Language Models for Lesion Segmentation.Video object segmentation results on the 272-video benchmark, where MLLMs[20,2,8,10,12,11]first localize the target lesion with 3 bounding boxes and a EdgeTAM tracker[28]propagates masks.",
+                "position": 915
+            }
+        ]
+    },
+    {
+        "header": "3Analysis and Insights",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x4.png",
+                "caption": "Figure 5:Colon-Skill on Prompted VQA.Skill-augmented prompting on the prompted VQA split, where a distilled error-based skill context yields consistent accuracy improvements for higher-capacity models.",
+                "position": 943
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x5.png",
+                "caption": "Figure 6:Ablation Study on Lesion Segmentation.We ablate the number of detection frames per windwo used in the segmentation benchmark, showing diminishing improvement in downstream segmentation quality.",
+                "position": 946
+            }
+        ]
+    },
+    {
+        "header": "4Conclusions",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.AAdditional Dataset Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x6.png",
+                "caption": "Figure 7:Polyp-Based Colon-Bench Pipeline Ablation.Temporal frame-level Precision, Recall, and F1 are reported at\neach processing stage, from raw VLM detection through human review. Annotated values are percentages from the polyp annotations of REAL-COLON[3].",
+                "position": 1673
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x7.png",
+                "caption": "Figure 8:Window Duration Distributions Across Stages.Overlaid distributions of lesion window durations (seconds at 10 FPS) are shown at successive pipeline filtering stages: VLM-detected, after verification, after AI confirmation with visual box overlays, and the final human-curated set. Each stage is a strict subset of the previous\none.",
+                "position": 1677
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.BAdditional Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/e260793a78844fa3812c511db02c4000/frame_000050/input.jpg",
+                "caption": "Figure 9:Colon-Bench Qualitative Detection Comparison.Each row shows a different endoscopy video frame:\n(1)mass,\n(2)sessile polyp,\n(3)pedunculated polyp,\n(4)ulcer,\n(5)pedunculated polyp,\n(6)sessile polyp.\nColumns show the raw input, ground-truth bounding box, and predicted bounding boxes from each model.\nBounding boxes are drawn in red. These detections are used in the segmentation benchmark using 3 box detections as prompts for the EdgeTAM tracker[28].",
+                "position": 2387
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/e260793a78844fa3812c511db02c4000/frame_000050/gt.jpg",
+                "caption": "",
+                "position": 2470
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/e260793a78844fa3812c511db02c4000/frame_000050/gpt-5.2.jpg",
+                "caption": "",
+                "position": 2471
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/e260793a78844fa3812c511db02c4000/frame_000050/claude-opus-4.6.jpg",
+                "caption": "",
+                "position": 2472
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/e260793a78844fa3812c511db02c4000/frame_000050/gemini-3-flash-preview.jpg",
+                "caption": "",
+                "position": 2473
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/e260793a78844fa3812c511db02c4000/frame_000050/qwen3.5-plus.jpg",
+                "caption": "",
+                "position": 2474
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/e260793a78844fa3812c511db02c4000/frame_000050/qwen-vl-max.jpg",
+                "caption": "",
+                "position": 2475
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/e260793a78844fa3812c511db02c4000/frame_000050/qwen3-vl-235b.jpg",
+                "caption": "",
+                "position": 2476
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/19ac4d483923425bb12d8f6caf0215a9/frame_000080/input.jpg",
+                "caption": "",
+                "position": 2479
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/19ac4d483923425bb12d8f6caf0215a9/frame_000080/gt.jpg",
+                "caption": "",
+                "position": 2480
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/19ac4d483923425bb12d8f6caf0215a9/frame_000080/gpt-5.2.jpg",
+                "caption": "",
+                "position": 2481
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/19ac4d483923425bb12d8f6caf0215a9/frame_000080/claude-opus-4.6.jpg",
+                "caption": "",
+                "position": 2482
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/19ac4d483923425bb12d8f6caf0215a9/frame_000080/gemini-3-flash-preview.jpg",
+                "caption": "",
+                "position": 2483
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/19ac4d483923425bb12d8f6caf0215a9/frame_000080/qwen3.5-plus.jpg",
+                "caption": "",
+                "position": 2484
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/19ac4d483923425bb12d8f6caf0215a9/frame_000080/qwen-vl-max.jpg",
+                "caption": "",
+                "position": 2485
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/19ac4d483923425bb12d8f6caf0215a9/frame_000080/qwen3-vl-235b.jpg",
+                "caption": "",
+                "position": 2486
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/24a756f84d164ae5a424e74805c2c8a8/frame_000062/input.jpg",
+                "caption": "",
+                "position": 2489
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/24a756f84d164ae5a424e74805c2c8a8/frame_000062/gt.jpg",
+                "caption": "",
+                "position": 2490
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/24a756f84d164ae5a424e74805c2c8a8/frame_000062/gpt-5.2.jpg",
+                "caption": "",
+                "position": 2491
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/24a756f84d164ae5a424e74805c2c8a8/frame_000062/claude-opus-4.6.jpg",
+                "caption": "",
+                "position": 2492
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/24a756f84d164ae5a424e74805c2c8a8/frame_000062/gemini-3-flash-preview.jpg",
+                "caption": "",
+                "position": 2493
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/24a756f84d164ae5a424e74805c2c8a8/frame_000062/qwen3.5-plus.jpg",
+                "caption": "",
+                "position": 2494
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/24a756f84d164ae5a424e74805c2c8a8/frame_000062/qwen-vl-max.jpg",
+                "caption": "",
+                "position": 2495
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/24a756f84d164ae5a424e74805c2c8a8/frame_000062/qwen3-vl-235b.jpg",
+                "caption": "",
+                "position": 2496
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/6be07dbb19684dc18e47d7bd94dfb59e/frame_000130/input.jpg",
+                "caption": "",
+                "position": 2499
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/6be07dbb19684dc18e47d7bd94dfb59e/frame_000130/gt.jpg",
+                "caption": "",
+                "position": 2500
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/6be07dbb19684dc18e47d7bd94dfb59e/frame_000130/gpt-5.2.jpg",
+                "caption": "",
+                "position": 2501
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/6be07dbb19684dc18e47d7bd94dfb59e/frame_000130/claude-opus-4.6.jpg",
+                "caption": "",
+                "position": 2502
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/6be07dbb19684dc18e47d7bd94dfb59e/frame_000130/gemini-3-flash-preview.jpg",
+                "caption": "",
+                "position": 2503
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/6be07dbb19684dc18e47d7bd94dfb59e/frame_000130/qwen3.5-plus.jpg",
+                "caption": "",
+                "position": 2504
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/6be07dbb19684dc18e47d7bd94dfb59e/frame_000130/qwen-vl-max.jpg",
+                "caption": "",
+                "position": 2505
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/6be07dbb19684dc18e47d7bd94dfb59e/frame_000130/qwen3-vl-235b.jpg",
+                "caption": "",
+                "position": 2506
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/31dd21778e2e4e5e9fb6b812af0b1c57/frame_000000/input.jpg",
+                "caption": "",
+                "position": 2509
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/31dd21778e2e4e5e9fb6b812af0b1c57/frame_000000/gt.jpg",
+                "caption": "",
+                "position": 2510
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/31dd21778e2e4e5e9fb6b812af0b1c57/frame_000000/gpt-5.2.jpg",
+                "caption": "",
+                "position": 2511
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/31dd21778e2e4e5e9fb6b812af0b1c57/frame_000000/claude-opus-4.6.jpg",
+                "caption": "",
+                "position": 2512
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/31dd21778e2e4e5e9fb6b812af0b1c57/frame_000000/gemini-3-flash-preview.jpg",
+                "caption": "",
+                "position": 2513
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/31dd21778e2e4e5e9fb6b812af0b1c57/frame_000000/qwen3.5-plus.jpg",
+                "caption": "",
+                "position": 2514
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/31dd21778e2e4e5e9fb6b812af0b1c57/frame_000000/qwen-vl-max.jpg",
+                "caption": "",
+                "position": 2515
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/31dd21778e2e4e5e9fb6b812af0b1c57/frame_000000/qwen3-vl-235b.jpg",
+                "caption": "",
+                "position": 2516
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/58a6cecc191142cf852cd8368d985ea3/frame_000000/input.jpg",
+                "caption": "",
+                "position": 2519
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/58a6cecc191142cf852cd8368d985ea3/frame_000000/gt.jpg",
+                "caption": "",
+                "position": 2520
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/58a6cecc191142cf852cd8368d985ea3/frame_000000/gpt-5.2.jpg",
+                "caption": "",
+                "position": 2521
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/58a6cecc191142cf852cd8368d985ea3/frame_000000/claude-opus-4.6.jpg",
+                "caption": "",
+                "position": 2522
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/58a6cecc191142cf852cd8368d985ea3/frame_000000/gemini-3-flash-preview.jpg",
+                "caption": "",
+                "position": 2523
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/58a6cecc191142cf852cd8368d985ea3/frame_000000/qwen3.5-plus.jpg",
+                "caption": "",
+                "position": 2524
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/58a6cecc191142cf852cd8368d985ea3/frame_000000/qwen-vl-max.jpg",
+                "caption": "",
+                "position": 2525
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/detection/58a6cecc191142cf852cd8368d985ea3/frame_000000/qwen3-vl-235b.jpg",
+                "caption": "",
+                "position": 2526
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1154f3aa0833463280d8a855bce3425b/frame_000041/input.jpg",
+                "caption": "Figure 10:Colon-Bench Qualitative Segmentation Comparison.Each row shows a different endoscopy video frame:\n(1)erythematous region,\n(2)lipoma,\n(3)sessile polyp,\n(4)erosion,\n(5)ulcer,\n(6)erythematous region.\nColumns show the raw input, ground-truth mask overlay, and predicted mask overlays from each model (including SAM 3).\nMasks are rendered as semi-transparent purple overlays.",
+                "position": 2543
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1273e9e7c3d24b44aa358702d757f4fe/frame_000080/input.jpg",
+                "caption": "",
+                "position": 2644
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1273e9e7c3d24b44aa358702d757f4fe/frame_000080/gt.jpg",
+                "caption": "",
+                "position": 2645
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1273e9e7c3d24b44aa358702d757f4fe/frame_000080/gpt-5.2.jpg",
+                "caption": "",
+                "position": 2646
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1273e9e7c3d24b44aa358702d757f4fe/frame_000080/claude-opus-4.6.jpg",
+                "caption": "",
+                "position": 2647
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1273e9e7c3d24b44aa358702d757f4fe/frame_000080/gemini-3-flash-preview.jpg",
+                "caption": "",
+                "position": 2648
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1273e9e7c3d24b44aa358702d757f4fe/frame_000080/qwen3.5-plus.jpg",
+                "caption": "",
+                "position": 2649
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1273e9e7c3d24b44aa358702d757f4fe/frame_000080/qwen-vl-max.jpg",
+                "caption": "",
+                "position": 2650
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1273e9e7c3d24b44aa358702d757f4fe/frame_000080/qwen3-vl-235b.jpg",
+                "caption": "",
+                "position": 2651
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/1273e9e7c3d24b44aa358702d757f4fe/frame_000080/facebook_sam3.jpg",
+                "caption": "",
+                "position": 2652
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/2393b6bbe1274740b36976d6315062ed/frame_000000/input.jpg",
+                "caption": "",
+                "position": 2666
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/2393b6bbe1274740b36976d6315062ed/frame_000000/gt.jpg",
+                "caption": "",
+                "position": 2667
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/2393b6bbe1274740b36976d6315062ed/frame_000000/gpt-5.2.jpg",
+                "caption": "",
+                "position": 2668
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/2393b6bbe1274740b36976d6315062ed/frame_000000/claude-opus-4.6.jpg",
+                "caption": "",
+                "position": 2669
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/2393b6bbe1274740b36976d6315062ed/frame_000000/gemini-3-flash-preview.jpg",
+                "caption": "",
+                "position": 2670
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/2393b6bbe1274740b36976d6315062ed/frame_000000/qwen3.5-plus.jpg",
+                "caption": "",
+                "position": 2671
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/2393b6bbe1274740b36976d6315062ed/frame_000000/qwen-vl-max.jpg",
+                "caption": "",
+                "position": 2672
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/2393b6bbe1274740b36976d6315062ed/frame_000000/qwen3-vl-235b.jpg",
+                "caption": "",
+                "position": 2673
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/2393b6bbe1274740b36976d6315062ed/frame_000000/facebook_sam3.jpg",
+                "caption": "",
+                "position": 2674
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/e5d5c2132523445fada4f2083b32c159/frame_000103/input.jpg",
+                "caption": "",
+                "position": 2677
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/e5d5c2132523445fada4f2083b32c159/frame_000103/gt.jpg",
+                "caption": "",
+                "position": 2678
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/e5d5c2132523445fada4f2083b32c159/frame_000103/gpt-5.2.jpg",
+                "caption": "",
+                "position": 2679
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/e5d5c2132523445fada4f2083b32c159/frame_000103/claude-opus-4.6.jpg",
+                "caption": "",
+                "position": 2680
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/e5d5c2132523445fada4f2083b32c159/frame_000103/gemini-3-flash-preview.jpg",
+                "caption": "",
+                "position": 2681
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/e5d5c2132523445fada4f2083b32c159/frame_000103/qwen3.5-plus.jpg",
+                "caption": "",
+                "position": 2682
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/e5d5c2132523445fada4f2083b32c159/frame_000103/qwen-vl-max.jpg",
+                "caption": "",
+                "position": 2683
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/e5d5c2132523445fada4f2083b32c159/frame_000103/qwen3-vl-235b.jpg",
+                "caption": "",
+                "position": 2684
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/e5d5c2132523445fada4f2083b32c159/frame_000103/facebook_sam3.jpg",
+                "caption": "",
+                "position": 2685
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/7b87b8b201174047bf18681b0117cecc/frame_000154/input.jpg",
+                "caption": "",
+                "position": 2688
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/7b87b8b201174047bf18681b0117cecc/frame_000154/gt.jpg",
+                "caption": "",
+                "position": 2689
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/7b87b8b201174047bf18681b0117cecc/frame_000154/gpt-5.2.jpg",
+                "caption": "",
+                "position": 2690
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/7b87b8b201174047bf18681b0117cecc/frame_000154/claude-opus-4.6.jpg",
+                "caption": "",
+                "position": 2691
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/7b87b8b201174047bf18681b0117cecc/frame_000154/gemini-3-flash-preview.jpg",
+                "caption": "",
+                "position": 2692
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/7b87b8b201174047bf18681b0117cecc/frame_000154/qwen3.5-plus.jpg",
+                "caption": "",
+                "position": 2693
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/7b87b8b201174047bf18681b0117cecc/frame_000154/qwen-vl-max.jpg",
+                "caption": "",
+                "position": 2694
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/7b87b8b201174047bf18681b0117cecc/frame_000154/qwen3-vl-235b.jpg",
+                "caption": "",
+                "position": 2695
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/images/snapshots/segmentation/7b87b8b201174047bf18681b0117cecc/frame_000154/facebook_sam3.jpg",
+                "caption": "",
+                "position": 2696
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x8.png",
+                "caption": "Figure 11:Colon-Bench Prompted VQA Accuracy.VQA accuracy (%) on the Colon-Benchpromptedbenchmark (1,485 questions) is computed as\ncorrect answers divided by the total number of questions so that\nunanswered questions count as incorrect.\nThe dashed red line indicates the 20% random-chance baseline.\nModels are ordered by accuracy (highest first), and colours denote model family.",
+                "position": 2713
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x9.png",
+                "caption": "Figure 12:Colon-Bench Unprompted VQA Accuracy.VQA accuracy (%) on the Colon-Benchunpromptedbenchmark (2,740 questions) follows the same protocol as the prompted benchmark: all unanswered\nquestions are treated as incorrect.\nThe dashed red line indicates the 20% random-chance baseline.\nModels are ordered by accuracy (highest first), and colours denote model family.",
+                "position": 2720
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x10.png",
+                "caption": "Figure 13:Colon-Bench Detection Metric Breakdown.Object detection results on the Colon-Bench (272 videos) evaluate each model’s ability to localise lesions via bounding-box prediction. These detections are used in the main segmentation benchmark.\nThree metrics are reported for each model:F1 Score(primary sort key),AP@50(average precision at IoU≥0.50\\,{\\geq}\\,0.50), andmAP@50-95(mean average precision averaged over\nIoU thresholds 0.50-0.95).\nModels are ordered by F1 (highest first).",
+                "position": 2726
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x11.png",
+                "caption": "Figure 14:Colon-Bench Classification Accuracy Summary.Binary lesion classification accuracy (%) on the Colon-Bench classification benchmark (790 records) is computed after each model predicts whether a lesion is present\n(positive) or absent (negative).\nAccuracy is computed over all records; unevaluated records count as\nincorrect.\nThe dashed red line indicates the 50% random-chance baseline.\nModels are ordered by accuracy (highest first), and colours denote model family.",
+                "position": 2735
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x12.png",
+                "caption": "Figure 15:Colon-Bench Classification Precision,Recall,F1.Binary lesion classificationPrecision,Recall, andF1 Score(%) are reported on the Colon-Bench classification benchmark (790 records) for the positive (polyp-present) class.\nModels are ordered by F1 (highest first).",
+                "position": 2743
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.CAdditional Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x13.png",
+                "caption": "Figure 17:Error Patterns: Unprompted Split.Normalized error rate by lesion category (1.0 = model average).",
+                "position": 3049
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x14.png",
+                "caption": "Figure 18:Error Patterns: Prompted Split.Normalized error rate by lesion category (1.0 = model average).",
+                "position": 3052
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x15.png",
+                "caption": "Figure 19:Colon-Skill Effect: Prompted VQA.Effect of skill context on VQA performance (promptedsplit).",
+                "position": 3055
+            },
+            {
+                "img": "https://arxiv.org/html/2603.25645/2603.25645v1/x16.png",
+                "caption": "Figure 20:Colon-Skill Effect: Unprompted VQA.Effect of skill context on VQA performance (unpromptedsplit).",
+                "position": 3058
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
