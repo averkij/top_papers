@@ -1,0 +1,218 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/headline.png",
+                "caption": "Figure 1:The GPU-FPGA heterogeneous system (1 MI210 + 1 Alveo U55C) can provide1.2−1.8×1.2-1.8\\timesspeedup and1.3−4.7×1.3-4.7\\timesenergy cost reduction consistently over a wide range of long-context LLM inference optimizations. “SA-R” stands for SeerAttention-R and “DSA” stands for DeepSeek Attention.",
+                "position": 245
+            }
+        ]
+    },
+    {
+        "header": "2Background",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/memory_manage_flow.png",
+                "caption": "Figure 2:Four-Step Memory Processing Pipeline in LLMs:Prepare Memorypreprocesses and structures raw memory for efficient access;Compute Relevancyassigns relevance scores to memory entries with respect to the input query;Retrievalextracts the most relevant memory based on these scores; andApply to Inferenceintegrates retrieved content and input into intermediate outputs, used in the rest operations in LLMs to produce tokens.",
+                "position": 650
+            }
+        ]
+    },
+    {
+        "header": "3Memory Processing in LLM Inference",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/sa_v2.png",
+                "caption": "Figure 3:Percentage of latency spent on memory processing for sparse attention methods. With 1M tokens, memory processing can take 22%–81% of the decoding time.",
+                "position": 710
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/rag.png",
+                "caption": "Figure 4:Percentage of latency on memory processing for RAG using the Wikipedia dump(Suet al.,2024). For two-stage RAG, reranking is time consuming, leading to a high percentage at 500K and slow increment as document count grows.",
+                "position": 719
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/context_mem_and_memagent.png",
+                "caption": "Figure 5:Left: Percentage of latency on memory processing for parameterized memory (Titans/HMT, LaCT). Right: Percentage of latency on memory processing for MemAgent.",
+                "position": 722
+            }
+        ]
+    },
+    {
+        "header": "4Computational Heterogeneity",
+        "images": []
+    },
+    {
+        "header": "5GPU-FPGA Heterogeneous System",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/system_v2.png",
+                "caption": "Figure 6:Kernel mapping and data communication on the GPU-FPGA system. (a) Sparse attention and RAG employ general setup, where the GPU prepares the memory and apply to tthe inference and the FPGA execute an efficient fused kernel for compute relevancy and retrieval. (b) For MemAgent, we utilize prefill-decode disaggregation where the FPGA operates LLM decoding and the GPU handles prefilling. (c) For Memory as Context, we update the data mapping for locality: memory on the FPGA, retrieved memory delivered from the FPGA to the GPU, and output is directly streamed to Prepare Memory.",
+                "position": 935
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/kernel.png",
+                "caption": "Figure 7:Architecture of the FPGA kernel for General Setup. A streaming dataflow design connecting two modules: (a) Compute Relevancy uses fast SRAM (BRAM+URAM) and HBM to store compressed keys, where an inner-product engine consumes queries and computes scores; (b) Retrieval performs partial and weighted sum across query heads and feeds results to a top-kkretriever that continuously maintains a running top-kklist.",
+                "position": 955
+            }
+        ]
+    },
+    {
+        "header": "6Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/sparse_attention_total.png",
+                "caption": "Figure 8:End-to-end speedup of the GPU-FPGA heterogeneous system over the baseline for sparse attention mechanisms.",
+                "position": 1044
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/sparse_attention_kernel.png",
+                "caption": "Figure 9:Speedup for the memory processing steps deployed on the GPU-FPGA heterogeneous system for sparse attentions.",
+                "position": 1047
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/rag_combined_v2.png",
+                "caption": "Figure 10:Left: End-to-end speedup of the GPU-FPGA system over the baseline for RAG. Right: Speedup of memory processing for the single stage RAG (DRAGIN/FLARE/FS-RAG) and two stage RAG. The reranker of the two stage RAG is executed on GPU.",
+                "position": 1050
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/mac_hmt.png",
+                "caption": "Figure 11:Left: End-to-end latency of the GPU-FPGA system vs.the baseline for memory as context method. Right: Latency for memory processing in memory as context. Similar to Titans, we use a linear projection on the current segment for query generation.",
+                "position": 1068
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/memagent.png",
+                "caption": "Figure 12:Left: End-to-end latency of the GPU-FPGA heterogeneous system vs. the GPU-centric system for MemAgent. Right: Latency for memory processing in MemAgent.",
+                "position": 1071
+            }
+        ]
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "8Impact Statement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ARelated Works",
+        "images": []
+    },
+    {
+        "header": "Appendix BDetail Computation Properties of Memory Processing Pipeline",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/arith_intensity_1.png",
+                "caption": "Figure 13:Arithmetic intensity (FLOPs/byte) of memory processing pipeline and the rest operations in LLM inference for sparse attention, single-stage RAG, Memory as Context, and TTT/LaCT. For RAG, prepare memory is a one-time operation and will be amortized with multiple queries.",
+                "position": 2128
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/arith_intensity_2.png",
+                "caption": "Figure 14:Arithmetic intensity of memory rocessing pipeline and the rest operations in LLM inference for two-stage RAG. Each stage has a compute relevancy and retrieval step.",
+                "position": 2131
+            }
+        ]
+    },
+    {
+        "header": "Appendix CCross-device Communication",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/pcie.png",
+                "caption": "Figure 15:(a) Standard cross device data transfer using memory copy for heterogeneous system. (b) PCIe P2P data transfer to bypass system DRAM accesses.",
+                "position": 2173
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/pcie_lat.png",
+                "caption": "Figure 16:Transfer latency on PCIe bus against the transfer data size. For transferring indices (KB) and single-token KV embeddings (MB) are in the order of us, which is negligible compared to the latency of memory processing.",
+                "position": 2186
+            }
+        ]
+    },
+    {
+        "header": "Appendix DDetail Experiment Settings",
+        "images": []
+    },
+    {
+        "header": "Appendix EFPGA Kernel Design",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/hmt_dataflow.png",
+                "caption": "Figure 17:FPGA kernel architecture for Memory as Context method. The kernel is a dataflow design with each module fully data driven compute a single operation. Past memory embeddings are cached in the HBM and the segment embeddings are loaded from CPU directly for each incoming segment.",
+                "position": 2300
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/fpga_llm.png",
+                "caption": "Figure 18:FPGA kernel architecture for MemAgent. Following the design in prior works(Zenget al.,2024; Heet al.,2025c,b), we design the kernel specialized to LLM decoding, where the KV cache is delivered from the GPU through PCIe. Linear projection are executed in INT4 to align with the weight precision, and the rest operations (attention, SwiGLU, LayerNorm) are calculated at FP32 to maintain accuracy of the model.",
+                "position": 2306
+            }
+        ]
+    },
+    {
+        "header": "Appendix FFPGA Kernel Improvement Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix GExpanded Results for Sparse Attention and RAG",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/sparse_attn_detail.png",
+                "caption": "Figure 19:End-to-end latency of each sparse attention mechanism on the baseline and GPU-FPGA system with respect to the sequence length.",
+                "position": 2383
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/sparse_attn_kernel.png",
+                "caption": "Figure 20:Latency of memory processing in each sparse attention mechanism with respect to the sequence length.",
+                "position": 2386
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/rag_detail.png",
+                "caption": "Figure 21:End-to-end latency of each RAG system on the baseline system and GPU-FPGA system with respect to the document counts.",
+                "position": 2389
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/rag_kernel.png",
+                "caption": "Figure 22:Latency of memory processing in single stage RAG using BM25 as the retrieval heuristic (DRAGIN, FLARE, FS-RAG) and two stage RAG with respect to the document counts.",
+                "position": 2392
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/sparse_attn_energy_v2.png",
+                "caption": "Figure 23:Energy efficiency of sparse attention mechanisms in Joule per token.",
+                "position": 2395
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/rag_energy.png",
+                "caption": "Figure 24:Energy efficiency of RAG systems in Joule per request.",
+                "position": 2398
+            }
+        ]
+    },
+    {
+        "header": "Appendix HResults with NVIDIA A100",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/dsa_vs_a100.png",
+                "caption": "Figure 25:The relative speedup of end-to-end inference of DeepSeek V3.2 Exp with DeepSeek Attention when deployed on MI210, A100, MI210 + U55C, and A100 + U55C (estimated). A100 is generally faster in LLM inference than MI210. When integrating U55C with A100, the GPU-FPGA heterogeneous system can still speed up the inference.",
+                "position": 2409
+            },
+            {
+                "img": "https://arxiv.org/html/2603.29002/2603.29002v1/figures/dsa_vs_a100_kernel.png",
+                "caption": "Figure 26:The relative speedup of memory processing in DeepSeek Attention when deployed on MI210, A100, MI210 + U55C, and A100 + U55C (estimated). Even with MI210, the GPU-FPGA heterogeneous system can still outperform A100.",
+                "position": 2412
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
