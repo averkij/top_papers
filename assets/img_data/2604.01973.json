@@ -1,0 +1,136 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.01973/2604.01973v1/x1.png",
+                "caption": "Figure 1:NearID: From Context to Identity.(Left)Traditional representations entangle object identity with background context.(Middle)Synthetic Data lacks explicit control over visually similar distractors.(Right)NearIDintroduces matched-context distractors to remove contextual shortcuts and isolate intrinsic identity signals.",
+                "position": 291
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.01973/2604.01973v1/x2.png",
+                "caption": "Figure 2:NearID overview.Left:In the pretrained image-embedding manifold (e.g., SigLIP2[64]), identity-consistentpositivescan be misaligned: edited or re-rendered views of the same instance may lie farther from the anchor than visually confusablenegatives(NearID distractors illustrated bydi<djd_{i}<d_{j}), which degrades retrieval and scoring reliability.Right:We keep the SigLIP2 image encoder frozen and train only a lightweight MAP[79,24]projection head to reshape the similarity geometry for the target task.\nCompared to the frozen baseline, the trained head increases similarity for true positives (green) while pushing NearID distractors and unrelated gallery items lower (red), improving the desired ordering of similarity scores with respect to a gallery.",
+                "position": 350
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.01973/2604.01973v1/x3.png",
+                "caption": "Figure 3:Left:Attention map comparison vs baseline on positives and negatives.Right:Summary of properties evaluated in this paper. NearID improves matched-context Near-ID rejection on NearID-bench and transfers to part-level identity evaluation on MTG, while remaining mask-free at inference.",
+                "position": 559
+            },
+            {
+                "img": "https://arxiv.org/html/2604.01973/2604.01973v1/x3.png",
+                "caption": "",
+                "position": 562
+            }
+        ]
+    },
+    {
+        "header": "3NearID",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.01973/2604.01973v1/x4.png",
+                "caption": "Figure 4:Per-category human alignment (M−HM-H) on DreamBench++[46].Each radar shows the Pearson correlation between a metric and human concept-preservation judgments across four DB++ categories;NearID (Ours)is repeated as a dashed reference in each subplot.\nDespite training exclusively on rigid objects, NearID improves over the frozen SigLIP2 baseline onAnimal(+0.105+0.105) andHuman(+0.065+0.065), indicating that disentangling identity from context transfers across semantic domains.\nThe expected decrease onStyle(−0.092-0.092), a category entirely absent from training, confirms that the gains reflect genuine identity learning rather than general score inflation.",
+                "position": 905
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.01973/2604.01973v1/x5.png",
+                "caption": "Figure 5:KernelPCA visualization of Near-Identity separation.We project embeddings forn=7n{=}7identities (S1–S7) into 2D using identical KernelPCA[52]settings in both panels.\nCircles denote positives (same identity) and crosses denote matched-context NearID distractors (negatives).\nCompared to the frozen SigLIP2 baseline, NearID increases separation by pushing the distractors away from the corresponding positive clusters, providing visual evidence of improved near-identity discrimination.",
+                "position": 1134
+            },
+            {
+                "img": "https://arxiv.org/html/2604.01973/2604.01973v1/x5.png",
+                "caption": "",
+                "position": 1137
+            },
+            {
+                "img": "https://arxiv.org/html/2604.01973/2604.01973v1/x6.png",
+                "caption": "",
+                "position": 1141
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.AContrastive Training Paradigm Comparison",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.01973/2604.01973v1/x7.png",
+                "caption": "Figure 6:Contrastive training paradigms.(A) SimCLR[8]forms positive pairs from two heavily augmented views of a single real image, learning pixel-level invariance via pairwise InfoNCE.(B) StableRep[63]replaces hand-crafted augmentations with generative diversity: multiple synthetic images produced from the same caption (different diffusion seeds) serve as multi-positive sets, learning caption-level invariance.(C) NearID (ours)draws positives from a curated multi-view dataset of up to three synthetic images per identity, generated via the SynCD pipeline across different backgrounds.\nIn addition to these identity-preserving positives, NearID constructsnear-identity distractors, visually similar but distinct instances inpainted into the same background as the anchor, providing a structured negative signal absent from both SimCLR and StableRep.",
+                "position": 1977
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.BDataset Construction Details",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.CAdditional Qualitative Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.01973/2604.01973v1/x8.png",
+                "caption": "Figure 7:NearID qualitative results.Each row shows one identity: Anchor — Positive 1 — Positive 2 — Distractor 1 — Distractor 2.\nPositives depict the same instance in a different background; near-identity distractors show a different but visually similar instance inpainted into the anchor’s original background.NearID (N)consistently assigns higher scores to positives than to distractors across diverse object categories (storage crates, conch shells, basketballs, coffee cups, spacecraft).\nIn contrast, frozen SigLIP2 (S) frequently assigns distractor scores on par with or exceeding positives; for instance, in the seashell rowSrates Distractor 2 at0.970.97, actually exceeding Positive 1 (0.790.79), whileNcorrectly suppresses the distractor to0.710.71.\nThe VLM judge (VL) is inconsistent: near-zero scores for the basketball row (0.100.10) yet1.001.00for a spacecraft distractor, reflecting the VLM’s tendency toward category-level rather than instance-level reasoning.\nNearID successfully resolves these confounds, maintaining a clear margin between positives and near-identity distractors in all five categories shown.",
+                "position": 2049
+            },
+            {
+                "img": "https://arxiv.org/html/2604.01973/2604.01973v1/x9.png",
+                "caption": "Figure 8:MTG qualitative results.Each row shows one identity: Anchor — Positive — Distractor 1 — Distractor 2.\nDistractors are generated by inpainting a localized part edit (e.g., the central motif of a brooch, the toe-cap design of a boot) while preserving the overall object shape and background; Oracle (O) measures the fractional area of the edited region.\nThe red contour marks the edited part boundary; the green contour traces the full object extent.\nIn the ornate brooch row, frozen SigLIP2 (S=0.93=0.93) actually ranks Distractor 1higherthan the genuine Positive (0.890.89), a failure caused by overall appearance similarity.NearID (N)correctly ranks Positive (0.960.96) above both distractors (0.790.79,0.840.84), detecting the fine-grained motif difference despite near-identical backgrounds.\nIn the boot row, VSM (V) assigns Distractor 2 a score of0.970.97, nearly identical to the Positive (0.980.98), whereas NearID cleanly separates them (0.950.95vs.0.660.66) even though the Oracle score (0.470.47) confirms a moderate but genuine edit.\nThese examples illustrate that NearID captures part-level identity differences beyond what holistic embedding models detect.",
+                "position": 2060
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.DComputational Cost",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.EAdditional Quantitative Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.01973/2604.01973v1/x10.png",
+                "caption": "(a)Frozen embedding baselines",
+                "position": 2333
+            },
+            {
+                "img": "https://arxiv.org/html/2604.01973/2604.01973v1/x10.png",
+                "caption": "(a)Frozen embedding baselines",
+                "position": 2336
+            },
+            {
+                "img": "https://arxiv.org/html/2604.01973/2604.01973v1/x11.png",
+                "caption": "(b)VLM, VSM & NearID (Ours)",
+                "position": 2341
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
