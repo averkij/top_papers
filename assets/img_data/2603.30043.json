@@ -1,0 +1,279 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x1.png",
+                "caption": "Figure 1:Video diffusion models plan early.Decoded intermediatex^0\\hat{x}_{0}predictions reveal that the model commits to a trajectory within the first few denoising steps(green box); later steps refine visual details but rarely alter the path(blue box).",
+                "position": 273
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x2.png",
+                "caption": "Figure 2:Overview of ChEaP.(Left)Early Planning Beam Searchscores early plans from partially denoised predictions and selects the most promising candidates for full generation.\n(Right)Chainingreconditions on the last frame of successful traces to extend reasoning beyond the single-generation horizon.",
+                "position": 299
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Mazes as a Controlled Testbed for Studying Reasoning",
+        "images": []
+    },
+    {
+        "header": "4Early Plan Commitment in Video Diffusion Models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x3.png",
+                "caption": "Figure 3:Early plans stay consistent.(Left) Across multiple settings, the early trajectories emerging from decodedx^0\\hat{x}_{0}predictions at step 5 match the final trajectory.\n(Right) Mean trajectory convergence throughout the denoising process.\nStep 5 already reaches 93%,i.e.trajectories stay converged (over 1634×44{\\times}4mazes).",
+                "position": 432
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x4.png",
+                "caption": "Figure 4:Stepwise refinement.Mean pairwise trajectory IoU amongK=5K{=}5re-noised completions at each stepτ\\tau, across grid sizes 4–10. Even atτ=1\\tau{=}1, branch trajectories are far more similar to each other than trajectories from different seeds (dashed line), indicating that the route is largely encoded in the initial noise sample.",
+                "position": 476
+            }
+        ]
+    },
+    {
+        "header": "5Trajectory Screening for Efficient Sampling",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x5.png",
+                "caption": "Figure 5:EPBS finds solutions much more efficiently than best-of-NN.Accuracy vs Function Evaluations (NFEs) on Frozen Lake mazes across four sizes with Wan2.2-14B. EPBS consistently dominates standard best-of-NN, with large gains on larger mazes.",
+                "position": 584
+            }
+        ]
+    },
+    {
+        "header": "6Chaining generations for long-horizon reasoning",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x6.png",
+                "caption": "Figure 6:EPBS fails beyond the single-generation horizon.While short paths are solved reliably, success drops sharply for trajectories longer than 10–12 steps. This breakdown persists even with strong seed selection, indicating a limitation in executing long plans rather than selecting them.",
+                "position": 750
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x7.png",
+                "caption": "Figure 7:Chaining extends reasoning beyond the single-generation horizon.Wan 2.2 success rates on Frozen Lake mazes by solution length.\nChaining provides the most benefit on mazes where the solution length exceeds the generation window (≥10\\geq 10steps).\nThe largest gain is on long mazes, from7%7\\%to67%67\\%success rate with ChEaP.",
+                "position": 927
+            }
+        ]
+    },
+    {
+        "header": "7What Breaks When Video Models Fail?",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x8.png",
+                "caption": "Figure 8:Failure mode comparison.Wan2.2 (left) goes from\nhorizon-limited to constraint-dominated as maze size increases. HunyuanVideo (right)\nis constraint-dominated atallsizes, suggesting that step distillation\ndegrades structural adherence independently of horizon.",
+                "position": 969
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x9.png",
+                "caption": "Figure 9:The model “cheats” on hard mazes.When the trajectory is too long to complete within the generation window,\nthe model sacrifices structural adherence to fulfill the prompt.Top:the gift teleports from the far corner to an adjacent cell,\nallowing the agent to “solve” the maze without traversing the full path.Bottom:a second agent spawns near the goal and reaches it,\nwhile the original agent remains stranded.",
+                "position": 994
+            }
+        ]
+    },
+    {
+        "header": "8Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.AImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.BEPBS Sensitivity Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x10.png",
+                "caption": "Figure 0.B.1:Probe step sensitivity.Pass@2 vs. NFE budget for probe stepsτ∈{2,3,5,10,15,20}\\tau\\in\\{2,3,5,10,15,20\\}at beam sizeK=2K=2, across four grid sizes.\nAll configurations use shared seed pools for fair comparison.τ=5\\tau=5provides\nthe best efficiency trade-off for size 4; larger mazes are less sensitive toτ\\tau.",
+                "position": 1352
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x11.png",
+                "caption": "Figure 0.B.2:Beam size ablation.Pass@KKvs. NFE budget for beam sizesK∈{1,2,3,4,5}K\\in\\{1,2,3,4,5\\}with fixed probe step (τ=5\\tau=5for sizes 4–6,τ=15\\tau=15for sizes 8–10).K=2K{=}2provides the best trade-off: it reaches\npeak accuracy at lower budgets thanK=1K{=}1without the probe-count penalty of\nlargerKKvalues.",
+                "position": 1358
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.CExtended Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/aggregate_cosine_both_models.png",
+                "caption": "Figure 0.C.1:Cross-model early plan commitment across all maze sizes.Mean trajectory convergence𝒞\\mathcal{C}between intermediatex^0\\hat{x}_{0}predictions and the final video, plotted against normalized schedule fraction.\nWe compute𝒞\\mathcal{C}using the cosine similarity between motion-energy maps, exactly as in the main text.\nBoth Wan2.2-14B (T=40T{=}40) and HunyuanVideo-1.5 (T=8T{=}8) commit to a trajectory within the first 10–15% of their denoising schedules, after which convergence largely plateaus.\nDespite using different schedulers and step counts, the normalized convergence profiles are similar, suggesting that early plan commitment is a structural property of video diffusion rather than a model-specific artifact.",
+                "position": 1496
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x12.png",
+                "caption": "Figure 0.C.2:Path length is the dominant difficulty axis for both models.HunyuanVideo’s effective planning horizon is shorter: both models solve short paths\nreliably but diverge sharply beyond 7 cells.",
+                "position": 1538
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x13.png",
+                "caption": "Figure 0.C.3:Diagnostic maze variants.From left to right:Trivial(1–2\nmoves, ceiling test),Decoy(goal visually adjacent but blocked by lake),Lake-Heavy(>75% lake, single narrow corridor), andDetour(Manhattan distance 2 but 8–12 move path around a lake wall).",
+                "position": 1569
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x14.png",
+                "caption": "Figure 0.C.4:Decoy maze: failure vs. success.Ghost-trail visualizations on a\n4×\\times4 decoy maze where the goal is visually adjacent but blocked.Left: the model beelines toward the visible goal through the lake\n(lake entry).Right: the rare seed that navigates the 5-step\ndetour around the obstruction.",
+                "position": 1591
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x15.png",
+                "caption": "Figure 0.C.5:Lake-heavy maze: failure vs. success.Ghost-trail visualizations on a\n6×\\times6 lake-heavy maze (>75% lake).Left: the agent follows the correct\ncorridor but cuts through a single lake cell at step 5 (lake entry).Right: the EPBS-selected seed navigates the full 7-step corridor without\nconstraint violations.",
+                "position": 1604
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x16.png",
+                "caption": "Figure 0.C.6:Detour maze: failure vs. success.Ghost-trail visualizations on the\nsame 4×\\times4 detour maze.Left: a typical failure—the agent walks straight\ntoward the goal through the lake (constraint violation).Right: the EPBS-selected\nsuccess—the agent navigates the 8-step detour around the lake wall. The verifier’s\nconstraint penalty correctly rejects the shortcut and surfaces the rare seed that\nrespects the maze topology.",
+                "position": 1689
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/x17.png",
+                "caption": "Figure 0.C.7:Diversity of candidate plans under different noise seeds.We overlay trajectories extracted from multiple samples of the same maze.\nIncorrect trajectories are shown in gray with reduced opacity, while a successful trajectory is shown in color.\nDespite sharing identical conditioning, different seeds produce diverse motion plans.\nImportantly, these plans are distinguishable early in the denoising process, suggesting that inference-time compute should be allocated toward selecting promising trajectories rather than refining all candidates.",
+                "position": 1717
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.DAdditional Qualitative Examples",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/commitment_rows/wan_s4_norm_103626.jpg",
+                "caption": "Figure 0.D.1:Wan2.2, size 4 (norm).The full solution path is already visible\nin theτ=5\\tau{=}5prediction; subsequent steps only sharpen the rendering without altering\nthe planned route.",
+                "position": 1746
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/commitment_rows/wan_s4_vary_686237.jpg",
+                "caption": "Figure 0.D.2:Wan2.2, size 4 (vary).The planned route is committed to byτ=5\\tau{=}5and maintains it through the final\nvideo.",
+                "position": 1751
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/commitment_rows/wan_s6_vary_486163.jpg",
+                "caption": "Figure 0.D.3:Wan2.2, size 6 (vary).A longer maze requiring more steps.\nDespite the increased path complexity, the overall route direction is locked in byτ=5\\tau{=}5.",
+                "position": 1755
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/commitment_rows/wan_s8_vary_138043.jpg",
+                "caption": "Figure 0.D.4:Wan2.2, size 8 (vary).Size 8 maze with varied lake ratio.\nThe early prediction captures the general trajectory shape, though fine-grained cell-level\ndetails continue to refine through later steps.",
+                "position": 1760
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/commitment_rows/wan_s8_vary_79768.jpg",
+                "caption": "Figure 0.D.5:Wan2.2, size 8 (vary), second example.The ghost\ntrail atτ=5\\tau{=}5already traces a path consistent with the final video, demonstrating\nthat early commitment holds across different maze instances.",
+                "position": 1765
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/commitment_rows/wan_s10_vary_84781.jpg",
+                "caption": "Figure 0.D.6:Wan2.2, size 10 (vary).The largest maze size. Even for this\n10×\\times10 grid, the model’s planned trajectory is apparent by step 5 of denoising.",
+                "position": 1770
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/commitment_rows/hunyuan_s8_vary_41975.jpg",
+                "caption": "Figure 0.D.7:HunyuanVideo-1.5, size 8 (vary).HunyuanVideo uses a\nstep-distilled schedule (T=8T{=}8). Despite the shorter schedule, the trajectory is\ncommitted by step 3 and remains stable, mirroring the early commitment seen in\nWan2.2.",
+                "position": 1774
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/commitment_rows/vrbench_maze4_easy_p2_589937.jpg",
+                "caption": "Figure 0.D.8:VR-Bench, maze_4 (easy).Early plan commitment on a VR-Bench maze with\na distinct brown/tan texture. The trajectory direction is already visible atτ=5\\tau{=}5and refines through later steps, showing that commitment generalizes beyond the Frozen Lake\nvisual style to procedurally generated maze textures.",
+                "position": 1780
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/commitment_rows/vrbench_maze1_hard_p3_385538.jpg",
+                "caption": "Figure 0.D.9:VR-Bench, maze_1 (hard).A harder VR-Bench puzzle on the blue/teal\nmaze_1 texture. Despite higher path complexity, thex^0\\hat{x}_{0}prediction atτ=5\\tau{=}5already captures the coarse trajectory shape, which persists through to the final\ngeneration.",
+                "position": 1786
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/commitment_rows/vrbench_maze2_easy_p4_532816.jpg",
+                "caption": "Figure 0.D.10:VR-Bench, maze_2 (easy).The purple/blue maze_2 texture. The ghost\ntrail atτ=2\\tau{=}2is largely noise, but byτ=5\\tau{=}5the planned path is clearly\ncommitted and matches the final output.",
+                "position": 1792
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/chaining_rows/wan_size6_size_6_norm_lake_20_maze_002.jpg",
+                "caption": "Figure 0.D.11:Wan2.2 chain, size 6 (norm), lake 20, maze 002.Two-segment chain.",
+                "position": 1805
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/chaining_rows/wan_size10_size_10_vary_lake_20_maze_002.jpg",
+                "caption": "Figure 0.D.12:Wan2.2 chain, size 10 (vary), lake 20, maze 002.Size 10 maze with\nvaried lake ratio. The longer solution path necessitates chaining.",
+                "position": 1809
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/chaining_rows/wan_size10_size_10_vary_lake_80_maze_003.jpg",
+                "caption": "Figure 0.D.13:Wan2.2 chain, size 10 (vary), lake 80, maze 003.High lake density leaves fewer safe cells, creating a narrow corridor that chaining navigates successfully.",
+                "position": 1813
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/chaining_rows/wan_vrbench_maze_3_medium_puzzle_0004.jpg",
+                "caption": "Figure 0.D.14:Wan2.2 chain, VR-Bench maze_3_medium, puzzle 0004.Chaining applied\nto a VR-Bench maze with a different visual texture than Frozen Lake. The agent navigates\na medium-difficulty procedurally generated maze across multiple segments.",
+                "position": 1816
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/chaining_rows/wan_vrbench_trapfield_2_medium_puzzle_0002.jpg",
+                "caption": "Figure 0.D.15:Wan2.2 chain, VR-Bench trapfield_2_medium, puzzle 0002.A trapfield\nenvironment where the agent must avoid trap cells (analogous to lakes). Chaining enables\ncompletion of longer trapfield paths.",
+                "position": 1821
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/chaining_rows/wan_vrbench_trapfield_2_medium_puzzle_0005.jpg",
+                "caption": "Figure 0.D.16:Wan2.2 chain, VR-Bench trapfield_2_medium, puzzle 0005.Another\ntrapfield example showing successful multi-segment navigation through a different\npuzzle layout.",
+                "position": 1826
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/chaining_rows/hunyuan_s4_size_4_vary_lake_65_maze_004.jpg",
+                "caption": "Figure 0.D.17:HunyuanVideo-1.5 chain, size 4 (vary), lake 65, maze 004.Chaining\nwith HunyuanVideo’s step-distilled schedule (T=8T{=}8). The pivot and chain segments\nare stitched to form a complete solution.",
+                "position": 1831
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/chaining_rows/hunyuan_s6_size_6_norm_lake_65_maze_004.jpg",
+                "caption": "Figure 0.D.18:HunyuanVideo-1.5 chain, size 6 (norm), lake 65, maze 004.A size 6\nmaze with 65% lake density. Chaining extends HunyuanVideo’s effective planning horizon\nbeyond a single generation.",
+                "position": 1836
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/chaining_rows/hunyuan_s6_size_6_vary_lake_80_maze_009.jpg",
+                "caption": "Figure 0.D.19:HunyuanVideo-1.5 chain, size 6 (vary), lake 80, maze 009.Despite the constrained environment, chaining produces a valid multi-segment solution.",
+                "position": 1841
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/failure_rows/cv_frozen_lake.jpg",
+                "caption": "Figure 0.D.20:Constraint violations — Frozen Lake.Ghost-trail visualizations showing\ntwo sub-types:lake entry(the elf crosses into a frozen-lake cell, violating the\nenvironment constraint) andgift movement(the goal tile shifts position during\ngeneration).",
+                "position": 1854
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/failure_rows/cv_vrbench.jpg",
+                "caption": "Figure 0.D.21:Constraint violations — VR-Bench.The agent enters a forbidden cell\n(lake or trap) in procedurally generated mazes and trapfields. Each panel uses a different\ntexture to illustrate that the failure mode is consistent across visual appearances.",
+                "position": 1860
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/failure_rows/degenerate.jpg",
+                "caption": "Figure 0.D.22:Degenerate failures.The model produces a video with little or no\nmeaningful agent motion. The ghost trail collapses to a single position, indicating that\nthe elf remains static throughout generation.",
+                "position": 1865
+            },
+            {
+                "img": "https://arxiv.org/html/2603.30043/2603.30043v1/supp_figs/horizon_limited.png",
+                "caption": "Figure 0.D.23:Horizon-limited failures.The generated trajectory respects all\nconstraints but fails to reach the goal within the 81-frame budget.Valid stall:\nthe agent follows a correct prefix but stops moving before reaching the goal.Wrong route: the agent takes a legal but sub-optimal path and runs out of frames.",
+                "position": 1870
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
