@@ -1,0 +1,162 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/x1.png",
+                "caption": "Figure 1:Illustration of visual bias.AVLLMs exhibit a critical modality bias, often prioritizing visual cues over vital audio cues. The diagram illustrates a counterfactual scene, visible objects (a blue car and a woman walking a dog) are silent and the only audible sound is an out-of-view ambulance siren. When prompted to describe the scene, the AVLLM hallucinates audio events (car engine, dog barking) and misses the actual siren sound.",
+                "position": 246
+            },
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/x2.png",
+                "caption": "Figure 2:Audio Understanding Performance.Audio understanding severely degrades under audio-visual conflict.",
+                "position": 253
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Preliminary",
+        "images": []
+    },
+    {
+        "header": "4Experimental Setup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/x3.png",
+                "caption": "Figure 3:Caption evaluation.We use an open-source reasoning LLM to evaluate audio-visual captions by assessing temporal sequences, object attributes, and cross-modal relationships. This approach is interpretable (explicit reasoning for scores) and flexible, we can calibrate it using in-context examples.",
+                "position": 411
+            },
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/x4.png",
+                "caption": "Figure 4:Mean attention from generated to input tokens.Generated tokens allocate high attention to audio in early layers (40-50% in layers 0-5), which drops to near-zero afterward. Video attention steadily increases through deeper layers, reaching 20-40% in layers 15-30.",
+                "position": 415
+            }
+        ]
+    },
+    {
+        "header": "5Investigating Attention Pattern",
+        "images": []
+    },
+    {
+        "header": "6Probing Audio Representations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/x5.png",
+                "caption": "Figure 5:Probing Audio Representations.We decode intermediate layer audio representations using the base LLM’s unembedding matrix and observe that they decode into meaningful concepts describing sound events and their sources, in multiple languages (e.g., 键盘/keyboard, typing).",
+                "position": 449
+            },
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/x6.png",
+                "caption": "Figure 6:Blocking audio-visual information flow to generated tokensWe block attention from generated tokens to vision (G↛\\nrightarrowV) or audio (G↛\\nrightarrowA) and measure impact on caption fidelity. 1)G↛\\nrightarrowAfor factual samples does not degrade video understandingⒶ as expected (ideally audio cues should not be used for video understanding) 2) surprisingly audio understandingⒷ does not degrade either, (AVLLM instead correlates audio cues from vision). On the contrary,G↛\\nrightarrowV, especially in deeper layers, in counterfactual samples, improves audio understanding Ⓓ (misleading vision features dominate over audio in cross-modal integration to generated text)",
+                "position": 453
+            }
+        ]
+    },
+    {
+        "header": "7Investigating Information Flow",
+        "images": []
+    },
+    {
+        "header": "8Investigating Origins of Visual Bias",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/x7.png",
+                "caption": "Figure 7:Illustration of AVLLM captions and comparison with LVLMs.We compare token distributions between Qwen2.5Omni and Qwen2.5VL, and measure shift (η\\eta) in token distributionunshiftedtokens (η=1\\eta=1),marginaltokens (1<η≤31<\\eta\\leq 3), andshiftedtokens (η>3\\eta>3) (Refer Sec8).Left:The model strongly attends to visual cues and predicts “helicopter” sound event confidently asserting it’s ”clear and distinct.”. Notably, when the model correctly identifies “child speaking” from audio, those tokens shift in LVLM predictions, indicating geuine audio understanding.Right:the model hallucinates that it can ”hear a man speaking”. These outputs are largelyunshiftedcompared to Qwen2.5VL demonstrating that the AVLLM’s predictions remain visually driven despite having access to audio.",
+                "position": 547
+            }
+        ]
+    },
+    {
+        "header": "9Conclusion, Limitations, and Future Work",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADataset",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/fig/dataset_factual_crow.png",
+                "caption": "Figure 8:Factual SampleA video where the visual content and audio content are highly correlated. The audio events in a factual sample can potentially be inferred by using visual cues",
+                "position": 1472
+            },
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/fig/dataset_cf_crow.png",
+                "caption": "",
+                "position": 1477
+            },
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/x8.png",
+                "caption": "Figure 10:World Sense TaskAn example task from World Sense. These tasks couple perception and reasoning.",
+                "position": 1569
+            },
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/x9.png",
+                "caption": "Figure 11:AVHBench TaskAn example task from AVHBench. These tasks evaluate perception capabilities.",
+                "position": 1572
+            }
+        ]
+    },
+    {
+        "header": "Appendix BEvaluation",
+        "images": []
+    },
+    {
+        "header": "Appendix CQualitative Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix DAdditional Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/x10.png",
+                "caption": "(a)VideoLlama 2.1:Blocking audio-visual information flow, for both factual and counterfactual samples",
+                "position": 1662
+            },
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/x10.png",
+                "caption": "(a)VideoLlama 2.1:Blocking audio-visual information flow, for both factual and counterfactual samples",
+                "position": 1665
+            },
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/x11.png",
+                "caption": "(b)MiniCPM-o2.6:Blocking audio-visual information flow, for both factual and counterfactual samples",
+                "position": 1671
+            },
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/fig/audio_caption_fidelity.png",
+                "caption": "Figure 13:The prompt used to measure audio caption fidelity.",
+                "position": 1678
+            },
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/fig/video_fidelity_prompt.png",
+                "caption": "Figure 14:The prompt used to measure video caption fidelity.",
+                "position": 1682
+            },
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/fig/videollama_final.png",
+                "caption": "Figure 15:Qualitative examples. We illustrate some outputs generated by VideoLlama along with its LLM-judge score and reasoning, for factual and counterfactal samples and under attention knockout. The examples in the first row capture audio fidelity and the ones below capture video fidelity",
+                "position": 1686
+            },
+            {
+                "img": "https://arxiv.org/html/2604.02605/2604.02605v1/fig/minicpm.png",
+                "caption": "Figure 16:Qualitative examples. We illustrate some outputs generated by MiniCPM-2.6-o along with its LLM-judge score and reasoning, for factual and counterfactal samples and under attention knockout. The examples in the first row capture audio fidelity and the ones below capture video fidelity",
+                "position": 1690
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
