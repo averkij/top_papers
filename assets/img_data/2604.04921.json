@@ -1,0 +1,136 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.04921/2604.04921v1/fig/fig_kv_budget_throughput_accuracy_memratio.png",
+                "caption": "Figure 1:Performance trade-offs on AIME25 (Qwen3-8B).(A)At equivalent accuracy (40.8%), TriAttention achieves 2.5×\\timeshigher throughput than Full Attention.(B)TriAttention reduces KV cache memory by 10.7×\\timeswhile matching Full Attention accuracy.",
+                "position": 285
+            },
+            {
+                "img": "https://arxiv.org/html/2604.04921/2604.04921v1/fig/fig_intro_combined_v2.png",
+                "caption": "Figure 2:Q/K concentration and its implications for attention.(A)Pre-RoPE Q/K vectors at the dominant frequency band are highly concentrated (high Mean Resultant LengthRR).(B)RoPE rotation disperses these vectors into arc patterns. In (A-B), three distinct input sequences are overlayed, showing this structure is stable across content.(C)This concentration holds across nearly all heads.(D)When Q/K are concentrated, attention logits can be accurately reconstructed using a trigonometric series (Pearsonr=0.72r=0.72).",
+                "position": 295
+            },
+            {
+                "img": "https://arxiv.org/html/2604.04921/2604.04921v1/fig/fig_freq_reconstruction_multimodel_row1_only.png",
+                "caption": "Figure 3:Attention reconstruction correlation across three DeepSeek-R1 distilled LLMs, including Qwen3(Qwen Team,2025), Qwen2.5(Qwen Team,2024), and Llama3(Dubeyet al.,2024). Distribution of per-head reconstruction Pearson correlation (r¯\\bar{r}) across all attention heads. The red dashed line indicates the mean. All models show right-skewed distributions with means above 0.5.",
+                "position": 310
+            }
+        ]
+    },
+    {
+        "header": "2Background and Related Work",
+        "images": []
+    },
+    {
+        "header": "3Pre-RoPE and Trigonometric Series",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.04921/2604.04921v1/x1.png",
+                "caption": "Figure 4:Method overview. From left to right: offline calibration computes Q distribution centers; then during inference, original attention is scored by combiningStrigS_{\\text{trig}}and norm-based components; the rightmost panel shows the attention map after pruning. We observe that some heads exhibit distance preference—distant keys tend to receive higher attention. However, we also find that certain keys, despite being far from the query, receive little attention due to their low norms. This motivates our two scoring components:StrigS_{\\text{trig}}captures distance preference, while the norm-based score identifies low-norm keys. In this example,StrigS_{\\text{trig}}correctly assigns low scores to nearby keys, while the norm-based score identifies the earliest token (leftmost) as unimportant due to its low norm, despite its maximal distance. Together, they accurately identify tokens that will not be attended to and prune them. See AppendixDfor visualizations with real attention maps.",
+                "position": 407
+            }
+        ]
+    },
+    {
+        "header": "4TriAttention",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.04921/2604.04921v1/fig/fig_kv_budget_accuracy_combined_4panel.png",
+                "caption": "Figure 5:Performance comparison on Qwen3-8B.(A–C)Accuracy vs. KV cache budget on three mathematical reasoning benchmarks. TriAttention consistently outperforms R-KV across all budget levels.(D)Memory retention on Recursive State Query benchmark. Depth refers to DFS recursion depth; deeper recursion requires retaining more intermediate states, increasing memory pressure.",
+                "position": 720
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Impact Statement",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix ALimitations and Future Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BRoPE and Trigonometric Series Connection",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.04921/2604.04921v1/fig/RECURSIVE_SIMULATION.jpg",
+                "caption": "Figure A:Evaluating memory via recursive simulation.Left: With complete memory, all intermediate states are retained and correct values propagate upward.Right: When an intermediate state is lost (State2), the error propagates through all subsequent return values, corrupting the final result.",
+                "position": 1825
+            }
+        ]
+    },
+    {
+        "header": "Appendix CRecursive State Query Benchmark Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.04921/2604.04921v1/x2.png",
+                "caption": "Figure B:Method visualization with real attention maps, corresponding to the schematic in Figure4.Top row: The four stages of TriAttention. (1) We compute the Q/K centers𝔼​[q]\\mathbb{E}[q],𝔼​[k]\\mathbb{E}[k]from pre-RoPE distributions. (2) Using the trigonometric series, we computeStrigS_{\\text{trig}}which scores keys based on distance preference. (3) We add the norm-based scoreSnormS_{\\text{norm}}, weighted by concentration, to obtain the final scoreS¯​(k)\\bar{S}(k). (4) We retain top-scoring keys and evict the rest.Bottom row: Real attention maps illustrating the scenario described in Figure4. From left to right: original attention pattern showing distance preference;StrigS_{\\text{trig}}visualization capturing the diagonal structure; combined scoreS¯\\bar{S}incorporating norm information; attention after KV cache pruning, preserving the essential pattern.",
+                "position": 1914
+            }
+        ]
+    },
+    {
+        "header": "Appendix DMethod Visualization",
+        "images": []
+    },
+    {
+        "header": "Appendix EComparison with Additional Baselines",
+        "images": []
+    },
+    {
+        "header": "Appendix FEvaluation on Diverse Benchmarks",
+        "images": []
+    },
+    {
+        "header": "Appendix GFuture Offset Design Ablation",
+        "images": []
+    },
+    {
+        "header": "Appendix HCalibration Data Sensitivity",
+        "images": []
+    },
+    {
+        "header": "Appendix IMLA Architecture Validation",
+        "images": []
+    },
+    {
+        "header": "Appendix JReal-World Deployment: Agentic Task on a Single GPU",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.04921/2604.04921v1/fig/fig_openclaw_demo.png",
+                "caption": "Figure C:OpenClaw demo on a single RTX 4090 with Qwen3-32B (INT4). Full attention runs out of memory during multi-turn interaction, while TriAttention completes the task within the GPU memory budget. Full video is available on our GitHub page:https://github.com/WeianMao/triattention.",
+                "position": 2459
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
