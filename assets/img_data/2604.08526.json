@@ -1,0 +1,144 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.08526/2604.08526v1/x1.png",
+                "caption": "Figure 1.The FIT Dataset.We present FIT, a dataset and benchmark designed forfit-awarevirtual try-on, featuring diverse garment fits (e.g., tight, loose) and precise size annotations.Left:Sample dataset triplets showing the conditioning garment image (top), the conditioning person image (middle), and the target try-on image (bottom).Right:Visualization of the corresponding person and garment measurement annotations. Backgrounds are removed for clarity.",
+                "position": 263
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": []
+    },
+    {
+        "header": "2.Related Works",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.08526/2604.08526v1/x2.png",
+                "caption": "Figure 2.FIT dataset generation.(a)Overall pipeline: For each sample, we first simulate garment draping in 3D via GarmentCode, rendering a synthetic try-on imageIsI_{s}(see (b)). Then, we generate a text promptpp(via VLM) describing the person and garment appearance, as well as a composite normal mapInI_{n}based onIsI_{s}. We useppandInI_{n}to condition our re-texturing modelftexturef_{\\text{texture}}to generate the photorealistic try-on imageItry-onI_{\\text{try-on}}. Finally, our modelfpairedf_{\\text{paired}}generates a paired person imageIpI_{p}(see (c)) and a VLM synthesizes the corresponding layflat garmentIgI_{g}.(b)GarmentCode simulation: Given a garment design template, we compute a sewing pattern with measurementsmgm_{g}for a specific body sizeAA. Then, we cross-drape the pattern onto a different target body of sizeBBwith person measurementsmpm_{p}, using box-mesh realignment to prevent simulation failures.(c)To generate a paired person image (same person and pose, different garment), we start with a paired rendered imageIs′I_{s}^{\\prime}containing adifferentgarment than inItry-onI_{\\text{try-on}}draped onto thesamebody. Next, we derive an identity mapIidI_{\\text{id}}by masking out the combined source and paired garment regions inItry-onI_{\\text{try-on}}. Conditioned onIidI_{\\text{id}}, the paired normal mapIn′I_{n}^{\\prime}, and a paired promptp′p^{\\prime},fpairedf_{\\text{paired}}generatesIpI_{p}.",
+                "position": 367
+            }
+        ]
+    },
+    {
+        "header": "3.Fit-Inclusive Try-on (FIT) Dataset",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.08526/2604.08526v1/x3.png",
+                "caption": "Figure 3.Fit-VTO architecture. Our architecture is a flow-based diffusion model based on Flux.1-dev(Black Forest Labs,2024)and finetuned with LoRA(Huet al.,2023). FiT-VTO generates a try-on imageItry-onI_{\\text{try-on}}given a layflat garment imageIgI_{g}, paired person imageIpI_{p}, and person-garment measurementsm=[mp,mg]m=[m_{p},m_{g}]. First, image inputsIgI_{g}andIpI_{p}are encoded into latents separately through a pre-trained VAE encoder. We replace the text embeddings in Flux.1-dev with custom measurement embeddingsmembedm_{\\text{embed}}computed frommm. Person latents are channel-concatenated with the noisy target latents, while layflat latents andmembedm_{\\text{embed}}are sequence-wise concatenated withztz_{t}. After processing through the diffusion transformer, clean latents are decoded by the VAE decoder.",
+                "position": 515
+            }
+        ]
+    },
+    {
+        "header": "4.Fit-Aware Virtual Try-On",
+        "images": []
+    },
+    {
+        "header": "5.Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.08526/2604.08526v1/x4.png",
+                "caption": "Figure 4.Paired Image Generation Comparison. VLM methods struggle with pose and shape preservation, while VTO and inpainting baselines introduce artifacts. Our approach yields highly consistent paired data.",
+                "position": 712
+            }
+        ]
+    },
+    {
+        "header": "6.Scope and Limitations",
+        "images": []
+    },
+    {
+        "header": "7.Conclusions and Future Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.08526/2604.08526v1/x5.png",
+                "caption": "Figure 5.Qualitative results. We show examples of Fit-VTO results on the synthetic FIT test dataset. Fit-VTO respects person and garment inputs, while also synthesizing realistic garment fit based on person and garment measurements (zoom in for details). For brevity, we approximate the full measurements with a size label (XS-3XL). See the appendix for our size categorization chart.",
+                "position": 962
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08526/2604.08526v1/x6.png",
+                "caption": "Figure 6.Qualitative comparisons. We compare Fit-VTO to related and ablated methods using synthetic FIT test data (top two rows) and real-world VITON-HD data (bottom two rows). Overall, our method best depicts the most accurate garment appearance and fit.",
+                "position": 974
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08526/2604.08526v1/x7.png",
+                "caption": "Figure 7.Independent size control. Fit-VTO realistically visualizes garment fit across various sizes on a fixed person size.",
+                "position": 986
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional FIT Dataset Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.08526/2604.08526v1/x8.png",
+                "caption": "Figure 8.During cross-body draping, the initial boxmeshes are often misaligned with the target human models, causing draping failures (left). We explicitly realign the boxmesh to ensure successful simulation (right).",
+                "position": 1740
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08526/2604.08526v1/x9.png",
+                "caption": "Figure 9.Additional dataset examples.In each example, we show the paired person image (top left), garment image (lower left), and the target try-on image (right).",
+                "position": 1743
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAdditional Details on Data Generation Pipeline",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.08526/2604.08526v1/x10.png",
+                "caption": "Figure 10.Qualitative resizing results. Fit-VTO adapts garment fit according to individual garment measurements. We show results of independently shrinking and growing the length, width, and sleeve length with respect to the original value. Please zoom in for details.",
+                "position": 1794
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAdditional Resizing Results",
+        "images": []
+    },
+    {
+        "header": "Appendix DFailure Cases",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.08526/2604.08526v1/x11.png",
+                "caption": "Figure 11.Failure cases. (a) GarmentCode(Korosteleva and Sorkine-Hornung,2023)simulation does not model varying degrees of tightness well, leading to similar-looking fit for all garment sizes smaller than the body size. (b) As a result of (a), it is difficult to tell the level of tightness in FIT try-on images. (c) Due to the correlations in measurements across sizes, adjustments to individual measurements may also lead to undesired changes in other dimensions. In this example, increasing garment length also increases garment width.",
+                "position": 1826
+            }
+        ]
+    },
+    {
+        "header": "Appendix EComparisons to State-of-the-Art",
+        "images": []
+    },
+    {
+        "header": "Appendix FLLM and VLM Prompts",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.08526/2604.08526v1/fig_ill_fit_distribution.png",
+                "caption": "Figure 12.Garment fit distribution. We plot the frequency of each (body size, garment size) pairing in our dataset according to the size classification in Table5.",
+                "position": 1877
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08526/2604.08526v1/x12.png",
+                "caption": "Figure 13.Real-world resizing results. We show Fit-VTO try-on performance on real-world person images using varying garment sizes. Fit-VTO realistically shrinks and grows the garment fit according to uniform adjustments to the garment measurements–length, width, and sleeve length–with respect to their original values (1.0x). The size label to the left of each example corresponds to the person’s body size. Since real-world garment images with precise measurements are difficult to acquire, we use our synthetic garment images and measurements.",
+                "position": 1919
+            }
+        ]
+    },
+    {
+        "header": "Appendix GUsage of LLM’s",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
