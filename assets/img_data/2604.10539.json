@@ -1,0 +1,141 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/x1.png",
+                "caption": "Figure 1:IceCache has the best trade-off between CUDA memory footprint and time-per-output-token (TPOT) on A100 at a 36k sequence length. Baselines are chosen to represent high-accuracy (Left) and memory-efficient (Right) methods.",
+                "position": 258
+            },
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/x2.png",
+                "caption": "Figure 2:Illustration of IceCache. (1) During the prefill stage, tokens are indexed into a hierarchical data structure (the DCI-tree) according to their semantic similarity in the transformed key-embedding space. Each leaf node of the DCI-tree corresponds to a physical memory page. (2) During the decoding stage, given a queryqq, IceCache performs a tree search to identify the top-kktokens most relevant toqq. The zoomed-in section at the bottom illustrates that these relevant tokens (highlighted in yellow) tend to be clustered within the same leaf nodes and are stored together in corresponding memory pages. (3) After the query-aware retrieval, the pages containing the relevant tokens are selected, and all tokens within these pages are used in the subsequent sparse attention withqq.",
+                "position": 268
+            }
+        ]
+    },
+    {
+        "header": "2Related work",
+        "images": []
+    },
+    {
+        "header": "3Background",
+        "images": []
+    },
+    {
+        "header": "4IceCache",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/x3.png",
+                "caption": "Figure 3:Illustration of DCI-tree and IceCache: The hierarchical data structure on the left visualizes the result of indexing key embeddings, DCI-tree, where each tree node stores metadata for the tokens, such as the key ID and node index. The tables on the right depict the mapping between nodes in the DCI-tree and the corresponding pages in physical memory. For each selected node, a mapping table is used to locate the memory region containing the associated key-value embeddings.",
+                "position": 377
+            },
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/x4.png",
+                "caption": "Figure 4:After IceCache selects important KV-pages, it aggregates all selected pages into a contiguous CPU preloading buffer. This buffer is then transferred via high-throughput PCIe transaction to a pre-allocated GPU buffer. Finally, the transferred blocks are scattered into their exact locations in the KV-Cache table. This bulk transfer avoids many small copying operations over PCIe and significantly improves utilization.",
+                "position": 476
+            },
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/x4.png",
+                "caption": "Figure 4:After IceCache selects important KV-pages, it aggregates all selected pages into a contiguous CPU preloading buffer. This buffer is then transferred via high-throughput PCIe transaction to a pre-allocated GPU buffer. Finally, the transferred blocks are scattered into their exact locations in the KV-Cache table. This bulk transfer avoids many small copying operations over PCIe and significantly improves utilization.",
+                "position": 479
+            },
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/x5.png",
+                "caption": "Figure 5:(a) Baseline serial workflow, where prefilling, offloading (OL), and indexing are executed strictly in sequence. (b) IceCache pipelining, where GPU prefilling overlaps with KV-offloading via PCIe and CPU-side DCI indexing. Once KVs of layerii(LiL_{i}) arrive in CPU memory, Li-DCI-tree indexing progresses in parallel with GPU prefilling and offloading of the subsequent layer (Li+1L_{i+1}). This results in significantly reduced end-to-end prefilling latency.",
+                "position": 485
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/pass_heatmap.png",
+                "caption": "(a)Cache Budget = 256",
+                "position": 531
+            },
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/pass_heatmap.png",
+                "caption": "(a)Cache Budget = 256",
+                "position": 534
+            },
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/pass_heatmap.png",
+                "caption": "(b)Cache Budget = 128",
+                "position": 539
+            },
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/pass_heatmap.png",
+                "caption": "(c)Cache Budget = 64",
+                "position": 544
+            },
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/bar_plot.png",
+                "caption": "(a)Time to the second token.",
+                "position": 1355
+            },
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/bar_plot.png",
+                "caption": "(a)Time to the second token.",
+                "position": 1358
+            },
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/decoding_time_vs_accuracy.png",
+                "caption": "(b)Time per output token.",
+                "position": 1363
+            },
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/latency_breakdown.png",
+                "caption": "(c)TPOT Latency breakdown.",
+                "position": 1368
+            },
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/x6.png",
+                "caption": "Figure 8:Latency scaling across context lengths (150k, 200k, 250k and 300k).",
+                "position": 1461
+            },
+            {
+                "img": "https://arxiv.org/html/2604.10539/2604.10539v1/x6.png",
+                "caption": "Figure 8:Latency scaling across context lengths (150k, 200k, 250k and 300k).",
+                "position": 1463
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "7Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AMethod Overview",
+        "images": []
+    },
+    {
+        "header": "Appendix BDetails of IceCache (reuse) on LongBench",
+        "images": []
+    },
+    {
+        "header": "Appendix CPerformance on Long Generation Benchmark",
+        "images": []
+    },
+    {
+        "header": "Appendix DLLM Usage",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
