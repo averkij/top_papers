@@ -1,0 +1,135 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.11035/2604.11035v1/x1.png",
+                "caption": "Figure 1:(a)Introspective consistency: standard DLMs generate tokens whose distributionsqqdiverge from the model’s own next-step predictionspp; I-DLM trains generation and introspection to agree (p≈qp\\approx q).(b)Quality vs. throughput on MATH-500: I-DLM-8B matches Qwen3-8B (thinking) AR performance while achieving 3.1×\\timeshigher throughput and +11.8 points over LLaDA-2.1-mini (16B), and 4.0×\\timeshigher throughput over SDAR (8B).",
+                "position": 299
+            }
+        ]
+    },
+    {
+        "header": "2Background and Motivation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.11035/2604.11035v1/x2.png",
+                "caption": "(a)Generation–introspection gap.Introspective acceptance rate (avgmin⁡(1,p/q)\\min(1,p/q)) between generation (qq) and introspection (pp) distributions. AR and Ours achieve near-perfect consistency.",
+                "position": 364
+            },
+            {
+                "img": "https://arxiv.org/html/2604.11035/2604.11035v1/x2.png",
+                "caption": "(a)Generation–introspection gap.Introspective acceptance rate (avgmin⁡(1,p/q)\\min(1,p/q)) between generation (qq) and introspection (pp) distributions. AR and Ours achieve near-perfect consistency.",
+                "position": 367
+            },
+            {
+                "img": "https://arxiv.org/html/2604.11035/2604.11035v1/x3.png",
+                "caption": "(b)Compute economicsat strideN=4N{=}4.ppdenotes the per-token acceptance probability. ISD achieves high TPF at low overhead.",
+                "position": 372
+            },
+            {
+                "img": "https://arxiv.org/html/2604.11035/2604.11035v1/x4.png",
+                "caption": "(c)Batching efficiency.TPF vs. batch throughput (tokens/s) at batch size 8. SDAR’s throughput barely scales with TPF; I-DLM translates higher TPF into proportionally higher throughput.",
+                "position": 378
+            },
+            {
+                "img": "https://arxiv.org/html/2604.11035/2604.11035v1/x5.png",
+                "caption": "Figure 3:Compute efficiency(TPF/OH) vs. acceptance rate atN=4N{=}4. ISD is the only method above the break-even line.",
+                "position": 399
+            }
+        ]
+    },
+    {
+        "header": "3Introspective Diffusion Language Model",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.11035/2604.11035v1/x6.png",
+                "caption": "Figure 4:Comparison of decoding paradigms.Our I-DLM uses strict causal attention with adaptive stride (1<stride<N1<\\text{stride}<N) and is a drop-in replacement within AR serving infrastructure. ISD produces a quality-guaranteed token𝒙i+1\\bm{x}_{i+1}together with draft tokens𝒙^i+2:i+N\\hat{\\bm{x}}_{i+2:i+N}via introspective strided decoding,𝒙i+1,𝒙^i+2:i+N=πstrided​(c1:i,m1:N−1)\\bm{x}_{i+1},\\hat{\\bm{x}}_{i+2:i+N}=\\pi_{\\text{strided}}(c_{1:i},m_{1:N-1}); Residual ISD (R-ISD) additionally gates a LoRA residual for bit-for-bit lossless output:𝒙i+1:i+N=πar​(c1:i,m1:N−1)+πL​(m1:N−1)\\bm{x}_{i+1:i+N}=\\pi_{\\text{ar}}(c_{1:i},m_{1:N-1})+\\pi_{\\text{L}}(m_{1:N-1}).",
+                "position": 472
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.11035/2604.11035v1/x7.png",
+                "caption": "Figure 5:Throughput–latency tradeoffacross batch sizes (1, 4, 16, 64).",
+                "position": 1088
+            },
+            {
+                "img": "https://arxiv.org/html/2604.11035/2604.11035v1/x8.png",
+                "caption": "(a)Training ablation.I-DLM (causal + logit shift) vs. block diffusion (block-causal, no logit shift).",
+                "position": 1106
+            },
+            {
+                "img": "https://arxiv.org/html/2604.11035/2604.11035v1/x8.png",
+                "caption": "(a)Training ablation.I-DLM (causal + logit shift) vs. block diffusion (block-causal, no logit shift).",
+                "position": 1109
+            },
+            {
+                "img": "https://arxiv.org/html/2604.11035/2604.11035v1/x9.png",
+                "caption": "(b)Systems optimization ablation.Cumulative throughput atC=1,8,32C{=}1,8,32. The full system achieves2.12.1–2.5×2.5\\timesover the naive baseline.",
+                "position": 1114
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADetailed Related work",
+        "images": []
+    },
+    {
+        "header": "Appendix BTPF and Compute Overhead Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix CWhy Block Diffusion Requires a Separate KV Commit Pass",
+        "images": []
+    },
+    {
+        "header": "Appendix DAttention Kernel Overhead",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.11035/2604.11035v1/x10.png",
+                "caption": "Figure 7:Attention kernel forward latencyat varying concurrency. I-DLM (Paged, single kernel) vs. Block DLLM (Cascade, three kernels). The cascade overhead grows from+4%+4\\%atC=1C{=}1to+20%+20\\%atC=64C{=}64.",
+                "position": 1957
+            }
+        ]
+    },
+    {
+        "header": "Appendix EAttention Mask Structure",
+        "images": []
+    },
+    {
+        "header": "Appendix FISD Step-by-Step Illustration",
+        "images": []
+    },
+    {
+        "header": "Appendix GLossless ISD with Gated LoRA",
+        "images": []
+    },
+    {
+        "header": "Appendix HTraining, Serving, and Evaluation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix IAdditional Results",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
