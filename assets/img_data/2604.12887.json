@@ -1,0 +1,152 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x1.png",
+                "caption": "",
+                "position": 265
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x2.png",
+                "caption": "Figure 2:VideoFlexTokreconstructions from a variable number of tokens.We find that just a fewVideoFlexToktokens capture information such as the semantic identities (e.g., a woman in the right example), scene geometry (the“arch”), camera motion (moving forward), and object motion (rotation).",
+                "position": 275
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x3.png",
+                "caption": "Figure 3:VideoFlexTokoverview.The encodertakes the spatiotemporal VAE video latents, interleaves them with learnable register tokens across the time dimension, and passes them through the Transformer with a time-causal attention pattern.\nThis results in a2D representation with the temporal and coarse-to-fine dimensions.Nested dropoutrandomly drops a random number of last register tokens along the 2nd dimension, inducing the coarse-to-fine structure.The decoderis a flow-based generative model that temporally interleaves masked register tokens with noisy VAE latents and passes them through a time-causal Transformer.The lossesare: 1) the rectified flow reconstructive loss that predicts clean patches from their noised version and tokens, and 2) the representation alignment loss(Yuet al.,2025)between the decoder and DINOv2(Oquabet al.,2023)features, which distills semantic information intoVideoFlexToktokens.",
+                "position": 339
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x4.png",
+                "caption": "Figure 4:Probing the firstVideoFlexToktokens.We design the following probing experiment to analyze the information contained in the firstVideoFlexToktokens.\nGiven a source video, we keep only one or two tokens per latent frame and make an isolated change to its first frame, e.g., changing an orange to an apple, using Nano Banana(Google,2025).\nWe then condition the decoder on both the original tokens and the new edited frame for reconstruction.\nWe find that, in most cases,VideoFlexTokpreserves the motion pattern from the original video and visual appearance from the edited frame throughout the reconstructed video,suggesting that the first tokens primarily capture the motion information.",
+                "position": 415
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x5.png",
+                "caption": "Figure 5:Flexible-length autoregressive text-to-video generation.A text-to-video generative model usingVideoFlexToktokens can generate token sequences of varying length for a given conditioning.\nAll token budgets lead to plausible generations, with 2-4 tokens/frame capturing the overall scene details and motion described in the text conditioning well (e.g., the balloon movement), while generating more tokens can express more fine-grained details (e.g., the number of floors).",
+                "position": 467
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x6.png",
+                "caption": "Figure 6:Compute-efficient AR training withVideoFlexTok.We show how the fidelity (top) and alignment (bottom) metrics change across three complementary scaling axes.Scaling the model size (left).We show how the fidelity (top, gFVD) and alignment (bottom, Classification Score) metrics change as we scale the size of the class-to-video autoregressive model. UsingVideoFlexTokmaintains good fidelity across a wider range of model sizes while solving the conditioning task well, achieving a much higher alignment score with smaller models.This implies that we can train much smaller models to solve the class-to-video downstream task.Scaling the number of training tokens (middle).We show how the fidelity (top, gFVD) and alignment (bottom, Classification Score) metrics evolve during training of the class-to-video downstream model. We use the 1.3B AR model size for this experiment. UsingVideoFlexTokenables having good reconstructions throughout the whole training, andachieves similar or better alignment using 5–10 times fewer training tokens than the 3D Grid tokenizer.Text-to-video FLOPs efficiency (right).We show how the fidelity (top, gFVD) and alignment (bottom, ViCLIP Score) metrics change as we scale both the model size and the number of training tokens in the compute-optimal way. We vary the model size from 400M to 5.2B with the estimated ratio ofD/N=20D/N=20(Hoffmannet al.,2022).\nIn addition to models trained on full-lengthVideoFlexToktoken sequences, we train a model on shorter 32-token sequences per latent frame while keeping the number of steps the same, resulting in much lower computational cost (purple line).Overall, we find that autoregressive generative modeling overVideoFlexToktokens can achieve similar performance using an order of magnitude less compute.",
+                "position": 500
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x7.png",
+                "caption": "Figure 7:Flexible-length generation.We measure fidelity (top, gFVD), and alignment (bottom, classification score and ViCLIP similarity, seeSection4.1) forVideoFlexTokand 3D grid tokenizers on class-to-video (left) and text-to-video (right) tasks.\nUsing much fewer tokens,VideoFlexTokmaintains fidelity comparable to or better than the 3D tokenizer, while achieving higher alignment, i.e., better solving the corresponding conditional generation task.",
+                "position": 511
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x8.png",
+                "caption": "Figure 8:Long text-to-video generation.We show an exemplar generation of a 10-second 81-frame video using only 672 tokens (32 tokens per frame).",
+                "position": 546
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion and Discussion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgment",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AOverview video",
+        "images": []
+    },
+    {
+        "header": "Appendix BAdditional qualitative results",
+        "images": []
+    },
+    {
+        "header": "Appendix CAdditional ablations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x9.png",
+                "caption": "Figure 9:REPA(Yuet al.,2025)loss ablation.We compare tokenizers trained with and without the REPA loss on the class-to-video downstream task.\nWe find that REPA inductive bias loss improves both the fidelity of the generated samples and the alignment with the class conditioning.",
+                "position": 1716
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x10.png",
+                "caption": "Figure 10:VideoFlexTokdecoder attention ablationWe ablate the decoder attention pattern by comparing the alignment score (Classification Score) on the class-to-video generative task.\nWe find that causal attention leads to a higher alignment score with fewer tokens, suggesting the early tokens capture more semantic information in this case (seeSectionC.2for discussion).",
+                "position": 1732
+            }
+        ]
+    },
+    {
+        "header": "Appendix DHierarchical generation withVideoFlexTok",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x11.png",
+                "caption": "Figure 11:Hierarchical vs. raster-order generation.We compare theVideoFlexTokand 3D grid tokenizers’ performance at the same sequence length (1280 tokens).\nWe find that hierarchical generation withVideoFlexTokleads to 1) better alignment (ViCLIP score) and 2) much better fidelity (gFVD) when not using classifier-free guidance.",
+                "position": 1825
+            }
+        ]
+    },
+    {
+        "header": "Appendix EInference cost analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x12.png",
+                "caption": "Figure 12:Text-to-video inference cost analysis.We compare the inference cost of various configurations of the number of AR-generated tokens and the number ofVideoFlexTokflow decoder steps.\nFor each AR model size and the number of generated tokens, we perform{1,2,5,10,20,40}\\{1,2,5,10,20,40\\}denoising steps and plot the corresponding lines.\nWe find that for all considered AR sizes and inference budgets, the best performance is achieved by generating less than 256 tokens per frame and performing multiple denoising steps.",
+                "position": 1837
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x13.png",
+                "caption": "Figure 13:VideoFlexTokreconstruction example. From top to bottom, each row corresponds to a video reconstructed using 1, 2, 4, …, 256 tokens. The last row shows the original video.",
+                "position": 1858
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x14.png",
+                "caption": "Figure 14:VideoFlexTokreconstruction example. From top to bottom each row corresponds to a video reconstructed using 1, 2, 4, …, 256 tokens. The last row shows the original video.",
+                "position": 1861
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x15.png",
+                "caption": "Figure 15:VideoFlexTokreconstruction example. From top to bottom each row corresponds to a video reconstructed using 1, 2, 4, …, 256 tokens. The last row shows the original video.",
+                "position": 1864
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12887/2604.12887v1/x16.png",
+                "caption": "Figure 16:VideoFlexTokreconstruction example. From top to bottom each row corresponds to a video reconstructed using 1, 2, 4, …, 256 tokens. The last row shows the original video.",
+                "position": 1867
+            }
+        ]
+    },
+    {
+        "header": "Appendix FArchitecture and training details",
+        "images": []
+    },
+    {
+        "header": "Appendix GReconstruction on MSR-VTT",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

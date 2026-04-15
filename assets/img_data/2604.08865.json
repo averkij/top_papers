@@ -1,0 +1,175 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Background",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x1.png",
+                "caption": "Figure 1:Analysis of the “Tail Effect”.We visualize Critic value dynamicsV​(st)V(s_{t})to diagnose inefficiencies. Blue and red lines denote correct and incorrect trajectories, respectively.\nThe Critic discriminates only near the sequence tail. For correct paths,V​(st)V(s_{t})rises late, causingA^t\\hat{A}_{t}to vanish; for incorrect ones, it fails to penalize intermediate steps. This indicates credit assignment based on token position rather than semantic contribution. The Critic was trained under 8192 context window. Additional randomly sampled visualizations are provided in AppendixB.",
+                "position": 360
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x2.png",
+                "caption": "Figure 2:Visualization of the GRPO Advantage Function.derived under the Bernoulli assumption (see AppendixA). The plot illustrates how GRPO implicitly models the reasoning task as aContextual Bandit: instead of a static reward, the advantage is dynamically scaled based on the prompt’s estimated difficultyp^​(sp)\\hat{p}(s_{p}), contrasting success (Blue) against failure (Red).",
+                "position": 383
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x3.png",
+                "caption": "Figure 3:Overview of SPPO.Motivated by the implicit bandit behavior of GRPO, SPPO explicitly reformulates reasoning as a Sequence-Level Contextual Bandit, utilizing a scalar value functionV​(sp)V(s_{p}).",
+                "position": 386
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": []
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x4.png",
+                "caption": "Figure 4:Ablation Analysis of the Optimization Objective.We compare SPPO against Standard PPO and a control baseline (“PPO + BCE”) that integrates the BCE loss into the token-level framework. The failure of the control baseline demonstrates that the performance gains do not stem from the loss function itself, but from theSequence-Level Contextual Bandit formulation, which propagates a unified advantage signal to resolve credit assignment ambiguity.",
+                "position": 725
+            }
+        ]
+    },
+    {
+        "header": "5Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x5.png",
+                "caption": "Figure 5:Training Efficiency on Deepseek-R1-Distill-Qwen-7B (Performance vs. Wall-clock Time).The plot compares the trajectory of SPPO against strong baselines (GRPO, PPO, RLOO, ReMax) on the DAPO-17k dataset(Yuet al.,2025).Solid Red:SPPO with a matched 7B Critic.Dashed Pink:SPPO with a decoupled, smaller 1.5B Critic (Deepseek-R1-Distill-Qwen-1.5B). The y-axis noted as the Avg@8 score evaluated onAIME24,AIME25,AMC23,MATH500, andMinerva Math. SPPO achieves optimal performance significantly faster than group-based methods, and the decoupled critic maintains performance while reducing memory overhead.",
+                "position": 741
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x6.png",
+                "caption": "Figure 6:GPU Memory Allocation Analysis.Comparison of normalized peak VRAM usage during the training of a 7B policy. The “Decoupled Critic” (7B+1.5B) approach, combined with the system-level optimizations inverl, significantly reduces memory bottlenecks compared to symmetric actor-critic setups (7B+7B), making efficient RL alignment accessible on consumer-grade hardware.",
+                "position": 753
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/critic.png",
+                "caption": "Figure 7:Correlation analysis between the Critic’s predicted difficulty (yy-axis) and the empirical AVG@kkrate (xx-axis) (Where k = 64). The plot reveals a clear positive correlation (Pearsonr=0.642r=0.642), indicating the Critic successfully distinguishes between hard and easy tasks. The marginal histograms (top and right) contrast the bimodal distribution of real task difficulty with the more conservative, quasi-normal distribution of the Critic’s predictions.",
+                "position": 781
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x7.png",
+                "caption": "Figure 8:RLVR Benchmark Results.Comparison of SPPO (Blue Solid) and Standard PPO (Red Dashed) across five control tasks with sparse outcome rewards (γ=1.0\\gamma=1.0). SPPO demonstrates robust convergence in complex control tasks where Standard PPO exhibits instability or failure (e.g.,Hopper,MountainCar), while achieving superior sample efficiency in precision tasks likeCartPole.",
+                "position": 823
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Limitations",
+        "images": []
+    },
+    {
+        "header": "Ethical Considerations",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADerivation and Analysis of GRPO Advantage",
+        "images": []
+    },
+    {
+        "header": "Appendix BExtended Visualization of Critic Dynamics",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x8.png",
+                "caption": "Figure 9:Extended Analysis of Critic Value Dynamics (10 Random Samples).Each subplot represents a distinct mathematical problem sampled from the validation set.Blue Lines:Value estimates for correct trajectories (R=1R=1).Red Lines:Value estimates for incorrect trajectories (R=0R=0).\nThe consistent overlap of value curves until the sequence tail demonstrates the systematic failure of token-level value estimation in distinguishing intermediate reasoning quality.",
+                "position": 1189
+            }
+        ]
+    },
+    {
+        "header": "Appendix CRisks",
+        "images": []
+    },
+    {
+        "header": "Appendix DResources and Implementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix EImplementation Details and Execution Commands",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x9.png",
+                "caption": "",
+                "position": 1279
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x10.png",
+                "caption": "",
+                "position": 1285
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x11.png",
+                "caption": "",
+                "position": 1291
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x12.png",
+                "caption": "",
+                "position": 1303
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x13.png",
+                "caption": "",
+                "position": 1314
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x14.png",
+                "caption": "",
+                "position": 1327
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x15.png",
+                "caption": "",
+                "position": 1333
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x16.png",
+                "caption": "",
+                "position": 1345
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x17.png",
+                "caption": "",
+                "position": 1356
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x18.png",
+                "caption": "",
+                "position": 1370
+            },
+            {
+                "img": "https://arxiv.org/html/2604.08865/2604.08865v1/x19.png",
+                "caption": "",
+                "position": 1381
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
