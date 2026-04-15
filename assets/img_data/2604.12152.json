@@ -1,0 +1,157 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig_pipeline_h3.png",
+                "caption": "Figure 1:Latent diffusion SR pipeline.Both methods share an identical LDM UNet (purple); only the VAE encoder/decoder differs.Top:SD-VAE SR uses a generic VAE trained on natural images (4-channel,32×3232\\times 32latent).Bottom:MedVAE SR (proposed) uses a domain-specific VAE trained on medical images (3-channel,64×6464\\times 64latent).\nThe controlled substitution isolates the VAE’s contribution to SR fidelity.",
+                "position": 543
+            }
+        ]
+    },
+    {
+        "header": "2Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig1.png",
+                "caption": "Figure 2:SR reconstruction quality across three datasets.(a)PSNR (dB) and(b)LPIPS for all methods on MRNet (knee MRI),\nBraTS (brain MRI), and MIMIC-CXR (chest X-ray).\nError bars:±1\\pm 1standard deviation across validation images.\nImprovement brackets (dark blue) show MedVAE SR vs. SD-VAE SR delta:+X+XdB for PSNR with 95% bootstrap CI,−Δ-\\Deltafor LPIPS (lower = better).\nMedVAE SR achieves better PSNR than SD-VAE SR and lower LPIPS than\nbicubic interpolation across all three datasets,\noccupying the Pareto frontier of the quality-perception tradeoff[44].\nThe MedVAE-AE ceiling (light blue, hatched) represents encode-then-decode\nwithout diffusion and sets the theoretical maximum for each VAE.",
+                "position": 813
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig_ae_ceiling_correlation.png",
+                "caption": "Figure 3:AE reconstruction ceiling predicts SR quality (R2=0.67R^{2}=0.67).Scatter plot of VAE autoencoder ceiling PSNR (encode-then-decode without diffusion, x-axis)\nvs. diffusion SR output PSNR (y-axis) for all method–dataset combinations (n=6n=6).\nPoints: MedVAE SR (blue) and SD-VAE SR (red); shapes: MRNet (circle), BraTS (square),\nCXR (triangle). Line: OLS regression with 95% confidence band (Pearsonr=0.82r=0.82,p<0.001p<0.001). The strong linear relationship indicates that AE reconstruction fidelity,\ncomputed without training any diffusion model, is a reliable screening criterion\nfor SR quality in any domain-specific LDM pipeline.",
+                "position": 826
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig3a_mrnet_freq.png",
+                "caption": "Figure 4:Multi-resolution frequency analysis.Rows: MRNet, BraTS, MIMIC-CXR.\nLeft: per-subband PSNR (3-level Haar, 10 bands) for MedVAE SR (blue) vs. SD-VAE SR (red).\nRight: log radial FFT spectrum (HR: dashed).\nGains concentrate at HH1(+1.18, +1.41, +0.70 dB), while LL3differences≤\\leq0.05 dB.",
+                "position": 905
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig3b_brats_freq.png",
+                "caption": "",
+                "position": 909
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig3c_cxr_freq.png",
+                "caption": "",
+                "position": 911
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig2b_brats_visual.png",
+                "caption": "Figure 5:Visual comparison and pixel-level difference maps — BraTS (brain MRI,4×4\\timesSR).Top: side-by-side comparison of AE reconstruction, MedVAE SR, SD-VAE SR, and HR ground truth.\nBottom: mean absolute pixel difference|SR−HR||\\text{SR}-\\text{HR}|(hot colormap; brighter==larger error).\nMedVAE SR produces cooler (darker) error maps, indicating better reconstruction of fine anatomical structure.\nScale bar in HR panel: 20 mm (pixel spacing≈\\approx0.938 mm; 240 mm FOV resized to 256 px).\nQualitatively consistent patterns for MRNet (knee MRI) and MIMIC-CXR are shown in Appendix Figs.S5–S6.",
+                "position": 983
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig2b_brats_diffmap.png",
+                "caption": "",
+                "position": 987
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig5.png",
+                "caption": "Figure 6:Multi-resolution latent embedding comparison (all datasets).Rows: MRNet (knee MRI), BraTS (brain MRI), MIMIC-CXR (chest X-ray).\n(a) PSNR and (b) cosine similarity between SR latents and HR latents\nat progressively coarser spatial pooling scales (64×6464\\times 64to1×11\\times 1).\nMedVAE SR achieves higher SR-to-HR latent fidelity at all scales,\nconfirming that the domain-specific latent space better preserves HR information\nthroughout the spatial hierarchy.",
+                "position": 1009
+            }
+        ]
+    },
+    {
+        "header": "3Discussion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig6.png",
+                "caption": "Figure 7:Statistical analysis of SR quality.(a) Cohen’sddforest plot.Each row shows the effect size (Cohen’sdd) for the MedVAE SR vs. SD-VAE SR\nPSNR gap on one dataset (MRNet, BraTS, CXR), with horizontal error bars\nindicating 95% bootstrap confidence intervals (nbootstrap=10,000n_{\\text{bootstrap}}=10{,}000).\nThe vertical dashed line marksd=0.8d=0.8(conventional “large” effect threshold).\nAll three datasets show large-to-very-large effect sizes (d>1.3d>1.3).(b) Per-image PSNR distribution (violin plots).Each violin shows the distribution of per-image PSNR values for MedVAE SR (blue)\nand SD-VAE SR (red) across the three validation sets; horizontal lines indicate\nmedians. MedVAE SR achieves consistently higher PSNR.(c) Bland-Altman intensity agreement plots.Each panel shows one validation set;xx-axis: mean of SR and HR per-image pixel\nintensities;yy-axis: difference SR−-HR. Solid lines: mean bias; dashed lines:\n95% limits of agreement (LoA). Both methods show near-zero bias; detailed\nstatistics are given in Appendix TableS9.",
+                "position": 1181
+            }
+        ]
+    },
+    {
+        "header": "4Methods",
+        "images": []
+    },
+    {
+        "header": "Data Availability",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "Competing Interests",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ASupplementary Tables",
+        "images": []
+    },
+    {
+        "header": "Appendix BSupplementary Figures",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig_perception_distortion.png",
+                "caption": "Figure S1:Perception-distortion tradeoff across three medical imaging datasets (MRNet, BraTS, MIMIC-CXR).\nEach point represents one SR method evaluated on one dataset.xx-axis: PSNR (dB; higher = less distortion);yy-axis: LPIPS (lower = more perceptually faithful).\nMedVAE SR moves toward the upper-right Pareto frontier relative to SD-VAE SR, achieving\nsimultaneously higher PSNR and lower LPIPS on all three datasets.",
+                "position": 3155
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig4a_mrnet_hallucination.png",
+                "caption": "Figure S2:Pixel-level hallucination and content loss — MRNet (knee MRI).\nBar chart showing hallucination rate and loss rate (% of pixels) for MedVAE SR and SD-VAE SR.",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig4b_brats_hallucination.png",
+                "caption": "Figure S3:Pixel-level hallucination and content loss — BraTS (brain MRI).",
+                "position": 3166
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig4c_cxr_hallucination.png",
+                "caption": "Figure S4:Pixel-level hallucination and content loss — MIMIC-CXR (chest X-ray,4×4\\timesSR).",
+                "position": 3170
+            }
+        ]
+    },
+    {
+        "header": "Appendix CSupplementary Methods",
+        "images": []
+    },
+    {
+        "header": "Appendix DSupplementary Notes",
+        "images": []
+    },
+    {
+        "header": "Appendix ESupplementary Figures (continued)",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig2a_mrnet_visual.png",
+                "caption": "Figure S5:Visual comparison and pixel-level difference maps — MRNet (knee MRI).\nTop: side-by-side comparison of AE reconstruction, MedVAE SR, SD-VAE SR, and HR ground truth.\nBottom: mean absolute pixel difference|SR−HR||\\text{SR}-\\text{HR}|(hot colormap; brighter==larger error).",
+                "position": 3356
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig2a_mrnet_diffmap.png",
+                "caption": "",
+                "position": 3360
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig2c_cxr_visual.png",
+                "caption": "Figure S6:Visual comparison and pixel-level difference maps — MIMIC-CXR (chest X-ray,4×4\\timesSR).\nTop: side-by-side comparison of AE reconstruction, MedVAE SR, SD-VAE SR, and HR ground truth.\nBottom: mean absolute pixel difference|SR−HR||\\text{SR}-\\text{HR}|(hot colormap).",
+                "position": 3367
+            },
+            {
+                "img": "https://arxiv.org/html/2604.12152/2604.12152v1/figures/fig2c_cxr_diffmap.png",
+                "caption": "",
+                "position": 3371
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
