@@ -1,0 +1,202 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/pics/teaser0.jpeg",
+                "caption": "",
+                "position": 366
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x1.png",
+                "caption": "Figure 1:Versatile applications of HY-World 2.0.Our framework unifiesworld generation(synthesizing immersive, explorable 3D worlds from text or single-view images) andworld reconstruction(recovering 3D representation from multi-view inputs). These capabilities empower diverse applications, including robotics simulation, game development, and environment mapping.",
+                "position": 458
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Overview",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x2.png",
+                "caption": "Figure 2:Architecture of HY-World 2.0.Our framework presents a four-stage process to transform multi-modal inputs into immersive 3D worlds: (1) initializing the world viaPanorama Generation, (2) deriving exploration camera paths throughTrajectory Planning, (3) expanding the world observations via memory-drivenWorld Expansion, and (4) constructing the final 3DGS assets usingWorld Composition. The core model/algorithm used in each stage is denoted at the bottom.",
+                "position": 518
+            }
+        ]
+    },
+    {
+        "header": "3World Generation Stage I: Panorama Generation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x3.png",
+                "caption": "Figure 3:Overview of the panorama generation architecture of HY-Pano 2.0.The Left side shows the framework pipeline of panorama generation, while the right side illustrates the circle padding (latent space) and the pixel blending (pixel space) for seamless panorama generation.",
+                "position": 576
+            }
+        ]
+    },
+    {
+        "header": "4World Generation Stage II: Trajectory Planning",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x4.png",
+                "caption": "Figure 4:The initial scene parsing for trajectory planning.We obtain panoramic point clouds, meshes, semantic masks, and NavMesh via several pioneering works[67,9,23,50].",
+                "position": 597
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x5.png",
+                "caption": "Figure 5:Illustration of five modes of trajectories planned in WorldNav.Some trajectories are omitted for a simplified visualization.",
+                "position": 638
+            }
+        ]
+    },
+    {
+        "header": "5World Generation Stage III: World Expansion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x6.png",
+                "caption": "Figure 6:Three training stages of WorldStereo 2.0, progressively enabling camera control, memory-based consistency, and fast inference.",
+                "position": 751
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x7.png",
+                "caption": "Figure 7:Overall pipeline of WorldStereo 2.0.(a) The main Video Diffusion Transformer (DiT) branch is enhanced by the retrieval-based improved Spatial-Stereo Memory (SSM++) for fine-grained consistency. (b) The camera control branch is guided by the panoramic point cloud, serving as Global-Geometric Memory (GGM) to confirm precise camera trajectory following and geometry-aware consistency. Here, we omit the VAE encoding/decoding for simplicity.",
+                "position": 755
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x8.png",
+                "caption": "Figure 8:Reconstruction and novel-view generation with different VAE variants.Keyframe-VAE preserves appearance consistency in reconstructions and substantially improves the fidelity of generated novel views, particularly under large viewpoint changes. Please zoom in for details.",
+                "position": 847
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x9.png",
+                "caption": "Figure 9:Keyframe-VAE in WorldStereo 2.0 versus a standard Video-VAE[64].Unlike (a) Video-VAE, which performs spatio-temporal compression, (b) Keyframe-VAE appliesspatial-onlycompression to better preserve high-frequency details and reduce artifacts essentially caused by Video-VAE encoding (e.g., motion blur and geometric distortion). Specifically, Keyframe-VAE loops the causal padding-basedimage encodingover(1+Tk​f)(1+T_{kf})times with a sparse frame set (Tk​f≪Tv​i​dT_{kf}\\ll T_{vid}) that spans the same viewpoint changes by sampling at larger temporal intervals.",
+                "position": 850
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x10.png",
+                "caption": "Figure 10:Data construction of WorldStereo 2.0 memory training.(a) The global point clouds built for the GGM training with one reference view andTg=2T_{g}=2target views. (b) Trajectory retrieval strategies for SSM++ training tailored to dataset characteristics: temporally misaligned retrieval for existing multi-view data (top), and multi-trajectory retrieval for synthetic data (bottom).",
+                "position": 902
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x11.png",
+                "caption": "Figure 11:Illustration of the RoPE[59]modification in SSM++.Target frames are spatially concatenated with their corresponding retrieved reference views along the horizontal axis (resulting in width2​W2W). Crucially, each retrieved view inherits the temporal index of its paired target frame before being fed into the main DiT branch.",
+                "position": 934
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x12.png",
+                "caption": "Figure 12:Model architecture of WorldMirror 2.0,which is a unified feed-forward model that takes multi-view images with optional geometric priors (camera poses, intrinsics, depth maps) as input, and simultaneously predicts dense point clouds, depth maps, surface normals, camera parameters, and 3DGS through a shared Transformer backbone with task-specific DPT decoder heads.",
+                "position": 1010
+            }
+        ]
+    },
+    {
+        "header": "6World Reconstruction: WorldMirror 2.0",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x13.png",
+                "caption": "Figure 13:Analysis of normalized position encoding.(a)Average cosine similarity of center-point RoPE encodings to other resolutions. Normalized RoPE maintains high cross-resolution consistency (>0.95>0.95), while standard RoPE degrades significantly.(b)and(c)show the mean and standard deviation of encoding values across resolutions, respectively. Normalized RoPE exhibits near-constant statistics, whereas standard RoPE shows systematic mean drift, confirming that normalization converts position extrapolation into interpolation.",
+                "position": 1237
+            }
+        ]
+    },
+    {
+        "header": "7World Generation Stage IV: World Composition",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x14.png",
+                "caption": "Figure 14:The pipeline of depth alignment.We align the WorldMirror depth estimated from generated keyframes with the panoramic point cloud. The point cloud is rendered as geometric guidance, identifying reliable regions to supervise the linear alignment. The outlier detection process effectively eliminated and corrected the alignment coefficients based on global statistics.",
+                "position": 1401
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x15.png",
+                "caption": "Figure 15:Comparison of reconstructed point clouds.(a) Reference panoramic point cloud estimated by MoGe2[67].\n(b-d) Results from state-of-the-art feedforward reconstruction methods: Mapanything[32], DepthAnything3 (DA3)[40], and WorldMirror 2.0. (e) WorldMirror 2.0 with the proposed depth alignment. Note that for all feedforward methods (b-d), the 10% of points with the lowest confidence are filtered out, and sky points are manually cropped for better visualization.",
+                "position": 1425
+            }
+        ]
+    },
+    {
+        "header": "8Results: Multi-Modal World Creation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x16.png",
+                "caption": "Figure 16:Visual results of panorama generation by HY-Pano 2.0.Our model supports both text and images of various resolutions as inputs.",
+                "position": 1611
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x17.png",
+                "caption": "Figure 17:Qualitative comparison on the text-to-panorama (T2P) task.Our method outperforms previous approaches in terms of layout coherence, fine-grained details, and overall visual aesthetics.",
+                "position": 1615
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x18.png",
+                "caption": "Figure 18:Qualitative comparison on the image-to-panorama (I2P) task.Our method outperforms previous approaches in extension plausibility, content richness, and overall quality.",
+                "position": 1618
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x19.png",
+                "caption": "Figure 19:Qualitative ablation results of trajectory planning.Relying solely on panoramic views (b) results in severe artifacts and incomplete geometry. By sequentially integrating views generated from (c) regular, (d) surrounding & reconstruction, (e) wandering, and (f) aerial trajectories, our method progressively eliminates blind spots, refines complex object structures, and enhances overall scene completeness. Please zoom in for details.",
+                "position": 1737
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x20.png",
+                "caption": "Figure 20:Point clouds and 3DGS comparisons with video2world[21].“Pcd.” denotes point cloud.\nFor each scene, both methods are evaluated within 300 images generated by WorldStereo 2.0.",
+                "position": 2253
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x21.png",
+                "caption": "Figure 21:Results of the overall world generation pipeline.Each scene is visualized across two rows. The top row displays, from left to right: the generatedpanorama, the alignedpoint clouds, a global overview ofsplattings, and the extractedcoarse mesh. The bottom row showcases novel views rendered from various viewpoints.",
+                "position": 2355
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x22.png",
+                "caption": "Figure 22:Interactive exploration within the generated 3D worlds of HY-World 2.0.By controlling virtual agents, users can navigate complex geometric structures (e.g., stairs and indoor layouts) with real-time collision detection and physically plausible feedback, demonstrating the readiness of our results for interactive applications.",
+                "position": 2358
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x23.png",
+                "caption": "Figure 23:Qualitative comparison with Marble[72]using the same panoramic inputs.The input panoramas are displayed on the left. For each scene, we present novel view renderings from the generated 3DGS models of both methods. Compared to Marble, our approach achieves higher fidelity to the input conditions, sharper textures, and superior geometric consistency across diverse viewpoints. Please zoom in for details.",
+                "position": 2371
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x24.png",
+                "caption": "Figure 24:Qualitative comparison with Marble[72]using the same input image.(a) displays input perspective images. For each scene, we compare both (b) generated panoramas and (c) 3DGS renderings. Compared to Marble, our approach better adheres to the input views while achieving comparable quality and superior completeness in 3DGS. Please zoom in for details.",
+                "position": 2374
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x25.png",
+                "caption": "Figure 25:Visual comparison of WorldMirror 1.0 and 2.0.We compare predicted surface normals and reconstructed point clouds. WorldMirror 2.0 produces more accurate normals with finer structural details and more consistent multi-view point clouds.",
+                "position": 3173
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x26.png",
+                "caption": "Figure 26:Multi-resolution point cloud comparison of WorldMirror 1.0 and 2.0.We evaluate under dense (32 views, top) and sparse (8 views, bottom) settings at different inference resolutions. WorldMirror 1.0 degrades severely at high resolution, while WorldMirror 2.0 maintains consistent reconstruction quality across all resolutions.",
+                "position": 3176
+            },
+            {
+                "img": "https://arxiv.org/html/2604.14268/2604.14268v1/x27.png",
+                "caption": "Figure 27:Comparison with Pow3R and MapAnything under different prior conditions.All methods are evaluated at high resolution (756×1036756{\\times}1036). Results are averaged on 7-Scenes, NRGBD, and DTU datasets. Pow3R (pro) refers to the original Pow3R with Procrustes alignment. WorldMirror 2.0 demonstrates stronger geometric reasoning and 3D prior integration capabilities\nat high resolution.",
+                "position": 3194
+            }
+        ]
+    },
+    {
+        "header": "9Conclusion",
+        "images": []
+    },
+    {
+        "header": "Contribution*",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

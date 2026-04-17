@@ -1,0 +1,116 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.15308/2604.15308v1/x1.png",
+                "caption": "",
+                "position": 219
+            },
+            {
+                "img": "https://arxiv.org/html/2604.15308/2604.15308v1/x2.png",
+                "caption": "",
+                "position": 220
+            },
+            {
+                "img": "https://arxiv.org/html/2604.15308/2604.15308v1/x3.png",
+                "caption": "Figure 1:Scaling RL in a Generator-Discriminator framework.(a) Stabilizing RL Optimization: RAD-2 projects the high-dim trajectory space into low-dim score and longitudinal components, ensuring stable policy updates. (b) Efficient Simulation: BEV-Warp enables high-throughput, feature-level closed-loop training, overcoming the limitations of existing simulators.",
+                "position": 244
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.15308/2604.15308v1/x4.png",
+                "caption": "Figure 2:The comparison of multimodal trajectory planning paradigms.(a) Vocabulary-based scoring with fixed anchors[2,30]. (b) Diffusion-based multimodal generation[36]. (c) RAD-2: synergizing diffusion generator with RL-discriminator in closed-loop training.",
+                "position": 260
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.15308/2604.15308v1/x5.png",
+                "caption": "Figure 3:Schematic of the BEV-Warp simulation environment.The closed-loop evaluation is driven by a recursive feature-warping mechanism.\nAt each timestep, a transformation matrix𝐌t\\mathbf{M}_{t}is derived from the relative pose deviation between the simulated agent𝒫t\\mathcal{P}_{t}and the logged reference𝒫tref\\mathcal{P}^{\\text{ref}}_{t}.\nThis matrix is then applied to the reference BEV featureℬtref\\mathcal{B}^{\\text{ref}}_{t}via spatial warping, synthesizing a high-fidelity observationℬt\\mathcal{B}_{t}for the subsequent planning cycle without expensive image-level rendering.",
+                "position": 518
+            },
+            {
+                "img": "https://arxiv.org/html/2604.15308/2604.15308v1/x6.png",
+                "caption": "Figure 4:The RAD-2 training pipeline.Our approach synergizes a Diffusion-based generator𝒢\\mathcal{G}and a Transformer-based discriminator𝒟\\mathcal{D}within a multi-stage optimization loop:\n(a)Pre-training Stage:𝒢\\mathcal{G}is initialized via imitation learning to capture multi-modal trajectory priors from expert demonstrations.\n(b)Closed-loop Rollout:The joint policy, integrating𝒢\\mathcal{G}for generation and𝒟\\mathcal{D}for selection, interacts with the high-throughput BEV-Warp environment to generate diverse rollout data.\n(c)Discriminator Optimization:𝒟\\mathcal{D}is optimized via Temporally Consistent Group Relative Policy Optimization, leveraging closed-loop feedback to enhance its scoring precision.\n(d)Generator Optimization:Through On-policy Generator Optimization,𝒢\\mathcal{G}is optimized via structured longitudinal optimizations derived from low-reward rollouts, effectively shifting its distribution toward safer and more efficient driving behaviors.",
+                "position": 547
+            }
+        ]
+    },
+    {
+        "header": "4Experiment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.15308/2604.15308v1/x7.png",
+                "caption": "Figure 5:Spatial equivariance in BEV-Warp.We evaluate the reliability of warped features via a frozen pre-trained perception head.(Left)Reference featureℬref\\mathcal{B}^{\\text{ref}}and its corresponding perception outputs.(Right)Under ego-displacement (e.g.,θ=1.08∘,Tx=10.658​m,Ty=2.387​m\\theta=1.08^{\\circ},T_{x}=10.658\\text{m},T_{y}=2.387\\text{m}), the warped features yield perception results that maintain precise spatial alignment. This consistency across significant spatial transformations confirms that BEV-Warp preserves complex semantic geometry (e.g., dynamic agents and lane topologies) requisite for high-fidelity closed-loop simulation.",
+                "position": 772
+            },
+            {
+                "img": "https://arxiv.org/html/2604.15308/2604.15308v1/x8.png",
+                "caption": "Figure 6:Replay buffer management and closed-loop optimization workflow.Driving rollouts are archived in a FIFO replay buffer that maintains a curated balance between safety-critical (yellow) and efficiency-oriented (green) scenarios.\nThe system employs an asynchronous dual-trigger optimization strategy:\n(i) the trajectory discriminator is updated upon each batch ingestion to maintain sensitivity to recent rollout quality;\n(ii) the trajectory generator undergoes optimization only after a full buffer circulation (every 8 batches).",
+                "position": 775
+            },
+            {
+                "img": "https://arxiv.org/html/2604.15308/2604.15308v1/x9.png",
+                "caption": "Figure 7:Scaling behavior of training paradigms.Performance (defined as2×Safety@1+EP@1.02\\times\\text{Safety@1}+\\text{EP@1.0}) is evaluated against the cumulative number of environment timesteps. The vertical dashed line marks the transition from on-policy generator optimization to discriminative optimization.",
+                "position": 1232
+            },
+            {
+                "img": "https://arxiv.org/html/2604.15308/2604.15308v1/x10.png",
+                "caption": "Figure 8:Training stability with and without clip filtering.Compared to the baseline (blue), clip filtering (orange) significantly stabilizes training dynamics and improves performance by prioritizing more informative training signals.",
+                "position": 1318
+            },
+            {
+                "img": "https://arxiv.org/html/2604.15308/2604.15308v1/x11.png",
+                "caption": "Figure 9:Entropy stability analysis.The inclusion ofℋ\\mathcal{H}(purple) prevents a rapid decline in trajectory score entropy, maintaining a more diverse distribution for stable optimization compared to the baseline without regularization (blue).",
+                "position": 1421
+            },
+            {
+                "img": "https://arxiv.org/html/2604.15308/2604.15308v1/x12.png",
+                "caption": "Figure 10:Impact of scenario composition on closed-loop performance.Compared to single-objective training (Safety-onlyorEfficiency-only), theMixedstrategy achieves a superior trade-off across all metrics. Models trained on biased subsets exhibit significant performance drops in complementary tasks (e.g.,Efficiency-onlylacks safety robustness), highlighting the necessity of diverse scenario curation for balanced driving policies.",
+                "position": 1430
+            },
+            {
+                "img": "https://arxiv.org/html/2604.15308/2604.15308v1/x13.png",
+                "caption": "Figure 11:Qualitative comparison of closed-loop safety interaction.(1)Reference Inputdisplays the front-view camera feed. (2)Baselineand (3)Ourseach show the warped BEV input (left) and the corresponding perception and planning output (right). Starting from the same initial state at theStart Frame, the two models exhibit diverging behaviors as the interaction unfolds. ByKeyframe 1, theBaselinefails to mitigate the risk and results in a collision, while our model performs proactive deceleration to maintain safety. AtKeyframe 2, our vehicle resumes stable navigation after the threat clears, validating the robustness of our learned policy.",
+                "position": 1481
+            },
+            {
+                "img": "https://arxiv.org/html/2604.15308/2604.15308v1/x14.png",
+                "caption": "Figure 12:Qualitative comparison of driving efficiency in dynamic traffic.(1)Reference Inputdisplays the front-view camera feed. (2)Baselineand (3)Ourseach show the warped BEV input (left) and the perception and planning output with Efficiency Progress (EP) (right). Starting from the same initial state, both models encounter a vehicle merging from the right atKeyframe 1. Despite sufficient clearance in the adjacent lane, theBaselineexhibits overly conservative behavior, decelerating to wait behind the merging vehicle. In contrast, our model executes a proactive lane change to bypass the slow-moving agent. ByKeyframe 2, our model achieves superior navigational progress (EP=1.09\\text{EP}=1.09) compared to theBaseline(EP=1.01\\text{EP}=1.01), validating its ability to make efficient tactical decisions in interactive environments.",
+                "position": 1489
+            }
+        ]
+    },
+    {
+        "header": "5Limitations and Future Work",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "7Acknowledgement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
