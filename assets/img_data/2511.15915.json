@@ -1,0 +1,171 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/figs/main-method-shaowz.png",
+                "caption": "Figure 1:At each iteration of AccelOpt, the agentic workflow shown on the right optimizes the candidate kernels with the latest optimization memory, and generates new candidate kernels, updating optimization memory with newly collected experiences.Section2explains the overall workflow and each component in detail.",
+                "position": 263
+            }
+        ]
+    },
+    {
+        "header": "2AccelOpt",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/x1.png",
+                "caption": "Figure 2:Prompt template for each agentic in the agentic workflow.",
+                "position": 420
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/x2.png",
+                "caption": "Figure 3:A snapshot of AccelOpt’s execution trace. In the experience item, the pseudocode of the slow-fast pairs looks like the above candidate and optimized kernels whereaffine_rangeis a NKI construct for parallel loops without carried dependency. The experience item will be stored in the optimization memory, and the optimized kernel will become a candidate for the next iteration.",
+                "position": 444
+            }
+        ]
+    },
+    {
+        "header": "3Benchmarks and Evaluation Infrastructure",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/x3.png",
+                "caption": "Figure 4:NKIBench architecture. Kernels are grouped by the configuration of ML operators. Each kernel instance stores both the kernel code and profiling information. The meshes represent cores of one Trainium chip; trn1.32xlarge and trn2.48xlarge are Amazon EC2 instances for Trainium 1 and 2, respectively.",
+                "position": 570
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/x4.png",
+                "caption": "Figure 5:One core of a Trainium chip with its device memory (HBM). Architecture details can refer to NKI docsAWS (2025f).",
+                "position": 573
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/x5.png",
+                "caption": "Figure 6:Compare AccelOpt using open-source LLMs with repeated sampling of Claude Sonnet 4 on Trainium 1 and 2.",
+                "position": 602
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/figs/ratio_bars_trn1.png",
+                "caption": "Figure 7:Per-task kernel improvement achieved using Claude Sonnet 4 and AccelOpt on Trainium 1 (above) and Trainium 2 (below). The x-axis is sorted by the baseline kernel’s percentage of peak throughput.",
+                "position": 606
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/figs/ratio_bars_trn2.png",
+                "caption": "",
+                "position": 613
+            }
+        ]
+    },
+    {
+        "header": "4Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/x6.png",
+                "caption": "Figure 8:Non-local optimization discovered by AccelOpt for the fused BatchMatmul+Softmax operator. All variables are tiles of tensors, and code has been simplified to highlight the changed dimensions of allocated tensors in the loop body.",
+                "position": 640
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/figs/10061059_speedups_full_grid_box__matmul_K5120_M4096_N12288.png",
+                "caption": "Figure 9:Saturating speedup with effective exploration. Same asFigure10andFigure11, the above panel is the speedup distribution of all generated kernels; the below is the distribution of additional performance metrics at each iteration.",
+                "position": 714
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/figs/all_metrics_violin_matmul_K5120_M4096_N12288.png",
+                "caption": "",
+                "position": 718
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/figs/10061059_speedups_full_grid_box__transpose_matmul_K2048_M4096_N10944.png",
+                "caption": "Figure 10:Early saturating speedup with effective exploration. The non-reduction dimension N is large, leading to a wide memory-management search space. However, because the operator is dominated by matrix multiplication and the baseline already reaches about 83% of peak throughput, further gains are difficult.",
+                "position": 726
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/figs/all_metrics_violin_transpose_matmul_K2048_M4096_N10944.png",
+                "caption": "",
+                "position": 730
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/figs/10061059_speedups_full_grid_box__bmm_B16_K64_M4096_N4096.png",
+                "caption": "Figure 11:Saturating speedup without effective exploration. Vector engine utilization is nearly zero, thus we plot scalar engine utilization here.",
+                "position": 743
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/figs/all_metrics_violin_bmm_B16_K64_M4096_N4096.png",
+                "caption": "",
+                "position": 747
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/figs/fused_binned_step_and_over_baseline.png",
+                "caption": "Figure 12:The orange bars show distribution of per-iteration speedup over the candidate kernels, while the blue bars show the speedup over the initial kernels. This plot collects distribution of speedups from all tasks.",
+                "position": 756
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/x7.png",
+                "caption": "Figure 13:Geometric mean of best speedup achieved up to a certain iteration across all tasks obtained through repeated sampling, beam search, and beam search + optimization memory. As defined inAlgorithm1,BBis the number of candidates andNNis the number of plans for each candidate.",
+                "position": 765
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/figs/plot_fastp.png",
+                "caption": "Figure 14:Optimization memory improves cost-efficiency, leading to a higher percentage of good performing kernels (top) by improving the kernel quality per-iteration (below).\nTo compare systems with different search hyperparameters, we consider the number of kernels sampled rather than number of iterations.\nNote that the average current iteration candidates’ speedup over baseline can drop below1.0×1.0\\timesbecauseβ\\betaselects from all correct kernels, not only those with speedups.",
+                "position": 786
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/figs/plot_candidates.png",
+                "caption": "",
+                "position": 790
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/x8.png",
+                "caption": "Figure 15:Cost-benefit trade-off across different TopK and ExpN. As the ExpN increases,σ\\sigmacan collect experiences from more iterations preceding the last iteration. As the TopK increases,σ\\sigmacan collect more experiences from the current iteration.",
+                "position": 826
+            }
+        ]
+    },
+    {
+        "header": "5Related work",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgment",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/figs/10061059_speedups_full_grid_box__bmm_softmax_B16_K64_M4096_N4096.png",
+                "caption": "Figure 16:An example showing diverse exploration leads to post-plateau improvements. We observed a run where the best speedup plateaued from iterations 3 to 8 (and even degraded), but continued exploration still changed key utilization metrics; from iteration 9 onward, non-trivial improvement began to emerge, and the best kernel improved again until iteration 14.",
+                "position": 1542
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/figs/all_metrics_violin_bmm_softmax_B16_K64_M4096_N4096.png",
+                "caption": "",
+                "position": 1546
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/x9.png",
+                "caption": "Figure 17:An example NKI program snippet adopted from an official NKI example.",
+                "position": 1550
+            },
+            {
+                "img": "https://arxiv.org/html/2511.15915/2511.15915v2/figs/accelopt-fib-24-clean.png",
+                "caption": "Figure 18:The ”Optimized” bars show that AccelOpt can optimize Triton kernels of FlashInfer-Bench (Accessed: 2025-12-23).",
+                "position": 1585
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
