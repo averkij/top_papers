@@ -1,0 +1,186 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x1.png",
+                "caption": "Figure 1:Accuracy and efficiency comparison across four benchmarks.Existing latent CoT methods underperform explicit CoT. OneVL is the first to surpass it while matching answer-only prediction latency.",
+                "position": 370
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x2.png",
+                "caption": "Figure 2:Comparison of three CoT paradigms.(a)Explicit CoT:the model generates a full chain of discrete reasoning tokens before the answer.(b)Implicit CoT:reasoning is compressed into a small number of opaque latent vectors𝒵\\mathcal{Z}.(c)OneVL (Ours):two types of latent tokens (𝒵v\\mathcal{Z}_{v},red) and language (𝒵l\\mathcal{Z}_{l},salmon); during training, dual auxiliary decoders decode these into future-frame visual tokens and CoT text, respectively, providing rich text and world model supervision. During inference, the decoders are discarded, and the latent tokens are prefilled into the prompt context, matching the speed of answer-only prediction while keeping the interpretability of (a) in both vision and language.",
+                "position": 486
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Model Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x3.png",
+                "caption": "Figure 3:OneVL architecture.An image and structured text prompt (ego state, command, historical trajectory) are fed into the VLM. The output hidden states shown below the VLM, contains image tokens (𝒯v\\mathcal{T}_{v}), text tokens (𝒯l\\mathcal{T}_{l}), visual latent tokens (𝒵v\\mathcal{Z}_{v}), language latent tokens (𝒵l\\mathcal{Z}_{l}), and trajectory answer tokens (𝒯^y\\hat{\\mathcal{T}}_{y}). During training, hidden statesℋv\\mathcal{H}_{v}andℋl\\mathcal{H}_{l}at the latent positions are routed to two auxiliary decoders: the Visual Aux. Decoder (left) directly predicts future-frame visual tokens at0.5​s0.5\\mathrm{s}and1.0​s1.0\\mathrm{s}(ℒv\\mathcal{L}_{v}), and the Language Aux. Decoder (right) predicts chain-of-thought reasoning (ℒl\\mathcal{L}_{l}). During inference, both decoders are discarded; latent tokens are prefilled into the prompt, matching the answer-only AR prediction latency.",
+                "position": 592
+            }
+        ]
+    },
+    {
+        "header": "4Three-Stage Training Pipeline",
+        "images": []
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x4.png",
+                "caption": "Table 1:Performance comparisons on the NAVSIM benchmark.PDM-score (higher is better) and average inference latency (lower is better) for all methods.∗indicates the result is derived from the corresponding paper. For OneVL, we only count the parameters of the main VLM, as the auxiliary decoders are discarded during inference. The same applies to all subsequent models.",
+                "position": 1028
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x4.png",
+                "caption": "Table 2:Performance comparisons on the ROADWork benchmark.ADE and FDE (pixels; lower is better), latency (lower is better).∗indicates the result is derived from the corresponding paper.",
+                "position": 1137
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x4.png",
+                "caption": "Table 3:Performance comparisons on the Impromptu benchmark.ADE and FDE (meters; lower is better), latency (lower is better).",
+                "position": 1238
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x4.png",
+                "caption": "Table 4:Performance comparisons on the Impromptu benchmark.We report trajectory prediction L2 error following the benchmark setting (meters; lower is better).",
+                "position": 1345
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x4.png",
+                "caption": "Table 5:Performance comparisons on the APR1 benchmark.ADE and FDE (meters; lower is better), latency (lower is better).",
+                "position": 1431
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x4.png",
+                "caption": "Figure 4:Visualizations of prediction on NAVSIM.Each plot overlays ground-truth (green) and predicted (red) trajectories on the front camera view. More examples can be found in Appendix8.6.",
+                "position": 1576
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x5.png",
+                "caption": "Figure 5:Visualizations of prediction on ROADWork.Each plot overlays ground-truth (green) and predicted (red) trajectories on the front camera view. More examples can be found in Appendix8.7.",
+                "position": 1579
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x6.png",
+                "caption": "Figure 6:Visualizations of prediction on Impromptu.Each plot overlays ground-truth (green) and predicted (red) trajectories on the front camera view. More examples can be found in Appendix8.8.",
+                "position": 1582
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x7.png",
+                "caption": "Figure 7:Visualizations of prediction on APR1.Each plot overlays ground-truth (green) and predicted (red) trajectories on the front camera view. More examples can be found in Appendix8.9.",
+                "position": 1585
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x8.png",
+                "caption": "Figure 8:Visual CoT under full trainingvs.an overfitting visual auxiliary decoder.(a) Top row: with the full training recipe, latent visual tokens decode to future frames that remain scene-consistent and usable as spatial-temporal reasoning supervision. (b) Bottom row: when without three-stage training, decoding from the same input collapses to memorized artifacts rather than generalizing—the predicted “future” frames are visually irrelevant to the input image.",
+                "position": 1726
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "7Contributions and Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "8Appendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x9.png",
+                "caption": "Figure 9:NAVSIM qualitative example 1.",
+                "position": 4141
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x10.png",
+                "caption": "Figure 10:NAVSIM qualitative example 2.",
+                "position": 4144
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x11.png",
+                "caption": "Figure 11:NAVSIM qualitative example 3.",
+                "position": 4147
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x12.png",
+                "caption": "Figure 12:NAVSIM qualitative example 4.",
+                "position": 4150
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x13.png",
+                "caption": "Figure 13:NAVSIM qualitative example 5.",
+                "position": 4153
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x14.png",
+                "caption": "Figure 14:NAVSIM qualitative example 6.",
+                "position": 4156
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x15.png",
+                "caption": "Figure 15:NAVSIM qualitative example 7.",
+                "position": 4159
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x16.png",
+                "caption": "Figure 16:NAVSIM qualitative example 8.",
+                "position": 4162
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x17.png",
+                "caption": "Figure 17:NAVSIM qualitative example 9.",
+                "position": 4165
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x18.png",
+                "caption": "Figure 18:ROADWork qualitative example 1.",
+                "position": 4168
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x19.png",
+                "caption": "Figure 19:ROADWork qualitative example 2.",
+                "position": 4171
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x20.png",
+                "caption": "Figure 20:Impromptu qualitative example 1.",
+                "position": 4174
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x21.png",
+                "caption": "Figure 21:Impromptu qualitative example 2.",
+                "position": 4177
+            },
+            {
+                "img": "https://arxiv.org/html/2604.18486/2604.18486v1/x22.png",
+                "caption": "Figure 22:APR1 qualitative example.",
+                "position": 4188
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
