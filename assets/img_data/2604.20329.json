@@ -1,0 +1,476 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/x1.png",
+                "caption": "Figure 1:We demonstrate the hidden visual understanding capabilities of image generators by instruction-tuning Nano Banana Pro.\nThe instruction-tuned model,Vision Banana, can produce visualizations in a precise format that can enable evaluation on established benchmarks.",
+                "position": 383
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/vb4.png",
+                "caption": "Table 1:The instruction-tunedVision Bananamodel surpasses or rivals SOTA specialists across visual generation and understanding.\nFor 2D visual understanding, it beats the highly specializedSegment Anything Model 3[Carion et al.,2025]on 3 segmentation datasets, and is on par with DINO-X[Ren et al.,2024]on instance segmentation.\nFor 3D visual understanding, it surpasses the best metric depth estimation expert,Depth Anything 3[Lin et al.,2025], and the best surface normal estimation specialist, Lotus-2[He et al.,2025].\nIn visual generation, Vision Banana inherits its capabilities from Nano Banana Pro and is on par with it on text-to-image and image editing.",
+                "position": 399
+            }
+        ]
+    },
+    {
+        "header": "2Method",
+        "images": []
+    },
+    {
+        "header": "3Vision Banana - Generalist Vision Model from Image Generator",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/vb4.png",
+                "caption": "Table 2:Vision-Bananacompared with state-of-the-art methods on various segmentation datasets.\nWe mainly compare with other methods that have not been trained on in-domain data, i.e., the training splits of these benchmarks.\nWe denote them as “Zero-Shot Transfer” in the table.\nThe usage of this term follows Segment Anything[Kirillov et al.,2023]and CLIP[Radford et al.,2021].\nNon zero-shot transfer methods are marked ingray.∗: On SA-Co/Gold, we evaluate our method on500500randomly sampled queries.\nOn ReasonSeg, methods are paired with multimodal LLMs for reasoning. We use Gemini 2.5 Pro in our case.\nReferences of previous methods are in the main text.",
+                "position": 533
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/semseg/image5.jpg",
+                "caption": "(a)Example 1",
+                "position": 745
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/semseg/image5.jpg",
+                "caption": "(a)Example 1",
+                "position": 748
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/semseg/image3.png",
+                "caption": "“Generate a semantic segmentation visualization image, using this color mapping: {\"cat\": \"red\", \"lock\": \"pink\", \"exit sign\": \"light purple\", \"background\": yellow}.”",
+                "position": 753
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/semseg/image2.png",
+                "caption": "“Generate a visualization image of semantic segmentation, using this color mapping: {\"cat ears\": <255, 165, 0>, \"exit sign\": <0, 0, 255>, \"background\":<125,0, 125>}”",
+                "position": 758
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/semseg/image4.jpg",
+                "caption": "(b)Example 2",
+                "position": 764
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/semseg/image6.png",
+                "caption": "“This image is a per-pixel class labeling of the input. The macaron cakes are represented by (255, 255, 0). The round plates are represented by (255, 192, 128). The slice cakes are depicted in (64, 192, 64). The flowers are shown in (128, 0, 64). The tongs are (255, 0, 192).”",
+                "position": 769
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/semseg/image1.png",
+                "caption": "“Generate a semantic segmentation visualization of the input. The menu is #80C000. The dessert is #800000. The patterns on the wall is #40FFC0”",
+                "position": 774
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/insseg/insseg4.jpg",
+                "caption": "(a)Example 1",
+                "position": 784
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/insseg/insseg4.jpg",
+                "caption": "(a)Example 1",
+                "position": 787
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/insseg/insseg4_pred1.png",
+                "caption": "“Generate an instance segmentation visualization of this image. Each piece of garlic is colored differently.”",
+                "position": 792
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/insseg/insseg4_pred2.png",
+                "caption": "“Generate an instance segmentation visualization of this image. Each piece of beef is colored differently.”",
+                "position": 797
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/insseg/insseg1.jpg",
+                "caption": "(b)Example 2",
+                "position": 803
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/insseg/insseg1_1.png",
+                "caption": "“Generate an instance segmentation visualization of this image. Each price tag is colored differently. ”",
+                "position": 808
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/insseg/insseg1_2.png",
+                "caption": "“This image is a segmentation task derived from the input. The \"crescent\"-shaped croissant instances are each represented by a unique, solid color. Background is RGB(88, 50, 82).”",
+                "position": 813
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/insseg/insseg3.png",
+                "caption": "(c)Example 3",
+                "position": 819
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/insseg/insseg3_1.png",
+                "caption": "“This image shows segmentation masks for the basketballs from the input image. The background is set to #10aa05. Each basketball instance is represented by a solid circular mask, and a different colora is used for each mask.”",
+                "position": 824
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/insseg/insseg3_2.png",
+                "caption": "“This image shows segmentation masks for the balls from the input image. The background is set to white color. Each ball is represented by a different color.”",
+                "position": 829
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/refseg/refseg1.jpeg",
+                "caption": "(a)Input image",
+                "position": 850
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/refseg/refseg1.jpeg",
+                "caption": "(a)Input image",
+                "position": 853
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/refseg/refseg1_pred.png",
+                "caption": "A segmentation map image. The area that corresponds to the man in pink t shirt is rendered solid white; the other man is rendered in green.",
+                "position": 858
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/refseg/refseg3.jpeg",
+                "caption": "(b)Input image",
+                "position": 863
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/refseg/refseg3_pred.jpg",
+                "caption": "A segmentation map image. The stretching cat is rendered in green, the cat that is cleaning itself is in cyan.",
+                "position": 868
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/refseg/refseg4_in.png",
+                "caption": "(c)Input image",
+                "position": 873
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/refseg/refseg_4_pred1.png",
+                "caption": "This image shows segmentation masks from the given image. The background is black color. The game control device is represented by a solid yellow.",
+                "position": 879
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/refseg/refseg5_in.png",
+                "caption": "(d)Input image",
+                "position": 884
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/v2_vis/refseg/refseg5_out.png",
+                "caption": "This image shows segmentation masks from the given image. The background is black color. The chef’s names in both Chinese and English are rendered as cyan color.",
+                "position": 889
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/color_tubes.png",
+                "caption": "Figure 5:A visualization of our bijection between scalar metric distancesd≥0d\\geq 0and RGB color values in[0,1]3[0,1]^{3}, which is achieved by curving metric depth with a power transform, and then interpolating along the edges of the color cube according to that curved metric depth. The metric depth values (in meters) corresponding to various RGB colors are overlaid.",
+                "position": 963
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/vb4.png",
+                "caption": "Table 3:Monocular metric depth estimation under the zero-shot transfer setting. Vision Banana achieves superior results on public datasets without using camera intrinsics in neither training of inference.\nMetrics marked with↑\\uparroware better if higher; metrics marked with↓\\downarroware better if lower.",
+                "position": 972
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_3_0.png",
+                "caption": "Figure 6:Demonstration of Vision Banana’s metric depth estimation capabilities.\nThe two columns to the left are the input images and the depth visualization image generated by Vision Banana.\nThe depth images are then decoded back to metric depth values. Combining them with the camera intrinsics, we can reconstruct the 3D scene accurately. The two columns on the right are random views of the reconstructed scenes.\nNote that camera intrinsics are not needed in predicting the depth itself.\nSamples taken from NYU v2[Silberman et al.,2012]and ETH 3D[Schops et al.,2019].",
+                "position": 1227
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_3_1.png",
+                "caption": "",
+                "position": 1231
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_3_2.png",
+                "caption": "",
+                "position": 1232
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_3_3.png",
+                "caption": "",
+                "position": 1233
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_162_0.png",
+                "caption": "",
+                "position": 1236
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_162_1.png",
+                "caption": "",
+                "position": 1237
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_162_2.png",
+                "caption": "",
+                "position": 1238
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_162_3.png",
+                "caption": "",
+                "position": 1239
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_eth3d_47_0.jpg",
+                "caption": "",
+                "position": 1242
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_eth3d_47_1.jpg",
+                "caption": "",
+                "position": 1243
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_eth3d_47_2.png",
+                "caption": "",
+                "position": 1244
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_eth3d_47_3.png",
+                "caption": "",
+                "position": 1245
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_eth3d_205_0.jpeg",
+                "caption": "",
+                "position": 1248
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_eth3d_205_1.png",
+                "caption": "",
+                "position": 1249
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_eth3d_205_2.png",
+                "caption": "",
+                "position": 1250
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_eth3d_205_3.png",
+                "caption": "",
+                "position": 1251
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_15_0.png",
+                "caption": "",
+                "position": 1254
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_15_1.png",
+                "caption": "",
+                "position": 1255
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_15_2.png",
+                "caption": "",
+                "position": 1256
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo/depth_15_3.jpg",
+                "caption": "",
+                "position": 1257
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo_real/depth_in.jpg",
+                "caption": "(a)Photo taken at Kinkaku-Ji",
+                "position": 1274
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo_real/depth_in.jpg",
+                "caption": "(a)Photo taken at Kinkaku-Ji",
+                "position": 1277
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo_real/depth_out.png",
+                "caption": "(b)Vision Banana estimated depth",
+                "position": 1282
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/depth_demo_real/depth_map.png",
+                "caption": "(c)Measurement from Google Maps",
+                "position": 1287
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/vb4.png",
+                "caption": "Table 4:Surface normal estimation results. Vision Banana achieves the lowest mean and median angle errors on the indoor datasets on average, and is on par with previous SOTA on outdoor scenes.",
+                "position": 1335
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/surface_normal/sn_1_in.jpg",
+                "caption": "Figure 8:Comparison with SOTA surface normal estimation method Lotus-2[He et al.,2025].\nResults of Lotus-2 are obtained using its Hugging-Face demo:https://huggingface.co/spaces/haodongli/Lotus-2_Normal.\nVision Banana can produce surface normal map with much higher visual quality and better fine-grained details.\nZoom-in for the details.",
+                "position": 1476
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/surface_normal/sn_1_lotus.jpg",
+                "caption": "",
+                "position": 1480
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/surface_normal/sn_1_gpm.jpg",
+                "caption": "",
+                "position": 1481
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/surface_normal/sn_2_in.jpg",
+                "caption": "",
+                "position": 1484
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/surface_normal/sn_2_lotus.jpg",
+                "caption": "",
+                "position": 1485
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/surface_normal/sn_2_gpm.jpg",
+                "caption": "",
+                "position": 1486
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/surface_normal/sn_4_in.jpg",
+                "caption": "",
+                "position": 1489
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/surface_normal/sn_4_lotus.png",
+                "caption": "",
+                "position": 1490
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/surface_normal/sn_4_gpm.png",
+                "caption": "",
+                "position": 1491
+            }
+        ]
+    },
+    {
+        "header": "4Discussion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgment",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix - Additional Demonstrations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/T2I/demo_1_dp.jpg",
+                "caption": "A ghostly ship sailing on a fog-shrouded, moonlit sea.",
+                "position": 2692
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/T2I/demo_1_dp.jpg",
+                "caption": "A ghostly ship sailing on a fog-shrouded, moonlit sea.",
+                "position": 2695
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/T2I/demo_1_nbp.jpg",
+                "caption": "",
+                "position": 2700
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/T2I/demo_2_dp.jpg",
+                "caption": "A lantern casting dim light in a haunted forest.",
+                "position": 2706
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/T2I/demo_2_nbp.jpg",
+                "caption": "",
+                "position": 2711
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/T2I/demo_3_dp.jpg",
+                "caption": "A yellow taxi waiting outside a modern glass building.",
+                "position": 2717
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/T2I/demo_3_nbp.jpg",
+                "caption": "",
+                "position": 2722
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/T2I/demo_4_vb.jpg",
+                "caption": "A samurai with a silk sash in a cherry blossom garden.",
+                "position": 2728
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/T2I/demo_4_nbp.jpg",
+                "caption": "",
+                "position": 2733
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/vb4.png",
+                "caption": "Figure 10:Comparing Vision Banana (left) and Nano Banana Pro (right) on image-editing. Prompts sampled from ImgEdit[Ye et al.,2025].",
+                "position": 2742
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/imgedit/sample.1.original.jpg",
+                "caption": "",
+                "position": 2751
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/imgedit/sample.1.vb.jpg",
+                "caption": "",
+                "position": 2752
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/imgedit/sample.1.nbp.jpg",
+                "caption": "",
+                "position": 2753
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/imgedit/sample.2.original.jpg",
+                "caption": "",
+                "position": 2759
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/imgedit/sample.2.vb.jpg",
+                "caption": "",
+                "position": 2760
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/imgedit/sample.2.nbp.jpg",
+                "caption": "",
+                "position": 2761
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/imgedit/sample.3.original.jpg",
+                "caption": "",
+                "position": 2767
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/imgedit/sample.3.vb.jpg",
+                "caption": "",
+                "position": 2768
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/imgedit/sample.3.nbp.jpg",
+                "caption": "",
+                "position": 2769
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/imgedit/sample.4.original.jpg",
+                "caption": "",
+                "position": 2775
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/imgedit/sample.4.vb.jpg",
+                "caption": "",
+                "position": 2776
+            },
+            {
+                "img": "https://arxiv.org/html/2604.20329/2604.20329v1/assets/imgedit/sample.4.nbp.jpg",
+                "caption": "",
+                "position": 2777
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
