@@ -1,0 +1,137 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x1.png",
+                "caption": "Figure 1:Overview of the UniT Framework, which establishes aunified physical languageto bridge the human-humanoid chasm.\n(a)Unified Tokenization:A tri-branch cross-reconstruction mechanism projects heterogeneous actions into a shared discrete latent space (verified via t-SNE) for extracting unified physical intents.\n(b)Policy Learning: Through predicting these unified tokens, VLA-UniT effectively leverages diverse human data to achieve robust OOD generalization andzero-shot task transferon humanoid robot.\n(c)World Modeling: By aligning cross-embodiment dynamics through unified token conditioning, WM-UniT enables direct human-to-humanoid action transfer, effectively leveraging human priors to improve controllability in humanoid video generation.",
+                "position": 307
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x2.png",
+                "caption": "Figure 2:Comparison of Latent Action Architectures.(a) Action-Only:Relies on action reconstruction (ZaZ_{a}), suffering from distribution misalignment without visual grounding.(b) Vision-Only:Infers representations (ZvZ_{v}) from pixels, which entangles with low-level appearances and misses fine-grained physical details.(c) Decoupled Vision-Action:Encodes modalities into disconnected spaces (Zv,ZaZ_{v},Z_{a}), lacking the explicit alignment needed to extract shared physical concepts.(d) UniT (Ours):Fuses heterogeneous data into a shared space (Zu​n​i​f​i​e​dZ_{unified}) viacross-reconstruction. This strict cross-modal alignment ensures tokens capture universal physical intentions, forming a robust unified physical language.",
+                "position": 366
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x3.png",
+                "caption": "Figure 3:Architecture of UniT.Heterogeneous cross-embodiment vision pairs(ot,ot+k)(o_{t},o_{t+k})and action chunksat:t+ka_{t:t+k}are encoded into vision, action, and fused features via tri-branch encoders. Ashared RQ-VAE codebookquantizes all three branches into a unified discrete space, yielding embodiment-agnosticUnified Latent Actiontokens. Both vision and action decoders reconstruct from these shared tokens, enforcingcross-reconstructionalignment.",
+                "position": 398
+            },
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x4.png",
+                "caption": "Figure 4:Downstream Applications of UniT Tokens.(a) VLA-UniT:Integrates UniT token prediction into a VLA architecture. Rather than direct action regression, the model predicts Unified Latent Action tokens in the shared space, while a lightweight action expert generates embodiment-specific controls from the same vision-language context, covering head pose, waist pose, wrist pose, and hand pose.(b) WM-UniT:Employs UniT tokens as universal action conditions for world modeling instead of embodiment-specific raw actions, generating future frames with autoregressive rollout.",
+                "position": 501
+            }
+        ]
+    },
+    {
+        "header": "4Experimental Setups",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x5.png",
+                "caption": "Figure 5:Real-world in-domain tasks.We design two tasks analogous to EgoDex subsets:Pick & Place(pick an object and place it into a box) andPouring(grasp a bottle and a cup, then pour).",
+                "position": 636
+            },
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x6.png",
+                "caption": "Figure 6:Real-world OOD generalization scenarios.(a)–(d): human demonstrations introduce complementary variations absent from robot data; we co-train and evaluate on human-introduced conditions.(a)Geometry (new shapes, same affordance).(b)Target (new placement destinations).(c)Distractor (unseen objects introduced as distractors).(d)Visual (unseen surfaces).(e)Combinational (instruction-based disambiguation among multiple objects seen during training).",
+                "position": 641
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x7.png",
+                "caption": "Figure 7:Cross-embodiment representation alignment.We plot t-SNE of human (blue) and humanoid (yellow) data across three levels:(a)raw actions vs. UniT token embeddings,(b)mean-pooled VLA vision-language hidden states,(c)mean-pooled WM cross-attention context embeddings. Vanilla baselines (top) show clearly separated distributions, while UniT-based models (bottom) produce highly overlapping representations, confirming that visual-anchored tokenization induces cross-embodiment alignment from the token level all the way to the internals of downstream models.",
+                "position": 719
+            },
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x8.png",
+                "caption": "Figure 8:Robustness to action noise.Gaussian noise of varying intensityσ\\sigmais injected into EgoDex action trajectories. Here,σ\\sigmadenotes the relative noise level normalized by the global action standard deviation of the dataset, so the injected noise magnitude isσ×global std\\sigma\\times\\text{global std}. Reconstruction quality is evaluated using mean squared error (MSE) between reconstructed actions and the original clean actions.(Left)Absolute (unnormalized) MSE, zoomed in toσ≤0.5\\sigma\\leq 0.5.(Right)Relative degradation, defined asMSEnoisy/MSEclean\\text{MSE}_{\\text{noisy}}/\\text{MSE}_{\\text{clean}}, shown on a log scale. Atσ=0.2\\sigma=0.2(vertical reference line), FAST degrades by10.7×10.7\\times, the action-only tokenizer by2.7×2.7\\times, and UniT by only1.7×1.7\\times, showing that visual grounding in UniT provides effective denoising.",
+                "position": 733
+            },
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x9.png",
+                "caption": "Figure 9:Overall performanceon RoboCasa GR1 Tabletop Simulation with full training data. VLA-UniT achieves the strongest overall policy performance among all compared methods.",
+                "position": 765
+            },
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x10.png",
+                "caption": "Figure 10:(Left)Data efficiency results on RoboCasa GR1 under full-data and few-shot settings.(Right)Impact of incorporating EgoDexbasic_pick_placehuman demonstrations on few-shot performance in RoboCasa GR1. UniT improves both sample efficiency and the utility of human co-training.",
+                "position": 776
+            },
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x11.png",
+                "caption": "",
+                "position": 779
+            },
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x12.png",
+                "caption": "Figure 11:(Left)In-domain results on the IRON-R01-1.11 robot.(Right)OOD generalization results on the IRON-R01-1.11 robot. Human Demonstration improves VLA-UniT’s real-world execution and OOD robustness.",
+                "position": 809
+            },
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x13.png",
+                "caption": "",
+                "position": 812
+            },
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x14.png",
+                "caption": "Figure 12:Zero-shot task transferon the IRON-R01-1.11 robot. (Left) Task illustration. (Right) Success rates on the unseen stacking task. UniT with human co-training shows the clearest transfer to the unseen task.",
+                "position": 834
+            },
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x15.png",
+                "caption": "Figure 13:Human-to-robot conditioning.Top: human reference video. Bottom: human reference actions condition robot video generation via UniT vs. Raw Action. UniT yields more faithful cross-embodiment conditioning than raw actions.",
+                "position": 1022
+            },
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x16.png",
+                "caption": "Figure 14:Robot-to-human conditioning.Top: robot reference video. Bottom: robot reference actions condition human video generation via UniT vs. Raw Action. UniT yields more faithful cross-embodiment conditioning than raw actions.",
+                "position": 1027
+            },
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x17.png",
+                "caption": "Figure 15:Tokenizer paradigm ablationon RoboCasa GR1 (full data with human co-training).(Left)OOD generalization.(Right)In-domain Pick & Place performance.",
+                "position": 1113
+            },
+            {
+                "img": "https://arxiv.org/html/2604.19734/2604.19734v1/x18.png",
+                "caption": "",
+                "position": 1116
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion and Discussion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
