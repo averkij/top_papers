@@ -1,0 +1,127 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.27505/2604.27505v1/x1.png",
+                "caption": "Figure 1:Our framework: from verifier-based reasoning reward model (RRM) to downstream.(a)Verifier as a reasoning reward model.The RRM decomposes an instruction into verifiable principles and scores an edited image against them in a single pass.\n(b)Reward benchmark performance.Our final 7B model, trained with SFT and GCPO (RL-RRM), reaches 82.22% accuracy, surpassing the Seed-VLM baseline. Each training component contributes to the performance gain.\n(c)Downstream application.Using our 7B RL-RRM as a reward signal significantly improves the performance of FLUX.Kontext[5]across multiple editing categories during post-training.",
+                "position": 292
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Works",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.27505/2604.27505v1/x2.png",
+                "caption": "Figure 2:The Training pipeline of Verifier-based Reasoning Reward Model (RRM).Top (Cold-Start SFT):Given an edit instruction and a source image, we generate large-scale quadruple data (instruction, source image, principles, edited image) and employ VLM pools to generate numerous reasoning traces and use another VLM to select the thinking COT with the highest accuracy to build SFT data and cold-start the Reasoning Reward Model (RRM).Bottom (GCPO):For each human-labeled preference pair, the reward model generatesNNthinking-score candidates per image.\nWe compute a win/loss ratio reward by pairwise comparing every candidate in the preferred group against all candidates in the non-preferred group.\nThe win ratio of a preferred candidate equals the fraction of comparisons where its score ishigherthan the opposite group’s scores; The loss ratio of a non-preferred candidate equals the fraction where its score islowerthan the preferred group’s scores.\nThe advantage is computed within each preferred or non-preferred group.",
+                "position": 581
+            },
+            {
+                "img": "https://arxiv.org/html/2604.27505/2604.27505v1/x3.png",
+                "caption": "Figure 3:Training dynamics of RRMs.a, SFT Loss, showing model convergence and scalability.b, SFT evaluation accuracy for the RRMs, showing steady improvement.c, Weighted advantage during GCPO training. The weighted advantage is defined as1G​∑i=1GAiLi\\frac{1}{G}\\sum_{i=1}^{G}\\frac{A_{i}}{L_{i}}, withLLrepresents the length of reasoning tokens. The negative value indicates it learns to generate longer reasoning traces for correct judgments.d, Training reward during the GCPO phase, showing stable improvement and scalability.",
+                "position": 591
+            },
+            {
+                "img": "https://arxiv.org/html/2604.27505/2604.27505v1/x4.png",
+                "caption": "Figure 4:Training dynamics of editing model optimization with different RRMs. The first row shows the training reward, and the second row shows the evaluation reward.\nHere, SFT-RRM denotes a reward model trained without GCPO, while RL-RRM denotes its counterpart trained with GCPO. First column: our SFT-RRM (7B) produces a reward signal that is as stable and effective as the Seed-1.5-VL. Second column: the SFT-RRM 7B exhibits stronger scalability, providing more reliable supervision and yielding better performance than the SFT-RRM 3B. Third and fourth columns: refining the RRM with GCPO results in consistently higher evaluation rewards, indicating that the RRM trained with GCPO acts as a stricter and more robust evaluator.",
+                "position": 719
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ASystem prompt",
+        "images": []
+    },
+    {
+        "header": "Appendix BInference result of RRM",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.27505/2604.27505v1/x5.png",
+                "caption": "(a)The input quadruple for the RRM, consisting of the source image, edit instruction, and the decomposed principles.",
+                "position": 2595
+            },
+            {
+                "img": "https://arxiv.org/html/2604.27505/2604.27505v1/x5.png",
+                "caption": "(a)The input quadruple for the RRM, consisting of the source image, edit instruction, and the decomposed principles.",
+                "position": 2598
+            },
+            {
+                "img": "https://arxiv.org/html/2604.27505/2604.27505v1/x6.png",
+                "caption": "(b)The final summarized response from the RRM after its reasoning process, providing the scores for each principle and a final score.",
+                "position": 2603
+            }
+        ]
+    },
+    {
+        "header": "Appendix CCategory label in quantitative results",
+        "images": []
+    },
+    {
+        "header": "Appendix DHuman Evaluation",
+        "images": []
+    },
+    {
+        "header": "Appendix EQualitative Results for FLUX-Kontext",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.27505/2604.27505v1/x7.png",
+                "caption": "Figure 6:Qualitative comparison of editing results on a diverse set of instructions. For each triplet, we show the input image, the output from the baseline model (FLUX.Kontext), and the output from our enhanced model (FLUX.Kontext w. Edit-R1). Our method demonstrates stronger performance on a broad range of editing categories, including text editing, color/material alteration, motion changes, and subject manipulation (addition and removal), producing results that better align with user instructions while maintaining high perceptual quality.",
+                "position": 2649
+            },
+            {
+                "img": "https://arxiv.org/html/2604.27505/2604.27505v1/x8.png",
+                "caption": "Figure 7:Further qualitative results on diverse editing benchmarks.(a)Additional comparison results on GEdit-Bench. Our model (w. Edit-R1) consistently produces higher-quality edits that better align with user instructions compared with FLUX.Kontext baseline across tasks such as text modification and subject addition.(b)A selection of qualitative results on the challenging Emu Edit Test Set with FLUX.Kontext w. Edit-R1. These examples showcase our model’s strong capability in handling a variety of complex instructions, including style transfer, object insertion with specific attributes, and substantial background alterations.",
+                "position": 2654
+            },
+            {
+                "img": "https://arxiv.org/html/2604.27505/2604.27505v1/x9.png",
+                "caption": "Figure 8:A selection of qualitative results on the challenging Emu Edit Test Set. These examples showcase our model’s robust capabilities in handling a wide variety of complex instructions.",
+                "position": 2661
+            }
+        ]
+    },
+    {
+        "header": "Appendix FQualitative Results for Qwen-Edit",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.27505/2604.27505v1/x10.png",
+                "caption": "Figure 9:Qualitative comparison of editing results on a diverse set of instructions. For each triplet, we show the input image, the output from the baseline model (Qwen-Edit), and the output from our enhanced model (Qwen-Edit w. Edit-R1).\nOur method further improves Qwen-Edit on challenging edits, especially motion-related edits and other fine-grained attribute changes.",
+                "position": 2674
+            },
+            {
+                "img": "https://arxiv.org/html/2604.27505/2604.27505v1/x11.png",
+                "caption": "Figure 10:A qualitative example illustrating how Reinforcement Learning (RL), guided by our Verifier-based Reasoning Reward Model (RRM), corrects a hallucination issue from the Supervised Fine-Tuning (SFT) model. The instruction is to change the shirt to red while preserving other features. The SFT model’s \"loser\" output incorrectly changes the hat color to red. The RRM penalizes this failure. The RL model’s \"winner\" output correctly preserves the blue hat, demonstrating the effectiveness of our training pipeline in resolving specific editing failures.",
+                "position": 2681
+            }
+        ]
+    },
+    {
+        "header": "Appendix GQualitative Analysis of RRM Judgments",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
