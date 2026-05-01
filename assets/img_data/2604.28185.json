@@ -1,0 +1,637 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/github-mark.png",
+                "caption": "",
+                "position": 917
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/x1.png",
+                "caption": "Figure 1:Publication trend of the 411 post-2014 references analyzed.Annual publication count (bars) and cumulative total (line) are computed from the updated bibliography after truncating entries before 2015. The curve reveals an exponential acceleration since 2022, with 2025 alone contributing 188 papers (45.7%). This surge reflects the rapid maturation of visual generation research driven by diffusion transformers, unified multimodal models, and post-training alignment techniques.",
+                "position": 1201
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/x2.png",
+                "caption": "Figure 2:Modern research landscape: topic maturity vs. recency.Each bubble represents a research category whose mean publication year falls in the modern visual-generation period, positioned by its mean publication year (xx-axis) and an adjusted 2025–2026 recency share (yy-axis), with bubble size proportional to paper count. The recency score is smoothed toward the corpus-level average so that very small emerging topics are not artificially pinned to 1.0. Topics in the upper-right quadrant (e.g., image editing, unified multimodal models, world modeling, and agentic generation) are both recent and rapidly growing, while comparatively mature modern foundations such as diffusion & flow models anchor the lower-left.",
+                "position": 1241
+            }
+        ]
+    },
+    {
+        "header": "2The Evolution of Visual Intelligence",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/level/fig_5levels_overview.jpg",
+                "caption": "Figure 3:Overview of the five-level taxonomy of visual intelligence: progression and concrete examples.The figure unifies an abstract progression strip (top, with capability axesControllability,Contextual Coherence,Closed-loop Agency, andCausal Grounding) with one concrete input/output example per level (bottom).L1: atomic text-to-image generation.L2: single-condition controlled generation.L3: multi-reference and multi-condition composition in one forward pass.L4: agentic generation with a planner–render–verify loop.L5: world-modeling generation respecting physical and domain rules. The five-level structure is a thread that runs through this survey—seeTable˜1for one-line definitions, the operational distinction between L3 and L4, representative methods, and key challenges.",
+                "position": 1269
+            }
+        ]
+    },
+    {
+        "header": "3Model, Architecture, and Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/x3.png",
+                "caption": "Figure 4:Timeline of representative image generation models by generative paradigm.Nodes are positioned by first public release month when available and grouped into GAN, diffusion / flow-matching, autoregressive, and hybrid categories. Hybrid nodes use both autoregressive and diffusion / flow colours to emphasize that recent frontier systems increasingly combine semantic planning with high-fidelity rendering.",
+                "position": 1632
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/method/fig_modeling_paradigms.jpg",
+                "caption": "Figure 5:Five generative-modeling paradigms at a glance.(1) GAN: a generatorGGmaps noisezzto a fake image while a discriminatorDDseparates real from fake under an adversarial loss.(2) Diffusion Model (DM): a forward chainx0→xTx_{0}\\to x_{T}adds noise; a learned reverse chain denoises along a curved sampling trajectory.(3) Flow Matching (FM): noise is transported to data along a straight-line ODE trajectory, simulation-free to train and integrable in few steps.(4) Autoregressive (AR): an image is discretized into tokens predicted next-token (raster) or next-scale (coarse-to-fine pyramid).(5) Hybrid (AR + Diffusion): an AR planner emits plan tokens that condition a diffusion renderer producing the final image.",
+                "position": 1635
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/x4.png",
+                "caption": "Figure 6:Paradigm landscape of representative visual generation architectures. Methods are positioned by their generative mechanism: diffusion/flow matching (left), autoregressive (right), and adversarial (bottom). The central overlap hosts hybrid architectures that combine diffusion and autoregressive components.★\\bigstardenotes unified models that jointly support visual understanding and generation.",
+                "position": 1795
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/method/fig_unified_architecture.jpg",
+                "caption": "Figure 7:The unified architecture for visual generation and editing.A modern visual generation / editing pipeline contains an encoder / tokenizer, condition routing, a generative backbone, and an output decoder arranged left-to-right.(1) Encoder / Tokenizeraccepts heterogeneous inputs (text prompt, optional reference image, optional source image, optional structural conditions such as depth / edge / layout) via VAE, VQ, SigLIP, or CLIP.(2) Condition Moduleroutes the encoded condition into the backbone through AdaLN modulation, cross-attention, or in-context concatenation.(3) Backbone(DiT, MM-DiT, or AR-transformer) does the heavy compute.(4) Decoder(VAE / VQ / pixel) produces the final image. The decoder is shown as the output endpoint, but its design is tied to the representation choice; the four axes analyzed below are representation, backbone, condition routing, and multimodal fusion. The same pipeline supports bothT2I(text→\\togenerated image, blue path) andediting(text++source image→\\toedited image, red path)—only the inputs entering the encoder and condition module differ.",
+                "position": 2155
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/x5.png",
+                "caption": "Figure 8:Three condition injection routes in modern transformer-based generators.(a) AdaLN modulation: conditionccpredicts scale and shift parameters of LayerNorm via a small MLP (used in DiT).(b) Cross-attention: conditionccflows into the K/V of an additional cross-attention layer (used in Stable Diffusion’s U-Net, IP-Adapter).(c) In-context concatenation: condition tokens are prepended to image tokens in the same sequence and processed by self-attention (used in MM-DiT, OmniGen, Bridge).",
+                "position": 2299
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/method/fig_closed_source_agent.jpg",
+                "caption": "Figure 9:Speculative agent-loop architecture for closed-source frontier image generation.The diagram visualizes conjecture (iv): a frontier VLM ingests the user instruction (and any reference image) and emits a planned prompt; a renderer (likely diffusion) generates a candidate image; a verifier checks the candidate against the plan and either accepts it or routes it back to a refiner that can call a small toolbox (e.g., text-rendering, font alignment, search grounding) before re-rendering.This figure is tentative and will be revisedas more evidence becomes available; treat it as a hypothesis-shaped sketch rather than a confirmed pipeline.",
+                "position": 2690
+            }
+        ]
+    },
+    {
+        "header": "4Training and Inference",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/x6.png",
+                "caption": "Figure 10:Overview of the three-stage training and inference pipeline for visual generation models.Pre-traininglearns a broad visual prior from web-scale data, then a continued-training (CT) sub-stage graduates the model to production resolutions and downstream tasks (text-to-image, editing, multi-view).Post-trainingaligns the prior with human preference through supervised fine-tuning followed by reinforcement learning.Inference accelerationreduces deployment cost through faster ODE/SDE solvers, per-step compute reduction (pruning, caching, quantization), and few-step distillation.",
+                "position": 2751
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/x7.png",
+                "caption": "Figure 11:Three families of distillation for diffusion / flow-matching models.(a) Trajectory Matching: student learns to follow the teacher’s per-step denoising trajectory at coarser granularity (e.g., 50-step teacher→\\to8-step student). Used in Hyper-SD, RayFlow, Wan-Image.(b) Consistency: any-step prediction maps directly to the same clean output, enforced by a self-consistency loss. Used in CM, sCM, rCM, LCM.(c) Distribution Matching: student’s output distribution matches the teacher’s via a fake/real score adversarial loop. Used in DMD, DMD2, ADD, MeanFlow.",
+                "position": 3868
+            }
+        ]
+    },
+    {
+        "header": "5Resources and Infrastructure",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/x8.png",
+                "caption": "Figure 12:A unified five-stage pipeline summarizing dataset construction methodologies across analyzed works. The pipeline progresses from source data acquisition (Stage 1), through instruction generation (Stage 2), image generation or editing (Stage 3), and quality control (Stage 4), to the final training datasets (Stage 5) ranging from curated collections of hundreds of samples to large-scale datasets exceeding one million pairs.",
+                "position": 3932
+            }
+        ]
+    },
+    {
+        "header": "6Applications and Evolving Frontiers",
+        "images": []
+    },
+    {
+        "header": "7Assessment for the Future: Stress Testing the Limits",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/spatial/puzzle_input.jpg",
+                "caption": "(a)Input: Scrambled Fragments",
+                "position": 4736
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/spatial/puzzle_input.jpg",
+                "caption": "(a)Input: Scrambled Fragments",
+                "position": 4739
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/spatial/puzzle_output.jpg",
+                "caption": "(b)Model Output",
+                "position": 4744
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/spatial/puzzle_gt.jpg",
+                "caption": "(c)Ground Truth",
+                "position": 4749
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/spatial/tile_map.jpg",
+                "caption": "(a)Isometric tile map",
+                "position": 4790
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/spatial/tile_map.jpg",
+                "caption": "(a)Isometric tile map",
+                "position": 4793
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/spatial/metro_map.jpg",
+                "caption": "(b)Metro-system map",
+                "position": 4798
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/orange_input.jpg",
+                "caption": "(a)Input: Floating State",
+                "position": 4869
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/orange_input.jpg",
+                "caption": "(a)Input: Floating State",
+                "position": 4872
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/orange_explainer.jpg",
+                "caption": "(b)Analytical Explainer",
+                "position": 4877
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/orange_sink.jpg",
+                "caption": "(c)Counterfactual: Sinking",
+                "position": 4882
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/driving_turn_in.jpg",
+                "caption": "(a)Scenario A: Initial Intersection State",
+                "position": 4976
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/driving_turn_in.jpg",
+                "caption": "(a)Scenario A: Initial Intersection State",
+                "position": 4979
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/driving_turn_out.jpg",
+                "caption": "(b)Predicted State: Perspective Shift",
+                "position": 4984
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/driving_highway_in.png",
+                "caption": "(c)Scenario B: Highway Anchor",
+                "position": 4990
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/driving_speed.jpg",
+                "caption": "(d)Predicted State: High Speed",
+                "position": 4995
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/driving_crash.jpg",
+                "caption": "(e)Counterfactual: Collision",
+                "position": 5000
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/grasp_mug.png",
+                "caption": "(a)Input: Mug to grasp",
+                "position": 5029
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/grasp_mug.png",
+                "caption": "(a)Input: Mug to grasp",
+                "position": 5032
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/grasp_gripper.png",
+                "caption": "(b)Input: Robot gripper",
+                "position": 5037
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/grasp.jpg",
+                "caption": "(c)Photorealistic Execution",
+                "position": 5042
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/robot_init.png",
+                "caption": "(a)Input: Initial State",
+                "position": 5078
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/robot_init.png",
+                "caption": "(a)Input: Initial State",
+                "position": 5081
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/robot_traj.jpg",
+                "caption": "(b)Output: Generated trajectory",
+                "position": 5086
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/human2robot_1.jpg",
+                "caption": "(a)Original Human Sequence: Multi-Step Causal Tasks (e.g., Pouring Action in Frame 2)",
+                "position": 5115
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/human2robot_1.jpg",
+                "caption": "(a)Original Human Sequence: Multi-Step Causal Tasks (e.g., Pouring Action in Frame 2)",
+                "position": 5118
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/human2robot_2.jpg",
+                "caption": "(b)Edited Humanoid Sequence: Plausible Identity but Causal Action Failure (Missing Pouring Simulation)",
+                "position": 5124
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/zucchini_input.jpg",
+                "caption": "(a)Initial State: Original Zucchini",
+                "position": 5182
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/zucchini_input.jpg",
+                "caption": "(a)Initial State: Original Zucchini",
+                "position": 5185
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/zucchini_cut.jpg",
+                "caption": "(b)Goal State: Cut Zucchini",
+                "position": 5190
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/carrot_input.jpg",
+                "caption": "(c)Initial State: Original Carrot",
+                "position": 5196
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/physics/carrot_cut.jpg",
+                "caption": "(d)Goal State: Peeled Rainbow Carrot",
+                "position": 5201
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/math/input.jpg",
+                "caption": "(a)Input: exam-style physics problem",
+                "position": 5270
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/math/input.jpg",
+                "caption": "(a)Input: exam-style physics problem",
+                "position": 5273
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/math/output.jpg",
+                "caption": "(b)Model output: solution rendered onto the image",
+                "position": 5278
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/multi_turn/banana-turn0.jpg",
+                "caption": "(a)Turn 0",
+                "position": 5351
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/multi_turn/banana-turn0.jpg",
+                "caption": "(a)Turn 0",
+                "position": 5354
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/multi_turn/banana-turn1.jpg",
+                "caption": "(b)Turn 1",
+                "position": 5359
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/multi_turn/banana-turn2.jpg",
+                "caption": "(c)Turn 2",
+                "position": 5364
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/multi_turn/banana-turn3.jpg",
+                "caption": "(d)Turn 3",
+                "position": 5369
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/multi_turn/cat-turn0.jpg",
+                "caption": "(a)Turn 0",
+                "position": 5402
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/multi_turn/cat-turn0.jpg",
+                "caption": "(a)Turn 0",
+                "position": 5405
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/multi_turn/cat-turn1.jpg",
+                "caption": "(b)Turn 1",
+                "position": 5410
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/multi_turn/cat-turn2.jpg",
+                "caption": "(c)Turn 2",
+                "position": 5415
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/multi_turn/cat-turn3.jpg",
+                "caption": "(d)Turn 3",
+                "position": 5420
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/children/children_before_mom.jpg",
+                "caption": "(a)Input: female",
+                "position": 5465
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/children/children_before_mom.jpg",
+                "caption": "(a)Input: female",
+                "position": 5468
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/children/children_before_dad.jpg",
+                "caption": "(b)Input: male",
+                "position": 5473
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/children/children_after_attempt1.jpg",
+                "caption": "(c)Attempt 1",
+                "position": 5478
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/children/children_after_attempt2.jpg",
+                "caption": "(d)Attempt 2",
+                "position": 5483
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/surgery/surgery_before.png",
+                "caption": "(a)Ex. 1 Input",
+                "position": 5516
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/surgery/surgery_before.png",
+                "caption": "(a)Ex. 1 Input",
+                "position": 5519
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/surgery/surgery_after.jpg",
+                "caption": "(b)Ex. 1 Output",
+                "position": 5524
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/surgery/surgery_before_girl.png",
+                "caption": "(c)Ex. 2 Input",
+                "position": 5529
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/surgery/surgery_after_girl.jpg",
+                "caption": "(d)Ex. 2 Output",
+                "position": 5534
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/hair/hair_before.jpg",
+                "caption": "(a)Input",
+                "position": 5567
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/hair/hair_before.jpg",
+                "caption": "(a)Input",
+                "position": 5570
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/hair/hair_after.jpg",
+                "caption": "(b)Model Output",
+                "position": 5575
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_sr_in.png",
+                "caption": "(a)Input",
+                "position": 5683
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_sr_in.png",
+                "caption": "(a)Input",
+                "position": 5686
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_sr_out.jpg",
+                "caption": "(b)Model Output",
+                "position": 5691
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_sr_gt.png",
+                "caption": "(c)Ground Truth",
+                "position": 5696
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_lowlight_in.jpg",
+                "caption": "(a)Input",
+                "position": 5703
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_lowlight_in.jpg",
+                "caption": "(a)Input",
+                "position": 5706
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_lowlight_out.jpg",
+                "caption": "(b)Model Output",
+                "position": 5711
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_lowlight_gt.jpg",
+                "caption": "(c)Ground Truth",
+                "position": 5716
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_denoise_in.jpg",
+                "caption": "(a)Input",
+                "position": 5723
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_denoise_in.jpg",
+                "caption": "(a)Input",
+                "position": 5726
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_denoise_out.jpg",
+                "caption": "(b)Model Output",
+                "position": 5731
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_denoise_gt.png",
+                "caption": "(c)Ground Truth",
+                "position": 5736
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_derain_in.jpg",
+                "caption": "(a)Input",
+                "position": 5743
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_derain_in.jpg",
+                "caption": "(a)Input",
+                "position": 5746
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_derain_out.jpg",
+                "caption": "(b)Model Output",
+                "position": 5751
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_derain_gt.png",
+                "caption": "(c)Ground Truth",
+                "position": 5756
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_deblur_in.jpg",
+                "caption": "(a)Input",
+                "position": 5763
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_deblur_in.jpg",
+                "caption": "(a)Input",
+                "position": 5766
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_deblur_out.jpg",
+                "caption": "(b)Model Output",
+                "position": 5771
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_depth_in.jpg",
+                "caption": "(a)Input: Real-world image",
+                "position": 5778
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_depth_in.jpg",
+                "caption": "(a)Input: Real-world image",
+                "position": 5781
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/low_level/low_level_depth_out.jpg",
+                "caption": "(b)Model output: grey depth estimation",
+                "position": 5786
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/real_world/real_world_city_design.jpg",
+                "caption": "Figure 35:Historical Urban Planning Design.The model successfully generates a historically accurate layout of the Tang Dynasty Chang’an city, but struggles with rendering clear and logically unique Chinese text labels. Generated by Nano Banana.",
+                "position": 5806
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/real_world/real_world_ui_design.jpg",
+                "caption": "Figure 36:Professional UI Dashboard Design.The model successfully generates a highly realistic and visually appealing football manager interface with accurate world knowledge, though it exhibits minor logical flaws in fine-grained details. Generated by Nano Banana.",
+                "position": 5833
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/code/input_easy.png",
+                "caption": "(a)Easy input: Fibonacci Number",
+                "position": 5862
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/code/input_easy.png",
+                "caption": "(a)Easy input: Fibonacci Number",
+                "position": 5865
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/code/easy_output.jpg",
+                "caption": "(b)GPT-Image-2 output",
+                "position": 5870
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/code/hard_input.png",
+                "caption": "(c)Hard input: Trapping Rain Water",
+                "position": 5876
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/code/hard_output.jpg",
+                "caption": "(d)GPT-Image-2 output",
+                "position": 5881
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/math/math_2.jpg",
+                "caption": "Figure 38:Structured mathematical diagram generation with GPT-Image-2.The prompt asks for a Euclidean proof diagram of the golden ratio in a regular pentagram, including a regular pentagon, all diagonals, a central similar pentagon, angle markings, side ticks, golden-section ratios, and algebraic identities involvingϕ\\phi. The generated image organizes geometry, formulas, labels, and proof annotations into a readable educational diagram.",
+                "position": 5914
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/real_world/real_world_food_poster.jpg",
+                "caption": "(a)Multilingual culinary poster",
+                "position": 5962
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/real_world/real_world_food_poster.jpg",
+                "caption": "(a)Multilingual culinary poster",
+                "position": 5965
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/real_world/real_world_lime_drug_design.jpg",
+                "caption": "(b)Biomedical infographic",
+                "position": 5970
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/high_level/ocr_input.png",
+                "caption": "(a)Input",
+                "position": 6026
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/high_level/ocr_input.png",
+                "caption": "(a)Input",
+                "position": 6029
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/high_level/ocr_output.jpg",
+                "caption": "(b)Model Output",
+                "position": 6034
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/high_level/keypoint_input.png",
+                "caption": "(a)Input",
+                "position": 6065
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/high_level/keypoint_input.png",
+                "caption": "(a)Input",
+                "position": 6068
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/high_level/keypoint_output.jpg",
+                "caption": "(b)Model Output",
+                "position": 6073
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/high_level/segment_input.png",
+                "caption": "(a)Input",
+                "position": 6106
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/high_level/segment_input.png",
+                "caption": "(a)Input",
+                "position": 6109
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/high_level/segment_output.jpg",
+                "caption": "(b)Model Output",
+                "position": 6114
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/high_level/detect_input.jpg",
+                "caption": "(a)Input",
+                "position": 6147
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/high_level/detect_input.jpg",
+                "caption": "(a)Input",
+                "position": 6150
+            },
+            {
+                "img": "https://arxiv.org/html/2604.28185/2604.28185v1/img/stress_test/high_level/detect_output.jpg",
+                "caption": "(b)Model Output",
+                "position": 6155
+            }
+        ]
+    },
+    {
+        "header": "8Positions and Frontiers",
+        "images": []
+    },
+    {
+        "header": "9Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
