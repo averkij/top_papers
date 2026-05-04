@@ -1,0 +1,296 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x1.png",
+                "caption": "Figure 1:Diffusion models struggle with multi-object compositional generation.(a)Diffusion models generate single object reliably, but struggle with multiple objects.\nWe study two regimes:(b)Concept generalization: the model has seen each concept at least once, but may still fail to learn it reliably (e.g., under data imbalance). Generation accuracy is evaluated using Geneval(Ghosh et al.,2023).(c)Compositional generalization: the model must generate new combinations of concepts that were never seen together during training. Stable Diffusion 3 (SD3)(Esser et al.,2024)is used to report generation accuracy and qualitative examples.",
+                "position": 272
+            }
+        ]
+    },
+    {
+        "header": "2Related work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x2.png",
+                "caption": "Figure 2:Our controlled datasetmosaicis designed for analyzing multi-object generation.Each subset isolates a specific reasoning dimension by varying one factor while randomizing others.\n(i) Attribution: varies object colors while keeping positions randomized, enabling control over color–object associations (e.g., “black sphere and blue cube”).\n(ii) Spatial Relations: varies the angular placement between two objects while fixing color and shape.\n(iii) Counting: varies the number of spheres while keeping all other factors constant.\nAn asterisk (*) marks variables that are also used as controlled factors in Section6.",
+                "position": 349
+            }
+        ]
+    },
+    {
+        "header": "3mosaic: Diagnostic dataset generation framework for multi-object compositions",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x3.png",
+                "caption": "Figure 3:Complexsettings for Attribution and Spatial Relations.Scene complexity is increased by introducing additional objects: for Attribution, objects are duplicated, while for Spatial Relations, additional objects are added as distractors.",
+                "position": 436
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x4.png",
+                "caption": "Figure 4:Gridsetting for Counting.Objects are constrained to predefined radial cells with small positional jitter, reducing positional variability compared to the default setting where objects can appear anywhere in the image.",
+                "position": 444
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x5.png",
+                "caption": "Figure 5:Compositionsetting for Spatial relation and Counting.We add Color as an additional conditioning factor, forming compositional pairs of color×\\timesspatial relation and color×\\timescount.",
+                "position": 456
+            }
+        ]
+    },
+    {
+        "header": "4Experimental setup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x6.png",
+                "caption": "Figure 6:Example of concept imbalance settings.Uniform: all categories have the same number of samples.Skewed: the frequency of categories varies, with some categories appearing more often than others.",
+                "position": 601
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x7.png",
+                "caption": "Figure 7:Seen and unseen composition configurations.\nEach matrix enumerates all possible combinations between two conceptsAiA_{i}andBjB_{j}(e.g., Color × Count).\nCells in blue indicate combinations that are observed during training, while cells in orange indicate unseen (held-out) compositions.\nWe vary the number of diagonals removed, which controls how many concept pairs are never seen during training.\nThis allows us to evaluate whether diffusion models can generalize to unseen concept compositions even when all individual concepts are fully observed.",
+                "position": 619
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x8.png",
+                "caption": "Figure 8:Training and evaluation pipeline.During training (left), a one-hot condition vector (e.g., “count = 10”) is embedded by a condition encoder and integrated into the diffusion model, such as a U-Net or a Diffusion Transformer (DiT), via attention with the VAE-encoded latent representation.\nThe condition encoder and the diffusion model are trained jointly.\nDuring evaluation (right), the trained diffusion model generates samples from a target condition vector, and a pretrained classifier determines whether each output matches the intended condition (Correct / Incorrect).",
+                "position": 656
+            }
+        ]
+    },
+    {
+        "header": "5Concept generalization",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x9.png",
+                "caption": "Figure 9:Accuracy vs. dataset size and data distribution.Attribution and Spatial Relations achieve high accuracy across data regimes, but Counting fails at 10k and 50k data scales, neither memorizing nor generalizing especially under skewed distributions, and recovers when the dataset is large.",
+                "position": 691
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x10.png",
+                "caption": "Figure 10:Scene complexity becomes critical in low-data regimes.We increase the number of objects for Attribution and introduce additional blue spheres as distractors for Spatial Relations.\n(Bottom) At a dataset size of 10k, accuracy drops for both Attribution and Spatial Relations, although the degradation is less severe than for Counting.",
+                "position": 696
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x11.png",
+                "caption": "Figure 11:Accuracy trajectories across training steps.Attribution and Spatial Relations use theComplexsetting, while Counting uses theBasesetting.\n(Top) With a U-Net backbone, Counting exhibits early peaking and subsequent degradation at dataset sizes of 10k and 50k, while Attribution and Spatial Relations remain stable.\n(Bottom) With a DiT backbone, a similar early-peaking behavior is observed for Counting at 10k, whereas other tasks remain stable.",
+                "position": 711
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x12.png",
+                "caption": "Figure 12:Introducing a spatial prior stabilizes counting performance.Using a grid layout dramatically improves counting accuracy across all dataset sizes and distributions.",
+                "position": 734
+            }
+        ]
+    },
+    {
+        "header": "6Compositional generalization",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x13.png",
+                "caption": "Figure 13:Compositional generalization on dataset size and the number of unseen compositions.(Top) For seen compositions, Attribution and Spatial relations remain stable across all dataset sizes, while Counting improves noticeably as the dataset size increases.\n(Bottom) For unseen compositions, performance drops rapidly as the dataset size decreases or the number of held-out compositions increases.",
+                "position": 781
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x14.png",
+                "caption": "Figure 14:Confusion matrix on unseen diagonals when half of the compositions (5 diagonals) are unseen.Compared to Attribution and Counting, Spatial relations show no clear error pattern.",
+                "position": 787
+            }
+        ]
+    },
+    {
+        "header": "7Generalization under expanded controlled settings",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x15.png",
+                "caption": "Figure 15:Fine-tuning behavior of SD3-medium on SPEC for spatial relations and counting.(Left) Training dynamics for each subset, where the top row shows training loss and the bottom row shows evaluation accuracy.\n(Right) Qualitative generation examples: the top row shows spatial relation samples, and the bottom row shows counting samples.\nWhile training loss consistently decreases for both tasks, counting accuracy degrades, whereas relative spatial accuracy increases, a trend that is also reflected in the qualitative generation examples.",
+                "position": 815
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x16.png",
+                "caption": "Figure 16:Compositional generalization under realistic object co-occurrence settings.(Top) Example scenes from the less controlledmosaic objectsvariant, with object co-occurrence.\n(Bottom) Accuracy on seen and unseen object compositions as the number of held-out diagonal compositions.\nWhile performance remains high on seen compositions, accuracy on unseen compositions degrades rapidly as more combinations are held out.\nAn illustrative example is the unseen composition (laptop, laptop).",
+                "position": 852
+            }
+        ]
+    },
+    {
+        "header": "8Conclusion",
+        "images": []
+    },
+    {
+        "header": "Impact Statement",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x17.png",
+                "caption": "Figure 17:Frequency of spatial relation concepts in the LAION-2B captions.The distribution is highly imbalanced, with “in front of” appearing more than 10 times as often as “left of” or “right of”, highlighting strong biases in relational supervision.",
+                "position": 1923
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x18.png",
+                "caption": "Figure 18:Influence of model size on Counting accuracy.Larger or smaller models do not mitigate the failure at moderate dataset sizes; all model sizes follow the same trend.",
+                "position": 2806
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x19.png",
+                "caption": "Figure 19:Memorization rate under the default setting.The x-axis denotes dataset size and the y-axis denotes memorization rate.\nMemorization is near 100% at small dataset sizes but gradually decreases as the dataset scale increases.",
+                "position": 2816
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x20.png",
+                "caption": "Figure 20:Memorization rate under increased scene complexity.The x-axis denotes dataset size and the y-axis denotes memorization rate.\nCompared to the default setting, memorization decreases more rapidly as dataset size increases.",
+                "position": 2822
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x21.png",
+                "caption": "Figure 21:Training loss across dataset sizes and architectures.Training loss decreases consistently during training for all settings, suggesting stable optimization.",
+                "position": 2832
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x22.png",
+                "caption": "Figure 22:Per-class accuracy for counting.(top) 10k dataset: Higher object counts suffer the most. Accuracy peaks early during training but later degrades, with partial recovery driven by memorization rather than genuine generalization.\n(bottom) 100k dataset: Higher counts are still more difficult but remain much more stable. All count classes converge to high accuracy, and memorization stays near zero throughout training.",
+                "position": 2847
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x23.png",
+                "caption": "Figure 23:Pixel-space distance to nearest training samples by count label.Pixel-distance histograms to nearest training samples for 10k (Top) and 50k (Bottom) datasets.\nLower count labels exhibit smaller distances, indicating initial memorization, while higher counts remain far from training samples.",
+                "position": 2863
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x24.png",
+                "caption": "",
+                "position": 2867
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x25.png",
+                "caption": "Figure 24:Confusion matrices for the Counting task at dataset size 10k.(Top) Confusion matrices at 2k in the left and 20k in the right. Training induces a systematic shift toward lower predicted counts.\n(Bottom) Despite this collapse, visual quality remains intact, indicating loss of count information rather than general generation failure.",
+                "position": 2883
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x26.png",
+                "caption": "",
+                "position": 2887
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x27.png",
+                "caption": "Figure 25:Validation loss and accuracy for Counting across dataset sizes.(Left) Validation loss increases for all dataset sizes except 100k, indicating overfitting in smaller datasets (2k, 10k, 50k).\n(Right) Unlike 2k and 50k, validation accuracy on 10k and 50k dataset size peak early then deteriorate.",
+                "position": 2897
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x28.png",
+                "caption": "Figure 26:Condition embedding collapse under small data.(Top) PCA visualization of count-conditioned embeddings at the final training step for datasets of size 10k, 50k, and 100k. The 10k setting shows collapse across count classes, whereas 50k and 100k maintain clear separation.\n(Bottom) Validation accuracy across training steps for the 10k dataset shows that collapse persists even when additional classification losses are applied or when using a frozen encoder that was already trained with classification.",
+                "position": 2915
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x28.png",
+                "caption": "",
+                "position": 2918
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x29.png",
+                "caption": "",
+                "position": 2922
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x30.png",
+                "caption": "",
+                "position": 2926
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x31.png",
+                "caption": "",
+                "position": 2930
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x32.png",
+                "caption": "Figure 27:Effect of lowering spatial complexity on compositional settings.Columns report Joint accuracy, task-specific accuracy,\nand Color accuracy on unseen compositions (diagonals).\nReducing scene complexity leads to modest improvements in Spatial relation and Counting accuracy,\nbut simultaneously degrades Color accuracy,\nresulting in overall performance comparable to the non-grid setting.",
+                "position": 2948
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x33.png",
+                "caption": "Figure 28:LoRA ablation across ranks and learning rates.Results are consistent across hyperparameter settings: spatial relation accuracy improves with fine-tuning, while counting accuracy degrades.",
+                "position": 2961
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x34.png",
+                "caption": "Figure 29:Compositional generalization on dataset size and the number of unseen compositions on Unet.(Top) For seen compositions, Attribution and Spatial relations remain stable across all dataset sizes, while Counting improves noticeably as the dataset size increases.\n(Bottom) For unseen compositions, performance drops rapidly as the dataset size decreases or the number of held-out compositions increases.",
+                "position": 2981
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x35.png",
+                "caption": "Figure 30:Confusion matrix on unseen diagonals when half of the compositions (5 diagonals) are unseen.Compared to Attribution and Counting, Spatial relations show no clear error pattern.\nThis indicates that spatial relations are highly fragile, and easily break when compositions are unseen.",
+                "position": 2986
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x36.png",
+                "caption": "Figure 31:Effect of lowering spatial complexity on compositional settings.Columns report Joint accuracy, task-specific accuracy,\nand Color accuracy on unseen compositions (diagonals).\nReducing scene complexity leads to modest improvements in Spatial relation and Counting accuracy,\nbut simultaneously degrades Color accuracy,\nresulting in overall performance comparable to the non-grid setting.",
+                "position": 2992
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x37.png",
+                "caption": "Figure 32:Effect of condition encoder disentanglement on compositional generalization.Dashed lines correspond to results obtained using a frozen, disentangled condition encoder, while solid lines correspond to the baseline, where the encoder is jointly trained with the diffusion model.\nThe performance gap remains small, indicating limited benefit from disentangling the condition embeddings alone.",
+                "position": 3010
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x38.png",
+                "caption": "Figure 33:Validation accuracy dynamics across the number of unseen diagonals.(Top) Accuracy on seen compositions.\n(Bottom) Accuracy on unseen compositions.\nBoth curves plateau, indicating that longer training does not improve compositional generalization.",
+                "position": 3020
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x39.png",
+                "caption": "Figure 34:Training samples frommosaic(non-grid, RQ1).Examples used for in-distribution evaluation across counting, spatial relations, and attribute-binding tasks.",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x40.png",
+                "caption": "Figure 35:Training samples frommosaic(non-grid, RQ2).Examples where half of compositional combinations are withheld during training to evaluate generalization to unseen compositions.",
+                "position": 3049
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x41.png",
+                "caption": "Figure 36:Training samples frommosaicunder grid layout (RQ1 and RQ2).Explicit spatial priors simplify scene structure, leading to improved counting and relational stability but reduced texture variation.",
+                "position": 3053
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x42.png",
+                "caption": "Figure 37:Training samples from SPEC.(Top) Relative Spatial Relations.\n(Bottom) Counting.",
+                "position": 3066
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x43.png",
+                "caption": "Figure 38:Generated samples for concept generalization (non-grid, RQ1).Examples from the best-performing checkpoints trained on the 100k uniform dataset. Rows show (top) Attribution, (middle) Spatial Relations, and (bottom) Counting. Samples are shown without filtering for correctness to illustrate raw generative behavior.",
+                "position": 3083
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x44.png",
+                "caption": "Figure 39:Generation trajectory across diffusion timesteps.Global spatial structure is established early in the denoising process, while fine-grained shapes are refined in later steps.",
+                "position": 3087
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00273/2605.00273v1/x45.png",
+                "caption": "Figure 40:Generated samples for compositional generalization (non-grid, RQ2).Results on unseen compositions when five diagonals are removed (100k dataset, best-validation checkpoint). Samples are shown without filtering for correctness to illustrate raw generation behavior under strong compositional shift.",
+                "position": 3091
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
