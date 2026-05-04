@@ -1,0 +1,123 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.21984/2604.21984v2/x1.png",
+                "caption": "Figure 1.SAD achieves superior\nreconstruction quality and remarkably higher training speed across different compression rates and resolutions. At 2.0 BPP (shown here), our method delivers 30.97 dB PSNR in 5.3s, compared to Image-GS(Zhanget al.,2025)(26.63 dB, 48.42s) and Instant-NGP(Mülleret al.,2022)(23.26 dB, 12.19s). Error maps (bottom row, 2× scaled) reveal significantly lower error on sharp edges and structural boundaries. Here, zoom insets demonstrate accurate reconstruction of fine details through our temperature-controlled soft Apollonius partition.",
+                "position": 362
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": []
+    },
+    {
+        "header": "2.Related Work",
+        "images": []
+    },
+    {
+        "header": "3.Preliminaries",
+        "images": []
+    },
+    {
+        "header": "4.Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.21984/2604.21984v2/x2.png",
+                "caption": "Figure 3.The Pipeline of SAD.Left:Given an input image, we initialize sites using content-adaptive sampling that places more sites in high-gradient regions (edges and textures).Middle:We jointly optimize site parameters including positions, colors, radii, and blending temperatures (τ\\tau). TheVoronoi Partitionrow (bottom right) shows the evolving spatial decomposition, while theTau Heatmap(top right) visualizes the learned blending sharpness: warm colors indicateharder, sharper transitions (highτ\\tau) suited for edges, while cool colors indicatesoftertransitions (lowτ\\tau) suited for soft gradients. Through iterative densification and pruning, the site count reduces from128128K to2525K while preserving quality.Right:The final output includes the reconstructed image, Apollonius partition boundaries, and optimized site distribution. We also visualize the content-adaptive site density and learned partition structure.",
+                "position": 757
+            },
+            {
+                "img": "https://arxiv.org/html/2604.21984/2604.21984v2/Figs/powerpixel_3panel.png",
+                "caption": "Figure 4.Representation diagram of our soft anisotropic additively weighted rendering.(1) Sites induce an anisotropic additively weighted diagram under the scoredmix​(x,i)=s​∥x−pi∥Gi−s​rid_{\\text{mix}}(x,i)=s\\lVert x-p_{i}\\rVert_{G_{i}}-s\\,r_{i}. Herepip_{i}sets position,rir_{i}controls reach, andGiG_{i}controls orientation and anisotropic stretch. (2) For a query pixelxx, we consider a small set of nearest candidate sites𝒞​(x)\\mathcal{C}(x)under this score. (3) We compute temperature-controlled softmax weightswi​(x)∝exp⁡(−τi​dmix​(x,i))w_{i}(x)\\propto\\exp\\!\\big(-\\tau_{i}d_{\\text{mix}}(x,i)\\big)overi∈𝒞​(x)i\\in\\mathcal{C}(x)and blend site colors to renderc​(x)=∑i∈𝒞​(x)wi​(x)​cic(x)=\\sum_{i\\in\\mathcal{C}(x)}w_{i}(x)\\,c_{i}, where largerτi\\tau_{i}yields sharper boundaries and smallerτi\\tau_{i}yields softer blending.",
+                "position": 765
+            },
+            {
+                "img": "https://arxiv.org/html/2604.21984/2604.21984v2/Figs/vpt_algorithm_visualization.png",
+                "caption": "Figure 5.Top-KKpropagation algorithm for maintaining per-pixel candidate site sets at constant cost.(1) Initialize each pixel’s list with the previous top-KKset𝒞t−1​(x)\\mathcal{C}_{t-1}(x)(temporal reuse). (2) Spatial propagation: merge candidate site IDs from a fixed neighborhood (self + 4 neighbors) using the current jump stepsts_{t}. (3) After propagation, each pixel holds an expanded candidate pool. (4) A small global probe step adds nonlocal candidate IDs when spatial propagation alone may miss distant competitors. (5) Score all candidates and keep the topKKbyℓi​(x)\\ell_{i}(x)to obtain the updated set𝒞t​(x)\\mathcal{C}_{t}(x)(an approximateKK-th order diagram update under the SAD score).",
+                "position": 799
+            },
+            {
+                "img": "https://arxiv.org/html/2604.21984/2604.21984v2/Figs/hash_gradient_accumulation.png",
+                "caption": "Figure 6.Threadgroup hash table gradient accumulation.(1) Each tile processes multiple pixels, with each pixel potentially affected by multiple sites (shown in different colors).\n(2) Sites are hashed into a threadgroup-local hash table where gradients are accumulated using local atomics. When sites collide (e.g.,s3s_{3}ands4s_{4}both hash to slot 2), open addressing is used with bounded probing.\n(3) After all pixels in the tile are processed, accumulated gradients are flushed to global memory. Sites that were successfully accumulated in the hash table require only 1 atomic write, while overflowed or collided sites may require multiple atomic writes. This approach significantly reduces global atomic contention compared to naive per-pixel atomics.",
+                "position": 994
+            }
+        ]
+    },
+    {
+        "header": "5.Implementation Details",
+        "images": []
+    },
+    {
+        "header": "6.Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.21984/2604.21984v2/Figs/div2k_comparison.jpeg",
+                "caption": "Figure 7.Qualitative comparison on DIV2K.Results for Instant-NGP, Image-GS, and SAD; error maps are shown at the bottom-right of each result.",
+                "position": 1955
+            },
+            {
+                "img": "https://arxiv.org/html/2604.21984/2604.21984v2/x3.png",
+                "caption": "Figure 8.Training performance: time per epoch vs image resolution.We report time per epoch (one full pass over all pixels) across methods. All methods were trained at 1.0 BPP on five test resolutions (5122to 20482) with three runs each. For Instant-NGP, we set batch size equal to total pixels to ensure each step processes exactly one epoch; standard NGP uses a fixed 262k batch size, resulting in vastly different sample coverage across resolutions. SAD is 1.75–3.36×\\timesfaster per epoch than Instant-NGP and 4.08–15.10×\\timesfaster than Image-GS. Results averaged over three runs with negligible variance (std dev<<2% of mean). NVIDIA RTX 5090.",
+                "position": 2079
+            },
+            {
+                "img": "https://arxiv.org/html/2604.21984/2604.21984v2/x4.png",
+                "caption": "Figure 9.Convergence analysis.Average PSNR vs training time across three resolution/bitrate configurations. All show similar convergence patterns: quality plateaus around half the maximum training time (2000 iterations), with minimal improvement or slight degradation from longer training.",
+                "position": 2094
+            },
+            {
+                "img": "https://arxiv.org/html/2604.21984/2604.21984v2/Figs/sites_count_comparison.jpeg",
+                "caption": "Figure 10.Effect of site budget on reconstruction quality.Three 2048×\\times1900 DIY photos rendered by SAD at 3k/6k/12k/24k sites (left to right), with the original in the final column.",
+                "position": 2097
+            },
+            {
+                "img": "https://arxiv.org/html/2604.21984/2604.21984v2/x5.png",
+                "caption": "Figure 11.Effect of learnable parameters on cell structure and reconstruction.Top row: SAD diagrams. Bottom row: Reconstructed images. From left to right: Fixedlog⁡τ=7.5\\log\\tau=7.5, Adaptive Tau, +Radius, +Anisotropy, Full model (+Radius+Anisotropy). Anisotropic cells create characteristic spiral patterns in smooth regions and align with edges in detailed areas.",
+                "position": 2307
+            },
+            {
+                "img": "https://arxiv.org/html/2604.21984/2604.21984v2/x6.png",
+                "caption": "Figure 12.Effect of fixed temperature on reconstruction.From left to right:log⁡τ=10.0\\log\\tau=10.0(23.96 dB),log⁡τ=7.5\\log\\tau=7.5(25.12 dB),log⁡τ=5.0\\log\\tau=5.0(25.37 dB). Higher temperatures produce sharper boundaries while lower temperatures create softer blending.",
+                "position": 2310
+            }
+        ]
+    },
+    {
+        "header": "7.More Applications",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2604.21984/2604.21984v2/Figs/forward_poisson.jpeg",
+                "caption": "Figure 13.Differentiable Poisson solving on irregular domain.Top: Ground truth solution, shaded heightfield visualization, and binary mask defining the smiley domain. Bottom: Our reconstructed solution, shaded output, and learned site IDs. The colorful ID map reveals adaptive site concentration near boundaries and high-curvature features. Explicit sites enable hard constraint enforcement by freezing boundary sites during optimization.",
+                "position": 2410
+            },
+            {
+                "img": "https://arxiv.org/html/2604.21984/2604.21984v2/Figs/fig_1d_signal.png",
+                "caption": "Figure 14.1D signal fitting at a matched 256-parameter budget.Rows: SAD (64 sites×\\times4 params), Gaussian splatting(Kerblet al.,2023)(64 splats×\\times4 params), and SIREN(Sitzmannet al.,2020)([1,16,16,1][1,16,16,1],ω0=15\\omega_{0}{=}15, 321 params).\nColumns: smooth sine, step-plus-sine, and multi-frequency periodic target.\nDots on the SAD and Gaussian rows mark primitive positions.\nGaussian splatting fits smooth regions near-optimally but rounds off the step;\nSIREN encodes frequency content globally yet exhibits Gibbs-like ringing at the discontinuity;\nSAD’s learnable per-site temperature sharpens the partition exactly at the step while\nremaining smooth elsewhere.",
+                "position": 2418
+            }
+        ]
+    },
+    {
+        "header": "8.Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": []
+    },
+    {
+        "header": "Appendix BImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
