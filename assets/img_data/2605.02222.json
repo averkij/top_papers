@@ -1,0 +1,279 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x1.png",
+                "caption": "Figure 1.Left:ShapeNet point cloud generation, single-shape encoding on complex Thingi10k meshes with Poisson-reconstructed surfaces, and minimal surface generation.Middle:Generation process visualization showing geometric probability paths transporting noise to surface points with encoded normals.Right:Energy-driven particle generation: diffusion-limited aggregation (top) and multilayer Thomson problem with electrons on concentric shells (bottom).",
+                "position": 417
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x2.png",
+                "caption": "Figure 2.OGPP.Our framework integrates three key components: (i)orbit-space canonicalizationassigns canonical indices (0,1,2,3) toX1X_{1}while keepingX0X_{0}uncanonicalized, (ii)particle index embeddings(colored blocks) allow each index to specialize to its canonical role, and (iii)geometric probability pathsencode surface normals via arc-length-aware terminal velocities. Per-particle coordinates𝒙tii\\bm{x}_{t_{i}}^{i}and learnable per-index embeddings are fed into a NN, predicting velocities𝒖tiθ,i\\bm{u}_{t_{i}}^{\\theta,i}supervised by reference velocities𝒖tiref,i\\bm{u}_{t_{i}}^{\\text{ref},i}.",
+                "position": 497
+            }
+        ]
+    },
+    {
+        "header": "2.Related Work",
+        "images": []
+    },
+    {
+        "header": "3.Background",
+        "images": []
+    },
+    {
+        "header": "4.Orbit-Space Probability Paths",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x3.png",
+                "caption": "Figure 3.Conceptual illustration of the conditional distribution of the terminal endpointX10X_{1}^{0}for a fixed particle index0under different coupling strategies. Each figure shows five sampled(𝒙0,𝒙1)(\\bm{x}_{0},\\bm{x}_{1})pairs for particles with index0: gray points denote the noise positions𝒙0(i),0\\bm{x}_{0}^{(i),0}, blue points denote the corresponding targets𝒙1(i),0\\bm{x}_{1}^{(i),0}on the surface, and arrows indicate their displacements. Left: independent coupling(lipman2022flow); middle: OT-based coupling(song2023equivariant;klein2023equivariant); right: our orbit-space canonicalization. Independent and OT-based couplings spread the possible endpointsX10X_{1}^{0}around the surface, yielding a broad conditional distributionp​(X10∣Xt=𝒙,I=0)p(X_{1}^{0}\\mid X_{t}=\\bm{x},I=0), whereas orbit-space canonicalization concentrates them into a smaller region, which is expected to reduce the conditional covariance and simplify the velocity regression.",
+                "position": 1058
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x4.png",
+                "caption": "Figure 4.Visualization of index-conditioned velocity fields in a realistic minimal-surface configuration (area-constrained). For each strategy, we sample 1000 random noise configurations𝒙0\\bm{x}_{0}for each minimal-surface target𝒙1\\bm{x}_{1}and construct couplings using independent coupling(lipman2022flow), OT-based coupling(klein2023equivariant;song2023equivariant), and our orbit-space canonicalization. Left: four minimal-surface boundary point sets with particles colored by index; arrows show, for a single trial, the velocity𝒙1i−𝒙0i\\bm{x}_{1}^{i}-\\bm{x}_{0}^{i}of two highlighted particles (black: Index=0, blue: Index=112) from a shared initialization𝒙0\\bm{x}_{0}. Right: empirical per-particle velocity fields for the same indices, obtained by aggregating these velocities over the 1000(𝒙0,𝒙1)(\\bm{x}_{0},\\bm{x}_{1})pairs and interpolating them onto a grid; streamlines visualize flow trajectories induced by these vector fields. As in the conceptual illustration Figure3, independent and OT-based couplings spread the possible endpoints for each index around the surface, whereas our orbit-space canonicalization concentrates them into a small, stable region and yields straighter  flows.",
+                "position": 1080
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x5.png",
+                "caption": "Figure 5.Minimal surface generation with variable anchors (3–8).3-step generation results from a single conditional model trained on varying anchor counts. The generated boundaries appear smooth and accurate across diverse configurations.",
+                "position": 1123
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x6.png",
+                "caption": "Figure 6.Minimal surface generation (3 anchors).We consider the 2D analog of minimal surfaces: soap film boundaries satisfying area constraints. We compare 1-step and 10-step generation results with different methods. Red dots indicate anchor particles; blue dots show generated boundary particles. Our method produces accurate minimal surface boundaries in a single step, while baselines require multiple steps and  exhibit artifacts. Ground truth (GT) shown on the right.",
+                "position": 1195
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x7.png",
+                "caption": "Figure 7.Illustration of directional cancellation in the Lipschitz ratio. Squares represent stacked particle vectors inℝD​N\\mathbb{R}^{DN}.Left:WhenΔ0(i​j)\\Delta_{0}^{(ij)}andΔ1(i​j)\\Delta_{1}^{(ij)}point in opposite directions, the denominator nearly vanishes while the numerator remains large, yielding a large Lipschitz ratio.Right:Without such cancellation, the ratio stays moderate.",
+                "position": 1307
+            }
+        ]
+    },
+    {
+        "header": "5.Geometric Probability Paths for Attribute Encoding",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x8.png",
+                "caption": "Figure 8.Geometric probability paths for attribute encoding.Left:Our geometric probability path (quadratic Hermite curve) aligns the terminal tangent with the surface normal𝒏1\\bm{n}_{1}, encoding per-particle attributes into the path geometry.Right:Standard linear interpolation leaves the terminal velocity as an unused degree of freedom.",
+                "position": 1347
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x9.png",
+                "caption": "Figure 9.Ablation on normal encoding strategies.Top row: Screened Poisson reconstructions from NTV, ATV, and canonicalized 6D flow matching (Canon. FM 6D), with normal-colored point clouds inset. Bottom rows: zoomed-in comparisons against the ground truth (GT). ATV and Canon. FM (6D) achieve comparable quality and accurately reconstruct small Voronoi cells and thin structures that NTV fails to capture.",
+                "position": 1366
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x10.png",
+                "caption": "Figure 10.Comparison of terminal velocity magnitude choices. Red dots indicate uniform time samplest∈{0,0.2,0.4,0.6,0.8,1.0}t\\in\\{0,0.2,0.4,0.6,0.8,1.0\\}; green arrows show𝒗1\\bm{v}_{1}.Top:NTV sets‖𝒗1‖=1\\|\\bm{v}_{1}\\|=1, yielding nonuniform arc-length spacing.Middle:Our ATV approximation sets‖𝒗1‖=D​(1+λ​(1−S))\\|\\bm{v}_{1}\\|=D(1+\\lambda(1-S)), achieving near-uniform spacing with negligible overhead.Bottom:Numerically optimized ATV chooses‖𝒗1‖\\|\\bm{v}_{1}\\|to minimize speed variance along the curve, giving optimal uniformity but requiring numerical optimization.",
+                "position": 1418
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x11.png",
+                "caption": "Figure 11.DLA generation comparison.10-step (left) and 200-step (right) generation results. At 10 steps, baselines produce scattered, non-fractal structures, while ours exhibits realistic dendritic branching. At 200 steps, all methods improve; ours appears closest to the ground-truth fractal morphology. Color encodes particle attachment order (early: dark, late: light).",
+                "position": 1425
+            }
+        ]
+    },
+    {
+        "header": "6.Algorithm Overview",
+        "images": []
+    },
+    {
+        "header": "7.Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x12.png",
+                "caption": "Figure 12.Uniform blue-noise generation.Comparison of flow-matching variants for 1024-point uniform blue-noise generation.Row 1:One generated point set.Row 2:2D power spectrum averaged over 1K generated samples.Row 3:Radial power spectrum averaged over 1K generated samples.Row 4:Delaunay triangulation valence (color indicates neighbor count).\nOur method (5M and 26M) produces the sharpest spectral ring, and the results closely match the ground truth.",
+                "position": 1723
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x13.png",
+                "caption": "(a)Minimal surface: area fraction error, angle smoothness, and uniformity CV (all lower is better). Circled points highlight representative steps.",
+                "position": 1753
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x13.png",
+                "caption": "(a)Minimal surface: area fraction error, angle smoothness, and uniformity CV (all lower is better). Circled points highlight representative steps.",
+                "position": 1756
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x14.png",
+                "caption": "",
+                "position": 1759
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x15.png",
+                "caption": "",
+                "position": 1760
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x16.png",
+                "caption": "(b)Blue noise: Pearson correlation (higher is better) and relativeL2L_{2}error (lower is better).",
+                "position": 1767
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x17.png",
+                "caption": "",
+                "position": 1776
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x18.png",
+                "caption": "(c)DLA: absolute error|Dfgen−DfGT||D_{f}^{\\text{gen}}-D_{f}^{\\text{GT}}|and estimated fractal dimensionDfD_{f}.",
+                "position": 1785
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x19.png",
+                "caption": "",
+                "position": 1794
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x20.png",
+                "caption": "(d)Multilayer Thomson: CV average (spatial uniformity) and tangential force RMS (equilibrium deviation).",
+                "position": 1803
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x21.png",
+                "caption": "",
+                "position": 1812
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x22.png",
+                "caption": "Figure 14.Adaptive blue-noise generation on CelebA.Unconditionally generated face distributions using our 26M model trained on 200K adaptive blue-noise samples. Point density varies with image intensity, revealing facial features—eyes, nose, mouth, and hair contours—while maintaining local blue-noise spectral characteristics throughout.",
+                "position": 1886
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x23.png",
+                "caption": "Figure 15.Our generated DLA growth process, rendered as a growing bacterial colony in a Petri dish.",
+                "position": 1919
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x24.png",
+                "caption": "Figure 16.Multilayer Thomson problem generation.Comparison of generated three-shell electron configurations (128 particles per shell). The top row shows the full configuration, and the bottom row zooms into the region indicated by the red box. Red circles mark irregular particle-spacing artifacts that remain in Original FM and Minibatch OT, while EqFM and our method produce Poisson-disk-like particle distributions on each shell that closely match the ground-truth equilibrium structure.",
+                "position": 2067
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x25.png",
+                "caption": "Figure 17.ShapeNet airplane generation.Comparison at 40-step and 200-step inference.",
+                "position": 2157
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x26.png",
+                "caption": "Figure 18.ShapeNet car generation.Comparison at 40-step and 200-step inference.",
+                "position": 2160
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x27.png",
+                "caption": "Figure 19.ShapeNet chair generation.Comparison at 40-step and 200-step inference.",
+                "position": 2163
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x28.png",
+                "caption": "Figure 20.3D generation with encoded normals on ShapeNet airplane.Green line segments show velocity directions during generation, which converge to surface normals at the terminal frame.",
+                "position": 2545
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x29.png",
+                "caption": "Figure 21.3D generation with encoded normals on ShapeNet airplane.Additional samples demonstrating consistent normal generation across diverse airplane geometries.",
+                "position": 2548
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x30.png",
+                "caption": "Figure 22.Normal comparison on ShapeNet airplane.Top-left: Poisson reconstruction from our generated normals. Our method produces consistent, accurate normals compared to PCA-estimated normals.",
+                "position": 2551
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x31.png",
+                "caption": "Figure 23.Single shape encoding.Left: point clouds colored by predicted normals. Right: reconstructed mesh.",
+                "position": 2563
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x32.png",
+                "caption": "Figure 24.Single-shape encoding comparison on Coral Cuff.Row 1: generated point clouds with zoomed-in details.\nRow 2: generated point clouds colored by normal direction.\nRow 3: meshes reconstructed via Screened Poisson.\nGeometry Distributions (3D) produces sparse, clustered points, while Generalized VP yields noisy normals on thin structures.\nGeometry Distributions (6D) further requires 6D outputs and higher computation.\nOur 3D geometric probability paths achieve quality comparable to 6D methods while maintaining the efficiency of a purely 3D generation process.",
+                "position": 2571
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x33.png",
+                "caption": "Figure 25.Minimal surface (area-constrained) generation ablation study (3 anchors).Comparison of 1-step and 10-step generations; red dots indicate anchor points (conditioning locations), and ground truth (GT) is shown on the right.\nWithout per-particle index (identity) embeddings, our method has only similar expressive power to vanilla Flow Matching (Eulerian view), while equipping vanilla Flow Matching with particle identities alone still fails to produce high-quality minimal surfaces.",
+                "position": 2583
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x34.png",
+                "caption": "Figure 26.Ablation study on canonicalization strategies and initial noise distributions.Row 1: generated point sets. Row 2: averaged 2D power spectrum. Row 3: radial power spectrum compared to ground truth. Red boxes highlight point pairs that are too close to each other.",
+                "position": 2657
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x35.png",
+                "caption": "Figure 27.Generated airplanes (left of each pair) and their nearest training samples under Chamfer Distance (right of each pair). The generated shapes are visually distinct from their closest training neighbors, indicating that the model produces novel geometry rather than memorizing training data.",
+                "position": 2927
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x36.png",
+                "caption": "Figure 28.Mid-time analysis of Lipschitz ratios and directional cancellation.From left to right: median and 90th percentile Lipschitz ratio, median and 90th percentile cancellation score att=1/2t=1/2overkk-NN edges (bins ordered by distance).\nLowerLi​jL_{ij}and higherscancs_{\\mathrm{canc}}are better.\nCanonicalizingX1X_{1}only (“sortx1x_{1}”, Ours) yields the lowest Lipschitz ratios and highest cancellation scores, matching our directional-cancellation analysis. See more experimental details in Section7.4.",
+                "position": 2936
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x37.png",
+                "caption": "",
+                "position": 2945
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x38.png",
+                "caption": "",
+                "position": 2950
+            },
+            {
+                "img": "https://arxiv.org/html/2605.02222/2605.02222v1/x39.png",
+                "caption": "",
+                "position": 2955
+            }
+        ]
+    },
+    {
+        "header": "8.Discussion",
+        "images": []
+    },
+    {
+        "header": "9.Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AFlow Matching Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BGroup Theory Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CConditional Covariance Reduction via Orbit-Space Canonicalization: Detailed Derivation",
+        "images": []
+    },
+    {
+        "header": "Appendix DLipschitz Ratio Analysis: CanonicalizingX0X_{0}",
+        "images": []
+    },
+    {
+        "header": "Appendix EOrbit-Continuous Canonicalization and Straight Flows: Detailed Derivation",
+        "images": []
+    },
+    {
+        "header": "Appendix FArc-Length Terminal Velocity: Detailed Discussion",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
