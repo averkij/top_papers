@@ -1,0 +1,226 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/resources/logo/rlwrld-logo.png",
+                "caption": "",
+                "position": 470
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x1.png",
+                "caption": "",
+                "position": 473
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x2.png",
+                "caption": "",
+                "position": 476
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x3.png",
+                "caption": "Figure 1:Overview ofRLDX-1.RLDX-1is a Vision-Language-Action model (VLA) that integrates diverse functional capabilities for dexterous manipulation in real-world deployment.",
+                "position": 478
+            }
+        ]
+    },
+    {
+        "header": "1. Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x4.png",
+                "caption": "Figure 2:Overview of RLDX-1.Given video observations and a language instruction, RLDX-1 predicts future actions through three key functionalities:motion awarenessvia the Motion Module,long-term memoryvia the Memory Module, andphysical sensingvia the Physics Stream that ingests torque and tactile signals.\nA VLM backbone grounds vision and language into a cognition representation, which is jointly denoised with physics and action tokens by the Multi-Stream Action Transformer to produce the final action.",
+                "position": 602
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x5.png",
+                "caption": "Figure 3:Overview of the RLDX-1 architecture.RLDX-1 consists of two main components: a Vision-Language Model (VLM) and an action model. The VLM takes video observations as input, captures motion-aware visual-language representations, and converts the extracted representations into cognition features that are passed to the action model.\nThese cognition features are further augmented with memory features through a memory module.\nThe action model then takes the memory-augmented cognition features, physical signals, robot states, and previous actions as inputs to a Multi-Stream Action Transformer (MSAT), which predicts future physical signals and actions for downstream manipulation.",
+                "position": 643
+            }
+        ]
+    },
+    {
+        "header": "2. Neural Architecture",
+        "images": []
+    },
+    {
+        "header": "3. Training Data",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x6.png",
+                "caption": "Figure 4:Overview of the synthetic data framework.(1)Data Generation: a source demonstration is diversified via scene and task augmentation, and an inverse dynamics model (IDM) annotates action labels for the generated videos. (2)Data Filtering: IDM-predicted actions are replayed in a simulator, and a motion-consistency classifier compares the rollout against the synthetic video to retain only consistent samples.",
+                "position": 912
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x7.png",
+                "caption": "Figure 5:Examples of synthetic data.We visualize one example of our synthetic data: (a) original in-house ALLEXstack cup noodlesdemonstration, (b) task-augmented variant with a VLM-generated instruction, and (c) scene-augmented variant via I2I editing of the initial frame followed by I2V generation.",
+                "position": 945
+            }
+        ]
+    },
+    {
+        "header": "4. Training Procedure",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x8.png",
+                "caption": "Figure 6:Overview of dataset composition for pre-training RLDX-1.RLDX-1 pre-train dataset covers multiple embodiments spanning single-arm grippers, dual-arm grippers, and humanoid platforms equipped with dexterous hands, including synthetic GR-1 humanoid data (Section˜3.3).",
+                "position": 997
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x9.png",
+                "caption": "Figure 7:Overview of data compositions of RLDX-1 mid-training.The mid-training data covers two target platforms: ALLEX and Franka Research 3 platform (FR3).\nThe ALLEX composition combines in-house teleoperation data with synthetic data from our generation pipeline (Section˜3.3), while the FR3 composition combines in-house teleoperation data with the public DROID dataset(khazatsky2024droid).",
+                "position": 1122
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x10.png",
+                "caption": "Figure 8:Normalized value over timesteps for a cube pick-and-place task.The text prediction critic (Ours) better reflects the task progress than the distributional critic:\n(a) It produces more monotonically increasing values for episodes that succeed on the first attempt, and (b) captures both failure and recovery in episodes that succeed after a retry.",
+                "position": 1179
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x11.png",
+                "caption": "Figure 9:Dynamic graph vs. Static graph (Ours).Dynamic graph execution accumulates launch overhead across repeated graph launches.\nStatic graph conversion captures the forward pass as a single CUDA Graph, reducing launch overhead.",
+                "position": 1203
+            }
+        ]
+    },
+    {
+        "header": "5. Inference Strategy",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x12.png",
+                "caption": "Figure 10:Effect of operator fusion on memory access.(a) Without fusion, each kernel writes its output to memory and the next kernel reads it back, and these memory round-trips dominate the runtime.\n(b) With fusion, the operators access memory only once for the input load and once for the output store, minimizing memory traffic.",
+                "position": 1321
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x13.png",
+                "caption": "Figure 11:Overview of the simulation benchmarks.(a) We consider established benchmarks, including LIBERO(liu2023libero), SIMPLER(li2024evaluating)with Google Robot and WidowX for evaluating RLDX-1 on a single-arm robot, and consider LIBERO-Plus(fei2025libero), SIMPLER Google-VA for evaluating robustness to diverse variations. (b) We further consider more challenging benchmarks, including RoboCasa Kitchen(nasiriany2024robocasa), GR-1 Tabletop(bjorck2025gr00t), and RoboCasa365(nasiriany2026robocasa365)for evaluating a more comprehensive assessment of RLDX-1.",
+                "position": 1341
+            }
+        ]
+    },
+    {
+        "header": "6. Evaluation and Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x14.png",
+                "caption": "Figure 12:Real-robot platforms.We use (a)OpenArm with Inspire RH56F1 Hands, a 28-DoF upper-body humanoid with stereo egocentric cameras; (b)ALLEX, a 48-DoF upper-body humanoid with stereo egocentric cameras; (c)Franka Research 3 platform (FR3), a 7-DoF single-arm robot with an AnySkin tactile sensor, wrist and third-person cameras.",
+                "position": 1630
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x15.png",
+                "caption": "Figure 13:OpenArm humanoid benchmark.We visualize the initial setup for six tasks for evaluating versatility in humanoid manipulation:Basic PnP,Directional PnP (Shelf),Directional PnP (Dish Rack),Unseen Object (Instance),Unseen Task (Placement), andObject Grounding.",
+                "position": 1646
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x16.png",
+                "caption": "",
+                "position": 1651
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x17.png",
+                "caption": "Figure 15:ALLEX humanoid benchmark.We design four tasks for evaluating functional capabilities in dexterous humanoid manipulation:Conveyor Pick-and-Place,Object-in-Box Selection,Card Slide-and-Pick, andPot-to-Cup Pouring.",
+                "position": 1734
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x18.png",
+                "caption": "Figure 16:ALLEX humanoid benchmark results.We report the success rates (%) of VLAs fine-tuned on the training dataset of each task. RLDX-1 substantially outperforms the baselines across all task categories, including motion awareness (Conveyor Pick-and-Place), long-term memory (Object-in-Box Selection), and physical sensing (Card Slide-and-Pick, Pot-to-Cup-Pouring).",
+                "position": 1739
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x19.png",
+                "caption": "Figure 17:Franka Research 3 benchmark.We design six tasks for evaluating functional capabilities in dexterous single-arm robot manipulation:Spin Tracking,Pong Game,Cup Swapping,Shell Game,Plug Insertion, andEgg Pick-and-Place.",
+                "position": 1832
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x20.png",
+                "caption": "Figure 18:Franka Research 3 benchmark results.We report the success rates (%) of VLAs fine-tuned on the training dataset of each task. RLDX-1 substantially outperforms the baselines across all task categories, including motion awareness (Spin Tracking, Pong Game), long-term memory (Cup Swapping, Shell Game), and physical sensing (Plug Insertion, Egg PnP).",
+                "position": 1836
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x21.png",
+                "caption": "Figure 20:Attention-based analysis.We visualize the self-attention scores from the last prompt token to the image patch tokens during task execution.",
+                "position": 2053
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x22.png",
+                "caption": "Figure 21:Overview of theLight Bulb Twistingtask.In this task, the robot should twist the bulb using its hand until it turns on the light.",
+                "position": 2069
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x22.png",
+                "caption": "Figure 21:Overview of theLight Bulb Twistingtask.In this task, the robot should twist the bulb using its hand until it turns on the light.",
+                "position": 2072
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x23.png",
+                "caption": "(a)Episode length by frames.",
+                "position": 2077
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x23.png",
+                "caption": "(a)Episode length by frames.",
+                "position": 2080
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x24.png",
+                "caption": "(b)Number of attempts.",
+                "position": 2086
+            }
+        ]
+    },
+    {
+        "header": "7. Related Work",
+        "images": []
+    },
+    {
+        "header": "8. Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AContributors and Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "Appendix BDatasets Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CReinforcement Learning (RL) Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DParameter-Efficient Fine-Tuning",
+        "images": []
+    },
+    {
+        "header": "Appendix ETest-time Sampling",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x25.png",
+                "caption": "Figure 23:On the offline dataset, we sampledN=10N=10from the RECAP3policy and measured the Q value to see whether test-time sampling would be effective.\n(a) Picking the best action chunk according to Q-value makes a difference, and (b), (c) the gap becomes clear as temperature increases.\n(d) Q-value versus frame of anLight Bulb Twistingepisode shows that Q improvement by temperature takes place uniformly within an episode.",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2605.03269/2605.03269v2/x26.png",
+                "caption": "Figure 24:Test-time sampling result of RL-trained RLDX-1 checkpoints (RECAP1to RECAP3).\nWe measure the number of attempts to completeLight Bulb Twistingtask.\nTest-time sampling (N=8N=8, andT=1.5T=1.5) improves RECAP1policy nearly to RECAP2policy performance, while it degrades the performance of RECAP2and RECAP3.\nWe checked that increasing the number of samples from 8 to 32 for RECAP1does not further improve the performance.\nWe find that test-time-sampling helps explore more which might harm near-converged policies.",
+                "position": 3281
+            }
+        ]
+    },
+    {
+        "header": "Appendix FKernel Optimization",
+        "images": []
+    },
+    {
+        "header": "Appendix GEvaluation & Analysis",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

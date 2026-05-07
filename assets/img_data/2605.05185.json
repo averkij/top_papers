@@ -1,0 +1,123 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Preliminaries",
+        "images": []
+    },
+    {
+        "header": "3Dataset Curation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.05185/2605.05185v1/x1.png",
+                "caption": "Figure 1:Overview of the data curation pipeline.(a) Starting from the English Wikipedia hyperlink graph, we construct high-quality multi-hop VQA instances by sampling constrained paths, generating canonical question–answer pairs, rewriting them into fuzzy questions, grounding anchor entities with representative images, and applying automated quality control.(b) We then perform staged filtering to retain only tool-demanding, non-trivial samples, and create an enhanced subset through image degradation and tool-based restoration to encourage think-with-image behavior.(c) Finally, we synthesize multi-turn expert trajectories in a real tool environment and apply rejection sampling with answer-correctness and process-level judges, yielding the final high-quality trajectories used for the following stage training.",
+                "position": 417
+            }
+        ]
+    },
+    {
+        "header": "4Training",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.05185/2605.05185v1/x2.png",
+                "caption": "Figure 2:Overview of the RL training pipeline.Starting from a supervised fine-tuned model, we sample a group of multi-turn trajectories against the real environmentℰ\\mathcal{E}. Each trajectory is evaluated by a composite reward combining final-task success (raccr_{\\text{acc}}) and process-level search quality (rqueryr_{\\text{query}}) along with a format check (rfmtr_{\\text{fmt}}). To preserve valid reasoning in trajectories that eventually encounter fatal errors, we apply fatal-aware token masking to truncate the sequence and employ one-sided advantage clamping during policy optimization, preventing the suppression of viable early steps.",
+                "position": 469
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.05185/2605.05185v1/x3.png",
+                "caption": "Figure 3:Training dynamics over the RL phase.Left:averagenumber of turns per rollout.Right:batch-level accuracy.Fatal-aware GRPO sustains a higher number of turnsandreaches ahigher accuracy than vanilla GRPO(Jinet al.,2025; Guoet al.,2025)and the Hard-Mask(Huanget al.,2026)baseline.",
+                "position": 1223
+            },
+            {
+                "img": "https://arxiv.org/html/2605.05185/2605.05185v1/x4.png",
+                "caption": "Figure 4:Fatal-aware masking with one-sided clamping on two illustrative rollout groups.Each panel shows a group ofG=16G{=}16rollouts (non-fatal in blue, fatal in brick red) together with a cartoon of the resulting token-level update on one representative fatal trajectoryτi\\tau_{i}. Bar outlines mark fatal rollouts whose pre-clamp scorer~i\\widetilde{r}_{i}exceeds the group meanr¯\\bar{r}(green, preserved) or falls below it (dark grey, clamped).(a) Higher-difficulty prompt.Whenr¯\\bar{r}is low, several fatal prefixes already beat it:r~i>0\\widetilde{r}_{i}>0andA^i=r~i\\hat{A}_{i}=\\widetilde{r}_{i}, so gradients flow only through the viable prefix (tokens up to the fatal onsetfif_{i}) while the post-failure suffix is hard-masked—the partial reasoning that reached the failure point isreinforcedeven though the trajectory itself is unsolvable.(b) Lower-difficulty prompt.When most rollouts succeed, every fatal reward falls far belowr¯\\bar{r}and one-sided clamping setsA^i=max⁡(r~i,0)=0\\hat{A}_{i}=\\max(\\widetilde{r}_{i},0)=0, degenerating to pure hard-masking and avoiding any suppression of the possibly-valid prefix.",
+                "position": 1226
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Limitations and Future Work",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix Contents",
+        "images": []
+    },
+    {
+        "header": "Appendix APreliminary of Reinforcement Learning",
+        "images": []
+    },
+    {
+        "header": "Appendix BMulti-Turn Search Fatal-Aware GRPO Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.05185/2605.05185v1/x5.png",
+                "caption": "Figure 5:Aggregate distribution of clamped and preserved fatal rollouts.Pre-clamp group-normalized scoresr~i\\widetilde{r}_{i}aggregated over10,00010{,}000groups (G=16G{=}16;47,97847{,}978fatal rollouts in total).91.8%91.8\\%of fatal rollouts fall on the negative side of the clampthreshold (meanr~¯−=−0.68\\overline{\\widetilde{r}}_{-}{=}-0.68) and are zeroedout byA^i=max⁡(r~i,0)\\hat{A}_{i}{=}\\max(\\widetilde{r}_{i},0); the remaining8.2%8.2\\%arepreserved (meanr~¯+=+0.57\\overline{\\widetilde{r}}_{+}{=}+0.57) and overlap withthe positive mode of the non-fatal reference density (blue line:pre-clamp scores of all non-fatal rollouts from the same groups).Preservation is therefore driven by the same group-normalized score thatGRPO already computes, and the preserved fatal prefixes sit in the samescore regime as stronger non-fatal behaviors – not an ad-hoc heuristic.",
+                "position": 2049
+            }
+        ]
+    },
+    {
+        "header": "Appendix CImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DData Curation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.05185/2605.05185v1/figures/au_zoo_example.jpg",
+                "caption": "Figure 6:Representative imageIIfor the anchorv0=Australia_Zoov_{0}=\\texttt{Australia\\_Zoo}.",
+                "position": 2901
+            }
+        ]
+    },
+    {
+        "header": "Appendix ESystem Prompts",
+        "images": []
+    },
+    {
+        "header": "Appendix FTool Definition and Usage",
+        "images": []
+    },
+    {
+        "header": "Appendix GCase Study",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.05185/2605.05185v1/x6.png",
+                "caption": "Figure 9:Case study of OpenSearch-VL.Given an image-based question about the opening year of a bridge, the model first inspects visual evidence and crops the road sign to obtain finer-grained location cues. It then uses image search to identify the bridge as the Kessock Bridge and issues a targeted text search to verify its official opening date. The retrieved evidence confirms that the bridge opened in 1982, leading to the final answer. This example illustrates how interleaved visual inspection, image retrieval, and textual evidence acquisition can resolve knowledge-intensive visual questions.",
+                "position": 3316
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
