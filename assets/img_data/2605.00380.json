@@ -1,0 +1,182 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x1.png",
+                "caption": "Figure 1:ResRL overview.Overlapping positive/negative semantic distributions (S.D.) can cause GRPO/NSR to penalize shared valid tokens. ResRL utilizes negative projection residualsRi,tR_{i,t}to reweight gradients, reducing shared semantic penalties.",
+                "position": 388
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x2.png",
+                "caption": "Figure 2:Pass@kkperformance on AIME24/25 and AMC23 using Qwen3-4B. ResRL consistently dominates the high-kkregime, outperforming the base model and diversity-oriented baselines such as NSR and FlowRL, indicating a widened capability frontier.",
+                "position": 671
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x3.png",
+                "caption": "Figure 3:Pass@kkperformance on AIME24/25 and AMC23 using Qwen3-1.7B.\nResRL demonstrates consistent superiority on the challenging AIME datasets across all sampling budgets (k=20k=2^{0}to272^{7}). On AMC23, ResRL leads in low-sample regimes and converges with baselines at highkkdue to task saturation.",
+                "position": 1212
+            }
+        ]
+    },
+    {
+        "header": "4Experiment Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x4.png",
+                "caption": "Figure 4:Impact of rankkkon model performance and optimization stability. (a) AIME2024 and (b) AIME2025 accuracy (Avg@16) curves across different ranks (k=8k=8,k=64k=64,k=128k=128,k=256k=256), demonstrating the protection-discrimination tradeoff. (c) Actor gradient norm highlighting the stability of updates, with larger ranks showing bursty gradients indicative of high variance.",
+                "position": 1386
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Impact Statement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AProofs and Derivation Details for the Theoretical Framework",
+        "images": []
+    },
+    {
+        "header": "Appendix BAlgorithm Design",
+        "images": []
+    },
+    {
+        "header": "Appendix CTime Complexity of Gradient-Inner-Product Modules",
+        "images": []
+    },
+    {
+        "header": "Appendix DAdditional Implementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x5.png",
+                "caption": "Figure 5:Pass@kkperformance on AIME24/25 and AMC23 using Qwen3-8B.\nResRL dominates practical low-to-mid regimes (k≤26k{\\leq}2^{6}) and remains competitive at high compute (k=27k{=}2^{7}). This confirms ResRL optimizes the precision–diversity trade-off, securing reliable reasoning without relying on the high-variance “brute-force” exploration of unconstrained methods.",
+                "position": 3540
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x6.png",
+                "caption": "Figure 6:Ablation of the KL penalty using Qwen3-8B.\nRemoving the explicit KL term (red) significantly boosts accuracy on(a)AIME2024 and(b)AIME2025 (Avg@16) compared to the standard configuration (purple).(c)The rising KL divergence reflects an expanded exploration horizon enabled by ResRL.\nCrucially, training remains stable despite this drift, confirming that ResRL’s projection-based weighting acts as a sufficient intrinsic regularizer, rendering the strict SFT constraint redundant.",
+                "position": 3544
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x7.png",
+                "caption": "Figure 7:Impact of hidden layer selection on reasoning performance.\nUtilizing the penultimate hidden layer (purple) yields significantly superior accuracy on(a)AIME2024 and(b)AIME2025 compared to the final hidden layer (green).(c)The optimization dynamics, characterized by elevated KL divergence and actor entropy, indicate that the penultimate layer facilitates more sufficient exploration.\nCrucially, this confirms that the penultimate layer captures high-level semantic abstractions while mitigating the immediate token-prediction bias inherent to the final layer, thereby preventing premature convergence to suboptimal reasoning paths.",
+                "position": 3551
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x8.png",
+                "caption": "Figure 8:Sensitivity analysis of the quantile hyperparameter.\nLower quantile thresholds (0.1 and 0.2) accelerate convergence and yield superior accuracy on(a)AIME2024 and(b)AIME2025 compared to the more permissive 0.3 level (green).(c)The elevated KL divergence at lower quantiles indicates that stricter residual penalization drives more aggressive exploration.\nCrucially, the 0.1 configuration maintains optimization stability (low gradient variance) despite this exploration, validating that the projection residual is a high-fidelity signal for error suppression, thus justifying a stricter gating mechanism.",
+                "position": 3558
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x9.png",
+                "caption": "Figure 9:Long-horizon training stability of ResRL (Qwen3-8B) without explicit KL regularization.We extend the training to 800 steps to verify asymptotic stability.\nDespite the removal of the KL penalty, the model exhibits(Top)continuous performance gains on AIME 2024/2025 and a natural, bounded rise in KL divergence indicative of effective exploration; and(Bottom)stable dynamics in response length, actor entropy, and gradient norms.\nThis confirms that ResRL’s subspace-based semantic constraints successfully prevent mode collapse and reward hacking without requiring rigid SFT anchoring.",
+                "position": 3565
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x10.png",
+                "caption": "Figure 10:Effect of the SVD subspace budgetMmaxM_{\\max}on learning dynamics.Ablations overMmax∈{2048,4096,6144,8192}M_{\\max}\\!\\in\\!\\{2048,4096,6144,8192\\}(rankkkfixed) under group rollouts (G=4G{=}4) and max response length 4096.\nWe report AIME2024/2025 accuracy (top row, left/middle), policy drift measured by actor KL loss (top row, right),\noptimization stability via actor gradient norm (bottom row, left), exploration via actor entropy (bottom row, middle),\nand mean response length (bottom row, right). Moderate budgets (Mmax=2048M_{\\max}{=}2048–40964096) yield similar accuracy and stable\noptimization, consistent with the redundancy and low effective dimensionality of Transformer representations, which makes\nthe dominant rank-kkpositive subspace recoverable from a subsample. IncreasingMmaxM_{\\max}beyond this range exhibits\ndiminishing returns and can alter the gating signal: very large budgets may compress residual contrast and push\ntoken-wise weights toward their floor, weakening error-specific shaping (e.g.,Mmax=8192M_{\\max}{=}8192shows lower KL yet slower\naccuracy gains), while intermediate-large budgets can increase drift and exploration (higher KL/entropy) without a\nproportional accuracy improvement (e.g.,Mmax=6144M_{\\max}{=}6144). Overall,Mmax=4096M_{\\max}{=}4096provides a favorable tradeoff between\nsubspace completeness, residual discriminability, and SVD compute.",
+                "position": 3572
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x11.png",
+                "caption": "Figure 11:Impact of representation normalization on performance and stability.\nRemoving the LayerNorm and centering mechanism (green) results in degraded performance on(a)AIME2024 and(b)AIME2025 compared to the standard ResRL configuration (purple).(c)The optimization dynamics reveal that the unnormalized configuration suffers from severe instability, evidenced by high-variance spikes in actor gradient norms.\nCrucially, this confirms that normalizing the representation geometry is essential for deriving reliable residual signals, thereby preventing erratic policy updates and ensuring robust optimization.",
+                "position": 3587
+            }
+        ]
+    },
+    {
+        "header": "Appendix ETraining Parameters",
+        "images": []
+    },
+    {
+        "header": "Appendix FOutput Cases",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x12.png",
+                "caption": "Figure 12:Responses generated by the ResRL-trained Qwen3-8B model (Rollout 1, no think mode) on the OlympiadBench test set.",
+                "position": 3917
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x13.png",
+                "caption": "Figure 13:Response generated by the ResRL-trained Qwen3-8B model (Rollout 2, no think mode) on the OlympiadBench test set.",
+                "position": 3921
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x14.png",
+                "caption": "Figure 14:Response generated by the ResRL-trained Qwen3-8B model (Rollout 3, no think mode) on the OlympiadBench test set.",
+                "position": 3925
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x15.png",
+                "caption": "Figure 15:Response generated by the ResRL-trained Qwen3-8B model (Rollout 4, no think mode) on the OlympiadBench test set.",
+                "position": 3929
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x16.png",
+                "caption": "Figure 16:Response generated by the ResRL-trained Qwen3-8B model (Rollout 1, no think mode) on the Math500 test set.",
+                "position": 3940
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x17.png",
+                "caption": "Figure 17:Response generated by the ResRL-trained Qwen3-8B model (Rollout 2, no think mode) on the Math500 test set.",
+                "position": 3944
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x18.png",
+                "caption": "Figure 18:Response generated by the ResRL-trained Qwen3-8B model (Rollout 3, no think mode) on the Math500 test set.",
+                "position": 3948
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x19.png",
+                "caption": "Figure 19:Response generated by the ResRL-trained Qwen3-8B model (Rollout 4, no think mode) on the Math500 test set.",
+                "position": 3952
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x20.png",
+                "caption": "Figure 20:Response generated by the ResRL-trained Qwen3-4B model (Rollout 1, think mode) on the Humaneval+ code test set (using Brute Force method).",
+                "position": 3963
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x21.png",
+                "caption": "Figure 21:Response generated by the ResRL-trained Qwen3-4B model (Rollout 2, think mode) on the Humaneval+ code test set (using Sorting & Scanning method).",
+                "position": 3967
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x22.png",
+                "caption": "Figure 22:Response generated by the ResRL-trained Qwen3-4B model (Rollout 1, think mode) on the Codeforces test set.",
+                "position": 3971
+            },
+            {
+                "img": "https://arxiv.org/html/2605.00380/2605.00380v1/x23.png",
+                "caption": "Figure 23:Response generated by the ResRL-trained Qwen3-4B model (Rollout 2, think mode) on the Codeforces test set.",
+                "position": 3975
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
