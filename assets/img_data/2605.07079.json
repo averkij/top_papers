@@ -1,0 +1,147 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x1.png",
+                "caption": "(a)RLA Autoencoder Learning",
+                "position": 264
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x1.png",
+                "caption": "(a)RLA Autoencoder Learning",
+                "position": 267
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x2.png",
+                "caption": "(b)Dynamics Learning",
+                "position": 272
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x3.png",
+                "caption": "(c)Applications",
+                "position": 278
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x4.png",
+                "caption": "Figure 2:RLA World Model.RLA-WM predicts future states by generating the residual latent actionzz. We first embed the robot actionsat:t+ha_{t:t+h}(padded to a maximum horizon) via an MLP. This embedding is concatenated with the DINO tokenssts_{t}and learnable queries, then processed through self-attention layers to produce condition tokens. During flow matching, this condition is fixed and concatenated with a noisy latentzτz_{\\tau}, starting from Gaussian noisez0=ϵz_{0}=\\epsilon. The flow network predicts the velocityv^\\hat{v}to iteratively transformz0z_{0}into the final RLAz1z_{1}. Finally,fdecf_{\\text{dec}}decodess^t+h\\hat{s}_{t+h}fromz1z_{1}andsts_{t}. During training, the model is supervised by the MSE loss against the ground truth velocityv∗=z−ϵv^{*}=z-\\epsilon, requiring no feature or image reconstruction losses.",
+                "position": 342
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x5.png",
+                "caption": "Figure 3:Qualitative Comparison for RLA-WM.Given an input frame att=0t=0, our RLA-WM predicts future frames with high visual quality and physical fidelity, closely matching ground-truth states. In contrast, DINO-WM produces increasingly blurrier predictions for Push-T over longer horizons, and inconsistent rope states. Applying diffusion or flow matching directly in DINO token space yields inferior results (RAE, FM-WM). Vid2World generates visually sharp frames. However, it hallucinates and predicts physical states that diverge significantly from reality.",
+                "position": 460
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x6.png",
+                "caption": "Figure 4:Learning from Actionless Videos using RLA.We extend a BC ResNet with a linear layer to predict the RLAz^\\hat{z}. The RLA targets are extracted from(st,st+h)(s_{t},s_{t+h})using an RLA encoderfencf_{\\text{enc}}learned from task-agnostic videos. This turns the BC policy into a minimalist world action model that can learn from videos whose proprioceptive states and robot actions are not available, without forcing the policy to couple with DINO or video generation backbones. As shown in Tab.2, RLA outperforms other latent action learners (replacingfencf_{\\text{enc}}) within the same framework.",
+                "position": 479
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x7.png",
+                "caption": "Figure 5:Visual Reinforcement Learning within RLA World Models.We adapt a pretrained ResNet BC policy for RL using LoRA adapters and a residual action head predicting delta actions and a Gaussian log deviation. The policy outputs action chunksat:t+ha_{t:t+h}to our RLA-WM, which predicts future tokenss^t+h\\hat{s}_{t+h}. A pretrained UNet decodess^t+h\\hat{s}_{t+h}into RGB observations for next step. RLA-WM resets its states^0\\hat{s}_{0}from the initial frames0s_{0}of a randomly sampled offline demonstration. For reward, we propose Video Aligned Reward (VAR). Because neural rollouts are time-synchronized with the reference video, VAR is simply defined as the negative DINO L1 distance betweens^t\\hat{s}_{t}andsts_{t}(or terminalsTs_{T}). Policy is optimized via PPO using rollouts generated entirely inside RLA-WM.",
+                "position": 583
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x8.png",
+                "caption": "Figure 6:World Model RL Performance Distribution.We select the best-performing BC models (■​BC∗{\\color[rgb]{0,.392,0}\\blacksquare}\\ \\text{BC}^{*}) and apply WMRL (Fig.5) across 15 independent seeds (1-15). Each seed’s best checkpoint success rate is plotted as a dot (∙{\\color[rgb]{.5,.5,.5}\\Huge\\bullet}), with the overall optimal checkpoint marked as★​RL∗{\\color[rgb]{0,0,0}\\bigstar}\\ \\text{RL}^{*}. Success rates here are evaluated on 50 episodes with standard seeds 42-91.",
+                "position": 598
+            }
+        ]
+    },
+    {
+        "header": "5Limitations and Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x9.png",
+                "caption": "Figure A1:Reconstruction Quality Comparison.We compare the reconstructions^t+h\\hat{s}_{t+h}decoded byfdecf_{\\text{dec}}from the current framests_{t}and a latent actionzz, wherezzis encoded byfencf_{\\text{enc}}from the pair(st,st+h)(s_{t},s_{t+h}). RLA produces accurate reconstructions even with a compact latent dimension|z|=64|z|=64. This is particularly impressive given the1024×10241024\\times 1024dimension of DINO tokenst+hs_{t+h}. In contrast, AdaWorld[24]and UniVLA[44]yield severely blurred and inaccurate predictions with latent dimensions 2048 and 256, respectively. This demonstrates that RLA captures sufficient predictive information for dynamics and enables accurate future token decoding in a single feedforward pass.",
+                "position": 1644
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x10.png",
+                "caption": "Figure A2:RLA Temporal Topology.We encode RLAzzfrom(st,st+h)(s_{t},s_{t+h})and normalize it toz¯=(z−μ)/σ\\bar{z}=(z-\\mu)/\\sigma, whereμ\\muandσ\\sigmaare estimated from data. We then interpolate between Gaussian noiseϵ\\epsilonandz¯\\bar{z}, then denormalize and decode the result. For example,(ϵ+z¯)/2(\\epsilon+\\bar{z})/2yields a reconstruction that approximatesst+h/2s_{t+h/2}. This indicates that the RLA latent space inherently captures temporal progression. In contrast, interpolating DINO tokens betweensts_{t}andst+hs_{t+h}produces inferior results.",
+                "position": 1656
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x11.png",
+                "caption": "Figure A3:RLA Generalization on Novel Tasks.We apply the pre-trained RLA autoencoder to a previously unseen setup. For example, the original Panda robot is replaced with an XArm robot with a Robotiq gripper for thePull Cube with Tooltask. This interaction type was never observed during RLA autoencoder training. Yet, RLA maintains high reconstruction fidelity.\nNotably, this cross-embodiment generalization is achieved by training solely on the limited ManiSkill dataset, without relying on large-scale video pre-training of the RLA autoencoder.",
+                "position": 1667
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x12.png",
+                "caption": "(a)ManiSkill Environment[49]",
+                "position": 1706
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x12.png",
+                "caption": "(a)ManiSkill Environment[49]",
+                "position": 1709
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x13.png",
+                "caption": "(b)IWS Dataset[10]",
+                "position": 1715
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x14.png",
+                "caption": "Figure A5:WMRL Performance Distribution.This plot complements Tab.3by showing the distribution of performance across 15 independent seeds (1-15). Each dot (∙{\\color[rgb]{.5,.5,.5}\\Huge\\bullet}) represents the success rate of the best checkpoint for a given seed, evaluated on 1500 episodes per seed (seeds 1-1500).",
+                "position": 1722
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x15.png",
+                "caption": "Figure A6:Additional Qualitative Comparison for RLA-WM.",
+                "position": 1907
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x16.png",
+                "caption": "Figure A7:Additional Qualitative Comparison for RLA-WM.",
+                "position": 1912
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x17.png",
+                "caption": "Figure A8:Additional Qualitative Comparison for RLA-WM.",
+                "position": 1917
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x18.png",
+                "caption": "Figure A9:Additional Qualitative Comparison for RLA-WM.",
+                "position": 1922
+            },
+            {
+                "img": "https://arxiv.org/html/2605.07079/2605.07079v1/x19.png",
+                "caption": "Figure A10:Additional Qualitative Comparison for RLA-WM.",
+                "position": 1927
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
