@@ -1,0 +1,150 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/pipeline.png",
+                "caption": "Figure 1:Overview of4DThinker.Top:Inference architecture. The model interleaves text reasoning withlatent visual tokensas “mental imagery” on a continuous manifold, enabling correct dynamic reasoning where purely textual CoT (e.g., Gemini-3.1-Pro) fails.Bottom:Two-stage training pipeline built on the data from Fig.2. DIFT (left) jointly supervises text tokens viaℒce\\mathcal{L}_{\\text{ce}}and latent tokens viaℒsim\\mathcal{L}_{\\text{sim}}; 4DRL (right) then applies modified GRPO with gradients on text tokens only, excluding latent positions to avoid noise from continuous-discrete mismatch.",
+                "position": 392
+            }
+        ]
+    },
+    {
+        "header": "3Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/data_gen.png",
+                "caption": "Figure 2:Overview of ourscalable, annotation-free4D data generation pipeline in three stages.(1) Video preprocessing:raw videos are processed via MegaSaM and SAM3 to extract camera trajectories and consistent mask overlays for landmarks.(2) Motion-centric QA construction:the pipeline formulates MCQs and imagery for both camera and object motions, grounded by sampled boundary or interval overlays.(3) Imagery-based CoT synthesis:MhighM_{\\text{high}}generates “think with 4D” data that interleaves text and dynamic mental imagery, culminating in the final training sample.",
+                "position": 448
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Conclusion and Limitation",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AObject Selection Rules",
+        "images": []
+    },
+    {
+        "header": "Appendix BPrompt Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/landmark_identification.png",
+                "caption": "Figure 3:Prompt forlandmark identification.MhighM_{\\text{high}}identifies one static and one dynamic object with short visual descriptions, which are subsequently used as text prompts for SAM3 mask extraction.",
+                "position": 2083
+            },
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/static_verification.png",
+                "caption": "Figure 4:Prompt forstatic mask consistency verification.MhighM_{\\text{high}}evaluates four criteria across all overlay frames to implement the consistency filter (Eq. (2)).",
+                "position": 2086
+            },
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/dynamic_verification.png",
+                "caption": "Figure 5:Prompt fordynamic object mask verification. Unlike the binary static check (Fig.4), this prompt returns per-frame validity indices, allowing partial acceptance of frames.",
+                "position": 2089
+            },
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/camera_question.png",
+                "caption": "Figure 6:Prompt forcamera motion question generation. Given a time segment and answer options,MhighM_{\\text{high}}produces a natural-language MCQ.",
+                "position": 2099
+            },
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/direction_analysis.png",
+                "caption": "Figure 7:Prompt forobject movement direction analysis.MhighM_{\\text{high}}analyzes centroid displacement and apparent scale variation across masked key frames to determine the primary movement direction, while explicitly separating camera ego-motion from the object’s own motion.",
+                "position": 2109
+            },
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/speed_analysis.png",
+                "caption": "Figure 8:Prompt forobject speed change analysis. Complementary to the Fig.7,MhighM_{\\text{high}}classifies the speed pattern by comparing per-frame centroid displacements and apparent size changes.",
+                "position": 2112
+            },
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/object_question.png",
+                "caption": "Figure 9:Prompts forobject motion question generation(four types). Each variant probes a different aspect of dynamic understanding: (a) movement direction, (b) 4D question with bounding-box grounding, (c) distance change relative to the camera, and (d) speed variation over time.",
+                "position": 2115
+            },
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/camera_cot.png",
+                "caption": "Figure 10:Prompt forcamera motion CoT synthesis. Given the video, static mask overlays, and the correct answer,MhighM_{\\text{high}}produces reasoning trace where<output_image>placeholders represent the model’s own “mental imagery,” which are later replaced by latent visual tokens during DIFT training.",
+                "position": 2125
+            },
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/object_cot.png",
+                "caption": "Figure 11:Prompt forobject motion CoT synthesis. Analogous to the camera motion variant (Fig.10), the model tracks the dynamic object’s position across frames.",
+                "position": 2128
+            },
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/system_prompt.png",
+                "caption": "Figure 12:Thesystem instructionappended before every question during DIFT training, 4DRL training, and inference. It specifies the output format that the model must follow.",
+                "position": 2131
+            }
+        ]
+    },
+    {
+        "header": "Appendix CCandidate Question Types and Answer Choices",
+        "images": []
+    },
+    {
+        "header": "Appendix DTraining and Evaluation Datasets",
+        "images": []
+    },
+    {
+        "header": "Appendix EBenchmark Subtask Descriptions",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/showcase1.png",
+                "caption": "Figure 13:Qualitative example on DSR-Bench (fine-grained).4DThinkercorrectly identifies a two-phase pattern (first becomes larger, then keeps constant) by mentally simulating the guinea pig’s trajectory via latent 4D imagery. Both Gemini-3 and the base Qwen2.5-VL-3B fail.",
+                "position": 2445
+            },
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/showcase2.png",
+                "caption": "Figure 14:Qualitative example on Dyn-Bench (holistic).4DThinkercorrectly identifies the player’s diagonal movement pattern across the full court by mentally tracking his position through 4D latents, while both Gemini-3 and the base Qwen2.5-VL-3B incorrectly conclude that the player stays in one half of the court, relying on local frame-level heuristics.",
+                "position": 2448
+            },
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/showcase3.png",
+                "caption": "Figure 15:Qualitative example.4DThinkertracks the panda’s apparent size across frames through latent visual tokens and correctly determines that the size ratio remains stable, distinguishing the panda’s posture change from actual camera zoom or physical depth movement.",
+                "position": 2451
+            },
+            {
+                "img": "https://arxiv.org/html/2605.05997/2605.05997v1/Figs/showcase4.png",
+                "caption": "Figure 16:Qualitative example.Given a first-person driving video,4DThinkertracks gradual environmental transitions via 4D latents and predict the open fields to dense forest.",
+                "position": 2454
+            }
+        ]
+    },
+    {
+        "header": "Appendix FAutomated CoT Validation",
+        "images": []
+    },
+    {
+        "header": "Appendix GQualitative Examples",
+        "images": []
+    },
+    {
+        "header": "Appendix HImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

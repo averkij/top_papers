@@ -1,0 +1,120 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.08044/2605.08044v1/x1.png",
+                "caption": "Figure 1:BLT-D inference.The encoder creates latent token representations from variable-length patches of bytes. The large global model predicts the next latent token. The decoder initializes a fixed-length block of[𝙼𝙰𝚂𝙺]\\mathtt{[MASK]}tokens and generates bytes in parallel via semi-autoregressive text diffusion, conditioning on the last latent token.Compared to BLT, this inference approach decreases the forward passes/network function evaluations (NFEs) of all model components (encoder, global model, and decoder).",
+                "position": 327
+            },
+            {
+                "img": "https://arxiv.org/html/2605.08044/2605.08044v1/x2.png",
+                "caption": "Figure 2:Verification procedure shared by BLT-S and BLT-DV.After a block of bytes is drafted (via self-speculation in BLT-S or diffusion in BLT-DV), the full model re-encodes the candidate sequence and produces next-byte predictions using causal attention. Drafted bytes are accepted up to the first mismatch, which is replaced with the model’s prediction. Under greedy decoding, this guarantees that verified outputs are identical to standard autoregressive decoding.",
+                "position": 345
+            }
+        ]
+    },
+    {
+        "header": "2Background and Related Work",
+        "images": []
+    },
+    {
+        "header": "3BLT Diffusion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.08044/2605.08044v1/x3.png",
+                "caption": "Figure 3:BLT-D attention masks during generation with block diffusion.Before cross-attention, latent tokens are first split into multiple representations via a linear transformation and splitting function (described in detail inPagnoni et al.2025). Within the cross-attention, each byte attends to the representations of the previous latent token, except for the last byte of a patch, which may attend to its own latent token. In the self-attention, the clean prefix uses causal attention, and the corrupted/masked portion of the sequence uses bidirectional attention.",
+                "position": 575
+            },
+            {
+                "img": "https://arxiv.org/html/2605.08044/2605.08044v1/x4.png",
+                "caption": "Figure 4:BLT-D training data preprocessing.(1) A raw training sample is loaded.\n(2) The entropy patcher segments the input dynamically; for illustration, only the first three patches are shown. This is referred to as thecleaninput.\n(3) All patches except the first are expanded into fixed-size blocks, containing bytes from future patches, with the original positional indices preserved. Allowing predictions beyond the patch enables BLT-D to draft beyond its average patch size during inference.\n(4) The blocks are corrupted with[𝙼𝙰𝚂𝙺]\\mathtt{[MASK]}s, resulting in thecorruptedinput.",
+                "position": 642
+            },
+            {
+                "img": "https://arxiv.org/html/2605.08044/2605.08044v1/x5.png",
+                "caption": "Figure 5:BLT-D training forward pass.(1-2) The encoder and global model process the clean input.\n(3) Clean and corrupted inputs are concatenated and passed to the decoder.\n(4) Byte hidden states cross-attend to their corresponding latent representations from the global model.\n(5) For the clean portion, self-attention is causal; for the corrupted portion, self-attention is bidirectional within each block, and causal towards previous clean patches.\n(6) Next-byte prediction loss is computed for the clean sequence, and masked byte prediction/diffusion loss is computed for corrupted sequence.",
+                "position": 658
+            }
+        ]
+    },
+    {
+        "header": "4Pre-training and Generation Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.08044/2605.08044v1/x6.png",
+                "caption": "Figure 6:Generation task results of 3B-parameter variants of BLT, BLT-D-4, BLT-D-8, and BLT-D-16. Higher is better for task performance; lower is better for NFEs and memory bandwidth. The NFEs and memory bandwidth for a byte-pair encoding (BPE) model matching BLT’s global model size are shown as a dashed line. BLT-D models are substantially faster than BLT while maintaining strong task performance, especially for translation. BLT-D-16 offers the most efficiency, with reduced performance on the coding-related tasks.",
+                "position": 772
+            }
+        ]
+    },
+    {
+        "header": "5Extensions: BLT-S and BLT-DV",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.08044/2605.08044v1/x7.png",
+                "caption": "Figure 7:Generation task results for 3B-parameter variants of BLT, BLT-S, BLT-D, and BLT-DV. For space, we report results only fork∈{8,16}k\\in\\{8,16\\}andB∈{8,16}B\\in\\{8,16\\}. Arrows indicate the same model evaluated with different inference methods. Verification (BLT-DV) enhances the task performance of BLT-D models, but increases global NFEs and memory bandwidth. Self-speculation (BLT-S) greatly improves BLT’s speed, with no loss in task performance. BLT-D remains the fastest model/inference method overall.",
+                "position": 870
+            }
+        ]
+    },
+    {
+        "header": "6BLT-D Generation Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.08044/2605.08044v1/x8.png",
+                "caption": "(a)1B models.",
+                "position": 964
+            },
+            {
+                "img": "https://arxiv.org/html/2605.08044/2605.08044v1/x8.png",
+                "caption": "(a)1B models.",
+                "position": 967
+            },
+            {
+                "img": "https://arxiv.org/html/2605.08044/2605.08044v1/x9.png",
+                "caption": "(b)3B models.",
+                "position": 973
+            }
+        ]
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "8Architecture and Optimization Details",
+        "images": []
+    },
+    {
+        "header": "9All 1B Model Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.08044/2605.08044v1/x10.png",
+                "caption": "Figure 9:Generation task results of 1B-parameter variants of BLT, BLT-D-4, BLT-D-8, and BLT-D-16. Higher is better for task performance; lower is better for NFEs and memory bandwidth. The NFEs and memory bandwidth for a byte-pair encoding (BPE) model matching BLT’s global model size are shown as a dashed line.",
+                "position": 2095
+            },
+            {
+                "img": "https://arxiv.org/html/2605.08044/2605.08044v1/x11.png",
+                "caption": "Figure 10:Generation task results for 1B-parameter variants of BLT, BLT-S, BLT-D, and BLT-DV. For space, we report results only fork∈{8,16}k\\in\\{8,16\\}andB∈{8,16}B\\in\\{8,16\\}. Arrows indicate the same model evaluated with different inference methods.",
+                "position": 2100
+            }
+        ]
+    },
+    {
+        "header": "10All 3B Model Results",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
