@@ -1,0 +1,382 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/x1.png",
+                "caption": "Figure 1:Text-to-image generation samples from our 1000-layer MV-Split DiT.More samples are provided in AppendixM. Code:https://github.com/erwold/mv-split. Model weights:https://huggingface.co/StableKirito/mvsplit-dit-1000l.",
+                "position": 321
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Preliminaries",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/x2.png",
+                "caption": "Figure 2:Baseline DiT and representative training diagnostics.(Left)Single-stream DiT backbone.(Middle)Training loss over the first 10k steps for the\nun-stabilized 400-layer baseline and the MV-Split 400-/1000-layer runs.(Right)Per-layer energy ratioρT=‖μ​(X)‖F/‖c​(X)‖F\\rho_{T}=\\|\\mu(X)\\|_{F}/\\|c(X)\\|_{F}(AppendixA) across L0–L384 in a baseline run.",
+                "position": 375
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/x3.png",
+                "caption": "",
+                "position": 384
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/x4.png",
+                "caption": "",
+                "position": 389
+            }
+        ]
+    },
+    {
+        "header": "3Failure Dynamics: Mean-Dominated Collapse",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/x5.png",
+                "caption": "Figure 3:Empirical trajectory of a representative divergence event\n(400-layer).The vertical dashed line marks the\ndivergence step.(a–c) Backward trigger:The global gradient norm\nspikes (a). The spike is concentrated in the mean-coherent gradient componentGmeanG_{\\text{mean}}, while the centered componentGctrG_{\\text{ctr}}shows no\ncomparable amplification (b). After the spike, Q/K gradients drop by roughly\nfour orders of magnitude whileWOW_{O}gradients remain nonzero (c).(d–f) Forward lock-in:The residual branch opens and the\nmean/centered energy ratioρT\\rho_{T}rises sharply (d). Deep attention remains\ncontractive on the centered subspace, with limited variance replenishment (e).\nToken representations homogenize across depth, with cosine similarity\napproaching one in deep layers (f).",
+                "position": 520
+            }
+        ]
+    },
+    {
+        "header": "4Mechanism",
+        "images": []
+    },
+    {
+        "header": "5Method: MV-Split Residuals",
+        "images": []
+    },
+    {
+        "header": "6Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/x6.png",
+                "caption": "Figure 4:Writer amplification at the gradient spike\n(400-layer Baseη\\etarun,t⋆=3400t^{\\star}{=}3400, measured on theT=256T{=}256image-token segment).Each point plots𝒜−1\\mathcal{A}-1against the equal-magnitude\nabsolute-coherence upper-envelope proxy(T−1)​κ^(T-1)\\hat{\\kappa}for(a)Attn_WOand(b)FFN_W2.\nGray points are pre-spike layer-step samples; colored points are\nactive layers att⋆t^{\\star}(𝒜−1>0.5\\mathcal{A}-1>0.5). The dashed line is\nthe absolute-coherence saturation envelope; fitted slopes andR2R^{2}values are shown in each panel.",
+                "position": 715
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/x7.png",
+                "caption": "Figure 5:Quality and optimizer stability over 80k steps\n(ImageNet256×256256{\\times}256).(Top)FID-50K and Inception Score.(Bottom)Post-clipping\nglobal gradient norm. The 400-layer curves define the controlled\ncomparison: among the non-divergent 400-layer runs, MV-Split preserves a\nhigher bounded gradient band than LayerScale while avoiding the spikes of\nthe un-stabilized baselines. The 1000-layer MV-Split trace is included as\nscale validation.",
+                "position": 759
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/x8.png",
+                "caption": "",
+                "position": 763
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/x9.png",
+                "caption": "Figure 6:Residual-writer gradient mode decomposition.Per-step median across depth of the mean-coherent (GmeanG_{\\text{mean}}, left)\nand centered (GctrG_{\\text{ctr}}, right) writer-gradient magnitudes; shaded\nregions denote the interquartile range (IQR; 25–75% across depth). Token-isotropic per-channel gating compresses both\nmodes; MV-Split bounds the mean-coherent component while preserving a\nhigher, stable centered band.",
+                "position": 884
+            }
+        ]
+    },
+    {
+        "header": "7Related Work",
+        "images": []
+    },
+    {
+        "header": "8Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADiagnostic Metrics and Definitions",
+        "images": []
+    },
+    {
+        "header": "Appendix BStandard Initialization Enters the Same Mean-Dominated State",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/x10.png",
+                "caption": "Figure 7:Standard-initialization control for a 128-layer DiT.(a)Token cosine similarity (TCS) over training steps and layer\ndepth. The dashed white contour marksTCS=0.9\\mathrm{TCS}=0.9.(b)Depth profiles of centered retentionRet​(c←c)\\mathrm{Ret}(c{\\leftarrow}c), centered branch replenishment VarGain, and\nattention row diversity RowDiv; curves report the median over diagnostic\ncheckpoints from steps 10–690.(c)Median writer-gradient decomposition for the attention output\nprojectionWOW_{O}and FFN output projectionW2W_{2}, reportingGmeanG_{\\mathrm{mean}}andGctrG_{\\mathrm{ctr}}across depth.",
+                "position": 1862
+            }
+        ]
+    },
+    {
+        "header": "Appendix CDerivations of Writer Gradient Scaling",
+        "images": []
+    },
+    {
+        "header": "Appendix DDetailed Comparison: MV-Split vs. LayerScale and ReZero",
+        "images": []
+    },
+    {
+        "header": "Appendix ESegment-wise Projectors for Multimodal Sequences",
+        "images": []
+    },
+    {
+        "header": "Appendix FStep-Level Gradient Trace for Failure Attribution",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/x11.png",
+                "caption": "Figure 8:Step-level gradient trace pipeline.A global-norm threshold (1) triggers a per-family top-KKranking of distributed gradient norms (2) and a cross-rank exclusion audit (3) that checks per-rank loss agreement, final-output-gradient RMS, andNaN/Infin stored parameters. When all three exclusions pass, the dominant top-KKparameter family at the detected step (4) is recorded for the gradient-mode audit and subsequent paragraphs.",
+                "position": 2518
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/x12.png",
+                "caption": "Figure 9:Step-level gradient trace at a representative spike (400 layers, Baseη/2\\eta/2).(Left)Top parameter-family gradient normsGl,τG_{l,\\tau}at one detected step (Step 26423). The top-KKentries span embedding/final parameters, Q/K/V projections, FFN input weights, and residual output projections.(Right)Per-rank loss across four snapshots (Steps 26423, 26430, 26434, 26437). The eight ranks stay tightly clustered (σ∈[0.005,0.007]\\sigma\\in[0.005,0.007]) and the maximum per-sample output-gradient normMout(r)≈1×10−4M_{\\mathrm{out}}^{(r)}\\!\\approx\\!1{\\times}10^{-4}matches across ranks (inset).",
+                "position": 2535
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/x13.png",
+                "caption": "Figure 10:Attention-branch-only MV-Split control (1000 layers).(Left)Top parameter-family gradient norms at the detected step (Step 7415). With the attention output branch protected, noAttn_WOentries appear in the top-KK; the largest printed entries areFFN_W2.(Right)Per-rank loss over four consecutive steps (7415–7419). Cross-rank losses stay tightly clustered (σ∈[0.011,0.023]\\sigma\\in[0.011,0.023]) while the loss rises uniformly from∼\\sim0.81 to∼\\sim2.12.",
+                "position": 2570
+            }
+        ]
+    },
+    {
+        "header": "Appendix GTraining Configuration Details",
+        "images": []
+    },
+    {
+        "header": "Appendix HThe Token Mean as an Implicit Timestep Carrier",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/x14.png",
+                "caption": "Figure 11:Real-image timestep linear probe.The backbone has no explicit timestep embedding or AdaLN modulation.(a)The trained image-token meanmimgm^{\\mathrm{img}}predictsttwith\nnear-perfect linearR2R^{2}across depth. The text-token meanmtxtm^{\\mathrm{txt}}becomes predictive after a few single-stream layers, indicating that the\ntrained model routes image-derived timestep information into the text-token\nside.(b)Adding hidden-state summaries removes nearly all residual error\nleft by scalar input statistics.(c)Probe MAE (mean absolute error) shows the same pattern on a log scale.\nThe result shows that the token mean is not merely a collapse-prone direction:\nit is also a useful global timestep carrier. The same coordinate is also\ndecodable from centered-energy summaries, so the claim is not uniqueness of\nthe mean subspace but its usefulness and stability as a global-state path.",
+                "position": 2964
+            }
+        ]
+    },
+    {
+        "header": "Appendix ISystem Implementation: Triton Fusion of RoPE, QK-Norm, SwiGLU, and MV-Split+RMSNorm",
+        "images": []
+    },
+    {
+        "header": "Appendix JMethods we try but failed to prevent MMS",
+        "images": []
+    },
+    {
+        "header": "Appendix KAdditional Results on the MV-Split Runs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/x15.png",
+                "caption": "Figure 12:Full-horizon training loss for the MV-Split 400-layer\nand 1000-layer runs.Note that the SFT and DPO stages use a separately\ncurated∼\\sim50k image set rather than the ImageNet-2012 pre-training\ndistribution; since loss values are data-dependent, the curves are shown\nfor reference only.",
+                "position": 3376
+            }
+        ]
+    },
+    {
+        "header": "Appendix LLimitations and Future Work",
+        "images": []
+    },
+    {
+        "header": "Appendix MMore Visual Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_044_alligator_lizard.jpg",
+                "caption": "Figure 13:Class “Alligator lizard” (044). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3467
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_071_scorpion.jpg",
+                "caption": "Figure 14:Class “Scorpion” (071). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3470
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_095_jacamar.jpg",
+                "caption": "Figure 15:Class “Jacamar” (095). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3473
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_159_rhodesian_ridgeback.jpg",
+                "caption": "Figure 16:Class “Rhodesian ridgeback” (159). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3476
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_163_bloodhound.jpg",
+                "caption": "Figure 17:Class “Bloodhound” (163). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3479
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_233_bouvier_des_flandres.jpg",
+                "caption": "Figure 18:Class “Bouvier des Flandres” (233). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3482
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_270_white_wolf.jpg",
+                "caption": "Figure 19:Class “White wolf” (270). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3485
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_367_chimpanzee.jpg",
+                "caption": "Figure 20:Class “Chimpanzee” (367). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3488
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_388_giant_panda.jpg",
+                "caption": "Figure 21:Class “Giant panda” (388). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3491
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_438_beaker.jpg",
+                "caption": "Figure 22:Class “Beaker” (438). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3494
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_469_caldron.jpg",
+                "caption": "Figure 23:Class “Caldron” (469). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3497
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_470_candle.jpg",
+                "caption": "Figure 24:Class “Candle” (470). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3500
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_479_car_wheel.jpg",
+                "caption": "Figure 25:Class “Car wheel” (479). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3503
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_505_coffeepot.jpg",
+                "caption": "Figure 26:Class “Coffeepot” (505). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3506
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_511_convertible.jpg",
+                "caption": "Figure 27:Class “Convertible” (511). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3509
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_521_crock_pot.jpg",
+                "caption": "Figure 28:Class “Crock Pot” (521). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3512
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_541_drum.jpg",
+                "caption": "Figure 29:Class “Drum” (541). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3515
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_549_envelope.jpg",
+                "caption": "Figure 30:Class “Envelope” (549). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3518
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_558_flute.jpg",
+                "caption": "Figure 31:Class “Flute” (558). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3521
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_565_freight_car.jpg",
+                "caption": "Figure 32:Class “Freight car” (565). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3524
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_566_french_horn.jpg",
+                "caption": "Figure 33:Class “French horn” (566). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3527
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_580_greenhouse.jpg",
+                "caption": "Figure 34:Class “Greenhouse” (580). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3530
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_603_horse_cart.jpg",
+                "caption": "Figure 35:Class “Horse cart” (603). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3533
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_616_knot.jpg",
+                "caption": "Figure 36:Class “Knot” (616). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3536
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_633_loupe.jpg",
+                "caption": "Figure 37:Class “Loupe” (633). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3539
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_643_mask.jpg",
+                "caption": "Figure 38:Class “Mask” (643). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3542
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_656_minivan.jpg",
+                "caption": "Figure 39:Class “Minivan” (656). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3545
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_658_mitten.jpg",
+                "caption": "Figure 40:Class “Mitten” (658). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3548
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_663_monastery.jpg",
+                "caption": "Figure 41:Class “Monastery” (663). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3551
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_671_mountain_bike.jpg",
+                "caption": "Figure 42:Class “Mountain bike” (671). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3554
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_736_pool_table.jpg",
+                "caption": "Figure 43:Class “Pool table” (736). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3557
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_738_pot.jpg",
+                "caption": "Figure 44:Class “Pot” (738). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3560
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_768_rugby_ball.jpg",
+                "caption": "Figure 45:Class “Rugby ball” (768). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3563
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_781_scoreboard.jpg",
+                "caption": "Figure 46:Class “Scoreboard” (781). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3566
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_841_sweatshirt.jpg",
+                "caption": "Figure 47:Class “Sweatshirt” (841). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3569
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_849_teapot.jpg",
+                "caption": "Figure 48:Class “Teapot” (849). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3572
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_875_trombone.jpg",
+                "caption": "Figure 49:Class “Trombone” (875). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3575
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_906_windsor_tie.jpg",
+                "caption": "Figure 50:Class “Windsor tie” (906). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3578
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_970_alp.jpg",
+                "caption": "Figure 51:Class “Alp” (970). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3581
+            },
+            {
+                "img": "https://arxiv.org/html/2605.06169/2605.06169v1/figures/appendix/grid_982_groom.jpg",
+                "caption": "Figure 52:Class “Groom” (982). Euler sampler, 35 NFE, CFGw=2.0w=2.0.",
+                "position": 3584
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
