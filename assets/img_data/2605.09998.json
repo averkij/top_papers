@@ -1,0 +1,273 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1  Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x1.png",
+                "caption": "Figure 1:Continual Harnessautomates the harness refinement performed manually in GPP, and extends to joint training of model weights and harness state.Each panel shares the same topology (environment,agent,harness,refiner); only the identity of the refiner changes. (1)Human-in-the-loop:in our Gemini Plays Pokémon (GPP) experiments, a human reads trajectories and rewrites the harness, producing the first AI system to complete Pokémon Blue, Yellow Legacy (hard mode), and Crystal. (2)Self-improving harness:Continual Harnessreplaces the human with an automated refiner that operates on trajectory data within a single continuous episode; evaluated on Red and Emerald across frontier models. (3)Model + harness co-learning:after warm-up stages, an open-source model’s weights and the harness state update jointly during online play.",
+                "position": 342
+            }
+        ]
+    },
+    {
+        "header": "2  Preliminaries",
+        "images": []
+    },
+    {
+        "header": "3  Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x2.png",
+                "caption": "Figure 2:Methodology overview.(a)Harness refinement within one episode: the Agent reads(st,ℋ,τ)(s_{t},\\mathcal{H},\\tau)and emitsata_{t}; everyFFsteps the Refiner readsτt−F:t\\tau_{t-F:t}, emits per-component editsΔ=(Δ​p,Δ​𝒢,Δ​𝒦,Δ​ℳ)\\Delta=(\\Delta p,\\Delta\\mathcal{G},\\Delta\\mathcal{K},\\Delta\\mathcal{M})via the meta-tool API, andℋ←ℋ⊕Δ\\mathcal{H}\\!\\leftarrow\\!\\mathcal{H}\\oplus\\Delta.(b)Co-learning across DAgger+PRM iterations: each iteration runsπθk\\pi_{\\theta_{k}}inside a live-refiningℋt\\mathcal{H}_{t}forK=256K{=}256steps. The trajectory is scored by a pairwise PRM, low-RRwindows are relabeled by Gemini-3.1-pro, and a soft SFT update producesθk+1\\theta_{k+1}. The loop is reset-free: a persistent state at the end of iterkkis loaded as the start of iterk+1k{+}1.",
+                "position": 415
+            }
+        ]
+    },
+    {
+        "header": "4  Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x3.png",
+                "caption": "Figure 3:Yellow Legacy harness refinement is concentrated and recurrent rather than uniform.(a) Counts of CRUD operations (creation, update, delete) on skill and sub-agent definitions, binned per 2,000 turns. The harness is updated throughout the run rather than converging to a fixed scaffold. (b) Update counts for the five most-updated components over the same horizon. A small subset of navigation and battle components accounts for the majority of updates.",
+                "position": 500
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x4.png",
+                "caption": "Figure 4:Decision-making complexity of the Yellow Legacybattle_strategist_agentprompt at successive revisions during the Elite Four phase of the run: total nodes, decision gates, graph depth, and max fan-out. See appendixBfor details.",
+                "position": 503
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x5.png",
+                "caption": "Figure 5:Milestones reached vs. cumulative button presses. Red (left): 11-milestone subset sequence through Thunder Badge. Emerald (right): 9-milestone sequence through Knuckle Badge (2nd gym); x-axis capped at 8.5k. Lines stop at each run’s last monitored milestone. Thick lines: seed medians; faint lines: individual seeds.",
+                "position": 511
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x6.png",
+                "caption": "Figure 6:Emerald cost–completion Pareto plane. Filled markers: individual 24-hour seeds. Ringed markers: per-cell medians. Dashed staircase: cost-monotone Pareto frontier. Y axis: fraction of the 31-milestone Emerald set reached; X axis: Gemini API spend (log scale, cached input at25%25\\%).",
+                "position": 521
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x7.png",
+                "caption": "Figure 7:Reset-free DAgger+PRM training drives sustained milestone progress on Pokémon Red.Milestone index reached versus training iterationkkfor the five advancing runs; the broken y-axis labels each band’s start and end. Filled dots: beginning of game. Open rings: mid-game checkpoint. Stars: judge-verified advances.+N+N: net objective gain. Dashed line: untrained Gemma-4 baseline (zero advance beyond the starting milestone). Teacher model: Gemini-3.1-pro.",
+                "position": 536
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x8.png",
+                "caption": "Figure 8:Pathfinding skill mechanism. (Left) Path-cost deficit of the top-10% evolved navigation skill set (Gemini 3.1 Pro) relative to the Dijkstra oracle over a 24-hour run on warp-to-warp obstacle-navigation tasks; lower is better, dashed line at 0% marks the oracle. (Right) Cumulative navigation-skill invocations against button presses across the same conditions.",
+                "position": 546
+            }
+        ]
+    },
+    {
+        "header": "5  Related Work",
+        "images": []
+    },
+    {
+        "header": "6  Discussion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix Contents",
+        "images": []
+    },
+    {
+        "header": "Appendix APokémon Environment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x9.png",
+                "caption": "Figure 9:Emerald Speedrunning Route.Milestones from Littleroot Town (1) to aquiring the Dynamo Badge (31), with game frames from each waypoint. The geographic overview (right) maps key locations. This series of milestones require substantial exploration and backtracking; agents must navigate branching paths, and manage nonlinear dependencies between objectives. The current world record speedrun completes this segment in 1:00:57 minutes[9].",
+                "position": 948
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x10.png",
+                "caption": "Figure 10:Pokémon Red Speedrunning Route.Milestones from obtaining starter Pokémon (1) to aquiring the Thunder Badge (18), with game frames from each waypoint. The geographic overview (right) maps key locations. This series of milestones require substantial exploration and backtracking; agents must navigate branching paths, and manage nonlinear dependencies between objectives. The current world record speedrun completes this segment in 43:04 minutes; seehttps://www.speedrun.com/pkmnredblue.00footnotetext:website: https://www.speedrun.com/pkmnredblue",
+                "position": 951
+            }
+        ]
+    },
+    {
+        "header": "Appendix BGemini Plays Pokémon: Additional Evidence",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x11.png",
+                "caption": "Figure 11:Crystal head-to-head comparison under the same harness. (Top) per-500-turn updates on skills and sub-agents for Gemini 2.5 Pro (left) and 3 Pro (right). (Bottom) top-5 most-updated components per model.",
+                "position": 970
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x12.png",
+                "caption": "Figure 12:The four Yellow Legacy battle-agent checkpoints markeda1/b1/c1/d1on the complexity plot inFigure˜4. These span the arc from a linear survival-gate chain (a1), through a hard-reset compact rebuild (b1), to a rebuilt-bigger screen-text-grounded program (c1), and finally to a master-agent decomposition (d1) that dispatches to five named sub-checks.",
+                "position": 1032
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x13.png",
+                "caption": "",
+                "position": 1042
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x14.png",
+                "caption": "",
+                "position": 1048
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x15.png",
+                "caption": "",
+                "position": 1054
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x16.png",
+                "caption": "Figure 13:The remaining ten Yellow Legacy battle-agent checkpoints, grouped by natural aspect. Row 1: long-chain variants around the first complexity spike and the late “last-stand” rewrite. Row 2: medium-hierarchy checkpoints across the rebuild-and-grow-again window. Row 3: the two wide master-agent variants that extend the decomposition introduced at checkpoint 12.",
+                "position": 1061
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x17.png",
+                "caption": "",
+                "position": 1071
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x18.png",
+                "caption": "",
+                "position": 1077
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x19.png",
+                "caption": "",
+                "position": 1083
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x20.png",
+                "caption": "",
+                "position": 1090
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x21.png",
+                "caption": "",
+                "position": 1096
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x22.png",
+                "caption": "",
+                "position": 1102
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x23.png",
+                "caption": "",
+                "position": 1108
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x24.png",
+                "caption": "",
+                "position": 1115
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x25.png",
+                "caption": "",
+                "position": 1121
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x26.png",
+                "caption": "Figure 14:Crystalbattle_advisorcheckpoints 1–6 from the Battle Tower window. The graphs trace the early evolution from a baseline matchup recommender (1) through legality and weakness-check additions (2–4) to role-based and survival rules (5–6).",
+                "position": 1135
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x27.png",
+                "caption": "",
+                "position": 1145
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x28.png",
+                "caption": "",
+                "position": 1151
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x29.png",
+                "caption": "",
+                "position": 1158
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x30.png",
+                "caption": "",
+                "position": 1164
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x31.png",
+                "caption": "",
+                "position": 1170
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x32.png",
+                "caption": "Figure 15:Crystalbattle_advisorcheckpoints 7–10. The late-window evolution adds switch-legality bookkeeping (7), an empirical-override / paranoia layer (8), a team-specific reconfiguration (9), and an explicit speed calculation rule (10).",
+                "position": 1177
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x33.png",
+                "caption": "",
+                "position": 1187
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x34.png",
+                "caption": "",
+                "position": 1193
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x35.png",
+                "caption": "",
+                "position": 1199
+            }
+        ]
+    },
+    {
+        "header": "Appendix CHarness Ablations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x36.png",
+                "caption": "Figure 16:Left: per-seed skill lifetime for the three Red from-scratchℋCH\\mathcal{H}_{\\mathrm{CH}}runs. Markers areadd,update,run_skill(green if no re-update within 5 steps, red otherwise), anddelete. Right: create-and-forget funnel across both games and bothℋCH\\mathcal{H}_{\\mathrm{CH}}bootstrap variants.",
+                "position": 1329
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x37.png",
+                "caption": "",
+                "position": 1338
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x38.png",
+                "caption": "Figure 17:Sub-agent handoffs. (a) Cumulative approximate tokens by role (orchestrator solid, sub-agent dashed). (b) Cumulativeexecute_custom_subagentcount. (c) Per-task-type handoff success:exitis the percent of spans ending viareturn_to_orchestrator;focusis the percent of returns where the orchestrator either pursued the pre-handoff objective or crossed a milestone within ten subsequent steps.",
+                "position": 1352
+            },
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x39.png",
+                "caption": "Figure 18:process_memoryuse inside the first real bottleneck of each game: Mauville Gym (Emerald, left column) and Mt Moon (Red, right column). One representative seed per condition. Top row: per-run timeline where each marker is aprocess_memorytool call at the step it fired; color encodes provenance of the memory entry. Bottom row: the same ops aggregated into a stacked composition bar.",
+                "position": 1363
+            }
+        ]
+    },
+    {
+        "header": "Appendix DTraining Setup and Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.09998/2605.09998v1/x40.png",
+                "caption": "Figure 19:Gemma-4 tool-calling behavior across warm-up stages. (A) SFT on frontierContinual Harnesstrajectories liftstool_formatsuccess from near zero. (B) Reward curves for the two offline GRPO variants (heuristic 4-component reward and Gemini-oracle reward); the dashed line marks the approximate SFT reward baseline.",
+                "position": 1800
+            }
+        ]
+    },
+    {
+        "header": "Appendix ELLM Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
