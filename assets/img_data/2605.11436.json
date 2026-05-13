@@ -1,0 +1,148 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.11436/2605.11436v1/x1.png",
+                "caption": "Figure 1:Three approaches to context management in long-horizon POMDP agents.Raw history(left), grows unbounded as𝒪​(n)\\mathcal{O}(n).Summary-based belief(middle) compresses history into a summary but collapses the belief distribution to a single MLE point estimates^∼bt​(s)\\hat{s}\\sim b_{t}(s), discarding uncertainty.Agent-BRACE(right) represents the belief as WEP-annotated statements (confirmed,probable,possible, etc.), approximating the full distributionbt​(s)b_{t}(s), with near-constant context window.Agent-BRACE(Qwen3-4B-Instruct) outperforms both baselines in accuracy while maintaining constant context length (right panel).",
+                "position": 314
+            },
+            {
+                "img": "https://arxiv.org/html/2605.11436/2605.11436v1/x2.png",
+                "caption": "Figure 2:Overview ofAgent-BRACE. The agent is decomposed into abelief state modelfϕf_{\\phi}and apolicy modelπθ\\pi_{\\theta}, jointly optimized via PPO (Dual Training). At each steptt,fϕf_{\\phi}consumes the goalGG, previous beliefbtb_{t}, and new observationot+1o_{t+1}to produce an updated beliefbt+1b_{t+1}with WEPs-based certainty labels (Belief State Update). The policyπθ\\pi_{\\theta}then selects an actionata_{t}conditioned on(G,bt+1,ot+1)(G,b_{t+1},o_{t+1})rather than the full historyℋt\\mathcal{H}_{t}(Action Selection). The belief model is trained with a composite rewardRbeliefR^{\\text{belief}}, while the policy model is trained with a binary environment rewardRenvR^{\\text{env}}.",
+                "position": 336
+            }
+        ]
+    },
+    {
+        "header": "2Methodology: Agent-BRACE",
+        "images": []
+    },
+    {
+        "header": "3Experimental Setup and Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.11436/2605.11436v1/x3.png",
+                "caption": "Table 2:Performance comparison ofAgent-BRACEagainst baselines across three TextWorld\nenvironments (Quest, Treasure, Cooking) on Qwen2.5-3B-Instruct and Qwen3-4B-Instruct. Acc. denotes task\nsuccess rate (%, higher is better); Steps denotes average number of steps taken (lower\nis better).Blue rowsare inference-only (no training);Agent-BRACEand other baselines are\ntrained with Quest only, while Treasure and Cooking are out-of-domain (OOD) tasks.",
+                "position": 526
+            },
+            {
+                "img": "https://arxiv.org/html/2605.11436/2605.11436v1/x3.png",
+                "caption": "Figure 3:Agent-BRACEmaintains a near constant context window while achieving the highest solve rate (78.5%). Comparison of context length growth (left) and cumulative solve rate (right) across methods with maximum 100 game steps on Quest using Qwen2.5-3B-Instruct.",
+                "position": 752
+            },
+            {
+                "img": "https://arxiv.org/html/2605.11436/2605.11436v1/x4.png",
+                "caption": "Table 3:Performance comparison ofAgent-BRACE(Qwen3-4B-Instruct) against baselines on ALFWorld environment.Blue rowsare inference-only.",
+                "position": 768
+            }
+        ]
+    },
+    {
+        "header": "4Ablation and Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.11436/2605.11436v1/x4.png",
+                "caption": "Table 4:Ablation analysis ofAgent-BRACEusing Qwen2.5-3B-Instruct and Qwen3-4B-Instruct. Each component is a variation ofAgent-BRACE.",
+                "position": 833
+            },
+            {
+                "img": "https://arxiv.org/html/2605.11436/2605.11436v1/x4.png",
+                "caption": "Figure 4:Brier score drops from 0.40→\\rightarrow0.28 whileconfirmedclaims grow 21% to 52%, confirming progressive calibration as evidence accumulates. WEP label distribution (bars, left axis) and mean Brier Score (line, right axis) across agent steps for Qwen3-4B-Instruct (Agent-BRACE) on Quest dataset.",
+                "position": 999
+            }
+        ]
+    },
+    {
+        "header": "5Related Work",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ABelief State Structure",
+        "images": []
+    },
+    {
+        "header": "Appendix BBelief Model SFT on Teacher Trajectories",
+        "images": []
+    },
+    {
+        "header": "Appendix CBelief State without Task-Specific Supervision",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.11436/2605.11436v1/x5.png",
+                "caption": "Table 5:Ablation of belief state supervision on Qwen3-4B-Instruct.Agent-BRACEvs. a variant with no SFT initialization and no domain-specific belief prompt structure (- Belief Supervision).",
+                "position": 1591
+            }
+        ]
+    },
+    {
+        "header": "Appendix DReward Design",
+        "images": []
+    },
+    {
+        "header": "Appendix EDataset Details",
+        "images": []
+    },
+    {
+        "header": "Appendix FImplementation Details and Hyperparameters",
+        "images": []
+    },
+    {
+        "header": "Appendix GBelief States are underconfident but improve over training",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.11436/2605.11436v1/x5.png",
+                "caption": "Figure 5:Calibration of WEP labels at early (0-4) and late (10-15) steps. For each WEP label emitted by the belief model, the colored bar shows the fraction of those claims independently verified as true, while the grey bar shows the nominal probability that the label represents on the WEP scale. The belief model is systematically underconfident; it assigns conservative labels to beliefs that are more often true than the label implies.",
+                "position": 2122
+            }
+        ]
+    },
+    {
+        "header": "Appendix HStatistical Reliability of Main Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.11436/2605.11436v1/x6.png",
+                "caption": "Table 11:Performance comparison ofAgent-BRACEagainst baselines across three TextWorld\nenvironments (Quest, Treasure, Cooking) on Qwen3-4B-Instruct with standard deviation across three independent runs.",
+                "position": 2132
+            }
+        ]
+    },
+    {
+        "header": "Appendix IBelief State Model Training",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.11436/2605.11436v1/x6.png",
+                "caption": "Figure 6:Reward component trajectories across PPO training steps for the belief state model (Qwen3-4B-Instruct).",
+                "position": 2306
+            }
+        ]
+    },
+    {
+        "header": "Appendix JAgent-BRACEwithout state correctness and tracking reward",
+        "images": []
+    },
+    {
+        "header": "Appendix KQualitative Examples",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
