@@ -1,0 +1,246 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x1.png",
+                "caption": "Figure 1:AIRA-Compose and AIRA-Design: agentic frameworks for neural architecture search and model design.(a–c)Downstream evaluations of selected agent-found architectures scaled-up to 1B scale with fixed token budget, alongside baselines and traditional NAS-found models: (a) validation loss, and (b) zero-shot average normalized accuracy across 6 tasks.(c)Best test accuracy after 24 GPU hours on the three Long Range Arena tasks. Greedy Opus 4.6 achieves the highest scores on ListOps (0.51) and Retrieval (0.79); Greedy Gemini 3 Pro leads on Text (0.88).(d)Autoresearch training-script optimization: cumulative best bits-per-byte (BPB) over agent steps. Greedy Opus 4.6 achieves the lowest BPB across 100 runs.",
+                "position": 279
+            }
+        ]
+    },
+    {
+        "header": "2Methodology",
+        "images": []
+    },
+    {
+        "header": "3The AIRA-Compose Pipeline",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x2.png",
+                "caption": "Figure 2:The AIRA-Compose pipeline. We recastComposerinto equivalentAIRS-Benchtasks. These tasks instruct agents to combine predefined computational primitives to assemble a 16-layer small scale architecture. Tasks are run employing theAIRA-dojoharness with 6 LLMs as core reasoning models. Search results are then ranked, aggregated and scaled to 350M, 1B and 3B parameters size.",
+                "position": 512
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x3.png",
+                "caption": "Figure 3:Greedy GPT-5 search (partial) on the 3-primitive NAS task within AIRA-Compose. The agent drafts five initial solutions and iteratively explores the architecture space via a greedy tree search. At each node, the agent reasons on different design choices, writes a candidate architecture tosubmission.csvand evaluates it. The highest-scoring node is then selected for further exploration. Red arrows indicatedebugoperations, while blue arrows indicateimproveoperations. At each improvement, the agent proposes a new architecture informed by the parent’s reasoning and score. We report a snippet of the agent’s design rationale, the submitted architecture string, the agent’s internal validation accuracy, and the true test accuracy obtained from the isolated scoring script.",
+                "position": 524
+            }
+        ]
+    },
+    {
+        "header": "4AIRA-Design: low-level mechanistic design",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x4.png",
+                "caption": "Figure 4:AIRA-Design: agent-driven, low-level mechanistic design. We recast the LRA and Autoresearch codebases into equivalentAIRS-Benchtasks. These tasks instruct agents to design novel computational primitives / full training loops and write them into amodel.py/train.pyfile. Tasks are run employing the one-shot and greedy scaffolds of theAIRA-dojoharness with 12 different LLMs as core reasoning models, for a total of up to 20 agents.",
+                "position": 538
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": []
+    },
+    {
+        "header": "6Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x5.png",
+                "caption": "Figure 5:IsoFLOP scaling curves and optimal frontier comparison (M, mA).Top:Validation loss versus model size for each architecture across 5 FLOPs budgets.Bottom:Comparison of each architecture’s optimal frontier against the Llama 3.2 scaling law derived from(acun2025composer).",
+                "position": 833
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x6.png",
+                "caption": "Figure 6:IsoFLOP scaling curves and optimal frontier comparison (M, mA, Mb).Top:Validation loss versus model size for each architecture across 5 FLOPs budgets.Bottom:Comparison of each architecture’s optimal frontier against the approximated Nemotron-2 and Nemotron-H.",
+                "position": 1062
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x7.png",
+                "caption": "Figure 7:Latency–validation loss Pareto frontiers at the 1B-parameter scale. Isotoken comparison (37.5B). Total latency is the sum of per-block latencies across all layers. Dashed lines indicate Pareto frontiers with and without agent-discovered architectures; the shaded region highlights the gap between the two.",
+                "position": 1076
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x8.png",
+                "caption": "Figure 8:Mean best test accuracyachieved by the 8 greedy agents across the 6 low-level mechanistic design tasks. Solid bars represent performance using the original LRA benchmark configuration, while striped bars indicate results from the Configurable LRA setup that permits agent-specified hyperparameters. Error bars represent standard error of the mean across 10 random seeds per task. Horizontal dashed lines indicate SOTA performance over the 3 datasets: ListOps (0.64), Text (0.91), and Retrieval (0.82). Agents are ordered by decreasing average performance.",
+                "position": 1092
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x9.png",
+                "caption": "Figure 9:Valid Submission Rate (VSR)across agents and setups. Top: per-task VSR showing the proportion of runs that produced valid submissions (i.e., final accuracy > 0) for each of the 6 task configurations. Bottom: average VSR across 3 tasks, where missing tasks contribute 0 to the average. Solid bars represent the original LRA benchmark configuration; striped bars indicate the Configurable LRA setup. Error bars represent standard error of the mean. Agents are ordered by decreasing average performance. No valid submission was achieved by one-shot agents.",
+                "position": 1098
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x9.png",
+                "caption": "",
+                "position": 1101
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x10.png",
+                "caption": "",
+                "position": 1106
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x11.png",
+                "caption": "Figure 10:Normalized Score (NS)using the march of 9s across agents and setups. Top: per-task NS computed only over valid submissions. Bottom: average NS across 3 tasks, where missing tasks contribute 0 to the average. Solid bars represent the original LRA benchmark configuration; striped bars indicate the Configurable LRA setup. Error bars represent standard error of the mean. Agents are ordered by decreasing average performance. No valid submission was achieved by one-shot agents.",
+                "position": 1118
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x11.png",
+                "caption": "",
+                "position": 1121
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x12.png",
+                "caption": "",
+                "position": 1126
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x13.png",
+                "caption": "Figure 11:The generalization gap. Comparison of best observed accuracy versus submitted (final) accuracy for greedy agents across the 3 LRA tasks. Each subplot shows results for a single task, with bars grouped by metric type (best vs submitted) and configuration (solid for original LRA, striped for Configurable). Only runs with valid submissions are included. Error bars represent standard error of the mean. Agents are ordered by decreasing best accuracy per task. The gap between best and submitted accuracy reflects the generalization gap, measuring the agent’s ability to detect the best-performing model for final submission.",
+                "position": 1178
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x14.png",
+                "caption": "Figure 12:Autoresearch: distribution of best validation BPB per seed. Each dot represents one seed’s best BPB achieved during its run. Boxes span the interquartile range (Q25–Q75) with bars extending to the most extreme point within1×1\\timesIQR. Dashed lines mark the RADv1 (i.e.,AIRA-dojo) baseline (BPB=1.0121\\text{BPB}=1.0121, red) and the Autoresearch best (BPB=0.9775\\text{BPB}=0.9775, black). Results are ordered by decreasing median BPB (in black).",
+                "position": 1192
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x15.png",
+                "caption": "Figure 13:Autoresearch: best-seed BPB progression for Greedy Opus 4.5 and Greedy Opus 4.6, with and without literature. Each step line tracks the cumulative best BPB over evaluation steps, with numbered annotations marking improvements. Faded dots indicate non-improving evaluations. The red dashed line marks the RADv1 baseline (BPB=1.0121\\text{BPB}=1.0121), while the black dashed line marks the original Autoresearch baseline (BPB=0.998\\text{BPB}=0.998).",
+                "position": 1403
+            }
+        ]
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix ARelated Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BSmall Scale Ranking",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x16.png",
+                "caption": "Figure 14:Agent-discovered Architecture Ranking on MAD 2-Primitives (M, mA).Top 120 small scale architectures discovered during greedy search, ranked by test performance. Each row displays the primitive sequence (M in green, mA in red) alongside its accuracy. Bar colors indicate the discovering agent.",
+                "position": 1465
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x17.png",
+                "caption": "Figure 15:Agent-discovered Architecture Ranking on MAD 3-Primitives (M, mA, Mb).Top 120 small scale architectures discovered during greedy search, ranked by test performance. Each row displays the primitive sequence (M in green, mA in red, Mb in blue) alongside its accuracy. Bar colors indicate the discovering agent.",
+                "position": 1468
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAdditional Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x18.png",
+                "caption": "Figure 16:Comparison of LLM agents on the 2-Primitives architecture search task across three datasets.Performance of 11 agents, {o3-mini, GPT-4o, gpt-oss-20b, gpt-oss-120b, and CWM}×\\times{one-shot, greedy} and greedy GPT-5. For greedy agents, we distinguish betweensubmittedsolutions (selected based on best validation fitness) andbestsolutions (achieving the highest test performance across all iterations). Top panel: MAD dataset (accuracy, higher is better); middle and bottom panels: BabiStories and DCLM datasets (loss, lower is better). The 2-Primitives search space is constrained to two primitives (M, mA). Error bars represent 95% confidence intervals. Best performing agent is highlighted in red.",
+                "position": 1586
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x19.png",
+                "caption": "Figure 17:Comparison of LLM agents on the 3-Primitives architecture search task on MAD dataset.Performance of 10 agents, {o3-mini, GPT-4o, gpt-oss-20b, gpt-oss-120b, and CWM}×\\times{one-shot, greedy}. For greedy agents, we distinguish betweensubmittedsolutions (selected based on best validation fitness) andbestsolutions (achieving the highest test performance across all iterations). The 3-Primitives search space is constrained to three primitives (M, mA, Mb). Error bars represent 95% confidence intervals. Best performing agent is highlighted in red.",
+                "position": 1589
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x20.png",
+                "caption": "Figure 18:Running Maximum Fitness Trajectories for MAD 3 Primitives (M, mA). Best validation (dashed line) and test (solid line) fitness achieved up to each step index, averaged across runs, for the greedy agents: o3-mini, GPT-4o, gpt-oss-20b, gpt-oss-120b, CWM. Shaded regions indicate95%95\\%confidence intervals, and hatched areas highlight the generalization gap between validation and test fitness.",
+                "position": 1592
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x21.png",
+                "caption": "Figure 19:Running Maximum Fitness Trajectories for MAD 3 Primitives (M, mA, Mb). Best validation (dashed line) and test (solid line) fitness achieved up to each step index, averaged across runs, for the greedy agents: o3-mini, GPT-4o, gpt-oss-20b, gpt-oss-120b, CWM and GPT-5. Shaded regions indicate95%95\\%confidence intervals, and hatched areas highlight the generalization gap between validation and test fitness.",
+                "position": 1595
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x22.png",
+                "caption": "Figure 20:Averaged exploration trajectories for the 2-primitive (M, mA) greedy search on the MAD benchmark. Each panel shows the mean validation (blue) and test (red) accuracy per step across 10 seeds, with±1\\pm 1standard deviation shading and validation accuracy linear trend lines. The gap between validation and test accuracy reflects the generalization challenge of agent-designed architectures under the proxy evaluation used for greedy selection.",
+                "position": 1598
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x23.png",
+                "caption": "Figure 21:Averaged exploration trajectories for the 3-primitive (M, mA, Mb) greedy search on the MAD benchmark. Each panel shows the mean validation (blue) and test (red) accuracy per step across 10 seeds, with±1\\pm 1standard deviation shading and validation accuracy linear trend lines. The gap between validation and test accuracy reflects the generalization challenge of agent-designed architectures under the proxy evaluation used for greedy selection.",
+                "position": 1601
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x24.png",
+                "caption": "Figure 22:Downstream evaluation of AIRAformer architectures at 1B scale. 0-shot accuracy on 6 commonsense reasoning tasks (ARC-C, ARC-E, HellaSwag, PIQA, SciQ, WinoGrande), showing both raw and normalized accuracy across three seeds.",
+                "position": 2073
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x25.png",
+                "caption": "Figure 23:IsoFLOP comparison of validation loss across model sizes.Each subplot shows validation loss for 8 architectures (6 AIRAformer variants and 2 Composite baselines) at a given model size (350M, 1B, 3B), evaluated across 5 FLOP budgets ranging from2×10192\\times 10^{19}to4×10204\\times 10^{20}. Bars with red borders indicate the architecture achieving the lowest validation loss at each FLOP budget.",
+                "position": 2079
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x26.png",
+                "caption": "Figure 24:IsoFLOP comparison of validation loss across model sizes, 3-primitive case.Each subplot shows validation loss for 11 architectures (8 AIRAhybrids, 2 baselines and 1 Composer-found baseline) at a given model size (350M, 1B, 3B), evaluated across 5 FLOP budgets ranging from2×10192\\times 10^{19}to4×10204\\times 10^{20}. Bars with red borders indicate the architecture achieving the lowest validation loss at each FLOP budget.",
+                "position": 2082
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x27.png",
+                "caption": "Figure 25:IsoFLOP scaling curves and optimal frontier comparison (M, mA, Mb), full results.Top:Validation loss versus model size for each architecture across 5 FLOPs budgets.Bottom:Comparison of each architecture’s optimal frontier against the approximated Nemotron-2 and Nemotron-H.",
+                "position": 2088
+            }
+        ]
+    },
+    {
+        "header": "Appendix DAggregation and Scaling Patterns",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x28.png",
+                "caption": "Figure 26:Architecture layer patterns for all discovered and baseline models across three parameter scales (350M, 1B, 3B), 2-primitive case. Each row within an architecture shows the sequence of Attention (red) and MLP (green) layers. Llama 3.2 uses a uniform 1:1 alternating pattern. Composite architectures are MLP-heavy (5A+11M base ratio). AIRAformer-A and AIRAformer-B (7A+9M base ratio) were obtained via custom andN1N_{1}aggregation across multiple models, respectively. AIRAformer-C and AIRAformer-D (11A+5M base ratio) were discovered viaN1N_{1}andN2N_{2}aggregation on the top cluster after 3-means clustering on GPT-5 rankings. Stacked variants repeat the base pattern, while Stretched variants proportionally scale each contiguous group of layers.",
+                "position": 2431
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x29.png",
+                "caption": "Figure 27:Architecture layer patterns for all discovered and baseline models across three parameter scales (350M, 1B, 3B), 3-primitive case (M, mA, Mb). Each row within an architecture shows the sequence of Attention (red), MLP (green) and Mamba (blue) layers. We compare our 8 agent-discovered architectures (AIRAhybrid A-E) with 2 baselines, Nemotron-H and Nemotron-2, approximated to the desired scales, and 1 Composer-found architecture.",
+                "position": 2809
+            }
+        ]
+    },
+    {
+        "header": "Appendix EAIRA-Design: LRA - Task Details",
+        "images": []
+    },
+    {
+        "header": "Appendix FAIRA-Design: Autoresearch - Task Details",
+        "images": []
+    },
+    {
+        "header": "Appendix GAIRA-Design: Autoresearch - Additional Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.15871/2605.15871v1/x30.png",
+                "caption": "Figure 28:Autoresearch: BPB trajectories across 10 agents and 10 seeds.Each subplot shows the validation bits-per-byte at each evaluation step for a single agent–seed combination. Colored dots mark steps that set a new cumulative best (improvements), gray dots indicate non-improving steps, and the colored step line tracks the best-so-far BPB. The dashed line denotes the RADv1 baseline (BPB=1.0121\\text{BPB}=1.0121). Green-shaded cells indicate seeds where the agent improved over the baseline by at least 0.0205 BPB, which is the improvement obtained inkarpathy2026autoresearch. Each subplot is labelled with the final fitness value achieved by the agent.",
+                "position": 4663
+            }
+        ]
+    },
+    {
+        "header": "Appendix HBest Autoresearch Solution (Greedy Opus 4.5 + Literature access)",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
