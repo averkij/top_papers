@@ -1,0 +1,174 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/materials/oscar_logo_kv_transparent.png",
+                "caption": "",
+                "position": 230
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/materials/github_mark.png",
+                "caption": "",
+                "position": 249
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/materials/website_mark.png",
+                "caption": "",
+                "position": 250
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/materials/huggingface_mark.png",
+                "caption": "",
+                "position": 250
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x1.png",
+                "caption": "Figure 1:OSCAR pipeline overview.Offline, OSCAR estimates attention-aware key/value covariance rotation and shows how the resulting rotation makes KV activations more uniform: Hadamard mixing flattens raw peaks, while the OSCAR rotation separates directions that matter more or less to attention.\nOnline, the serving path keeps sink and recent tokens in BF16 while applying the fixed rotate–clip–INT2 path to history KV tokens inside the paged SGLang cache.\nThe right panels summarize that OSCAR preserves accuracy across models while achieving throughput close to the QuaRot(INT2) serving path and higher throughput than BF16.",
+                "position": 265
+            }
+        ]
+    },
+    {
+        "header": "2Preliminaries and Motivation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x2.png",
+                "caption": "Figure 2:Quantization error. OSCAR limits it at every stage (Qwen3-4B-Thinking-2507, AIME).(a)Relative MSE in quantizedKKandVVcaches (keys solid, values dashed).(b)KL​(pFP16∥pq)\\mathrm{KL}(p_{\\mathrm{FP16}}\\,\\|\\,p_{q})between FP16 and quantized attention score distributions.(c)Relative MSE at the attention-block output (post-WOW_{O}).(d)Relative MSE in the propagated hidden states across layers.\nCurves compare naive INT2, Hadamard-only preprocessing, clip-only outlier control, and full OSCAR.",
+                "position": 352
+            }
+        ]
+    },
+    {
+        "header": "3Algorithm Design: Offline Calibration and Justification",
+        "images": []
+    },
+    {
+        "header": "4System Design: Online Serving with 2-bit KV Cache",
+        "images": []
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x3.png",
+                "caption": "(a)Qwen3-4B-Thinking-2507",
+                "position": 1250
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x3.png",
+                "caption": "(a)Qwen3-4B-Thinking-2507",
+                "position": 1253
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x4.png",
+                "caption": "(b)Qwen3-8B",
+                "position": 1258
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x5.png",
+                "caption": "Figure 4:Left: Decode throughput speedup relative to BF16 at batch size11with a full prefix-cache hit with 1k our output sequence length. OSCAR achieves progressively larger speedups as the context increases. Right: Job-level throughput at100​k100\\mathrm{k}sequence, as a function of batch size for Qwen3-4B/8B and GLM-4.7-FP8. Each group of bars compares BF16, Saw-INT4, and ours atBS∈{1,8,32}\\mathrm{BS}\\in\\{1,8,32\\}.",
+                "position": 1894
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x6.png",
+                "caption": "Figure 5:Long-context serving stress test with 100k-token inputs. OSCAR’s uniform INT2 KV-cache scales up to282^{8}requests with continued throughput gains.",
+                "position": 1911
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x7.png",
+                "caption": "Figure 6:Effect of prefix-cache hit ratio on end-to-end serving throughput (100k ISL, 1K OSL). Each subplot shows median per-user throughputUU(x-axis, tok/s) versus mean per-GPU throughputGG(y-axis, tok/s), with markers denoting batch sizesBS∈{1,8,16,32}\\mathrm{BS}\\in\\{1,8,16,32\\}. Rows correspond to Qwen3-4B-Thinking-2507 and GLM-4.7-FP8. Columns correspond to radix cache disabled, radix cache enabled during normal execution, and immediate replay after warmup (near-100% hit ratio).",
+                "position": 1918
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional Details and Theoretical Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/figures/qk_alignment_layer16.png",
+                "caption": "Figure 7:Layer 16 of Qwen3-8B. From left: heatmap ofQ⊤​QQ^{\\top}Q; heatmap ofK⊤​KK^{\\top}K(same colour scale); eigenvalue spectra; absolute eigenvector alignment|UQ⊤​UQ||U_{Q}^{\\top}U_{Q}|with both bases sorted by descending eigenvalue. A diagonal-bright alignment matrix would indicate a shared eigenbasis; the observed uniform-texture pattern shows the eigenbases are nearly uncorrelated.",
+                "position": 3228
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x8.png",
+                "caption": "(a)KKMSE",
+                "position": 3265
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x8.png",
+                "caption": "(a)KKMSE",
+                "position": 3268
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x9.png",
+                "caption": "(b)VVMSE",
+                "position": 3273
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x10.png",
+                "caption": "(c)Q​K⊤QK^{\\top}MSE",
+                "position": 3279
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x11.png",
+                "caption": "(d)S​VSVMSE",
+                "position": 3284
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x12.png",
+                "caption": "(e)Attention KL",
+                "position": 3290
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x13.png",
+                "caption": "(f)Attention-output MSE",
+                "position": 3295
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAlgorithm Flow and Serving Procedure",
+        "images": []
+    },
+    {
+        "header": "Appendix CRelated Work",
+        "images": []
+    },
+    {
+        "header": "Appendix DDiscussion",
+        "images": []
+    },
+    {
+        "header": "Appendix EAdditional Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x14.png",
+                "caption": "Figure 9:Attention-aware rotations make history-token activations easier to quantize.Hadamard mixing flattens raw activation peaks by spreading energy across channels. OSCAR goes further: the target covariance separates directions that matter more or less to attention, and the Hadamard transform then mixes each part into a more uniform range.",
+                "position": 4315
+            },
+            {
+                "img": "https://arxiv.org/html/2605.17757/2605.17757v1/x15.png",
+                "caption": "Figure 10:Attention-aware rotations make history-token activations easier to quantize.Hadamard mixing flattens raw activation peaks by spreading energy across channels. OSCAR goes further: the target covariance separates directions that matter more or less to attention, and the Hadamard transform then mixes each part into a more uniform range.",
+                "position": 4319
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
