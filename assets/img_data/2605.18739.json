@@ -1,0 +1,133 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.18739/2605.18739v1/x1.png",
+                "caption": "Figure 1:Overview of the LongLive-2.0 Framework.Training Infra (Left):The diffusion model is fine-tuned via AR training on long videos, where Balanced SP and NVFP4 quantization improve training efficiency. In parallel, we derive standalone LoRA weights via DMD training.Inference Infra (Right):Full NVFP4 enables low-precision inference (W4A4) and KV-cache compression. Furthermore, asynchronous decoding eliminates idle time to maximize generation throughput.",
+                "position": 259
+            }
+        ]
+    },
+    {
+        "header": "2Training Infrastructure",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.18739/2605.18739v1/x2.png",
+                "caption": "Figure 2:Overview of the Training Infrastructure.Traditional SP (Left):In the efficient teacher-forcing layout, clean history tokens and noisy target tokens are concatenated into one sequence. Naive SP treats this as a general sequence, causing loss computation workload imbalance and leaving VAE encoding replicated across sequence-parallel ranks.Balanced SP (Middle):The same temporal chunk ownership is reused across clean/noisy latent streams, SP attention, VAE encoding, and loss computation. This chunk-aligned layout balances loss-bearing tokens across GPUs while avoiding replicated VAE preparation.NVFP4 (Right):NVFP4 training orthogonally accelerates GEMMs and reduces memory footprint.",
+                "position": 289
+            },
+            {
+                "img": "https://arxiv.org/html/2605.18739/2605.18739v1/x3.png",
+                "caption": "Figure 3:Clean Pipeline for AR Video Generation.LongLive-2.0 bypasses the complex, multi-stage processes (e.g., ODE initialization, intermediate DMD) required by previous methods. Instead, our first stage directly performs AR training on the base bidirectional model using long-video data. By simply injecting standalone LoRA weights to enable few-step inference, we achieve a streamlined pipeline that uniquely supports long, interactive, multi-shot, and real-time generation all at once.",
+                "position": 334
+            }
+        ]
+    },
+    {
+        "header": "3Inference Infrastructure",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.18739/2605.18739v1/x4.png",
+                "caption": "Figure 4:NVFP4 DMD training infrastructure.The generator, real-score model, and fake-score model are colocated under a low-precision NVFP4 setup.",
+                "position": 421
+            },
+            {
+                "img": "https://arxiv.org/html/2605.18739/2605.18739v1/x5.png",
+                "caption": "Figure 5:NVFP4 inference infrastructure.LongLive-2.0 combines W4A4 NVFP4 inference, quantized KV cache, and asynchronous VAE decoding to improve throughput and reduce memory for long-video generation.",
+                "position": 453
+            }
+        ]
+    },
+    {
+        "header": "4Algorithm-level Designs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.18739/2605.18739v1/x6.png",
+                "caption": "Figure 6:Multi-shot Attention Sink for streaming multi-shot inference.",
+                "position": 495
+            }
+        ]
+    },
+    {
+        "header": "5Experimental Results",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ARelated Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BMulti-shot Long-video Dataset",
+        "images": []
+    },
+    {
+        "header": "Appendix CBalanced SP Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.18739/2605.18739v1/x7.png",
+                "caption": "Figure 7:Iteration speed and peak memory for sequence parallelism (SP), tensor parallelism (TP), and data parallelism (DP) in interactive AR video generation training on 4 NVIDIA GB200 GPUs. Left: iteration speed. Right: peak memory. SP is fastest at all tested sequence lengths and becomes the most memory-efficient method at long contexts.",
+                "position": 1374
+            },
+            {
+                "img": "https://arxiv.org/html/2605.18739/2605.18739v1/x8.png",
+                "caption": "",
+                "position": 1383
+            }
+        ]
+    },
+    {
+        "header": "Appendix DSequence Parallelism Inference",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.18739/2605.18739v1/x9.png",
+                "caption": "Figure 8:Sequence Parallelism (SP) Inference.Inference uses a W4A4 model with SP. KV-cache quantization significantly reduces communication overhead during the All-to-All exchange.",
+                "position": 1416
+            }
+        ]
+    },
+    {
+        "header": "Appendix EVisual Ablation of Multi-Shot Attention Sink",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.18739/2605.18739v1/x10.png",
+                "caption": "Figure 9:Visual ablation of the multi-shot attention sink.Without the multi-shot attention sink, the generated content drifts. With the multi-shot attention sink stabilizes shot-level appearance.",
+                "position": 1547
+            }
+        ]
+    },
+    {
+        "header": "Appendix FScale Search NVFP4 Quantization",
+        "images": []
+    },
+    {
+        "header": "Appendix GAblation of NVFP4 Quantization",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.18739/2605.18739v1/x11.png",
+                "caption": "Figure 10:Comparison of PTQ and Pre-trained NVFP4.Top: PTQ. Bottom: pre-trained NVFP4. The first column shows the initial frame, while the following frames compare temporal visual quality. PTQ leads to blurred eyes, whereas pre-trained NVFP4 preserves much clearer facial details.",
+                "position": 1635
+            }
+        ]
+    },
+    {
+        "header": "Appendix HImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
