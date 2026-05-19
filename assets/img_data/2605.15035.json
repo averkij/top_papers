@@ -1,0 +1,232 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/figures/topoprimer_arch.png",
+                "caption": "Figure 1:TopoPrimer architecture overview.Two frozen signals are extracted offline from the series population: a\n125-dimensional global TDA fingerprint via topological filtration\n(top), and a 256-dimensional per-series spectral sheaf coordinate via\ntruncated SVD (bottom). After fusion, the combined context is injected into\nthe backbone either by broadcast-addition to every input token(a) fully-trainedor via a lightweight adapter with the backbone\nfrozen(b) pre-trained. Backbone weights are\nnever modified; both components require no\ngradient.",
+                "position": 447
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/figures/fig_broadcast_injection.pdf.png",
+                "caption": "Figure 2:Global context broadcast injection (Path (a)).𝐠∈ℝd\\mathbf{g}\\in\\mathbb{R}^{d}is broadcast-added to every temporal token\nbefore the encoder.\nNo gradient flows through𝐠\\mathbf{g}.",
+                "position": 625
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/figures/fig3_adapter_horizontal.png",
+                "caption": "Figure 3:Topology adapter for frozen pre-trained backbones.Four independent branches each project to a common hidden dimensionH=128H{=}128: the TDA fingerprint (blue), the per-series spectral sheaf\ncoordinate (green), four z-scored context statistics (orange), and the frozen\nbackbone’s cached median forecast (red).\nSeparate projections ensure no branch dominates\nby sheer input dimensionality.\nThe concatenated 512-dimensional representation passes through an output\nMLP that produces a residual correctionΔ​𝐲^∈ℝ9×H\\Delta\\hat{\\mathbf{y}}\\in\\mathbb{R}^{9\\times H},\nadded to the base forecast across all\n9 quantiles to yield𝐲^final\\hat{\\mathbf{y}}_{\\text{final}}.",
+                "position": 631
+            }
+        ]
+    },
+    {
+        "header": "4Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/figures/cold_start_mae_2.png",
+                "caption": "Figure 4:(a) Cold-start performance(new items only,N=40,324N=40{,}324series):\nMAE vs. weeks of post-launch history available. All models receive a\nzero context at week 0; the shaded band (MAE 1.38–1.52) marks the\naccuracy floor TDAItopology variants maintain from launch, while vanilla\nTransformer (MAE 1.887 at week 0) never enters it despite training on\nthe full population.(b) Seasonality window(all items): MAE over four weeks of\npeak demand. Classical baselines and zero-shot TSFMs degrade sharply\n(+46–50%). Topology variants degrade only marginally, with\nTransformer++TDAE++TDAI++Sheaf maintaining the lowest MAE\nfrom week 1 onward, attributable to explicit cross-item seasonal\nstructure encoded in the population manifold.",
+                "position": 1170
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AMathematical Preliminaries",
+        "images": []
+    },
+    {
+        "header": "Appendix BLipschitz Stability of Persistence Landscape Features",
+        "images": []
+    },
+    {
+        "header": "Appendix CTransformer Architecture",
+        "images": []
+    },
+    {
+        "header": "Appendix DArchitecture Diagrams",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/figures/fig2_population_tda.pdf.png",
+                "caption": "Figure 5:Per-series vs. population-level TDA.Prior work (left) computes a separate vector per sliding window, yielding\none descriptor per window of temporal dynamicswithinone series. TopoPrimer (right) treats the full population as a point cloud, runs a single Vietoris-Rips filtration on the correlation manifold, and produces one\n125-dimensional persistence landscape vector shared across all series. TopoPrimer encodes structure\nthat no individual trajectory contains.",
+                "position": 2040
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/figures/sheaf_spectral.png",
+                "caption": "Figure 6:Sheaf spectral coordinate computation (per-series).The kNN graph on the correlation manifold (shared with TDA) defines\nthe edge weights used to form the entity-time matrix𝐗∈ℝN×T\\mathbf{X}\\in\\mathbb{R}^{N\\times T}. A truncated SVD𝐗≈U​Σ​V⊤\\mathbf{X}\\approx U\\Sigma V^{\\top}extracts the top-kkleft singular vectors; rowiiofUUis the 256-dimensional spectral coordinate𝐳i∈ℝ256\\mathbf{z}_{i}\\in\\mathbb{R}^{256}for seriesii. This yieldsNNper-series coordinates,\none per series in the population, encoding each series’ structural\nposition on the correlation manifold. In contrast to the TDA fingerprint𝐭∈ℝ125\\mathbf{t}\\in\\mathbb{R}^{125}(one shared vector for the entire\npopulation), the sheaf coordinate is per-series and relational.",
+                "position": 2050
+            }
+        ]
+    },
+    {
+        "header": "Appendix ETDA Analysis of Public Benchmarks",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/x1.png",
+                "caption": "Figure 7:Population manifold TDA fingerprints across benchmarks.Each curve is the 125-dimensional persistence landscape vector\n(H0H_{0}: 50 dims,H1H_{1}: 50 dims,H2H_{2}: 25 dims) for one dataset.H0H_{0}(connected components): similar across all datasets; coarse\ncluster merging dominates the signal.H1H_{1}(cyclic co-movement): the diagnostic panel. Weather and ECL\nexhibit irregular, multi-scale peaks indicative of genuine cyclic manifold\nstructure. M5 shows evenly-spaced harmonics (calendar artifact, not relational\ngeometry). METR-LA is near-flat (tree-like road hierarchy, few genuine cycles).H2H_{2}(structural voids): active only for Weather and ECL.",
+                "position": 2102
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/x2.png",
+                "caption": "(a)ECL.Weekday segments show higherβ1\\beta_{1}and largerH1H_{1}landscape norms than weekend, reflecting a genuine structural regime change driven by commercial usage cycles.",
+                "position": 2127
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/x2.png",
+                "caption": "(a)ECL.Weekday segments show higherβ1\\beta_{1}and largerH1H_{1}landscape norms than weekend, reflecting a genuine structural regime change driven by commercial usage cycles.",
+                "position": 2130
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/x3.png",
+                "caption": "(b)Monash Weather.Active-day segments show higherβ1\\beta_{1}counts and largerH1H_{1}landscape norms, confirming that missing observations weaken but do not eliminate the topological signal.",
+                "position": 2135
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/x4.png",
+                "caption": "(c)M5 Household.Cross-category TDA variation is modest relative to within-category calendar artifact, with small Wasserstein distances reflecting shared periodicity across all categories.",
+                "position": 2141
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/x5.png",
+                "caption": "(d)METR-LA.The off-peak segment shows higherβ1\\beta_{1}counts and the largest Wasserstein-2 distance from peak, confirming that time-of-day fundamentally alters sensor correlation topology.",
+                "position": 2146
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/figures/umap_manifolds_4panel.pdf.png",
+                "caption": "Figure 9:Entity correlation manifolds (UMAP) across four benchmarks.Projection shape encodes topology: arc/loop structures indicateH1>0H_{1}>0(ECL, Weather); filamentary structure indicates near-tree topology with\nsparse local loops (METR-LA); diffuse cloud indicates low topological\nstructure (M5 Household). Color encodes TDA-derived cluster assignment.\nM5 shows no visual clustering or geometric structure: a diffuse cloud\nwith no arcs, loops, or filaments. This is consistent with its null\npre-screening verdict (Table1), where calendar-dominated\ncorrelations produce no exploitable manifold geometry and no topology\ngain is expected or observed.",
+                "position": 2174
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/x6.png",
+                "caption": "(a)ECL (k=8k{=}8, TDA-informed).Clusters correspond to distinct usage archetypes (high-daytime commercial, overnight industrial, flat residential, weekend-shifted), with Cluster 7 an outlier of extreme diurnal amplitude.",
+                "position": 2200
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/x6.png",
+                "caption": "(a)ECL (k=8k{=}8, TDA-informed).Clusters correspond to distinct usage archetypes (high-daytime commercial, overnight industrial, flat residential, weekend-shifted), with Cluster 7 an outlier of extreme diurnal amplitude.",
+                "position": 2203
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/x7.png",
+                "caption": "(b)Monash Weather.Station clusters align with Köppen climate classifications, confirming that TDA-derived groupings recover interpretable geographic climate structure.",
+                "position": 2208
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/x8.png",
+                "caption": "(c)M5 Household.Item clusters correspond to demand archetypes (stable staple, seasonal, low-velocity, intermittent), with higher within-cluster variance than ECL or Weather consistent with weaker manifold structure.",
+                "position": 2214
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/x9.png",
+                "caption": "(d)METR-LA.Sensor clusters correspond to highway archetypes (mainline freeway, interchange, ramp, arterial connector), with low within-cluster variance reflecting strong spatial regularity of freeway traffic patterns.",
+                "position": 2219
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/figures/mapper_ECL_all.png",
+                "caption": "(a)ECL.Pronounced loop structures link customers with similar but phase-shifted usage cycles, directly corroborating the nonzeroβ1\\beta_{1}from the persistence diagrams.",
+                "position": 2246
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/figures/mapper_ECL_all.png",
+                "caption": "(a)ECL.Pronounced loop structures link customers with similar but phase-shifted usage cycles, directly corroborating the nonzeroβ1\\beta_{1}from the persistence diagrams.",
+                "position": 2249
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/figures/mapper_Monash-Weather_all.png",
+                "caption": "(b)Monash Weather.Branching structures correspond to diverging climate subtypes and loop structures correspond to transitional regions connecting adjacent zones, consistent with theβ1>0\\beta_{1}>0result.",
+                "position": 2254
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/figures/mapper_CA_1_HOUSEHOLD.png",
+                "caption": "(c)M5 Household.Loop structures in the graph identify product groups connected through shared demand periodicity (calendar co-movement), not genuine relational structure.",
+                "position": 2260
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/figures/mapper_METR-LA_all.png",
+                "caption": "(d)METR-LA.The graph topology mirrors the physical road network, with linear chains for highway segments and loops for interchanges and ring roads, directly validating theβ1>0\\beta_{1}>0finding.",
+                "position": 2265
+            }
+        ]
+    },
+    {
+        "header": "Appendix FTDA Analysis: Internal Corpus",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/x10.png",
+                "caption": "Figure 12:Persistence landscape curvesλ1​(t)\\lambda_{1}(t)forH0H_{0},H1H_{1}, andH2H_{2}across all five categories (internal corpus).Categories A and D have substantially higherH1H_{1}amplitude than C and E,\nindicating far more recurring loop-like structure in their item populations.",
+                "position": 2317
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/x11.png",
+                "caption": "Figure 13:Cross-category TDA comparison (internal corpus).Left panel: 125-dim TDA feature vectors per category (H0H_{0}: dims 0–49,H1H_{1}: dims 50–99,H2H_{2}: dims 100–124).\nRight panel:H1H_{1}Wasserstein-2 pairwise distance matrix between categories\n(lower = more topologically similar).\nCategories A and D show structurally meaningful differences from C and E.",
+                "position": 2338
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/x12.png",
+                "caption": "Figure 14:UMAP projection of Category A item trajectories (internal corpus),\ncolored by TDA-derived cluster.Compact, well-separated cluster regions confirm that the persistence\nlandscape fingerprints encode genuine structural distinctions.\nPeripheral items are structural outliers invisible to volume-weighted\nrepresentations.",
+                "position": 2362
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/x13.png",
+                "caption": "Figure 15:Item cluster assignments for Category A (internal corpus),\nK-meansk=8k{=}8(TDA-informed) on 125-dim TDA persistence landscape fingerprints.Eight structurally distinct archetypes emerge from topology alone.\nTwo items with nearly identical mean demand can occupy different clusters,\nrepresenting fundamentally different forecast behaviors that volume-based\nassignment would collapse.",
+                "position": 2384
+            },
+            {
+                "img": "https://arxiv.org/html/2605.15035/2605.15035v1/figures/mapper_A.png",
+                "caption": "Figure 16:Mapper graph for Category A (internal corpus).55 nodes; node size∝\\proptoitem count; edge width∝\\proptointer-cluster\naffinity.\nThe hub-and-spoke topology reveals a dense core of structurally typical items\nand several peripheral branches of structural outliers, directly corroborating\nthe nonzeroβ1\\beta_{1}(first Betti number: count of independent loops in the manifold) from the persistence diagrams.",
+                "position": 2410
+            }
+        ]
+    },
+    {
+        "header": "Appendix GRandomized Control Ablations",
+        "images": []
+    },
+    {
+        "header": "Appendix HSpectral vs. Neural Sheaf Encoder",
+        "images": []
+    },
+    {
+        "header": "Appendix ITopology Signal Survives Fine-Tuning",
+        "images": []
+    },
+    {
+        "header": "Appendix JQuantile Calibration on the Internal Corpus",
+        "images": []
+    },
+    {
+        "header": "Appendix KInternal Corpus: Cold-Start and Seasonality MAE Tables",
+        "images": []
+    },
+    {
+        "header": "Appendix LECL: Full Results",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
