@@ -1,0 +1,952 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar.png",
+                "caption": "",
+                "position": 323
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/x1.png",
+                "caption": "Figure 1:Conceptual overview of this paper. We revisit the per-channel key quantization paradigm and identify its inherent limitation, termedtoken norm imbalance (TNI). We then propose OScaR, a streamlined framework that appliesCanalized Rotationfollowed byOmni-Token Scalingto effectively mitigate TNI. Extensive evaluations across X-LLMs demonstrate that OScaR establishes a superior accuracy-efficiency Pareto front.",
+                "position": 346
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/k_proj_layer_18_head_2_3dmesh.png",
+                "caption": "(a)Key distribution.",
+                "position": 430
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/k_proj_layer_18_head_2_3dmesh.png",
+                "caption": "(a)Key distribution.",
+                "position": 433
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/v_proj_layer_18_head_2_3dmesh.png",
+                "caption": "(b)Value distribution.",
+                "position": 438
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/x2.png",
+                "caption": "(c)Schematic illustration of KIVI.",
+                "position": 443
+            }
+        ]
+    },
+    {
+        "header": "3Preliminaries",
+        "images": []
+    },
+    {
+        "header": "4Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/q_proj_layer_18_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 522
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/q_proj_layer_18_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 525
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/k_proj_layer_18_boxplot.png",
+                "caption": "(b)Key L2 norm distribution",
+                "position": 530
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/v_proj_layer_18_boxplot.png",
+                "caption": "(c)Value L2 norm distribution",
+                "position": 535
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/q_proj_layer_18_head_0_heatmap.png",
+                "caption": "(d)Query heatmap",
+                "position": 541
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/k_proj_layer_18_head_0_heatmap.png",
+                "caption": "(e)Key heatmap",
+                "position": 546
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/v_proj_layer_18_head_0_heatmap.png",
+                "caption": "(f)Value heatmap",
+                "position": 551
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/x3.png",
+                "caption": "Figure 4:Conceptual overview of OScaR. The detailed algorithm is presented in Algorithm1.",
+                "position": 607
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_9_head_1_3dmesh.png",
+                "caption": "Figure 5:Key magnitude (top row) and L2 norm distribution (bottom row) across different processing stages: Original, afterOmni-Token Scalingalone, afterCanalized Rotationalone, and the full OScaR. Direct scaling balances token norms but introduces theScaling-Induced Outlier Artifact.Canalized Rotationalone fails to balance token norms. Only the complete OScaR successfully addresses TNI without incurring the artifact. Additional visualizations are provided in AppendixJ.",
+                "position": 639
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_9_head_1_3dmesh.png",
+                "caption": "",
+                "position": 642
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_9_head_1_3dmesh_scaled.png",
+                "caption": "",
+                "position": 646
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_9_head_1_3dmesh_hadamard.png",
+                "caption": "",
+                "position": 650
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_9_head_1_3dmesh_oscar.png",
+                "caption": "",
+                "position": 654
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_9_boxplot.png",
+                "caption": "",
+                "position": 658
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_9_boxplot_scaled.png",
+                "caption": "",
+                "position": 663
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_9_boxplot_hadamard.png",
+                "caption": "",
+                "position": 667
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_9_boxplot_oscar.png",
+                "caption": "",
+                "position": 671
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/Efficiency/single_batch_latency.png",
+                "caption": "(a)Decoding latency across context lengths.",
+                "position": 1041
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/Efficiency/single_batch_latency.png",
+                "caption": "(a)Decoding latency across context lengths.",
+                "position": 1044
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/Efficiency/multi_batch_throughput.png",
+                "caption": "(b)Decoding throughput across batch sizes.",
+                "position": 1049
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix Contents",
+        "images": []
+    },
+    {
+        "header": "",
+        "images": []
+    },
+    {
+        "header": "Appendix ALimitations and Future Directions",
+        "images": []
+    },
+    {
+        "header": "Appendix BAlgorithm of OScaR",
+        "images": []
+    },
+    {
+        "header": "Appendix CPreliminaries on Low-Bit Quantization",
+        "images": []
+    },
+    {
+        "header": "Appendix DToken Norm Imbalance in Text-Only LLMs",
+        "images": []
+    },
+    {
+        "header": "Appendix EOutlier Tokens and Attention Sinks",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/q_proj_layer_18_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 2031
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/q_proj_layer_18_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 2034
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/k_proj_layer_18_boxplot.png",
+                "caption": "(b)Key L2 norm distribution",
+                "position": 2039
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/v_proj_layer_18_boxplot.png",
+                "caption": "(c)Value L2 norm distribution",
+                "position": 2044
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/q_proj_layer_18_head_0_heatmap.png",
+                "caption": "(d)Query heatmap",
+                "position": 2050
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/k_proj_layer_18_head_0_heatmap.png",
+                "caption": "(e)Key heatmap",
+                "position": 2055
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/v_proj_layer_18_head_0_heatmap.png",
+                "caption": "(f)Value heatmap",
+                "position": 2060
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/attention_layer_18_head_0.png",
+                "caption": "(g)Attention map (Head 0)",
+                "position": 2066
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/attention_layer_18_head_1.png",
+                "caption": "(h)Attention map (Head 1)",
+                "position": 2071
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/attention_layer_18_head_3.png",
+                "caption": "(i)Attention map (Head 3)",
+                "position": 2076
+            }
+        ]
+    },
+    {
+        "header": "Appendix FToken Norm Imbalance in Multi-modal LLMs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/waterview.jpg",
+                "caption": "Figure 8:Example image used as visual input.",
+                "position": 2110
+            }
+        ]
+    },
+    {
+        "header": "Appendix GTheoretical Derivation of TNI-Induced Quantization Errors",
+        "images": []
+    },
+    {
+        "header": "Appendix HQuantitative Analysis of TNI-Induced Quantization Errors",
+        "images": []
+    },
+    {
+        "header": "Appendix IDetailed Analysis of Scaling-Induced Outlier Artifact",
+        "images": []
+    },
+    {
+        "header": "Appendix JAdditional Visualizations of OScaR Processing Stages",
+        "images": []
+    },
+    {
+        "header": "Appendix KTheoretical Complexity Analysis of KV Cache Quantization Methods",
+        "images": []
+    },
+    {
+        "header": "Appendix LImplementation Details of OScaR’s CUDA Kernels",
+        "images": []
+    },
+    {
+        "header": "Appendix MDetails of Datasets and Benchmarks",
+        "images": []
+    },
+    {
+        "header": "Appendix NAdditional TurboQuant+ Implementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix OExperimental Results and Analysis on Needle-in-a-Haystack",
+        "images": []
+    },
+    {
+        "header": "Appendix PExperimental Results and Analysis on OCRBench",
+        "images": []
+    },
+    {
+        "header": "Appendix QExperimental Results and Analysis on DocVQA",
+        "images": []
+    },
+    {
+        "header": "Appendix RExperimental Results and Analysis on MMAU-Pro",
+        "images": []
+    },
+    {
+        "header": "Appendix STNI Analysis Before and After OScaR",
+        "images": []
+    },
+    {
+        "header": "Appendix TAblation Study",
+        "images": []
+    },
+    {
+        "header": "Appendix UAccuracy-Efficiency Pareto Front Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/x4.png",
+                "caption": "Figure 9:Pareto front analysis of KV cache quantization methods on Qwen3-8B. The x-axis represents the average LongBench-E accuracy (higher is better), and the y-axis represents the decode cost in million units (lower is better). OScaR achieves the highest accuracy with competitive efficiency, occupying a distinct and advantageous position on the Pareto front.",
+                "position": 3505
+            }
+        ]
+    },
+    {
+        "header": "Appendix VAdditional Decoding Efficiency Comparison",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/q_proj_layer_6_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 3795
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/q_proj_layer_6_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 3798
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/k_proj_layer_6_boxplot.png",
+                "caption": "(b)Key L2 norm distribution",
+                "position": 3803
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/v_proj_layer_6_boxplot.png",
+                "caption": "(c)Value L2 norm distribution",
+                "position": 3808
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/q_proj_layer_6_head_0_heatmap.png",
+                "caption": "(d)Query heatmap",
+                "position": 3814
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/k_proj_layer_6_head_0_heatmap.png",
+                "caption": "(e)Key heatmap",
+                "position": 3819
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/v_proj_layer_6_head_0_heatmap.png",
+                "caption": "(f)Value heatmap",
+                "position": 3824
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/q_proj_layer_12_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 3831
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/q_proj_layer_12_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 3834
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/k_proj_layer_12_boxplot.png",
+                "caption": "(b)Key L2 norm distribution",
+                "position": 3839
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/v_proj_layer_12_boxplot.png",
+                "caption": "(c)Value L2 norm distribution",
+                "position": 3844
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/q_proj_layer_12_head_0_heatmap.png",
+                "caption": "(d)Query heatmap",
+                "position": 3850
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/k_proj_layer_12_head_0_heatmap.png",
+                "caption": "(e)Key heatmap",
+                "position": 3855
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/v_proj_layer_12_head_0_heatmap.png",
+                "caption": "(f)Value heatmap",
+                "position": 3860
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/q_proj_layer_18_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 3867
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/q_proj_layer_18_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 3870
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/k_proj_layer_18_boxplot.png",
+                "caption": "(b)Key L2 norm distribution",
+                "position": 3875
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/v_proj_layer_18_boxplot.png",
+                "caption": "(c)Value L2 norm distribution",
+                "position": 3880
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/q_proj_layer_18_head_0_heatmap.png",
+                "caption": "(d)Query heatmap",
+                "position": 3886
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/k_proj_layer_18_head_0_heatmap.png",
+                "caption": "(e)Key heatmap",
+                "position": 3891
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-2-7b/v_proj_layer_18_head_0_heatmap.png",
+                "caption": "(f)Value heatmap",
+                "position": 3896
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/q_proj_layer_6_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 3903
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/q_proj_layer_6_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 3906
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/k_proj_layer_6_boxplot.png",
+                "caption": "(b)Key L2 norm distribution",
+                "position": 3911
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/v_proj_layer_6_boxplot.png",
+                "caption": "(c)Value L2 norm distribution",
+                "position": 3916
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/q_proj_layer_6_head_0_heatmap.png",
+                "caption": "(d)Query heatmap",
+                "position": 3922
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/k_proj_layer_6_head_0_heatmap.png",
+                "caption": "(e)Key heatmap",
+                "position": 3927
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/v_proj_layer_6_head_0_heatmap.png",
+                "caption": "(f)Value heatmap",
+                "position": 3932
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/q_proj_layer_12_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 3939
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/q_proj_layer_12_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 3942
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/k_proj_layer_12_boxplot.png",
+                "caption": "(b)Key L2 norm distribution",
+                "position": 3947
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/v_proj_layer_12_boxplot.png",
+                "caption": "(c)Value L2 norm distribution",
+                "position": 3952
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/q_proj_layer_12_head_0_heatmap.png",
+                "caption": "(d)Query heatmap",
+                "position": 3958
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/k_proj_layer_12_head_0_heatmap.png",
+                "caption": "(e)Key heatmap",
+                "position": 3963
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/v_proj_layer_12_head_0_heatmap.png",
+                "caption": "(f)Value heatmap",
+                "position": 3968
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/q_proj_layer_18_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 3975
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/q_proj_layer_18_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 3978
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/k_proj_layer_18_boxplot.png",
+                "caption": "(b)Key L2 norm distribution",
+                "position": 3983
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/v_proj_layer_18_boxplot.png",
+                "caption": "(c)Value L2 norm distribution",
+                "position": 3988
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/q_proj_layer_18_head_0_heatmap.png",
+                "caption": "(d)Query heatmap",
+                "position": 3994
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/k_proj_layer_18_head_0_heatmap.png",
+                "caption": "(e)Key heatmap",
+                "position": 3999
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/llama-3-8b/v_proj_layer_18_head_0_heatmap.png",
+                "caption": "(f)Value heatmap",
+                "position": 4004
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/q_proj_layer_9_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 4011
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/q_proj_layer_9_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 4014
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/k_proj_layer_9_boxplot.png",
+                "caption": "(b)Key L2 norm distribution",
+                "position": 4019
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/v_proj_layer_9_boxplot.png",
+                "caption": "(c)Value L2 norm distribution",
+                "position": 4024
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/q_proj_layer_9_head_0_heatmap.png",
+                "caption": "(d)Query heatmap",
+                "position": 4030
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/k_proj_layer_9_head_0_heatmap.png",
+                "caption": "(e)Key heatmap",
+                "position": 4035
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/v_proj_layer_9_head_0_heatmap.png",
+                "caption": "(f)Value heatmap",
+                "position": 4040
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/q_proj_layer_12_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 4047
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/q_proj_layer_12_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 4050
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/k_proj_layer_12_boxplot.png",
+                "caption": "(b)Key L2 norm distribution",
+                "position": 4055
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/v_proj_layer_12_boxplot.png",
+                "caption": "(c)Value L2 norm distribution",
+                "position": 4060
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/q_proj_layer_12_head_0_heatmap.png",
+                "caption": "(d)Query heatmap",
+                "position": 4066
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/k_proj_layer_12_head_0_heatmap.png",
+                "caption": "(e)Key heatmap",
+                "position": 4071
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/v_proj_layer_12_head_0_heatmap.png",
+                "caption": "(f)Value heatmap",
+                "position": 4076
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/q_proj_layer_18_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 4083
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/q_proj_layer_18_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 4086
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/k_proj_layer_18_boxplot.png",
+                "caption": "(b)Key L2 norm distribution",
+                "position": 4091
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/v_proj_layer_18_boxplot.png",
+                "caption": "(c)Value L2 norm distribution",
+                "position": 4096
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/q_proj_layer_18_head_0_heatmap.png",
+                "caption": "(d)Query heatmap",
+                "position": 4102
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/k_proj_layer_18_head_0_heatmap.png",
+                "caption": "(e)Key heatmap",
+                "position": 4107
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/llm/qwen-3-8b/v_proj_layer_18_head_0_heatmap.png",
+                "caption": "(f)Value heatmap",
+                "position": 4112
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/mllm/qwen-3-vl-8b/q_proj_layer_24_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 4121
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/mllm/qwen-3-vl-8b/q_proj_layer_24_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 4124
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/mllm/qwen-3-vl-8b/k_proj_layer_24_boxplot.png",
+                "caption": "(b)Key L2 norm distribution",
+                "position": 4130
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/mllm/qwen-3-vl-8b/v_proj_layer_24_boxplot.png",
+                "caption": "(c)Value L2 norm distribution",
+                "position": 4136
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/mllm/qwen-3-vl-8b/q_proj_layer_0_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 4143
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/mllm/qwen-3-vl-8b/q_proj_layer_0_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 4146
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/mllm/qwen-3-vl-8b/k_proj_layer_0_boxplot.png",
+                "caption": "(b)Key L2 norm distribution",
+                "position": 4152
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/mllm/qwen-3-vl-8b/v_proj_layer_0_boxplot.png",
+                "caption": "(c)Value L2 norm distribution",
+                "position": 4158
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/mllm/qwen-3-vl-8b/q_proj_layer_15_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 4165
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/mllm/qwen-3-vl-8b/q_proj_layer_15_boxplot.png",
+                "caption": "(a)Query L2 norm distribution",
+                "position": 4168
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/mllm/qwen-3-vl-8b/k_proj_layer_15_boxplot.png",
+                "caption": "(b)Key L2 norm distribution",
+                "position": 4174
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/norm_vis/mllm/qwen-3-vl-8b/v_proj_layer_15_boxplot.png",
+                "caption": "(c)Value L2 norm distribution",
+                "position": 4180
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_12_head_2_3dmesh.png",
+                "caption": "Figure 22:Key magnitude (top row) and L2 norm distribution (bottom row) across different processing stages. Results are shown for Llama-2-7B, Layer 12.",
+                "position": 4188
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_12_head_2_3dmesh.png",
+                "caption": "",
+                "position": 4191
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_12_head_2_3dmesh_scaled.png",
+                "caption": "",
+                "position": 4195
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_12_head_2_3dmesh_hadamard.png",
+                "caption": "",
+                "position": 4199
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_12_head_2_3dmesh_oscar.png",
+                "caption": "",
+                "position": 4203
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_12_boxplot.png",
+                "caption": "",
+                "position": 4207
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_12_boxplot_scaled.png",
+                "caption": "",
+                "position": 4212
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_12_boxplot_hadamard.png",
+                "caption": "",
+                "position": 4216
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_12_boxplot_oscar.png",
+                "caption": "",
+                "position": 4220
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_15_head_0_3dmesh.png",
+                "caption": "Figure 23:Key magnitude (top row) and L2 norm distribution (bottom row) across different processing stages. Results are shown for Llama-2-7B, Layer 18.",
+                "position": 4226
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_15_head_0_3dmesh.png",
+                "caption": "",
+                "position": 4229
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_15_head_0_3dmesh_scaled.png",
+                "caption": "",
+                "position": 4233
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_15_head_0_3dmesh_hadamard.png",
+                "caption": "",
+                "position": 4237
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_15_head_0_3dmesh_oscar.png",
+                "caption": "",
+                "position": 4241
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_15_boxplot.png",
+                "caption": "",
+                "position": 4245
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_15_boxplot_scaled.png",
+                "caption": "",
+                "position": 4250
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_15_boxplot_hadamard.png",
+                "caption": "",
+                "position": 4254
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/oscar_process/k_proj_layer_15_boxplot_oscar.png",
+                "caption": "",
+                "position": 4258
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/direct_scaling/k_proj_layer_18_head_2_3dmesh.png",
+                "caption": "Figure 24:Key magnitude (top row) and L2 norm distribution (bottom row) across different processing stages. Results are shown for Llama-2-7B, Layer 18.",
+                "position": 4264
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/direct_scaling/k_proj_layer_18_head_2_3dmesh.png",
+                "caption": "",
+                "position": 4267
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/direct_scaling/k_proj_layer_18_head_2_3dmesh_scaled.png",
+                "caption": "",
+                "position": 4271
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/direct_scaling/k_proj_layer_18_head_2_3dmesh_hadamard.png",
+                "caption": "",
+                "position": 4275
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/direct_scaling/k_proj_layer_18_head_2_3dmesh_oscar.png",
+                "caption": "",
+                "position": 4279
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/direct_scaling/k_proj_layer_18_boxplot.png",
+                "caption": "",
+                "position": 4283
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/direct_scaling/k_proj_layer_18_boxplot_scaled.png",
+                "caption": "",
+                "position": 4288
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/direct_scaling/k_proj_layer_18_boxplot_hadamard.png",
+                "caption": "",
+                "position": 4292
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/direct_scaling/k_proj_layer_18_boxplot_oscar.png",
+                "caption": "",
+                "position": 4296
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_18_boxplot_llama3_8b_before.png",
+                "caption": "(a)Llama-3.1-8B Layer 18 (before OScaR).",
+                "position": 4303
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_18_boxplot_llama3_8b_before.png",
+                "caption": "(a)Llama-3.1-8B Layer 18 (before OScaR).",
+                "position": 4306
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_18_boxplot_llama3_8b_after.png",
+                "caption": "(b)Llama-3.1-8B Layer 18 (after OScaR).",
+                "position": 4311
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_24_boxplot_llama3_8b_before.png",
+                "caption": "(c)Llama-3.1-8B Layer 24 (before OScaR).",
+                "position": 4317
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_24_boxplot_llama3_8b_after.png",
+                "caption": "(d)Llama-3.1-8B Layer 24 (after OScaR).",
+                "position": 4322
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_18_boxplot_qwen3_vl_before.png",
+                "caption": "(a)Qwen3-VL-8B (before OScaR).",
+                "position": 4329
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_18_boxplot_qwen3_vl_before.png",
+                "caption": "(a)Qwen3-VL-8B (before OScaR).",
+                "position": 4332
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_18_boxplot_qwen3_vl_after.png",
+                "caption": "(b)Qwen3-VL-8B (after OScaR).",
+                "position": 4338
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_18_boxplot_qwen3_8b_before.png",
+                "caption": "(a)Qwen3-8B Layer 18 (before OScaR).",
+                "position": 4345
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_18_boxplot_qwen3_8b_before.png",
+                "caption": "(a)Qwen3-8B Layer 18 (before OScaR).",
+                "position": 4348
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_18_boxplot_qwen3_8b_after.png",
+                "caption": "(b)Qwen3-8B Layer 18 (after OScaR).",
+                "position": 4353
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_24_boxplot_qwen3_8b_before.png",
+                "caption": "(c)Qwen3-8B Layer 24 (before OScaR).",
+                "position": 4359
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_24_boxplot_qwen3_8b_after.png",
+                "caption": "(d)Qwen3-8B Layer 24 (after OScaR).",
+                "position": 4364
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_24_boxplot_qwen2_5_vl_before.png",
+                "caption": "(a)Qwen2.5-VL-7B (before OScaR).",
+                "position": 4371
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_24_boxplot_qwen2_5_vl_before.png",
+                "caption": "(a)Qwen2.5-VL-7B (before OScaR).",
+                "position": 4374
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/ba_oscar/k_proj_layer_24_boxplot_qwen2_5_vl_after.png",
+                "caption": "(b)Qwen2.5-VL-7B (after OScaR).",
+                "position": 4380
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/NIAH/needle_heatmap_16bit.png",
+                "caption": "(a)Full-precision baseline with 16-bit KV cache. Retrieval accuracy: 96.0%.",
+                "position": 4389
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/NIAH/needle_heatmap_16bit.png",
+                "caption": "(a)Full-precision baseline with 16-bit KV cache. Retrieval accuracy: 96.0%.",
+                "position": 4392
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/NIAH/needle_heatmap_kivi_2bit.png",
+                "caption": "(b)KIVI under 2-bit KV cache quantization. Retrieval accuracy: 88.8%.",
+                "position": 4398
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/NIAH/needle_heatmap_ott_2bit.png",
+                "caption": "(c)OTT under 2-bit KV cache quantization. Retrieval accuracy: 90.1%.",
+                "position": 4404
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/NIAH/needle_heatmap_turboquant_2_5bit.png",
+                "caption": "(d)TurboQuant+ under 2.5-bit KV cache quantization. Retrieval accuracy: 92.7%.",
+                "position": 4410
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19660/2605.19660v1/Figure/NIAH/needle_heatmap_oscar_2bit.png",
+                "caption": "(e)OScaR under 2-bit KV cache quantization (our method). Retrieval accuracy: 96.5%.",
+                "position": 4416
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
