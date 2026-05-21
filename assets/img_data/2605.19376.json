@@ -1,0 +1,173 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x1.png",
+                "caption": "Figure 1:Comparison of Latent Reasoning Trajectories.Left: N-Queens Example with two valid solutions. Right: Given three independent runs for latent reasoning (τ1,τ2,τ3\\tau_{1},\\tau_{2},\\tau_{3}):\n(a) Prior RRMs (e.g. HRM, TRM) are deterministic—all runs collapse to an identical trajectory, converging to a single solution and failing to explore alternatives, while (b) GRAM explores diverse trajectories, producing diverse trajectories that reach multiple valid solutionsy1y_{1}andy2y_{2}, while naturally enabling parallel inference-time scaling.",
+                "position": 282
+            }
+        ]
+    },
+    {
+        "header": "2Generative Recursive Reasoning Models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x2.png",
+                "caption": "Figure 2:GRAM Architecture.A single stochastic latent transition in the hierarchical instantiationz=(h,l)z=(h,l). AfterKKlow-level refinements viafLf_{\\mathrm{L}}, the high-level updatefHf_{\\mathrm{H}}produces a deterministic proposalutu_{t}, to which stochastic guidanceϵt\\epsilon_{t}is added:ht=ut+ϵth_{t}=u_{t}+\\epsilon_{t}.",
+                "position": 315
+            }
+        ]
+    },
+    {
+        "header": "3Related Work",
+        "images": []
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x3.png",
+                "caption": "Figure 3:Performance on puzzle benchmarks.On both Sudoku-Extreme and ARC-AGI, GRAM consistently outperforms all deterministic recursive baselines (Looped TF, HRM, TRM), demonstrating that stochastic latent transitions yield substantial gains within the recursive-reasoning paradigm. Looped TF results on ARC-AGI are omitted due to prohibitive training cost (seeSection˜C.1.1) Note that large reasoning model scores are included only as external reference points for benchmark difficulty.",
+                "position": 567
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x4.png",
+                "caption": "Figure 4:(Left) Inference-time scaling on Sudoku-Extreme.While both TRM and GRAM benefit from longer recursion (x-axis), GRAM additionally scales with parallel sampling (NN= number of samples); each iteration corresponds to a supervision step, while meaningK×K\\timesmore flat iterations in Looped TF.(Right) Accuracy across number of solutions in N-Queens (8×88\\times 8).Conventional deterministic recursive models suffer a sharp performance drop as the number of possible solutions increases, whereas GRAM maintains consistent performance.",
+                "position": 574
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x5.png",
+                "caption": "Table 2:Unconditional generation results on binarized MNIST.We report IS (↑\\uparrow) and FID (↓\\downarrow). For iterative models, a step corresponds to a supervision step for TRM and GRAM, and a denoising step for D3PM. FID is calculated using real samples with original pixel values (0–255).",
+                "position": 756
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x6.png",
+                "caption": "Figure 6:Visualization of the generation process and samples.(a) The generation process over recursion steps. Each row corresponds to a different model. GRAM (bottom) progressively refines the generated image through recursive latent updates, correcting initial errors. (b) Unconditional generated samples from each model.",
+                "position": 846
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x7.png",
+                "caption": "Figure 7:Qualitative examples of unconditional Sudoku generation by GRAM.Each board is independently sampled from an empty grid using the learned prior. GRAM produces diverse, complete boards satisfying all row, column, and box constraints, without an explicit constraint checker or search procedure. Incorrect digits are highlighted in red.",
+                "position": 961
+            }
+        ]
+    },
+    {
+        "header": "5Conclusions and Limitations",
+        "images": []
+    },
+    {
+        "header": "Acknowledgment",
+        "images": []
+    },
+    {
+        "header": "Broader Impacts",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional Method Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x8.png",
+                "caption": "Figure 8:Full ELBOℒELBO\\mathcal{L}_{\\mathrm{ELBO}}and surrogate objectiveℒGRAM\\mathcal{L}_{\\mathrm{GRAM}}throughout training(plotted as−ELBO-\\mathrm{ELBO}, smaller is better). On both Sudoku-Extreme (left) and N-Queens8×88\\times 8(right), both quantities decrease monotonically over training, indicating that gradient updates ofℒGRAM\\mathcal{L}_{\\mathrm{GRAM}}consistently improve the full variational bound. The two curves do not coincide becauseℒELBO\\mathcal{L}_{\\mathrm{ELBO}}sums KL contributions across allTTotalT_{\\mathrm{Total}}transitions whileℒGRAM\\mathcal{L}_{\\mathrm{GRAM}}evaluates only the final-step KL of each supervision step; their gap reflects the cumulative KL across earlier transitions, not a failure of optimization. The N-Queens plot uses a log scale on the y-axis due to the large dynamic range.",
+                "position": 1886
+            }
+        ]
+    },
+    {
+        "header": "Appendix BTraining and Architecture Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CAdditional Details of Experiment Setup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x9.png",
+                "caption": "Figure 9:Example of an8×88\\times 8N-Queens puzzle instance.In this example, 5 queens are removed from the full board, leaving 3 queens. The model must find the positions of the remaining queens. This configuration admits exactly 3 valid solutions.",
+                "position": 2256
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x10.png",
+                "caption": "Figure 10:Distribution of the number of valid solutions for generated N-Queens instances.The dataset covers a wide range of solution counts, testing the model’s ability to recover multiple valid outputs.",
+                "position": 2268
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x11.png",
+                "caption": "Figure 11:Graph Coloring Example",
+                "position": 2291
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x12.png",
+                "caption": "Figure 12:Distribution of the number of valid solutions for generated graph coloring instances.The dataset covers a wide range of solution counts, testing the model’s ability to recover multiple valid outputs.",
+                "position": 2294
+            }
+        ]
+    },
+    {
+        "header": "Appendix DAdditional Experiment Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x13.png",
+                "caption": "Figure 13:Effect of sampling on ARC-AGI-1 without data augmentation.To isolate the internal sampling effect, both models are evaluated on original problem instances without 1,000 augmentations. While removing augmentations causes an initial performance drop, GRAM exhibits robust scaling through generative sampling as the number of parallel samplesNNincreases, outperforming the TRM baseline.",
+                "position": 2451
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x14.png",
+                "caption": "Figure 14:Effect of augmentation on sampling efficiency.With limited augmentation (Aug=0), parallel sampling provides consistent gains. As augmentation increases, sampling benefits diminish—at Aug=50=50, performance saturates regardless of sample count, suggesting augmentation and sampling serve complementary roles in capturing solution diversity.",
+                "position": 2462
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x15.png",
+                "caption": "(a)N-Queens8×88\\times 8",
+                "position": 2480
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x15.png",
+                "caption": "(a)N-Queens8×88\\times 8",
+                "position": 2483
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x16.png",
+                "caption": "(b)N-Queens10×1010\\times 10",
+                "position": 2488
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x17.png",
+                "caption": "Figure 16:Additional generated samples from GRAM.We provide 8 additional samples generated unconditionally on binarized MNIST using GRAM. Each row represents a single generated sample, visualized across its recursive refinement process.",
+                "position": 2509
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/x18.png",
+                "caption": "Figure 17:Unconditional Sudoku generation setup.Starting from an empty board, the task is to generate complete Sudoku boards. The valid sample satisfies all Sudoku constraints, while red entries in the invalid sample indicate cells involved in constraint violations.",
+                "position": 2578
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/figures/trm_traj.png",
+                "caption": "Figure 18:Latent reasoning trajectory of TRM.The red dot indicates the initial stateh0h_{0}and the green dot indicates the final statehTh_{T}. Background color represents the loss landscape: bright yellow corresponds to high loss regions, while dark blue indicates low loss (optimal) regions. TRM follows a single deterministic path with no ability to escape suboptimal trajectories.",
+                "position": 2593
+            },
+            {
+                "img": "https://arxiv.org/html/2605.19376/2605.19376v2/figures/gram_traj.png",
+                "caption": "Figure 19:Latent reasoning trajectories of GRAM (50 samples).Using the same visualization scheme as Figure18, we show 50 sampled trajectories from GRAM. The stochastic guidance enables diverse exploration of the latent space: while some trajectories converge to local minima (right bottom), others successfully reach the global optimum (left middle), demonstrating how parallel sampling improves solution discovery.",
+                "position": 2596
+            }
+        ]
+    },
+    {
+        "header": "Licenses",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
