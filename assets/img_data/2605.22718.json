@@ -1,0 +1,149 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.22718/2605.22718v1/x1.png",
+                "caption": "Figure 1:Emergent memory from attending Full KV cache: We empirically observed that, even though Matrix-Game-2.0[6]was trained only on short clips, the model can use the KV cache as long-term visual context/memory.",
+                "position": 290
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.22718/2605.22718v1/figs/introduction/kv_cache_vram_short_labels_large_font.png",
+                "caption": "(a)KV cache size (LingBot-World-Fast 14B)",
+                "position": 362
+            },
+            {
+                "img": "https://arxiv.org/html/2605.22718/2605.22718v1/figs/introduction/kv_cache_vram_short_labels_large_font.png",
+                "caption": "(a)KV cache size (LingBot-World-Fast 14B)",
+                "position": 365
+            },
+            {
+                "img": "https://arxiv.org/html/2605.22718/2605.22718v1/figs/introduction/fps_fullkv_ours_14b_13b_ours14_distinct.png",
+                "caption": "(b)FPS over rollout length",
+                "position": 370
+            },
+            {
+                "img": "https://arxiv.org/html/2605.22718/2605.22718v1/x2.png",
+                "caption": "Figure 3:Attention maps for the action sequence “Right (chunks C0–C3)→\\rightarrowStop (C4)→\\rightarrowLeft (C5–C8)→\\rightarrowStop (C9)→\\rightarrowRight (C10)”. The model assigns high attention to KV-caches whose viewpoint overlaps with the current action. This pattern motivates using camera/action as the retrieval criterion for selecting relevant past KV caches.",
+                "position": 416
+            }
+        ]
+    },
+    {
+        "header": "3Preliminaries",
+        "images": []
+    },
+    {
+        "header": "4Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.22718/2605.22718v1/x3.png",
+                "caption": "Figure 4:Overview of WorldKV.(a) World Retrieval stores KV-cache chunks after compression and retrieves view-relevant chunks back into the attention window at revisit time. (b) World Compression designates first frame of each chunk as the anchor, computes key similarity against the remaining frames, and prunes tokens redundant with the anchor.",
+                "position": 503
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.22718/2605.22718v1/x4.png",
+                "caption": "Table 1:Quantitative comparison on world memory evaluation.We apply WorldKV to video world models,\nmeasuring revisit consistency between\nrevisited and first-visit frames.\nThroughputs are measured on 4×\\timesH200 GPUs by default; values\nin () are measured on 4×\\timesB200 GPUs.",
+                "position": 658
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.22718/2605.22718v1/x4.png",
+                "caption": "Figure 5:Frame-by-frame comparison across methods on two trajectories.",
+                "position": 1000
+            }
+        ]
+    },
+    {
+        "header": "7Limitations & Future Work",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix ASelective Retrieval Outperforms Full KV Cache Attention",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.22718/2605.22718v1/x5.png",
+                "caption": "Figure 6:Each column shows the same viewpoint revisited at different times during a long-horizon rollout. Compared with full KV-cache attention, WorldKV preserves scene-specific details more faithfully across repeated visits by selectively retrieving viewpoint-relevant chunks and pruning redundant caches within each chunk.",
+                "position": 1501
+            }
+        ]
+    },
+    {
+        "header": "Appendix BKey-Key Similarity Visualization",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.22718/2605.22718v1/x6.png",
+                "caption": "Figure 7:Key-Key similarity visualization on Matrix-Game-2.0 and LingBot-World-Fast.Yellow patches indicate tokens in the 2nd and 3rd frames with the lowest 12.5% cosine similarity to the anchor-frame keys. These low-similarity tokens correspond to information not present in the anchor, including newly revealed regions under camera motion and dynamic object changes, and are retained by World Compression.",
+                "position": 1521
+            }
+        ]
+    },
+    {
+        "header": "Appendix CRetrieval Algorithm Ablations",
+        "images": []
+    },
+    {
+        "header": "Appendix DIncreasing Retrieval Chunk Size",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.22718/2605.22718v1/figs/appendix/retrieval_scaling_combined_7chunks_bigtitle.png",
+                "caption": "Figure 8:Effect of increasing the number of retrieved chunks on memory fidelity.Retrieving more past KV-cache chunks generally improves reconstruction metrics on both models, motivating World Compression as a way to fit more historical chunks within a fixed attention-window budget.",
+                "position": 1647
+            }
+        ]
+    },
+    {
+        "header": "Appendix EWorldKV in Inspatio-World",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.22718/2605.22718v1/x7.png",
+                "caption": "Figure 9:Applying WorldKV to Inspatio-World[22], a video-to-video 4D world model. Top: input video with a fixed camera. Middle: Inspatio-World generates novel-view sequences from the input video but loses scene memory upon revisit. Bottom: with WorldKV applied, the same scene content is preserved consistently across views without any fine-tuning.",
+                "position": 1660
+            }
+        ]
+    },
+    {
+        "header": "Appendix FAdditional Qualitative Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.22718/2605.22718v1/x8.png",
+                "caption": "Figure 10:Frame-by-frame comparison across methods on two trajectories.",
+                "position": 1668
+            }
+        ]
+    },
+    {
+        "header": "Appendix GBroader Impact",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
