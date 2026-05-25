@@ -1,0 +1,165 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x1.png",
+                "caption": "Figure 1:Scalable test-time compute emerges from convergence to neural attractors.We evaluate Equilibrium Reasoners (EqRs) with varying inference budgets and plot exact accuracy against\nthe fixed-point residual∥fθ​(𝐳;𝐱)−𝐳∥\\lVert f_{\\theta}(\\mathbf{z};\\mathbf{x})-\\mathbf{z}\\rVert(where𝐳\\mathbf{z}denotes latent states; lower indicates better convergence).\nPoint color encodes the number of iterations on a log scale.\nRemarkably, while training is capped at 16 iterations, the learned attractor dynamics generalize to over 1,024 iterations at test time.\nEquivalent to unrolling over40,000effective layers,\nthis massive scale-up drives the fixed-point residual down and boosts reasoning accuracy to over 99% on Sudoku-Extreme\nwhen further combined with breadth scaling via random initializations.",
+                "position": 336
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x2.png",
+                "caption": "Figure 2:Landscape alignment enables scalable and generalizable reasoning.The lower surface depicts the task-metric landscape over solutions,\nwhile the upper surface depicts the model’s learned internal landscape over latent states.\nWe conceptualize EqR\nas learning a task-conditioned fixed-point system𝐳⋆=fθ​(𝐳⋆;𝐱)\\mathbf{z}^{\\star}=f_{\\theta}(\\mathbf{z}^{\\star};\\mathbf{x}),\nwhose attractors form aninternal landscapein latent space.\nTraining shapes this internal landscape so that its attractors align with the \"attractor\"\nof thetask-metric landscape(\"low-error basin\").\nBy learningfθf_{\\theta}, EqR models\nalign basins across the two landscapes,\nso that descending the internal landscape via iterative updates also moves toward a correct task solution.",
+                "position": 352
+            },
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x3.png",
+                "caption": "Figure 3:Pareto heatmaps illustrating two-axis test-time scaling with iterations (\"depth\",DD),\nand stochastic trajectories from multiple initializations (\"breadth\",BB).Left: fixed-point residualr=∥fθ​(𝐳;𝐱)−𝐳∥r=\\lVert f_{\\theta}(\\mathbf{z};\\mathbf{x})-\\mathbf{z}\\rVert(power-law normalized),\nwhere𝐱\\mathbf{x}stands for model input and𝐳\\mathbf{z}for latent states.\nRight: prediction error (lower is better, log-scaled).\nBreadth scaling becomes effective only beyond a minimum number of model steps\n(D≳4D\\gtrsim 4, or equivalently 168 layers unrolled),\nwhere more model steps allow restarts to better explore the landscape and find attractors.\nAt sufficiently large \"depth\", increasing \"breadth\" consistently reduces fixed-point error and prediction error.\nAcross the grid, lower prediction error is strongly associated with smaller residuals,\nsupporting convergence as a reliable scaling signal.",
+                "position": 449
+            }
+        ]
+    },
+    {
+        "header": "2Background and Problem Formulation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x4.png",
+                "caption": "Figure 4:Controlled construction path.We build a controlled path from a feedforward model to a scalable iterative reasoner by progressively adding\nfive ingredients:\n(1)Weight-tied parametersacross iteration steps;\n(2)Gradient truncationwith detached carry to stabilize optimization through long trajectories and reduce cost;\n(3)Segmented online trainingto shape intermediate solver\nstates through interleaved parameter updates\nalong the latent-state trajectory;\n(4)Hierarchical iterationswith coupled fast/slow latent updates;\nand (5)Adaptive computationto allocate compute by problem difficulty.\nTogether, these components turn a feedforward model into a stable\niterative reasoning process whose trajectories can converge to solution-bearing attractors.",
+                "position": 564
+            }
+        ]
+    },
+    {
+        "header": "3From Feedforward Predictors to Iterative Reasoners",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x5.png",
+                "caption": "Figure 5:Datasets and Evaluations.We evaluate our models and baselines onSudoku-Extreme,\na challenging9×99\\times 9Sudoku benchmark for long-horizon constraint satisfaction,\nand onMaze-Unique,\na uniquely solvable variant of Maze-hard-1k designed to remove ambiguity caused by multiple shortest paths.\nAdditional details are provided in AppendixC.",
+                "position": 670
+            }
+        ]
+    },
+    {
+        "header": "4Iterative Models as Attractor Dynamics",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x6.png",
+                "caption": "Figure 6:Four attractor landscape modes visualized by residual and task error.We run 512 random initializations over 256 Sudoku-Extreme examples, project trajectories to 2D with PCA,\nand color by sequence-level error:(a)no correct attractor;(b)correct and spurious attractors;(c)a narrow correct basin;(d)a broad, mostly unique correct attractor.",
+                "position": 762
+            }
+        ]
+    },
+    {
+        "header": "5Shaping Attractor Landscapes",
+        "images": []
+    },
+    {
+        "header": "6Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x7.png",
+                "caption": "Figure 7:Test-time depth-scaling efficiency on Sudoku-Lite.At a matched exact-accuracy target of 92.99%, EqR requires3.76×3.76\\timesfewer NFEs than the baseline, and EqR+ACT improves this to11.34×11.34\\timesfewer NFEs.\nThe gain is therefore not explained by increased test-time compute alone: the proposed training interventions make the same accuracy reachable with substantially less inference compute.",
+                "position": 1297
+            },
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x8.png",
+                "caption": "Figure 8:Breadth-scaling efficiency of aggregation rules on Sudoku.Expected accuracy versus the number of restarts for majority vote and Top-1 Converged across TRM, TRM+RI, and EqR (TRM+RI+NI).\nAfter applying RI, especially RI+NI, Top-1 Converged becomes more compute-efficient than majority vote and reaches a higher accuracy ceiling.",
+                "position": 1353
+            }
+        ]
+    },
+    {
+        "header": "7Related Work",
+        "images": []
+    },
+    {
+        "header": "8Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional Results, Analyses, and Findings",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x9.png",
+                "caption": "Figure 9:Iterative depth improves generalization under a matched layer-evaluation budget.On Sudoku, increasing the iteration steps changes both optimization and generalization:\nthe shallow iterative model reaches higher training accuracy than the feedforward depth baseline at its best evaluation checkpoint,\nwhile deeper iterative models trade slightly lower training accuracy for substantially higher evaluation accuracy under the same approximate layer-evaluation budget.\nThe three panels plot training accuracy, evaluation accuracy, and the evaluation-minus-training accuracy gap.\nThe axis choices expose different scales of variation: the left and middle panels use log-scaled vertical axes for positive training and evaluation accuracy,\nwhile the right panel keeps a padded linear gap axis because evaluation-minus-training accuracy is signed; all panels use log-scaled training steps to emphasize early fitting dynamics.\nCurves start at 5k training steps, matching the first available evaluation checkpoint.",
+                "position": 1776
+            },
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x10.png",
+                "caption": "Figure 10:Gradient flow in segmented online training.Left: a segment loss supervises the current solver state while backpropagating only through\nthe immediately preceding local computation graph,\nmarked by the red dashed region.\nRight: over a long trajectory,\nSOT changes the optimizer time scale:\neach segment performs a local backward pass and an immediate parameter update,\nthen the next segment continues from the detached carried state under the updated shared parameters.\nThis lets training follow long iteration trajectories without backpropagating through the entire history,\nwhile still providing local credit assignment to the states that produced each supervised segment.",
+                "position": 1788
+            },
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x11.png",
+                "caption": "Figure 11:Residual diagnostic for late anchors.At the terminal-loss detached-carry checkpoint, the rollout residual∥𝐳t−𝐳t−1∥\\lVert\\mathbf{z}_{t}-\\mathbf{z}_{t-1}\\rVertdrops sharply in the early iterations and then changes only slightly over the late trajectory.\nThe shifted-log scale keeps this late plateau visible: the change from iterations88to1212is small compared with the early22to88drop,\nsupporting the use of late anchors that supervise states after the trajectory has largely stabilized.\nTogether with Tab.7, this separates early transient anchors, which can conflict with the rollout dynamics, from late anchors placed near a stable basin.",
+                "position": 1981
+            },
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x12.png",
+                "caption": "Figure 12:Ablation of ACT halting mechanisms.We compare several ACT variants (including oracle halting based on ground-truth correctness)\nand report both task performance and the resulting average number of iteration steps at 50k training steps;\noracle halting tends to overfit and collapses toward near-single-step behavior.",
+                "position": 2318
+            }
+        ]
+    },
+    {
+        "header": "Appendix BQualitative Study",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x13.png",
+                "caption": "Figure 13:An example reasoning trajectory (length 32) produced by TRM on a Sudoku-Extreme puzzle.\nCorrect predictions are highlighted in green.\nThe figure suggests that the model’s reasoning is not strictly sequential in the way an algorithmic\nsolver would be.\nInstead, it exhibits “erase then retry” behavior,\nwith partial revisions that overwrite earlier choices.\nWe mark one representative location with a red circle,\nwhere the model oscillates between 2 and 6, with 3 appearing once at step 8.",
+                "position": 3055
+            }
+        ]
+    },
+    {
+        "header": "Appendix CDataset Details and Task Definitions",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x14.png",
+                "caption": "(a)Maze-1k instance from the HRM paper (Fig. 6c); the shortest path is not unique.",
+                "position": 3236
+            },
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x14.png",
+                "caption": "(a)Maze-1k instance from the HRM paper (Fig. 6c); the shortest path is not unique.",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x15.png",
+                "caption": "(b)Maze-Unique instance with a unique shortest path between the start and goal.",
+                "position": 3244
+            },
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x16.png",
+                "caption": "Figure 15:Distribution of Sudoku-Extreme difficulty ratings.Ratings are derived from the backtrace length of a code-based solver and are provided by the HRM dataset release\n(https://huggingface.co/datasets/sapientinc/sudoku-extreme).",
+                "position": 3253
+            },
+            {
+                "img": "https://arxiv.org/html/2605.21488/2605.21488v1/x17.png",
+                "caption": "Figure 16:Model accuracy versus Sudoku-Extreme difficulty rating.The model solves some extremely difficult instances while failing on some easier puzzles, suggesting that\nsolver-based difficulty ratings do not fully predict model success.",
+                "position": 3258
+            }
+        ]
+    },
+    {
+        "header": "Appendix DMethod and Experimental Details",
+        "images": []
+    },
+    {
+        "header": "Appendix EExtended Related Work and Discussion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
