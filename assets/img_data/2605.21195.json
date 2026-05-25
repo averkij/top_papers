@@ -1,0 +1,120 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.21195/2605.21195v1/x1.png",
+                "caption": "Figure 1:Latent Covariate Shift intensifies under RL and is mitigated by RankE.Left:KL divergence between each model’s VQ token distribution and that of5,0005{,}000real MS-COCO images; the dashed line marksReal, a natural-variation lower bound computed from two independently sampled real-image sets encoded by the same frozen tokenizer. The shift grows progressively across pre-training, SFT, and RL—standard RL widens the endpoint gap by21%21\\%over SFT—while RankE returns it to the SFT level via decoder co-evolution; per-step dynamics are shown in Fig.6.Right:CLIP–FID trajectory across training checkpoints. Standard RL improves CLIP at the cost of stagnating FID, exposing a systematic fidelity–alignment tension caused by the frozen decoder; RankE breaks this tension, simultaneously raising CLIP and lowering FID throughout training.",
+                "position": 372
+            },
+            {
+                "img": "https://arxiv.org/html/2605.21195/2605.21195v1/x2.png",
+                "caption": "Figure 2:Comparison of existing AR post-training and RankE framework.Left:After pre-training the VQ tokenizer, the existing works[10,62]only optimize the AR generator with the sampled latent rollouts by the RL ranking loss (policy gradients) with the T2I rewards while freezing the decoder, which will cause the Latent Covariate Shift between the generator and the decoder.Right:RankE applies an alternative training pipeline to co-evolve both the generator and the decoder by RL objectives with the T2I rewards (for the generator & decoder) and pixel rewards (for the decoder). By unlocking the decoder, this joint optimization directly mitigates this shift, ensuring that the latent representations remain firmly grounded in high-fidelity visual outputs.",
+                "position": 387
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.21195/2605.21195v1/x3.png",
+                "caption": "Figure 3:Overview of the RankE co-evolution framework.Stage 1 (Policy Alignment):The AR policy is updated via policy-gradient optimization to maximize a human-preference reward, with KL regularization toward an EMA reference policy.\nThe VQ decoder is frozen; this stage improves latent-space alignment but widens the mismatch with the decoder training distribution.Stage 2 (Decoder Adaptation):The policy is frozen and the VQ decoder is updated on policy-sampled latents via reward-weighted adversarial supervision (Rank-GAN), differentiable reward gradients, and EMA consistency regularization.\nAlternating the two stages couples policy improvement with decoder adaptation, absorbing Latent Covariate Shift at each round.",
+                "position": 491
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.21195/2605.21195v1/x4.png",
+                "caption": "Table 1:Comparison of representative T2I alignment methods. We focus on whether the decoder (VAE or VQ) is updated during post-training (Dec.). Most methods keep the decoder frozen; RankE is, to our knowledge, the first discrete AR method to co-evolve the decoder. FID and CLIP are reported on MS-COCO 30K where available; “–” indicates the metric is not reported by the original work under a comparable protocol. Numbers from prior work are cited as-is and may use different reward signals or evaluation pipelines, thus not apples-to-apples; more comparison appears inTab.˜2. Methods besides SFT and RL baselines use different training protocols, hindering direct comparison.",
+                "position": 635
+            },
+            {
+                "img": "https://arxiv.org/html/2605.21195/2605.21195v1/x4.png",
+                "caption": "Figure 4:Evolution of generation metrics over training steps.Comparison of RankE against a Standard RL baseline with a frozen decoder. While Standard RL achieves marginal improvements in alignment, it suffers from stagnant or degrading visual fidelity (b) as the frozen decoder cannot adapt to policy-induced latent drift. In contrast, the co-evolution mechanism of RankE effectively translates reward optimization into pixel-space gains, simultaneously improving semantic alignment (a), image fidelity (b), and human preference scores (c).",
+                "position": 1055
+            },
+            {
+                "img": "https://arxiv.org/html/2605.21195/2605.21195v1/x5.png",
+                "caption": "Figure 5:Visualization of T2I generation. RankE yields precise attributes and details according to the text prompt when compared to the baseline, while reducing the artifacts with high image quality in comparison to the existing RL method (GRPO).",
+                "position": 1072
+            },
+            {
+                "img": "https://arxiv.org/html/2605.21195/2605.21195v1/x6.png",
+                "caption": "Figure 6:Latent Covariate Shift and token entropy during training.Left:distributional shift measured asDKL​(πθ∥preal)D_{\\mathrm{KL}}(\\pi_{\\theta}\\,\\|\\,p_{\\mathrm{real}}),\nevaluated every 500 steps. Standard RL with a frozen decoder\nshows steadily increasing divergence (+24%+24\\%over training),\nwhereas RankE keeps the divergence near the SFT\ninitialization.Right:standard RL reduces token entropy as the\npolicy concentrates on fewer codebook entries; RankE maintains\nentropy closer to the real-image level (13.8713.87bits).",
+                "position": 1075
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Roadmap",
+        "images": []
+    },
+    {
+        "header": "Appendix AExtended Related Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BGeneralized EM Formal Derivation",
+        "images": []
+    },
+    {
+        "header": "Appendix CLatent Covariate Shift: Measurement Protocol",
+        "images": []
+    },
+    {
+        "header": "Appendix DTraining Dynamics and Convergence Behavior",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.21195/2605.21195v1/x7.png",
+                "caption": "Figure D.1:Training dynamics of RankE over3,0003{,}000steps underCLIP(blue, solid) andHPSv2(orange, dashed).\n(a, b) GAN reconstruction loss on generated and ground-truth\nimages. (c, d) Discriminator and distillation consistency\nlosses. (e) Policy KL divergence. (f) Reward curves with dualyy-axes.",
+                "position": 2537
+            }
+        ]
+    },
+    {
+        "header": "Appendix EExtended Ablations and Sensitivity Studies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.21195/2605.21195v1/x8.png",
+                "caption": "Figure E.1:Training dynamics for theλc\\lambda_{c}ablation.\nRun A:λc=10\\lambda_{c}{=}10; Run B:λc=1\\lambda_{c}{=}1(default);\nRun C:λc=50\\lambda_{c}{=}50. Excessiveλc\\lambda_{c}causes decoder\ncollapse (Run C); moderate values stay stable.",
+                "position": 2614
+            }
+        ]
+    },
+    {
+        "header": "Appendix FImplementation Details and Hyperparameters",
+        "images": []
+    },
+    {
+        "header": "Appendix GTraining Algorithm",
+        "images": []
+    },
+    {
+        "header": "Appendix HTraining Data and Curation",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
