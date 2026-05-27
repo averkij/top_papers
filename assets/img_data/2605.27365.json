@@ -1,0 +1,123 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.27365/2605.27365v1/x1.png",
+                "caption": "Figure 1:Versatile tasks of LocateAnything with parallel box decoding.Top:LocateAnything supports diverse localization tasks under a unified vision-language model.Bottom:Textual digit decoding spells coordinates digit by digit, and quantized coordinate decoding predicts coordinate tokens sequentially.\nIn contrast,Parallel Box Decodingpredicts each geometric unit (\\eg, a bounding box) in a single forward pass.",
+                "position": 324
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.27365/2605.27365v1/x2.png",
+                "caption": "Figure 2:Comparison of Token Decoding Methods.The NTP generates coordinate values one-by-one. The standard MTP method results in irregular distributions and non-coherent, unstructured patterns. Our proposed PBD generates a single atomic box (or point) unit in a parallel step, ensuring box-aligned and structured output.",
+                "position": 350
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.27365/2605.27365v1/x3.png",
+                "caption": "Figure 3:Architecture and Block-Based Output Representation.LocateAnything formulates localization as generating a sequence of fixed-length,box-aligned atomic blocks. Four functional block types—Semantic, Box, Negative, and End blocks—are defined to jointly specify predicted entities or termination states.",
+                "position": 397
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.27365/2605.27365v1/x4.png",
+                "caption": "Figure 4:Attention Mask for Joint NTP–MTP Training.The shared context and NTP stream use causal attention, the MTP blocks follow a block-causal pattern across blocks, and tokens within the same block share bidirectional attention. The two streams are isolated to prevent leakage while jointly attending to the shared context.",
+                "position": 437
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27365/2605.27365v1/x5.png",
+                "caption": "Figure 5:Corrected NTP Re-decoding.When parallel decoding encountersFormat IrregularityorSpatial Ambiguity, the model discards the erroneous block and reverts to standard NTP to ensure robust predictions.",
+                "position": 456
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27365/2605.27365v1/x6.png",
+                "caption": "Figure 6:Overview of theLocateAnything-Datadataset. The pie charts illustrate the task distribution across natural language queries, bounding boxes, and unique images. The bottom panel provides a detailed breakdown specifically for the language queries, showing the absolute count and percentage for each task category.",
+                "position": 480
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.27365/2605.27365v1/x7.png",
+                "caption": "Figure 7:Ablation Study on Box Ordering and Decoding Speed.Left:Effect of different box sorting strategies on the F1-score.Right:Comparison of Generation Time (bars) and Throughput (lines) across varying numbers of predicted boxes for Textual, Quantized, and Parallel box decoding.",
+                "position": 1863
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27365/2605.27365v1/x8.png",
+                "caption": "Figure 8:Qualitative results. Each row shows test cases with varying numbers of target objects and diverse box scales. Different colors indicate different query categories, includingattribute,part,reasoning, andspatialqueries. Our model consistently localizes targets across diverse scene domains, arbitrary image resolutions, free-form textual queries, and an arbitrary number of objects, demonstrating strong robustness.",
+                "position": 1882
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix ATraining and Inference Configurations",
+        "images": []
+    },
+    {
+        "header": "Appendix BLocateAnything-Data Construction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.27365/2605.27365v1/x9.png",
+                "caption": "Figure 9:Data engine for multi-targets grounding.Top:For detection datasets with gt boxes, we use each box category as a prompt to Qwen3-VL(bai2025qwen3vltechnicalreport)to synthesize detailed object-centric queries, including attributes, spatial relations, and reasoning cues. These queries are then fed to Molmo(deitke2025molmo)to predict candidate points, from which we retain the points falling inside the corresponding gt boxes as reliable supervision.Bottom:For a large collection of high-quality unlabeled images, Qwen3-VL directly generates diverse queries from the image. Such queries can be used to prompt Molmo for point prediction, followed by SAM 3(carion2025sam3segmentconcepts)to produce boxes, or directly prompt Rex-Omni(jiang2025rexomni)to generate boxes. All generated boxes are finally post-verified by Qwen3-VL.",
+                "position": 2249
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27365/2605.27365v1/x10.png",
+                "caption": "Figure 10:Distribution of the number of targets per query across different domains. The x-axis shows the number of targets associated with a query, while the y-axis (log scale) indicates the number of queries.",
+                "position": 2541
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27365/2605.27365v1/x11.png",
+                "caption": "Figure 11:Distribution of query length across domains. The x-axis represents the number of words in the target description (excluding template text), and the y-axis (log scale) shows the number of queries.",
+                "position": 2544
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAdditional Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.27365/2605.27365v1/x12.png",
+                "caption": "Figure 12:Qualitative comparison on Referring Expression Comprehension (REC).Compared to Qwen3-VL and Rex-Omni, LocateAnything demonstrates superior compositional grounding capabilities. It accurately aligns nuanced, free-form human intents (e.g., spatial or attribute-based queries) with correct visual regions.",
+                "position": 2939
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27365/2605.27365v1/x13.png",
+                "caption": "Figure 13:Qualitative comparison on Dense Object Detection (DOD).This figure illustrates performance in highly dense and heavily overlapping environments, such as stacked logs and abacus beads. While traditional token-by-token generation models (Qwen3-VL) and point-based models (Rex-Omni) suffer from severe omissions or spatial ambiguity (blurring boundaries between adjacent objects), LocateAnything maintains compact, well-separated, and highly accurate bounding boxes. This confirms the effectiveness of our block-level intra-attention and dense-aware Stage-2 training.",
+                "position": 2942
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27365/2605.27365v1/x14.png",
+                "caption": "Figure 14:Qualitative comparison on Optical Character Recognition (OCR).For scene text (e.g., magazine covers) and structured documents (e.g., tables), LocateAnything yields tightly bounded boxes around text elements. The baseline models frequently exhibit format irregularities or merge distinct text blocks. Our parallel decoding, combined with the Hybrid Mode fallback for complex spatial layouts, ensures high-precision localization without sacrificing structural coherence.",
+                "position": 2945
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
