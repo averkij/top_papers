@@ -1,0 +1,137 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.27358/2605.27358v1/x1.png",
+                "caption": "Figure 1:MobileMoE establishes a new Pareto frontier for on-device LLMs.Average benchmark accuracy, computed over 14 benchmarks spanning commonsense, knowledge, science, comprehension, and reasoning, is plotted against (a) per-token inference computeFinf=2​NactF_{\\text{inf}}=2N_{\\text{act}}(GFLOPs) and (b) total parametersNtotalN_{\\text{total}}(B); in (b), x-axis tick labels show total params (B)||projected INT4 memory (GB)222Accuracy is reported from public model releases at full precision (BF16). In subplot (b), the x-axis shows total parametersNtotalN_{\\text{total}}in billions alongside the corresponding projected INT4 weight memory, computed asℳweight=12​Ntotal\\mathcal{M}_{\\text{weight}}=\\tfrac{1}{2}N_{\\text{total}}GB under 4-bit weight quantization that is commonly used for on-device LLM deployment (as detailed in Section3.4, Section4.3)..",
+                "position": 299
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27358/2605.27358v1/x2.png",
+                "caption": "",
+                "position": 309
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Scaling On-Device MoE",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.27358/2605.27358v1/x3.png",
+                "caption": "Figure 2:MobileMoE architectures.Left: MoE model design space with three design factors: model sparsity(E,k)(E,k), expert granularitygg, shared expertsss.Right: MobileMoE at three scales: Small (S), Medium (M), Large (L) with 0.3, 0.5, 0.9B active parameters, using a base architecture of expansion ratiodff/dmodel=4d_{\\text{ff}}/d_{\\text{model}}=4, aspect ratiodmodel/nl≈40d_{\\text{model}}/n_{l}\\approx 40, SwiGLU, GQA with 4 KV heads, along with variants of MoE design choices on number of expertsE∈{1,2,4,8,16,32}E\\in\\{1,2,4,8,16,32\\}, fine-grained expert granularityg∈{1,2,4,8,16}g\\in\\{1,2,4,8,16\\}, and shared expert {✓, ×}.",
+                "position": 372
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27358/2605.27358v1/figure/moe_iso_flops_e.png",
+                "caption": "Figure 3:Scaling the number of expertsEE.Model loss predicted by the fitted on-device scaling law (Eq. (1)) plotted against (a) total parametersNtotalN_{\\text{total}}, (b) on-device memoryℳ\\mathcal{M}(Eq. (5)), and (c) active parametersNactN_{\\text{act}}, under a training budget of5×10205\\times 10^{20}FLOPs (our experimental regime). Each curve corresponds to one expert countEE, truncated at the crossover with the next-largerEEcurve. Shaded regions indicate the optimalEEalong each axis; e.g., atℳ=5\\mathcal{M}=5GB, the optimalEEis 8, marked by the star in (b).",
+                "position": 531
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27358/2605.27358v1/x4.png",
+                "caption": "Figure 4:Scaling MoE models with compute optimality.The compute-optimal loss vs. training compute FLOPs for each MoE design factor predicted by the on-device scaling law (Eq. (1)): when varying (a) number of expertsEE, (b) expert granularitygg, (c) with vs without shared expert, the curves with lower model loss indicate the more compute-efficient design choices given a fixed compute budget. Grey area is the experimental regime.",
+                "position": 554
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27358/2605.27358v1/x5.png",
+                "caption": "Figure 5:Training efficiency of MoE architecture(Nact=0.3N_{\\text{act}}=0.3B). Training loss vs. wall-clock hours when varying (a) number of expertsE∈{1,2,4,8,16,32}E\\in\\{1,2,4,8,16,32\\}, (b) expert granularityg∈{1,2,4,8,16}g\\in\\{1,2,4,8,16\\}atE=8E=8, and (c) with vs. without a shared experts∈{✓,×}s\\in\\{\\checkmark,\\times\\}atE=8,g=8E=8,g=8. For fair comparison, each run is trained on the same data for 500B tokens, with identical hardware (8 nodes, 64 NVIDIA H100 96 GB GPUs) – see Table6.1for full ablation details.",
+                "position": 589
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27358/2605.27358v1/x6.png",
+                "caption": "Figure 6:MobileMoE four-stage training recipe:pre-training (PT)→\\rightarrowmid-training (MT)→\\rightarrowinstruct supervised fine-tuning (SFT)→\\rightarrowquantization-aware training (QAT) with INT4 precision.",
+                "position": 608
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27358/2605.27358v1/figure/data_mixture.png",
+                "caption": "Figure 7:MobileMoE training data mixtures across stages.Domain composition of pre-training (PT,∼\\sim6T tokens), mid-training (MT,∼\\sim500B tokens), and supervised fine-tuning (SFT,>>80M samples), with consistent colors per domain across stages. Across stages, the mixture transitions from web-heavy coverage in PT toward domain-specific data (knowledge, code, math) in MT and SFT. Full per-domain datasets are listed in Tables7.1,7.2, and7.3.",
+                "position": 614
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.27358/2605.27358v1/figure/data_scaling.png",
+                "caption": "Figure 8:MobileMoE pre-training trajectories.Average benchmark accuracy of MobileMoE-S/M/L across five core competencies plus overall average, plotted against training tokensDDup to 6T. Horizontal lines: publicly released pre-trained models with reported pre-training token budgets (i.e., Llama 3.2 1B: 9T, with distillation from Llama 3.1 8B; OLMoE-1B-7B: 5T; OLMo 2-1B: 4T; SmolLM2-1.7B: 11T). Evaluation setups are given in Table8.1.",
+                "position": 836
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27358/2605.27358v1/figure/model_scaling.png",
+                "caption": "Figure 9:MobileMoE-Base model comparison.Average benchmark accuracy of MobileMoE-S/M/L after mid-training across five core competencies plus overall average, vs. publicly released base models (Gemma 3, SmolLM2, Qwen3.5, MobileLLM-Pro, Llama 3.2, OLMoE, OLMo 2), plotted against active parametersNactN_{\\text{act}}. Green stars: MobileMoE-S/M/L; dashed line: MobileMoE Pareto curve. Full table results are given in Table2.",
+                "position": 842
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27358/2605.27358v1/x7.png",
+                "caption": "Figure 10:MobileMoE capability progression across training stages.Benchmark accuracy (%) for MobileMoE-S/M/L after each of the three main training stages: pre-training (PT, light), mid-training (MT, medium), and instruction supervised fine-tuning (SFT, dark). Gray dashed line: instruct-tuned OLMoE-1B-7B (1.3B active) as a scale-matched MoE reference baseline. Each per-competence panel (Commonsense, Knowledge, Science, Reading, Reasoning) reports the average over its constituent benchmarks; the overall panel reports the average over all 14 benchmarks. Full per-benchmark numerical results are in Table5.",
+                "position": 1723
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Author Contributions",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "6Scaling Law Ablation Details",
+        "images": []
+    },
+    {
+        "header": "7Training Data",
+        "images": []
+    },
+    {
+        "header": "8Evaluation Details",
+        "images": []
+    },
+    {
+        "header": "9Quantitative Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.27358/2605.27358v1/figure/heatmap_pt.png",
+                "caption": "Figure 9.1:MobileMoE expert utilization heatmaps across training stages and domains.Each heatmap shows per-layer (rows) per-expert (columns) activation utilization on the log10scale (blue: dormant, red: hot) for MobileMoE-S evaluated on three downstream domains. Two patterns emerge: (i) different domains activate distinct expert subsets (cross-task specialization), and (ii) expert utilization broadens progressively from PT through MT to SFT.",
+                "position": 4602
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27358/2605.27358v1/figure/heatmap_mt.png",
+                "caption": "",
+                "position": 4609
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27358/2605.27358v1/figure/heatmap_sft.png",
+                "caption": "",
+                "position": 4613
+            },
+            {
+                "img": "https://arxiv.org/html/2605.27358/2605.27358v1/x8.png",
+                "caption": "Figure 9.2:Distribution of expert utilization across tasks: math, code, knowledge, combined (all tasks).Statistics of expert utilization ratios (log10scale) are shown across all MoE layers for MobileMoE-S (post SFT).",
+                "position": 4623
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
