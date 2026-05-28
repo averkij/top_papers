@@ -1,0 +1,94 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.23163/2605.23163v2/x1.png",
+                "caption": "Figure 1:(a) Comparison of E2E driving VLA paradigms. AR VLAs are memory-bandwidth-bound at batch size one and produce only one token per forward pass; full-sequence diffusion VLAs preclude KV-cache reuse and admit logical leakage across the perceive-then-plan stages. Fast-dDrive overcomes both via section-aligned block diffusion, and further pre-fills template tokens as a frozen scaffold to accelerate inference and inject schema priors. (b) Our combined approach achieves up to 11.8×\\timesend-to-end speedup compared to the AR baseline, measured on a single NVIDIA H100 GPU.",
+                "position": 286
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.23163/2605.23163v2/x2.png",
+                "caption": "Figure 2:Pipeline of Fast-dDrive during training. The structured JSON output is decomposed into four semantic sections; template tokens form a frozenscaffold(grey, pre-filled and never masked), while value tokens are denoised in section-aligned blocks with bidirectional attention within each block and strict causal ordering across sections. SASD adds per-section loss weights and Beta noise schedules at training time only.",
+                "position": 499
+            },
+            {
+                "img": "https://arxiv.org/html/2605.23163/2605.23163v2/x3.png",
+                "caption": "Figure 3:Scaffold Speculative Decoding. For each block: (1) scaffold tokens are auto-accepted; (2) the MDM head drafts value tokens via bidirectional attention; (3) the AR head verifies the draft with causal attention, accepting tokens until the first mismatch plus one bonus token.",
+                "position": 564
+            },
+            {
+                "img": "https://arxiv.org/html/2605.23163/2605.23163v2/x4.png",
+                "caption": "Figure 4:Shared-prefix multi-trajectory rollouts.(a)On a representative WOD-E2E val sample,N=4N{=}4rollouts (light blue) disagree most at the late waypoints, while their mean (dark blue) lies on top of the ground truth (black).(b)Mean ADE@5s on WOD-E2E val decreases monotonically withNN, confirming the variance-of-the-mean argument.",
+                "position": 626
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix AInput Modalities: Full Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BQualitative Case Studies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.23163/2605.23163v2/figures/case_study_combined/case_left_turn.png",
+                "caption": "Figure 5:Night left turn into a clear cross street.With no critical objects in the scene, Fast-dDrive commits tospeed up / left turnand emits a smoothly curving trajectory whose 5-second arc tracks the GT (blue) tightly across the FRONT and FRONT_LEFT cameras.",
+                "position": 1111
+            },
+            {
+                "img": "https://arxiv.org/html/2605.23163/2605.23163v2/figures/case_study_combined/case_pickup_truck.png",
+                "caption": "Figure 6:Lane follow with a pickup truck ahead.The model flags the single lead vehicle as critical, pickslane follow / keep speed, and emits a long forward trajectory that maintains the lane while keeping pace with the lead. GT (blue) and the predicted final waypoint agree on the longitudinal range.",
+                "position": 1156
+            },
+            {
+                "img": "https://arxiv.org/html/2605.23163/2605.23163v2/figures/case_study_combined/case_right_turn.png",
+                "caption": "Figure 7:Sharp right turn off a multi-lane road.Fast-dDrive flips the lateral channel toright turnand emits a deeply curving trajectory whose lateral excursion reaches−17-17m at 5 s. The predicted arc tracks the GT (blue) closely across the FRONT→\\rightarrowFRONT_RIGHT seam.",
+                "position": 1201
+            },
+            {
+                "img": "https://arxiv.org/html/2605.23163/2605.23163v2/figures/case_study_combined/case_traffic_light.png",
+                "caption": "Figure 8:Green-light cruise through a signalised intersection.The model correctly reads the green signal, tags onlytraffic_elementas critical, and commits tospeed up / go straight. The forward trajectory matches the GT (blue) heading down the same lane through the junction.",
+                "position": 1246
+            },
+            {
+                "img": "https://arxiv.org/html/2605.23163/2605.23163v2/figures/case_study_combined/case_rain_left_turn.png",
+                "caption": "Figure 9:Wet-weather left turn at a stop-controlled intersection(same scene as the demo video). Fast-dDrive jointly tags the stop sign (traffic_element) and the wet road (weather_condition), commits toslow down / left turn, and emits a sharply curving trajectory that swings from FRONT into FRONT_LEFT. The cylindrical projection (§A) keeps the arc geometrically continuous across the camera seam, and the predicted curve overlays the GT (blue) closely for the entire 5 s.",
+                "position": 1291
+            }
+        ]
+    },
+    {
+        "header": "Appendix CLimitations",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
