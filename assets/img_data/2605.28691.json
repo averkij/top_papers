@@ -1,0 +1,123 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/figs/icons/github.png",
+                "caption": "",
+                "position": 261
+            },
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/figs/icons/hf.png",
+                "caption": "",
+                "position": 265
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/x1.png",
+                "caption": "Figure 1:Skiparse-2D Attention.Skiparse-2D Attention alternates between Token-wise Sparse Attention and Group-wise Sparse Attention, enabling any two tokens to interact within at most two attention operations. Unlike Skiparse-1D Attention, which treats a video as a flattened one-dimensional sequence, Skiparse-2D Attention applies the Skiparse-1D pattern orthogonally along the height and width dimensions, thereby better leveraging the locality of image and video modalities.",
+                "position": 403
+            },
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/x2.png",
+                "caption": "Figure 2:Any Resolution Strategy.The minimum repeating unit of Skiparse-2D Attention is ak2∗k2k^{2}*k^{2}subfigure, wherekkdenotes the sparse ratio. When the height or width of a video shape is not a multiple ofk2k^{2}, we pad it to the nearest multiple ofk2k^{2}and generate the corresponding attention mask. This any resolution strategy ensures that tokens at the same spatial position across videos of different shapes are assigned to the same subfigure.",
+                "position": 420
+            },
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/x3.png",
+                "caption": "Figure 3:Sparse Sequence Parallel (SSP).Benefiting from the local equivalence of Skiparse-2D Attention, we can locally rearrange the subfigures sharded to each rank to identify the elements that remain on the same local rank after pattern switching. The target layout can then be obtained through All-to-All communication within the sparse parallel group, without requiring global All-Gather. Compared with Ulysses sequence parallelism (SP), SSP reduces the communication volume by 75% and requires only one communication operation per block.",
+                "position": 432
+            },
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/x4.png",
+                "caption": "Figure 4:Model Architecture.OSP-Next adopts CrossDiT with a hybrid attention strategy. Specifically, we use full attention blocks in the first2​n2nlayers and the last2​n2nlayers to better capture fine-grained features, while using Skiparse Attention blocks in the remaining middle layers to maximize runtime efficiency. When computing self attention, the model processes all subsequences in parallel, reducing the computational complexity to1k\\frac{1}{k}of full attention, wherekkdenotes the sparse ratio. When SSP is enabled, each rank holds a subset of the subsequences. When Ulysses SP and SSP are enabled together, each rank obtains the local heads of the corresponding subsequences through an All-to-All communication before attention. Element-wise operations, such as LayerNorm and FFN, are unaffected by the parallelization strategy. During block forward, SSP changes the token pattern through a single All-to-All communication.",
+                "position": 630
+            },
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/x5.png",
+                "caption": "Figure 5:Effective mantissa–exponent allocation of 8-bit floating-point formats.HiF8 adopts a tapered precision design tailored to the statistical distribution of neural network data. Unlike conventional FP8 formats such as E4M3 and E5M2, whose fixed exponent allocation imposes a trade-off between dynamic range and numerical precision, HiF8 concentrates higher precision in frequently occurring value regions, which typically follow a Gaussian-like distribution in model weights and activations. This enables a better match between numerical representation and deep learning data characteristics.",
+                "position": 654
+            },
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/x6.png",
+                "caption": "Figure 6:Overview of the pipeline for OSP-Next RL post-training.The policy performs denoising with a hybrid sampling strategy, using stochastic SDE updates in the early steps and deterministic ODE updates in the late steps. The generated videos are then evaluated by VideoAlign along three dimensions—visual quality, motion quality, and text alignment—to produce the training signal for policy optimization.",
+                "position": 704
+            }
+        ]
+    },
+    {
+        "header": "4Experiment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/x7.png",
+                "caption": "Figure 7:Generation quality of the OSP-Next series with the Wan2.1 baseline.By exploiting video locality through Skiparse-2D Attention and benefiting from the hybrid attention architecture, OSP-Next achieves generation quality that is highly comparable to the Wan2.1 baseline. In addition, due to the dynamic precision of the HiF8 quantization format, OSP-Next-HiF8 shows almost no quality drop compared with OSP-Next.",
+                "position": 916
+            },
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/x8.png",
+                "caption": "Figure 8:Initialization Gap. OSP-Next adopts Wan2.1-T2V-14B as the initialization weights, whereas an initialization gap remains between the pretrained full attention model and the sparse attention model. To estimate the magnitude of this gap, we compare the zero-shot inference results of the initialized sparse attention model against the baseline. With an increasing number of full attention blocks, the zero-shot inference results of the sparse attention model progressively approach the baseline. Across all settings, Skiparse-2D Attention achieves generation quality that is consistently closer to the baseline than Skiparse-1D Attention. Finally, to balance generation efficiency and generation quality, we choose 8 full attention blocks as the configuration of OSP-Next.",
+                "position": 1360
+            },
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/x9.png",
+                "caption": "Figure 9:Impact of reinforcement learning on the Sparse Attention model.Adapting a pretrained full attention model to a sparse attention model often results in a degradation of model performance. To mitigate this issue, we use Mix-GRPO for post-training OSP-Next. After post-training, OSP-Next exhibits notable gains in spatial relation understanding, video-text alignment, and related dimensions, indicating that reinforcement learning is effective for the sparse attention model.",
+                "position": 1374
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/x10.png",
+                "caption": "Figure 10:More comparisons between OSP-Next and the Wan2.1 baseline.",
+                "position": 1402
+            },
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/x11.png",
+                "caption": "Figure 11:More comparisons between OSP-Next and the Wan2.1 baseline.",
+                "position": 1406
+            },
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/x12.png",
+                "caption": "Figure 12:More comparisons between OSP-Next and the Wan2.1 baseline.",
+                "position": 1410
+            },
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/x13.png",
+                "caption": "Figure 13:More comparisons between OSP-Next and the Wan2.1 baseline.",
+                "position": 1414
+            },
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/x14.png",
+                "caption": "Figure 14:More comparisons between OSP-Next and the Wan2.1 baseline.",
+                "position": 1418
+            },
+            {
+                "img": "https://arxiv.org/html/2605.28691/2605.28691v1/x15.png",
+                "caption": "Figure 15:More comparisons between OSP-Next and the Wan2.1 baseline.",
+                "position": 1422
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
