@@ -1,0 +1,1659 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/x1.png",
+                "caption": "Figure 1:DynaFLIP learns dynamics-aware visual representations that focus on control-relevant regions and capture spatially coherent structure, leading to strong downstream performance.DynaFLIP serves as a visual backbone for diverse downstream policies (MLP, diffusion policy, VLA).\nGrad-CAM shows DynaFLIP attending to manipulated objects and interaction regions, while PCA reveals coherent object-level structure.\nDynaFLIP outperforms baselines across simulation, real-world tasks, and the control-relevant metric.",
+                "position": 284
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/x2.png",
+                "caption": "Figure 2:Overview of DynaFLIP.Three modalities are encoded into embeddings in a shared hyperspherical space.\nThe image encoder (initialized from DINOv2 and fully fine-tuned) produces per-frame features fromIt,It+HI_{t},I_{t+H}via CLS and mean-pooled patch tokens, which are then fused intozIz_{I}.\nA frozen T5 with a learnable adapter produceszLz_{L}from the EOS token ofLL, and a 3D flow encoder produceszFz_{F}fromFt:t+KF_{t:t+K}.\nThe alignment loss minimizes the areaAAspanned by these embeddings, with auxiliary actor and temporal contrastive losses reinforcing dynamics-aware representations.\nOur pre-trained image encoder serves as a visual backbone for diverse downstream policies, with the language encoder optionally included for instruction-conditioned policies.",
+                "position": 320
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/x3.png",
+                "caption": "Figure 3:Two optimization pitfalls of naïve simplex-volume minimization.(a) Geometric ambiguity.A flat triangle has near-zero area even when one modality remains far from the other two.\nThe cosine regularizer pulls selected modality pairs together, yielding a desired alignment (see Eq. (2)).(b) Trivial collapse.Without negative tuples, all modality embeddings collapse to a single point. Negative tuples in our contrastive framework push apart mismatched configurations, preventing collapse (see Eq. (3)).",
+                "position": 367
+            }
+        ]
+    },
+    {
+        "header": "3Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/x4.png",
+                "caption": "Figure 4:Control-relevant score versus downstream success rate(MLP policy).The control-relevant scoreSmS_{m}[13](x-axis) measures how well a frozen image encoder preserves state information relevant to control, and the y-axis reports policy success rate on MetaWorld[56](left) and RLBench[23](right).\nDynaFLIP appears in the top-right region of both plots, indicating its dynamics-aware representations preserve control-relevant information and improve manipulation performance.",
+                "position": 493
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/x5.png",
+                "caption": "(a)Grad-CAM heatmaps over action prediction.",
+                "position": 497
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/x5.png",
+                "caption": "(a)Grad-CAM heatmaps over action prediction.",
+                "position": 500
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/x6.png",
+                "caption": "(b)Feature visualization with PCA.",
+                "position": 505
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/x7.png",
+                "caption": "Figure 6:Real-world manipulation results(VLA policy).DynaFLIP performs well not only on the three in-distribution tasks, but also under both out-of-distribution perturbation types. The top row contrasts in-distribution (seen) tasks with out-of-distribution (unseen) evaluation settings, and the bottom row reports success rates (%) on the three in-distribution tasks together with two out-of-distribution settings.",
+                "position": 753
+            }
+        ]
+    },
+    {
+        "header": "4Related work",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments and Disclosure of Funding",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional Related Works",
+        "images": []
+    },
+    {
+        "header": "Appendix BMathematical Proofs and Theoretical Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CDataset Construction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/x8.png",
+                "caption": "Figure 7:Composition of pre-training dataset.The dataset contains 260K image–language–3D flow triplets in total, combining 190K trajectories from robot videos and 70K from human videos.",
+                "position": 2158
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/x9.png",
+                "caption": "Figure 8:Dataset generation pipeline.Each raw video is first frame-sampled to obtain image observations. Three parallel branches then process these images: (i) a VLM generates language instructions describing the manipulation intent, (ii) per-frame camera pose and depth are estimated using SpatialTrackerV2[54], and (iii) 2D points are tracked across frames using CoTracker3[28]. Tracked 2D points are unprojected with the estimated depth and transformed into the reference camera coordinate frame to produce 3D flow trajectories that are invariant to camera motion.",
+                "position": 2169
+            }
+        ]
+    },
+    {
+        "header": "Appendix DExperiment Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/x10.png",
+                "caption": "Figure 9:UR3 hardware setup.Real-robot setup used for demonstration collection and policy evaluation.",
+                "position": 2622
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/x11.png",
+                "caption": "Figure 10:Real-world evaluation tasks.Illustration of the in-distribution and out-of-distribution evaluation settings for the three real-world tasks, including the exact task instructions.",
+                "position": 2825
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/x12.png",
+                "caption": "Figure 11:Representative rollout examples on three real-world tasks.We compare DynaFLIP with DINOv2 and SigLIP on(a)Pick up red doll and place it in sink(OOD),(b)Pour almonds into white and yellow\nplate(OOD), and(c)Unfold towel(in-distribution). Baselines exhibit distinct failure modes (wrong object selection, grasping failure, spilling, wrong direction), while DynaFLIP completes all three tasks successfully.",
+                "position": 2828
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/x13.png",
+                "caption": "",
+                "position": 2832
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/x14.png",
+                "caption": "",
+                "position": 2834
+            }
+        ]
+    },
+    {
+        "header": "Appendix EAdditional Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/assembly/original.png",
+                "caption": "Table 8:Grad-CAM visualizations",
+                "position": 3047
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/assembly/r3m.png",
+                "caption": "",
+                "position": 3118
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/assembly/vc1.png",
+                "caption": "",
+                "position": 3122
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/assembly/liv.png",
+                "caption": "",
+                "position": 3126
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/assembly/clip.png",
+                "caption": "",
+                "position": 3130
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/assembly/dinov2.png",
+                "caption": "",
+                "position": 3134
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/assembly/siglip.png",
+                "caption": "",
+                "position": 3138
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/assembly/sigma.png",
+                "caption": "",
+                "position": 3142
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/bin-picking/original.png",
+                "caption": "",
+                "position": 3153
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/bin-picking/r3m.png",
+                "caption": "",
+                "position": 3157
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/bin-picking/vc1.png",
+                "caption": "",
+                "position": 3161
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/bin-picking/liv.png",
+                "caption": "",
+                "position": 3165
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/bin-picking/clip.png",
+                "caption": "",
+                "position": 3169
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/bin-picking/dinov2.png",
+                "caption": "",
+                "position": 3173
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/bin-picking/siglip.png",
+                "caption": "",
+                "position": 3177
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/bin-picking/sigma.png",
+                "caption": "",
+                "position": 3181
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/box-close/original.png",
+                "caption": "",
+                "position": 3192
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/box-close/r3m.png",
+                "caption": "",
+                "position": 3196
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/box-close/vc1.png",
+                "caption": "",
+                "position": 3200
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/box-close/liv.png",
+                "caption": "",
+                "position": 3204
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/box-close/clip.png",
+                "caption": "",
+                "position": 3208
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/box-close/dinov2.png",
+                "caption": "",
+                "position": 3212
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/box-close/siglip.png",
+                "caption": "",
+                "position": 3216
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/box-close/sigma.png",
+                "caption": "",
+                "position": 3220
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/button-press/original.png",
+                "caption": "",
+                "position": 3231
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/button-press/r3m.png",
+                "caption": "",
+                "position": 3235
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/button-press/vc1.png",
+                "caption": "",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/button-press/liv.png",
+                "caption": "",
+                "position": 3243
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/button-press/clip.png",
+                "caption": "",
+                "position": 3247
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/button-press/dinov2.png",
+                "caption": "",
+                "position": 3251
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/button-press/siglip.png",
+                "caption": "",
+                "position": 3255
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/button-press/sigma.png",
+                "caption": "",
+                "position": 3259
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/dial-turn/original.png",
+                "caption": "",
+                "position": 3270
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/dial-turn/r3m.png",
+                "caption": "",
+                "position": 3274
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/dial-turn/vc1.png",
+                "caption": "",
+                "position": 3278
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/dial-turn/liv.png",
+                "caption": "",
+                "position": 3282
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/dial-turn/clip.png",
+                "caption": "",
+                "position": 3286
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/dial-turn/dinov2.png",
+                "caption": "",
+                "position": 3290
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/dial-turn/siglip.png",
+                "caption": "",
+                "position": 3294
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/dial-turn/sigma.png",
+                "caption": "",
+                "position": 3298
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/drawer-open/original.png",
+                "caption": "",
+                "position": 3309
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/drawer-open/r3m.png",
+                "caption": "",
+                "position": 3313
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/drawer-open/vc1.png",
+                "caption": "",
+                "position": 3317
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/drawer-open/liv.png",
+                "caption": "",
+                "position": 3321
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/drawer-open/clip.png",
+                "caption": "",
+                "position": 3325
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/drawer-open/dinov2.png",
+                "caption": "",
+                "position": 3329
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/drawer-open/siglip.png",
+                "caption": "",
+                "position": 3333
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/drawer-open/sigma.png",
+                "caption": "",
+                "position": 3337
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hammer/original.png",
+                "caption": "",
+                "position": 3348
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hammer/r3m.png",
+                "caption": "",
+                "position": 3352
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hammer/vc1.png",
+                "caption": "",
+                "position": 3356
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hammer/liv.png",
+                "caption": "",
+                "position": 3360
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hammer/clip.png",
+                "caption": "",
+                "position": 3364
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hammer/dinov2.png",
+                "caption": "",
+                "position": 3368
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hammer/siglip.png",
+                "caption": "",
+                "position": 3372
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hammer/sigma.png",
+                "caption": "",
+                "position": 3376
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hand-insert/original.png",
+                "caption": "",
+                "position": 3387
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hand-insert/r3m.png",
+                "caption": "",
+                "position": 3391
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hand-insert/vc1.png",
+                "caption": "",
+                "position": 3395
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hand-insert/liv.png",
+                "caption": "",
+                "position": 3399
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hand-insert/clip.png",
+                "caption": "",
+                "position": 3403
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hand-insert/dinov2.png",
+                "caption": "",
+                "position": 3407
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hand-insert/siglip.png",
+                "caption": "",
+                "position": 3411
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/hand-insert/sigma.png",
+                "caption": "",
+                "position": 3415
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/handle-pull/original.png",
+                "caption": "",
+                "position": 3426
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/handle-pull/r3m.png",
+                "caption": "",
+                "position": 3430
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/handle-pull/vc1.png",
+                "caption": "",
+                "position": 3434
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/handle-pull/liv.png",
+                "caption": "",
+                "position": 3438
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/handle-pull/clip.png",
+                "caption": "",
+                "position": 3442
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/handle-pull/dinov2.png",
+                "caption": "",
+                "position": 3446
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/handle-pull/siglip.png",
+                "caption": "",
+                "position": 3450
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/handle-pull/sigma.png",
+                "caption": "",
+                "position": 3454
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/lever-pull/original.png",
+                "caption": "",
+                "position": 3465
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/lever-pull/r3m.png",
+                "caption": "",
+                "position": 3469
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/lever-pull/vc1.png",
+                "caption": "",
+                "position": 3473
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/lever-pull/liv.png",
+                "caption": "",
+                "position": 3477
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/lever-pull/clip.png",
+                "caption": "",
+                "position": 3481
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/lever-pull/dinov2.png",
+                "caption": "",
+                "position": 3485
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/lever-pull/siglip.png",
+                "caption": "",
+                "position": 3489
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/lever-pull/sigma.png",
+                "caption": "",
+                "position": 3493
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/peg-unplug-side/original.png",
+                "caption": "",
+                "position": 3504
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/peg-unplug-side/r3m.png",
+                "caption": "",
+                "position": 3508
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/peg-unplug-side/vc1.png",
+                "caption": "",
+                "position": 3512
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/peg-unplug-side/liv.png",
+                "caption": "",
+                "position": 3516
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/peg-unplug-side/clip.png",
+                "caption": "",
+                "position": 3520
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/peg-unplug-side/dinov2.png",
+                "caption": "",
+                "position": 3524
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/peg-unplug-side/siglip.png",
+                "caption": "",
+                "position": 3528
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/peg-unplug-side/sigma.png",
+                "caption": "",
+                "position": 3532
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/push-wall/original.png",
+                "caption": "",
+                "position": 3543
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/push-wall/r3m.png",
+                "caption": "",
+                "position": 3547
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/push-wall/vc1.png",
+                "caption": "",
+                "position": 3551
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/push-wall/liv.png",
+                "caption": "",
+                "position": 3555
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/push-wall/clip.png",
+                "caption": "",
+                "position": 3559
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/push-wall/dinov2.png",
+                "caption": "",
+                "position": 3563
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/push-wall/siglip.png",
+                "caption": "",
+                "position": 3567
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/push-wall/sigma.png",
+                "caption": "",
+                "position": 3571
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/reach/original.png",
+                "caption": "",
+                "position": 3582
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/reach/r3m.png",
+                "caption": "",
+                "position": 3586
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/reach/vc1.png",
+                "caption": "",
+                "position": 3590
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/reach/liv.png",
+                "caption": "",
+                "position": 3594
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/reach/clip.png",
+                "caption": "",
+                "position": 3598
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/reach/dinov2.png",
+                "caption": "",
+                "position": 3602
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/reach/siglip.png",
+                "caption": "",
+                "position": 3606
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/reach/sigma.png",
+                "caption": "",
+                "position": 3610
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/shelf-place/original.png",
+                "caption": "",
+                "position": 3621
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/shelf-place/r3m.png",
+                "caption": "",
+                "position": 3625
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/shelf-place/vc1.png",
+                "caption": "",
+                "position": 3629
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/shelf-place/liv.png",
+                "caption": "",
+                "position": 3633
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/shelf-place/clip.png",
+                "caption": "",
+                "position": 3637
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/shelf-place/dinov2.png",
+                "caption": "",
+                "position": 3641
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/shelf-place/siglip.png",
+                "caption": "",
+                "position": 3645
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/shelf-place/sigma.png",
+                "caption": "",
+                "position": 3649
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/sweep-into/original.png",
+                "caption": "",
+                "position": 3660
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/sweep-into/r3m.png",
+                "caption": "",
+                "position": 3664
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/sweep-into/vc1.png",
+                "caption": "",
+                "position": 3668
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/sweep-into/liv.png",
+                "caption": "",
+                "position": 3672
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/sweep-into/clip.png",
+                "caption": "",
+                "position": 3676
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/sweep-into/dinov2.png",
+                "caption": "",
+                "position": 3680
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/sweep-into/siglip.png",
+                "caption": "",
+                "position": 3684
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/sweep-into/sigma.png",
+                "caption": "",
+                "position": 3688
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-box/original.png",
+                "caption": "",
+                "position": 3699
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-box/r3m.png",
+                "caption": "",
+                "position": 3703
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-box/vc1.png",
+                "caption": "",
+                "position": 3707
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-box/liv.png",
+                "caption": "",
+                "position": 3711
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-box/clip.png",
+                "caption": "",
+                "position": 3715
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-box/dinov2.png",
+                "caption": "",
+                "position": 3719
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-box/siglip.png",
+                "caption": "",
+                "position": 3723
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-box/sigma.png",
+                "caption": "",
+                "position": 3727
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-laptop-lid/original.png",
+                "caption": "",
+                "position": 3738
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-laptop-lid/r3m.png",
+                "caption": "",
+                "position": 3742
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-laptop-lid/vc1.png",
+                "caption": "",
+                "position": 3746
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-laptop-lid/liv.png",
+                "caption": "",
+                "position": 3750
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-laptop-lid/clip.png",
+                "caption": "",
+                "position": 3754
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-laptop-lid/dinov2.png",
+                "caption": "",
+                "position": 3758
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-laptop-lid/siglip.png",
+                "caption": "",
+                "position": 3762
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/close-laptop-lid/sigma.png",
+                "caption": "",
+                "position": 3766
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/unplug-charger/original.png",
+                "caption": "",
+                "position": 3777
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/unplug-charger/r3m.png",
+                "caption": "",
+                "position": 3781
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/unplug-charger/vc1.png",
+                "caption": "",
+                "position": 3785
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/unplug-charger/liv.png",
+                "caption": "",
+                "position": 3789
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/unplug-charger/clip.png",
+                "caption": "",
+                "position": 3793
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/unplug-charger/dinov2.png",
+                "caption": "",
+                "position": 3797
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/unplug-charger/siglip.png",
+                "caption": "",
+                "position": 3801
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/unplug-charger/sigma.png",
+                "caption": "",
+                "position": 3805
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/water-plants/original.png",
+                "caption": "",
+                "position": 3816
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/water-plants/r3m.png",
+                "caption": "",
+                "position": 3820
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/water-plants/vc1.png",
+                "caption": "",
+                "position": 3824
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/water-plants/liv.png",
+                "caption": "",
+                "position": 3828
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/water-plants/clip.png",
+                "caption": "",
+                "position": 3832
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/water-plants/dinov2.png",
+                "caption": "",
+                "position": 3836
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/water-plants/siglip.png",
+                "caption": "",
+                "position": 3840
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/gradcam/water-plants/sigma.png",
+                "caption": "",
+                "position": 3844
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/assembly/original.png",
+                "caption": "Table 9:PCA visualizations of learned representations",
+                "position": 3864
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/assembly/r3m.png",
+                "caption": "",
+                "position": 3935
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/assembly/vc1.png",
+                "caption": "",
+                "position": 3939
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/assembly/liv.png",
+                "caption": "",
+                "position": 3943
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/assembly/clip.png",
+                "caption": "",
+                "position": 3947
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/assembly/dinov2.png",
+                "caption": "",
+                "position": 3951
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/assembly/siglip.png",
+                "caption": "",
+                "position": 3955
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/assembly/sigma.png",
+                "caption": "",
+                "position": 3959
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/bin-picking/original.png",
+                "caption": "",
+                "position": 3970
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/bin-picking/r3m.png",
+                "caption": "",
+                "position": 3974
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/bin-picking/vc1.png",
+                "caption": "",
+                "position": 3978
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/bin-picking/liv.png",
+                "caption": "",
+                "position": 3982
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/bin-picking/clip.png",
+                "caption": "",
+                "position": 3986
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/bin-picking/dinov2.png",
+                "caption": "",
+                "position": 3990
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/bin-picking/siglip.png",
+                "caption": "",
+                "position": 3994
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/bin-picking/sigma.png",
+                "caption": "",
+                "position": 3998
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/box-close/original.png",
+                "caption": "",
+                "position": 4009
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/box-close/r3m.png",
+                "caption": "",
+                "position": 4013
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/box-close/vc1.png",
+                "caption": "",
+                "position": 4017
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/box-close/liv.png",
+                "caption": "",
+                "position": 4021
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/box-close/clip.png",
+                "caption": "",
+                "position": 4025
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/box-close/dinov2.png",
+                "caption": "",
+                "position": 4029
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/box-close/siglip.png",
+                "caption": "",
+                "position": 4033
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/box-close/sigma.png",
+                "caption": "",
+                "position": 4037
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/button-press/original.png",
+                "caption": "",
+                "position": 4048
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/button-press/r3m.png",
+                "caption": "",
+                "position": 4052
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/button-press/vc1.png",
+                "caption": "",
+                "position": 4056
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/button-press/liv.png",
+                "caption": "",
+                "position": 4060
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/button-press/clip.png",
+                "caption": "",
+                "position": 4064
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/button-press/dinov2.png",
+                "caption": "",
+                "position": 4068
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/button-press/siglip.png",
+                "caption": "",
+                "position": 4072
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/button-press/sigma.png",
+                "caption": "",
+                "position": 4076
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/dial-turn/original.png",
+                "caption": "",
+                "position": 4087
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/dial-turn/r3m.png",
+                "caption": "",
+                "position": 4091
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/dial-turn/vc1.png",
+                "caption": "",
+                "position": 4095
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/dial-turn/liv.png",
+                "caption": "",
+                "position": 4099
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/dial-turn/clip.png",
+                "caption": "",
+                "position": 4103
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/dial-turn/dinov2.png",
+                "caption": "",
+                "position": 4107
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/dial-turn/siglip.png",
+                "caption": "",
+                "position": 4111
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/dial-turn/sigma.png",
+                "caption": "",
+                "position": 4115
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/drawer-open/original.png",
+                "caption": "",
+                "position": 4126
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/drawer-open/r3m.png",
+                "caption": "",
+                "position": 4130
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/drawer-open/vc1.png",
+                "caption": "",
+                "position": 4134
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/drawer-open/liv.png",
+                "caption": "",
+                "position": 4138
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/drawer-open/clip.png",
+                "caption": "",
+                "position": 4142
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/drawer-open/dinov2.png",
+                "caption": "",
+                "position": 4146
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/drawer-open/siglip.png",
+                "caption": "",
+                "position": 4150
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/drawer-open/sigma.png",
+                "caption": "",
+                "position": 4154
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hammer/original.png",
+                "caption": "",
+                "position": 4165
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hammer/r3m.png",
+                "caption": "",
+                "position": 4169
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hammer/vc1.png",
+                "caption": "",
+                "position": 4173
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hammer/liv.png",
+                "caption": "",
+                "position": 4177
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hammer/clip.png",
+                "caption": "",
+                "position": 4181
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hammer/dinov2.png",
+                "caption": "",
+                "position": 4185
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hammer/siglip.png",
+                "caption": "",
+                "position": 4189
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hammer/sigma.png",
+                "caption": "",
+                "position": 4193
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hand-insert/original.png",
+                "caption": "",
+                "position": 4204
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hand-insert/r3m.png",
+                "caption": "",
+                "position": 4208
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hand-insert/vc1.png",
+                "caption": "",
+                "position": 4212
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hand-insert/liv.png",
+                "caption": "",
+                "position": 4216
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hand-insert/clip.png",
+                "caption": "",
+                "position": 4220
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hand-insert/dinov2.png",
+                "caption": "",
+                "position": 4224
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hand-insert/siglip.png",
+                "caption": "",
+                "position": 4228
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/hand-insert/sigma.png",
+                "caption": "",
+                "position": 4232
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/handle-pull/original.png",
+                "caption": "",
+                "position": 4243
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/handle-pull/r3m.png",
+                "caption": "",
+                "position": 4247
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/handle-pull/vc1.png",
+                "caption": "",
+                "position": 4251
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/handle-pull/liv.png",
+                "caption": "",
+                "position": 4255
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/handle-pull/clip.png",
+                "caption": "",
+                "position": 4259
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/handle-pull/dinov2.png",
+                "caption": "",
+                "position": 4263
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/handle-pull/siglip.png",
+                "caption": "",
+                "position": 4267
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/handle-pull/sigma.png",
+                "caption": "",
+                "position": 4271
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/lever-pull/original.png",
+                "caption": "",
+                "position": 4282
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/lever-pull/r3m.png",
+                "caption": "",
+                "position": 4286
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/lever-pull/vc1.png",
+                "caption": "",
+                "position": 4290
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/lever-pull/liv.png",
+                "caption": "",
+                "position": 4294
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/lever-pull/clip.png",
+                "caption": "",
+                "position": 4298
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/lever-pull/dinov2.png",
+                "caption": "",
+                "position": 4302
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/lever-pull/siglip.png",
+                "caption": "",
+                "position": 4306
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/lever-pull/sigma.png",
+                "caption": "",
+                "position": 4310
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/peg-unplug-side/original.png",
+                "caption": "",
+                "position": 4321
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/peg-unplug-side/r3m.png",
+                "caption": "",
+                "position": 4325
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/peg-unplug-side/vc1.png",
+                "caption": "",
+                "position": 4329
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/peg-unplug-side/liv.png",
+                "caption": "",
+                "position": 4333
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/peg-unplug-side/clip.png",
+                "caption": "",
+                "position": 4337
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/peg-unplug-side/dinov2.png",
+                "caption": "",
+                "position": 4341
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/peg-unplug-side/siglip.png",
+                "caption": "",
+                "position": 4345
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/peg-unplug-side/sigma.png",
+                "caption": "",
+                "position": 4349
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/push-wall/original.png",
+                "caption": "",
+                "position": 4360
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/push-wall/r3m.png",
+                "caption": "",
+                "position": 4364
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/push-wall/vc1.png",
+                "caption": "",
+                "position": 4368
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/push-wall/liv.png",
+                "caption": "",
+                "position": 4372
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/push-wall/clip.png",
+                "caption": "",
+                "position": 4376
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/push-wall/dinov2.png",
+                "caption": "",
+                "position": 4380
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/push-wall/siglip.png",
+                "caption": "",
+                "position": 4384
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/push-wall/sigma.png",
+                "caption": "",
+                "position": 4388
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/reach/original.png",
+                "caption": "",
+                "position": 4399
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/reach/r3m.png",
+                "caption": "",
+                "position": 4403
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/reach/vc1.png",
+                "caption": "",
+                "position": 4407
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/reach/liv.png",
+                "caption": "",
+                "position": 4411
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/reach/clip.png",
+                "caption": "",
+                "position": 4415
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/reach/dinov2.png",
+                "caption": "",
+                "position": 4419
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/reach/siglip.png",
+                "caption": "",
+                "position": 4423
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/reach/sigma.png",
+                "caption": "",
+                "position": 4427
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/shelf-place/original.png",
+                "caption": "",
+                "position": 4438
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/shelf-place/r3m.png",
+                "caption": "",
+                "position": 4442
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/shelf-place/vc1.png",
+                "caption": "",
+                "position": 4446
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/shelf-place/liv.png",
+                "caption": "",
+                "position": 4450
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/shelf-place/clip.png",
+                "caption": "",
+                "position": 4454
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/shelf-place/dinov2.png",
+                "caption": "",
+                "position": 4458
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/shelf-place/siglip.png",
+                "caption": "",
+                "position": 4462
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/shelf-place/sigma.png",
+                "caption": "",
+                "position": 4466
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/sweep-into/original.png",
+                "caption": "",
+                "position": 4477
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/sweep-into/r3m.png",
+                "caption": "",
+                "position": 4481
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/sweep-into/vc1.png",
+                "caption": "",
+                "position": 4485
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/sweep-into/liv.png",
+                "caption": "",
+                "position": 4489
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/sweep-into/clip.png",
+                "caption": "",
+                "position": 4493
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/sweep-into/dinov2.png",
+                "caption": "",
+                "position": 4497
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/sweep-into/siglip.png",
+                "caption": "",
+                "position": 4501
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/sweep-into/sigma.png",
+                "caption": "",
+                "position": 4505
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-box/original.png",
+                "caption": "",
+                "position": 4516
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-box/r3m.png",
+                "caption": "",
+                "position": 4520
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-box/vc1.png",
+                "caption": "",
+                "position": 4524
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-box/liv.png",
+                "caption": "",
+                "position": 4528
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-box/clip.png",
+                "caption": "",
+                "position": 4532
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-box/dinov2.png",
+                "caption": "",
+                "position": 4536
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-box/siglip.png",
+                "caption": "",
+                "position": 4540
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-box/sigma.png",
+                "caption": "",
+                "position": 4544
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-laptop-lid/original.png",
+                "caption": "",
+                "position": 4555
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-laptop-lid/r3m.png",
+                "caption": "",
+                "position": 4559
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-laptop-lid/vc1.png",
+                "caption": "",
+                "position": 4563
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-laptop-lid/liv.png",
+                "caption": "",
+                "position": 4567
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-laptop-lid/clip.png",
+                "caption": "",
+                "position": 4571
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-laptop-lid/dinov2.png",
+                "caption": "",
+                "position": 4575
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-laptop-lid/siglip.png",
+                "caption": "",
+                "position": 4579
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/close-laptop-lid/sigma.png",
+                "caption": "",
+                "position": 4583
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/unplug-charger/original.png",
+                "caption": "",
+                "position": 4594
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/unplug-charger/r3m.png",
+                "caption": "",
+                "position": 4598
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/unplug-charger/vc1.png",
+                "caption": "",
+                "position": 4602
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/unplug-charger/liv.png",
+                "caption": "",
+                "position": 4606
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/unplug-charger/clip.png",
+                "caption": "",
+                "position": 4610
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/unplug-charger/dinov2.png",
+                "caption": "",
+                "position": 4614
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/unplug-charger/siglip.png",
+                "caption": "",
+                "position": 4618
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/unplug-charger/sigma.png",
+                "caption": "",
+                "position": 4622
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/water-plants/original.png",
+                "caption": "",
+                "position": 4633
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/water-plants/r3m.png",
+                "caption": "",
+                "position": 4637
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/water-plants/vc1.png",
+                "caption": "",
+                "position": 4641
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/water-plants/liv.png",
+                "caption": "",
+                "position": 4645
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/water-plants/clip.png",
+                "caption": "",
+                "position": 4649
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/water-plants/dinov2.png",
+                "caption": "",
+                "position": 4653
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/water-plants/siglip.png",
+                "caption": "",
+                "position": 4657
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30350/2605.30350v1/figures/appendix/pca/water-plants/sigma.png",
+                "caption": "",
+                "position": 4661
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
