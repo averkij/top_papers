@@ -1,0 +1,151 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/sleepy_tom.png",
+                "caption": "",
+                "position": 217
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x1.png",
+                "caption": "Figure 1:Left: This paper aims to improve the inference efficiency of video understanding based on video large language models (LLMs). Latency profiling suggests the major speed bottleneck lies in the vision encoder part instead of the LLM. Knowing this, we introduceEarlyTom, a training-freetoken compression method designed for theearlystage (i.e., vision encoder) of video LLMs. EarlyTom features two core components: (1) early-stage visual token compression achieved via inner vision encoder frame merging, and (2) a spatial token selection strategy that further increases compression effectiveness without introducing bias.Right: Scatter plot illustrating the relationship between FLOPs and throughput, along with the average performance across four widely used video understanding benchmarks (MVBench, EgoSchema, LongVideoBench, and VideoMME) for several training-free state-of-the-art methods. EarlyTom achieves state-of-the-art performance while maintaining accuracy comparable to full-token methods.",
+                "position": 239
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x2.png",
+                "caption": "Figure 2:The video sink tokens.We visualize videos across datasets to illustrate the video attention sinking phenomenon: certain tokens (specific frames/regions) consistently attract disproportionately high attention (as shown in the attention score heatmaps), revealing that existing top-K-based token compression methods overlook semantic information in other frames and limit video context understanding.",
+                "position": 299
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x3.png",
+                "caption": "Figure 3:Time-to-first-token (TTFT) latency composition.We break down TTFT into four parts: vision encoding, visual token processing, LLM prefill, and system overhead. In the baseline, vision encoding takes 323 ms, accounting for 36.3% of the total, indicating that this stage still has substantial room for optimization. For state-of-the-art methods like HoliTom and VisionZip, vision encoding remains the largest component, occupying 55.8% (324 ms) and 68.4% (325 ms), respectively. In addition, HoliTom introduces extra token-processing overhead, increasing this component by 121.9% (+78 ms) compared to the baseline. In contrast, our method reduces vision encoding time directly inside the encoder, achieving a 2.65×\\timesTTFT reduction over the baseline while adding almost no additional overhead, evaluated under 10% token retention on an NVIDIA A100 GPU.",
+                "position": 302
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x4.png",
+                "caption": "Figure 4:Overall pipeline of EarlyTom.Our method consists of two main stages for efficient video token compression.Stage I: Inner-vision encoder frame merging performs temporal compression inside the vision encoder. The video is adaptively segmented based on streaming frame similarity, redundant middle frames are merged using a local-optimal criterion, and merged representations are further refined with weighted fusion to reduce early-stage temporal redundancy.Stage II: Decoupling selection conducts spatial token reduction after vision encoding. Merged frame features are decomposed into dynamic and static token sets: dynamic frames undergo global Top-K selection, while static frames use local-window selection to preserve spatial distribution. The selected tokens from both paths are recombined and fed into the LLM for decoding. Together, these two stages enable early temporal compression and balanced spatial sampling, significantly accelerating Video LLM inference while maintaining semantic fidelity.",
+                "position": 309
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x5.png",
+                "caption": "Figure 5:Frames compression and distribution of features.(a) Illustrates the cosine similarity changes across different frame indices for network layers at indices 6 and 20 during frame compression in the vision encoder. (b) The distribution of raw tokens, top-K sampling, and our method. This subfigure shows that our method is closer to vanilla top-K selection.",
+                "position": 387
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Overview",
+        "images": []
+    },
+    {
+        "header": "AGeneralizability Analysis on LLaVA-Video and Qwen2.5-VL",
+        "images": []
+    },
+    {
+        "header": "BDetailed Analysis of TTFT Latency Decomposition",
+        "images": []
+    },
+    {
+        "header": "CVisualization of the Attention Sink Phenomenon Across Diverse Video Samples",
+        "images": []
+    },
+    {
+        "header": "DPseudocode of EarlyTom",
+        "images": []
+    },
+    {
+        "header": "EFuture Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x6.png",
+                "caption": "Figure 6:Additional visualizations of attention score distributions. We present the attention heatmaps from the SigLIP vision encoder across six randomly selected videos. The consistent vertical stripes (highlighted in bright colors) indicate that specific spatial tokens accumulate disproportionately high attention scores throughout the temporal sequence. This observation confirms that attention “sinks” are a widely existing structural characteristic in the vision encoder, motivating the design of our decoupled token selection strategy.",
+                "position": 2956
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x7.png",
+                "caption": "(a)10% token retention rate.",
+                "position": 2959
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x7.png",
+                "caption": "(a)10% token retention rate.",
+                "position": 2962
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x8.png",
+                "caption": "(b)15% token retention rate.",
+                "position": 2967
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x9.png",
+                "caption": "(c)20% token retention rate.",
+                "position": 2973
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x10.png",
+                "caption": "(d)25% token retention rate.",
+                "position": 2978
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x11.png",
+                "caption": "(a)10% token retention rate.",
+                "position": 2985
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x11.png",
+                "caption": "(a)10% token retention rate.",
+                "position": 2988
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x12.png",
+                "caption": "(b)15% token retention rate.",
+                "position": 2993
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x13.png",
+                "caption": "(c)20% token retention rate.",
+                "position": 2999
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30010/2605.30010v1/x14.png",
+                "caption": "(d)25% token retention rate.",
+                "position": 3004
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
