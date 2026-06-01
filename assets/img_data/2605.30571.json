@@ -1,0 +1,104 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30571/2605.30571v1/x1.png",
+                "caption": "Figure 1:The inverted deployment ladder for single-stream 7–8B decode.\nLeft: achieved fraction of peak HBM bandwidth at Qwen-2.5-7B ctx=2048{=}2048batch 1 across four NVIDIA GPUs; L4 reaches 79% of its peak, H100 only\n27%. Right: step time for the same workload after applying the best\nlever per GPU; L4 with GPTQ+{+}ExLlamaV2 (17.36 ms) closes most of the\ngap to H100 with CUDA Graphs (11.78 ms) despite the H100 having11×11\\timesthe peak HBM bandwidth.",
+                "position": 410
+            }
+        ]
+    },
+    {
+        "header": "2Related work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": []
+    },
+    {
+        "header": "4Results: the main matrix",
+        "images": []
+    },
+    {
+        "header": "5The CUDA Graphs A/B test",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30571/2605.30571v1/x2.png",
+                "caption": "Figure 5:CUDA Graphs A/B speedup versus context length and batch size on\nH100 and L4. The H100 b=1{=}1ctx=2048{=}2048point is theN=10N{=}10mean\n(Table2); shading is the 95% bootstrap CI on the\nmean. Other H100 b=1{=}1points are single-session from the v11 main\nsweep. H100 b=4{=}4is the v13 batch sweep\n(Table4). L4 b=1{=}1replicates to four significant\nfigures across the v12 sweep. L4 b=4{=}4is omitted: every cell OOMs.\nThe dotted line at1.15×1.15\\timesis the pre-registered falsification\nthreshold.",
+                "position": 1433
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30571/2605.30571v1/x3.png",
+                "caption": "Figure 6:Eager and graphed H100 ctx=2048{=}2048b=1{=}1step times underN=10N{=}10(this work) andN=3N{=}3(v12). TheN=3N{=}3eager outlier at\n27.28 ms drives the 35.3% CV reported in earlier versions; theN=10N{=}10eager distribution is tight (CV 0.9%) and bounds the noise\nfloor decisively. The graphed distribution is tight in both samples.",
+                "position": 1444
+            }
+        ]
+    },
+    {
+        "header": "6Software stack matrix: SDPA backends, FlashAttention, FlashInfer",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30571/2605.30571v1/x4.png",
+                "caption": "Figure 7:Per-layer attentionp50p_{50}on H100 with explicit SDPA backend\nselection plus FlashAttention-3 and FlashInfer. Default SDPA (top,\nhighlighted) is faster than every pinned backend includingFLASH_ATTENTION, FlashInfer and FA-3 at this single-decode\nshape (Llama-3-8B, n_q_heads=32{=}32, n_kv_heads=8{=}8,\nhead_dim=128{=}128, ctx=2048{=}2048, bf16, H100). Error bars are SD across\nthree sessions.CUDNN_ATTENTIONis not supported for this\nshape on H100 SXM5 PyTorch 2.8+cu126. The kernel choice is not the\nbinding constraint; the launch sequence is.",
+                "position": 1683
+            }
+        ]
+    },
+    {
+        "header": "7Quantisation baseline on L4",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30571/2605.30571v1/x5.png",
+                "caption": "Figure 8:L4 quantisation step times for Qwen-2.5-7B at ctx=2048{=}2048. bf16\n(62.32 ms), bnb-nf4 (59.36 ms), AutoAWQ+{+}Marlin (45.24 ms),\nGPTQ+{+}ExLlamaV2 EXL2 4.25bpw (17.36 ms). The Marlin kernel was tuned\nfor SM80 (Ampere); ExLlamaV2’s int4 GEMMs are tuned for SM89 (Ada) and\nrecover most of the bandwidth saving the bit-width reduction predicts.",
+                "position": 1797
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30571/2605.30571v1/x6.png",
+                "caption": "Figure 9:Cost-per-million-tokens-served at batch-1 streaming decode,\nQwen-2.5-7B ctx=2048{=}2048, derived from per-step time and Modal published\nhourly rates as of May 2026. The L4 with ExLlamaV2 serves the same\nworkload at substantially lower $/Mtok than the H100 with CUDA Graphs.\nNumbers depend on hourly rates and exclude idle, networking and storage;\nthe ladder direction is the point.",
+                "position": 1840
+            }
+        ]
+    },
+    {
+        "header": "8Per-kernel evidence with torch.profiler",
+        "images": []
+    },
+    {
+        "header": "9Limitations and threats to validity",
+        "images": []
+    },
+    {
+        "header": "10Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix AReproducibility",
+        "images": []
+    },
+    {
+        "header": "Appendix BPer-cell observed step times and bandwidth floors",
+        "images": []
+    },
+    {
+        "header": "Appendix CFailed experiments and missing cells",
+        "images": []
+    },
+    {
+        "header": "Appendix DKernel count and replicate terminology",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
