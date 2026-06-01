@@ -1,0 +1,122 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.31598/2605.31598v1/x1.png",
+                "caption": "Figure 1:Overview of StateKV. Left: a frozen pretrained VLM processes a video incrementally, one frame at a time. While StateKV maintains approximately constant marginal video-prefill compute per added frame (red), unmodified full self-attention (gray) incurs in increasing per-frame cost. This yields linear video-prefill scaling in the number of frames for StateKV, in contrast to quadratic scaling for the base model. Right: compute-accuracy frontier at 512 frames (VideoMME), where StateKV surpasses ReKV and full self-attention operating points across practical compute budgets.",
+                "position": 290
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.31598/2605.31598v1/x2.png",
+                "caption": "Figure 2:Single-transformer-layer view of StateKV, showing the required modifications to a transformer block. The video stream is processed frame-by-frame with\na frozen backbone. A fixed-capacity compressed state (in blue) allows information from previous frames to flow through a fixed size set of sink tokens during prefill. Separately, we build a full length detailed state for decoding (shown in red).",
+                "position": 406
+            }
+        ]
+    },
+    {
+        "header": "4Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.31598/2605.31598v1/x3.png",
+                "caption": "Figure 3:Total compute to preprocess a 512-frame video (in GFLOPs) versus performance on VideoMME across three model sizes of the same model family (InternVL3 1B, 2B, 8B). Marker shape denotes which self-attention approximation (or Full SA) is used, while color denotes model size: circles are the 512-frame Full Self-Attention, triangles are StateKV operating points at cache budgetsB∈{16,64,256,1024,4096,16384}B\\in\\{16,64,256,1024,4096,16384\\}, and squares are ReKV operating points at retained-frame budgetsR∈{1,4,16,64}R\\in\\{1,4,16,64\\}.\nConstant-FLOPs-per-frame methods reduce FLOPs compared to full self-attention while preserving accuracy. Of these, StateKV achieves accuracy competitive with full self-attention and enables larger models under the same budget. For instance, StateKV-8B withB=4096B=4096achieves 62.5% accuracy at similar compute cost as Full SA-1B (46.2%). Compared to existing sliding-window based methods like ReKV, StateKV achieves superior accuracy at comparable compression levels. The right and bottom supporting bars use one representative operating point per method: StateKV withB=4096B=4096and ReKV with a 16-frame window (plus Full SA). These are compute-matched, so the bars isolate the quality difference at similar compute.",
+                "position": 653
+            },
+            {
+                "img": "https://arxiv.org/html/2605.31598/2605.31598v1/x4.png",
+                "caption": "Figure 4:Comparison of VideoMME accuracy across context budgets for InternVL3-1B/2B/8B. The dotted lines show Full SA (target behavior), while ReKV and StateKV trace budgeted approximations. Across short, medium, and long videos, StateKV stays consistently closer to the Full SA accuracy frontier than ReKV at comparable budgets, indicating a stronger approximation of full attention under constrained compute.",
+                "position": 955
+            },
+            {
+                "img": "https://arxiv.org/html/2605.31598/2605.31598v1/x5.png",
+                "caption": "Figure 5:Compute cost versus frame index. Left: marginal FLOPs per frame. Right: cumulative FLOPs. Dotted curves denote full self-attention and solid curves denote StateKV.",
+                "position": 987
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.AEmpirical validation of the assumptions",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.31598/2605.31598v1/x6.png",
+                "caption": "Figure 6:Validation of Assumption 1 on 16 long videos from the VideoMME training split, using 128 frames sampled approximately uniformly over each full video and budgetsB∈{1,4,16,64,256,1024,4096,16384}B\\in\\{1,4,16,64,256,1024,4096,16384\\}. Each panel shows one model scale (InternVL3-1B/2B/8B). For each framenn, we compute attention with the full key set available to that frame, then reportCn,BℓC_{n,B}^{\\ell}, the fraction of totalhistoricalattention mass assigned to the top-BBhistorical tokens from frames<n<n. Rapid saturation of these curves is the direct evidence for the bounded-sink assumption.",
+                "position": 1116
+            },
+            {
+                "img": "https://arxiv.org/html/2605.31598/2605.31598v1/x7.png",
+                "caption": "Figure 7:Primary validation of Assumption 2 on the same 16-video, 128-frame setting. Each panel shows one model scale (InternVL3-1B/2B/8B). For each layer and budgetBB,SnℓS_{n}^{\\ell}is the oracle top-BBstate over all tokens seen up to and including framenn, and the plotted quantity is the weighted recallR~n+1,Bℓ\\widetilde{R}_{n+1,B}^{\\ell}ofSn+1ℓS_{n+1}^{\\ell}by the incremental candidate poolSnℓ∪framen+1S_{n}^{\\ell}\\cup\\text{frame}_{n+1}. High values mean that the most important members of the next oracle state are already present in the previous state plus the current frame, which is the specific slow-evolution claim used by StateKV.",
+                "position": 1191
+            },
+            {
+                "img": "https://arxiv.org/html/2605.31598/2605.31598v1/x8.png",
+                "caption": "Figure 8:Additional analysis of Assumption 2 on the same 16-video, 128-frame setting. Retention measures the fraction of the oracle state that persists from framennto framen+1n+1, while churn measures the fraction ofSn+1ℓS_{n+1}^{\\ell}that is newly admitted. The repeated weighted-recall curve is included to distinguish exact set turnover from loss of high-mass sinks. The resulting pattern clarifies that the temporal state is not static, but changes in a structured way: a stable core persists even when a larger set of lower-mass sinks turns over.",
+                "position": 1194
+            },
+            {
+                "img": "https://arxiv.org/html/2605.31598/2605.31598v1/x9.png",
+                "caption": "Figure 9:Supporting comparison to recency-based retention on the same 16-video, 128-frame setting. Each panel shows one model scale (InternVL3-1B/2B/8B). The attention-based curve reportsCn,BℓC_{n,B}^{\\ell}, the historical attention mass captured by top-BBhistorical tokens, while the recency baseline is evaluated at the explicit operating points corresponding to keeping the most recent11,44,1616, or6464frames. This figure is not a direct assumption test, but it shows why the observed attention structure matters: if the main historical mass lies on a combination of recent frames and persistent long-range anchors, then a pure sliding window should underperform attention-based selection at comparable budgets.",
+                "position": 1226
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.BWall-time comparison under mismatched attention kernels",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.31598/2605.31598v1/x10.png",
+                "caption": "Figure 10:Measured wall time per frame versus frame index on a single NVIDIA L40S with batch size 1, comparing Full Self-Attention with FlashAttention-2 against StateKV with eager attention during cache building. For each point, we time the model forward pass for processing one additional frame given the preceding cache at the corresponding frame index, after warmup, and report standard-deviation error bars over repeated measurements. Solid colored curves sweep StateKV cache sizes{256,1024,4096,16384}\\{256,1024,4096,16384\\}, while the dashed dark curve is the Full SA FlashAttention-2 baseline. Despite giving the baseline the more efficient attention kernel, the bounded per-frame cost of StateKV overtakes the linearly increasing cost of full self-attention for sufficiently long sequences.",
+                "position": 1246
+            },
+            {
+                "img": "https://arxiv.org/html/2605.31598/2605.31598v1/x11.png",
+                "caption": "Figure 11:Measured wall time per frame versus frame index on a single NVIDIA L40S with batch size 1, comparing Full Self-Attention with FlashAttention-2 against StateKV with the Triton kernel during cache building. Format matches Fig.10: solid colored curves sweep StateKV cache sizes{256,1024,4096,16384}\\{256,1024,4096,16384\\}, while the dashed dark curve is the Full SA FlashAttention-2 baseline. Using the Triton kernel moves the crossover to shorter sequences compared to the eager-attention baseline.",
+                "position": 1263
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.CAdditional Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.31598/2605.31598v1/x12.png",
+                "caption": "Figure 12:Marginal compute cost of processing another frame (in GFLOPs) versus performance on VideoMME across three model sizes of the same model family (InternVL3 1B, 2B, 8B). Marker shape denotes which self-attention approximation (or Full SA) is used, while color denotes model size: circles are Full Self-Attention measured at frames32,64,128,256,32,64,128,256,and512512, triangles are StateKV operating points at cache budgetsB∈{16,64,256,1024,4096,16384}B\\in\\{16,64,256,1024,4096,16384\\}, and squares are ReKV operating points at retained-frame budgetsR∈{1,4,16,64}R\\in\\{1,4,16,64\\}. Full Self-Attention shows linear growth with video length, requiring increasingly more FLOPs as the prefix grows. In contrast, KV cache compression methods maintain constant marginal cost regardless of video length, trading off context preservation versus more aggressive compression for lower compute cost. StateKV significantly reduces FLOPs compared to full self-attention at the same model size while maintaining competitive accuracy. Conversely, for a given compute budget StateKV allows us to run larger, more accurate models. For instance, StateKV-8B withB=4096B=4096achieves 62.5% accuracy at similar compute cost as Full SA-1B (46.2%). Compared to existing sliding-window based methods like ReKV, StateKV achieves superior accuracy at all comparable compression levels. The right and bottom supporting panels summarize key per-experiment accuracy/FLOPs comparisons, and the lower-right panel reports the corresponding compute-accuracy tradeoff callouts.",
+                "position": 1272
+            },
+            {
+                "img": "https://arxiv.org/html/2605.31598/2605.31598v1/x13.png",
+                "caption": "Figure 13:Compute cost versus frame index up to 3600 frames. Top: linear scale. Bottom: log scale. Left in each panel: marginal FLOPs per frame. Right: cumulative FLOPs. Dotted curves denote full self-attention and solid curves denote StateKV.",
+                "position": 1285
+            },
+            {
+                "img": "https://arxiv.org/html/2605.31598/2605.31598v1/x14.png",
+                "caption": "",
+                "position": 1289
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
