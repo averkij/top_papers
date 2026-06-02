@@ -1,0 +1,114 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.00761/2606.00761v1/x1.png",
+                "caption": "Figure 1:Illustration of how routing confidence modulates gate sharpness in aκ\\kappa-SwiGLU instance. The shaded region denotes the subset of embedding space routed to a particular expert. Tokens closer to the expert’s router weight vector (center arrow) have higher routing confidence, which can induce different gate sharpness depending on the learned confidence–sharpness mapping. The small SiLU curves illustrate the corresponding gate-sharpness changes; Figure2provides a magnified view of this mechanism.",
+                "position": 241
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00761/2606.00761v1/x2.png",
+                "caption": "Figure 2:Two mechanisms by which routing confidence can influence expert gates. Left: naturally emerging router–gate alignment implicitly shifts the input to the SiLU gate, moving tokens across different regions of the same gate curve. Right:κ\\kappa-SwiGLU explicitly changes the gate curve itself by modulating its sharpness with a token-dependent multiplicative coefficient.",
+                "position": 277
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.00761/2606.00761v1/x3.png",
+                "caption": "Figure 3:Cosine similarity between router weight vectors and routed token embeddings during training, measured over all routed token–expert pairs in the 7th layer of an 8-layer MoE. The similarities stabilize between0.0750.075and0.250.25, with a mean of0.150.15. It indicates that tokens routed to an expert have non-negligible alignment with its router direction, yielding high router logits.",
+                "position": 333
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00761/2606.00761v1/x4.png",
+                "caption": "(a)Layer 4",
+                "position": 348
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00761/2606.00761v1/x4.png",
+                "caption": "(a)Layer 4",
+                "position": 351
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00761/2606.00761v1/x5.png",
+                "caption": "(b)Layer 7",
+                "position": 357
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00761/2606.00761v1/x6.png",
+                "caption": "Figure 5:Empirically observed implicit bias in expert gates induced by router–gate alignment. We compute the bias term(we,j⊤​r^e)​a(w_{e,j}^{\\top}\\hat{r}_{e})afor each gate projection across all experts in two representative layers of an 8-layer MoE, and report the mean of the top and bottom5%5\\%values. The top5%5\\%biases remain consistently positive, while the bottom5%5\\%remain consistently negative, indicating that router–gate alignment can systematically shift subsets of expert gates in opposite directions.",
+                "position": 396
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00761/2606.00761v1/x7.png",
+                "caption": "Figure 6:TheSiLUκ​(z)\\mathrm{SiLU}_{\\kappa}(z)function under different sharpness coefficientsκ\\kappa. Largerκ\\kappayields a sharper transition between inactive and active states around zero, while smallerκ\\kappayields a smoother transition. The right panel shows the corresponding gradient,dd​z​SiLUκ​(z)\\frac{d}{dz}\\mathrm{SiLU}_{\\kappa}(z), where differentκ\\kappavalues lead to substantially different gradient profiles near the transition region around zero.",
+                "position": 421
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.00761/2606.00761v1/x8.png",
+                "caption": "Figure 7:Performance comparison betweenκ\\kappa-SwiGLU and standard SwiGLU across different layers of standard MoE models. The y-axis reports the centered CORE score, computed as the average score across 22 CORE benchmarks relative to a fixed-answer baseline.κ\\kappa-SwiGLU improves over standard SwiGLU at all evaluated standard MoE depths.",
+                "position": 717
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00761/2606.00761v1/x9.png",
+                "caption": "Figure 8:Performance comparison betweenκ\\kappa-SwiGLU and standard SwiGLU across different numbers of total layers in sandwiched MoE models. The y-axis reports the centered CORE score, computed as the average score across 22 CORE benchmarks relative to a fixed-answer baseline.κ\\kappa-SwiGLU consistently outperforms standard SwiGLU for models with more than 16 layers, with slightly larger gains at higher layer counts.",
+                "position": 720
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Limitations",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ABreakdown of CORE Results",
+        "images": []
+    },
+    {
+        "header": "Appendix BEmpirical Analysis ofκ\\kappa-SwiGLU",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.00761/2606.00761v1/x10.png",
+                "caption": "Figure 9:The mean of the top and bottom5%5\\%of the learnedκ\\kappavalues in the 9th layer of a 12-layer MoE.\nDuring the first 1,100 training iterations, theκ\\kappavalues are frozen at 1, corresponding to the standard SiLU gate.\nAfterward, they rapidly diverge: the top5%5\\%increase to around2.52.5, while the bottom5%5\\%decrease to around0.40.4.\nThis indicates thatκ\\kappa-SwiGLU initially learns both sharper, more selective gates and smoother, more broadly active gates.\nIn the second half of training, the values gradually move back toward 1, suggesting that the model later adopts a more moderate modulation of gate sharpness.",
+                "position": 1997
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00761/2606.00761v1/x11.png",
+                "caption": "Figure 10:Mean of the positive subsets of the learned scale and bias parameters,α\\alphaandbb, in theκ\\kappaparameterization in Eq. (3) for the 9th layer of a 12-layer MoE. Bothα\\alphaandbbfollow trends similar to the resulting sharpness coefficientκ\\kappa. The negative subsets ofα\\alphaandbbare approximately symmetric.",
+                "position": 2005
+            }
+        ]
+    },
+    {
+        "header": "Appendix CScaling of Computational Budgets",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
