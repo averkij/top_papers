@@ -1,0 +1,174 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x1.png",
+                "caption": "Figure 1:Conceptual illustration of modality hierarchy and WALL-WM’s general performance.Left:a stylized alignment landscape over semantic abstraction and spatial-temporal precision. Text provides coarse semantic alignment, vision provides denser spatial-temporal grounding, and action requires fine-grained contact-sensitive precision. Tactile-force input, when available, is treated as an optional contact-rich signal rather than a required modality.Right:WALL-WM shows clear advantages across manipulation-task performance and video-generation metrics, indicating that event-grounded pretraining improves both executable control and future-observation modeling.Bottom:representative real-robot task snapshots provide illustrative examples of the physical tasks.",
+                "position": 360
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x2.png",
+                "caption": "Figure 2:Next-event training and equilong-chunk schemes.In prior-aligned training, the event caption, event video, and event action describe the same semantic interval, giving a well-posed caption-to-video/action target.\nIn equilong-chunk mode, a global instruction alone is ambiguous for a local chunk; adding history windows restores a well-posed next-chunk prediction problem.",
+                "position": 449
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Architecture Design: Event-Centric World Action Modeling",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x3.png",
+                "caption": "Figure 3:Overall framework ofWALL-WM.WALL-WMimplementsevent-centricworld action modeling as a layer-coupled video-action denoiser: given the current multi-view observation and a next-event instruction, it jointly denoises future video latents and the corresponding end-effector trajectory.\nThe figure is organized as three subfigures.\n(a) supplies instruction: event mode routes next-event language into the shared text conditioner (T5(62)embeds in the figure), whereas unified mode routes through a Staircase decoder to CoT latents.\n(b) is the event-centric world model—a Multi-View Video DiT denoises video latents and an Action Transformer denoises actions;ExecuteandRolloutclose the control loop above.\n(c) summarizes the spatial-temporal fusion that threadsNv=3N_{v}{=}3camera streams through the stack: view folding that preserves the inherited within-view self-attention with its 3D RoPE positional encoding (S1), cross-view mixing in each DiT block (S2), token-axisViewConcat(S3), and one-way block-wise coupling of fused video keys/values into the action tower at every depth (S4).",
+                "position": 544
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x4.png",
+                "caption": "Figure 4:Cross-view masking inWALL-WM’s view attention.(a) Sight-cone mask.A token pair(u,u′)(u,u^{\\prime})is allowed to attend if and only if their back-projected sight cones share a 3D region in front of both cameras; the resulting binary maskℳsc\\mathcal{M}_{\\text{sc}}is added as a(1−ℳsc)​(−∞)(1-\\mathcal{M}_{\\text{sc}})(-\\infty)attention bias, with intra-view pairs always allowed (matrix diagonal).(b) Tube mask.A spatial window on one viewv∗v^{*}is masked across all latent frames—and, with nested probability, also on the InP conditioning channel𝐲\\mathbf{y}—leaving cross-view attention to the other views as the only path that can recover the masked content; the in-tubevv-prediction loss is up-weighted as in the flow-matching objective below.\nBoth masks are training-only, so the runtime path stays calibration-free.",
+                "position": 649
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x5.png",
+                "caption": "Figure 5:Observation-centered window (M=1M{=}1).One 3D VAE pass encodes a1+4​M+4​N1{+}4M{+}4Nraw buffer into1+M+N1{+}M{+}Nlatents.\nEach latent carriesKpK_{p}relative-pose action tokens (𝟎\\mathbf{0}at the anchor)",
+                "position": 773
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x6.png",
+                "caption": "Figure 6:Comparison of three CoT reasoning schedules.(a)Traditional CoT autoregressively emits discrete vocabulary tokens.(b)Latent CoT replaces discrete tokens with continuous latent vectors while preserving the serial dependency.(c)Our staircase latent reasoning relays intermediate hidden states across staggered layer depths, producing parallel continuous CoT latents through a shared projector.",
+                "position": 956
+            }
+        ]
+    },
+    {
+        "header": "4Training Data",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x7.png",
+                "caption": "Figure 7:Internal self-developed deployment platform.",
+                "position": 987
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x8.png",
+                "caption": "Figure 8:Data-source map of theWALL-WMdataset.The four quadrants group general internet video, egocentric video, non-embodiment data, and heterogeneous teleoperation/open robot data; the center denotes human-intervention and failure-recovery data used to enrich contact-rich corrections.\nData sources include OpenVID(55), HD-VILA(79), Ego4D(25), EPIC-KITCHENS(18), DROID(40), AgiBot World(10), and self-collected data(73).",
+                "position": 1000
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x9.png",
+                "caption": "Figure 9:Distribution statistics of the[video+action]data.The plots show normalized coverage across scene categories, episode-duration ranges, and atomic-action labels. Scene and duration categories are reported as percentage distributions, while atomic actions indicate the percentage of episodes containing each action label.",
+                "position": 1005
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x10.png",
+                "caption": "Figure 10:XRZero-G0 no-embodiment collection rig and its place alongside teleoperation(73).(Left)The wearable rig from two views: a VR-tracked headset carries three egocentric cameras (one top + two wrist-side feeds shown), an operator-borne backpack handles synchronization and edge-side compute, and a pair of handheld grippers reproduces the deployment robot’s end-effector geometry; the inset thumbnails show the three on-rig views (left wrist / top / right wrist) that the policy will eventually consume.(Right)XRZero-G0 sits alongside master-slave and VR teleoperation rather than replacing them: in the production recipe a small real-robotanchorfraction (the two teleoperation modes) is paired with a much larger no-embodiment volume (the XRZero-G0 rig), realizing the few-shot physical-anchoring regime characterized in(73).",
+                "position": 1018
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x11.png",
+                "caption": "Figure 11:Temporal Synchronization of[video+action]layers.We illustrate the process of temporal synchronization for a specific timestep.\n(a) Calculating the optical-flow motion cube from video data: we grayscale and normalize the camera RGB images, then calculate theoptical flowfrom the video data.\n(b) Before synchronization: there is a constant lagging between video signal and action signal.\n(c) We performed temporal synchronization calculating the correlation between the video signal and the action signal, and synchronized the action signal based on the results.",
+                "position": 1048
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x12.png",
+                "caption": "Figure 12:Four-level caption tracks for a single episode.The visualization stacks the four core lanes shown in the figure: Task (L3), Subtask (L2), Action (L1), and Segment (L0), aligned to the video timeline.",
+                "position": 1096
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x13.png",
+                "caption": "Figure 13:Caption-granularity distributions for balanced sampling.The five panels compare 30K samples at Instruction, Task (L3), Subtask (L2), Action (L1), and Segment (L0) granularities after action-boundary segmentation.\nFiner caption levels expose more localized long-tail modes that are consumed by the cluster-balanced dataloader.",
+                "position": 1131
+            }
+        ]
+    },
+    {
+        "header": "5Training and Inference Recipe",
+        "images": []
+    },
+    {
+        "header": "6Infrastructure",
+        "images": []
+    },
+    {
+        "header": "7Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x14.png",
+                "caption": "Figure 14:Qualitative results.Our method exhibits better alignment with real-world physical laws, showing more consistent motion and physically plausible interactions, while Wan2.1 and Wan2.2 frequently generate hallucinated objects or unrealistic dynamics (e.g., contact failures, object deformation).",
+                "position": 1828
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x15.png",
+                "caption": "Figure 15:Multi-view consistency and 3D awareness.3D Probe Error vs. Cross-view Correspondence Error (lower is better). WALL-WM achieves jointly low probe and correspondence errors, evidencing 3D-aware and view-consistent representations.",
+                "position": 1840
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x16.png",
+                "caption": "Figure 16:Real-robot Diverse Manipulation benchmark.Task Progress scores on direct tabletop manipulation tasks, including grasping, placing, pouring, spatial relocation, and color-conditioned placement.",
+                "position": 1896
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x17.png",
+                "caption": "Figure 17:Real-robot Reasoning Manipulation benchmark.Task Progress scores on tasks requiring semantic classification, ordering, matching, and instruction-conditioned selection.",
+                "position": 1921
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x18.png",
+                "caption": "Figure 18:Real-robot Dexterous Manipulation benchmark.Average Task Progress on contact-sensitive tasks that require precise insertion and fine object handling.",
+                "position": 1945
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x19.png",
+                "caption": "Figure 19:Real-robot Generalization benchmark.Task Progress scores in a complex tabletop scene where different instructions are issued in randomized order, testing scene grounding and compositional transfer.",
+                "position": 1969
+            }
+        ]
+    },
+    {
+        "header": "8Discussion",
+        "images": []
+    },
+    {
+        "header": "Contributors",
+        "images": []
+    },
+    {
+        "header": "9Appendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x20.png",
+                "caption": "Figure 21:Tri-view PCA consistency of Wan generative features.For a synchronizedego / left-wrist / right-wristtriplet (top: raw inputs), we extract intermediate Wan2.1 DiT features and project them with a PCA basis fit jointly across the three views (middle); the bottom row overlays the resulting PCA coloring onto the input frames.\nSemantically equivalent surfaces (the manipulated object, the operator’s hand, the empty bowl) receive consistent PCA signatures across cameras despite minimal raw-pixel overlap, and per-token cross-view cosine consistency stays at∼0.97\\sim\\!0.97.\nRead alongside(78,34), this provides a concrete visual rationale for treating the inherited Wan features as a visual-semanticandspatial substrate, rather than as a generic image prior.",
+                "position": 2228
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x21.png",
+                "caption": "Figure 22:Pre-training Tasks Overview.Representative pre-training tasks with four scene or event variations.\nRows are grouped by difficulty, and task names inblueindicate embodiment-free examples.\nInstructions are taken from human segment-level captions.",
+                "position": 2255
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x22.png",
+                "caption": "Figure 23:Real-Robot Evaluation Setup.Representative real-robot evaluation scenes.\nEach row shows one task with four scene variations and the\ncorresponding English sub-instructions.",
+                "position": 2264
+            },
+            {
+                "img": "https://arxiv.org/html/2606.01955/2606.01955v1/x23.png",
+                "caption": "Figure 24:Generated Video vs. Real Execution.Qualitative comparison between generated future video and real-robot\nexecution.Gdenotes generated frames andEdenotes execution frames.",
+                "position": 2272
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
