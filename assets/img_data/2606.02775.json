@@ -1,0 +1,136 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method: AURA-Mem",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.02775/2606.02775v1/x1.png",
+                "caption": "Figure 1:AURA-Mem in one picture: memory that knows when to shut up.The whole system is a learnedwrite gateplus a bounded fast-weight state wrapped around\nafrozenVLA backbone. At each tick the observationoto_{t}is summarised by the frozen\nbackbone (OpenVLA-OFT 7B, weights unchanged) into a latent tokenzt=proj​(ht)z_{t}{=}\\mathrm{proj}(h_{t}). An\naction-error write gategt=𝟏​[pt>τ]g_{t}{=}\\mathbf{1}[p_{t}{>}\\tau]decides whether to write: it firesonly on surprise, so most steps carry the state over untouched. The bounded fast-weight\nstateW∈ℝdk×dvW\\in\\mathbb{R}^{d_{k}\\times d_{v}}hasO(1) inference-state VRAM—a constant4,2244{,}224bytes (batch 1, fp32) regardless of horizon—and is read back asrtr_{t}, which\nconditions the next actionata_{t}; the executed action changes the world, closing the loop into\nthe next observation (dashed arc). The two AURA-Mem contributions are highlighted: thelearned write gate(writes only when the incoming token is action-relevant surprise)\nand thebounded O(1) state(constant bytes, never a growing cache). The backbone is\nnever fine-tuned; only the lightweight gate, projections, and memory read/write heads are\ntrained.",
+                "position": 909
+            },
+            {
+                "img": "https://arxiv.org/html/2606.02775/2606.02775v1/x2.png",
+                "caption": "Figure 2:AURA-Mem single control-step datapath.At each tickttthe frozen backbone summarises the raw observation into a latent tokenzt∈ℝdz_{t}\\in\\mathbb{R}^{d}. Three linear projections emit a queryq=θQ​zq{=}\\theta_{Q}z, keyk=θK​zk{=}\\theta_{K}z, and valuev=θV​zv{=}\\theta_{V}z; the fast-weight stateW∈ℝdk×dvW\\in\\mathbb{R}^{d_{k}\\times d_{v}}isreadfirst viao=q⊤​Wo{=}q^{\\top}Wto produce the memory\noutput before any write occurs. Thesurprisescalars=‖k​W−v‖22s{=}\\|kW-v\\|_{2}^{2}(the inner\nTTT reconstruction error, detached from the gradient graph) is fed together withzzand the\nprevious readoointo a small GateMLP, which emits a soft gate probabilitypt=σ​(ℓ/τ)p_{t}{=}\\sigma(\\ell/\\tau); a straight-through binariser producesgt∈{0,1}g_{t}{\\in}\\{0,1\\}in the\nforward pass while passing soft gradients backward. The gated TTT write isW←g⋅TTT​(W,z)+(1−g)⋅WW\\leftarrow g\\cdot\\mathrm{TTT}(W,z)+(1{-}g)\\cdot W: wheng=0g{=}0the state is\ncarried over byte-for-byte and no write traffic is incurred. The readoopasses to the\nActionIB head, which mapso→(μ,log⁡σ2)o\\to(\\mu,\\log\\sigma^{2}), samplesz′∼𝒩​(μ,σ2)z^{\\prime}\\sim\\mathcal{N}(\\mu,\\sigma^{2})(reparameterisation; meanμ\\muat eval), and predicts\nthe action chunk; the training loss isℒ=ℒaction+β​ℒIB+γ​ℒwrite\\mathcal{L}=\\mathcal{L}_{\\text{action}}+\\beta\\,\\mathcal{L}_{\\text{IB}}+\\gamma\\,\\mathcal{L}_{\\text{write}}.\nAt budgetN=32N{=}32the architecture uses 30,279 total parameters (21,447 gradient-active;\nsweep configdmodel=64d_{\\text{model}}{=}64,dk=dv=Nd_{k}{=}d_{v}{=}N); parameter counts scale withNN(20,935 / 30,279 / 55,111 total atN=16/32/64N{=}16/32/64). At every budget the parity variants\nare exactly parameter-matched; the GateMLP contributes+6,337+6{,}337gradient-active parameters\nnot present in the write-every-step baseline, a capacity asymmetry disclosed in\n§7and AppendixB.2.",
+                "position": 926
+            },
+            {
+                "img": "https://arxiv.org/html/2606.02775/2606.02775v1/x3.png",
+                "caption": "Figure 3:O(1) constant-shape state vs. growing KV-cache across a long episode.Top:AURA-Mem unrolled overTTsteps: the fast-weight tensorWWmaintains a\nfixed shape[dk×dv][d_{k}\\times d_{v}]at every step; only thecontentsofWWevolve, and\nonly on gate-selected steps (sparse ticks, filled circles); the resident inference-state\nfootprint is4,224 bytesthroughout (formula(dk​dv+dv)×batch×4(d_{k}d_{v}+d_{v}){\\times}\\text{batch}{\\times}4,dk=dv=32d_{k}{=}d_{v}{=}32), confirmed constant across\n100,000 steps on an NVIDIA L40S GPU.Bottom:a standard attention KV-cache unrolled\nover the sameTTsteps: each step appends a new row of256256bytes, growing to25,600,000 bytes(25.6 MB) at step 100,000,6,061×\\timeslarger\nthan AURA-Mem’s state (the KV contrast uses a local untrained stub with the same\ndimensionsdk=dv=32d_{k}{=}d_{v}{=}32, fp32, batch=1=1; not a trained transformer). Sparse writes\n(4.98–9.19×\\timesfewer than write-every-step, across state budgetsN=32N{=}32–6464) further\nreduce DRAM/HBM write traffic beyond the O(1) state-size advantage. (O(1) refers to the carried\ninference state only; see §3.2.)",
+                "position": 1298
+            }
+        ]
+    },
+    {
+        "header": "4Theory: an action-sufficiency value-loss bound",
+        "images": []
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.02775/2606.02775v1/x4.png",
+                "caption": "Figure 4:Write-bandwidth vs. accuracy frontier(noisy_long_recall,T=96T{=}96,N=64N{=}64, 4,000 training steps; Wong colorblind-safe palette; error bars: 95%tt-interval). Each point is one variant’s mean task success plotted against its mean write\nbandwidth (writes/sec, log scale) at the highest evaluated state budget (N=64N{=}64); lower\nbandwidth is preferable for DRAM/HBM wear and energy cost. AURA-Mem (blue star)\nachieves9.19×\\mathbf{9.19\\times}fewer writes per second than the write-every-step reference\n(ours:2.175±0.5512.175\\pm 0.551writes/s,n=3n{=}3seeds; dense:20.00020.000writes/s) at statistically\nindistinguishable task success (Δ​acc=+0.0005\\Delta\\text{acc}{=}{+}0.0005), while random-write and\nperiodic-write schedules at comparable bandwidth score≈0.366{\\approx}0.366success (vs. ours1.0001.000). Thelearned_token_gatevariant (sky-blue triangle) is a collapsed\ncomparator (g=0g{=}0always, writes/sec=0.000=0.000, success≈0.257\\approx 0.257) and should be read\nas a broken baseline, not a fair ablation; theN=64N{=}64ours result rests onn=3n{=}3seeds and\nthe task is saturated at this budget (both ours and write-every-step reach≈1.000{\\approx}1.000),\nso bandwidth efficiency rather than an accuracy gap is the meaningful discriminant.",
+                "position": 1789
+            },
+            {
+                "img": "https://arxiv.org/html/2606.02775/2606.02775v1/x5.png",
+                "caption": "Figure 5:Task success rate vs. state budgetNNon thehardnoisy_long_recallconfiguration (nkeys=16n_{\\text{keys}}{=}16,nvals=8n_{\\text{vals}}{=}8,nbindings=16n_{\\text{bindings}}{=}16,\ndistractor=0.5=0.5, overwrite=0.4=0.4,T=128T{=}128; up to 6 seeds per cell; chance floor0.1250.125;\nshaded bands: 95%tt-CI). AURA-Mem (solid blue) matchesfixed_size_state(solid green) at every tested budget (N∈{8,16,24,32}N{\\in}\\{8,16,24,32\\}): accuracy gaps areΔ∈{−0.016,+0.023,+0.006,+0.007}\\Delta{\\in}\\{-0.016,\\,+0.023,\\,+0.006,\\,+0.007\\}, with all Welch-ttand bootstrap 95% CIs\nincluding zero (parity, not superiority).full_recurrence(orange, write-every dense\nGRU with fixed hidden state) collapses to0.250.25–0.380.38success, far below parity and\napproaching the chance floor of0.1250.125at small budgets, demonstrating that dense writes do not automatically confer better task performance\non the hard configuration. TheN=16N{=}16AURA-Mem point is0.962±0.0230.962\\pm 0.023(n=6n{=}6healthy seeds); a single seed-1 collapse reproduces on rerun (both runs≈0.117{\\approx}0.117),\na genuine reproducible bad-seed failure that we exclude and disclose rather than silently drop.learned_token_gatecollapses tog=0g{=}0(≈\\approxchance) at all\nbudgets and is a broken comparator, not a meaningful ablation.",
+                "position": 1806
+            },
+            {
+                "img": "https://arxiv.org/html/2606.02775/2606.02775v1/x6.png",
+                "caption": "Figure 6:Accuracy vs. memory-footprint frontier(noisy_long_recall,T=96T{=}96,N=64N{=}64; Wong palette; error bars: 95%tt-CI). Each point plots a variant’s mean task\nsuccess against its mean per-step memory footprint (bytes, log scale); upper-left is\npreferable (high accuracy, low memory). AURA-Mem (blue star, annotated) achieves task\nsuccess1.000±0.0001.000\\pm 0.000(n=3n{=}3seeds) at a constant state footprint of4,2244{,}224bytes,6,061×6{,}061\\timessmaller than the KV-cache reference at 100,000 steps, while\nwrite-every-step andfixed_size_stateachieve comparable accuracy only at higher\nmemory cost. Random-write and periodic-write schedules are memory-matched to AURA-Mem but\nscore≈0.365{\\approx}0.365, confirming that low bandwidth alone does not suffice; the learned\naction-utility gate signal is necessary. The write-rate targetρ=0.15\\rho{=}0.15is held fixed:\nthis is a one-dimensional curve through the (success, bytes, writes/sec) surface, not a full\ntwo-dimensional Pareto sweep. TheN=64N{=}64ours result rests onn=3n{=}3seeds; memory\nfootprints are formula-derived constants confirmed over the 100k-step rollout (extended detail in Appendix Fig.14).",
+                "position": 1823
+            }
+        ]
+    },
+    {
+        "header": "6Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.02775/2606.02775v1/x7.png",
+                "caption": "Figure 7:Carried-state growth vs. horizon.AURA-Mem’s inference state is constant at4,2244{,}224bytes (batch 1, fp32) at every horizonTT, while a growing KV-cache scales linearly\nwithTT. The crossover is nearT=17T{=}17; beyond it the separation grows without bound.",
+                "position": 2213
+            },
+            {
+                "img": "https://arxiv.org/html/2606.02775/2606.02775v1/x8.png",
+                "caption": "Figure 8:One mechanism, two deployment regimes.The same byte counts scale by the batch factor\n(×64\\times 64here); see text. Datacenter serving (batch-NN) amortizes and resets the cache;\nphysical AI (batch-1) does neither, so O(1) state is required.",
+                "position": 2218
+            },
+            {
+                "img": "https://arxiv.org/html/2606.02775/2606.02775v1/x9.png",
+                "caption": "Figure 9:Trained closed-loop 3-arm panel(OpenVLA-OFT 7B / LIBERO-Long; held-outseed_eval=999\\texttt{seed\\_eval}{=}999, tasks{0,1,2,3,5,7}\\{0,1,2,3,5,7\\},n=60n{=}60episodes/arm,520520-step horizon,\nNVIDIA A100-40GB).Left:closed-loop task success per arm—base14/60=0.23314/60{=}0.233,kv13/60=0.21713/60{=}0.217,aura14/60=0.23314/60{=}0.233(nncounts annotated). AURA-Memmatches the ungated base policy’s success exactlyand slightly exceeds the always-write\nKV arm.Right:memory write rate—base0.0000.000,kv1.0001.000,aura0.1420.142(504504vs.3,5413{,}541writes, the annotated7.0×\\mathbf{7.0\\times}fewer)—at a constant4,2244{,}224-byte inference state versus KV’s growth to906,496906{,}496bytes. The success spread across\narms (0.2170.217–0.2330.233) is within small-sample noise atn=60n{=}60, so the defensible reading issuccess parity at a fraction of the writes and constant VRAM, not a success improvement;\nabsolute success is bounded by the underlying zero-shot base policy, not by the memory layer.",
+                "position": 2314
+            },
+            {
+                "img": "https://arxiv.org/html/2606.02775/2606.02775v1/x10.png",
+                "caption": "Figure 10:Variant ablation atN=64N{=}64(noisy_long_recall, runlean-20260530-1449; error bars: 95%tt-CI). Each ablated gate signal is compared at\nmatched state size. The forced-write twins (write_every_step,fixed_size_state) and AURA-Mem all reach≈1.000{\\approx}1.000success, but\nAURA-Mem does so at2.182.18writes/s vs.20.020.0(9.19×9.19\\timesfewer). Content-blind\nschedules (random/periodic) collapse to≈0.37{\\approx}0.37at matched bandwidth, andlearned_token_gateis a broken comparator (g→0g{\\to}0, high variance). The gatesignal, not the writebudget, drives the result.",
+                "position": 2449
+            },
+            {
+                "img": "https://arxiv.org/html/2606.02775/2606.02775v1/x11.png",
+                "caption": "Figure 11:Information-bottleneck ablation(hardnoisy_long_recall,N=8N{=}8, runlean-hard-ibabl-20260530-2125).ours_ib(β>0\\beta{>}0,0.867±0.0400.867\\pm 0.040)\nvs.ours_noib(β=0\\beta{=}0,0.692±0.2760.692\\pm 0.276); gap+0.175+0.175, Welchp=0.153p{=}0.153(CI[−0.100,+0.450][-0.100,+0.450]), bootstrap CI[+0.014,+0.368][+0.014,+0.368]. Borderline positive: a\ntraining-stability benefit, but the write-rate effect is not significant at this sample size.",
+                "position": 2460
+            },
+            {
+                "img": "https://arxiv.org/html/2606.02775/2606.02775v1/x12.png",
+                "caption": "Figure 12:Action-error gate selectivity on a sequential control stream(SparseRecallTask,T=40T{=}40,nsymbols=4n_{\\text{symbols}}{=}4, chance0.250.25; 512 evaluation\nepisodes; single trained seed; error bars: standard error over episodes).Left:a\nsingle episode’s per-step soft gate probabilitypsoftp_{\\text{soft}}(blue) overlaid on event steps\n(orange shading,≈10%{\\approx}10\\%of steps) and distractor steps (grey shading).Right:meanpsoftp_{\\text{soft}}by step category: the gate fires at0.829±0.2110.829\\pm 0.211on event steps\nversus0.318±0.2480.318\\pm 0.248on distractor steps (2.61×\\timesselectivity,Δ=+0.511\\Delta{=}{+}0.511),\nand0.236±0.2450.236\\pm 0.245on query steps. The policy reaches0.9820.982accuracy writing≈24%{\\approx}24\\%of steps. Mechanism illustration on one synthetic stream, single seed; not a\nrobotics benchmark.",
+                "position": 2506
+            },
+            {
+                "img": "https://arxiv.org/html/2606.02775/2606.02775v1/x13.png",
+                "caption": "Figure 13:Write-rate vs. accuracy trade-offunder the rate-knob sweep\n(SparseRecallTask,T=40T{=}40;ρ∈{0.05,0.20,0.50,0.85}\\rho{\\in}\\{0.05,0.20,0.50,0.85\\}; single seed (seed 3);\n350 training steps per run;xx: measured write rate;yy: accuracy; points labeled byρ\\rho). Below the task’s event density (≈10%{\\approx}10\\%), the gate collapses (ρ=0.05→\\rho{=}0.05\\towrite0.0230.023, accuracy0.4200.420). Atρ=0.20\\rho{=}0.20the gate enters the correct regime (write≈0.38{\\approx}0.38, accuracy0.9880.988); further increasingρ\\rhosaturates (write0.4670.467–0.5070.507,\naccuracy0.9790.979–0.9810.981). A tunable bandwidth knob with a sharp threshold near the task’s\ninformation density; single-seed synthetic result.",
+                "position": 2519
+            }
+        ]
+    },
+    {
+        "header": "7Limitations and honest disclosures",
+        "images": []
+    },
+    {
+        "header": "8Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AProofs (full detail)",
+        "images": []
+    },
+    {
+        "header": "Appendix BAdditional experimental details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.02775/2606.02775v1/x14.png",
+                "caption": "Figure 14:Extended 100k-step horizon-stress detail: memory footprint vs. sequence horizon(log–log; NVIDIA L40S, run20260530-endless-100k, 100,000 steps, 500 logged\ncheckpoints). This is the extended long-horizon companion to the main-text crossover figure\n(Figure7): the same constant-vs-growing comparison carried out to\n100,000 steps. AURA-Mem’s inference state (blue) occupies aconstant𝟒,𝟐𝟐𝟒\\mathbf{4{,}224}bytesat every step, computed by the closed-form formula(dk​dv+dv)×batch×4(d_{k}d_{v}+d_{v}){\\times}\\text{batch}{\\times}4(dk=dv=32d_{k}{=}d_{v}{=}32, batch=1=1, fp32) and confirmed\nidentical across all 500 logged steps, while a growing-KV reference stub (vermillion dashed;\nsame dimensions, local untrained reference,256256bytes/step analytic) reaches𝟐𝟓,𝟔𝟎𝟎,𝟎𝟎𝟎\\mathbf{25{,}600{,}000}bytes(25.6 MB) at step 100,000, a ratio of𝟔,𝟎𝟔𝟏×\\mathbf{6{,}061\\times}larger. (O(1) refers to the inference state only; see\n§3.2.) The 4,224-byte figure is the architectural state formula and\nmust not be conflated with the peak CUDA allocator reading\n(cuda_max_memory_allocated=43,051,008=43{,}051{,}008bytes, which includes weights,\nactivations, and transient buffers); the KV contrast uses a local untrained stub, not a\ntrained transformer.",
+                "position": 4190
+            }
+        ]
+    },
+    {
+        "header": "Appendix CModel card (abridged)",
+        "images": []
+    },
+    {
+        "header": "Appendix DBroader impact",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
