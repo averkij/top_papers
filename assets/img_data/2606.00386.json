@@ -1,0 +1,1623 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/teaser.jpg",
+                "caption": "Figure 1:Layeredα\\alphaDepth Representation. We introduceα\\alphaDepth to decompose soft boundaries (e.g., hair, thin structures, and defocus blur) for high-fidelity stereo conversion.\nGiven an image and its depth map as inputs, our approach estimates layered information,i.e., alpha, foreground/background (FG/BG) colors and depths, atlocal soft boundaries(see non-zero alpha regions), enabling scene-level inference of multiple/overlapping targets in a single forward pass without user intervention.",
+                "position": 247
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/task_comparison.jpg",
+                "caption": "Figure 2:Comparison with existing paradigms.Depth estimation models typically assign a single depth value per pixel, struggling with mixed colors at soft boundaries and suffering from depth ambiguity. While conventional matting approaches extract instance-level soft boundaries, they usually require manual guidance (e.g., trimaps). In contrast, our layeredα\\alphaDepth representation enables automatic scene-level decomposition. Given an image and its depth map,α\\alphaDepth explicitly decomposes soft boundaries into layered color, alpha, and layered depth in a single forward pass.",
+                "position": 251
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/epi.jpg",
+                "caption": "(a)Visual comparison of warping performance and Epipolar Plane Images (EPIs)",
+                "position": 311
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/epi.jpg",
+                "caption": "(a)Visual comparison of warping performance and Epipolar Plane Images (EPIs)",
+                "position": 314
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/alpha_valley.jpg",
+                "caption": "(b)Alpha valley issue (Alpha is shown only at soft regions,i.e.,α∈[0.02,0.98]\\alpha\\in[0.02,0.98], for comparison)",
+                "position": 320
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/network.jpg",
+                "caption": "Figure 4:α\\alphaDepth estimation pipeline.Given an image and its corresponding depth map (e.g., from a pre-trained depth model), we employ a dual-path encoder to extract both semantic and detail features. A multi-branch decoder then processes these features for task-specific predictions. Finally, we apply circular alpha decoding to generate the estimated alpha map, which subsequently modulates and constrains the layered color and depth predictions on soft boundary regions.",
+                "position": 327
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/circular_alpha.jpg",
+                "caption": "Figure 5:Circular Alpha Representation (CAR).The vanilla alpha representation inherently suffers from sharp discontinuities at the intersecting boundaries of multiple overlapping instances. By contrast, CAR encodes the ground-truth alpha into continuous trigonometric space during training, benefiting model optimization and eliminating alpha valley issues (Fig.3(b)). During inference, the predicted trigonometric components are decoded back into an alpha matteα^\\hat{\\alpha}at soft boundaries.",
+                "position": 378
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/data_pipe.jpg",
+                "caption": "Figure 6:Training Data Curation.Firstly, the alpha map is processed via circular alpha encoding to yield continuous alpha labels (αsin,αcos\\alpha_{\\sin},\\alpha_{\\cos}) and thresholded to produce layered masks (MFG,MBGM_{\\mathrm{FG}},M_{\\mathrm{BG}}). In layered color/depth generation, foreground and background assets are composited to form the synthesized input image (IINI_{\\mathrm{IN}}) and depth (DIND_{\\mathrm{IN}}). Concurrently, masked blending is applied to generate ground-truth color layers (IFG,IBGI_{\\mathrm{FG}},I_{\\mathrm{BG}}) and depth layers (DFG,DBGD_{\\mathrm{FG}},D_{\\mathrm{BG}}) for soft boundary regions.",
+                "position": 427
+            }
+        ]
+    },
+    {
+        "header": "4Experiments and Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/stereo/00143125/input.jpg",
+                "caption": "Input Image",
+                "position": 466
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/stereo/00143125/input.jpg",
+                "caption": "",
+                "position": 469
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/stereo/00143125/input.jpg",
+                "caption": "",
+                "position": 472
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/stereo/00143125/hairguard_warp.jpg",
+                "caption": "",
+                "position": 476
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/stereo/00143125/hairguard.jpg",
+                "caption": "",
+                "position": 480
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/stereo/00143125/ours_warp.jpg",
+                "caption": "",
+                "position": 484
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/stereo/00143125/ours.jpg",
+                "caption": "",
+                "position": 488
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/stereo/00166907/input.jpg",
+                "caption": "Input Image",
+                "position": 496
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/stereo/00166907/input.jpg",
+                "caption": "Input Image",
+                "position": 499
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/stereo/00166907/hairguard_warp.jpg",
+                "caption": "HairGuard Warping",
+                "position": 504
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/stereo/00166907/hairguard.jpg",
+                "caption": "HairGuard Result",
+                "position": 509
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/stereo/00166907/ours_warp.jpg",
+                "caption": "Our Warping",
+                "position": 514
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/stereo/00166907/ours.jpg",
+                "caption": "Our Result",
+                "position": 519
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b508d293/input.jpg",
+                "caption": "Input Image",
+                "position": 708
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b508d293/input.jpg",
+                "caption": "",
+                "position": 711
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b508d293/input.jpg",
+                "caption": "",
+                "position": 714
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b508d293/gvm.jpg",
+                "caption": "",
+                "position": 718
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b508d293/matanyone2.jpg",
+                "caption": "",
+                "position": 722
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b508d293/vitmatte.jpg",
+                "caption": "",
+                "position": 726
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b508d293/ours.jpg",
+                "caption": "",
+                "position": 730
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/alpha/o_268a126b/img.jpg",
+                "caption": "Input Image",
+                "position": 738
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/alpha/o_268a126b/img.jpg",
+                "caption": "Input Image",
+                "position": 741
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/alpha/o_268a126b/gvm.jpg",
+                "caption": "GVMGeet al.(2025)",
+                "position": 746
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/alpha/o_268a126b/matanyone2.jpg",
+                "caption": "MatAnyone 2Yanget al.(2026)",
+                "position": 751
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/alpha/o_268a126b/vitmatte.jpg",
+                "caption": "ViTMatteYaoet al.(2024)",
+                "position": 756
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/alpha/o_268a126b/ours.jpg",
+                "caption": "α\\alphaDepth (Ours)",
+                "position": 761
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix AMore Implementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BMore Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/ref_view/0029.jpg",
+                "caption": "Input Video",
+                "position": 2214
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/ref_view/0029.jpg",
+                "caption": "",
+                "position": 2217
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/alpha/0029.jpg",
+                "caption": "",
+                "position": 2221
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/0039348/alpha/0029.jpg",
+                "caption": "",
+                "position": 2225
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/ref_view/0000.jpg",
+                "caption": "",
+                "position": 2229
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/alpha/0000.jpg",
+                "caption": "",
+                "position": 2233
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/104219/alpha/0000.jpg",
+                "caption": "",
+                "position": 2237
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/ref_view/0030.jpg",
+                "caption": "",
+                "position": 2241
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/alpha/0030.jpg",
+                "caption": "",
+                "position": 2246
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/0039348/alpha/0030.jpg",
+                "caption": "",
+                "position": 2250
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/ref_view/0002.jpg",
+                "caption": "",
+                "position": 2254
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/alpha/0002.jpg",
+                "caption": "",
+                "position": 2258
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/104219/alpha/0002.jpg",
+                "caption": "",
+                "position": 2262
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/ref_view/0032.jpg",
+                "caption": "",
+                "position": 2266
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/alpha/0032.jpg",
+                "caption": "",
+                "position": 2270
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/0039348/alpha/0032.jpg",
+                "caption": "",
+                "position": 2275
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/ref_view/0004.jpg",
+                "caption": "",
+                "position": 2279
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/alpha/0004.jpg",
+                "caption": "",
+                "position": 2283
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/104219/alpha/0004.jpg",
+                "caption": "",
+                "position": 2287
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/ref_view/0030.jpg",
+                "caption": "",
+                "position": 2291
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/alpha/0030.jpg",
+                "caption": "",
+                "position": 2295
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/0039348/alpha/0030.jpg",
+                "caption": "",
+                "position": 2299
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/ref_view/0006.jpg",
+                "caption": "",
+                "position": 2304
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/alpha/0006.jpg",
+                "caption": "",
+                "position": 2308
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/104219/alpha/0006.jpg",
+                "caption": "",
+                "position": 2312
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/ref_view/0039.jpg",
+                "caption": "",
+                "position": 2316
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/alpha/0039.jpg",
+                "caption": "",
+                "position": 2320
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/0039348/alpha/0039.jpg",
+                "caption": "",
+                "position": 2324
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/ref_view/0008.jpg",
+                "caption": "",
+                "position": 2328
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/alpha/0008.jpg",
+                "caption": "",
+                "position": 2333
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/104219/alpha/0008.jpg",
+                "caption": "",
+                "position": 2337
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/ref_view/0042.jpg",
+                "caption": "",
+                "position": 2341
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/alpha/0042.jpg",
+                "caption": "",
+                "position": 2345
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/0039348/alpha/0042.jpg",
+                "caption": "",
+                "position": 2349
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/ref_view/0010.jpg",
+                "caption": "",
+                "position": 2353
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/alpha/0010.jpg",
+                "caption": "",
+                "position": 2357
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/104219/alpha/0010.jpg",
+                "caption": "",
+                "position": 2362
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/ref_view/0049.jpg",
+                "caption": "",
+                "position": 2366
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/alpha/0049.jpg",
+                "caption": "",
+                "position": 2370
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/0039348/alpha/0049.jpg",
+                "caption": "",
+                "position": 2374
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/ref_view/0018.jpg",
+                "caption": "",
+                "position": 2378
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/alpha/0018.jpg",
+                "caption": "",
+                "position": 2382
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/104219/alpha/0018.jpg",
+                "caption": "",
+                "position": 2386
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/ref_view/0056.jpg",
+                "caption": "",
+                "position": 2391
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/alpha/0056.jpg",
+                "caption": "",
+                "position": 2395
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/0039348/alpha/0056.jpg",
+                "caption": "",
+                "position": 2399
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/ref_view/0020.jpg",
+                "caption": "",
+                "position": 2403
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/alpha/0020.jpg",
+                "caption": "",
+                "position": 2407
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/104219/alpha/0020.jpg",
+                "caption": "",
+                "position": 2411
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/ref_view/0069.jpg",
+                "caption": "",
+                "position": 2415
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/alpha/0069.jpg",
+                "caption": "",
+                "position": 2420
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/0039348/alpha/0069.jpg",
+                "caption": "",
+                "position": 2424
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/ref_view/0022.jpg",
+                "caption": "",
+                "position": 2428
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/alpha/0022.jpg",
+                "caption": "",
+                "position": 2432
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/104219/alpha/0022.jpg",
+                "caption": "",
+                "position": 2436
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/ref_view/0078.jpg",
+                "caption": "Input Video",
+                "position": 2440
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/0039348/alpha/0078.jpg",
+                "caption": "Vanilla Alpha",
+                "position": 2445
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/0039348/alpha/0078.jpg",
+                "caption": "CAR (Ours)",
+                "position": 2451
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/ref_view/0024.jpg",
+                "caption": "Input Video",
+                "position": 2456
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/vanilla/104219/alpha/0024.jpg",
+                "caption": "Vanilla Alpha",
+                "position": 2461
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stability/car/104219/alpha/0024.jpg",
+                "caption": "CAR (Ours)",
+                "position": 2466
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_099cc48f/cropped.jpg",
+                "caption": "Input Image",
+                "position": 2481
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_099cc48f/cropped.jpg",
+                "caption": "Input Image",
+                "position": 2484
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_099cc48f/depth_spectral/dav2.jpg",
+                "caption": "",
+                "position": 2494
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_099cc48f/depth_spectral/depthpro.jpg",
+                "caption": "",
+                "position": 2501
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_099cc48f/depth_spectral/ppd.jpg",
+                "caption": "",
+                "position": 2508
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_099cc48f/depth_spectral/moge2.jpg",
+                "caption": "",
+                "position": 2515
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_099cc48f/alpha_jpg/dav2.jpg",
+                "caption": "",
+                "position": 2524
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_099cc48f/alpha_jpg/depthpro.jpg",
+                "caption": "",
+                "position": 2531
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_099cc48f/alpha_jpg/ppd.jpg",
+                "caption": "",
+                "position": 2538
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_099cc48f/alpha_jpg/moge2.jpg",
+                "caption": "",
+                "position": 2545
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_f937f968/cropped.jpg",
+                "caption": "Input Image",
+                "position": 2556
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_f937f968/depth_spectral/dav2.jpg",
+                "caption": "",
+                "position": 2566
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_f937f968/depth_spectral/depthpro.jpg",
+                "caption": "",
+                "position": 2573
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_f937f968/depth_spectral/ppd.jpg",
+                "caption": "",
+                "position": 2580
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_f937f968/depth_spectral/moge2.jpg",
+                "caption": "",
+                "position": 2587
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_f937f968/alpha_jpg/dav2.jpg",
+                "caption": "",
+                "position": 2596
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_f937f968/alpha_jpg/depthpro.jpg",
+                "caption": "",
+                "position": 2603
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_f937f968/alpha_jpg/ppd.jpg",
+                "caption": "",
+                "position": 2610
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/depth_impact/o_f937f968/alpha_jpg/moge2.jpg",
+                "caption": "",
+                "position": 2617
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/cam_traj/left/cropped.jpg",
+                "caption": "Input Image",
+                "position": 2710
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/cam_traj/left/cropped.jpg",
+                "caption": "Input Image",
+                "position": 2713
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/cam_traj/left/cropped.jpg",
+                "caption": "Input Image",
+                "position": 2716
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/cam_traj/left/cam_09_cropped.jpg",
+                "caption": "Camera Motion",
+                "position": 2722
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/cam_traj/left/original_warped/0020.jpg",
+                "caption": "Frame#1(Original[45])",
+                "position": 2730
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/cam_traj/left/original_warped/0020.jpg",
+                "caption": "Frame#1(Original[45])",
+                "position": 2733
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/cam_traj/left/original_warped/0035.jpg",
+                "caption": "Frame#2(Original[45])",
+                "position": 2739
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/cam_traj/left/original_warped/0050.jpg",
+                "caption": "Frame#3(Original[45])",
+                "position": 2746
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/cam_traj/left/refined_warped/0020.jpg",
+                "caption": "Frame#1(+ HairGuard[55])",
+                "position": 2752
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/cam_traj/left/refined_warped/0035.jpg",
+                "caption": "Frame#2(+ HairGuard[55])",
+                "position": 2759
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/cam_traj/left/refined_warped/0050.jpg",
+                "caption": "Frame#3(+ HairGuard[55])",
+                "position": 2765
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/cam_traj/left/alpha_warped/0020.jpg",
+                "caption": "Frame#1(+ Ours)",
+                "position": 2772
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/cam_traj/left/alpha_warped/0035.jpg",
+                "caption": "Frame#2(+ Ours)",
+                "position": 2778
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/cam_traj/left/alpha_warped/0050.jpg",
+                "caption": "Frame#3(+ Ours)",
+                "position": 2785
+            }
+        ]
+    },
+    {
+        "header": "Appendix CMore Ablation Studies",
+        "images": []
+    },
+    {
+        "header": "Appendix DLimitations and Discussions",
+        "images": []
+    },
+    {
+        "header": "Appendix EDiscussion of Societal Impacts",
+        "images": []
+    },
+    {
+        "header": "Appendix FVisualization of Ablation Models",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/ablation/model_a/input.jpg",
+                "caption": "Input Image",
+                "position": 3010
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/ablation/model_a/input.jpg",
+                "caption": "Input Image",
+                "position": 3013
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/ablation/model_a/input.jpg",
+                "caption": "Input Image",
+                "position": 3016
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/ablation/model_a/a1.jpg",
+                "caption": "Model A#1",
+                "position": 3021
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/ablation/model_a/a2.jpg",
+                "caption": "Model A#2",
+                "position": 3026
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/ablation/model_a/a3.jpg",
+                "caption": "Model A#3",
+                "position": 3031
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/ablation/model_a/a4.jpg",
+                "caption": "Model A#4",
+                "position": 3036
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/ablation/model_b/o_1ae3ae29/cropped.jpg",
+                "caption": "Input Image",
+                "position": 3045
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/ablation/model_b/o_1ae3ae29/cropped.jpg",
+                "caption": "Input Image",
+                "position": 3048
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/ablation/model_b/o_1ae3ae29/b1.jpg",
+                "caption": "Model B#1",
+                "position": 3053
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/ablation/model_b/o_1ae3ae29/b2.jpg",
+                "caption": "Model B#2",
+                "position": 3058
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/ablation/model_b/o_1ae3ae29/b3.jpg",
+                "caption": "Model B#3",
+                "position": 3063
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/ablation/model_b/o_1ae3ae29/b4.jpg",
+                "caption": "Model B#4",
+                "position": 3068
+            }
+        ]
+    },
+    {
+        "header": "Appendix GVisualization ofα\\alphaDepth Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00108533/input_img.jpg",
+                "caption": "Input ImageIINI_{\\mathrm{IN}}",
+                "position": 3086
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00108533/input_img.jpg",
+                "caption": "Input ImageIINI_{\\mathrm{IN}}",
+                "position": 3089
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00108533/alpha.jpg",
+                "caption": "Alphaα^\\hat{\\alpha}",
+                "position": 3094
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00108533/bg_depth.jpg",
+                "caption": "Background DepthD^BG\\hat{D}_{\\mathrm{BG}}",
+                "position": 3099
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00108533/bg_color.jpg",
+                "caption": "Background ColorI^BG\\hat{I}_{\\mathrm{BG}}",
+                "position": 3104
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00108533/input_depth.jpg",
+                "caption": "Input DepthDIND_{\\mathrm{IN}}",
+                "position": 3110
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00108533/soft_region.jpg",
+                "caption": "Soft Boundary RegionS^\\hat{S}",
+                "position": 3115
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00108533/fg_depth.jpg",
+                "caption": "Foreground DepthD^FG\\hat{D}_{\\mathrm{FG}}",
+                "position": 3120
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00108533/fg_color.jpg",
+                "caption": "Foreground ColorI^FG\\hat{I}_{\\mathrm{FG}}",
+                "position": 3125
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00122802/input_img.jpg",
+                "caption": "Input ImageIINI_{\\mathrm{IN}}",
+                "position": 3131
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00122802/alpha.jpg",
+                "caption": "Alphaα^\\hat{\\alpha}",
+                "position": 3136
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00122802/bg_depth.jpg",
+                "caption": "Background DepthD^BG\\hat{D}_{\\mathrm{BG}}",
+                "position": 3141
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00122802/bg_color.jpg",
+                "caption": "Background ColorI^BG\\hat{I}_{\\mathrm{BG}}",
+                "position": 3146
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00122802/input_depth.jpg",
+                "caption": "Input DepthDIND_{\\mathrm{IN}}",
+                "position": 3152
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00122802/soft_region.jpg",
+                "caption": "Soft Boundary RegionS^\\hat{S}",
+                "position": 3157
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00122802/fg_depth.jpg",
+                "caption": "Foreground DepthD^FG\\hat{D}_{\\mathrm{FG}}",
+                "position": 3162
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00122802/fg_color.jpg",
+                "caption": "Foreground ColorI^FG\\hat{I}_{\\mathrm{FG}}",
+                "position": 3167
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00143125/input_img.jpg",
+                "caption": "Input ImageIINI_{\\mathrm{IN}}",
+                "position": 3173
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00143125/alpha.jpg",
+                "caption": "Alphaα^\\hat{\\alpha}",
+                "position": 3178
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00143125/bg_depth.jpg",
+                "caption": "Background DepthD^BG\\hat{D}_{\\mathrm{BG}}",
+                "position": 3183
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00143125/bg_color.jpg",
+                "caption": "Background ColorI^BG\\hat{I}_{\\mathrm{BG}}",
+                "position": 3188
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00143125/input_depth.jpg",
+                "caption": "Input DepthDIND_{\\mathrm{IN}}",
+                "position": 3194
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00143125/soft_region.jpg",
+                "caption": "Soft Boundary RegionS^\\hat{S}",
+                "position": 3199
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00143125/fg_depth.jpg",
+                "caption": "Foreground DepthD^FG\\hat{D}_{\\mathrm{FG}}",
+                "position": 3204
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alphadepth_vis/00143125/fg_color.jpg",
+                "caption": "Foreground ColorI^FG\\hat{I}_{\\mathrm{FG}}",
+                "position": 3209
+            }
+        ]
+    },
+    {
+        "header": "Appendix HMore Visual Comparisons",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00039348/input.jpg",
+                "caption": "Input Image",
+                "position": 3228
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00039348/input.jpg",
+                "caption": "Input Image",
+                "position": 3231
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00039348/input.jpg",
+                "caption": "Input Image",
+                "position": 3234
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00039348/original_warp.jpg",
+                "caption": "VDA Warping[3]",
+                "position": 3239
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00039348/hairguard_warp.jpg",
+                "caption": "HairGuard Warping[55]",
+                "position": 3244
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00039348/ours_warp.jpg",
+                "caption": "α\\alphaDepth Warping (Ours)",
+                "position": 3249
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00039348/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3258
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00039348/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3261
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00039348/stereocrafter.jpg",
+                "caption": "StereoCrafter Result[56]",
+                "position": 3266
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00039348/hairguard.jpg",
+                "caption": "HairGuard Result[55]",
+                "position": 3271
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00039348/ours.jpg",
+                "caption": "α\\alphaDepth Result (Ours)",
+                "position": 3276
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00122802/input.jpg",
+                "caption": "Input Image",
+                "position": 3285
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00122802/input.jpg",
+                "caption": "Input Image",
+                "position": 3288
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00122802/original_warp.jpg",
+                "caption": "VDA Warping[3]",
+                "position": 3293
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00122802/hairguard_warp.jpg",
+                "caption": "HairGuard Warping[55]",
+                "position": 3298
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00122802/ours_warp.jpg",
+                "caption": "α\\alphaDepth Warping (Ours)",
+                "position": 3303
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00122802/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3312
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00122802/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3315
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00122802/stereocrafter.jpg",
+                "caption": "StereoCrafter Result[56]",
+                "position": 3320
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00122802/hairguard.jpg",
+                "caption": "HairGuard Result[55]",
+                "position": 3325
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00122802/ours.jpg",
+                "caption": "α\\alphaDepth Result (Ours)",
+                "position": 3330
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00042375/input.jpg",
+                "caption": "Input Image",
+                "position": 3339
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00042375/input.jpg",
+                "caption": "Input Image",
+                "position": 3342
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00042375/original_warp.jpg",
+                "caption": "VDA Warping[3]",
+                "position": 3347
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00042375/hairguard_warp.jpg",
+                "caption": "HairGuard Warping[55]",
+                "position": 3352
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00042375/ours_warp.jpg",
+                "caption": "α\\alphaDepth Warping (Ours)",
+                "position": 3357
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00042375/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3366
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00042375/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3369
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00042375/stereocrafter.jpg",
+                "caption": "StereoCrafter Result[56]",
+                "position": 3374
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00042375/hairguard.jpg",
+                "caption": "HairGuard Result[55]",
+                "position": 3379
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00042375/ours.jpg",
+                "caption": "α\\alphaDepth Result (Ours)",
+                "position": 3384
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00142260/input.jpg",
+                "caption": "Input Image",
+                "position": 3393
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00142260/input.jpg",
+                "caption": "Input Image",
+                "position": 3396
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00142260/original_warp.jpg",
+                "caption": "VDA Warping[3]",
+                "position": 3401
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00142260/hairguard_warp.jpg",
+                "caption": "HairGuard Warping[55]",
+                "position": 3406
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00142260/ours_warp.jpg",
+                "caption": "α\\alphaDepth Warping (Ours)",
+                "position": 3411
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00142260/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3420
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00142260/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3423
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00142260/stereocrafter.jpg",
+                "caption": "StereoCrafter Result[56]",
+                "position": 3428
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00142260/hairguard.jpg",
+                "caption": "HairGuard Result[55]",
+                "position": 3433
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00142260/ours.jpg",
+                "caption": "α\\alphaDepth Result (Ours)",
+                "position": 3438
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00179879/input.jpg",
+                "caption": "Input Image",
+                "position": 3448
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00179879/input.jpg",
+                "caption": "Input Image",
+                "position": 3451
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00179879/input.jpg",
+                "caption": "Input Image",
+                "position": 3454
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00179879/original_warp.jpg",
+                "caption": "VDA Warping[3]",
+                "position": 3459
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00179879/hairguard_warp.jpg",
+                "caption": "HairGuard Warping[55]",
+                "position": 3464
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00179879/ours_warp.jpg",
+                "caption": "α\\alphaDepth Warping (Ours)",
+                "position": 3469
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00179879/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3478
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00179879/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3481
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00179879/stereocrafter.jpg",
+                "caption": "StereoCrafter Result[56]",
+                "position": 3486
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00179879/hairguard.jpg",
+                "caption": "HairGuard Result[55]",
+                "position": 3491
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00179879/ours.jpg",
+                "caption": "α\\alphaDepth Result (Ours)",
+                "position": 3496
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00194148/input.jpg",
+                "caption": "Input Image",
+                "position": 3505
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00194148/input.jpg",
+                "caption": "Input Image",
+                "position": 3508
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00194148/original_warp.jpg",
+                "caption": "VDA Warping[3]",
+                "position": 3513
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00194148/hairguard_warp.jpg",
+                "caption": "HairGuard Warping[55]",
+                "position": 3518
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00194148/ours_warp.jpg",
+                "caption": "α\\alphaDepth Warping (Ours)",
+                "position": 3523
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00194148/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3532
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00194148/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3535
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00194148/stereocrafter.jpg",
+                "caption": "StereoCrafter Result[56]",
+                "position": 3540
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00194148/hairguard.jpg",
+                "caption": "HairGuard Result[55]",
+                "position": 3545
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00194148/ours.jpg",
+                "caption": "α\\alphaDepth Result (Ours)",
+                "position": 3550
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00175555/input.jpg",
+                "caption": "Input Image",
+                "position": 3559
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00175555/input.jpg",
+                "caption": "Input Image",
+                "position": 3562
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00175555/original_warp.jpg",
+                "caption": "VDA Warping[3]",
+                "position": 3567
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00175555/hairguard_warp.jpg",
+                "caption": "HairGuard Warping[55]",
+                "position": 3572
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00175555/ours_warp.jpg",
+                "caption": "α\\alphaDepth Warping (Ours)",
+                "position": 3577
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00175555/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3586
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00175555/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3589
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00175555/stereocrafter.jpg",
+                "caption": "StereoCrafter Result[56]",
+                "position": 3594
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00175555/hairguard.jpg",
+                "caption": "HairGuard Result[55]",
+                "position": 3599
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00175555/ours.jpg",
+                "caption": "α\\alphaDepth Result (Ours)",
+                "position": 3604
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00201499/input.jpg",
+                "caption": "Input Image",
+                "position": 3613
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00201499/input.jpg",
+                "caption": "Input Image",
+                "position": 3616
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00201499/original_warp.jpg",
+                "caption": "VDA Warping[3]",
+                "position": 3621
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00201499/hairguard_warp.jpg",
+                "caption": "HairGuard Warping[55]",
+                "position": 3626
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00201499/ours_warp.jpg",
+                "caption": "α\\alphaDepth Warping (Ours)",
+                "position": 3631
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00201499/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3640
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00201499/input_depth.jpg",
+                "caption": "Input Depth",
+                "position": 3643
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00201499/stereocrafter.jpg",
+                "caption": "StereoCrafter Result[56]",
+                "position": 3648
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00201499/hairguard.jpg",
+                "caption": "HairGuard Result[55]",
+                "position": 3653
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/stereo_conv/00201499/ours.jpg",
+                "caption": "α\\alphaDepth Result (Ours)",
+                "position": 3658
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b0c6c2f9/input.jpg",
+                "caption": "Input Image",
+                "position": 3676
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b0c6c2f9/input.jpg",
+                "caption": "",
+                "position": 3679
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b0c6c2f9/input.jpg",
+                "caption": "",
+                "position": 3682
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b0c6c2f9/gvm.jpg",
+                "caption": "",
+                "position": 3686
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b0c6c2f9/matanyone2.jpg",
+                "caption": "",
+                "position": 3690
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b0c6c2f9/vitmatte.jpg",
+                "caption": "",
+                "position": 3694
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b0c6c2f9/ours.jpg",
+                "caption": "",
+                "position": 3698
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b62c06fe/input.jpg",
+                "caption": "",
+                "position": 3706
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b62c06fe/input.jpg",
+                "caption": "",
+                "position": 3709
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b62c06fe/gvm.jpg",
+                "caption": "",
+                "position": 3713
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b62c06fe/matanyone2.jpg",
+                "caption": "",
+                "position": 3717
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b62c06fe/vitmatte.jpg",
+                "caption": "",
+                "position": 3721
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_b62c06fe/ours.jpg",
+                "caption": "",
+                "position": 3725
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/alpha/o_0530e2e7/img.jpg",
+                "caption": "",
+                "position": 3733
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/alpha/o_0530e2e7/img.jpg",
+                "caption": "",
+                "position": 3736
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/alpha/o_0530e2e7/gvm.jpg",
+                "caption": "",
+                "position": 3740
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/alpha/o_0530e2e7/matanyone2.jpg",
+                "caption": "",
+                "position": 3744
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/alpha/o_0530e2e7/vitmatte.jpg",
+                "caption": "",
+                "position": 3748
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/main/alpha/o_0530e2e7/ours.jpg",
+                "caption": "",
+                "position": 3752
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_c56a90a4/input.jpg",
+                "caption": "",
+                "position": 3760
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_c56a90a4/input.jpg",
+                "caption": "",
+                "position": 3763
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_c56a90a4/gvm.jpg",
+                "caption": "",
+                "position": 3767
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_c56a90a4/matanyone2.jpg",
+                "caption": "",
+                "position": 3771
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_c56a90a4/vitmatte.jpg",
+                "caption": "",
+                "position": 3775
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_c56a90a4/ours.jpg",
+                "caption": "",
+                "position": 3779
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_d74e3ad1/input.jpg",
+                "caption": "",
+                "position": 3787
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_d74e3ad1/input.jpg",
+                "caption": "",
+                "position": 3790
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_d74e3ad1/gvm.jpg",
+                "caption": "",
+                "position": 3794
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_d74e3ad1/matanyone2.jpg",
+                "caption": "",
+                "position": 3798
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_d74e3ad1/vitmatte.jpg",
+                "caption": "",
+                "position": 3802
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_d74e3ad1/ours.jpg",
+                "caption": "",
+                "position": 3806
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_e4f47cba/input.jpg",
+                "caption": "",
+                "position": 3814
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_e4f47cba/input.jpg",
+                "caption": "",
+                "position": 3817
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_e4f47cba/gvm.jpg",
+                "caption": "",
+                "position": 3821
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_e4f47cba/matanyone2.jpg",
+                "caption": "",
+                "position": 3825
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_e4f47cba/vitmatte.jpg",
+                "caption": "",
+                "position": 3829
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_e4f47cba/ours.jpg",
+                "caption": "",
+                "position": 3833
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_e62df10b/input.jpg",
+                "caption": "",
+                "position": 3841
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_e62df10b/input.jpg",
+                "caption": "",
+                "position": 3844
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_e62df10b/gvm.jpg",
+                "caption": "",
+                "position": 3848
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_e62df10b/matanyone2.jpg",
+                "caption": "",
+                "position": 3852
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_e62df10b/vitmatte.jpg",
+                "caption": "",
+                "position": 3856
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_e62df10b/ours.jpg",
+                "caption": "",
+                "position": 3860
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_ebc2e45c/input.jpg",
+                "caption": "",
+                "position": 3868
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_ebc2e45c/input.jpg",
+                "caption": "",
+                "position": 3871
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_ebc2e45c/gvm.jpg",
+                "caption": "",
+                "position": 3875
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_ebc2e45c/matanyone2.jpg",
+                "caption": "",
+                "position": 3879
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_ebc2e45c/vitmatte.jpg",
+                "caption": "",
+                "position": 3883
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_ebc2e45c/ours.jpg",
+                "caption": "",
+                "position": 3887
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_f95689c1/input.jpg",
+                "caption": "",
+                "position": 3895
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_f95689c1/input.jpg",
+                "caption": "",
+                "position": 3898
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_f95689c1/gvm.jpg",
+                "caption": "",
+                "position": 3902
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_f95689c1/matanyone2.jpg",
+                "caption": "",
+                "position": 3906
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_f95689c1/vitmatte.jpg",
+                "caption": "",
+                "position": 3910
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_f95689c1/ours.jpg",
+                "caption": "",
+                "position": 3914
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_fe2c82a9/input.jpg",
+                "caption": "Input Image",
+                "position": 3922
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_fe2c82a9/input.jpg",
+                "caption": "Input Image",
+                "position": 3925
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_fe2c82a9/gvm.jpg",
+                "caption": "GVM[8]",
+                "position": 3930
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_fe2c82a9/matanyone2.jpg",
+                "caption": "MatAnyone 2[46]",
+                "position": 3935
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_fe2c82a9/vitmatte.jpg",
+                "caption": "ViTMatte[48]",
+                "position": 3940
+            },
+            {
+                "img": "https://arxiv.org/html/2606.00386/2606.00386v1/imgs/supp/alpha/o_fe2c82a9/ours.jpg",
+                "caption": "α\\alphaDepth (Ours)",
+                "position": 3945
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
