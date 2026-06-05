@@ -1,0 +1,144 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/teaser18.png",
+                "caption": "Figure 1:OPRD is strictly Pareto-dominant on accuracy, training time, and GPU memory.Each bubble is a method trained from the same R1-distill-1.5B student against JustRL-1.5B teacher for500500optimizer steps on8×8\\!\\times\\!A100 GPU (80G) FSDP (§4).\nAxes carry the two “compute” costs (wall-clock↓\\downarrow, AIME24 Avg@16↑\\uparrow); bubble area encodes the third cost (actor-updateΔ\\Deltapeak GPU memory↓\\downarrow).\nOPRD (navy bubble) simultaneously dominates the strongest output-space baseline (OPD top-1616) on all three axes:2.72.7pt accuracy gain,1.44×1.44\\timesspeed-up, and54%54\\%Δ\\Deltapeak memory cut. Results on AIME25 and AIMO are qualitatively identical (§4.2).",
+                "position": 318
+            }
+        ]
+    },
+    {
+        "header": "2Background and Problem Setup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/x1.png",
+                "caption": "Figure 2:Architecture of OPRD vs. output-space OPD.Both methods share the same on-policy rollouty^∼πθ(⋅∣x)\\hat{y}\\sim\\pi_{\\theta}(\\cdot\\!\\mid\\!x), which is fed to the student (blue, trainable) and the teacher (orange, frozen).OPDextracts supervisionafterthe LM head, comparing output distributionsptp_{t}andqtq_{t}via reverse KL on a token subset.OPRD (ours)extracts supervisionbeforethe LM head, comparing intermediate hidden statesh(l)h^{(l)}at selected layers via maskedℓ2\\ell_{2}loss.\nOPRD is used on its own by default, but can optionally be combined withℒOPD\\mathcal{L}_{\\mathrm{OPD}}asℒOPD+μ​ℒOPRD\\mathcal{L}_{\\mathrm{OPD}}+\\mu\\,\\mathcal{L}_{\\mathrm{OPRD}}.\nOPRD taps the teacherbeforethe LM-head projection, exposing per-layer structural information that any output-space objective discards.",
+                "position": 984
+            }
+        ]
+    },
+    {
+        "header": "3On-Policy Representation Distillation",
+        "images": []
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/AIME24-avg16-OPRD_last2000_coef1-OPD_top1.png",
+                "caption": "(a)AIME24    vs. OPD top-1",
+                "position": 1155
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/AIME24-avg16-OPRD_last2000_coef1-OPD_top1.png",
+                "caption": "(a)AIME24    vs. OPD top-1",
+                "position": 1158
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/AIME25-avg16-OPRD_last2000_coef1-OPD_top1.png",
+                "caption": "(b)AIME25    vs. OPD top-1",
+                "position": 1163
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/AIMO-avg16-OPRD_last2000_coef1-OPD_top1_1.png",
+                "caption": "(c)AIMO    vs. OPD top-1",
+                "position": 1168
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/AIME24-avg16-OPRD_last2000_coef1-OPD_top16.png",
+                "caption": "(d)AIME24    vs. OPD top-16",
+                "position": 1174
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/AIME25-avg16-OPRD_last2000_coef1-OPD_top16.png",
+                "caption": "(e)AIME25    vs. OPD top-16",
+                "position": 1179
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/AIMO-avg16-OPRD_last2000_coef1-OPD_top16.png",
+                "caption": "(f)AIMO    vs. OPD top-16",
+                "position": 1184
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/response_length_mean-three_methods3.png",
+                "caption": "Figure 4:OPRD produces shorter responses than OPD at higher accuracy.Mean rollout lengthresponse_length/meanalong training for OPRD vs. OPD top-11vs. OPD top-1616(smoothing window=15=15).\nOPRD converges to∼5,700{\\sim}5{,}700tokens per response, while both OPD variants plateau around∼7,000{\\sim}7{,}000tokens, indicating that hidden-state supervision yields more concise and efficient reasoning chains.",
+                "position": 1319
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/token_reward_direct_DAPO-Math-17k-opd-rep_all_last2000_coef1_DeepSeek-R1-Distill-Qwen-1.5B_JustRL-DeepSeek-1.5B_16384-T_1.0-Tch_1.0-n_2-mbs_8-topk_0-topk_strategy_only_stu-rw_student_p-2026-05-31_01-12-04-OPD-rep_cosine.png",
+                "caption": "Figure 5:OPRD monotonically increases the student–teacher representation cosine similarity it supervises (higher is better).rep/cosine_similarityon the OPRD-supervised positions along training (smoothing window=5=5).\nThe curve rises sharply early and drifts upward steadily thereafter, confirming that (6) is being optimised end-to-end.",
+                "position": 1377
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/ablation_mu.png",
+                "caption": "Figure 6:Adding OPRD on top of OPD top-1 monotonically lifts accuracy.AIME24 avg@16 ofℒOPD+μ⋅ℒOPRD\\mathcal{L}_{\\mathrm{OPD}}+\\mu\\cdot\\mathcal{L}_{\\mathrm{OPRD}}forμ∈{0,1,10}\\mu\\!\\in\\!\\{0,1,10\\}. Evenμ=1\\mu\\!=\\!1already surpasses OPD top-1616(47.147.1);μ=10\\mu\\!=\\!10closes the gap to teacher to within0.60.6pt.",
+                "position": 1442
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/cos_position2.png",
+                "caption": "Figure 7:The student diverges from the teacher mostly at the end of the response.Cosine similarity between student (R1-distill-1.5B) and teacher (JustRL-1.5B) last-layer hidden states on on-policy rollouts, restricted to either the firstkkor the lastkkresponse tokens, as a function ofkk(log scale; “ALL” = full response, at which both curves coincide at95.42%95.42\\%by construction).\nThe first-kkcurve is nearly teacher-aligned at everykk(≥97%\\geq\\!97\\%fork≤1600k\\!\\leq\\!1600); the last-kkcurve lags by≥4\\geq\\!4points untilkkexceeds the full response length.\nThis empirically motivates concentrating OPRD’s supervision on the last-kkpositions (§4.1).",
+                "position": 1469
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/pg_loss-OPD_vs_OPD_plus_OPRD.png",
+                "caption": "Figure 8:OPRD accelerates the PG-loss phase transition and validates the information bottleneck.actor/pg_lossalong training for OPD top-11++OPRD composite runs (ℒOPD​top​-​1+μ⋅ℒOPRD\\mathcal{L}_{\\mathrm{OPD\\,top\\text{-}1}}+\\mu\\cdot\\mathcal{L}_{\\mathrm{OPRD}},μ∈{0,1,10}\\mu\\!\\in\\!\\{0,1,10\\}; smoothing window=15=15).\nAll runs show a loss spike (possible phase transition); OPRD shifts it earlier, indicating accelerated distillation.\nIn late training all curves converge to≈0{\\approx}\\,0, yet accuracy differences persist, corroborating the LM-head bottleneck ofTheorem˜2.",
+                "position": 1516
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/overlap_ratio-OPDtop16_vs_plus_OPRD.png",
+                "caption": "Figure 9:Adding OPRD to OPD top-1616further aligns student and teacher next-token top-1616sets (higher is better).Validationval-topk/overlap_ratioalong training.\nThe two runs are nearly co-located early on, but in the second half of training OPD top-1616plateaus while OPD top-1616++OPRD keeps climbing, the same late-stage divergence that distinguishes the accuracy curves ofFigure˜3.",
+                "position": 1522
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/entropy-OPD1.png",
+                "caption": "(a)μ=0\\mu=0(OPD only).",
+                "position": 1527
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/entropy-OPD1.png",
+                "caption": "(a)μ=0\\mu=0(OPD only).",
+                "position": 1530
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/entropy-OPD_plus_1xOPRD1.png",
+                "caption": "(b)μ=1\\mu=1(OPD+1⋅+1\\!\\cdot\\!OPRD).",
+                "position": 1535
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06021/2606.06021v1/Figure/entropy-OPD_plus_10xOPRD1.png",
+                "caption": "(c)μ=10\\mu=10(OPD+10⋅+10\\!\\cdot\\!OPRD).",
+                "position": 1540
+            }
+        ]
+    },
+    {
+        "header": "5Discussion",
+        "images": []
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion and Future Work",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AFormal Theoretical Guarantees",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
