@@ -1,0 +1,167 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x1.png",
+                "caption": "Figure 1:Pose-controllable object insertion.(a) Existing pipelines have difficulty placing the reference object in a reasonable and user-specified pose within the background image, even when using a strong 2D generative model such as Nano Banana Pro(Google,2025)or a 3D-aware editing model such as Object3DIT(Michelet al.,2023).\nIn contrast, our framework inserts the object with precise pose control and better scene alignment.\n(b) Additional results show that our method achieves high-fidelity insertion with precise pose control in complex real-world scenes.\nWe report the prompts used for competing methods in AppendixA.",
+                "position": 266
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x2.png",
+                "caption": "Figure 2:Illustration of our framework.The generation process is controlled by three types of conditions: appearance guidance from the original reference object, geometry guidance from the rendered image with the user-specified pose, and context guidance from global features of the background image.\nThese conditions are injected through decomposed LoRA pathways to reduce interference.\nThe standard masked background condition is modified by pasting the rendered object with the desired pose into the masked region.\nThe editing region is cropped for focused local insertion and pasted back into the high-resolution image after generation.",
+                "position": 341
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x3.png",
+                "caption": "Figure 3:Geometric semantic ambiguity.Standard spatial signals, such as depth and normal maps, fail to distinguish the orientation of symmetric objects, whereas our RGB geometric condition explicitly preserves semantic pose.",
+                "position": 426
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x4.png",
+                "caption": "Figure 4:Appearance fidelity gap.Current image-to-3D models suffer from severe texture degradation.\nRelying solely on the rendered proxy can lead to blurry outputs, motivating the re-injection of the original reference.",
+                "position": 431
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x5.png",
+                "caption": "Figure 5:Overview of geometric alignment pipeline.Given a target imageIg​tI_{gt}, we estimate the rendering pose of the 3D proxy𝒫\\mathcal{P}such that its projection matches the target object.\nThe pose-aligned rendering is then used as the geometric conditionIg​e​oI_{geo}for training.",
+                "position": 572
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x6.png",
+                "caption": "Figure 6:Qualitative Comparison.We compare our method against Object3DIT(Michelet al.,2023)and TRELLIS(Xianget al.,2025). Our method achieves superior identity preservation and background consistency, avoiding the appearance artifacts observed in TRELLIS and the geometric distortions in Object3DIT.\nIA denotes InsertAnything(Songet al.,2026).",
+                "position": 768
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x7.png",
+                "caption": "Figure 7:Large pose-change examples.Representative cases show substantial pose variations between the reference object and target pose.\nThese examples require synthesis of largely unseen object views from limited reference appearance, including large rotations, top-view to side-view transformation, and near180∘180^{\\circ}viewpoint changes.\nOur method preserves object identity while following the specified pose.",
+                "position": 878
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x8.png",
+                "caption": "Figure 8:Comparison of geometry guidance signals.Top row: Reference object, RGB/normal guidance at0∘0^{\\circ}, and RGB/normal guidance at180∘180^{\\circ}.\nBottom row: Background image and the four corresponding generation results.\nFor the symmetric road sign, the normal maps are invariant to the180∘180^{\\circ}rotation, leading to semantic ambiguity and orientation errors in the normal-based results.\nIn contrast, our RGB proxy provides semantically rich textural cues, ensuring the model follows the desired pose.",
+                "position": 892
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x9.png",
+                "caption": "Figure 9:Effectiveness of the decomposed injection.We compare our approach against a vanilla LoRA baseline that naively concatenates the appearance and geometry guidance.\nWhen the 3D proxy contains texture artifacts, the vanilla baseline suffers from feature entanglement, incorrectly inheriting degraded details.\nOur decomposed strategy successfully isolates these conflicting signals, leveraging the proxy for geometry guidance while preserving high-fidelity identity from the reference.",
+                "position": 901
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x10.png",
+                "caption": "Figure 10:Robustness to degraded 3D proxies.In an extreme object insertion case with rich textual details on the object surface, the 3D proxy suffers from significant quality degradation. In contrast, our model inserts precise, legible details.",
+                "position": 1043
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x11.png",
+                "caption": "Figure 11:Failure case.The upstream model incorrectly reconstructs the rectangular reference as a square proxy.\nOur model strictly follows this distorted geometric condition, resulting in an incorrect aspect ratio in the final output.",
+                "position": 1049
+            }
+        ]
+    },
+    {
+        "header": "5Conclusions",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "Impact Statement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix Overview",
+        "images": []
+    },
+    {
+        "header": "Appendix APrompts for Competing Methods in Fig.1",
+        "images": []
+    },
+    {
+        "header": "Appendix BTraining Data Construction Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x12.png",
+                "caption": "Figure 12:Overview of the Interactive Inference Pipeline.First, the reference image is lifted into a 3D proxy.\nUsers then manipulate the proxy over the background canvas via a visual gizmo to determine the target 6-DoF pose.\nFinally, the system automatically renders the necessary conditions to guide our generative framework, yielding a high-fidelity composite image that respects the user-specified pose.",
+                "position": 1759
+            }
+        ]
+    },
+    {
+        "header": "Appendix CInteractive Inference Pipeline",
+        "images": []
+    },
+    {
+        "header": "Appendix DAdditional Intrinsic-Guided Compositing Baseline",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x13.png",
+                "caption": "Figure 13:Qualitative comparison with intrinsic-guided compositing.The intrinsic-guided compositing baseline provides strong geometric adherence, but struggles to preserve fine-grained reference appearance and overall image realism.\nIn contrast, our method simultaneously achieves pose control, identity preservation, and realistic scene integration.",
+                "position": 1887
+            }
+        ]
+    },
+    {
+        "header": "Appendix EInference Latency and Memory Overhead",
+        "images": []
+    },
+    {
+        "header": "Appendix FSensitivity to 3D Proxy-Scene Misalignment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x14.png",
+                "caption": "Figure 14:Sensitivity to 3D proxy-scene misalignment.We show representative cases where the user-specified 3D proxy is mildly misaligned with the target scene.\nIn the first example, the proxy is placed slightly above the ground.\nIn the second example, the proxy is not perfectly aligned with the supporting surface.\nDespite these mild proxy-scene placement errors, our method produces natural insertion results, suggesting robustness to small inaccuracies in user-specified proxy placement.",
+                "position": 1967
+            }
+        ]
+    },
+    {
+        "header": "Appendix GPerformance in Complex Environments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x15.png",
+                "caption": "Figure 15:Performance in complex environments.We show representative examples involving occlusion, lighting, and reflection.\nFor occlusion, a pen is inserted into a pen holder, where the generated result exhibits a plausible depth relationship between the pen and the holder structure.\nFor lighting, a car is inserted into a scene with strong directional illumination, and the model generates a plausible shadow consistent with the surrounding scene.\nFor reflection, a boat is inserted onto a reflective water surface, and the generated result includes a visually plausible reflection on the background surface.",
+                "position": 1988
+            }
+        ]
+    },
+    {
+        "header": "Appendix HVisual Demonstrations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06601/2606.06601v1/x16.png",
+                "caption": "Figure 16:Visual Demonstrations.We showcase our model’s capability to insert various objects into complex real-world backgrounds with high visual fidelity.\nThe results show that our method supports explicit pose control (e.g., varying angles and orientations) while strictly preserving the identity and texture details of the reference objects.",
+                "position": 2006
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
