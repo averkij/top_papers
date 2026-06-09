@@ -1,0 +1,114 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3AsyncWebRL",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.05597/2606.05597v1/x1.png",
+                "caption": "Figure 1:Multi-step Asynchronous Management.Compared to WebGym, AsyncWebRL eliminates theinter-iteration bubble timecaused by reconstructing the rollout pool at every iteration boundary and waiting for the policy refresh ofπt\\pi_{t}to complete. Colored blocks denote concurrent rollout workers producing trajectories, gradient updates onπt\\pi_{t}, and policy refreshes that broadcast new weights to the rollout workers. White gaps under synchronous RL (top) are bubble time. AsyncWebRL (bottom) eliminates these gaps by maintaining an everlasting rollout pool so that rollout, gradient update, and policy refresh overlap continuously.",
+                "position": 321
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.05597/2606.05597v1/x2.png",
+                "caption": "Figure 2:Test success rate vs. training trajectories collected on the WebGym OOD test split. Solid colored curves are our runs under AsyncWebRL:AsyncWebRL (full)andAsyncWebRL-RAFT++. The gray dashed curve is the prior WebGym sync REINFORCE baseline (values fromBaiet al.(2026)).Top:Instruct.Bottom:Thinking. No WebGym curve is shown on Thinking because its baseline was not trained under our(10,20,30)(10,20,30)per difficulty horizons. AsyncWebRL (full) achieves both higher final test reward and higher sample efficiency per training trajectory collected.",
+                "position": 476
+            },
+            {
+                "img": "https://arxiv.org/html/2606.05597/2606.05597v1/x3.png",
+                "caption": "Figure 3:Left:End to end training trajectory throughput.Right:Off-policyness during GRPO training for the Instruct (blue) and Thinking (red) Qwen3-VL-8B runs: mean and max of the per-token off-policy gapggacross a training batch.",
+                "position": 482
+            },
+            {
+                "img": "https://arxiv.org/html/2606.05597/2606.05597v1/x4.png",
+                "caption": "Figure 4:Effect of the1/|τi|1/|\\tau_{i}|normalizer on GRPO training dynamics. Rows are the two Qwen3-VL-8B variants (top: Instruct, bottom: Thinking), columns are, from left to right, test reward, #steps per trajectory, per-token entropy, and #tokens per step. Test reward is essentially tied between the two losses, but the1/|τi|1/|\\tau_{i}|run produces longer trajectories, longer per-step responses, and lower per-token entropy.",
+                "position": 496
+            },
+            {
+                "img": "https://arxiv.org/html/2606.05597/2606.05597v1/x5.png",
+                "caption": "Figure 5:Coupled vs. decoupled importance sampling under the async RL GRPO loss. From left to right: per update mean of training reward, fraction of tokens hit by theϵ\\epsilon-clip, and fraction of tokens hit by the dual clip.",
+                "position": 502
+            }
+        ]
+    },
+    {
+        "header": "5Dynamics Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.05597/2606.05597v1/x6.png",
+                "caption": "Figure 6:Memoryat step44of one representative 10/20/30-horizon rollout per checkpoint.1/|τi|1/|\\tau_{i}|accumulates verbose generic keys; the constant1/k1/kfix re-keysMemoryto task sub-questions.",
+                "position": 521
+            },
+            {
+                "img": "https://arxiv.org/html/2606.05597/2606.05597v1/x7.png",
+                "caption": "Figure 7:Trajectory-mean number ofMemoryJSON keys per agent step, split by outcome (Success, Failure) and difficulty (Easy, Medium).1/|τi|1/|\\tau_{i}|tracks the one-new-key-per-step diagonal; the constant1/k1/kfix stays close to Base.",
+                "position": 524
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional Analyses",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.05597/2606.05597v1/x8.png",
+                "caption": "Figure 8:Learning-rate ablation on RAFT++\n(Qwen3-VL-8B-Instruct,b=120b{=}120, off-policy==2, no KL).\nFrom left to right: held-out test success rate (the larger-LR run\nwins by a wide margin at the peak), training reward, where the trend\nreverses, pre-clipping gradient L2 norm (consistently bounded for\nthe larger LR), and per-token policy entropy, which decays faster\nunder the larger LR. The train/test flip suggests low-LR RAFT++\noverfits the filtered positives buffer, noisier optimization\ngeneralizes better.",
+                "position": 905
+            },
+            {
+                "img": "https://arxiv.org/html/2606.05597/2606.05597v1/x9.png",
+                "caption": "Figure 9:GRPO vs. RAFT++ onQwen3-VL-8B-Instruct.Left:training reward per optimizer step.Middle:per-token policy entropy averaged over the loss mask, the step-zero\noffset is induced by the conditional vs. unconditional denominator\n(see text).Right:fraction of tokens hitting theϵ\\epsilon-clip, both runs sit near 0.3%, ruling out clip\nmechanics as the driver of the entropy gap.",
+                "position": 924
+            },
+            {
+                "img": "https://arxiv.org/html/2606.05597/2606.05597v1/x10.png",
+                "caption": "Figure 10:Effect of consumer batch size on GRPO Instruct training, plotted against wall-clock hours: batch=128 (the canonical setting used throughout the paper) versus batch=32, all other hyperparameters held fixed. From left: test reward, training reward, policy entropy, average steps per trajectory, and average response tokens per step.",
+                "position": 1031
+            }
+        ]
+    },
+    {
+        "header": "Appendix BImplementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.05597/2606.05597v1/x11.png",
+                "caption": "Figure 11:Lightweight Screenshot Handling. Compared to WebGym, which serializes every screenshot through the shared RPC object store and spills to disk under concurrent rollouts, AsyncWebRL keeps all image tensors in a dedicated in-memory actor and routes only lightweightreferencesthrough RPC, eliminating the per-step object-store bottleneck.",
+                "position": 1099
+            }
+        ]
+    },
+    {
+        "header": "Appendix CQualitative Examples",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
