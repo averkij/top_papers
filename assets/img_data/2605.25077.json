@@ -1,0 +1,99 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.25077/2605.25077v1/x1.png",
+                "caption": "Figure 1:WorldCraft overview.(Top-left)WorldCraft lifts a user-specified 2D trajectory into a camera-decoupled normalized world space and re-projects it into per-frame trajectory conditions under the given camera actions.(Top-right)The trajectory and camera controls are injected through a lightweight pathway-selective LoRA on the spatial-control pathway, while the backbone attention and MLP layers remain frozen.(bottom)During autoregressive generation, WorldCraft updates the anchor frame and memory bank across chunks, and refreshes outdated memories to support long-horizon out-of-camera object reasoning.",
+                "position": 474
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.25077/2605.25077v1/x2.png",
+                "caption": "Figure 2:Qualitative comparison of trajectory control.WorldCraftachieves precise and composable controllability, jointly controlling camera motion and target-object trajectories.",
+                "position": 914
+            },
+            {
+                "img": "https://arxiv.org/html/2605.25077/2605.25077v1/x3.png",
+                "caption": "Figure 3:Long-horizon comparisons with off-camera motion.Given the same initial frame and camera actions, the goose moves right while the camera pans left and then returns.WorldCraftmaintains scene consistency and, via TASP, recovers the goose at the correct off-camera-updated position when it re-enters view, whereas baselines either lose scene consistency or cannot track the off-camera object state.",
+                "position": 917
+            },
+            {
+                "img": "https://arxiv.org/html/2605.25077/2605.25077v1/x4.png",
+                "caption": "Figure 4:Extended capabilities.Part: part-level control-the shield follows the trajectory while the body stays still.Multi: multi-object control-three objects steered simultaneously along independent trajectories.Long:253253-frame autoregressive rollout with long trajectory (∼10.5{\\sim}10.5s at 24 fps).",
+                "position": 979
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.25077/2605.25077v1/x5.png",
+                "caption": "Figure 5:Curated training set statistics(N=27,027N{=}27{,}027clips after filtering).(a)Representative samples with the first frame, the SAM2 mask contour of the selected subject (blue), and the multi-point trajectory overlay (start in green, end in red, path in yellow). Subjects range from vehicles and pedestrians to pushed or carried objects under diverse weather and lighting.(b)Distribution of object displacement magnitude, measured as the net 2D displacement of the subject centroid across the 97-frame window, normalized by the frame diagonal. The distribution is right-skewed with median15.2%15.2\\%andp95=43.6%p_{95}{=}43.6\\%, covering small to large object motions.(c)Joint distribution of camera translation (world units, symlog axis) and object displacement (% diagonal). Using thresholds of0.50.5world-units for camera and10%10\\%diagonal for object, four regimes partition the dataset:47%47\\%static-cam / moving-obj (purely object-centric),23%23\\%static-cam / static-obj,7%7\\%moving-cam / static-obj (pure ego-motion), and23%23\\%moving-cam / moving-obj, the WorldCraft-specific regime that demands composable control and is absent from most existing trajectory datasets.",
+                "position": 1485
+            }
+        ]
+    },
+    {
+        "header": "Appendix AProgressive training",
+        "images": []
+    },
+    {
+        "header": "Appendix BScalable data curation pipeline",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.25077/2605.25077v1/x6.png",
+                "caption": "Figure 6:Automatic data curation pipeline. Given unlabeled video, we extract camera parameters, discover the salient moving subject, track it with SAM2 to obtain per-frame masks, and run CoTracker to produce multi-point trajectories. Physical-plausibility filters remove degenerate samples. The pipeline adapts to two data sources with complementary strengths: WISA-80K contributes diverse real-world scenes via a fully automatic VLM-guided discovery; SpatialVID-HQ provides metric camera annotations that we combine with a novel tracklet-based subject selection.",
+                "position": 1524
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAdditional analysis details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.25077/2605.25077v1/x7.png",
+                "caption": "Figure 7:Activation-level analysis of camera – trajectory interaction.(a)Trajectory effect is a small additive perturbation on top of the camera signal across all blocks (stacked bars onprope_proj).(b)Counterfactual camera invariance:cos⁡(𝐜α,𝐜β)\\cos(\\mathbf{c}_{\\alpha},\\mathbf{c}_{\\beta})per block, where𝐜\\mathbf{c}is the camera effect vector measured under two different trajectories. Mean = 0.89, confirming that trajectory variation does not alter the camera effect direction.(c)Layer selection ablation on camera preservation: per-block cosine similarity averaged across all hooked layer types (img_mod,prope_proj, Q/K/V, MLP,img_attn_proj) between base model and each LoRA variant under camera-only input. Pathway-selective adaptation (prope+action) preserves camera activations far better than Q/K/V LoRA, which causes significant degradation in mid-to-late blocks.",
+                "position": 1675
+            },
+            {
+                "img": "https://arxiv.org/html/2605.25077/2605.25077v1/x8.png",
+                "caption": "Figure 8:Shared control subspace.2D PCA projection of token-level camera-control updates𝐮\\mathbf{u}(blue) and trajectory-control updates𝐯\\mathbf{v}(red) at the peak block.\nThe two distributions are aligned along the same principal directions rather than forming orthogonal subspaces, indicating that trajectory control is injected within the camera-compatible spatial-control subspace.",
+                "position": 1689
+            }
+        ]
+    },
+    {
+        "header": "Appendix DLimitations.",
+        "images": []
+    },
+    {
+        "header": "Appendix EBroader impact.",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
