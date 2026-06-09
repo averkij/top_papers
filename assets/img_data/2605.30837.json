@@ -1,0 +1,238 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/x1.png",
+                "caption": "Figure 1:SCOUT allocates detectors per input.(a)Four detectors on the shared SCOUT-450 sample space (UMAP of input embeddings): green dots are correct decisions, blue crosses are false positives, and orange crosses are false negatives. The detectors make different errors and their accuracy varies widely.(b)A single-detector defense commits each request to one fixed detector’s verdict (top). SCOUT (bottom) asks how every detector will behave on the input: a small predictor reads the retrieved detector fingerprints and estimates each detector’s correctness and latency, and an operator thresholdτ\\tauthen selects which light detectors to trust and when to escalate to the LLM judge.(c)Detector-invocation share on SCOUT-450 (GPT-4o judge) at four thresholds (τ∈{0.55,0.75,0.875,1.00}\\tau\\in\\{0.55,0.75,0.875,1.00\\}; headline0.8750.875), whereρ\\rhois the escalation rate. Asτ\\taurises, the judge (DLLMD_{\\text{LLM}}) takes a larger share of invocations.",
+                "position": 384
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/x2.png",
+                "caption": "Figure 2:SCOUT framework overview.(a)Fingerprint construction: for each requestxx, kNN retrieval over the anchor prompt bank surfaces the top-1010neighbours and returns the matching detector fingerprints. (b)Outcome prediction: a small predictor (Qwen3-4B, SFT++GRPO post-training on SCOUT-30K with chain-of-thought rationales) maps the fingerprint slice to per-detector(pred_corr,pred_lat)(\\texttt{pred\\_corr},\\texttt{pred\\_lat})estimates. (c)Uncertainty-aware triage: a single thresholdτ\\tauover the predictor-filtered ensemble routes the request to a light-pool verdict, an LLM-judge escalation, or a skip, producing the final attack/benign decision.",
+                "position": 428
+            }
+        ]
+    },
+    {
+        "header": "3Detector Fingerprints and Retrieval",
+        "images": []
+    },
+    {
+        "header": "4Outcome Predictor",
+        "images": []
+    },
+    {
+        "header": "5Uncertainty-Aware Triage",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/x3.png",
+                "caption": "Figure 3:Quality–latency frontier on SCOUT-450.Wall-clock vs. quality across theτ∈[0.50,1.00]\\tau\\in[0.50,1.00]sweep of the predictor-filtered cascade; gray triangles are all individual standalone detectors, and X marks the always-onDLLMD_{\\text{LLM}}. Attack block rate≡1−ASR\\equiv 1-\\mathrm{ASR}(higher is better). Sweepingτ\\tautrades latency for quality, with Acc,1−ASR1-\\mathrm{ASR}, and BU improving together.",
+                "position": 806
+            }
+        ]
+    },
+    {
+        "header": "6Data",
+        "images": []
+    },
+    {
+        "header": "7Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/x4.png",
+                "caption": "Figure 4:Ablation curves on SCOUT-450(polynomial fits over the threshold sweepτ∈[0.50,1.00]\\tau\\in[0.50,1.00];xxis total wall-clock, log scale).Top row:1−ASR1-\\mathrm{ASR}(attack block rate).Bottom row: benign utility (1−FPR1-\\mathrm{FPR}). Columns vary one link of SCOUT: predictor recipe, routing rule, and trust mixingω\\omega. Always-DLLMD_{\\text{LLM}}(X) is the high-latency reference. Companion accuracy panels are in AppendixG, Figure19.",
+                "position": 1014
+            }
+        ]
+    },
+    {
+        "header": "8Conclusion",
+        "images": []
+    },
+    {
+        "header": "Limitations",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADetector pool details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/figures/detector_diversity.png",
+                "caption": "Figure 5:Detector behavioral diversity.Left: median per-request latency (log scale).Right: accuracy. Both are shown for SCOUT-30K and SCOUT-450. Detectors span four orders of magnitude in latency and a wide accuracy band, and each detector’s profile is consistent across the two splits.",
+                "position": 2263
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/figures/ds_SCOUT-450_detector_overlay.png",
+                "caption": "Figure 6:Per-detector correctness on SCOUT-450.Each panel shows one detector’s predictions overlaid on the shared UMAP ofeval_contentembeddings. Light gray dots are the full SCOUT-450 distribution; green dots are correct decisions, dark-blue crosses are false positives, and orange crosses are false negatives.",
+                "position": 2273
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/figures/detector_error_atlas.png",
+                "caption": "Figure 7:Detector correctness atlas on SCOUT-450.Columns are the base-pool and extension detectors; rows are samples grouped by category (harder samples first within each group). Gray cells are correct decisions, dark-blue cells are false positives, and orange cells are false negatives. Top bars give each detector’s correct/false-positive/false-negative rates (accuracy annotated above); the right margin counts how many detectors misclassify each sample.",
+                "position": 2283
+            }
+        ]
+    },
+    {
+        "header": "Appendix BData construction and composition",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/x5.png",
+                "caption": "Figure 8:Composition of the three released splits.(a) SCOUT-30K source carriers:2,7002{,}700unique input samples paired with detector profiles to produce the29,55129{,}551(sample, detector) examples used for SFT and GRPO. (b) Anchor-400, the held-out fingerprint and kNN retrieval set. (c) SCOUT-450, the held-out routing benchmark. Each donut shows the inner attack-vs-benign split (red==attack, blue==benign) and the outer per-category breakdown; warm shades are attack-bearing categories and cool shades are benign categories.",
+                "position": 2386
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/figures/ds_SCOUT-450_sample_space.png",
+                "caption": "Figure 9:SCOUT-450 sample space (UMAP).The shared UMAP ofeval_contentembeddings, colored by attack category (left), carrier type (middle), and difficulty (right). The per-detector correctness overlays in Figure6use the same coordinates.",
+                "position": 2396
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/figures/ds_SCOUT-450_hard.png",
+                "caption": "Figure 10:Sample difficulty on SCOUT-450.Left: each sample on the shared UMAP, colored by the number of the eight base-pool detectors that misclassify it.Right: histogram of that count.",
+                "position": 2406
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/figures/coverage_category.png",
+                "caption": "Figure 11:Anchor-400 coverage of the SCOUT-30K training distribution, by category.One panel per attack/benign category, on a shared UMAP ofeval_contentembeddings; light gray = all training samples, colored points = training samples in the focal category, squares = Anchor-400 anchors in the focal category. Panel titles report per-category query and anchor counts.",
+                "position": 2416
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/figures/coverage_hiding_strategy.png",
+                "caption": "Figure 12:Thehidden_trickycategory by concealment strategy.Anchor-400 coverage of the ten concealment strategies that make uphidden_tricky(SCOUT-30K queries vs Anchor-400 anchors), on the sharedeval_contentUMAP; light gray = all training samples, colored points = training samples using the focal strategy, squares = Anchor-400 anchors. Panel titles report per-strategy query and anchor counts.",
+                "position": 2419
+            }
+        ]
+    },
+    {
+        "header": "Appendix CFingerprint construction and retrieval",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/figures/fingerprint_metadata_umap.png",
+                "caption": "Figure 13:Fingerprint descriptor space (UMAP).UMAP of the anchorsample_characteristicsdescriptors used on the document side of retrieval, colored by attack category (left), carrier type (middle), and difficulty (right).",
+                "position": 2513
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/x6.png",
+                "caption": "Figure 14:Attack-type retrieval and fingerprint compaction (SCOUT-450).(a)Attack-type Coverage@KK: fraction of queries whose top-KKanchors include a same-attack_typeanchor, overall and split into attack and benign queries.(b)Coverage@1010per attack type; bar annotations give the query countnn.(c)Mean tokens per anchor record: the LLM-serializedsample_characteristics(∼\\sim69) versus the raweval_content(∼\\sim535), the compaction that keeps the predictor’sKK-shot context small.",
+                "position": 2523
+            }
+        ]
+    },
+    {
+        "header": "Appendix DPredictor training details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/x7.png",
+                "caption": "Figure 15:Latency rewardrlatr_{\\text{lat}}.Predictions withinδ/2\\delta/2of the ground-truth latency receive full reward, with linear decay to zero atδ\\delta, whereδ=max⁡(2​ms,0.5​ℓgt)\\delta=\\max(2\\,\\text{ms},\\,0.5\\,\\ell_{\\text{gt}}).Left: a light detector (ℓgt=20\\ell_{\\text{gt}}=20ms).Right: the LLM judge (ℓgt=1500\\ell_{\\text{gt}}=1500ms). The full reward isgfmt⋅rcorr⋅(1+rlat)g_{\\text{fmt}}\\cdot r_{\\text{corr}}\\cdot(1+r_{\\text{lat}}), so a correct prediction earns between11and22depending on latency accuracy, and an incorrect or malformed one earns0.",
+                "position": 2667
+            }
+        ]
+    },
+    {
+        "header": "Appendix ETriage rule details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/x8.png",
+                "caption": "Figure 16:Uncertainty-aware triage in SCOUT.The predictor emits a per-detector reliability estimate (pred_corr) and latency estimate (pred_lat). The reliability estimate filters the light pool before execution, and the selected light detectors vote with trust weights that mix local fingerprint evidence and global detector reliability. If the weighted vote is confident under thresholdτ\\tau, SCOUT skips the LLM judge; otherwise it escalates only when the predictor also estimates the judge to be reliable, and keeps the light-pool vote when it does not. The latency estimate gives the predicted wall-clock of the path taken, which makesτ\\taua latency control (Section7.6).",
+                "position": 2701
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/x9.png",
+                "caption": "Figure 17:Budget-to-threshold recipe (SCOUT-450).The operator maps a target budget to the thresholdτ⋆\\tau^{\\star}that meets it: a latency budgetLL(left, label-free frompred_lat) or a safety budgetq=1−ASRq=1-\\mathrm{ASR}(right). Both maps are monotone; the red circle marks the headline operating pointτ=0.875\\tau=0.875.",
+                "position": 2745
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/x10.png",
+                "caption": "Figure 18:Detector-invocation portfolio across theτ\\tau-sweep on SCOUT-450 (Base pool).Share of detector invocations under filter++skip routing. Rows: LLM judge (GPT-4o, GPT-5.1). Columns:τ∈{0.55,0.75,0.875,1.00}\\tau\\in\\{0.55,0.75,0.875,1.00\\}; the first three match the SCOUT rows in Table1.D2D_{2}aggregates the three ML-classifier variants. A light detector is counted on every request it voted on;DLLMD_{\\text{LLM}}on every escalated request. The annotationρ​(τ)\\rho(\\tau)below each panel is the empirical escalation rate.",
+                "position": 2755
+            }
+        ]
+    },
+    {
+        "header": "Appendix FTrust-mixing sweep",
+        "images": []
+    },
+    {
+        "header": "Appendix GAblation: accuracy panels",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/x11.png",
+                "caption": "Figure 19:Ablation: accuracy panelson SCOUT-450, companion to Figure4. Routing accuracy versus total wall-clock; columns are the predictor recipe, routing rule, and trust mixingω\\omega. Always-DLLMD_{\\text{LLM}}(X) is shown for reference.",
+                "position": 2902
+            }
+        ]
+    },
+    {
+        "header": "Appendix HPer-predictor quality",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/x12.png",
+                "caption": "Figure 20:Per-predictor quality and verbosity.Left:pred_corraccuracy broken out by detector group (light pool /DLLMD_{\\text{LLM}}judge / overall). The light-pool bar governs the routing trade-off position in the predictor-recipe block of Table2.Right:mean output tokens per (sample, detector). SCOUT compresses chain-of-thought to∼110\\sim 110tokens via the reward’s length gate.",
+                "position": 2920
+            }
+        ]
+    },
+    {
+        "header": "Appendix IPredictor as a standalone detector",
+        "images": []
+    },
+    {
+        "header": "Appendix JExtended generalization study",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/x13.png",
+                "caption": "Figure 21:Pool extension on SCOUT-450 (RQ3), latency view.Six panels (3 rows×\\times2 judges) show the SCOUT threshold sweep (base,+D7+\\,D_{7},+D7+D8+\\,D_{7}+D_{8}) on Acc,1−ASR1-\\mathrm{ASR}, and BU plotted against total wall-clock. Columns: GPT-4o (left), GPT-5.1 (right). The always-LLM-judge marker (X) is the right-end reference.",
+                "position": 3063
+            },
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/x14.png",
+                "caption": "Figure 22:Cross-benchmark latency-quality view.SCOUTτ\\tau-sweeps on BIPIA, IPI, and IHEval (N=1000N{=}1000each), plotted against Acc,1−ASR1{-}\\mathrm{ASR}, and BU with GPT-5.1 asDLLMD_{\\text{LLM}}. Always-LLM-judge (X) is the right-end reference; SCOUT cuts wall-clock on all three benchmarks.",
+                "position": 3066
+            }
+        ]
+    },
+    {
+        "header": "Appendix KEnd-to-end deployment study",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2605.30837/2605.30837v1/x15.png",
+                "caption": "Figure 23:Predicted wall-clock follows the realized trend.Predicted total wall-clockT^​(τ)\\hat{T}(\\tau)(frompred_lat, dashed) and realized (solid) across theτ\\tau-sweep (ω=0.6\\omega=0.6) for all four benchmarks under both judges (rows: SCOUT-450, BIPIA, IPI, IHEval; columns: GPT-4o, GPT-5.1). On SCOUT-450 the curves match in magnitude (gap≤2.5%\\leq 2.5\\%); on the external benchmarks the predictor underestimates absolute wall-clock (gap up to29%29\\%) while reproducing the same monotone rise and plateau. Dotted line: headlineτ=0.875\\tau=0.875.",
+                "position": 3463
+            }
+        ]
+    },
+    {
+        "header": "Appendix LLLM judge selection",
+        "images": []
+    },
+    {
+        "header": "Appendix MWorked examples",
+        "images": []
+    },
+    {
+        "header": "Appendix NReproducibility and responsible use",
+        "images": []
+    },
+    {
+        "header": "Appendix OLicenses and intended use",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
