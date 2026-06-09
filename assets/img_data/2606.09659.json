@@ -1,0 +1,146 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09659/2606.09659v1/x1.png",
+                "caption": "Figure 1:Our Latent Context Language Models achieve high quality compression while being fast and memory efficient.We show RULER(Hsieh et al.,2024)(left) and LongBench(Bai et al.,2024)(right) accuracy vs. TTFT (time to first token) per sample on a single H200. All methods are based on the same decoderQwen3-4B-Instruct-2507(Yang et al.,2025). We see that our models lie on a new Pareto frontier, compressing contexts much faster while maintaining high accuracy, especially for high compression ratios.\nKV cache compression baselines appear as vertical lines because the context is prefilled the same way regardless of compression ratio, and the eviction operation is much faster than the prefill time.",
+                "position": 424
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3The Latent Context Language Model Architecture",
+        "images": []
+    },
+    {
+        "header": "4Training Recipe",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09659/2606.09659v1/x2.png",
+                "caption": "Figure 2:Examples of the three data types used to train LCLMs.We curate continual pre-training data with interleaved compressed/uncompressed blocks of tokens, supervised fine-tuning data with compressed prompts and long documents, and auxiliary reconstruction data that asks the decoder to reproduce the original context from the compressed latents.",
+                "position": 536
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09659/2606.09659v1/x3.png",
+                "caption": "Figure 3:A from-scratch pre-training sweep identifies the best encoder-decoder compressor architecture.Left:We explore how to best train an encoder LM to compress raw text into latent vectors and a decoder LM that uses the vectors as latent context.Right:We sweep many variants of encoder-decoder compressors end-to-end with 38B training tokens at a compression ratio of16×16\\timesand compare pre-training loss to find the best architecture. Since loss is computed only on the uncompressed tokens, the pre-training loss is substantially lower than a standard next-token prediction loss over all tokens. Extended experiments are inAppendix˜D.",
+                "position": 736
+            }
+        ]
+    },
+    {
+        "header": "5Architectural Design Space of Latent Encoders",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09659/2606.09659v1/x4.png",
+                "caption": "Figure 4:Latent Context Language Models have lower TTFT and peak GPU memory as context length increases.We plot time to first token (left) and peak GPU memory (right) for a single sample. We note the baselines use the same time and memory regardless of compression ratio; hence, there is only one line per baseline method.\nWe record all measurements on the same H200 GPU, and truncate lines when the method cannot be performed within the 141GB of memory. For peak GPU memory, our method plateaus at longer contexts for larger compression ratios: in this regime, the encoder’s batched processing dominates memory usage over the decoder. Memory begins to grow again once the decoder’s prefill memory surpasses the encoder’s activation per forward pass.",
+                "position": 784
+            }
+        ]
+    },
+    {
+        "header": "6Results: Improving Latency- and Memory-Performance Tradeoffs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09659/2606.09659v1/x5.png",
+                "caption": "Figure 5:Latent Context Language Models establish a new Pareto frontier on long-context benchmarks in terms of time to first token.We plot accuracy across RULER and LongHealth, and find that our LCLMs compress samples faster with equivalent or higher accuracy than other compression methods.\nFull results can be viewed inTables˜6,8and9.",
+                "position": 826
+            }
+        ]
+    },
+    {
+        "header": "7Agent Scaffolding With Latent Context",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09659/2606.09659v1/x6.png",
+                "caption": "Figure 6:LCLMs can use tools to retrieve compressed context and improve exact string-match accuracy.Left:We equip LCLMs with a tool that retrieves compressed context and inserts it into their working context uncompressed.Right:We test the agent on challenging NIAH tasks, and the agent substantially improves exact string-match accuracy on retrieval tasks.",
+                "position": 876
+            }
+        ]
+    },
+    {
+        "header": "8Conclusions",
+        "images": []
+    },
+    {
+        "header": "9Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AImpact Statement",
+        "images": []
+    },
+    {
+        "header": "Appendix BExtended Related Work",
+        "images": []
+    },
+    {
+        "header": "Appendix CDataset Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DExtended Architecture Search",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09659/2606.09659v1/x7.png",
+                "caption": "Figure 7:Full architecture design choices for the compressor.From left to right, we visualize token-based pooling, mean pooling, concat pooling, and overlap context.",
+                "position": 2701
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09659/2606.09659v1/x8.png",
+                "caption": "",
+                "position": 2706
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09659/2606.09659v1/x9.png",
+                "caption": "Figure 9:MLP adapters, causal masking, and no boundary overlap give the lowest pre-training loss across the architecture sweep.We sweep combinations of adapter, boundary-overlap, and encoder mask, and find that (1) causal masking is strictly better than bidirectional masking, (2) boundary overlap does not improve over non-overlapping windows while substantially increasing compute, and (3) the MLP adapter outperforms attention-based adapters. The same trends hold at scale (plot d).",
+                "position": 2794
+            }
+        ]
+    },
+    {
+        "header": "Appendix EFull-Scale Training Recipe Sweeps",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09659/2606.09659v1/x10.png",
+                "caption": "Figure 10:Architecture choices selected by the small-scale sweep continue to hold at scale.Continual pre-training loss for the full-pipeline runs at compression ratio16×16\\times. Across (a) encoder window size, (b) encoder attention mask, (c) encoder initialization (LM vs. embedding), and (d) adapter family, the configuration chosen from the from-scratch sweep (W=1024W=1024, causal masking, embedding-initialized encoder, MLP adapter) yields the lowest pre-training loss.",
+                "position": 2940
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09659/2606.09659v1/x11.png",
+                "caption": "Figure 11:Scaling the decoder helps more than scaling the encoder, and lower compression ratios yield lower pre-training loss.Left:pre-training loss at the end of stage 2 with compression ratio16×16\\timesacross encoder/decoder size combinations; increasing the decoder size produces a much larger drop in loss than increasing the encoder size.Right:pre-training loss at the end of stage 2 for our 0.6B-4B models across compression ratios; lower compression ratios yield lower pre-training loss. Note that the 4B-encoder and 8B-decoder runs use 256 ranks rather than 128 ranks. Because our stateful Parquet dataloader assigns work by rank, these runs complete slightly fewer optimization steps. For a clean comparison, we therefore truncate all loss curves at the same optimization step in the plot above.",
+                "position": 2954
+            }
+        ]
+    },
+    {
+        "header": "Appendix FCompute",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09659/2606.09659v1/x12.png",
+                "caption": "Table 5:Evaluation benchmarks and what content is compressed.We evaluate on long-context suites, general reasoning, knowledge, instruction-following benchmarks, and an agentic coding benchmark. The “What is Compressed” column specifies which part of the input is placed inside the compressible memory block, while remaining components, such as instructions, are kept as hard tokens when applicable.",
+                "position": 3044
+            }
+        ]
+    },
+    {
+        "header": "Appendix GBenchmarks and Results",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
