@@ -1,0 +1,110 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09056/2606.09056v1/x1.png",
+                "caption": "Figure 1:Our hierarchical autoencoder consists of a multi-resolution encoder-decoder pair.\nThe encoder receives a multi-resolution image pyramid as input.\nIt patchifies the pyramid’s images using a fixed kernel size, yielding fewer tokens for coarser levels, then feeds the tokens through a transformer.\nDuring training, we zero out all but one randomly chosen level.\nThe decoder, also a transformer, must reconstruct the entire resolution cascade based on the remaining tokens.\nThe highest-resolution reconstruction is supervised using MSE and LPIPS, while the others are supervised only using MSE.\nWe show three levels and a small number of tokens here for clarity; in practice, we use more.",
+                "position": 415
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09056/2606.09056v1/x2.png",
+                "caption": "Figure 2:To generate videos, we use coarse-to-fine rollout.\nDuring each rollout step, the model sees a mixture ofcontextandtargettokens across different hierarchy levels; it does not see thefixed(already generated) orpending(not yet generated) tokens.\nOur model’s first four rollout steps are shown on the left.\nEach step is represented as a 3-row grid where the rows represent hierarchy levels and each column represents a single frame.\nOver the first three steps, the model generates a long sequence of coarse frames, a medium-length sequence of medium frames, and a single fine frame.\nThe full rollout sequence is shown on our accompanying project page and in Figure10in the appendix.\nWe show three levels here for clarity; in practice, we use more.",
+                "position": 467
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09056/2606.09056v1/x3.png",
+                "caption": "",
+                "position": 494
+            }
+        ]
+    },
+    {
+        "header": "4Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09056/2606.09056v1/x4.png",
+                "caption": "Figure 3:Unlike the baselines, our method reliably recalls the scene’s structure, even when many frames have elapsed.\nThe top-left panel shows a top-down view of the trajectory the models follow.\nBlue is context; orange is generated.\nThe points at which frames are shown are marked.\nWe encourage the reader to consult our project website for videos of similar comparisons.",
+                "position": 533
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09056/2606.09056v1/x5.png",
+                "caption": "Figure 4:We separately measure consistency and quality on theLoopcraftdataset.\nThe X axis indicates the number of frames each model has generated since seeing ground-truth context.\nWe use LPIPS to measure consistency—i.e., how well generated videos match ground-truth videos following the same trajectories.\nWe use Fréchet Video Distance (FVD) as a measure of visual fidelity that is independent of consistency.\nOur method matches the baselines on quality and clearly exceeds them on consistency.\nRefer to Figure9in the appendix for further plots of consistency and quality metrics.",
+                "position": 735
+            }
+        ]
+    },
+    {
+        "header": "5Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09056/2606.09056v1/x6.png",
+                "caption": "Figure 5:As our hierarchical autoencoder’s token budget decreases, it discards fine-grained texture and geometry while retaining coarse scene structure (top row).\nCompared to an autoencoder trained to decode mean-pooled, full-resolution latents (bottom row)—the kind of latents one would find in a cascaded diffusion model—our hierarchical autoencoder produces significantly better reconstructions.",
+                "position": 832
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09056/2606.09056v1/x7.png",
+                "caption": "Figure 6:A cascaded variant of our method, in which the model is trained to operate on downscaled (mean-pooled) versions of our highest-resolution hierarchy level instead of using the full latent hierarchy, performs worse on both consistency and quality.\nFor all ablations, we train models with sequence lengths of 1280, where 1/3 as many frames are seen at every level compared to the models in Figure4.\nNote that the mean-pooled tokens the cascaded model sees are also visualized in Figure5.",
+                "position": 838
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09056/2606.09056v1/x8.png",
+                "caption": "Figure 7:We plot three variants of FramePack against the original FramePack model.\nSee Section5(Q3) for a description of each model.\nThe mirrored variant performs better on consistency despite having a shorter context window; all perform worse on quality.\nWe find that the hierarchical variant’s consistency becomes worse than random frames due to rollout instability.",
+                "position": 854
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "7Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09056/2606.09056v1/x9.png",
+                "caption": "Figure 8:Full metrics:All metrics plotted for our method and the baselines.\nOur method not only produces better consistency (as measured by PSNR, LPIPS, SSIM, DINOv2 class token cosine similarity, and the number of keypoints with≥0.5\\geq 0.5confidence detected by LightGlue), but also produces significantly better per-frame quality as measured by FID and FVD, with less exposure bias.",
+                "position": 1888
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09056/2606.09056v1/x10.png",
+                "caption": "Figure 9:Scaling properties:A comparison of our method and the baselines at two distinct scales.\nGiven 3840 tokens, both our method and FramePack hold 255 frames of context.\nMeanwhile, given 3584 tokens, the autoregressive high-resolution rollout model holds 7 frames of context.\nGiven 1280 tokens, both our method and FramePack hold 85 frames of context; the high-resolution rollout model holds 2 frames of context.\nThe models with longer sequence length were trained for192,000192{,}000steps, while the ones with shorter sequence length were trained for256,000256{,}000steps.\nLonger sequence length improves consistency for both our model and FramePack.\nHowever, it causes the high-resolution rollout model to become unstable, and so its consistency falls below the consistency of random ground-truth frames.\nWith a lower sequence length, all models have roughly the same per-frame quality.\nHowever, increasing sequence length appears to increase exposure bias (as indicated by increasing FVD) for the baselines whilereducingit for our model.\nThis suggests that our model may have more favorable scaling properties than the baselines.",
+                "position": 1896
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09056/2606.09056v1/x11.png",
+                "caption": "Figure 10:Our model’s rollout procedure:On the left, see our model’s full rollout sequence in the case of 3 hierarchy levels.\nWe show the initial state, containing 22 frames; the final state, containing 38 frames; and 21 rollout steps, each of which is represented by a 3-row grid.\nDuring each rollout step, the model sees a mixture ofcontextandtargettokens across different hierarchy levels; it does not see thefixed(already generated) orpending(not yet generated) tokens.\nIn each step, the rows represent hierarchy levels—fine (top), medium (middle), and coarse (bottom)—with 256, 64, and 16 tokens per frame respectively.\nDepending on the step, the model generates long sequences of coarse frames, medium-length sequences of medium-compression frames, or short sequences of fine frames.\nThe rollout procedure is repeated to generate longer videos.Right side:During each rollout step, the transformer sees the exact same number of tokens.\nNote that while this figure shows the case of 3 levels and 256 tokens at the finest level, our approach scales to arbitrary numbers of levels and different per-image token counts.\nGiven an increased sequence length budget, one can extend the context length by either (1) multiplying the number of frames at each level by some integer value or (2) increasing the number of levels.\nFor a more intuitive view of the algorithm, we highly encourage readers to watch the animated version of the rollout sequence on our project website.",
+                "position": 1912
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09056/2606.09056v1/x12.png",
+                "caption": "Figure 11:Other methods:Visualizations of the rollout procedures for the other methods mentioned in the paper.\nTherollout + upscalingmodel rolls out at the coarsest level, then combines rollout and upscaling for all subsequent levels.FramePackuses varying patchification, denoted via asterisks, to control the number of tokens per frame.\nIt always predicts frames at their full resolution.FramePack (Mirrored & Hierarchical)is a variant of FramePack that uses hierarchical latents.\nIt is trained to predict coarse frames far into the future.\nAt sampling time, the coarse predictions are discarded, as indicated by the crosses drawn through them.\nInfull-resolution rollout, there is only a single latent resolution; frames are rolled out at this resolution.",
+                "position": 1932
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
