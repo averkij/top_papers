@@ -1,0 +1,408 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3ICALens: Making ICA Practical for LLM Activations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x1.png",
+                "caption": "",
+                "position": 551
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x2.png",
+                "caption": "Figure 2:Final ICA component counts selected by the adaptive refit procedure. For each layer, we initially attempt to fit the full hidden dimension and reduce the target component count when convergence fails. Dashed horizontal lines indicate the hidden dimension of each model.",
+                "position": 688
+            }
+        ]
+    },
+    {
+        "header": "4What Does ICA Recover? Non-Gaussianity and Context Dependence",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x3.png",
+                "caption": "Figure 3:ICA recovers highly non-Gaussian directions in LLM activation space.\nFor each model and layer, we project row-normalized residual-stream activations onto random unit directions, public SAE decoder directions, and fitted ICA score directions, then compute the excess kurtosis of each projection distribution.\nAcross GPT-2 Small, Gemma 2 2B, and Qwen 3.5 2B Base, random projections remain close to Gaussian, SAE directions show elevated non-Gaussianity, and ICA directions are the most non-Gaussian, validating the statistical objective of the ICA fit.\nStatistics are computed over one million token positions from Pile-10k; random baselines use 32,768 Gaussian unit directions per layer.\nLines show medians across directions, and shaded bands show interquartile ranges.",
+                "position": 750
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x4.png",
+                "caption": "Figure 4:Layerwise distribution of effective receptive field (ERF).\nFor each ICA component, we average the sample-level ERF over its evidence examples and bucket components by the resulting mean ERF.\nEach stacked bar shows the fraction of components in one layer.\nThe final bin includes components not recovered within the 11-token window, reported as11+11+",
+                "position": 832
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x5.png",
+                "caption": "Figure 5:Relationship between effective receptive field (ERF) and excess kurtosis.\nEach cell counts ICA components with a given excess-kurtosis range and mean ERF.\nAcross all three models, components with larger excess kurtosis tend to have smaller ERFs, with Spearman correlations ranging from−0.41-0.41to−0.50-0.50.\nThis indicates that high-kurtosis components are typically more local, while broad-context components tend to have lower kurtosis and larger ERFs.",
+                "position": 865
+            }
+        ]
+    },
+    {
+        "header": "5Human Inspection of ICA Components",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/figures/screenshots/ICA_GPT_sample_layer6.png",
+                "caption": "Figure 6:Interactive inspection view for GPT-2 Small layer 6. For each token, the explorer displays the strongest ICA components, signed scores, working labels, top examples, ERF, kurtosis, and annotation metadata used during component annotation. Additional screenshots for Gemma 2 2B and Qwen 3.5 2B Base are provided in AppendixF.",
+                "position": 901
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x6.png",
+                "caption": "Figure 7:Contextual decomposition of a polysemous word in GPT-2 Small. We probe four occurrences ofbankin one paragraph, including two financial-bank uses (F1, F2) and two river-edge uses (R1, R2). Each cell lists the five largest-absolute-score ICA components at the target token in a given layer. Bar lengths show relative score magnitude within the cell, and the legend decodes annotation type and confidence. Across layers, the same surface token is represented by different mixtures of lexical, syntactic, semantic, positional, and longer-context components.",
+                "position": 1544
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x7.png",
+                "caption": "Figure 8:Sentence-level traces for selected GPT-2 Small ICA components. We plot raw absolute ICA scores across two sentences for layer-6 components C67 and C273. C67 tracks a financial-bank context and becomes active across several related tokens in Sentence 2. C273 tracks an arrival- or purpose-related construction and responds strongly to “arrived at the library to study” in Sentence 1, while also responding to related movement and purpose structure in Sentence 2. ICA directions can therefore trace context-sensitive signals across spans, rather than firing only at isolated tokens.",
+                "position": 1579
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x8.png",
+                "caption": "Figure 9:Embedding-layer ICA components for familiar analogy word sets in Qwen 3.5 2B Base. Each box corresponds to one token embedding and lists its five largest-absolute-score ICA components. Columns pair familiar masculine-coded tokens with their feminine-coded counterparts. Bar lengths show relative score magnitude within each box, and the legend decodes annotation type and confidence. The figure shows that familiar analogy pairs are supported by overlapping component directions, including royalty, gender-associated terms, family relations, professions, morphology, and common-token components.",
+                "position": 1602
+            }
+        ]
+    },
+    {
+        "header": "6Feature Utility under Sparse Probing and Intervention",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x9.png",
+                "caption": "Figure 10:SAEBench sparse-probing performance for ICA, public SAE, ITDA, and PCA representations.\nFor each representation, SAEBench ranks features by class contrast on the training set and trains supervised probes using only the top-kkranked feature activations.\nEach curve reports test accuracy averaged over the eight default sparse-probing datasets and two evaluated layers for that model.\nSAE features are produced by the SAE encoder, while ICA and PCA use signed component scores split into two nonnegative sides.",
+                "position": 1679
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x10.png",
+                "caption": "Figure 11:SAEBench sparse-probing comparison for Gemma 2 2B layer 12.\nWe compare PCA, ICA, ITDA, prefix-restricted Matryoshka SAE variants, and the full Gemma Scope 16k SAE.",
+                "position": 1687
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x11.png",
+                "caption": "Figure 12:SAEBench Targeted Probe Perturbation (TPP) for GPT-2 Small, Gemma 2 2B, and Qwen 3.5 2B Base.\nThe x-axis is the number of top-ranked features ablated for each target class.\nThe top row reports the overall TPP score.\nThe bottom row decomposes the same interventions into intended effects on the target-class probe and unintended effects on non-target probes.\nScores are averaged over evaluated layers and the two TPP datasets, with shaded bands indicating interquartile ranges.\nICA uses the two-sign SAE-compatible wrapper; SAE results use the public SAE dictionaries from the SAEBench comparison configs.",
+                "position": 1719
+            }
+        ]
+    },
+    {
+        "header": "7How ICA Relates to SAEs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x12.png",
+                "caption": "Figure 13:Nearest-SAE overlap for ICA components.\nFor each ICA component, we report the maximum absolute cosine with any public SAE decoder direction in the same layer.\nAcross all three models, most components lie in a moderate-overlap range, with both weakly matched and strongly matched tails.\nThe distributions show partial agreement between ICA and SAE rather than a one-to-one correspondence.",
+                "position": 1761
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x13.png",
+                "caption": "Figure 14:Layer-wise nearest-SAE overlap.\nEach point shows the median maximum absolute cosine between ICA components and public SAE decoder directions in one layer.\nShaded bands show interquartile ranges.\nThe median overlap remains moderate across depth, showing that partial ICA-SAE alignment is a consistent property of the decompositions rather than an artifact of a few layers.",
+                "position": 1769
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x14.png",
+                "caption": "Figure 15:Token-wise ICA and SAE responses on the same GPT-2 Small sentence.\nAt each token, we select the strongest ICA component by absolute score and the strongest SAE feature by activation, then plot the union of selected directions across the sentence.\nEach row is normalized by its maximum value to show within-direction response shape.\nSAE features mostly appear as localized activations, while ICA directions often vary across short spans, including the financial context aroundbank,deposit,check,withdraw, andcash.\nSentence: “Maya stopped at the bank before the trip, waiting in line to deposit a check and withdraw enough cash for the weekend.”",
+                "position": 1950
+            }
+        ]
+    },
+    {
+        "header": "8Conclusion",
+        "images": []
+    },
+    {
+        "header": "9Limitations and Future Directions",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional FastICA Fitting Diagnostics",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x15.png",
+                "caption": "((a))Layer 0",
+                "position": 2013
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x15.png",
+                "caption": "((a))Layer 0",
+                "position": 2016
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x16.png",
+                "caption": "((b))Layer 1",
+                "position": 2021
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x17.png",
+                "caption": "((c))Layer 2",
+                "position": 2026
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x18.png",
+                "caption": "((d))Layer 3",
+                "position": 2031
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x19.png",
+                "caption": "((e))Layer 4",
+                "position": 2036
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x20.png",
+                "caption": "((f))Layer 5",
+                "position": 2041
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x21.png",
+                "caption": "((g))Layer 6",
+                "position": 2047
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x22.png",
+                "caption": "((h))Layer 7",
+                "position": 2052
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x23.png",
+                "caption": "((i))Layer 8",
+                "position": 2057
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x24.png",
+                "caption": "((j))Layer 9",
+                "position": 2062
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x25.png",
+                "caption": "((k))Layer 10",
+                "position": 2067
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x26.png",
+                "caption": "((l))Layer 11",
+                "position": 2072
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x27.png",
+                "caption": "((a))Layer 0",
+                "position": 2079
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x27.png",
+                "caption": "((a))Layer 0",
+                "position": 2082
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x28.png",
+                "caption": "((b))Layer 1",
+                "position": 2087
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x29.png",
+                "caption": "((c))Layer 2",
+                "position": 2092
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x30.png",
+                "caption": "((d))Layer 3",
+                "position": 2097
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x31.png",
+                "caption": "((e))Layer 4",
+                "position": 2102
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x32.png",
+                "caption": "((f))Layer 5",
+                "position": 2107
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x33.png",
+                "caption": "((g))Layer 6",
+                "position": 2113
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x34.png",
+                "caption": "((h))Layer 7",
+                "position": 2118
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x35.png",
+                "caption": "((i))Layer 8",
+                "position": 2123
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x36.png",
+                "caption": "((j))Layer 9",
+                "position": 2128
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x37.png",
+                "caption": "((k))Layer 10",
+                "position": 2133
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x38.png",
+                "caption": "((l))Layer 11",
+                "position": 2138
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x39.png",
+                "caption": "((a))Layer 0",
+                "position": 2145
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x39.png",
+                "caption": "((a))Layer 0",
+                "position": 2148
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x40.png",
+                "caption": "((b))Layer 1",
+                "position": 2153
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x41.png",
+                "caption": "((c))Layer 2",
+                "position": 2158
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x42.png",
+                "caption": "((d))Layer 3",
+                "position": 2163
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x43.png",
+                "caption": "((e))Layer 4",
+                "position": 2168
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x44.png",
+                "caption": "((f))Layer 5",
+                "position": 2173
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x45.png",
+                "caption": "((g))Layer 6",
+                "position": 2179
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x46.png",
+                "caption": "((h))Layer 7",
+                "position": 2184
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x47.png",
+                "caption": "((i))Layer 8",
+                "position": 2189
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x48.png",
+                "caption": "((j))Layer 9",
+                "position": 2194
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x49.png",
+                "caption": "((k))Layer 10",
+                "position": 2199
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x50.png",
+                "caption": "((l))Layer 11",
+                "position": 2204
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x51.png",
+                "caption": "Figure 19:Representative FastICA convergence curves across model families. Each panel shows component-wise FastICA limit values over iterations for one fitted layer. Solid colored lines show medians, shaded regions show the 5th–95th percentile interval, dashed black lines show the maximum, and dotted horizontal lines mark the10−410^{-4}convergence threshold.",
+                "position": 2211
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAdditional Human Interpretation Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x52.png",
+                "caption": "Figure 20:Contextual decomposition of a polysemous word in Gemma 2 2B.",
+                "position": 2219
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x53.png",
+                "caption": "Figure 21:Contextual decomposition of a polysemous word in Qwen 3.5 2B Base.",
+                "position": 2222
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x54.png",
+                "caption": "Figure 22:Embedding-layer ICA components for familiar analogy word sets in GPT-2 Small.",
+                "position": 2225
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x55.png",
+                "caption": "Figure 23:Embedding-layer ICA components for familiar analogy word sets in Gemma 2 2B.",
+                "position": 2228
+            }
+        ]
+    },
+    {
+        "header": "Appendix CComplete Random Annotation Tables",
+        "images": []
+    },
+    {
+        "header": "Appendix DSecondary Contrastive Label Audit",
+        "images": []
+    },
+    {
+        "header": "Appendix EToken-Wise Activation Patterns in Gemma and Qwen",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x56.png",
+                "caption": "Figure 24:Token-wise ICA and SAE patterns for the same Gemma 2 2B sentence. For each token in the bank sentence, we select the top-2 ICA components by absolute score and the top-2 SAE features by activation, then plot the union of selected directions across all token positions.",
+                "position": 5888
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/x57.png",
+                "caption": "Figure 25:Token-wise ICA and SAE patterns for the same Qwen 3.5 2B Base sentence. For each token in the bank sentence, we select the top-2 ICA components by absolute score and the top-2 SAE features by activation, then plot the union of selected directions across all token positions.",
+                "position": 5891
+            }
+        ]
+    },
+    {
+        "header": "Appendix FExplorer Interface Screenshots",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/figures/screenshots/ICA_Gemma_sample_layer12.png",
+                "caption": "Figure 26:Explorer interface screenshots for Gemma 2 2B layer 12. Two screenshots are ICA Explorer and SAE Explorer.",
+                "position": 5899
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/figures/screenshots/SAE_Gemma_sample_layer12.png",
+                "caption": "",
+                "position": 5903
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/figures/screenshots/ICA_Qwen_sample_layer12.png",
+                "caption": "Figure 27:Explorer interface screenshots for Qwen 3.5 2B Base layer 12.",
+                "position": 5907
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11722/2606.11722v1/figures/screenshots/SAE_Qwen_sample_layer12.png",
+                "caption": "",
+                "position": 5911
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
