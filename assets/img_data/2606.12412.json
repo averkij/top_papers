@@ -1,0 +1,120 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.12412/2606.12412v1/x1.png",
+                "caption": "Figure 1:Reroute, don’t remove.Under aggressive 88.9% visual token reduction (576→64 visual tokens), conventional pruning permanently discards visual evidence and grounding collapses (top rows, IoU < 0.4). Replacing irreversible removal with our recoverable routing, using the same scorer (PDrop) and the same token budget, we can recover grounding accuracy across three backbones spanning early-generation MLLM (LLaVA-1.5-7B), native dynamic resolution (Qwen2.5-VL-7B), and hybrid Mamba-Transformer (Qwen3.5-9B). Reroute is a training-free plug-in that improves grounding at matched theoretical cost.",
+                "position": 264
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.12412/2606.12412v1/x2.png",
+                "caption": "Figure 2:Why reroute? Important visual tokens are ranked low when pruning decides.(a) On a single RefCOCO image, attention from each query word (“boy”, “blue”, “jacket”, “gray”) to visual tokens drifts substantially across decoder depth. Shallow layers attend diffusely, while target-relevant regions only emerge at middle and deep layers. (b) Tracking one ground-truth token (⋆\\star) inside the GT bbox of “man in green shirt”: its attention percentile is 0.11 at L3 (where FastV drops) and 0.25 at L8 (where PDrop drops), so both methods irreversibly remove it. Yet its importance climbs to 0.97 by L25, a token that is essential at deep layers but indistinguishable from background at the layers where pruning commits. Reroute keeps such tokens recoverable.",
+                "position": 309
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.12412/2606.12412v1/x3.png",
+                "caption": "Figure 3:Overview of Reroute.Reroute organizes decoder-side visual token reduction as a sequence ofSSrouting stages, each consisting of aRank & Rerouteoperator followed byNNtransformer layers.(Left): The full pipeline. Input visual tokensV={vi}V=\\left\\{v_{i}\\right\\}pass through stages1​…​S1...S; at each stageii, the operator selects a top-rir_{i}% subset to route through the transformer block, while the remainingdeferredtokens bypass it via a residual path. Crucially, deferred tokens are not removed from V. They re-enter the next stage’s ranking and may be reselected.(Right): Within one stage, selected and deferred tokens take separate computational paths and merge back at the stage output, restoring the original sequence ordering for the next stage. TheRank & Rerouteoperator itself reuses the existing text-to-vision attention from the current decoder layer as the ranking signal. No additional router is trained. The top-KKvisual tokens (K=⌊ri⋅|V|⌋K=\\left\\lfloor r_{i}\\cdot\\left|V\\right|\\right\\rfloor) are markedselected; the rest are markeddeferred. Reroute therefore preserves the FLOPs and KV-cache budget of conventional pruning (only|ri|\\left|r_{i}\\right|tokens enter Attn + FFN), while breaking the irreversibility constraint that pruning imposes onVV.",
+                "position": 430
+            }
+        ]
+    },
+    {
+        "header": "3Preliminaries",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.12412/2606.12412v1/x4.png",
+                "caption": "Figure 4:Pruning as a degenerate routing policy.We compare FastV and PDrop with their Reroute variants on Qwen2.5-VL-7B.\nBlue, gray, and orange denote selected, pruned/deferred, and re-admitted tokens.\nThe red box marks the shared selected-token prefix before pruning and reroute diverge: pruning keeps only the previous candidate set, whereas reroute restores the full visual-token candidate set.",
+                "position": 469
+            }
+        ]
+    },
+    {
+        "header": "4Method",
+        "images": []
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.12412/2606.12412v1/x5.png",
+                "caption": "(a)Frequency sweep.",
+                "position": 4487
+            },
+            {
+                "img": "https://arxiv.org/html/2606.12412/2606.12412v1/x5.png",
+                "caption": "(a)Frequency sweep.",
+                "position": 4490
+            },
+            {
+                "img": "https://arxiv.org/html/2606.12412/2606.12412v1/x6.png",
+                "caption": "(b)Location sweep.",
+                "position": 4495
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix Overview",
+        "images": []
+    },
+    {
+        "header": "Appendix AExperimental Protocol and Configurations",
+        "images": []
+    },
+    {
+        "header": "Appendix BRouting Schedule Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix CSupplementary Results and Visualizations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.12412/2606.12412v1/x7.png",
+                "caption": "Figure 6:Selected visual-token masks on LLaVA-1.5. The highlighted regions indicate the visual tokens selected by the routing policy under the corresponding token budget.",
+                "position": 7871
+            },
+            {
+                "img": "https://arxiv.org/html/2606.12412/2606.12412v1/x8.png",
+                "caption": "Figure 7:Selected visual-token masks on Qwen2.5-VL. The highlighted regions indicate the visual tokens selected by the routing policy under the corresponding token budget.",
+                "position": 7874
+            },
+            {
+                "img": "https://arxiv.org/html/2606.12412/2606.12412v1/x9.png",
+                "caption": "Figure 8:Additional RefCOCO-family grounding examples on LLaVA-1.5. We compare\npruning baselines with their corresponding Reroute variants under matched\ntoken budgets.",
+                "position": 7877
+            },
+            {
+                "img": "https://arxiv.org/html/2606.12412/2606.12412v1/x10.png",
+                "caption": "Figure 9:Additional RefCOCO-family grounding examples on Qwen2.5-VL. Reroute preserves deferred visual evidence and improves grounding over matched pruning baselines.",
+                "position": 7884
+            },
+            {
+                "img": "https://arxiv.org/html/2606.12412/2606.12412v1/x11.png",
+                "caption": "Figure 10:Additional RefCOCO-family grounding examples on Qwen3.5. We compare pruning baselines and their Reroute variants under matched gated-attention token budgets.",
+                "position": 7887
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
