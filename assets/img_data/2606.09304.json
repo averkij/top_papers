@@ -1,0 +1,118 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09304/2606.09304v1/x1.png",
+                "caption": "Figure 1:Illustration of token-level sign-consistency gating on a\ncorrect math rollout. Since the final answer is verified as correct,\nthe outcome-level GRPO advantagea1a_{1}is positive for the trajectory.\nHowever, the OPD reverse-KL advantagea2a_{2}can still vary by token:\nconsensus tokens such as “75%”, “÷\\div”, and “16” havea1​a2>0a_{1}a_{2}>0and are extrapolated, while a redundant verification token\nsuch as “Check:” can receivea2<0a_{2}<0because the teacher assigns it\nlower probability, so SG-OPD routes it through interpolation.",
+                "position": 402
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Preliminaries and Failure Modes of OPD",
+        "images": []
+    },
+    {
+        "header": "4Method: SG-OPD",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09304/2606.09304v1/x2.png",
+                "caption": "Figure 2:Sample-level Phased Teacher Sampling (PTS). A mini-batch is\nsplit into student on-policy rollouts and a small fraction of teacher\nrollouts. Verified teacher trajectories are retained\nand used as an auxiliary CE anchor, while incorrect teacher\ntrajectories are discarded. The teacher-guidance weight is annealed\nfrom warm-up to zero, so the asymptotic training distribution remains\non-policy.",
+                "position": 735
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09304/2606.09304v1/figures/4.2-SGOPD.jpg",
+                "caption": "Figure 3:Overview of token-level sign-consistency gating. GRPO and OPD token advantages are routed by sign agreement:\nconsensus tokens are extrapolated, while conflict tokens are softened by interpolation.",
+                "position": 817
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09304/2606.09304v1/x3.png",
+                "caption": "Figure 4:Per-benchmark avg@3232accuracy (%) under the\nstrong-to-weak setting (Qwen3-1.7B distilled from\nQwen3-4B-Non-Thinking-RL-Math). The light-to-dark blue gradient\nranges over the off-/on-policy distillation baselines (SFT, OPD,\nExOPD);SG-OPD(red) consistently leads on AIME and on\naverage.",
+                "position": 1388
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09304/2606.09304v1/x4.png",
+                "caption": "Figure 5:Training dynamics under the same setup as\nTab.1for the three on-policy distillation regimes:OPD(no extrapolation,λ=1.0\\lambda{=}1.0),ExOPD(uniform extrapolation,λ=1.25\\lambda{=}1.25), andSG-OPD(token-level sign-consistency gating withλhigh=1.8\\lambda_{\\mathrm{high}}{=}1.8).(a)Training reward: SG-OPD reaches and maintains the\nhighest plateau, while OPD converges to the lowest.(b)Mean response length: OPD generates noticeably shorter\ntrajectories than the two extrapolation-based variants.(c)Policy entropy: SG-OPD preserves substantially higher\nentropy throughout training, consistent with its sign-consistency-gated\nextrapolation amplifying consensus tokens without collapsing\nexploration.",
+                "position": 1476
+            }
+        ]
+    },
+    {
+        "header": "6Analysis",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Limitations",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional Derivation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BVariance Analysis of the Token-Level Approximation",
+        "images": []
+    },
+    {
+        "header": "Appendix CFull Hyperparameters",
+        "images": []
+    },
+    {
+        "header": "Appendix DExtended Training Curves",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09304/2606.09304v1/x5.png",
+                "caption": "Figure 6:Per-benchmark avg@3232accuracy under the strong-to-weak\nsetting (Qwen3-1.7B distilled from Qwen3-4B-Non-Thinking-RL-Math).\nFour configurations are shown:OPD(dark gray,λ=1.0\\lambda{=}1.0),ExOPDat the best uniform setting (blue,λ=1.25\\lambda{=}1.25),ExOPDat an aggressive uniform strength\n(orange,λ=1.8\\lambda{=}1.8, “untrainable” regime), and ourSG-OPD(red,λhigh=1.8\\lambda_{\\mathrm{high}}{=}1.8). Uniform\naggressive extrapolation collapses across all four benchmarks,\nwhile SG-OPD recovers the same extrapolation strength via\nsign-consistency gating and improves over both OPD and ExOPD.",
+                "position": 2102
+            }
+        ]
+    },
+    {
+        "header": "Appendix ESign-Agreement Case Study",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09304/2606.09304v1/x6.png",
+                "caption": "Figure 7:Sign-agreement diagnostic logged inside the gate\nfor the SG-OPD run. Of the tokens with\nnon-zero advantages,3030+34≈47%\\frac{30}{30+34}\\!\\approx\\!47\\%are amplified\nand53%53\\%are softened, in stable ratio across training. Naive\nadditive ExOPD+\\!+\\!RL would propagatebothstreams without\ndistinction; SG-OPD routes the34%34\\%disagree mass throughinterpwithβ=1\\beta{=}1and the30%30\\%agree mass through\nextrapolationλhigh=1.8\\lambda_{\\mathrm{high}}{=}1.8. The36%36\\%remaining\nmass corresponds to tokens with either advantage≈0{\\approx}0and\nis unaffected by the gate. The disagree share never falls below31%31\\%, consistent with keeping the gate active throughout training\nrather than only at warm-up.",
+                "position": 2119
+            }
+        ]
+    },
+    {
+        "header": "Appendix FFull Ablation Runs",
+        "images": []
+    },
+    {
+        "header": "Appendix GReproducibility",
+        "images": []
+    },
+    {
+        "header": "Appendix HFailed and Alternative Designs",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

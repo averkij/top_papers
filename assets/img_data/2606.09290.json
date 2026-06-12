@@ -1,0 +1,102 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09290/2606.09290v1/x1.png",
+                "caption": "Figure 1:Visual Para-Thinker++ framework. A single shared policyπθ\\pi_{\\theta}is instantiated as three role-conditioned agents under a fixed protocol. Given a multimodal input(v,q)(v,q), theMain Agentemits one of two fixed task-allocation patterns (block-based or scan-order); fourWorker Agents, role-conditioned instances of the same policy, then explore the dispatched visual sub-problems along parallel reasoning paths under mutually isolated contexts; aSummary Agentperforms trace-level evidence reconciliation to produce the final answer. All three agents share the same policy weights (see the shared-policy icon on top); only the role embedding and the visible context differ.",
+                "position": 410
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09290/2606.09290v1/x2.png",
+                "caption": "Figure 2:The two fixed task-allocation patterns used by the Main Agent under the four-Worker protocol. (a)Block-based: the image is partitioned into four disjoint quadrants, each dispatched to one Worker Agent for local evidence collection. (b)Scan-order: each Worker Agent retains a global view but traverses the image along a distinct scan order.",
+                "position": 413
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09290/2606.09290v1/x3.png",
+                "caption": "Figure 3:Training pipeline of Role-Decoupled Multi-Agent Optimization.Top branch (Global Outcome-Based Reward).A trajectory contributes the outcome rewardRout∈{0,1}R_{\\text{out}}\\!\\in\\!\\{0,1\\}depending on whether the Summary Agent’s final answer matches ground truth; group normalisation over the on-policy group then yields the outcome advantageAoutA_{\\text{out}}.Bottom branch (Worker Reward Assignment).Each Worker Agent’s intermediate sub-answer is graded by a lightweight cross-Worker majority-vote heuristic (e.g., W3 disagrees with the majority and is penalised,RW​3=0R_{W3}{=}0); group normalisation over all Worker rewards yields the per-Worker advantage stream, written compactly asAW⁣∗A_{W*}in the figure and instantiated asAw(i)A_{w}^{(i)}for Workerii.Composition.The two advantage streams are composed token-wise (Eq.4): Main and Summary segments receiveAt=AoutA_{t}{=}A_{\\text{out}}, while Workerii’s segment receivesAt=Aout+λ​Aw(i)A_{t}{=}A_{\\text{out}}+\\lambda A_{w}^{(i)}. The composed advantages are plugged into a clipped DAPO loss to update the shared policy.",
+                "position": 432
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09290/2606.09290v1/x4.png",
+                "caption": "Figure 4:Three representative ways to compose a Worker reward with the outcome reward across a multi-agent rollout. The figure denotes the per-Worker reward asRW​iR_{Wi}(also written asRpathiR_{\\text{path}}^{i}) and its normalised advantage asAW⁣∗A_{W*}; in the main text we equivalently write these asRw(i)R_{w}^{(i)}andAw(i)A_{w}^{(i)}.(a) Naive Sum(weak decomposition, strong coupling): all Worker rewards are summed withRoutR_{\\text{out}}into a singleAshared=norm​(Rout+∑iRW​i)A_{\\text{shared}}=\\mathrm{norm}(R_{\\text{out}}+\\sum_{i}R_{Wi})that is broadcast to every token segment, coupling Worker and outcome gradients.(b) Conditional Sum(reduced coupling, suboptimal):RoutR_{\\text{out}}gates the Worker rewards viaAshared=norm​(Rout+Rout⋅∑iRW​i)A_{\\text{shared}}=\\mathrm{norm}(R_{\\text{out}}+R_{\\text{out}}\\!\\cdot\\!\\sum_{i}R_{Wi}), but the advantage is still shared across roles.(c) Role-decoupled Advantages (ours)(reward decoupling, optimal):RoutR_{\\text{out}}and eachRW​iR_{Wi}are normalisedwithin their own on-policy groupsintoAoutA_{\\text{out}}andAW⁣∗A_{W*}, then composed token-wise via Eq.4—Main and Summary tokens receiveAt=AoutA_{t}=A_{\\text{out}}, while Workerii’s tokens receiveAt=Aout+λ​AW⁣∗A_{t}=A_{\\text{out}}+\\lambda A_{W*}.",
+                "position": 501
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09290/2606.09290v1/x5.png",
+                "caption": "Figure 5:Native multi-agent inference engine.",
+                "position": 563
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09290/2606.09290v1/x6.png",
+                "caption": "Figure 6:Per-benchmark comparison of Visual Para-Thinker++ (3B) against the Qwen2.5-VL-3B backbone on six vision-centric axes drawn directly from Table1.",
+                "position": 1042
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Limitations",
+        "images": []
+    },
+    {
+        "header": "Ethics Statement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AResults on Qwen2.5-VL-7B",
+        "images": []
+    },
+    {
+        "header": "Appendix BTraining data and hyper-parameters",
+        "images": []
+    },
+    {
+        "header": "Appendix CExtended ablations",
+        "images": []
+    },
+    {
+        "header": "Appendix DTask Allocation Patterns: Details and Data Examples",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.09290/2606.09290v1/figures/COCO_train2014_000000000009.jpg",
+                "caption": "",
+                "position": 1707
+            },
+            {
+                "img": "https://arxiv.org/html/2606.09290/2606.09290v1/figures/coco-count_example.jpg",
+                "caption": "",
+                "position": 1757
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

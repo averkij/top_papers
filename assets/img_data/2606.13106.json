@@ -1,0 +1,148 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.13106/2606.13106v1/arxiv_lark/LARK_Lab_Arxiv_Template/figures/fig_overview.png",
+                "caption": "Figure 1:Switchoverview.(a) Training.Three phases turn a Qwen3 base into a\nswitchable latent reasoner: SFT to wrap high-entropy CoT spans\nin<swi>/</swi>, a curriculum that gradually replaces text\ninside those spans with<latent>positions (jointly,Switch-SFT), and Switch-GRPO for on-policy RL on the\nanswer reward.(b1) Inference token stream.The model emits<swi>to\nenter latent mode, runs a block of<latent>steps, and emits</swi>to resume text decoding.(b2) Hidden-state recurrence inside the block.Each\nlatent step’s last-layer hidden state becomes the input\nembedding of the next<latent>position (Coconut-style\nrecurrence).",
+                "position": 493
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.13106/2606.13106v1/arxiv_lark/LARK_Lab_Arxiv_Template/figures/injection.png",
+                "caption": "Figure 2:Sequential vs. parallel curriculum\nschedules.Hidden states (green circles) replace\ntext inside<swi>-spans either one span at a time or in every\nspan simultaneously across curriculum stages.",
+                "position": 650
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.13106/2606.13106v1/x1.png",
+                "caption": "Figure 3:Switch-GRPO training trajectory, four metrics\noverlaid with per-metric min–max normalisation. Legend shows\nthe actual start→\\toend values; the dashed line marks the\nreported step-800800checkpoint.",
+                "position": 949
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13106/2606.13106v1/x2.png",
+                "caption": "Figure 4:Accuracy–efficiency operating curveon the\nrepresentative training run. MATH-500 accuracy vs. average\nvisible tokens. The Switch-GRPO endpoint (star) sits at the\nhigh-accuracy end; the brevity-bonus operating point (diamond)\ntrades a modest amount of accuracy for shorter outputs and zero\nmax-length truncation. Dashed curve: empirical Pareto frontier.",
+                "position": 978
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13106/2606.13106v1/x3.png",
+                "caption": "Figure 5:Distribution of visible tokens per problem,SFT vs. Switch-GRPO vs. +brevity. Dashed lines mark each\ncheckpoint’s mean.",
+                "position": 986
+            }
+        ]
+    },
+    {
+        "header": "5How Does Latent Work in Reasoning?",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.13106/2606.13106v1/x4.png",
+                "caption": "Figure 6:Switch-window curves.p​(<swi>)p(\\texttt{<swi>})(solid, left\nlog axis) and entropy (dashed, right linear axis) at relative\noffsets−8,…,+8-8,\\ldots,+8around annotated<swi>positions. The\nspike at the boundary collapses by several orders of magnitude\none token later. Switch-GRPO preserves the spike but softens\nits peak height; per-offset values at−1,0,+1-1,0,+1in\nTable4.",
+                "position": 1096
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13106/2606.13106v1/x5.png",
+                "caption": "Figure 7:Linear probe accuracyfor “next token is<swi>” at seven layer offsets. Both checkpoints rise from near\nchance in the early layers to≥88%\\geq\\!88\\%at the last layer\n(exact numbers in Table5).",
+                "position": 1194
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13106/2606.13106v1/x6.png",
+                "caption": "Figure 8:Latent-state intervention.Accuracy (left) and\nanswer-change rate (right) under four intervention modes on the\nunrestricted MATH-500 set (light bars) and on the diagnostic\nsubset (dark bars).Zerocollapses diagnostic accuracy\nfrom100%100\\%to33%33\\%(−66.7-66.7points);Random-normandSkipare far less destructive. The latent\ncomputation is the specific hidden state of Eq.1,\nnot just any non-zero perturbation.",
+                "position": 1279
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Limitations",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BSwitch-GRPO Loss, in Full",
+        "images": []
+    },
+    {
+        "header": "Appendix CPer-Checkpoint Trajectory ofSwitch",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.13106/2606.13106v1/x7.png",
+                "caption": "Figure 9:Full Switch-GRPO trajectory(1,9641{,}964optimizer\nsteps) on the representative training run. Light scatter is raw\nper-batch metrics; coloured lines are8080-step rolling means.\nThe pink-shaded region marks the late-training reward-hacking\nregime (≳step​1,200\\gtrsim\\!\\text{step}\\ 1{,}200); the dashed vertical line\nmarks the reported step-800800checkpoint, our early-stopping point.\nThe main-body Fig.3shows the same panels\ncropped to the stable0–1,0001{,}000window.",
+                "position": 2198
+            }
+        ]
+    },
+    {
+        "header": "Appendix DAlgorithm Boxes",
+        "images": []
+    },
+    {
+        "header": "Appendix EVisible-Token CDF",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.13106/2606.13106v1/x8.png",
+                "caption": "Figure 10:Empirical CDF of visible tokens per problem.",
+                "position": 2452
+            }
+        ]
+    },
+    {
+        "header": "Appendix FMechanistic Analysis: Additional Details",
+        "images": []
+    },
+    {
+        "header": "Appendix GPer-Subject and Per-Difficulty Visualisation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.13106/2606.13106v1/x9.png",
+                "caption": "Figure 11:Per-subject (left) and per-difficulty (right)\nMATH-500 accuracyofSwitchafter Switch-GRPO.",
+                "position": 2585
+            }
+        ]
+    },
+    {
+        "header": "Appendix HGeneration Trace Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix IAblations",
+        "images": []
+    },
+    {
+        "header": "Appendix JFull Related Work",
+        "images": []
+    },
+    {
+        "header": "Appendix KExtended Discussion",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
