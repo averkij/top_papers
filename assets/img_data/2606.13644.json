@@ -1,0 +1,337 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/x1.png",
+                "caption": "Figure 1:Surflo turns a handful of unposed RGB views into a detailed 3D surface.From a variable number of input views(left), Surflo encodes the scene into a fixed-size latent and decodes it via flow matching into an arbitrary number of oriented surface points, yielding a clean mesh(middle). Per-view feed-forward models[68,45]instead emit overlapping pointmaps(right)that complicate mesh extraction. Surflo exceeds them in quality, while running an order of magnitude faster than state-of-the-art optimization-based methods like Gaussian Wrapping[20], which require hundreds of views. All results are from the same 16 unposed input images, a sparse set of screenshots from an in-the-wild video of theGallossculpture at Tintagel Castle, UK.",
+                "position": 266
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/x2.png",
+                "caption": "Figure 2:Three key ingredients define Surflo.Encoder:a frozen VGGT[68]mapsNNunposed RGB views to patch tokens, which a Perceiver-style compressor withKKlearnable queries distills into a fixed-size latent𝐳∈ℝK×D{\\bf z}\\in{\\mathds{R}}^{K\\times D}.Decoder:each query𝐱t∈ℝ3×𝕊2{\\bf x}_{t}\\in{\\mathds{R}}^{3}\\times\\mathbb{S}^{2}is diffusedindependentlyvia cross-attention with𝐳{\\bf z}to a velocityvθv_{\\theta}; any number of points can be integrated in parallel.Guidance(Sec.2.3): fort≥0.95t\\geq 0.95, at each step of the ODE integration, per-point velocities are coupled[5]viaMMgradient steps on a global rendering lossℒ\\mathcal{L}.",
+                "position": 324
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/truck_ref.jpg",
+                "caption": "Figure 3:Surflo denoises 3D points into an oriented surface.From a variable number of input views (a), Surflo denoises an arbitrary number of noisy 3D points and normals (b) into an oriented surface (c). Integrating the flow-matching velocity without guidance already achieves high accuracy but can exhibit outliers and miss fine details.\nWe therefore introduce two guidance terms. A photometric guidance term∇𝐱ℒphoto\\nabla_{{\\bf x}}\\mathcal{L}_{\\text{photo}}computed by instantiating Gaussian Splatting[40]on the points, pulls them onto surfaces consistent with the input views and recovers finer details (d). An optional monocular depth[45]guidance further sharpens geometry (e).",
+                "position": 413
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/truck_source.jpg",
+                "caption": "",
+                "position": 427
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/truck_no_guidance.jpg",
+                "caption": "",
+                "position": 428
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/truck_photo_guidance.jpg",
+                "caption": "",
+                "position": 429
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/truck_photo_guidance_monodepthexpert.jpg",
+                "caption": "",
+                "position": 430
+            }
+        ]
+    },
+    {
+        "header": "3Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/gundam1_ref.jpg",
+                "caption": "Figure 4:Qualitative comparisons from1616unposed input views.From left to right: reference view, VGGT[68]pointmaps (one color per view), Gaussian Wrapping[20]mesh from VGGT initialization, and Surflo’s points and mesh. VGGT pointmaps are noisy and duplicated across views, and per-scene GW struggles from few inputs; Surflo yields well-distributed surface points and a clean mesh from the same shared latent.",
+                "position": 500
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/gundam1_vggt_points_2.jpg",
+                "caption": "",
+                "position": 513
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/gundam1_wrapping_mesh.jpg",
+                "caption": "",
+                "position": 515
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/gundam1_surflo_points.jpg",
+                "caption": "",
+                "position": 517
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/gundam1_surflo_mesh.jpg",
+                "caption": "",
+                "position": 519
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/caterpillar_ref.jpg",
+                "caption": "",
+                "position": 523
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/caterpillar_vggt_points.jpg",
+                "caption": "",
+                "position": 525
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/caterpillar_wrapping_mesh.jpg",
+                "caption": "",
+                "position": 527
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/caterpillar_surflo_points.jpg",
+                "caption": "",
+                "position": 529
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/caterpillar_surflo_mesh.jpg",
+                "caption": "",
+                "position": 531
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/teaser/buzz_ref.jpg",
+                "caption": "",
+                "position": 535
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/teaser/vggt_pointmaps.jpg",
+                "caption": "",
+                "position": 537
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/teaser/buzz1_wrapping.jpg",
+                "caption": "",
+                "position": 539
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/teaser/surflo_points_2.jpg",
+                "caption": "",
+                "position": 541
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/teaser/surflo_mesh.jpg",
+                "caption": "",
+                "position": 543
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/garden_ref.jpg",
+                "caption": "",
+                "position": 547
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/garden_vggt_points.jpg",
+                "caption": "",
+                "position": 549
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/garden_wrapping_mesh.jpg",
+                "caption": "",
+                "position": 551
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/garden_surflo_points.jpg",
+                "caption": "",
+                "position": 553
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/garden_surflo_mesh.jpg",
+                "caption": "",
+                "position": 555
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/ignatius_ref.jpg",
+                "caption": "",
+                "position": 559
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/ignatius_vggt_points.jpg",
+                "caption": "",
+                "position": 561
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/ignatius_wrapping_mesh.jpg",
+                "caption": "",
+                "position": 563
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/ignatius_surflo_points.jpg",
+                "caption": "",
+                "position": 565
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/ignatius_surflo_mesh.jpg",
+                "caption": "",
+                "position": 567
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/totoro_ref1.jpg",
+                "caption": "",
+                "position": 571
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/totoro_vggt_points.jpg",
+                "caption": "",
+                "position": 573
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/totoro_wrapping_mesh.jpg",
+                "caption": "",
+                "position": 575
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/totoro_surflo_points.jpg",
+                "caption": "",
+                "position": 577
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/totoro_surflo_mesh.jpg",
+                "caption": "",
+                "position": 579
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/truck_surflo_8Kpts.jpg",
+                "caption": "Figure 5:Variable-resolution decoding from a single shared latent.Left to right: the flow-matching decoder is queried more densely;the latent is unchanged across columns. Bottom: mesh extracted from each point set.",
+                "position": 990
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/truck_surflo_32Kpts.jpg",
+                "caption": "",
+                "position": 1012
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/truck_surflo_128Kpts.jpg",
+                "caption": "",
+                "position": 1013
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/truck_surflo_8Kpts_mesh.jpg",
+                "caption": "",
+                "position": 1021
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/truck_surflo_32Kpts_mesh.jpg",
+                "caption": "",
+                "position": 1022
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/truck_surflo_128Kpts_mesh.jpg",
+                "caption": "",
+                "position": 1023
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/woody_ref.jpg",
+                "caption": "Figure 6:Surflo reconstructions with a varying number of\ninput views.More views progressively complete the scene and sharpen fine detail; the decoder cost is unchanged, since all five reconstructions are produced from a single fixed-size latent. Surflo therefore handles a wide range of capture densities without retraining or architectural change.",
+                "position": 1396
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/woody_pts_mv_3.jpg",
+                "caption": "",
+                "position": 1406
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/woody_pts_mv_9.jpg",
+                "caption": "",
+                "position": 1407
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/woody_pts_mv_16.jpg",
+                "caption": "",
+                "position": 1415
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/woody_pts_mv_33.jpg",
+                "caption": "",
+                "position": 1416
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/renders/woody_pts_mv_65.jpg",
+                "caption": "",
+                "position": 1417
+            }
+        ]
+    },
+    {
+        "header": "4Related Work",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "6Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ARelated work",
+        "images": []
+    },
+    {
+        "header": "Appendix BArchitecture details",
+        "images": []
+    },
+    {
+        "header": "Appendix CTraining",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/dataset/dl3dv_1_ref.jpg",
+                "caption": "Figure 7:Meshed DL3DV dataset.We enrich every scene of DL3DV[46](a) with a watertight mesh (b) and an associated oriented point cloud. For each scene we run Gaussian Wrapping[20]to extract a watertight surface, and finally sample10710^{7}points uniformly on this surface together with their normals.",
+                "position": 2985
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/dataset/dl3dv_2_ref.jpg",
+                "caption": "",
+                "position": 2995
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/dataset/dl3dv_3_ref.jpg",
+                "caption": "",
+                "position": 2996
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/dataset/dl3dv_1_mesh.jpg",
+                "caption": "",
+                "position": 3004
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/dataset/dl3dv_2_mesh.jpg",
+                "caption": "",
+                "position": 3005
+            },
+            {
+                "img": "https://arxiv.org/html/2606.13644/2606.13644v1/images/dataset/dl3dv_3_mesh.jpg",
+                "caption": "",
+                "position": 3006
+            }
+        ]
+    },
+    {
+        "header": "Appendix DGuidance",
+        "images": []
+    },
+    {
+        "header": "Appendix EEvaluation protocol.",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
