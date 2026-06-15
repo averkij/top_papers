@@ -1,0 +1,162 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.11599/2606.11599v1/x1.png",
+                "caption": "Figure 1:Conventional approach requires costly full rollout and LLM judge to decide whether a steering attempt succeeds or not. We propose that the outcome can be efficiently predicted from the hidden states of the first few tokens, as illustrated in the green path.",
+                "position": 278
+            }
+        ]
+    },
+    {
+        "header": "2Steering and Steerability",
+        "images": []
+    },
+    {
+        "header": "3ASTEER Dataset",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.11599/2606.11599v1/x2.png",
+                "caption": "Figure 2:We construct ASTEER with 150 concepts, 50 prompts, and two steering methods (i.e., DiffMean and Probe), with 45 and 18 steering strengths, respectively. Steering is applied on 3 LLMs, whose rollouts are annotated by an LLM judge to one of the labels in Table2.",
+                "position": 375
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11599/2606.11599v1/all-twemojis.pdf",
+                "caption": "Table 2:Example of labels in ASTEER dataset.",
+                "position": 432
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11599/2606.11599v1/x3.png",
+                "caption": "Figure 3:Distribution of steering outcomes (UnderSteer,SuccSteer,OverSteer) as a function of steering strengthα\\alpha.The first row aggregates over all concepts and prompts; the second and third rows show results on individual concepts and prompts, respectively. The concepts and prompts to the ids (c=0, 43, 88; p=0, 8, 41) are in AppendixJand AppendixK. Steering outcome is sensitive toα\\alpha, and the effective range varies substantially across concepts, prompts, and methods.",
+                "position": 512
+            }
+        ]
+    },
+    {
+        "header": "4SteerBoost: Predicting Steerability from Early Decoding States",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.11599/2606.11599v1/x4.png",
+                "caption": "Figure 4:The overview of SteerBoost.Given a prompt, we first decodekktokens with the steering vector applied at layerLs​t​e​e​rL_{steer}(left), then run a single unsteered forward pass over the same token sequence (right). For each (token, layer) position on the sampled grid, we extract features as in Table4to capture how the steering effect propagate in the model. These features, together with steering condition features are fed into an ensemble classifier that predicts the intervention result without requiring the full autoregressive rollout.",
+                "position": 618
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11599/2606.11599v1/x5.png",
+                "caption": "Figure 5:Steerability prediction (classification) performance of SteerBoost.Left: macro-F1 on ID and OOD concepts. The mean and std are reported with runs of 5 random seeds. DiffMean features consistently achieve∼\\sim0.80 macro-F1 on ID concepts and retain∼\\sim0.72 on OOD concepts. Right: row-normalized confusion matrices aggregated over ID test and OOD splits.OverSteeris predicted most reliably (≥\\geq87% recall), whileSuccSteeris most often confused withUnderSteer, reflecting the inherent difficulty of distinguishing borderline steering outcomes from internal representations alone.",
+                "position": 660
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11599/2606.11599v1/x6.png",
+                "caption": "",
+                "position": 663
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11599/2606.11599v1/x7.png",
+                "caption": "Figure 6:Gain-based feature importance of SteerBoost on DiffMean, aggregated by token, layer, and feature group.Scores are summed within each categories and row-normalized. Predictive mass concentrates on the earliest decoded tokens and on alignment-based geometry features (SA, DA), while remaining broadly distributed across layers.222VectorNorm(V) andSteeringStrength(S) appear small in Figure2because the sum-aggregation view of importance compares a single-feature group against groups that span the across grid. The mean-aggregation view is in AppendixH.See Table4for feature abbreviations.",
+                "position": 678
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11599/2606.11599v1/x8.png",
+                "caption": "Figure 7:Cross-method transferability of SteerBoost on Qwen3-1.7B.Each cell reports macro-F1 when trained on the source method and test on the target method.",
+                "position": 690
+            }
+        ]
+    },
+    {
+        "header": "5Application: How Strong do You need to Steer Your LLM?",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.11599/2606.11599v1/x9.png",
+                "caption": "Figure 8:Cost–success trade-off for steering-strength search on DiffMean steering.SteerBoost-guided search achieves better trade-off than current baselines and, atK=20K{=}20, recovers∼\\sim98% of the item-level oracle’s success rate using only∼\\sim11% decoded tokens of IGS, (∼\\sim40% of decoded tokens of IGS-A). The same trends hold in ID and OOD, indicating that it transfers well to unseen concepts.",
+                "position": 768
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADetailed Related Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BFeatures",
+        "images": []
+    },
+    {
+        "header": "Appendix CAblation Study",
+        "images": []
+    },
+    {
+        "header": "Appendix DAn Alternative Approach",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.11599/2606.11599v1/x10.png",
+                "caption": "Figure 9:Macro-F1 of single-state linear probes across token positionstt(rows) and layer offsetsnn(columns), evaluated on ID and OOD concepts. Each block corresponds to one (model, steering-method) pair, where the steering method labels the prediction target. Compare with the ALL configuration of SteerBoost in Table5.",
+                "position": 1484
+            }
+        ]
+    },
+    {
+        "header": "Appendix EGBDT and training details",
+        "images": []
+    },
+    {
+        "header": "Appendix FLimitation",
+        "images": []
+    },
+    {
+        "header": "Appendix GComputational Resource",
+        "images": []
+    },
+    {
+        "header": "Appendix HAdditional Feature Importance Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.11599/2606.11599v1/x11.png",
+                "caption": "Figure 10:Gain-based feature importance of SteerBoost on Probe, aggregated by token, layer, and feature group.Scores are summed within each category and row-normalized.",
+                "position": 1549
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11599/2606.11599v1/x12.png",
+                "caption": "Figure 11:Gain-based feature importance of SteerBoost on DiffMean, aggregated by token, layer, and feature group.Scores are averaged within each category and row-normalized.",
+                "position": 1555
+            },
+            {
+                "img": "https://arxiv.org/html/2606.11599/2606.11599v1/x13.png",
+                "caption": "Figure 12:Gain-based feature importance of SteerBoost on Probe, aggregated by token, layer, and feature group.Scores are averaged within each category and row-normalized.",
+                "position": 1558
+            }
+        ]
+    },
+    {
+        "header": "Appendix IPrompt Template",
+        "images": []
+    },
+    {
+        "header": "Appendix JConcept List",
+        "images": []
+    },
+    {
+        "header": "Appendix KPrompt List",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

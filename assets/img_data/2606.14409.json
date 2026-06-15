@@ -1,0 +1,128 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.14409/2606.14409v1/x1.png",
+                "caption": "Figure 1:Overview of Hy-Embodied-0.5-VLA.An end-to-end VLA system that pairs the Hy-Embodied-0.5-MoT backbone with a flow-matching action expert under a delta-chunk action representation, pre-trained on a1010K-hour egocentric UMI corpus and refined with a reward-free, Proximalized Preference Optimization (PRO)-based offline RL stage (FlowPRO). A single pre-trained checkpoint specializes along two parallel post-training tracks for cross-embodiment transfer to morphologically unseen robots.",
+                "position": 292
+            }
+        ]
+    },
+    {
+        "header": "2Model Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.14409/2606.14409v1/x2.png",
+                "caption": "Figure 2:Architectural overview ofHyVLA-0.5.The framework adopts a MoT architecture to facilitate cross-modal interactions via a shared joint-attention mechanism. To effectively processKK-frame multi-view RGB sequences, the image encoder is extended into a compact memory encoder. Specifically, temporal attention blocks are interleaved every four layers to enforce causal masking across the temporal dimension and seamlessly incorporate historical visual context. As depicted on the right, the attention mask demonstrates our block-wise causal attention strategy. Following Hy-Embodied-0.5[44], we apply local bidirectional attention to model the multi-view observations.",
+                "position": 331
+            }
+        ]
+    },
+    {
+        "header": "3Pre-training and Supervised Fine-tuning",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.14409/2606.14409v1/x3.png",
+                "caption": "Figure 3:UMI custom data collection workstation.The in-house designed hardware setup features an external optical motion-capture system delivering sub-millimeter high-precision tracking, an ego-centric visual perspective camera with native depth capture, a 6-dimensional force-sensing gripper on each hand.",
+                "position": 487
+            },
+            {
+                "img": "https://arxiv.org/html/2606.14409/2606.14409v1/x4.png",
+                "caption": "Figure 4:UMI dataset distribution.Detailed characterization of our diverse, in-house collected 10K-hour UMI demonstration corpus. The distribution outlines broad scale, diverse skill categories, environmental conditions, and manipulated objects, ensuring generalist-level manipulation capacity.",
+                "position": 497
+            }
+        ]
+    },
+    {
+        "header": "4Reinforcement Learning Post-Training",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.14409/2606.14409v1/fig/rl/RL_Algorithm2.png",
+                "caption": "Figure 5:FlowPRO data pipelinefor collecting real-robot preference trajectories and converting them into dense per-state preference tuples. During policy rollouts, an operator triggers an intervention-and-rollback: the system rewinds to a prior state, logs the executed segment as a negative trajectory, and records a corrective teleoperation segment as the paired positive trajectory. A smooth-interpolation procedure then synthesizes the missing counterpart action on each branch to yield per-state tuples(s,aw,al)(s,a^{w},a^{l})used for preference optimization.",
+                "position": 570
+            },
+            {
+                "img": "https://arxiv.org/html/2606.14409/2606.14409v1/fig/rl/RL_Data2.png",
+                "caption": "Figure 6:RPRO optimization.The learnable policyπθ\\pi_{\\theta}and frozen referenceπref\\pi_{\\text{ref}}predict actionsaθa^{\\theta}andarefa^{\\text{ref}}for the same state. The objectivepullsaθa^{\\theta}toward the preferred actionawa^{w}(rw↑r^{w}\\!\\uparrow) andpushesit from the dispreferredala^{l}(rl↓r^{l}\\!\\downarrow). A proximal regularizer (blue dashed) anchors both reward branches toπref\\pi_{\\text{ref}}, preventing reward hacking. Batches mix𝒟prefk\\mathcal{D}_{\\text{pref}}^{k},𝒟pref<k\\mathcal{D}_{\\text{pref}}^{<k}, and𝒟SFT\\mathcal{D}_{\\text{SFT}}.",
+                "position": 627
+            }
+        ]
+    },
+    {
+        "header": "5Deployment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.14409/2606.14409v1/x5.png",
+                "caption": "Figure 7:Asynchronous execution timeline.Policy inference, Bézier smoothing, buffer overwrite, and servo-rate action execution are overlapped; executed actions are recorded inℋ\\mathcal{H}to estimate tangents for the next chunk stitch.",
+                "position": 691
+            },
+            {
+                "img": "https://arxiv.org/html/2606.14409/2606.14409v1/fig/inference/action_comparison_10.png",
+                "caption": "Figure 8:Trajectory comparisonbetween raw action chunks (orange) and the asynchronous Bézier-smoothed trajectory (blue). Smoothing reduces visible discontinuities at chunk boundaries for both arms acrossxx,yy, andzzdimensions.",
+                "position": 776
+            }
+        ]
+    },
+    {
+        "header": "6Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.14409/2606.14409v1/fig/evaluation/results.png",
+                "caption": "Figure 9:Real-robot evaluation on six bimanual manipulation tasks.Left panel: Snapshots of representative task executions captured during rollout.\nRight panel: Per-task success rates (%) after supervised fine-tuning on tele-operated or UMI demonstrations.",
+                "position": 900
+            },
+            {
+                "img": "https://arxiv.org/html/2606.14409/2606.14409v1/fig/evaluation/unitree_force.png",
+                "caption": "Figure 10:Force-guided object discrimination on a Unitree G1.The robot sequentially grasps two boxes of differing mass and places the lighter one into the front basket, confirming that the in-house UMI workstation captures actionable tactile information.",
+                "position": 925
+            },
+            {
+                "img": "https://arxiv.org/html/2606.14409/2606.14409v1/x6.png",
+                "caption": "Figure 11:Additional fine-grained real-robot tasks for FlowPRO post-training.BeyondInsert Bottles(Bottle, sub-cm insertion) andZip Up the Pen Case, which are shown in Fig.9, we further evaluate FlowPRO on two fine-grained tasks:USB insertion(USB, sub-mm precision) andPen-Cap Assembly(Cap, in-air bimanual coordination). This figure illustrates these two additional tasks.",
+                "position": 934
+            },
+            {
+                "img": "https://arxiv.org/html/2606.14409/2606.14409v1/x7.png",
+                "caption": "Figure 12:Per-iteration success rate on the four real-robot tasks withHyVLA-0.5as the base policy.Iteration0corresponds to the shared SFT checkpoint; iterations11–33correspond to successive rounds of post-training. RPRO consistently dominates DAgger andπ0.6\\pi_{0.6}* throughout the iterative process.",
+                "position": 1017
+            }
+        ]
+    },
+    {
+        "header": "7Related Work",
+        "images": []
+    },
+    {
+        "header": "8Discussion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ARoboTwin 2.0 Evaluation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BSupplementary Deployment",
+        "images": []
+    },
+    {
+        "header": "Appendix CFlowPRO Hyperparameters",
+        "images": []
+    },
+    {
+        "header": "Appendix DAuthor Contributions",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
