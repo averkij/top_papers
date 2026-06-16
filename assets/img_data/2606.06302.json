@@ -1,0 +1,128 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1.Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06302/2606.06302v2/x1.png",
+                "caption": "Figure 1.(a) KV cache size growth for Qwen2.5-32B with the number of conversation turns (top, # requests = 16) or with the number of concurrent requests (bottom, # turns = 10). The dashed line indicates the model weight size. (b) Comparison of uniform (top) and non-uniform (below) KV compression strategies at a 50% target global retention ratio, where the numbers in each box denote the importance score of each KV entry. (c) Comparative accuracy on long-term conversation QA benchmarks(Leeet al.,2025)using KVzip(Kimet al.,2025a)with Uniform and non-uniform KV compression.",
+                "position": 343
+            }
+        ]
+    },
+    {
+        "header": "2.Background",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06302/2606.06302v2/x2.png",
+                "caption": "Figure 3.Challenges posed by non-uniform KV compression. (a)Monolithic Page Structure: unified pages span all heads, causing page fragmentation (red dashed: pages allocated per request; teal dashed: per-group allocation under Ragged Paging). (b)Page Management Overhead: reclaiming scattered pages at runtime incurs severe control-plane cost. (c)Workload Imbalance: uniform KV splits across thread blocks cause stragglers under different per-head KV lengths.",
+                "position": 480
+            }
+        ]
+    },
+    {
+        "header": "3.Motivation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06302/2606.06302v2/x3.png",
+                "caption": "Figure 4.Workload imbalance on decode attention. (a) Uniform KV compression, (b) Non-uniform KV compression, (c) attention latency across different configurations of requests on Qwen3-4B. The dashed line indicates the maximum workload among all thread blocks.",
+                "position": 566
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06302/2606.06302v2/x4.png",
+                "caption": "Figure 5.Per-head KV retention rates (%) under non-uniform compression using KVzip(Kimet al.,2025a)at a 50% target global retention ratio, across three model families (Llama-3.1-8B, Gemma-3-12B, GPT-OSS-20B) and three SCBench(Liet al.,2024a)tasks—summarization (Summary), code understanding (Code; RepoQA), and fact retrieval (Retrieve; QA-Eng)—shown for three selected layers per model; for the hybrid models (Gemma-3-12B, GPT-OSS-20B), these are full-attention layers. Heads on the x-axis are sorted by their retained budget. Each box aggregates 50 input samples. Dashed lines mark the per-head budget thatTangramreserves with the safety coefficientα=2\\alpha=2(§4.1).",
+                "position": 586
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06302/2606.06302v2/x5.png",
+                "caption": "Figure 6.System overview ofTangram.(a)chunk-wise prefill with per-chunk compression at scheduling time;(b)a scoring function rates each KV entry to drive compression;(c)the static per-head budget fixes the post-compression memory footprint;(d)a ragged block table manages each head group at its own length;(e)an ahead-of-time workload partition balances decode attention across SMs.",
+                "position": 615
+            }
+        ]
+    },
+    {
+        "header": "4.Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06302/2606.06302v2/x6.png",
+                "caption": "Figure 7.Freeing KV pages under non-uniform KV compression.\nA page is freed only whenallheads sharing it are evicted.(a) Monolithicshares one page across all heads, so a single long\nhead (H3) blocks every page.(b) Raggedpages each head group (Hp=3H_{p}{=}3) independently, freeing\npages in groups without a long head.(c) Clusteredfirst sorts heads by retention, packing short heads\ntogether to free far more pages.",
+                "position": 627
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06302/2606.06302v2/x7.png",
+                "caption": "Figure 8.Comparison of Unified Page and Ragged Page on Llama-3.1-8B under 100K single-request non-uniform compression input at a 30% target global retention ratio:\n(a) Unified Page (vLLM), where all heads share a single page;\n(b) Ragged Page (Hp=4H_{p}=4), where each head group maintains its own independent page; and\n(c) page fragmentation versus management overhead as a function of heads per pageHpH_{p}.",
+                "position": 709
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06302/2606.06302v2/x8.png",
+                "caption": "Figure 9.Multi-turn accuracy of three non-uniform KV compression methods (rows) across five models (columns), at target global retention ratiosρ\\rhoof 0.7/0.5/0.3 and averaged over all SCBench tasks. For each method,w/o Tangram(dashed, open markers) is its original implementation, whilew/ Tangram(solid, filled markers) is the same method run underTangram’s Ragged Paging and budget reservation. The horizontal dashed line denotes the Full-KV reference.",
+                "position": 853
+            }
+        ]
+    },
+    {
+        "header": "5.Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06302/2606.06302v2/x9.png",
+                "caption": "Figure 10.Throughput breakdown on SCBench(Liet al.,2024a)across target global retention ratios (Hp=4H_{p}=4). Against the vLLM baseline (ρ=100%\\rho=100\\%),Tangram’s techniques are applied cumulatively: Budget Reservation, then Ragged Paging, then AOT Load Balancing. The red ×N marksTangram’s peak throughput (ρ=25%\\rho=25\\%) over vLLM.",
+                "position": 903
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06302/2606.06302v2/x10.png",
+                "caption": "Figure 11.Latency breakdown across various target global retention ratios, comparing static budget allocation (S) against dynamic allocation (D). While dynamic allocation incurs significant page reclamation overhead (orange) that scales with the eviction rate,Tangram’s budget reservation completely eliminates this extra cost, operating without page reclaim overhead.",
+                "position": 920
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06302/2606.06302v2/x11.png",
+                "caption": "Figure 12.Throughput versus heads per page (HpH_{p}); the three curves correspond to eviction rates of 25/50/75%. SmallHpH_{p}minimizes fragmentation but incurs high management overhead, while largeHpH_{p}fails to effectively reclaim memory.",
+                "position": 923
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06302/2606.06302v2/x12.png",
+                "caption": "Figure 13.Attention latency evaluated under the impact of AOT (Ahead-Of-Time) load balancing (fixed batch size of 4).",
+                "position": 948
+            },
+            {
+                "img": "https://arxiv.org/html/2606.06302/2606.06302v2/x13.png",
+                "caption": "Figure 14.TTFT (Time-To-First-Token) under increasing throughput pressure with 30K average request lengths is maintained through budget reservation and Ragged Paging with 75% of the KV cache evicted.",
+                "position": 968
+            }
+        ]
+    },
+    {
+        "header": "6.Related Works",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06302/2606.06302v2/x14.png",
+                "caption": "Figure 15.Memory reclaimed (fraction of the full KV cache) with and without Budget-Aware Clustering (Hp=4H_{p}=4).",
+                "position": 999
+            }
+        ]
+    },
+    {
+        "header": "7.Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.06302/2606.06302v2/x15.png",
+                "caption": "",
+                "position": 1636
+            }
+        ]
+    },
+    {
+        "header": "Appendix ARetention Regularity across Compression Methods",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
