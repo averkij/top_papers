@@ -1,0 +1,160 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.17168/2606.17168v1/x1.png",
+                "caption": "Figure 1:A unified evaluation framework for LLM unlearning.We characterize unlearning along three measurable dimensions: forgetting, disruption, and robustness.\nStage 1 unlearns on the forget set𝒟forget\\mathcal{D}_{\\text{forget}}and measures forgetting (question-answering accuracy on held-out𝒟eval\\mathcal{D}_{\\text{eval}}) and disruption (MMLU, WikiText KL) on the retain set𝒟retain\\mathcal{D}_{\\text{retain}}.\nStage 2 applies relearning (fine-tuning and few-shot learning) on the relearn set𝒟relearn\\mathcal{D}_{\\text{relearn}}(similar to the forget set) and evaluates post-relearning accuracy as the depth of forgetting, i.e., robustness.",
+                "position": 364
+            },
+            {
+                "img": "https://arxiv.org/html/2606.17168/2606.17168v1/x2.png",
+                "caption": "Figure 2:Overview.(A) Top principal components (PCs, from SVD on forget set activations) capture most retain-set variance (red shades) and encode common concepts (red words) not specific to the forget set, while bottom PCs are more forget-specific.\nNaive unlearning targets mainly the top PCs, so it disrupts general capabilities and is trivially reversed by an attacker fine-tuning on similar data.\n(B) RepSelect collapses the top PCs before each update, restricting weight changes to the forget-specific bottom subspace.\n(C) RepSelect drives post-attack score far below the next-best baselines (NPO, RMU) under both fine-tuning and few-shot (k=5k{=}5) attacks. Bars extend leftward from the no-unlearn baseline (right edge); longer bar = more unlearning. Results on Llama-3.1-8B / WMDP-Bio; the same pattern holds across all models and datasets we test (Figure6, Table3).",
+                "position": 370
+            },
+            {
+                "img": "https://arxiv.org/html/2606.17168/2606.17168v1/x3.png",
+                "caption": "Figure 3:Unlearning trajectories of RepSelect and best baselines(Gemma-4-E4B):Leftpanels show the unlearning–disruption trade-off (x: WikiText KL divergence, i.e. disruption to retain set; y: post-attack answer probability,↓\\downarrowlower is better; bottom-left corner is ideal).Rightpanels show robustness under a fine-tuning attack (x: relearning epochs; a flat low line is more robust).\nFor knowledge unlearning (WMDP-Bio;top), only RepSelect achieves meaningful unlearning within the same disruption budget and is robust to relearning.\nFor tendency unlearning (Animal Abuse;bottom), NPO matches RepSelect’s unlearning but, unlike RepSelect, is fully reverted by relearning.\nSimilar pattern holds across Llama-3.1-8B, Qwen3.5-9B, and DeepSeek-V2-Lite (MoE); see Figures12–14.",
+                "position": 378
+            }
+        ]
+    },
+    {
+        "header": "2Experiment setup",
+        "images": []
+    },
+    {
+        "header": "3Why unlearning fails?",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.17168/2606.17168v1/x4.png",
+                "caption": "Figure 4:Representation structure of forget PCs on Llama-3.1-8B (WMDP-Bio, Layer 10).(a)Retain and forget variance per PC (sorted high→\\tolow by forget variance): retain variance is∼4×{\\sim}4\\timeshigher per PC in the top tiers than the bottom tiers, making the top subspace retain-concentrated. RepSelect collapses these top directions and operates in the retain-dilute bottom subspace.(b)Fraction of weight-update norm (‖Δ​W‖F2\\|\\Delta W\\|_{F}^{2}) concentrated in the top-50 forget PCs: a fine-tuning attacker and all baselines place 33–41% in the same retain-concentrated subspace, while RepSelect avoids it (∼{\\sim}6%).\nQwen3.5-9B shows identical patterns (Figure10, AppendixD.1).",
+                "position": 674
+            }
+        ]
+    },
+    {
+        "header": "4RepSelect",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.17168/2606.17168v1/x5.png",
+                "caption": "Figure 5:RepSelect overview.For each MLP module, we accumulate the weight gradient∇Wℒ\\nabla_{W}\\mathcal{L}on the forget set (with LoRA active). The top principal components of∇Wℒ\\nabla_{W}\\mathcal{L}are softly collapsed, yielding a filtered updateΔ​W′\\Delta W^{\\prime}that avoids high-variance forget directions.The model is updated asW←W−α⋅Δ​W′W\\leftarrow W-\\alpha\\cdot\\Delta W^{\\prime}.",
+                "position": 703
+            },
+            {
+                "img": "https://arxiv.org/html/2606.17168/2606.17168v1/x6.png",
+                "caption": "Figure 6:Post-attack answer probability across methods and tasks.Lower is better (↓\\downarrow).\nRepSelect achieves substantially lower post-attack answer probability than all five baselines on both WMDP-Bio and Animal Abuse (BeaverTails), across four model families.multi-epochandw/o LoRAare RepSelect ablations.\nError bars denote standard deviation across top 10 runs.",
+                "position": 783
+            }
+        ]
+    },
+    {
+        "header": "5RepSelect is robust and non-disruptive",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.17168/2606.17168v1/x7.png",
+                "caption": "Figure 7:Collapse design ablations.Post-attack answer probability (↓\\downarrow) under variants of RepSelect’s collapse step: SVD source (forgetvsretaindistribution) crossed with what is collapsed (activations, outputgradients, orboth);no collapseis the unintervened gradient-ascent baseline.\nTwo-sided collapse is consistently the best.\nFor knowledge unlearning, SVD on forget distribution is better than on retain distribution.",
+                "position": 822
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "Author Contributions",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix AMore on RepSelect Algorithm and Implementation",
+        "images": []
+    },
+    {
+        "header": "Appendix BMore on Experiment Setup",
+        "images": []
+    },
+    {
+        "header": "Appendix CMore Motivation for Selectivity",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.17168/2606.17168v1/x8.png",
+                "caption": "Figure 8:Gradient overlap between superficially similar facts.We compute the weight gradient for unlearning “The capital of France isParis” (negated cross-entropy on the answer tokens) and measure its cosine similarity with the gradient for each other fact.\nNo unlearning training is performed; this is a single forward-backward pass showing how much thegradient directionsoverlap.ActivationsandGradientscolumns show a slice of the first 40 elements in activations and output gradient vectors, at an MLPgate_projmodule in a middle layer (green = positive values, red = negative).\nThe near-identical patterns across some facts illustrate that most of their representation is shared, not fact-specific.\nModel:Llama-3.2-1B.",
+                "position": 2469
+            },
+            {
+                "img": "https://arxiv.org/html/2606.17168/2606.17168v1/x9.png",
+                "caption": "",
+                "position": 2473
+            },
+            {
+                "img": "https://arxiv.org/html/2606.17168/2606.17168v1/x10.png",
+                "caption": "Figure 9:Comparison of two masking strategies.We show a slice of updates of a single weight matrix when unlearning “The capital of France isParis\".\nWeights are colored green when an update successfully unlearns a paraphrased fact (\"France’s capital isParis\"), red when it disrupts recall of a different fact (“The capital of Spain isMadrid\"), and blue for a control fact disruption (“The capital of Italy isRome\").\nThen we use the control fact disruption pattern to identify weights (or rows/columns) that are likely to be disruptive, and filter the unlearning update accordingly.\nIdeally we would want high unlearning transfer (green), with low disruption (red).\nOur approach of masking whole columns and rows removes disruption much more accurately.",
+                "position": 2507
+            }
+        ]
+    },
+    {
+        "header": "Appendix DMore on Representation Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.17168/2606.17168v1/x11.png",
+                "caption": "Figure 10:Representation structure of forget PCs on Qwen3.5-9B (WMDP-Bio, Layer 10), mirroring Figure4on Llama-3.1-8B.(a)Retain variance is∼4×{\\sim}4\\timeshigher per PC in the top tiers than the bottom tiers; RepSelect operates in the retain-dilute bottom subspace.(b)Baselines and the fine-tuning attacker concentrate 50–62% of weight-update norm in the top-50 forget PCs; RepSelect places∼{\\sim}4%.",
+                "position": 2547
+            }
+        ]
+    },
+    {
+        "header": "Appendix EMore on Disruption and Robustness Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix FMore Unlearning and relearning trajectories",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.17168/2606.17168v1/x12.png",
+                "caption": "Figure 11:Data scaling on Animal Abuse.Unlearning (left) and relearning (right) trajectories for RepSelect on BeaverTails Animal Abuse, varying the forget-set size from 10 to 360 samples (out of 371 available).\nTwo models are shown (Llama-3.1-8B, Qwen3.5-9B); RepSelect is run without the LoRA adversary, with SVD computed on the forget set.\n10 samples already achieve over half of the maximal unlearning, and 90 samples saturate it; further data yields no additional gain.\nThe dashed gray line shows the no-unlearning baseline, also subjected to the same relearning attack.",
+                "position": 4045
+            },
+            {
+                "img": "https://arxiv.org/html/2606.17168/2606.17168v1/x13.png",
+                "caption": "Figure 12:Unlearning and relearning trajectories onLlama-3.1-8B. Same layout as Figure3(bottom).",
+                "position": 4052
+            },
+            {
+                "img": "https://arxiv.org/html/2606.17168/2606.17168v1/x14.png",
+                "caption": "Figure 13:Unlearning and relearning trajectories onQwen3.5-9B. Same layout as Figure3(bottom).",
+                "position": 4055
+            },
+            {
+                "img": "https://arxiv.org/html/2606.17168/2606.17168v1/x15.png",
+                "caption": "Figure 14:Unlearning and relearning trajectories onDeepSeek-V2-Lite(MoE). Same layout as Figure3(bottom).",
+                "position": 4058
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
