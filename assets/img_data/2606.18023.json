@@ -1,0 +1,97 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.18023/2606.18023v1/x1.png",
+                "caption": "",
+                "position": 302
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Preliminaries and Problem Formulation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.18023/2606.18023v1/x2.png",
+                "caption": "Figure 1:Overview of PLT loop-count selection. Left: standard sequential looping\nincreases latency and KV-cache memory with the loop count, whereas PLT uses a\ncross-loop position offset and shared-KV G-SWA to keep both costs nearly\nconstant. Middle: each added loop trades marginal refinement gain against the\nCLP-induced offset mismatch. The gain peaks early and then shrinks while the\noffset cost remains roughly stable, makingr=2r=2the preferred operating point.\nRight: per-loop diagnostics explain this choice. Loop 2 shows coherent\nhidden-state movement, changed attention routing, increased representation\ndiversity, and broad token-level refinement, while loop 3 is more redundant and\nless productive.",
+                "position": 367
+            }
+        ]
+    },
+    {
+        "header": "3Analyzing Parallel Loop Transformers",
+        "images": []
+    },
+    {
+        "header": "4Per-Loop Interpretability Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.18023/2606.18023v1/x3.png",
+                "caption": "Figure 2:Step sizeδ(r)\\delta^{(r)}(top-left), angular changecos⁡θ(r)\\cos\\theta^{(r)}(top-right), scale-free effective rankerank​(𝐡(r))\\mathrm{erank}(\\mathbf{h}^{(r)})(bottom-left), and fixed-point gapΔFP(r)\\Delta_{\\text{FP}}^{(r)}(bottom-right)\nas a function of loop indexrr. Lines: PLT2/PLT3/PLT4(trainedR=2,3,4R{=}2,3,4); the baseline (R=1R{=}1) is shown\nwhere defined. Shaded bands are 95% CIs over 500 samples (often narrower than\nthe markers); the dotted line in (c) marks the embedding. Effective rank peaks\nat loop 2 and declines for every deeper loop; successive updates are oscillatory\n(cos⁡θ(r)<0\\cos\\theta^{(r)}<0) through the refinement loops, and the step size shrinks to\na mid-depth minimum before rebounding at the final (output) loop.",
+                "position": 1209
+            },
+            {
+                "img": "https://arxiv.org/html/2606.18023/2606.18023v1/x4.png",
+                "caption": "Figure 3:The gain–cost scissors (PLT4). The per-loop refinement gainΔ​p(r)\\Delta p^{(r)}(output-distribution KL; left axis, log) collapses after loop 2\nand never recovers, whereas the intrinsic CLP offset costΩ(r)\\Omega^{(r)}(Equation 6; right axis) stays high and roughly fixed. At every\nextra loop the offset cost exceeds the per-loop gain by3030–45×45\\times, so the\nfixed offset tax dominates the shrinking refinement beyond loop 2. 500 samples;\nshaded bands are 95% CIs.",
+                "position": 1221
+            },
+            {
+                "img": "https://arxiv.org/html/2606.18023/2606.18023v1/x5.png",
+                "caption": "Figure 4:Head×\\timeshead cosine similarity of the per-head attention\ndistributions at loopsr=1,2,3r=1,2,3(PLT3, 500 held-out samples; self-similarity\non the diagonal masked). Brighter cells indicate more redundant heads;sim¯\\overline{\\mathrm{sim}}is the mean off-diagonal similarity. Heads grow\nprogressively more redundant across loops.",
+                "position": 1230
+            },
+            {
+                "img": "https://arxiv.org/html/2606.18023/2606.18023v1/x6.png",
+                "caption": "Figure 5:Mean attention entropyℋ(r)\\mathcal{H}^{(r)}(left),\ninter-loop KL divergenceDKL(r)D_{\\text{KL}}^{(r)}(middle),\nand mean G-SWA gateg¯(r)\\bar{g}^{(r)}(right; the weight on the global loop-1\nbranch) as a function of loop indexrr(PLT2/PLT3/PLT4). The inter-loop\nKL drops sharply after loop 2 and stays low, indicating that attention routing\nlargely freezes once the second loop completes; the gate stays well above0.50.5at every loop.",
+                "position": 1237
+            },
+            {
+                "img": "https://arxiv.org/html/2606.18023/2606.18023v1/x7.png",
+                "caption": "Figure 6:Logit-lens ground-truth token rank (left), inter-loop output\nKL divergenceΔ​p(r)\\Delta p^{(r)}(middle, log scale), and output entropyℋ​(p(r))\\mathcal{H}(p^{(r)})(right) as a function of loop indexrr(PLT2/PLT3/PLT4).\nPredictions sharpen monotonically with depth, but theper-loopchangeΔ​p(r)\\Delta p^{(r)}collapses after loop 2 (the small uptick at the final loop is\noutput readout rather than new refinement), marking the onset of diminishing\nreturns.",
+                "position": 1246
+            },
+            {
+                "img": "https://arxiv.org/html/2606.18023/2606.18023v1/x8.png",
+                "caption": "Figure 7:How post-context refinement is distributed across the extra loops of\nPLT4. Each bar splits the refinement carried by the refinement loops\n(r≥2r\\geq 2) into its loop-2, loop-3, and loop-4 shares, under three independent\nlenses: the output shiftΔ​p(r)\\Delta p^{(r)}, the inter-loop attention re-routingDKL(r)D_{\\mathrm{KL}}^{(r)}, and the per-token peak-contribution loopr∗=arg⁡maxr⁡Δ​p(r)r^{*}=\\arg\\max_{r}\\Delta p^{(r)}. The middle extra loop (loop 3, grey) carries\nthesmallestshare on every lens: genuine refinement concentrates at\nloop 2,where attention re-routing and effective rank also peak,while loop 4’s\nlarge output-side share is final readout rather than representational\nenrichment (its effective rank is the lowest;Figure 2c).\n(Loop 1 builds context and is excluded to isolate refinement.)",
+                "position": 1256
+            }
+        ]
+    },
+    {
+        "header": "5Discussion",
+        "images": []
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AForward-Pass Pseudocode",
+        "images": []
+    },
+    {
+        "header": "Appendix BModel Architecture Configurations",
+        "images": []
+    },
+    {
+        "header": "Appendix CPretraining Code-Data Composition",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
