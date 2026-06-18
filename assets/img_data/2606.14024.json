@@ -1,0 +1,89 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "IIntroduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.14024/2606.14024v1/x1.png",
+                "caption": "Figure 1:(A)Overview of ViT-Up. ViT-Up treats feature upsampling as coordinate-conditioned feature prediction: given an input image and an arbitrary continuous query coordinate, it predicts the corresponding ViT feature from low-resolution backbone hidden states, e.g., the28×2828{\\times}28patch-token grid produced by DINOv3-S+ for a448×448448{\\times}448input. This enables feature upsampling by independently evaluating the implicit decoder over a dense query grid, yielding high-resolution feature maps at arbitrary output resolutionsH×WH{\\times}W.(B)The resulting dense feature maps can be used for downstream dense prediction tasks such as semantic segmentation and depth estimation.",
+                "position": 261
+            }
+        ]
+    },
+    {
+        "header": "IIRelated Work",
+        "images": []
+    },
+    {
+        "header": "IIIMethod",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.14024/2606.14024v1/x2.png",
+                "caption": "Figure 2:Overview of ViT-Up.(A)Training strategy.\nA frozen teacher ViT is evaluated on the same image at resolutions224×224224{\\times}224,448×448448{\\times}448, and896×896896{\\times}896, providing feature targets at token-grid resolutions14×1414{\\times}14,28×2828{\\times}28, and56×5656{\\times}56.\nThe student receives a downscaled version of the image pasted into a fixed-size image container, together with query coordinates sampled over the visible image region.\nA LoRA-adapted ViT backbone provides low-resolution intermediate hidden states to ViT-Up.\nFor each sampled continuous coordinate, ViT-Up first constructs an initial query embedding and then refines it throughTTViT-Up blocks that consume the corresponding backbone hidden states.\nFor visualization, the figure shows three ViT-Up blocks consuming hidden states from layers44,88, and1212.\nIn our DINOv3-S+/B main configurations, we use six ViT-Up blocks consuming hidden states from layers{2,4,6,8,10,12}\\{2,4,6,8,10,12\\}.\nThe decoded query features are supervised at the finest teacher resolution and, after average pooling, at the corresponding coarser teacher token-grid resolutions using feature reconstruction losses and relational KL regularization.(B)Query embedding.\nThe input image is processed with the ViT patch-embedding layer to obtain a224×224224{\\times}224patch-token grid, which is bilinearly interpolated at the query coordinatexqx_{q}to initialize the query representationq0q_{0}.(C)ViT-Up block.\nEach block refines the previous query representationqt−1q_{t-1}by fusing token-level context from cross-attention with sub-token detail extracted from the nearest patch token using FeatX.(D)FeatX block.\nFeatX encodes the relative offset between the query coordinate and its nearest patch-token center, predicts FiLM parameters, and modulates the nearest-token feature to extract query-specific sub-token information.",
+                "position": 390
+            }
+        ]
+    },
+    {
+        "header": "IVExperiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.14024/2606.14024v1/x3.png",
+                "caption": "Figure 3:Qualitative comparison of feature upsampling methods on DINOv3-S+.\nAll methods use a448×448448{\\times}448input image; the native backbone produces a28×2828{\\times}28feature grid, and upsampled feature maps are shown at448×448448{\\times}448output resolution.\nWe show two examples: a vegetable-store scene in the top two rows and a traffic scene in the bottom two rows.\nFor each example, the top row visualizes the feature structure using PCA, including the input image, the original28×2828{\\times}28backbone feature map, and the upsampled feature maps produced by ViT-Up, NAF[3], UpLiFT[48], AnyUp[51], and JAFAR[7].\nThe bottom row shows the corresponding query-based similarity maps, including the input image with the query point encircled in blue, the similarity map obtained from the low-resolution backbone features, and the similarity maps obtained from the upsampled features of each method.\nViT-Up produces coherent PCA structures and semantically selective similarity maps that remain aligned with the queried region.\nIn contrast, NAF, AnyUp, and JAFAR can produce visually sharp but fragmented feature maps with leakage into nearby structures, while UpLiFT tends to produce smoother features and weaker similarity responses for small semantic regions.",
+                "position": 795
+            },
+            {
+                "img": "https://arxiv.org/html/2606.14024/2606.14024v1/x4.png",
+                "caption": "Figure 4:Qualitative dense probing results on DINOv3-S+.\nAll methods use a448×448448{\\times}448input image; the native backbone produces a28×2828{\\times}28feature grid, and dense predictions are shown at448×448448{\\times}448output resolution.Top two rows:semantic segmentation example with a person in front of a bus, showing PCA projections of the dense features and the corresponding predicted segmentation masks together with the ground-truth mask (left).Bottom two rows:monocular depth example with a group of ducks, showing PCA projections of the dense features and the corresponding predicted depth maps together with the pseudo-depth target (left) generated by Depth Anything V2[56].\nFor the bilinear baseline, we visualize PCA on the original28×2828{\\times}28backbone feature grid.\nNAF[3], AnyUp[51], and JAFAR[7]produce visually sharp but fragmented feature maps and noisy dense predictions.\nUpLiFT[48]produces more localized but blurrier features, weakening fine structures such as the person’s head region and small distant ducks.\nViT-Up produces more coherent dense features, resulting in cleaner segmentation masks and more consistent depth estimates.",
+                "position": 978
+            },
+            {
+                "img": "https://arxiv.org/html/2606.14024/2606.14024v1/x5.png",
+                "caption": "Figure 5:Qualitative semantic correspondence results on SPair-71k.\nWe show two image pairs, birds in the top two rows and horses in the bottom two rows.\nFor each pair, the first row shows PCA projections of the dense features, and the second row shows correspondences obtained by matching each source query point to the target location with maximum cosine similarity.\nGreen lines indicate correct matches under the SPair-71k threshold, while red lines indicate incorrect matches.\nViT-Up produces fine-grained object features and accurate part-level correspondences.\nNAF[3]and UpLiFT[48]suffer from feature fragmentation or blurring in small structures such as the bird tail and the partially occluded horse tail, leading to incorrect matches.",
+                "position": 1122
+            },
+            {
+                "img": "https://arxiv.org/html/2606.14024/2606.14024v1/x6.png",
+                "caption": "Figure 6:Qualitative ablation of cross-attention and FeatX on DINOv3-S+.\nThe input image has resolution448×448448{\\times}448, the native DINOv3-S+ feature grid has resolution28×2828{\\times}28, and all dense feature maps are shown at448×448448{\\times}448resolution.\nFrom left to right, we show the input RGB image, DINOv3-S+@28, ViT-Up after one epoch of training, and the one-quarter-epoch ablated variants of ViT-Up in its base configuration, without FeatX, and without cross-attention.\nWithout FeatX, the features remain spatially consistent but lose fine local texture, most visibly near the arm ends of the sea star highlighted by the green box.\nWithout cross-attention, the features preserve more local detail but exhibit pronounced pixelation artifacts, especially in the region highlighted by the red box.\nCombining both components yields coherent features with visible local detail; the remaining pixelation artifacts after one-quarter epoch of training largely disappear after one full epoch. Best viewed digitally.",
+                "position": 1598
+            }
+        ]
+    },
+    {
+        "header": "VLimitations and Outlook",
+        "images": []
+    },
+    {
+        "header": "VIConclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "Appendix AComparison to Higher Native Token Resolutions",
+        "images": []
+    },
+    {
+        "header": "Appendix BUpsampling versus Artifact Suppression",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.14024/2606.14024v1/x7.png",
+                "caption": "Figure 7:Upsampling versus artifact suppression.\nFor each example, the top row shows DINOv2-based features and the bottom row shows DINOv3-based features under the same visualization protocol.\nDINOv2 exhibits stronger spatial leakage and position-dependent artifacts, while DINOv3 provides a cleaner dense feature field.\nImage-guided upsamplers can suppress such artifacts by injecting high-resolution image cues, whereas ViT-Up reconstructs the target ViT representation more directly.\nThis explains the trade-off observed across backbones: artifact-prone features favor suppression-based behavior, while clean modern ViT features favor faithful reconstruction.",
+                "position": 1921
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
