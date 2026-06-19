@@ -1,0 +1,345 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x1.png",
+                "caption": "Figure 1:All sources of randomness behind a generative model.Training and then sampling a generative model is a chain of pseudo-random\ndraws.\nThey fall into two lotteries. Thetraining lottery(left) is drawn from four sources: the random weight initialisation, the order in which examples are visited, the fresh Gaussian noise the flow-matching loss injects\nat every gradient step, and the bitwise non-determinism\nof multi-GPU execution. This draws a single trained network out of the many networks the same recipe could have produced. Thegeneration lottery(right) then draws a fresh initial noisexT∼𝒩​(0,I)x_{T}\\!\\sim\\!\\mathcal{N}(0,I)for every\nsampled image. Common practice accounts for only, reporting error bars over sampling seeds on one fixed\nnetwork. In this work we study all five.",
+                "position": 264
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x2.png",
+                "caption": "",
+                "position": 273
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x3.png",
+                "caption": "",
+                "position": 274
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x4.png",
+                "caption": "",
+                "position": 275
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x5.png",
+                "caption": "",
+                "position": 276
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x6.png",
+                "caption": "",
+                "position": 277
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x7.png",
+                "caption": "",
+                "position": 278
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x8.png",
+                "caption": "Figure 2:The FID lottery in SiT-B/2 at 400k steps.Each violin is one of2525independently trained SiT-B/2\nmodels, sorted by per-seed mean Inception FID. Small dots are the250250individual sampling-seed evaluations and short black ticks are\nper-seed means. The two highlighted markers pick out the single best\n(33.59\\mathbf{33.59}) and worst (35.69\\mathbf{35.69}) FID across the panel,\na2.10\\mathbf{2.10}-point gap produced purely by changing seeds. Each\nviolin is short (σwithin≈0.14\\sigma_{\\text{within}}\\!\\approx\\!0.14, evaluation\nlottery). The per-seed means stagger over a3×3{\\times}wider range\n(σbetween=0.44\\sigma_{\\text{between}}\\!=\\!0.44, training lottery).",
+                "position": 327
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x9.png",
+                "caption": "Figure 3:Variance decomposition of the training-seed lottery\n(SiT-B/2, 400k, no CFG).(a) Per-seed mean Inception FID under the three single-source\nconditions plus the fully-stochastic baseline (vary all) and\nthesame seedcontrol. Each dot is one training seed, boxes show\nthe 25/50/75 percentiles. (b) Between-seedσ\\sigma(coral) versus\nwithin-seed samplingσ\\sigma(sage) per condition. The four\nrandom-source conditions are ordered monotonically by between-seedσ\\sigma,\nwith samplingσ\\sigmaflat across all four. The rightmostsame seedcolumn is a control that fixes init, data order,andtraining noise to identical values, leaving only the bitwise\nnon-determinism of multi-GPU (DDP) execution: its between-seedσ\\sigmacollapses to0.0470.047, below the within-seed sampling floor, even though\nthe trained weights differ by≈5{\\approx}5–6%6\\%of their norm.\nNumerical non-determinism is thus not a meaningful source of FID\nvariance.",
+                "position": 471
+            }
+        ]
+    },
+    {
+        "header": "3Experimental Setup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x10.png",
+                "caption": "Figure 4:What does FID spectrum looks like?Each row is one scene rendered by SiT-XL model whose Inception FID\nfalls log-uniformly from𝟒𝟑\\mathbf{43}(left) to3.6\\mathbf{3.6}(right),\na𝟏𝟐×\\mathbf{12\\times}range: quality improves toward the right, as FID goes down.\nFID is definedat the distribution level. It’s a Fréchet distance\nbetween Gaussians fit to the Inception features of the reference distribution (the ImageNet dataset) and50,00050{,}000generated images. It is a property of the wholeset, never of any single generated image.\nFor a fuller, set-level impression\nat each FID level, see the per-class galleries inAppendix G.",
+                "position": 537
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x11.png",
+                "caption": "Figure 5:Per-cell guidance tuning halves the seed-induced FID\nspread, but reshuffles which seeds rank best.Per-(training, sampling)-seed golden-section CFG search\n(GS-FID) across2525SiT-B/2 training seeds (400400k steps,1010sampling seeds per cell). (a) Per-seed violins of guided Inception\nFID, sorted by per-seed mean. The relative spread tightens toCoV=0.67%\\mathrm{CoV}\\!=\\!0.67\\%, about half the1.26%1.26\\%measured unguided\non the same panel. (b) Tuning does not preserve the seed ranking:\nunguided and guided ranks correlate at only Spearmanρ=0.73\\rho\\!=\\!0.73. Lavender lines mark seeds that barely move\n(|Δ​rank|<5|\\Delta\\!\\operatorname{rank}|\\!<\\!5), coral lines the8/258/25seeds\nthat shift by|Δ​rank|≥5|\\Delta\\!\\operatorname{rank}|\\!\\geq\\!5.",
+                "position": 654
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x12.png",
+                "caption": "",
+                "position": 661
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x13.png",
+                "caption": "Figure 6:The seed lottery across compute and model size.(a) Inception FID over training: thin pastel lines are\nindividual training-seed trajectories, bold lines are per-step means.\nThe spread between seeds stays wide at every checkpoint and does not\nshrink as training converges. (b) Coefficient of\nvariationσ/μ\\sigma/\\muover training: all four models stay near a11–2%2\\%band. Bigger models do not yield proportionally tighter FID.\n(c) Spearmanρ\\rhobetween the seed ranking at stepttand at22M:\nweak before∼1\\sim\\!1M steps.",
+                "position": 753
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x14.png",
+                "caption": "Figure 7:The luck of the draw: a1.2\\boldsymbol{1.2}–2.0×\\boldsymbol{2.0{\\times}}convergence gap.For each model the dashed horizontal line marks the targetTT, the FID reached by theunluckiestof∼20\\sim\\!20seeds at22M. The green dot is the step at which theluckiestseed\nfirst crossesTT. The coral dot sits at22M where the unlucky seed\nfinally reaches it. The amber band between them is the training\ncompute the unlucky seed wastes catching up. The per-step shaded band is\nthe min–max envelope across seeds, and the bold line is the per-step mean.",
+                "position": 837
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x15.png",
+                "caption": "Figure 8:𝝁\\boldsymbol{\\mu}P-coordinated LR sweep at𝟏𝟎𝟎\\boldsymbol{100}k for SiT-S/B/L/XL.Solid lines are the per-LR mean Inception FID across1010training seeds, the shaded envelope is the per-LR seed min–max, and the\nopen ring on each curve circles each size’s best-mean-FID dot.\n(a) Unguided FID is monotone in LR for every size, so the highlighted\ndot sits at5×10−45\\!\\times\\!10^{-4}(the edge of training stability) for\nall four. (b) GS-FID has flat-bottomed valleys aroundω⋆≈2\\omega^{\\star}\\!\\approx\\!2–3×10−43\\!\\times\\!10^{-4}. Within seed noise,\ntwo LRs on either side are indistinguishable from the highlighted dot,\ngiving a1.7×1.7{\\times}LR window per size. (c) Between-seedσbetween/μ\\sigma_{\\text{between}}/\\muon log scale. The green band is the11–2%2\\%floor ofSec. 4.4. Open rings mark\neach size’s optimum LR from (b): the CoV doesnotdip there.",
+                "position": 904
+            }
+        ]
+    },
+    {
+        "header": "5Discussion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AOverview",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x16.png",
+                "caption": "Figure 9:The FID lottery, drawn as two slot machines.A casino-themed rendering of the same two lotteries diagrammed from first\nprinciples inFigure 1. Reporting an FID means\npulling two levers. Thetraining lottery(left) draws one network\nfrom three coupled sources of randomness. These are the random weight\ninitialisation (a die), the shuffled data order (a deck), and the\nper-step flow-matching noise (a trace), and they yield one trained network\n(centre, tagged by its seed). Thegeneration lottery(right) then draws1010sampling seeds and scores1010FIDs ofthatnetwork. On the measured SiT-B/2 panel\n(Figure 2) resampling a fixed network barely moves the\nscore (σwithin≈0.14\\sigma_{\\mathrm{within}}\\!\\approx\\!0.14), while retraining moves\nit3.2×\\mathbf{3.2\\times}farther (σbetween=0.44\\sigma_{\\mathrm{between}}\\!=\\!0.44): a2.10\\mathbf{2.10}-point gap between the best (33.59\\mathbf{33.59}) and worst\n(35.69\\mathbf{35.69}) evaluation, from seeds alone.",
+                "position": 2494
+            }
+        ]
+    },
+    {
+        "header": "Appendix BPer-experiment configurations",
+        "images": []
+    },
+    {
+        "header": "Appendix CCompanion summary tables",
+        "images": []
+    },
+    {
+        "header": "Appendix DAdditional analyses on Inception FID",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x17.png",
+                "caption": "Figure 10:(a) Vary all(σbetween=0.438\\sigma_{\\text{between}}\\!=\\!0.438).\nAll three randomness sources are free. The panel is the same data asFigure 2, repeated here as the reference baseline for\nthe three single-source panels that follow.",
+                "position": 2866
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x18.png",
+                "caption": "Figure 11:(b) Vary noise(σbetween=0.336\\sigma_{\\text{between}}\\!=\\!0.336).\nInit and data order are fixed. Only the per-step Gaussian noise of\nthe flow-matching loss varies between training runs. Noise alone\nreproduces≈77%{\\approx}77\\%of the baseline between-seedσ\\sigmaof (a).",
+                "position": 2873
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x19.png",
+                "caption": "Figure 12:(c) Vary init(σbetween=0.294\\sigma_{\\text{between}}\\!=\\!0.294).\nData order and noise are fixed. Only the parameter initialisation\nvaries. Init alone reproduces≈67%{\\approx}67\\%of the baseline\nbetween-seedσ\\sigmaof (a).",
+                "position": 2881
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x20.png",
+                "caption": "Figure 13:(d) Vary data(σbetween=0.221\\sigma_{\\text{between}}\\!=\\!0.221).\nInit and noise are fixed. Only the data-loader order varies. Data\norder alone reproduces≈51%{\\approx}51\\%of the baseline between-seedσ\\sigmaof (a). All four panels share the same y-range and a\nconsistent layout: every violin is one training seed showing the\nGaussian KDE of its1010sampling-seed evaluations, the small dots\nare individual evaluations, and the black tick is the per-seed mean.",
+                "position": 2888
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x21.png",
+                "caption": "Figure 14:Rank stability of the 25 training seeds (SiT-B/2, 400k).(a) Bump chart: each line is one training seed traced through three\nranking criteria — mean, min, and max FID across its 10 sampling seeds.\nCrossings dominate the picture: the best seed bymeanis rarely\nthe best byminormax. Coral and teal highlight the\nseeds that are best- and worst-by-mean to make their rank trajectories\nvisible.\n(b) Spearmanρ\\rhobetween rankings under all six combinations of{\\{Inception, DINOv2}×{\\}\\times\\{mean, min, max}\\}. Inception and\nDINOv2 agree strongly on themeanranking (ρ=0.99\\rho\\!=\\!0.99) but\nthe agreement weakens for themaxcriterion (ρ=0.94\\rho\\!=\\!0.94),\ni.e. the two metrics disagree more often on which seed had the\nworst-case sampling.",
+                "position": 2958
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x22.png",
+                "caption": "Figure 15:Seed optimality: are “good” init seeds universal?\n(SiT-B/2, 400k, no CFG.)(a) Heatmap of mean Inception FID over a10×1510\\!\\times\\!15grid of\ninit seeds (rows) and (data, noise) pairings (columns). Cells span∼33.9{\\sim}33.9–35.935.9. A single init does not consistently shade greenest\nacross rows.\n(b) Bump chart of the same data: each line is one init seed traced\nthrough its rank within each (data, noise) pair. Heavy crossings make\nthe rank instability visceral. Kendall’sW=0.41W\\!=\\!0.41on the init\nrankings (mean criterion) shows significant agreement, but far from\nconcordance. The “best” init by grand mean wins only5/155/15pairs.",
+                "position": 3036
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x23.png",
+                "caption": "Figure 16:Seed-induced𝟗𝟓%\\boldsymbol{95\\%}confidence interval\nas a function of the reported Inception FID.For a mean FID computed\nfromNNindependently trained models withK=10K\\!=\\!10sampling seeds\neach, the normal-approximation half-width isCI95=1.96​CoV​F/N\\mathrm{CI}_{95}\\!=\\!1.96\\,\\mathrm{CoV}\\,F/\\sqrt{N}, whereCoV=σbetween/μ\\mathrm{CoV}\\!=\\!\\sigma_{\\text{between}}/\\muis the scale-invariant\nnoise floor reported for Inception FID across the7676(model,step)(\\text{model},\\text{step})cells of the scaling sweep\n(Table 9, with median1.30%1.30\\%andp10−p90=0.88−1.73%p_{10}\\!-\\!p_{90}\\!=\\!0.88\\!-\\!1.73\\%).\nThe solid coral curve uses the median CoV. The shaded band traces thep10−p90p_{10}\\!-\\!p_{90}envelope atN=1N\\!=\\!1. Three readings: atFID≈15\\text{FID}\\!\\approx\\!15(typical converged SiT-L), a single trained\nmodel carries a±0.38\\pm 0.38FID seed-only CI – four times the±0.1\\pm 0.1gaps that routinely separate published methods. Pulling that\nCI under±0.1\\pm 0.1requiresN=25N\\!=\\!25training seeds. Within-seed\n(sampling-only) contributions are absorbed into the displayed band:\natK=10K\\!=\\!10the within-CoV is≈0.4%\\!\\approx\\!0.4\\%on this panel and\ncontributes less than5%5\\%to the total variance of the seed-mean.",
+                "position": 3153
+            }
+        ]
+    },
+    {
+        "header": "Appendix ETheory of golden-section search for FID(CFG)",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x24.png",
+                "caption": "Figure 17:Golden-section search on𝐅𝐈𝐃​(ω)\\boldsymbol{\\mathrm{FID}(\\omega)}(referenced briefly fromSec. 4.3).(a)Figure 17: pseudocode for the bracket-contraction loop\n(the bracket-contraction sequence itself is illustrated inFigure 18).\n(b) Two interior probesx1=b−ρ​(b−a)x_{1}=b-\\rho(b-a)andx2=a+ρ​(b−a)x_{2}=a+\\rho(b-a)withρ=1/φ≈0.618\\rho=1/\\varphi\\!\\approx\\!0.618split\nthe bracket[a,b][a,b]. The side with the largerff-value is\ndiscarded.",
+                "position": 3221
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x25.png",
+                "caption": "Figure 18:Bracket contraction across iterations ofFigure 17.Companion toFigure 17. Kept half\n(lavender) and discarded half (faded coral) of the bracket on the\nillustrative interval[a0,b0]=[0.3,1.9][a_{0},b_{0}]=[0.3,1.9]. The surviving probe\nof each iteration is reused as one of the two probes for the next\niteration, so each step past the initial pair costs exactly one new\nFID evaluation. The bracket length contracts by a factorρ\\rhoper\nstep.",
+                "position": 3360
+            }
+        ]
+    },
+    {
+        "header": "Appendix FReplication across DINOv2 FID and Inception PRDC",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x26.png",
+                "caption": "Figure 19:The four PRDC metrics on a 2D toy.Marker convention:circles (∙\\bullet) arerealpoints\nand triangles (▲\\blacktriangle) aregeneratedpoints. The\nlarger marker in each panel is the entity the metric tests. In panels\n(a, c, d) the metric is a per-point indicator, drawn green\n(∙\\bullet/▲\\blacktriangle= counted /\ncovered) or red and hollow\n(∘\\circ/△\\triangle= not counted /\nuncovered). Lavender (▲{\\color[rgb]{0.484375,0.43359375,0.66015625}\\definecolor[named]{pgfstrokecolor}{rgb}{0.484375,0.43359375,0.66015625}\\blacktriangle}) marks\ngenerated points whose coverage status is not relevant in that panel.\nCoral discs are real-anchoredkk-NN balls and lavender discs are\ngenerated-anchored balls. The amber disc in (d) is the outlier\ngenerated point’s enlarged ball.Scenario:reals sit on a curved manifold plus an isolated\nmini-mode of three tightly grouped points in the upper-left. The\ngenerated points cover the manifold but miss the isolated mode and\nadd one outlier far above.\n(a)Precision=7/87/8: each generated point is tested against\nthe union of real-anchored balls, and the outlier triangle is the only\nhollow one.\n(b)Density=1.001.00: same balls, but each generated point is\nlabelled with the count of real-balls it lies in (a multiplicity, not\nan indicator). Cluster points score11–33, while the outlier scores0.\n(c)Coverage=7/107/10: each real point is tested against the\nsame real-anchored balls. The three isolated reals have tinykk-NN\nballs (ρkR≈0.2\\rho_{k}^{R}\\!\\approx\\!0.2) that no generated point reaches,\nso they appear as red hollow circles.\n(d)Recall=7/107/10: real points are tested against\ngenerated-anchored balls instead. The outlier generated point’s ball\n(ρkG=3.75\\rho_{k}^{G}\\!=\\!3.75, amber) is1.8×1.8{\\times}larger than any\ncluster ball and engulfs much of the manifold. The three isolated\nreals remain hollow, so recall coincides with coverageon\nthis draw, butby a different mechanism: in (c) the balls\nare fixed across draws ofGG, while in (d) every sampling seed\nredraws the entire ball geometry, inflating the within-seed\nestimator floor reported inTable 5.",
+                "position": 3688
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x27.png",
+                "caption": "",
+                "position": 3695
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x28.png",
+                "caption": "",
+                "position": 3699
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x29.png",
+                "caption": "",
+                "position": 3703
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x30.png",
+                "caption": "Figure 20:Seed lottery on the same SiT-B/2 panel under DINOv2\nFID.Each violin is one of2525trained models, sorted left-to-right\nby per-seed mean. Violin shape traces the within-seed sampling\ndistribution. The black tick is the per-seed mean. The training-seed\nmean ticks span694.8694.8to718.8718.8around grand mean708.6708.6. The\nbetween-to-within ratio isσbetween/σwithin=4.82×\\sigma_{\\text{between}}/\\sigma_{\\text{within}}\\!=\\!4.82{\\times}, against3.19×3.19{\\times}for Inception FID, so the staircase of mean ticks\nstretches over a wider multiple of the violin height than inFigure 2.",
+                "position": 3930
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x31.png",
+                "caption": "Figure 21:Seed lottery under Inception Precision.Y-axis values\nare multiplied by100100for readability. Per-seed means span0.4800.480to0.4910.491around grand mean0.4850.485. Violin height (within-seed sampling\nspread) and the staircase of mean ticks (between-seed training spread)\nare comparable, sinceσbetween/σwithin=1.14×\\sigma_{\\text{between}}/\\sigma_{\\text{within}}\\!=\\!1.14{\\times}. A\nmulti-sampling-seed CI therefore covers roughly half of the seed-induced\nenvelope on precision, in contrast with FID where it covers a quarter.",
+                "position": 3943
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x32.png",
+                "caption": "Figure 22:Seed lottery under Inception Recall (the inversion\ncase).Y-axis values are multiplied by100100for readability. Per-seed\nmeans span0.3120.312to0.3170.317around grand mean0.3140.314. Each violin is\ntaller than the staircase of mean ticks:σbetween/σwithin=0.28×\\sigma_{\\text{between}}/\\sigma_{\\text{within}}\\!=\\!0.28{\\times}, an\ninversion of the FID asymmetry. On Inception recall the right CI to\nreport on a fixed trained model is the sampling-only one. This is the\nopposite recommendation from FID and from the other PRDC metrics\n(Table 6).",
+                "position": 3954
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x33.png",
+                "caption": "Figure 23:Coefficient of variation across compute and scale, for\nsix metrics.Each panel plots between-seedCoV=σ/μ\\mathrm{CoV}\\!=\\!\\sigma/\\muversus training step on the\nvariance-over-training panel for SiT-S/B/L/XL with the clean seed sets\nofTable 2. The shaded green stripe in each panel\nis that metric’s empirical[p10,p90][p_{10},p_{90}]envelope of CoV across\nits7676(model,step)(\\mathrm{model},\\mathrm{step})cells, reported in the panel\ntitle. Inception FID’s envelope is0.880.88–1.73%1.73\\%, matching the11–2%2\\%headline ofFigure 6b. DINOv2 FID\n(0.560.56–1.50%1.50\\%) and Inception precision/coverage\n(0.280.28–0.70%0.70\\%,0.200.20–1.04%1.04\\%) sit below the FID envelope at\nevery model size. Recall (0.380.38–1.56%1.56\\%) and density\n(0.540.54–1.26%1.26\\%) fall in between. Each metric therefore has its own\nscale-invariant relative noise floor. The floor is wider for recall\nbecauseσ\\sigmadoes not shrink with compute on SiT-B/L\n(Table 9).",
+                "position": 4381
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/x34.png",
+                "caption": "Figure 24:Rank stability across compute, for six metrics.Each\npanel plots Spearmanρ\\rhobetween the seed ranking at training stepttand at22M, one curve per model size, mirroring the layout ofFigure 6c. Dashed horizontal lines markρ=0.8\\rho\\!=\\!0.8(the high-stability target) andρ=0\\rho\\!=\\!0(random).\nInception FID, DINOv2 FID and Inception density approachρ≈0.8\\rho\\!\\approx\\!0.8by∼1.4\\sim\\!1.4M on most models. Inception\nprecision and coverage stabilise more slowly. Inception Recall is the\noutlier:ρ\\rhostays below0.60.6at every pre-final checkpoint on\nevery model and dips negative early in training, so the recall\nranking at any intermediate checkpoint is essentially uninformative\nabout the eventual recall ranking. The recall panel uses a wideryy-range[−0.4,1.05][-0.4,1.05]to accommodate the dip below zero.",
+                "position": 4408
+            }
+        ]
+    },
+    {
+        "header": "Appendix GWhat does FID look like?",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/guided/class_00_golden_retriever.jpg",
+                "caption": "Figure 25:Guided FID gallery – golden retriever.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4916
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/guided/class_01_tabby_cat.jpg",
+                "caption": "Figure 26:Guided FID gallery – tabby cat.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4920
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/guided/class_02_macaw.jpg",
+                "caption": "Figure 27:Guided FID gallery – macaw.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4924
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/guided/class_03_flamingo.jpg",
+                "caption": "Figure 28:Guided FID gallery – flamingo.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4928
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/guided/class_04_cheeseburger.jpg",
+                "caption": "Figure 29:Guided FID gallery – cheeseburger.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4932
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/guided/class_05_ice_cream.jpg",
+                "caption": "Figure 30:Guided FID gallery – ice cream.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4936
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/guided/class_06_volcano.jpg",
+                "caption": "Figure 31:Guided FID gallery – volcano.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4940
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/guided/class_07_alp.jpg",
+                "caption": "Figure 32:Guided FID gallery – alp.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4944
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/guided/class_08_geyser.jpg",
+                "caption": "Figure 33:Guided FID gallery – geyser.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4948
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/guided/class_09_daisy.jpg",
+                "caption": "Figure 34:Guided FID gallery – daisy.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4952
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/unguided/class_00_golden_retriever.jpg",
+                "caption": "Figure 35:Unguided FID gallery – golden retriever.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4956
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/unguided/class_01_tabby_cat.jpg",
+                "caption": "Figure 36:Unguided FID gallery – tabby cat.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4960
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/unguided/class_02_macaw.jpg",
+                "caption": "Figure 37:Unguided FID gallery – macaw.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4964
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/unguided/class_03_flamingo.jpg",
+                "caption": "Figure 38:Unguided FID gallery – flamingo.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4968
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/unguided/class_04_cheeseburger.jpg",
+                "caption": "Figure 39:Unguided FID gallery – cheeseburger.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4972
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/unguided/class_05_ice_cream.jpg",
+                "caption": "Figure 40:Unguided FID gallery – ice cream.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4976
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/unguided/class_06_volcano.jpg",
+                "caption": "Figure 41:Unguided FID gallery – volcano.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4980
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/unguided/class_07_alp.jpg",
+                "caption": "Figure 42:Unguided FID gallery – alp.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4984
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/unguided/class_08_geyser.jpg",
+                "caption": "Figure 43:Unguided FID gallery – geyser.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4988
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20536/2606.20536v1/figures/fig_data/fid_class_panels/unguided/class_09_daisy.jpg",
+                "caption": "Figure 44:Unguided FID gallery – daisy.Rows are66fixed initial-noise seeds, and columns step through88FID-ordered checkpoints. The two halves continue along the same FID axis. Pastel colorbars report per-column FID. SeeAppendix Gfor the full setup.",
+                "position": 4992
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
