@@ -1,0 +1,117 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20563/2606.20563v1/x1.png",
+                "caption": "Figure 1:Zero-shot 3D Visual Illusion Generation.Given two different text prompts, our method creates a single 3D mesh that embodies a dual-semantic visual illusion. The generated shape appears unrecognizable from arbitrary viewpoints, but it perfectly reveals the two target semantics (e.g., a peacock and a pineapple) when observed from specific camera angles (Viewθ1\\theta_{1}and Viewθ2\\theta_{2}). Our framework achieves this intricate 3D illusion efficiently without requiring per-shape optimization.",
+                "position": 297
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20563/2606.20563v1/x2.png",
+                "caption": "Figure 2:Comparison of 3D visual illusion generation methods.(a)SDS-Based Methodssuffer from severe over-saturation and slow optimization.\n(b)Direct Concatenationexposes unnatural geometric seams and semantic leakage at target views (red arrows).\n(c)Our methodcreates a seamless, dual-semantic coherent 3D mesh.\nUnlike previous approaches, our method does not require training.\nIt generates high-quality 3D visual illusions in just 3–5 minutes while completely preventing geometric interference between the two semantics.",
+                "position": 307
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20563/2606.20563v1/x3.png",
+                "caption": "Figure 3:Pipeline overview.(a) Stage 1employs dual-branch denoising. At each step, latents are decoded to voxel space, rotation-aligned, and fused via SDF blending (Fig.4), then re-encoded to continue denoising, producing a single unified 3D mesh.(b) Stage 2applies view-conditioned texturing to the fused mesh. Estimated clean imagesx^1|t\\hat{x}_{1|t}are predicted via Stable Diffusion, un-projected from viewpointsθ1\\theta_{1}andθ2\\theta_{2}, and iteratively aggregated via Mesh Texture Aggregation, producing a single object with distinct semantics at each target viewpoint.",
+                "position": 437
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20563/2606.20563v1/x4.png",
+                "caption": "Figure 4:SDF blending.(a) Given two rotation-aligned voxels, we compute their SDFs, take the element-wise average, and binarize with thresholdτ\\tauto obtain the blended voxel.\n(b) 2D illustration: averaging the SDFs of a circle (A) and a triangle (B) produces a smooth intermediate contour lying geometrically between the two.",
+                "position": 483
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20563/2606.20563v1/x5.png",
+                "caption": "Figure 5:Noise Guidance.Given two promptsy1y_{1}andy2y_{2}, two single-semantic voxelsv^1\\hat{v}_{1}andv^2\\hat{v}_{2}are independently generated and concatenated atθ1\\theta_{1}andθ2\\theta_{2}to formvguidev_{\\text{guide}}, encoded intozguidez_{\\text{guide}}via the Sparse Structure Encoder.Noise Blending Guidancemixeszguidez_{\\text{guide}}with pure noise viaα⋅zguide+(1−α)⋅znoise\\alpha\\cdot z_{\\text{guide}}+(1-\\alpha)\\cdot z_{\\text{noise}}, injecting a mild spatial prior.Space Control Guidanceinterpolates betweenzguidez_{\\text{guide}}and noise at timestept0t_{0}, providing stronger structural constraints for geometrically challenging pairs.",
+                "position": 539
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20563/2606.20563v1/x6.png",
+                "caption": "Figure 6:CLIP-guided Orientation Search.Anchor View Selectionidentifies the best representative viewI1I_{1}forv^1\\hat{v}_{1}from 4 orthogonal renders via CLIP text-image similarity (e.g.,“pineapple”at90∘90^{\\circ}).Cross-object Matchingthen evaluates 28 3D rotations ofv^2\\hat{v}_{2}, selecting the angleθ2∗\\theta_{2}^{*}that maximizes CLIP image-image similarity toI1I_{1}. This optimally aligns their silhouettes prior to SDF blending.",
+                "position": 591
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20563/2606.20563v1/x7.png",
+                "caption": "Figure 7:Extension to three-object 3D illusion.Our framework scales to three semantics (e.g.,“Grapes”,“A Pineapple”,“Bamboo”) by adding a third denoising branch, with rotation angles fixed at0∘0^{\\circ},120∘120^{\\circ},240∘240^{\\circ}to uniformly cover360∘360^{\\circ}. Noise Guidance steers all three branches toward their respective targets, ensuring each semantic is clearly presented at its target viewpoint.",
+                "position": 620
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20563/2606.20563v1/x8.png",
+                "caption": "Figure 8:Object detection at the junction viewpointfor“Bamboo”&“Dwarf Cottage”.\n(a) Direct Concatenation is detected as two separate objects (red and green boxes);\n(b) Ours is detected as a single unified object (red box only).",
+                "position": 732
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20563/2606.20563v1/x9.png",
+                "caption": "Figure 9:Qualitative comparison with baselines.Left-to-right: View 1, blended mesh, View 2.(a)Shape From Semantics[40]suffers from over-saturation and geometry leakage (e.g.,“Stork”/“Grapes”).(b)Direct Concatenation exposes unnatural junction seams and the opposing geometry at target views.(c)Ours produces a single coherent mesh with clear, view-dependent semantics and no leakage.(d)TRELLIS[73], prompted with“a single 3D object, front side is A, back side is B”, fails to produce view-dependent semantics and collapses to a generic shape that reflects neither target interpretation.(e)DreamBeast[42], despite its part-level semantic control, generates fantastical hybrid creatures that blend both semantics into every viewpoint rather than isolating them, failing to achieve the intended illusion effect.",
+                "position": 794
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20563/2606.20563v1/x10.png",
+                "caption": "Figure 10:Qualitative comparison (CLIP-guided orientation).Left-to-right: View 1, blended mesh, View 2.(c) Oursuses CLIP-guided search to adaptively align compatible silhouettes (e.g., sideways fish with pineapple, flying owl with plane), revealing clearer semantics at both viewpoints. Lacking adaptive rotation,(a)Shape From Semantics[40]and(b)Direct Concatenation suffer from silhouette misalignment and degraded fusion.(d)TRELLIS[73], prompted with“a single 3D object, front side is A, back side is B”, produces flat, degenerate geometry that fails to capture either semantic.(e)DreamBeast[42]blends both semantics uniformly across all viewpoints, generating fantastical hybrid creatures rather than achieving view-dependent separation.",
+                "position": 799
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20563/2606.20563v1/x11.png",
+                "caption": "Figure 11:User study.(Left) Semantic Recognizability: 78.5% of participants rated our results as clearly recognizable (score 3).(Middle) Method Preference: 71% of participants preferred our method over Shape From Semantics[40](16%) and Direct Concatenation (13%).(Right) Orientation Strategy: 91% of participants found CLIP-guided orientation to produce a more natural illusion than fixed0∘0^{\\circ}/180∘180^{\\circ}angles.",
+                "position": 920
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20563/2606.20563v1/x12.png",
+                "caption": "Figure 12:Ablation on geometry blending(“carriage”/“sundae”). Left-to-right: View 1, blended mesh, View 2.(a) Union:yields conflicting junctions.(b) Blur Avg:loses fine details.(c) Minkowski:over-expands geometry.(d) Polar Coord:distorts asymmetric objects.(e) SDF Avg (Ours):optimally balances geometric integrity and semantic preservation.",
+                "position": 934
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20563/2606.20563v1/x13.png",
+                "caption": "Figure 13:Ablation on noise guidanceacross varying geometric compatibilities: (a) no guidance, (b) Noise Blending, and (c) Space Control.(c)handles large geometric discrepancies (“Bamboo”/“Grapes”) best via strong spatial constraints.(b)is optimal for similar silhouettes but distinct semantics (“Succulent”/“Rooster”), avoiding semantic loss in (a) and residual artifacts in (c). For compatible pairs (“Frog”/“Turtle”), all settings perform comparably. Thus, optimal intervention strength depends on geometric alignment.",
+                "position": 946
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20563/2606.20563v1/x14.png",
+                "caption": "Figure 14:Ablation on texture synthesis and orientation search.Each pair shows View 1, blended mesh, and View 2.(a) w/o View-Conditioned Texture:Standard texturing fails on fused geometries, blending semantics into indistinguishable appearances (e.g., uniform foliage or solid purple).(b) w/ View-Conditioned Texture (Ours):Accurately assigns distinct, prompt-driven textures to each viewpoint.(c) w/o CLIP-guided:Fixed0∘0^{\\circ}/180∘180^{\\circ}angles cause silhouette misalignments, failing to reveal clear semantics.(d) w/ CLIP-guided (Ours):Adaptive rotation optimally aligns silhouettes, recovering distinct semantics at both views.",
+                "position": 959
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20563/2606.20563v1/x15.png",
+                "caption": "Figure 15:Qualitative results of three-object 3D illusion generation.Each row shows the fused mesh and three target-viewpoint renders for a prompt triplet.\nOur method successfully generates a single coherent mesh that presents three distinct semantics at0∘0^{\\circ},120∘120^{\\circ}, and240∘240^{\\circ}, respectively.",
+                "position": 987
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
