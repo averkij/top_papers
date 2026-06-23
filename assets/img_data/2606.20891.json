@@ -1,0 +1,185 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x1.png",
+                "caption": "Figure 1.Applications ofGo-with-the-Track.We present a simple and flexible video generation framework conditioned on multiple reference images and point-tracks that anchor both the generated frames and the references. Our approach enables: (1) motion-preserved video restylization using multiple reference images with point-tracks from off-the-shelf trackers; (2) we also support mesh- or keypoint-driven compositing; and (3) camera motion control for both static and dynamic scenes with one or more reference images. Please refer to the supplementary webpage and the appendix figures for additional results.",
+                "position": 372
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x2.png",
+                "caption": "Figure 2.Go-with-the-Trackoverview.Top:Go-with-the-Trackconditions on multiple reference images and point-track annotations spatially aligned with both reference and generated frames.\nBottom: The resulting video after denoising.",
+                "position": 416
+            }
+        ]
+    },
+    {
+        "header": "2.Related work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x3.png",
+                "caption": "Figure 3.Design details of Go-with-the-Track.(Left):Point-Track Embedder: For each point-track, we encode its coordinate sequence using a shared coordinate-wise MLP, followed by temporal max-pooling. This produces a single spatially-aware point-track embedding that is virtually distributed across frames. (Middle)Point-Track Adapter: To downsample pixel-space point-track embeddings into a compressed patchified latent space, our lightweight adapter aggregates embeddings that fall within each4×16×164\\times 16\\times 16spatiotemporal block. These embeddings are concatenated with their relative position and max pooled to obtain a single compressed point-track embedding per block. (Right)Video Diffusion Transformer:The compressed point-track embeddings are channel-wise concatenated with the noisy latent video and VAE-encoded reference images. The combined representation is then processed by a partially fine-tuned video diffusion transformer to generate the final video.",
+                "position": 491
+            }
+        ]
+    },
+    {
+        "header": "3.Method",
+        "images": []
+    },
+    {
+        "header": "4.Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x4.png",
+                "caption": "Figure 4.Qualitative ablation analysis.Although the task is simply to generate zoomed-in videos of the TV given reference images of a zoomed-out conference room, removing our spatially-aware point-track embeddings, point-track adapter, relative position injection, or hybrid training data strategy results in geometric distortions and severe motion-following failures. In contrast, our full model accurately adheres to the prescribed point tracks and produces correct zoomed-in TV videos. Additional results are available on the supplementary webpage.",
+                "position": 1135
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x5.png",
+                "caption": "Figure 5.Qualitative comparisons to baselines on video reconstruction and video restylization.(Left) Given the first frame and point-tracks extracted from the source video, each method attempts to reconstruct the source video. (Right) Given the stylized first frame and point-tracks, each method generates\nmotion-preserved restylized videos.\nAs evident, Go-with-the-Track better preserves the source motion while adhering to the appearance of the source/stylized first frame.\nAdditional results are provided in the supplementary webpage.",
+                "position": 1268
+            }
+        ]
+    },
+    {
+        "header": "5.Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADataset preprocessing",
+        "images": []
+    },
+    {
+        "header": "Appendix BIterative densification of point tracks",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x6.png",
+                "caption": "Figure 6.Iterative point-track resampling vs. random uniform sampling.Visual comparison of detected point-tracks obtained using our iterative resampling strategy (algorithm1) and uniform random sampling of point queries over the video frames. Our iterative resampling produces denser and more uniformly distributed point-tracks, achieving better spatial coverage with reduced sparsity. Please refer to the supplementary webpage for the corresponding video.",
+                "position": 2953
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x7.png",
+                "caption": "Figure 7.Examples of augmented training samples.Visualization of training samples after applying the data augmentation strategies described inappendixC. The examples highlight the diversity of motion patterns and reference image variations. For clarity, point-track conditions are omitted. Please refer to the supplementary webpage for additional examples.",
+                "position": 2969
+            }
+        ]
+    },
+    {
+        "header": "Appendix CDetails of point-track augmentation.",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x8.png",
+                "caption": "Figure 8.Details of theGo-with-the-Trackpipeline.Go-with-the-Trackis built upon the pre-trained video diffusion modelsWan2.1/2.2-T2V(Wan,2025). For clarity, timestep conditioning is omitted from the diagram.Top left:VAE-encoded reference images and noisy target frames are concatenated along the temporal dimension.Right:Both reference and generated frames are conditioned on point-tracks. The point-tracks are first encoded into spatially-aware point-track embeddings, which are then downsampled using our lightweight point-track adapter to align with the resolution of the patchified latent space.Bottom left:The resulting point-track embeddings are concatenated channel-wise with the patchified tokens of the noisy video and reference frames, followed by a linear projection layer, and then processed by partially fine-tuned DiT blocks.",
+                "position": 3007
+            }
+        ]
+    },
+    {
+        "header": "Appendix DModel architecture details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x9.png",
+                "caption": "Figure 9.Details of point-track embedder.For each point-track, we encode its 2D coordinates together with their corresponding frame indices using a sinusoidal positional embedding, followed by a shared coordinate-wise MLP to produce per-coordinate embeddings. These embeddings are then aggregated via temporal max pooling to obtain a single, unified, spatially-aware point-track embedding.",
+                "position": 3047
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x10.png",
+                "caption": "Figure 10.Details of the point-track adapter.To align pixel-space point-track embeddings with the compressed patchified latent space (with4×4\\timestemporal and16×1616\\times 16spatial downsampling), our lightweight adapter partitions the video volume into non-overlapping4×16×164\\times 16\\times 16spatiotemporal blocks. Within each block, point-track embeddings are concatenated with their relative intra-block coordinates and processed by an MLP, followed by max pooling to produce a single per-block latent-aligned token.",
+                "position": 3050
+            }
+        ]
+    },
+    {
+        "header": "Appendix EExperiment details",
+        "images": []
+    },
+    {
+        "header": "Appendix FQuantitative results on TapVid3D-ADT",
+        "images": []
+    },
+    {
+        "header": "Appendix GAdditional ablation study",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x11.png",
+                "caption": "Figure 11.PCA visualization of point-track embeddings.We visualize both random embeddings and our spatially-aware point-track embeddings using PCA and project the resulting components onto the pixel space. Our embeddings exhibit clear spatial correlations, whereas random embeddings show no meaningful spatial structure.",
+                "position": 3478
+            }
+        ]
+    },
+    {
+        "header": "Appendix HDetails of Qualitative Comparison",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x12.png",
+                "caption": "Figure 12.Qualitative comparisons to baselines on video reconstruction.Given the first frame and extracted point tracks, each method attempts to reconstruct the source video.\nAs evident, we find the outputs fromGo-with-the-Trackalign much more closely with ground-truth while preserving the spatial structure and element identity better.\nAdditional results are provided in the supplementary webpage.",
+                "position": 3526
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x13.png",
+                "caption": "Figure 13.Qualitative comparisons to baselines on video restylization.Given stylized first frames and point-track conditions, each method generates motion-preserved restylized videos.Go-with-the-Trackbetter preserves the source motion while adhering to the appearance of the stylized first frame. Additional results are provided in the supplementary webpage.",
+                "position": 3536
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x14.png",
+                "caption": "Figure 14.Examples with Sparse Point-tracks.Although the model is not explicitly trained on extremely sparse point-track inputs, our model successfully generates videos that adhere to the given motion conditions.",
+                "position": 3547
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/fig/user_study.jpg",
+                "caption": "Figure 15.User Study.At the top, we show participants instructions on how to perform the task and answer the questions. Then, we provide an interactive interface that allows synchronous playback of all videos side by side while answering three questions about motion following, subject identity preservation, and overall quality for each example. Each participant annotates 30 examples by answering 90 questions in total.",
+                "position": 3558
+            }
+        ]
+    },
+    {
+        "header": "Appendix IDetails of Applications",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x15.png",
+                "caption": "Figure 16.Video restylization.Given point-tracks estimated from a source video, along with stylized reference images,Go-with-the-Trackproduces restylized videos while preserving the original motion. Additional results are available on our supplementary website.",
+                "position": 3569
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x16.png",
+                "caption": "Figure 17.Mesh-driven compositing and stylization.We render static and dynamic mesh scenes from arbitrary viewpoints and stylize the rendered images to obtain reference images. Together with point tracks derived from projected mesh vertices,Go-with-the-Trackgenerates stylized mesh-animated videos. Additional results are shown in our supplementary webpage.",
+                "position": 3577
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x17.png",
+                "caption": "Figure 18.Keypoint-driven compositing.Given a source video and a reference image, facial and full-body keypoints are extracted to form reference-anchored point tracks. Conditioned on these keypoint-derived point-tracks and the reference image,Go-with-the-Tracktransfers the reference subject’s appearance to the source video while preserving the original motion. Additional results are available on our supplementary webpage.",
+                "position": 3584
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x18.png",
+                "caption": "Figure 19.Camera control in static scenes.Reprojected 3D point clouds, together with reference images captured from arbitrary viewpoints, enableGo-with-the-Trackto retarget camera motion in both static scenes along user-defined trajectories. Additional results are available on our supplementary webpage.",
+                "position": 3591
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x19.png",
+                "caption": "Figure 20.Camera control in dynamic scenes.Reprojected dynamic point clouds, together with reference images captured from arbitrary viewpoints, enableGo-with-the-Trackto retarget camera motion in dynamic scenes along user-defined trajectories. Additional results are available on our supplementary webpage.",
+                "position": 3594
+            },
+            {
+                "img": "https://arxiv.org/html/2606.20891/2606.20891v1/x20.png",
+                "caption": "Figure 21.Temporal stabilization for intrinsic decomposition.Using the albedo and shading estimates from the first and last frames as references,Go-with-the-Trackpropagates these predictions across the sequence to produce temporally consistent albedo and shading videos, reducing flicker compared to frame-by-frame estimation. Additional results are available on our supplementary webpage.",
+                "position": 3615
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
