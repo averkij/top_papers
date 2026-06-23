@@ -1,0 +1,262 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/figures/teaser_v20.png",
+                "caption": "Figure 1:Bayesian Manifold Curriculum (BMC).BMC uses Bayesian learning over the policy model’s latent task manifold to construct training batches from productive and diverse problem types. BMC improves the trade-off between training efficiency and broad data coverage.",
+                "position": 357
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Preliminaries",
+        "images": []
+    },
+    {
+        "header": "3Latent Task Trees",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/figures/ltt_v9.png",
+                "caption": "Figure 2:Latent Task Tree construction and example structure.Left:We construct the Latent Task Tree recursively from LLM (policy) embeddings. At each node, embeddings are reduced with PCA, tested for approximate chart-like structure, projected with UMAP, and clustered with HDBSCAN; recursion continues only when meaningful substructure remains.Right:A (partial) Latent Task Tree induced fromDAPO-Math-17K, showing that the policy’s latent representation space organizes prompts into fine-grained and imbalanced problem types. Node percentages indicate the fraction of the dataset assigned to each node. Full tree visualization is provided inFigure12.",
+                "position": 447
+            }
+        ]
+    },
+    {
+        "header": "4Bayesian Manifold Curriculum",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/figures/bmc_v8.png",
+                "caption": "Figure 3:Bayesian Manifold Curriculum (BMC).Left:During hierarchical Thompson sampling, each batch element independently descends the Latent Task Tree according to sampled reward beliefs, recursively selecting child nodes until reaching a prompt. The figure illustrates the trajectory of a single agent for visualization purposes.Right:After rollout rewards are observed, prompt-level beliefs are updated and propagated upward through the tree using empirical Bayes updates, allowing observations from individual problems to influence higher-level regions of the task manifold.",
+                "position": 506
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x1.png",
+                "caption": "Figure 4:Training efficiency across sampling strategies.Dynamic sampling achieves the highest effective ratio and learning signal, but incurs substantially higher wall-clock time due to repeated batch regeneration.\nIn contrast, Difficulty Only and BMC achieve comparable learning speed while maintaining training times close to uniform sampling.\nUniform sampling exhibits lower learning signal and slower training progress.",
+                "position": 743
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x2.png",
+                "caption": "Figure 5:Coverage and information sharing across sampling strategies.Left:Rarity-weighted exposure, measuring coverage of underrepresented regions of the task manifold.\nBMC balances the diversity-focused behavior of the tree-only ablation with the productivity-focused behavior of Difficulty Only.Right:Structure gain, measuring how much variation in learning signal is explained by the Latent Task Tree relative to size-matched random partitions; the dotted gray line marks the random-partition baseline (1×1\\times).\nBoth BMC and Difficulty Only exhibit substantial structure gain, indicating that learning signal already possesses latent structure even when the tree is not explicitly used for sampling.",
+                "position": 769
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x3.png",
+                "caption": "Figure 6:Evaluation performance across benchmark categories.Results are shown forQwen3-8B-Basetrained with GSPO; additional settings are provided inAppendixL.6, and per-step trajectories for this run are shown inFigure24.\nNo single sampling strategy dominates across all evaluations, reflecting tradeoffs between productivity, diversity, and utility. Methods with similar learning signal or training efficiency can produce different evaluation profiles due to differences in problem-type exposure. BMC performs strongly on the OOD GPQA-Diamond benchmark, while exhibiting trade-offs on several in-distribution math evaluations.",
+                "position": 802
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x4.png",
+                "caption": "Figure 7:Utility-aware sampling changes downstream capability profiles while preserving productivity.Top:BMC and the two BMC-T variants exhibit similar productivity during training, with comparable learning speed, effective ratio, and learning signal.Bottom:Despite similar productivity, the variants produce different evaluation outcomes depending on the target distribution used to bias sampling. Targeting AIME2024 improves AIME-style English competition math benchmarks, while targeting the full evaluation mixture shifts performance toward a broader set of evaluations, including stronger Chinese math performance. SeeFigure27for per-step trajectories.",
+                "position": 853
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x5.png",
+                "caption": "",
+                "position": 857
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments and Disclosure of Funding",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix Overview",
+        "images": []
+    },
+    {
+        "header": "Appendix AExtended Related Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BStructure Drift",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x6.png",
+                "caption": "Figure 8:Periodic tree reconstruction.We compare standard BMC, which keeps the Latent Task Tree fixed throughout training, against a variant that reconstructs the tree every 100 steps after round-robin initialization.",
+                "position": 3153
+            }
+        ]
+    },
+    {
+        "header": "Appendix CThe Standard Bandit Pattern",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x7.png",
+                "caption": "Figure 9:Productivity and evaluation behavior under the standard bandit pattern.Top:Training productivity metrics onDAPO-Math-17K. MoPPS and the Difficulty Only ablation both improve learning speed and effective ratio relative to uniform sampling while avoiding the wall-clock overhead of dynamic sampling.Bottom:Evaluation performance across English mathematics, Chinese mathematics, and out-of-distribution science benchmarks. MoPPS and the Difficulty Only ablation exhibit similar qualitative behavior, supporting their use as representative instantiations of the standard bandit pattern. SeeFigure10for per-step trajectories.",
+                "position": 3255
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x8.png",
+                "caption": "",
+                "position": 3259
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x9.png",
+                "caption": "Figure 10:Evaluation curves.Performance across evaluations forQwen3-8B-basewhile training onDAPO-Math-17kusingGSPO. These evaluation trajectories correspond to the bar graphs visualized inFigure9.",
+                "position": 3268
+            }
+        ]
+    },
+    {
+        "header": "Appendix DMedical Data Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x10.png",
+                "caption": "Figure 11:Training and evaluation dynamics on AlphaMed19K.Top:Training productivity metrics for Uniform Sampling, Dynamic Sampling, Difficulty Only, Tree Only, and BMC. Dynamic Sampling maintains the highest effective ratio and reward variance, but incurs substantially higher wall-clock time due to repeated filtering. BMC and Difficulty Only improve learning speed (training-set pass@1) relative to Uniform Sampling, even though their effective ratio and observed learning signal decline after adaptive sampling begins.Bottom:Medical evaluation performance on MedQA, MedMCQA, and MedXpertQA. Evaluation performance is strongest for Dynamic Sampling and Difficulty Only, while BMC’s structure-aware sampling does not translate into the strongest downstream accuracy in this setting. This reinforces the tradeoffs between productivity, diversity, and utility.",
+                "position": 3292
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x11.png",
+                "caption": "",
+                "position": 3296
+            }
+        ]
+    },
+    {
+        "header": "Appendix ETree Visualizations & Statistics",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x12.png",
+                "caption": "Figure 12:Latent Task Tree forDAPO-Math-17kusing Qwen3-8B-Base’s latent space.The dataset contains mathematical reasoning problems in both Chinese and English.\nThemes such asChineseandEuclidean Geometryare not tree nodes, but descriptive annotations used to summarize the condensed view of the full tree shown inFigure2.\nThe induced tree contains5050nodes.\nOn one node with8×8\\timesH100 GPUs, loading the latent representations took 5:35 minutes and recursive tree construction took 6:29 minutes, for a total construction time of 12:04 minutes.\nSince the corresponding training run took 25.06 hours (includingthe tree construction time), the tree construction accounted for only0.802%0.802\\%of the total training time.",
+                "position": 3410
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x13.png",
+                "caption": "Figure 13:Latent Task Tree forDeepCoder-Preview-Dataset(Luo et al.,2025)using DeepSeek-R1-Distilled-Qwen-14B’s latent space.The dataset consists of 24K coding problems. The induced tree contains4949nodes. On one node with8×8\\timesH100 GPUs, loading the latent representations took 12:56 minutes and recursive tree construction took 7:22 minutes, for a total construction time of 20:18 minutes.",
+                "position": 3422
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x14.png",
+                "caption": "Figure 14:Latent Task Tree forAlphaMed19k(Liu et al.,2025)using Qwen3-8B’s latent space.The dataset contains medical Q&A multiple-choice problems across varying topics.\nThe induced tree contains6767nodes.\nOn one node with8×8\\timesH100 GPUs, loading the latent representations took 10:07 minutes and recursive tree construction took 10:46 minutes, for a total construction time of 20:53 minutes.\nSince the corresponding training run (seeAppendixD) took 30.30 hours (includingtree construction time), tree construction accounted for only1.15%1.15\\%of the total training time.",
+                "position": 3430
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x15.png",
+                "caption": "Figure 15:Latent Task Tree forBarExamQA(Zheng et al.,2025c)using the latent space of Llama-3.1-8B-Instruct(Grattafiori et al.,2024).The dataset consists of  1K multistate bar exam (MBE) questions. The induced tree contains5656nodes. On one node with8×8\\timesH100 GPUs, loading the latent representations took 52 seconds and recursive tree construction took 51.5 seconds, for a total construction time of 1:44 minutes.",
+                "position": 3441
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x16.png",
+                "caption": "Figure 16:Latent Task Tree forAgentar-DeepFinance-100K(Zhao et al.,2025)using the latent space of Gemma-4-12B(Team et al.,2024)The dataset consists of 100K financial reasoning problems. The dataset is predominantly Chinese. A very small minority of prompts appear to be intended for SFT rather than RLVR. The induced tree contains5151nodes. On one node with8×8\\timesH100 GPUs, loading the latent representations took 58:45 minutes and recursive tree construction took 48:19 minutes, for a total construction time of 1:47:04 hours.",
+                "position": 3450
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x17.png",
+                "caption": "Figure 17:Latent Task Tree forGURU-92k(Cheng et al.,2026a)using Qwen3-14B-Base’s latent space.GURU-92kis a multi-domain reasoning dataset spanning math, code, science, logic, simulation, and tabular reasoning problems, allowing us to test whether latent task trees can organize heterogeneous training data beyond a single domain. The induced tree contains5454nodes.\nOn one node with8×8\\timesH100 GPUs, loading the latent representations took 1:25:16 hours and recursive tree construction took 52:31 minutes, for a total construction time of 2:17:53 hours.\nFor scale, the original work reports a training wall-clock time of three days; thus, although this tree is more expensive to construct than those for smaller datasets, its construction time is still on the order of hours rather than days.",
+                "position": 3458
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x18.png",
+                "caption": "Figure 18:Latent Task Tree forIF-RLVR(Pyatkin et al.,2025)using the latent space of Qwen3.5-9B-Base(Qwen Team,2026)The dataset consists of 95K instruction-following problems spanning mathematics, coding, NLP tasks, multilingual QA, writing, safety-sensitive requests, and other domains. Each prompt pairs a base task with automatically verifiable output constraints, so the induced hierarchy reflects both semantic topic and instruction-following form. The induced tree contains 59 nodes. On one node with (8×\\times) H100 GPUs, loading the latent representations took 48:37 minutes and recursive tree construction took 48:32 minutes, for a total construction time of 1:37:09 hours.",
+                "position": 3469
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x19.png",
+                "caption": "Figure 19:Latent Task Tree forGeometry3KLu et al.(2021)using Qwen3-VL-32B-Instruct’s(Bai et al.,2025)latent space.The dataset consists of multimodal geometry problems, and the induced tree contains5454nodes.\nOn one node with8×8\\timesH100 GPUs, loading the latent representations took 3:26 minutes, and recursive tree construction took 2:21 minutes, for a total construction time of 5:47 minutes.\nBecause our cluster labels are assigned from example prompts and word clouds, several clusters with minimal or ambiguous text could not be cleanly differentiated without inspecting the associated diagrams.\nThese cases suggest that the induced structure is not driven by language alone, but also reflects visual and multimodal properties of the problems.\nA finer-grained visual audit could further refine these labels, but the prompt-level analysis already shows that the latent tree captures structure beyond surface text.",
+                "position": 3477
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x20.png",
+                "caption": "Figure 20:Additional information forFigure19.\nExample word clouds and recursion statistics shown separately from the original figure to due space constraints.",
+                "position": 3490
+            }
+        ]
+    },
+    {
+        "header": "Appendix FFrontier Imbalance",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/figures/frontierimbalance_v1.png",
+                "caption": "Figure 21:Dataset imbalance and frontier imbalance.Dataset imbalance arises from the static composition of the training set, while frontier imbalance arises from the policy-dependent distribution of problems that currently provide learning signal. A productivity-oriented sampler may therefore concentrate on a subset of problem types either because they are common in the dataset, overrepresented on the current frontier, or both.",
+                "position": 3501
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/figures/problemskipping_v1.png",
+                "caption": "Figure 22:Problem skipping in Dynamic Sampling.Dynamic Sampling scans candidate prompts and adds prompts with nonzero reward variance to a composite batch. Once the composite batch is filled, later effective prompts in the current partition may be deferred until a future pass. When effective prompts are unevenly distributed across problem types or dataset partitions, this mechanism can interact with dataset and frontier imbalance. SeeFigure23for a consequence of this mechanism.",
+                "position": 3520
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x21.png",
+                "caption": "Figure 23:Dynamic Sampling and minority-type exposure.The training data is dominated by English mathematics problems, while Chinese mathematics problems form a smaller subset. For the 8B model, Dynamic Sampling improves strongly on English mathematics evaluations but plateaus on Chinese mathematics evaluations relative to uniform sampling. This behavior is consistent with an interaction between dataset imbalance, policy-dependent frontier imbalance, and problem skipping, though the experiment does not isolate these factors causally.",
+                "position": 3536
+            }
+        ]
+    },
+    {
+        "header": "Appendix GUtility-Aware Sampling and the Evaluation-Protocol Tension",
+        "images": []
+    },
+    {
+        "header": "Appendix HExternal Models",
+        "images": []
+    },
+    {
+        "header": "Appendix IInter-Batch Diversity (Temporal Awareness)",
+        "images": []
+    },
+    {
+        "header": "Appendix JLimitations",
+        "images": []
+    },
+    {
+        "header": "Appendix KDirections for Future Work",
+        "images": []
+    },
+    {
+        "header": "Appendix LAdditional Experimental Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x22.png",
+                "caption": "Figure 24:Evaluation curves.Performance across evaluations forQwen3-8B-basewhile training onDAPO-Math-17kusingGSPO. This corresponds to the bar graphs visualized inFigure6. We refer toAppendixFfor additional intuition and discussion on why the performances between the 8B and 4B models can vary on the same dataset.",
+                "position": 4443
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x23.png",
+                "caption": "Figure 25:Evaluation curves.Performance across evaluations forQwen3-4B-basewhile training onDAPO-Math-17kusingGSPO. We refer toAppendixFfor additional intuition and discussion on why the performances between the 8B and 4B models can vary on the same dataset.",
+                "position": 4446
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x24.png",
+                "caption": "Figure 26:Evaluation curves.Performance across evaluations forQwen3-4B-basewhile training onDAPO-Math-17kusingGRPO. We refer toAppendixFfor additional intuition and discussion on why the performances between the algorithms can vary on the same model-dataset combination.",
+                "position": 4449
+            },
+            {
+                "img": "https://arxiv.org/html/2606.19750/2606.19750v1/x25.png",
+                "caption": "Figure 27:Evaluation curves.Performance across evaluations forQwen3-8B-basewhile training onDAPO-Math-17kusing variations of BMC-T. These evaluation trajectories correspond to the bar graphs visualized inFigure7.",
+                "position": 4452
+            }
+        ]
+    },
+    {
+        "header": "Appendix MAdditional Algorithmic Details",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
