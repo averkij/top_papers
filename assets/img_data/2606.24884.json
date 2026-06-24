@@ -1,0 +1,109 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.24884/2606.24884v1/figures/pipeline.png",
+                "caption": "",
+                "position": 235
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.24884/2606.24884v1/x1.png",
+                "caption": "(a)Stage 1: automatic primitive segmentation.(1) Human collects teleoperation data of a known task. (2) These demonstrations are decomposed into labeled primitives by aligning a VLM-generated primitive plan with gripper-state transitions and dominant end-effector motion. (3) The primitive-labeled trajectories are used to fine-tune a VLA. (4) Individual primitives can be composed for language-conditioned steerability in new tasks.\nThe example shows a side pick-and-place demonstration segmented into six primitives, with the gripper-state and dominant-motion signals used for alignment shown below the frames.",
+                "position": 324
+            },
+            {
+                "img": "https://arxiv.org/html/2606.24884/2606.24884v1/x1.png",
+                "caption": "(a)Stage 1: automatic primitive segmentation.(1) Human collects teleoperation data of a known task. (2) These demonstrations are decomposed into labeled primitives by aligning a VLM-generated primitive plan with gripper-state transitions and dominant end-effector motion. (3) The primitive-labeled trajectories are used to fine-tune a VLA. (4) Individual primitives can be composed for language-conditioned steerability in new tasks.\nThe example shows a side pick-and-place demonstration segmented into six primitives, with the gripper-state and dominant-motion signals used for alignment shown below the frames.",
+                "position": 327
+            },
+            {
+                "img": "https://arxiv.org/html/2606.24884/2606.24884v1/x2.png",
+                "caption": "(b)Stage 2: VLM-guided skill acquisition.(1) Given a novel task, (2) the VLM builds a plan and flags any primitive missing from the VLA’s current vocabulary as aprimitive gap. (3) During a rollout, known primitives are executed by the steerable VLA, while each primitive gap is executed by a low-level controller parameterized by a VLM-proposed motion axis and signed magnitude. (4) A VLM oracle verifies task success, and the successful rollouts of each new primitive are added to the training set to fine-tune the VLA with the acquired primitive. In this example,InSightacquires thetilt bottle forwardandtilt bottle back uprightprimitives needed to pour the bottle into the bowl.",
+                "position": 334
+            }
+        ]
+    },
+    {
+        "header": "3Skill Acquisition via Steerable Primitives",
+        "images": []
+    },
+    {
+        "header": "4Experiments and Analyses",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.24884/2606.24884v1/x3.png",
+                "caption": "Figure 3:Block flip sample efficiency:InSightvs. RL.Full flip success rate as a function of total environment rollouts (task attempts), with the number of rotate-block primitives in grey. The RL SAC[14]baseline (given the same rollout budget) does not complete a flip (0%), although it learns to reach the block (in 23% of episodes) and grasp it (in 10% of episodes), but never lifts and rotates it to completion. The upper bound success is shown by the dotted line at80%80\\%.",
+                "position": 426
+            },
+            {
+                "img": "https://arxiv.org/html/2606.24884/2606.24884v1/x4.png",
+                "caption": "Figure 4:Drawer closing.A VLA is trained only onopen-drawerdemos (left). Closing the drawer (right) requires a newpush drawer closedprimitive executed from an open drawer, which is an OOD initial state for the base policy.InSightcan use a VLM completion check to terminate the known approach primitive and trigger the new push drawer primitive.",
+                "position": 440
+            },
+            {
+                "img": "https://arxiv.org/html/2606.24884/2606.24884v1/x5.png",
+                "caption": "Figure 5:Compositional twist-then-pour evaluation rollout.InSightchains 14 primitives from the separately acquired twist and pour skills, with no end-to-end demonstrations of the combined task. Shaded headers mark primitives acquired autonomously byInSightand added back into the VLA’s vocabulary; unshaded primitives are already known from the pick-and-place base demonstrations. The step/progress value shown in each panel is the learnedper-primitiveprogress channel, which resets at the start of each primitive rather than increasing monotonically across the full 14-primitive sequence. A VLM oracle verifies task success.",
+                "position": 451
+            },
+            {
+                "img": "https://arxiv.org/html/2606.24884/2606.24884v1/x6.png",
+                "caption": "Figure 6:Real-world per-primitive success rates, 25 trials per method. Each marker is the success rate of the labeled primitive across rollouts;Overall/End-to-endis full-task success.\nTheπ0.5\\pi_{0.5}baseline is fine-tuned on 50 human pick-and-place demos;InSightadditionally uses 20 successful acquired primitive episodes.\nIn the cap twisting (left), bottle pouring (center), and twist-then-pour (right) tasks,InSightconsistently outperforms CaP-X[8].",
+                "position": 454
+            },
+            {
+                "img": "https://arxiv.org/html/2606.24884/2606.24884v1/x7.png",
+                "caption": "Figure 7:Per-trial time decomposition.InSightspends substantially less wall-clock time per trial than CaP-X on both skills.Thinkingreports VLM-call latency;Executionreports robot motion.N=25N{=}25evaluation trials per method.",
+                "position": 475
+            },
+            {
+                "img": "https://arxiv.org/html/2606.24884/2606.24884v1/x7.png",
+                "caption": "Figure 7:Per-trial time decomposition.InSightspends substantially less wall-clock time per trial than CaP-X on both skills.Thinkingreports VLM-call latency;Executionreports robot motion.N=25N{=}25evaluation trials per method.",
+                "position": 478
+            },
+            {
+                "img": "https://arxiv.org/html/2606.24884/2606.24884v1/x8.png",
+                "caption": "Figure 8:Base skill retention.The unified VLA retains the original pick-and-place skills after adding twist and pour primitives (N=15N{=}15).",
+                "position": 483
+            },
+            {
+                "img": "https://arxiv.org/html/2606.24884/2606.24884v1/x9.png",
+                "caption": "Figure 9:Sweeping from only scooping human demonstrations.Exterior and wrist views of the demonstrated scooping skill (top) and the sweeping skill acquired throughInSight(bottom). Since both scooping and sweeping require the gripper to be lowered to the rocks,InSightacquires sweeping by adding a lateral-push primitive to the scooping primitives.",
+                "position": 530
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion, Limitations, and Future Work",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BVLM Demonstration Segmentation, Plan, Primitive Gap Proposal, and Oracle Check",
+        "images": []
+    },
+    {
+        "header": "Appendix CVLM-Generated Plans",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
