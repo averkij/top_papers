@@ -1,0 +1,116 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.24033/2606.24033v1/x1.png",
+                "caption": "Figure 1:RoPE-block allocation.(a)The RoPE attention logit𝐪⊤​RΔ​𝐤\\mathbf{q}^{\\top}R_{\\Delta}\\mathbf{k}decomposes into a sum over two-dimensional frequency blocks.(b)Per-block energy scores for one Qwen3-8B KV head (layer 10, head 4); scores are median-normalized for display and span orders of magnitude.(c)Under the same average bit widthb¯=3\\bar{b}=3(dashed line), Block-GTQ reallocates bits from low-energy blocks to high-energy blocks instead of using a uniform 3-bit width.",
+                "position": 397
+            }
+        ]
+    },
+    {
+        "header": "2RoPE-Structured Key-Cache Error",
+        "images": []
+    },
+    {
+        "header": "3Block-GTQ: RoPE-Block Bit Allocation",
+        "images": []
+    },
+    {
+        "header": "4Serving Block-GTQ from a Packed Cache",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.24033/2606.24033v1/x2.png",
+                "caption": "Figure 2:Packed-cache serving path.Persistent HBM stores packed\nK/V code streams plus norms and metadata. The fused attention kernel decodes\nonly the current tile into kernel-local temporaries and consumes them directly\nin QK and PV products, avoiding a resident decoded fp16 KV cache.",
+                "position": 683
+            }
+        ]
+    },
+    {
+        "header": "5Related Work",
+        "images": []
+    },
+    {
+        "header": "6Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.24033/2606.24033v1/x3.png",
+                "caption": "Figure 3:Allocator fingerprint at the33b/dim budget.One\nsubplot per model; each vertical slice is one layer, with stacked color\nbands giving its bit-width distribution (11b red→\\rightarrow88b green).",
+                "position": 967
+            },
+            {
+                "img": "https://arxiv.org/html/2606.24033/2606.24033v1/x4.png",
+                "caption": "Figure 4:Mean softmax KL and Top-10 attended-token overlap across models.K-only quantization (VVstays fp16).(a)Mean softmax KL versus fp16 per method, averaged over the\nten-model panel at22,33, and44b/dim budgets.(b)Top-10 attended-token overlap versus softmax KL, one marker per\nmodel (color: method, shape: bit-rate); the upper-left corner is best.\nSee AppendixB.4for the KIVI no-buffer setting.",
+                "position": 972
+            },
+            {
+                "img": "https://arxiv.org/html/2606.24033/2606.24033v1/x5.png",
+                "caption": "Figure 5:NIAH single-needle retrieval on Llama-3.1-8B-Instruct.Pass rate is shown over context length (44K–128128K) and needle depth\n(0%0\\%–100%100\\%), averaged over three trials per cell. The two rows use the\nsame method layout:fp16,KIVI-ScaleOnly(AppendixB.4),TQ-MSE, andBlock-GTQ.",
+                "position": 1226
+            },
+            {
+                "img": "https://arxiv.org/html/2606.24033/2606.24033v1/x6.png",
+                "caption": "Figure 6:Kernel-optimization gains, decode latency, and peak\nmemory for Block-GTQ on Qwen2.5-3B-Instruct (single H800). Panel\n(a) decomposes the speedup contribution of each kernel-optimization\nstage—each stage targets a specific bottleneck of the\npacked-cache decode path. As context length grows\n(panels (b), (c)), Block-GTQ’s optimized decode kernel overtakes\nfp16 FA-2 atT=128T=128K and continues to run cleanly atT≥256T\\geq 256K where fp16 OOMs. PPL is annotated on in panel (b).",
+                "position": 1851
+            }
+        ]
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix Roadmap",
+        "images": []
+    },
+    {
+        "header": "Appendix ASupplementary Theory Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BAttention-Interface Diagnostic Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.24033/2606.24033v1/x7.png",
+                "caption": "Figure 7:Allocator fingerprint at the22b/dim budget.Per-layer bit-width distribution for each model. The numeric counterpart is\nTable9.",
+                "position": 3273
+            },
+            {
+                "img": "https://arxiv.org/html/2606.24033/2606.24033v1/x8.png",
+                "caption": "Figure 8:Per-layer Shannon entropyH(ℓ)H^{(\\ell)}of the bit-width histogram\nat33b/dim across normalized layer depth (0= first layer,11= last\nlayer). Each curve is one model; per-model means and extrema are listed in\nTable10.",
+                "position": 3428
+            }
+        ]
+    },
+    {
+        "header": "Appendix CCalibration Robustness",
+        "images": []
+    },
+    {
+        "header": "Appendix DDownstream Evaluation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.24033/2606.24033v1/x9.png",
+                "caption": "Figure 9:NIAH single-needle retrieval on Qwen2.5-7B-Instruct.Pass rate is shown over context length (44K–128128K) and needle depth\n(0%0\\%–100%100\\%), averaged over three trials per cell. The two rows use the\nsame method layout as Figure5:fp16,KIVI-ScaleOnly(AppendixB.4),TQ-MSE, andBlock-GTQ. Top row: K3V3. Bottom row: K2V2. The fp16 panel is identical across budgets for a\nfixed model and serves as the retrieval ceiling.",
+                "position": 5023
+            }
+        ]
+    },
+    {
+        "header": "Appendix EDeployment Protocol and Extended Results",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
