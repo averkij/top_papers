@@ -1,0 +1,137 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x1.png",
+                "caption": "Figure 1:The benchmark and its running example.Left:tasks span Korean categories (rows)\nand three difficulty tiers (columns); each cell is one real task, with a strip of its columns\nbeneath—the membership-key column(s) shaded, one box marking a list, two a cross-product\ngrid. Reading left to right, tasks gain columns to fill and their membership turns from a list\ninto a grid.Right:the Government/Hardcell shown in full—ahard-set\nexampleI reuse as the paper’s running example: every Korean metropolitan province’s elected head in\nthe 7th and 8th local elections. Its rows are (province×\\timesround) pairs (every province in every election,17×2=3417\\times 2=34rows), and per-row attributes such as each winner’s age are looked up off the results\npage (cross-source). Four of sixteen categories are shown.",
+                "position": 307
+            }
+        ]
+    },
+    {
+        "header": "Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x2.png",
+                "caption": "Figure 2:Ko-WideSearchextends WideSearch(?) along two structural\naxes.(a) Difficulty: the two knobs I dial—table width and the 2-D composite-key\nshare—span the plane. WideSearch is a single, un-tiered reference (median six columns, 35% 2-D),\nwhereasKo-WideSearchcovers a calibratedEasy→\\rightarrowMedium→\\rightarrowHardregion (shaded), itsHardtier reaching the original’s width and exceeding its cross-product share (100% vs. 35%).(b) Sourcing: an orthogonal, web-grounded property—whether a table’s attributes sit on one\npage (exhaustive) or span several (cross-source)—rising from 77% cross-source inEasyto everyMediumandHardtask.",
+                "position": 438
+            }
+        ]
+    },
+    {
+        "header": "The Ko-WideSearch Benchmark",
+        "images": []
+    },
+    {
+        "header": "Experimental Setup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x3.png",
+                "caption": "Figure 3:Membership is recovered; full rows and whole tables are not.Item-F1 (membership),\nColumn-F1 (matched cells), Row-F1 (full rows), and table success (the whole table exactly correct), as\npercentages, on all 228 tables for the twenty-system roster (sorted by Row-F1; x-axis labels colored by\nfamily). Each model’s bars cascade downward: the set (Item-F1, up to 94) is recovered far more\nfully than whole rows (Row-F1 16–54), and even the strongest solves under a fifth of tables\noutright. The bottleneck is exhaustive per-cell filling, not finding the membership; notably, the\nopen-weightDeepSeek-V4-Pro(Row-F1 45.0) stays competitive, mid-pack among the proprietary systems.",
+                "position": 805
+            }
+        ]
+    },
+    {
+        "header": "Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x4.png",
+                "caption": "Figure 4:The metric breakdown by difficulty, faceted by model family.Each of the four WideSearch\nmetrics (columns: Item-F1, Column-F1, Row-F1, and table success), as percentages, across the difficulty\ntiers (Easy/Medium/Hard), with one row of panels per family—proprietary\n(solid, top), open-weight (dashed, middle), Korean-specialized (dotted, bottom);yy-scales are shared\ndown each column so the families are directly comparable. Faceting keeps all twenty models legible\nrather than overplotting them in one panel. Membership (Item-F1) holds up across the tiers, but every\ndownstream metric falls as width and the 2-D composite key are added—Row-F1 and especially table\nsuccess drop steeplyEasy→\\rightarrowHard—and the family rows separate top to\nbottom. The orthogonal sourcing breakdown is in Figure9(Appendix); since the\n27 exhaustive-only tables are allEasy, it partly re-expresses difficulty.",
+                "position": 1036
+            }
+        ]
+    },
+    {
+        "header": "Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x5.png",
+                "caption": "Figure 5:Where and why agents break.(a) Per-cell-type Column-F1 on an instrumented\nthree-system subset (pooled): the open-endedfree-textcells are filled least reliably and the\nformat-constrained ones (dates, names) most, so the difficulty is finding and normalizing the value, not\nformatting it. (b) Row-F1 by gold set size on the full pool is essentially flat—breadth alone does not\ndrive failure. (c) Average tool calls per table against Row-F1:more search does not buy\ncompleteness—the two heaviest searchers (Qwen3.6-35B, Solar-Open-2-preview) score lowest, while GPT-5.5 and\nClaude-Opus-4.8 lead the benchmark with moderate search. Marker shapes: circle (proprietary), square\n(open-weight), triangle (Korean-specialized); model colors as in Figure4.",
+                "position": 1089
+            },
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x6.png",
+                "caption": "Figure 6:Failure composition by stage, for the ten timely-routed systems with per-task logging.\nEvery task is assigned to its first failure stage—no parseable table, a substantially wrong row set\n(membership, item-F1<0.9<0.9), an essentially-correct set with a wrong attribute cell\n(cells), or fullysolved—so the four shares sum over the 228 tasks. For capable systems\nthe bottleneck is cell-filling (cells 56–66%); the smallest fail a stage earlier at membership\n(46–52%); parse failure is rare except forClaude-Haiku-4.5(24%).",
+                "position": 1210
+            },
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x7.png",
+                "caption": "Figure 7:Neither dollars nor search calls close the gap.(a)Row-F1 against cost per\ntask for the six API-served models with metered cost. Accuracy rises with cost then flattens: the\nopen-weightDeepSeek-V4-Proreaches most of the frontier’s Row-F1 at a fraction of the price of\nGPT-5.5 and Claude-Opus-4.8.(b)Share of\ntasks on which a model spends at least thirty tool calls, over all twenty systems; the models that cross\nthat bar most often (Claude-Sonnet-4.6, Claude-Haiku-4.5) are not the top scorers, while the top systems\nsearch far less. The per-question budget is thirty agent iterations,\neach able to batch several calls, so totals run higher—to 947 for Qwen3.6. The four self-hosted\nmodels (A.X-4.0, Solar-Open-2-preview, Qwen3.6-35B, K-EXAONE-236B) have no API fee, so they sit at the leftmost\n“self-hosted” position of (a) at their Row-F1 (their small horizontal spread is jitter, not cost).",
+                "position": 1218
+            }
+        ]
+    },
+    {
+        "header": "Conclusion and Limitations",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Technical Appendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x8.png",
+                "caption": "Figure 8:Semantic judging helps strong models more.Strict→\\rightarrowjudged Row-F1 per\nmodel (full 228-table pool). The dumbbell length is the correction the LLM judge applies; it grows with\nmodel strength (DeepSeek-V4-Pro+4.9+4.9at top vs.+0.8+0.8for the weakest), so strict cell-matching\nunder-states the gap between strong and weak systems.",
+                "position": 1801
+            },
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x9.png",
+                "caption": "Figure 9:The metric breakdown by sourcing label, faceted by model family(companion to\nFigure4). The same facet-by-family layout, but thexx-axis is the orthogonal\nsourcing label—single-pageexhaustive-onlyversuscross-sourcetables. Every metric\ndrops from exhaustive to cross-source for nearly every model; because all 27 exhaustive-only tables areEasy, this gap partly re-expresses difficulty rather than a fully independent axis.",
+                "position": 1896
+            },
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x10.png",
+                "caption": "Figure 10:Pooled Row-F1 by topical category (mean across the twenty systems, model-task weighted). Most\ncategories sit near the 0.36 pooled mean; Literature/Books is the clear low outlier and the\nlargest category, Sports, sits mid-pack. Small-sample categories (<4<4tasks) are faded as high-variance.",
+                "position": 1903
+            },
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x11.png",
+                "caption": "Figure 11:Errors that survive the semantic judge.After the judge credits transliteration and\nadministrative-granularity variants, the residual judge-confirmed-wrong cells are substantive: a\ndifferent entity (n=269n{=}269), a different region/district (328328), a wrong value (164164), or a category\nmismatch (3535). The Item-F1≫\\,\\gg\\,Row-F1 gap is factual error, not formatting.",
+                "position": 2016
+            },
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x12.png",
+                "caption": "Figure 12:GPT-5.5 — surface variants and membership.Gold vs. prediction; predicted cells are\ncoloured white (correct), teal (strict-wrong but rescued by the semantic judge), red (genuinely wrong),\norange (hallucinated). (a) The cast is fully recovered, and the cells the deterministic scorer marks wrong\nare mostly surface variants—the has-children enum written as a free-text count\n(“yes”≡\\equiv“NNchildren”) and the residence coarsened (“Seoul, Korea”≡\\equiv“Seoul”)—that the\nsemantic judge credits (Table3); only “near Sadang Station, Seoul” is a genuinely different\nlocation. This is the kind of strict-wrong cell that motivates the judged re-scoring. (b) The set boundary\nis nearly right both ways, with a few invented product trims and one dropped boundary member.",
+                "position": 2094
+            },
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x13.png",
+                "caption": "Figure 13:DeepSeek-V4-Pro — blank attribute cells.All eight metropolitan cities are recovered,\nbut the population column is left blank for every row and the mayor for most, so no row is complete.",
+                "position": 2104
+            },
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x14.png",
+                "caption": "Figure 14:GPT-5.4-mini — under-recall.Of nine valid stations the model returns only three (one\nof them out of scope) and leaves every distance blank — a recall collapse.",
+                "position": 2108
+            },
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x15.png",
+                "caption": "Figure 15:Solar-Open-2-preview — two failure modes.(a) Parse failure: the model narrates a\nprose list instead of a table, so the answer is unscorable. (b) Even when it emits a valid table, the\nnumeric cells are fabricated (plausible but wrong populations), so no row is complete.",
+                "position": 2113
+            },
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x16.png",
+                "caption": "Figure 16:Qwen3.6-35B — over-search, then no table.The model issues the run’s maximum number\nof tool calls, yet still emits prose rather than a table — its most common outcome on the benchmark.",
+                "position": 2118
+            },
+            {
+                "img": "https://arxiv.org/html/2606.27595/2606.27595v1/x17.png",
+                "caption": "Figure 17:A.X-4.0 — fabricated free-text cells.All eight planets are recovered, but the\ndiscovery-year and discoverer cells are fabricated (“2000 BC”, “Babylonian astronomers” where the gold\nis “ancient”); only one row is fully correct.",
+                "position": 2122
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
