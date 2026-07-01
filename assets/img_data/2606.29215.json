@@ -1,0 +1,103 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.29215/2606.29215v2/x1.png",
+                "caption": "Figure 1:SingleBD decodes blocks sequentially and creates KV cache storing bubbles.\nIn contrast, MultiBD overlaps future-block refinement with KV cache storing of completed blocks, and enables inter-block parallelism.",
+                "position": 399
+            }
+        ]
+    },
+    {
+        "header": "2Preliminaries",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.29215/2606.29215v2/x2.png",
+                "caption": "Figure 2:Train–inference statistics for MultiBD.(A)Slot-wise mask-ratio distributions induced by the D2F-style monotonic scheduler.(B)Slot-wise mask-ratio distributions induced by our chain-uniform scheduler.(C)Inference-time mask-ratio distributions before and after MultiTF post-training.(D)Mean and one-standard-deviation range of the active-block count during MultiBD inference.(E)Sampled active-block trajectories during decoding.\nPanels (A–C) compare scheduler-induced training noise patterns with inference-time mask-ratio patterns for train–inference alignment analysis.\nPanels (D–E) report the active part of the MultiBDrunning-setunder a buffer size of four; the active-block count can therefore occasionally exceed two.",
+                "position": 537
+            }
+        ]
+    },
+    {
+        "header": "3Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.29215/2606.29215v2/x3.png",
+                "caption": "Figure 3:Train–inference alignment across paradigms.(A)TF and D2F provide existing BD-LM training states, but neither matches practical MultiBD.(B)MultiBD maintains a boundedrunning-setfor concurrent block refinement.(C)MultiTF builds inference-likenoise-groupswith heterogeneous slot-wise noise patterns.",
+                "position": 734
+            },
+            {
+                "img": "https://arxiv.org/html/2606.29215/2606.29215v2/x4.png",
+                "caption": "Figure 4:Overview of MultiTF.(A)Systematicgroup-layoutsenumerate group sizes and shifts so that blocks appear at different group-relative positions.(B)Randomgroup-layoutsincrease layout diversity; each layout is converted into a noisy–clean input sequence with theGroup-Aware Dual-Stream Mask.(C)The resulting input sequences are used to post-train BD-LMs into MBD-LMs with masked CE and optional model-specific objectives.",
+                "position": 777
+            },
+            {
+                "img": "https://arxiv.org/html/2606.29215/2606.29215v2/x5.png",
+                "caption": "Figure 5:Inference and system support in MultiBD.(1)Blocks follow a four-state transition:dummy→\\rightarrowactive→\\rightarrowto-cache→\\rightarrowin-cache.(2)MultiBD organizes decoding with a block–buffer–request hierarchy, where each request maintainsBlock Buffersand each buffer contains multiple block slots for parallel refinement.(3)During MultiBD inference, noisy blocks are refined jointly under block-causal self-attention, while committed prefix blocks are served from the KV cache; completed blocks enter the cache and theBlock Bufferslides forward.",
+                "position": 903
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Related Work",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ATheoretical View of MultiTF",
+        "images": []
+    },
+    {
+        "header": "Appendix BMultiTF Training Implementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CMultiBD Inference Implementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2606.29215/2606.29215v2/x6.png",
+                "caption": "(a)CUDA Graph compatibility across decoding designs.(1)SingleBD uses a fixed single active block but exposes no inter-block parallelism.(2)Naive MultiBD appends future blocks dynamically, making therunning-setlength change over time.(3)Optimized MultiBD maps the logicalrunning-setinto a fixed-sizeBlock Bufferwith dummy slots, keeping tensor shapes static for CUDA Graph capture and replay.",
+                "position": 2956
+            },
+            {
+                "img": "https://arxiv.org/html/2606.29215/2606.29215v2/x6.png",
+                "caption": "(a)CUDA Graph compatibility across decoding designs.(1)SingleBD uses a fixed single active block but exposes no inter-block parallelism.(2)Naive MultiBD appends future blocks dynamically, making therunning-setlength change over time.(3)Optimized MultiBD maps the logicalrunning-setinto a fixed-sizeBlock Bufferwith dummy slots, keeping tensor shapes static for CUDA Graph capture and replay.",
+                "position": 2959
+            },
+            {
+                "img": "https://arxiv.org/html/2606.29215/2606.29215v2/x7.png",
+                "caption": "(b)Making D2F fully block-causal hurts accuracy.\nPrefix-full attention gives D2F stronger noisy-prefix visibility but is not naturally compatible with prefix KV caching.\nDirectly replacing it with a fully block-causal mask improves cache compatibility but drops accuracy from 77.60% to 69.60%.",
+                "position": 2969
+            },
+            {
+                "img": "https://arxiv.org/html/2606.29215/2606.29215v2/x8.png",
+                "caption": "Figure 7:Prefix caching in block-causal BD-LMs.(1)SingleBD keeps completed blocks as an immutable clean prefix, enabling direct KV-cache reuse.(2)D2F-style prefix-full attention breaks this cache semantics because noisy prefix blocks are not reusable as stable causal prefix pages.(3)Block BufferMultiBD separates cached prefix blocks from activeBlock Bufferslots, enabling prefix KV reuse while refining multiple active blocks.",
+                "position": 3237
+            }
+        ]
+    },
+    {
+        "header": "Appendix DExperimental Details",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
