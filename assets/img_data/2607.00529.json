@@ -1,0 +1,104 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.00529/2607.00529v1/assets/teaser.png",
+                "caption": "Figure 1:Gaussian (FROSS[11]) vs Non-Parametric (Ours).We show the problem of under-merging when merging objects represented as 3D Gaussians on a single window object instance.Top Row (FROSS):Under Gaussian parameterization, the local object (1st column) fails to merge with the global object (2nd column) which results in under-merging (3rd column). After the merging process, the window instance is incorrectly represented by two smaller Gaussians instead of a single larger one. This fragmentation produces splintered 3D scene graphs that do not reflect the true scene structure. Strict post-processing filters would then remove fragmented objects together with their relations. As a result, the quality of the final 3D SSG degrades.Bottom Row (Ours):Our non-parametric formulation allows the local object to merge with the global object and preserves richer geometric support. This reduces under-merging and produces more accurate and consistent 3D SSGs.",
+                "position": 260
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Problem Definition",
+        "images": []
+    },
+    {
+        "header": "4Preliminaries",
+        "images": []
+    },
+    {
+        "header": "5Our Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.00529/2607.00529v1/assets/framework-new.png",
+                "caption": "Figure 2:Overview of our online 3D scene graph generation pipeline.\n(1) A pretrained RT-DETR-EGTR[13,45]model predicts a local 2D scene graph from each RGB frame.\n(2) For every object node, we sample pixels inside its 2D bounding box, back-project them with depth, and obtain a 3D particle set in the world frame.\n(3) We associate each local particle set with existing global objects using a two-stage test: a constant-time Hellinger pre-filter followed by MMD on ambiguous cases.\n(4) We propagate relations within high-affinity clusters to reduce relation dropouts from the 2D predictor.",
+                "position": 426
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00529/2607.00529v1/x1.png",
+                "caption": "Figure 3:The visualization of objects in Scene41385849from the 3DSSG dataset. In the top row, we visualize an instance of the sink class localized by a red bounding box. In the bottom row, we visualize the global 3D object instances.Left:Visualized Gaussian blobs from FROSS[11]. The Gaussian blob only encompasses half of the sink in (a). Spurious blobs spanning across the scene in (c) visualizes the impact of incorrect merging.Right:Visualized kernel densities for our particle set. The entire sink is associated with our particle set in (b). Our representation attains good coverage on objects across the scene without large artifacts in (d).",
+                "position": 489
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00529/2607.00529v1/assets/merging_part.png",
+                "caption": "Figure 4:Visualization of the merging process for an object in Scene7272e16cfrom the 3DSSG dataset.\nIf the local particle set and the global particle set yields a small Hellinger distance (dH<δH−ϵd_{H}<\\delta_{H}-\\epsilon) after fitting a unimodal Gaussian (Stage 1), their covariances clearly matches, and the merge decision is straightforward. If the Hellinger distance falls within the margin band (Stage 2), covariance alignment alone is insufficient to determine merging. Consequently, we apply the more robust MMD criterion and merge the particle sets ifdMMD<δMMDd_{\\mathrm{MMD}}<\\delta_{\\mathrm{MMD}}.Left:Initial kernel density estimates of the local and global particle sets.Right:Kernel density estimate of the merged particle set after fusion. The number of particles remain constant after merging due to KDE resampling while the updated particle set captures the multi-modal distribution.",
+                "position": 587
+            }
+        ]
+    },
+    {
+        "header": "6Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.00529/2607.00529v1/x2.png",
+                "caption": "Figure 5:We compare the qualitative results between FROSS and our proposed approach for scene 321c867e from the 3DSSG dataset. The scene shows a kitchen from bird’s eye view (BEV). FROSS fails to predict a majority of the wall background class. As a consequence, a majority of the predicate relationships are lost. Our method correctly classifies most objects, except for the counter instance, while correctly predicting the majority of predicate relationships.",
+                "position": 848
+            }
+        ]
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.AAdditional Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.00529/2607.00529v1/x3.png",
+                "caption": "Figure 6:We compare the qualitative results between FROSS and our proposed approach for sceneab835faefrom the 3DSSG dataset. The object instances denoted with a * are not visible from either viewpoint angles but are visible in the input images. FROSS fails to predict a majority of thewallbackground class. Notably, FROSS has trouble differentiating thewallclass with thesinkclass. FROSS also fails to predict a majority of the predicate relationships. Our method correctly classifies most objects while correctly predicting the majority of predicate relationships.",
+                "position": 1812
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00529/2607.00529v1/x4.png",
+                "caption": "Figure 7:We compare the qualitative results between FROSS and our proposed approach for scenec2d9933ffrom the 3DSSG dataset. FROSS once again fails to predict a majority of thewallbackground class. FROSS also misclassifies thesofainstance as achairinstance. Even though FROSS correctly classifies most objects, FROSS fails to predict the predicate relationships between most objects. Our method correctly classifies all objects while correctly predicting the majority of predicate relationships.",
+                "position": 1816
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00529/2607.00529v1/x5.png",
+                "caption": "Figure 8:We compare the qualitative results between FROSS and our proposed approach for scene5630cfe7from the 3DSSG dataset. FROSS misclassifies thedeskobject as atableclass. FROSS also misclassifies thewallinstance as another furnitureinstance. Because of the initial incorrect classification, all the relationships that are predicted with thewallinstance are misclassified or missing. Our method correctly classifies all objects while correctly predicting the majority of predicate relationships.",
+                "position": 1820
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.BAnalysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.00529/2607.00529v1/x6.png",
+                "caption": "Figure 9:We show the distribution of merge decisions in the test split of the ReplicaSSG dataset according the Hellinger distance calculated from fitting the Gaussian distribution on NoPA’s particles. Even in the narrow margin band betweenδH−ϵ≤dH≤δH+ϵ\\delta_{H}-\\epsilon\\leq d_{H}\\leq\\delta_{H}+\\epsilonwhereδH=0.85\\delta_{H}=0.85andϵ=0.05\\epsilon=0.05, there exists a substantial number of merge decisions that requires sensitive MMD calculation beyond moments matching.",
+                "position": 2046
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

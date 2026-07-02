@@ -1,0 +1,145 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1.Introduction",
+        "images": []
+    },
+    {
+        "header": "2.Background",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x1.png",
+                "caption": "Figure 1.Decode-phase per-expert activation relative to the cross-domain mean,\nfor three MoE models along task (top) and language (bottom,\nWildChat(Zhaoet al.,2024)) domains at each model’s most discriminative layer.\nDarker is above-average (below-average clipped to white); experts are reordered\nper panel into contiguous per-domain blocks. Each domain over-activates a\ndistinct subset of experts. Task domains:\nCode(Chenet al.,2021; Zhuoet al.,2025; Laiet al.,2023; Austinet al.,2021),\nMath(Cobbeet al.,2021; Hendryckset al.,2021b; Lightmanet al.,2023; Heet al.,2024; Linget al.,2017),\nMedical(Jinet al.,2021,2019; Hendryckset al.,2021a), and\nLegal(Chalkidiset al.,2022).",
+                "position": 524
+            }
+        ]
+    },
+    {
+        "header": "3.Motivation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x2.png",
+                "caption": "Figure 2.MoE layer latency scales with active experts, not batch\nsize (single MoE layer, one MI300X).",
+                "position": 572
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x3.png",
+                "caption": "Figure 3.Prefill expert activation predicts decode activation. Each\npoint is one expert (normalized prefillxxvs. decodeyy, pooled over\ndomains); points near the diagonal are experts used about equally in\nboth phases.",
+                "position": 661
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x4.png",
+                "caption": "Figure 4.Same-domain batches (blue) activate fewer experts per decode\nstep than mixed-domain (orange),\nfor task (top) and language (bottom) across three MoE models.",
+                "position": 721
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x5.png",
+                "caption": "Figure 5.WildChat(Zhaoet al.,2024)request volume is heavily skewed: English and\nChinese alone are∼\\sim75% of requests.",
+                "position": 777
+            }
+        ]
+    },
+    {
+        "header": "4.Design",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x6.png",
+                "caption": "Figure 6.ELDRarchitecture: offline fitting of one centroid\nper decode worker over expert signatures, then online routing\nat the prefill?밺ecode handoff by signature similarity,\nsubject to load.",
+                "position": 832
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x7.png",
+                "caption": "Figure 7.Signature qualityρ\\rho(Eq.1) for six candidate\ntransformationsTT. Bars are the mean across six cells\n(3 models×\\times2 workloads); whiskers span the per-cell min/max.",
+                "position": 1140
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x8.png",
+                "caption": "Figure 8.Cumulativeρ\\rho(Eq.1) versus the number of\nlayers kept under greedy layer selection. One panel per model;\ntask (blue) and language (orange) shown separately. The star\nmarks the peakN∗N^{*}chosen byELDR’s offline fit.",
+                "position": 1195
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x9.png",
+                "caption": "Figure 9.PCA of calibration signatures with Hungarian-balanced centroids\n(K=8K{=}8for legibility), colored by task domain (top) or top-4\nWildChat(Zhaoet al.,2024)language (bottom).",
+                "position": 1269
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x10.png",
+                "caption": "Figure 10.ELDRstores expert signatures at KV cache block granularity: the\nsignature cache is co-indexed with KV cache.",
+                "position": 1328
+            }
+        ]
+    },
+    {
+        "header": "5.Implementation",
+        "images": []
+    },
+    {
+        "header": "6.Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x11.png",
+                "caption": "Figure 11.TPOT (median, p99) and median TTFT vs request rate on thetaskworkload at 8P16D.",
+                "position": 1416
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x11.png",
+                "caption": "Figure 11.TPOT (median, p99) and median TTFT vs request rate on thetaskworkload at 8P16D.",
+                "position": 1419
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x12.png",
+                "caption": "Figure 12.TPOT (median, p99) and median TTFT vs request rate on thelanguageworkload at 8P16D.",
+                "position": 1425
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x13.png",
+                "caption": "Figure 13.Mean active experts per decode step on Qwen3-30B-A3B in the task domain on\nan 8P16D cluster.",
+                "position": 1678
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x14.png",
+                "caption": "Figure 14.TPOT P50/P99 %Δ\\Deltavs. RR atr=60r{=}60req/s (8P16D, six\n(model, dataset) cells) for two signature transforms: the IDF-reweighted\ntop-kkcount (count⋅\\cdotidf) vs. the continuous softmax\ngate (gate-prob). Rest of the recipe\nfixed (greedy mask, balancedKK-meansK=16K{=}16,τ=0.1\\tau{=}0.1).",
+                "position": 1694
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x15.png",
+                "caption": "Figure 15.Mean %Δ\\Deltavs. RR over five request rates\n(2020–100100qps) at 8P16D withτ=0.1\\tau{=}0.1.",
+                "position": 1716
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x16.png",
+                "caption": "Figure 16.Mean %Δ\\Deltavs RR (five rates, 20–100 qps; 8P16D) for six\ncells (three models×\\timestwo datasets) at fourτ\\tauvalues.",
+                "position": 1735
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x17.png",
+                "caption": "Table 2.Topology generalization on Qwen3-30B-A3B, language workload:\nmean %Δ\\Deltavs RR across 20–100 qps.",
+                "position": 1755
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00466/2607.00466v1/x18.png",
+                "caption": "Figure 18.TPOT (median, p99) for Qwen3-235B-A22B on language workload\nat 2P8D withT​P=4TP{=}4andE​P=4EP{=}4per instance (40 GPUs across 5 nodes).",
+                "position": 1848
+            }
+        ]
+    },
+    {
+        "header": "7.Related Work",
+        "images": []
+    },
+    {
+        "header": "8.Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
