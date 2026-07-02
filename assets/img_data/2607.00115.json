@@ -1,0 +1,108 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.00115/2607.00115v1/figs/teaser_new.png",
+                "caption": "Figure 1:Paradigm Comparison for Active Visual Search.\n(a) A challenging instance-anchored visual query. (b) Coupled Agent (Baseline): Relying on coarse bounding boxes, existing models suffer from \"inattentional blindness\" (spotting the correct region but failing to recognize the target) and fall into rigid, inefficient deep-search loops, eventually exhausting the turn limit. (c) Decoupled Agent (PixelEyes): By employing the SAMTok tool for precise, mask-guided cropping and adopting a Semantic-Region Breadth-First Search (BFS) exploration strategy, our framework eliminates background distractors and efficiently locates the target in just 5 turns. (d) Consequently, PixelEyes achieves state-of-the-art performance across multiple rigorous visual search benchmarks, significantly outperforming existing methods.",
+                "position": 249
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method: PixelEyes",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.00115/2607.00115v1/figs/agent_pipeline.png",
+                "caption": "Figure 2:The PixelEyes Pipeline. Given a queryQQand an input imageII, the policy model generates multiple chains-of-thought per turn and invokes a mask-based crop tool with a referring expression.\nThis tool first utilizes the bbox proposal to extract a candidate cropIcI_{c}from the original imageII. Based onIcI_{c}, a specialized referring segmentation model (SAMTok[52]in this figure) returns a precise localization mask, and the cropped region is then fed back to the policy for the next turn. Afterkkturns, the agent successfully zooms onto the target and identifies its color as white. In this figure, the task is completed in only 2 turns, and the multiple turn-iiexamples are for illustration purposes only.\nNote that the target \"63\" is barely visible in the global image, illustrating both the difficulty of Pinpoint-Bench and the necessity of mask-guided decoupled perception.",
+                "position": 327
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00115/2607.00115v1/figs/data_pipe.png",
+                "caption": "Figure 3:Data Pipeline for PixelEyes-6K Dataset Construction. (1)In-Context Initialization:Manually annotated multi-turn trajectories and specific referring expression examples are provided to guide Gemini’s reasoning. (2)Interactive Closed-Loop Rollout:Incorporating ourmask-guided visual searchandSemantic-Region BFSstrategies, the VLM iteratively plans its next move, generates region captions (ctc_{t}), proposes low-IoU bounding boxes (𝐁tin\\mathbf{B}^{\\text{in}}_{t}), and dynamically invokes tools. (3)Trajectory Filtering:Only trajectories resulting in the correct answer are retained, distilling 5.8K high-fidelity trajectories from 7K raw pairs.",
+                "position": 528
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AMore Experiment Results",
+        "images": []
+    },
+    {
+        "header": "Appendix BDeeper analysis on Pinpoint-Bench",
+        "images": []
+    },
+    {
+        "header": "Appendix CMore Details of Pinpoint-Bench",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.00115/2607.00115v1/x1.png",
+                "caption": "Figure 4:Statistical overview of Pinpoint-Bench. (a) Image resolution distribution, featuring ultra-high-definition samples with an average of5500×35165500\\times 3516pixels. (b) Composition of task types, covering attribute recognition, spatial relationship reasoning, and OCR-centric queries. (c) Distribution of mask area ratios, where all targets\noccupy less than 1% of the total pixels in the image, highlighting the \"needle-in-a-haystack\" nature of the benchmark.",
+                "position": 2087
+            }
+        ]
+    },
+    {
+        "header": "Appendix DLimitations",
+        "images": []
+    },
+    {
+        "header": "Appendix EVisualizations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.00115/2607.00115v1/figs/pixeleyes_good_case2.png",
+                "caption": "Figure 5:A hard case from our Pinpoint-Bench. The question asks about the color of the umbrella. PixelEyes quickly grounded the target and answered the questioncorrectly. The mask contours have been overlaid onto the original image for visualization.",
+                "position": 2112
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00115/2607.00115v1/figs/pixeleyes_good_case1.png",
+                "caption": "Figure 6:A hard case from our Pinpoint-Bench. The question asks whether the woman wearing a black mask is using a crutch. By continuously proposing coarse bounding boxes and applying a mask grounder on them, PixelEyes progressively localized the target and ultimately answered the questioncorrectly. The mask contours have been overlaid onto the original image for visualization.",
+                "position": 2117
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00115/2607.00115v1/figs/pixeleyes_bad_case1.png",
+                "caption": "Figure 7:A hard case from our Pinpoint-Bench. The question asks for the number the hour hand might be pointing to on the clock. Although PixelEyes quickly localized the target, it still answeredincorrectly; however, this should be blamed on the base model itself. The mask contours have been overlaid onto the original image for visualization.",
+                "position": 2122
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00115/2607.00115v1/figs/pixeleyes_bad_case2.png",
+                "caption": "Figure 8:A hard case from our Pinpoint-Bench. The question asks for the color of the earphones of the man wearing a white short-sleeved shirt. Despite significant lighting variations and multiple distractors (several people wearing earphones), PixelEyes repeatedly grounded a woman wearing earphones twice. It then confidently gave awronganswer based on this faulty grounding, failing to consider the clothing constraint. Furthermore, it hallucinated, as the grounded man was not wearing earphones at all. The mask contours have been overlaid onto the original image for visualization.",
+                "position": 2127
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00115/2607.00115v1/figs/hardcase3.drawio.png",
+                "caption": "Figure 9:A hard case from our Pinpoint-Bench. The question asks for the color of the car parked on the rooftop. During multi-turn cropping, Mini-o3 is distracted by a white car in an open parking structure and ultimately answers \"white,\" mistaking the parking-garage car for the rooftop car.",
+                "position": 2132
+            },
+            {
+                "img": "https://arxiv.org/html/2607.00115/2607.00115v1/figs/hardcase4.drawio.png",
+                "caption": "Figure 10:A hard case from our Pinpoint-Bench. The question asks for the number of trains in the image. Through multi-turn cropping, Mini-o3 gives the wrong answer 1.",
+                "position": 2137
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
