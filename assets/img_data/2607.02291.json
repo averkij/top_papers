@@ -1,0 +1,151 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x1.png",
+                "caption": "Figure 1:Visualization of class-conditional image generation using varied initial noises. The baseline model (without RL, first row, FID 8.30) frequently produces visual artifacts, such as incorrect text rendering, spurious elements, distortion, and vignetting. Applying a sample-wise RL reward111We use ImageReward(Xuet al.,2023)as the sample-wise reward model, formatting prompts as “an image of {class name}” to adapt to the class-conditional generation setting, and train both the sample-wise and distribution-wise RL models until the reward saturates.leads to severe reward hacking (second row, FID 34.26), causing a collapse in sample diversity and introducing artifacts like bizarre rainbow patterns. In contrast, ourdistribution-wise reward (third row, FID 5.77)significantly mitigates these defects, enhancing overall generation quality and better aligning the learned distribution with the real data.",
+                "position": 300
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x2.png",
+                "caption": "Figure 2:Illustration of our proposed RL framework with distribution-wise rewards.(1) Subset-replace Strategy: Initially, a reference set is generated using the diffusion policy. During rollout, a random subset is replaced with newly generated samples in the same classes. The distribution-wise metric of the resulting set acts as a reward, which is then normalized into an advantage signal to update the model via policy gradient. The reference set is regenerated periodically.(2) Post-hoc Model Merging with RL: The distribution-wise reward signal can guide a lightweight policy to learn the optimal weights for merging a pool of model checkpoints. This efficiently creates an improved model, while allowing the rollout process to utilize ODE-based inference.",
+                "position": 315
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x3.png",
+                "caption": "Figure 3:Ablation studies on hyperparameters in RL withsubset-replace strategy.(a) Reference set size.The relationship between set size and FID-50K is non-monotonic. While performance generally improves as the size increases from 2,500 to 10,000, the 7,500-sample set exhibits significant degradation, performing worse than even smaller sets.(b) Number of images to replace.We evaluate replacing 50, 100, and 200 images in the subset-replace strategy. A smaller replacement size of 50 images yields the best FID-5K performance after 100 training steps.(c) Impact of rollout sample selection strategies.Selecting the global top 25% of samples is optimal. Per-process selection methods are inferior, and retaining low-quality samples hinders training.",
+                "position": 612
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x3.png",
+                "caption": "(a)",
+                "position": 620
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x4.png",
+                "caption": "(b)",
+                "position": 625
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x5.png",
+                "caption": "(c)",
+                "position": 630
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x6.png",
+                "caption": "Figure 4:Analysis of key design choices for our RL training pipeline.(a)Batch-level advantage normalization for advantages outperforms group-level constantly, yielding faster convergence regardless of whether all or only the top 25% of rollout samples are used for training.(b)The performance gap from training-inference inconsistency. A model trained with SDE-based rollouts shows a steadily improving FID score when evaluated with an SDE solver while its performance stagnates when using an ODE solver at the same 250 denoising steps.(c)RL training after Rejection Sampling fine-tuning (RS) provided no performance gain, likely due to overfitting from the RS phase. We therefore adopted a pure RL approach.",
+                "position": 735
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x6.png",
+                "caption": "(a)",
+                "position": 744
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x7.png",
+                "caption": "(b)",
+                "position": 749
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x8.png",
+                "caption": "(c)",
+                "position": 754
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "Impact Statement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AHyperparameter Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x9.png",
+                "caption": "Figure 5:Ablation results on reference set refresh interval. We compare intervals of 5, 10, and 20 training steps, finding that 10 steps achieves the best FID-5K score by providing a good balance between reward representativeness and computational overhead.",
+                "position": 1823
+            }
+        ]
+    },
+    {
+        "header": "Appendix BCross-Metric Evaluation",
+        "images": []
+    },
+    {
+        "header": "Appendix CReward Variance Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix DComputational Cost Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix ELimitations",
+        "images": []
+    },
+    {
+        "header": "Appendix FQualitative Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x10.png",
+                "caption": "Figure 6:Uncurated samples of class label\"airliner\"(404)",
+                "position": 2124
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x11.png",
+                "caption": "Figure 7:Uncurated samples of class label\"balloon\"(417)",
+                "position": 2127
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x12.png",
+                "caption": "Figure 8:Uncurated samples of class label\"giant panda\"(388)",
+                "position": 2130
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x13.png",
+                "caption": "Figure 9:Uncurated samples of class label\"lion\"(291)",
+                "position": 2133
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02291/2607.02291v1/x14.png",
+                "caption": "Figure 10:Uncurated samples of class label\"zebra\"(340)",
+                "position": 2136
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
