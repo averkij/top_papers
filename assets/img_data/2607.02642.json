@@ -1,0 +1,132 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/x1.png",
+                "caption": "Figure 1:This paper analyzes 324,000 world-model-simulated rollouts, 7 video world models, 4 action representation paradigms. Complemented by more than 12,000 hours of training data and guided by the roadmap we establish for building world models tailored to robot policy evaluation, we introduceGigaWorld-1.",
+                "position": 405
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Preliminaries",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/x2.png",
+                "caption": "Figure 2:World model as policy evaluator framework.A world model serves as a policy evaluator by iteratively receiving policy actions and predicting future observations. Reliable evaluation requires not only visual quality, but also action-faithful rollout and agreement with real-world policy outcomes.",
+                "position": 506
+            }
+        ]
+    },
+    {
+        "header": "4WMBench: A Benchmark for World Models as Policy Evaluators",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/x3.png",
+                "caption": "Figure 3:WMBench evaluation pipeline.The four-step protocol includes (1) collecting real-world policy rollouts, (2) training world models on a strict split, (3) executing closed-loop policy rollouts inside the learned world model, and (4) assessing metrics and outcomes to measure alignment with real-world conclusions.",
+                "position": 631
+            }
+        ]
+    },
+    {
+        "header": "5What Matters in Building World Models For Evaluating Robot Policies?",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/x4.png",
+                "caption": "Figure 4:Metric-group correlation with WMES.Metrics submitted to the WMBench are grouped into visual fidelity, geometry, semantics, dynamics, interaction, and appearance stability categories. Visual fidelity and geometry are the strongest group-level predictors, while appearance stability is negatively correlated with WMES.",
+                "position": 762
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/x5.png",
+                "caption": "Figure 5:Pearson correlation matrix over all submitted metrics.The full metric-level heatmap shows that Subject Consistency, Perspectivity, JEPA Similarity, Instruction Following, Image Quality, and Aesthetic Quality correlate strongly with WMES, whereas appearance-stability metrics and Interaction Quality are much less reliable.",
+                "position": 765
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/",
+                "caption": "Figure 6:VLM-assisted Rollout Evaluator.Given a three-view rollout video and a task-specific evaluation prompt,\nthe LoRA-tuned Qwen3-VL evaluator predicts a WMES score and produces\nevidence-grounded rationales with structured aspect-level assessments ofoverall video quality,instruction following, andphysical adherence.",
+                "position": 789
+            }
+        ]
+    },
+    {
+        "header": "6Final Design Map and GigaWorld-1",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/x7.png",
+                "caption": "Figure 7:Data construction pipeline.Multi-source data is filtered, balanced, and automatically annotated before being incorporated into the world-model training corpus.",
+                "position": 1288
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/x8.png",
+                "caption": "Figure 8:Overall architecture ofGigaWorld-1.The model is built as an autoregressive diffusion-transformer world generator with parameter-efficient LoRA adaptation. Historical frames are encoded through memory patchification, future noisy latents are encoded through patchification, and structured controls such as actions, depth, semantic maps, and captions are injected as temporally aligned conditions. Frozen VAE and text-encoder components preserve pretrained visual and semantic priors, while trainable LoRA adapters and control modules adapt the DiT backbone to embodied rollout generation. Generated windows are decoded by the VAE and appended back into the rollout history for subsequent prediction.",
+                "position": 1481
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/x9.png",
+                "caption": "Figure 9:Prompt transition via spherical linear interpolation.Instead of abruptly switching between prompt embeddings,GigaWorld-1samples intermediate text conditions along the spherical path between two semantic endpoints. These interpolated embeddings are injected into successive autoregressive windows, producing smoother changes in scene appearance, motion pattern, and task phase.",
+                "position": 1758
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/images/Training_Pipeline.png",
+                "caption": "Figure 10:Training pipeline ofGigaWorld-1.The model is first adapted into a robot world foundation model, converted into an autoregressive world generator, and finally compressed through optional ODE warm start and required DMD2 distillation for few-step rollout. Dashed branches denote optional modules that can be skipped.",
+                "position": 1815
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/x10.png",
+                "caption": "Figure 11:Model architecture comparison.Left: mean score across six evaluation metrics. Right: radar plot of individual metric scores.GigaWorld-1-Nanoachieves the second-best overall score and performs particularly well in JEPA Similarity, Semantic Alignment, Subject Consistency, and Trajectory Accuracy.",
+                "position": 2497
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/images/rollout.png",
+                "caption": "Figure 12:Long-horizon rollout dynamics.PSNR (↑\\uparrow) and FID (↓\\downarrow) are measured over successive 10-frame rollout chunks, showing how reconstruction fidelity and perceptual quality evolve with rollout length.",
+                "position": 2636
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/x11.png",
+                "caption": "Figure 13:Long-horizon model comparison.GigaWorld-1is compared with general video generation and world-model baselines under the same rollout evaluation protocol.",
+                "position": 2639
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/images/mem.png",
+                "caption": "Figure 14:Effect of memory and prompt interpolation(left arm moves to a predefined observation pose, while the right arm places a towel into the blue box). Without memory, the rollout suffers from background jumps and inconsistent scene layout. Adding history memory stabilizes the workspace, but a fixed or abruptly switched prompt can make the model over-conditioned on the previous subtask during stage transitions. Combining memory with prompt interpolation preserves background consistency while enabling smoother semantic transition from the left-arm observation pose to the right-arm towel-placement action.",
+                "position": 2649
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/images/ood.png",
+                "caption": "Figure 15:OOD generalization cases.From top to bottom, the rows evaluate generalization to object color and container appearance, object content changes, background and table-surface changes, and action-outcome variation covering both successful and failed executions.",
+                "position": 2659
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/images/multi_task_success_rate_fit.png",
+                "caption": "Figure 16:Task-level success-rate alignment.Real-robot success rates are compared with generated success rates under closed-loop policy rollout. The gray dashed line indicates perfect agreement.GigaWorld-1has a fitted line closer to the diagonal than the challenge baselines, indicating better calibration of task difficulty across the evaluated tasks and subtasks.",
+                "position": 2704
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02642/2607.02642v1/x12.png",
+                "caption": "Figure 17:Success-rate bias across world models and subtasks.Bars showGen−Real\\mathrm{Gen}-\\mathrm{Real}success-rate differences: green indicates overestimation of real-world success, red indicates underestimation, and values near zero indicate closer agreement.",
+                "position": 2707
+            }
+        ]
+    },
+    {
+        "header": "7Discussion and Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
