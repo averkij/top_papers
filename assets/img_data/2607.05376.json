@@ -1,0 +1,116 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05376/2607.05376v1/x1.png",
+                "caption": "Figure 1:Given a text prompt and camera sequences, MV-Forcing generates coherent video across an arbitrary number of viewpoints and unbounded temporal horizons. For each prompt, we show 3viewsat increasing camera displacements (rows) across 160timesteps(columns). Appearance, motion, and scene geometry remain consistent across all views and timesteps, demonstrating the effectiveness of our 4D-grounded geometric prior in maintaining cross-view consistency over long-horizon generation.",
+                "position": 258
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05376/2607.05376v1/images/overview/overview_cr.png",
+                "caption": "Figure 2:Overview of MV-Forcing.Given a text prompt, camera sequencescamk−1\\texttt{cam}_{k-1}andcamk\\texttt{cam}_{k}, and a previously generated viewz^k−1\\hat{z}_{k-1}, the causal student generates the next viewz^k\\hat{z}_{k}. The decoded previous viewVk−1=𝒟​(z^k−1)V_{k-1}=\\mathcal{D}(\\hat{z}_{k-1})is integrated into CUT3R’s persistent state𝒮\\mathcal{S}, which is queried usingcamk\\texttt{cam}_{k}to produce a geometric renderingV^k\\hat{V}_{k}. This rendering is encoded and projected via aConv3dlayer into a conditioning tensorgkg_{k}that is added to the patchified noisy latentzkz_{k}. Bothz^k−1\\hat{z}_{k-1}(clean) andzkz_{k}(noisy) are forwarded through DiT blocks with causal temporal attention and MVS cross-view attention. The student’s outputz^k\\hat{z}_{k}and the precedingz^k−1\\hat{z}_{k-1}are re-noised and scored by the bidirectional SynCamMaster teacher viaℒDMD\\mathcal{L}_{\\text{DMD}}. Thered arrowillustrates the view-sequential unrolling,z^k\\hat{z}_{k}is decoded and integrated into CUT3R’s state, and fed back as the conditioning view for the next generation step, mirroring the inference-time autoregressive loop. The 3D reconstruction visualized alongside𝒮\\mathcal{S}illustrates the scene geometry accumulated in the state from all previously generated views.",
+                "position": 313
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": []
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05376/2607.05376v1/x2.png",
+                "caption": "Figure 3:Qualitative Comparison on Long Sequences.We generate multiple views across 162 frames for the prompt“A young man wearing white clothes practicing karate kicks on an urban street.”For each method, we show 3 views (rows) at 5 timesteps (columns). SF+ReCamMaster degrades when operating beyond its training window, producing visible artifacts in the third view and beyond 81 frames. SF+ReCamMaster+SF recovers temporal continuity but lacks cross-view consistency, with scene structure and appearance varying significantly between viewpoints. Our method maintains consistency across both views and time. As highlighted by theredboxes (shown on the last timestep for visibility), the baselines produce inconsistent leg positions across views at the same timestep, while our method preserves a coherent pose across all viewpoints.",
+                "position": 720
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.AInteractive Visualizations",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.BAdditional Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05376/2607.05376v1/x3.png",
+                "caption": "Figure 4:CUT3R Geometric Prior Visualization.We generate a 3-view video for the prompt“A child dances in a restaurant”and query view 2’s camera at the same timestep under two accumulation stages. For each stage, we show the rendered RGB image from CUT3R’s[wang2025continuous]accumulated state and the corresponding per-pixel confidence map, where brighter values indicate higher reconstruction certainty. After only view 0, the RGB render is largely uninformative and confidence is near zero, as view 0 has minimal overlap with view 2. After integrating views 0 and 1, the rendered prior captures recognizable scene structure with substantially higher confidence. The rightmost column shows the final generated view 2, produced by the student conditioned on this accumulated prior.",
+                "position": 1131
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.CFailure Case Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05376/2607.05376v1/x4.png",
+                "caption": "Figure 5:Failure Case Analysis.Top:Generation backbone quality. When the first viewV0V_{0}contains artifacts such as malformed hands (left, red boxes), these are faithfully propagated to subsequent views through the autoregressive formulation. WhenV0V_{0}is artifact-free (right), subsequent views remain clean.Middle:The artifact-free case extends across both views and timesteps, with consistent hand geometry maintained across all views and temporal steps.Bottom left:Extreme camera displacement. At the steeper viewing angle, sofa geometry is displaced onto the floor region. The geometric prior has depth ambiguity in regions unobserved from the source view, and cross-view attention cannot establish correct spatial correspondences.Bottom right:Extreme motion (e.g., kicking while jumping) causes CUT3R to reconstruct incorrect limb geometry, resulting in an inconsistent number of visible legs across views. In both cases, the model could in principle recover by relying on the previous viewz^k−1\\hat{z}_{k-1}rather than the geometric prior, but these scenarios are highly out-of-distribution, making this difficult.",
+                "position": 1248
+            },
+            {
+                "img": "https://arxiv.org/html/2607.05376/2607.05376v1/x5.png",
+                "caption": "",
+                "position": 1252
+            },
+            {
+                "img": "https://arxiv.org/html/2607.05376/2607.05376v1/x6.png",
+                "caption": "",
+                "position": 1254
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.DAdditional Comparisons and Ablations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05376/2607.05376v1/x7.png",
+                "caption": "Figure 6:Qualitative Comparison on Short Sequences.We compare MV-Forcing against the bidirectional SynCamMaster[bai2024syncammaster]teacher at 2 views and 81 frames. For each prompt, we show 2 views (rows) across 4 timesteps (columns).Redboxes highlight cross-view inconsistencies in SynCamMaster that our method overcomes through the accumulated geometric prior, while achieving comparable visual quality.",
+                "position": 1306
+            },
+            {
+                "img": "https://arxiv.org/html/2607.05376/2607.05376v1/x8.png",
+                "caption": "Figure 7:Synthetic Long Sequence Comparison.We generate 3 views across 162 frames for the prompt“A man practicing martial arts in an urban setting with tall buildings in the background.”For each method, we show 3 views (rows) at 5 timesteps (columns). All methods are trained and evaluated on the synthetic SynCamVideo dataset for a fair in-domain comparison. SF(ft)+ReCamMaster degrades beyond its 81-frame window, producing visible artifacts in later timesteps. SF(ft)+ReCamMaster+SF(ft) recovers temporal continuity but lacks cross-view consistency. As highlighted by theredboxes, the baselines produce inconsistent limb positions across views at the same timestep, while our method preserves coherent pose and scene geometry across all viewpoints.",
+                "position": 1309
+            },
+            {
+                "img": "https://arxiv.org/html/2607.05376/2607.05376v1/x9.png",
+                "caption": "Figure 8:Component Ablation.We show 3 views at a single timestep for each ablation variant described in Sec.4.2in the main paper.Redboxes highlight cross-view inconsistencies. Without view unrolling, background elements shift unnaturally across views. Without CUT3R, the occluded background behind the person changes between viewpoints. Without accumulation, the tree behind the person shifts forward and changes shape across views. With manual rendering, the tree appears displaced due to warping artifacts in occluded regions. Our full model maintains consistent scene structure across all views.",
+                "position": 1312
+            },
+            {
+                "img": "https://arxiv.org/html/2607.05376/2607.05376v1/x10.png",
+                "caption": "Figure 9:View Scaling.We show all generated views at a single timestep as the number of views increases from 2 to 5 at a fixed 81 frames for the prompt“A child in a green t-shirt dancing in a modern living room.”The accumulated geometric prior grounds each new view in the full 4D structure observed so far, maintaining consistent scene geometry as the view count grows.",
+                "position": 1315
+            },
+            {
+                "img": "https://arxiv.org/html/2607.05376/2607.05376v1/x11.png",
+                "caption": "Figure 10:Temporal Scaling.We show 2 views at evenly spaced relative positions as the temporal length increases from 81 to 648 frames for the prompt“A man in a pink t-shirt practicing martial arts on a wooden deck by the ocean.”. Cross-view synchronization remains stable across an 8×\\timesincrease in duration.",
+                "position": 1318
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
