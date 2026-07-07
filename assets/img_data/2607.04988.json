@@ -1,0 +1,113 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.04988/2607.04988v1/x1.png",
+                "caption": "Figure 1:Overview of InternVLA-A1.5.InternVLA-A1.5 unifies understanding, latent foresight, and action by attaching a lightweight expert to a pretrained VLM backbone. It is co-trained on vision-language and robot manipulation data, and introduces learnable foresight tokens to extract task-relevant future information as a compact latent representation. This representation is supervised by a frozen video generation model, which is used only during training and removed at inference. Extensive simulation and real-world experiments validate the effectiveness of the design.",
+                "position": 302
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.04988/2607.04988v1/x2.png",
+                "caption": "Figure 2:Framework of InternVLA-A1.5. The architecture adopts a Mixture-of-Transformers design comprising apretrained VLMfor multimodal perception and a lightweightunified expertthat shares full attention layers with the VLM while maintaining separate linear attention layers. The unified expert uses learnable foresight tokens for training-only visual foresight supervision and action query tokens decoded via flow matching for continuous action prediction.",
+                "position": 333
+            }
+        ]
+    },
+    {
+        "header": "2InternVLA-A1.5 Model Design",
+        "images": []
+    },
+    {
+        "header": "3Training Recipe",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.04988/2607.04988v1/x3.png",
+                "caption": "Figure 3:The chat-template layout.Robot action samples and VQA samples share the same prompt-and-label structure.\nThe prompt concatenatesKKimage blocks, the task instruction, the control modemm, and the discretized state. The label part carries the supervised target: a subtask description and a FAST action token segment for robot data, or the answer span for VQA. Only label tokens contribute to the next-token cross-entropy.",
+                "position": 407
+            },
+            {
+                "img": "https://arxiv.org/html/2607.04988/2607.04988v1/x4.png",
+                "caption": "Figure 4:The foresight reasoning mechanism.Learnable foresight query tokens attend to the current visual-language context through the unified expert and produce conditioning embeddings for the frozen video generation model.\nThe video supervision loss encourages these tokens to encode future-relevant information, which is further reused to guide continuous action generation.",
+                "position": 459
+            },
+            {
+                "img": "https://arxiv.org/html/2607.04988/2607.04988v1/x5.png",
+                "caption": "Figure 5:Attention masking pattern of InternVLA-A1.5 during training and inference.The VLM tokens follow the causal attention pattern of Qwen3.5.\nThe unified expert uses group-wise causal attention across token groups and bidirectional attention within each group.\nDuring training, the unified expert is prevented from attending to FAST action tokens to avoid information leakage and gradient interference.",
+                "position": 581
+            }
+        ]
+    },
+    {
+        "header": "4Data Recipe",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.04988/2607.04988v1/x6.png",
+                "caption": "Figure 6:Overview of the training data for InternVLA-A1.5.(a) Robot manipulation data.Six sources, one synthetic\n(InternData-A1) and five real-world, are unified into a single action space\nand together provide 1.2M episodes and 861M frames. Each card reports the\nepisode count, frame count, and sampling weight of a source, and the outer\nring shows its share of frames. By frame count the corpus is split roughly\nevenly between simulation and real-world data, while the sampling weights\nshift the effective mixture toward the real-world sources.(b) Multimodal data.The InternVLA-M1 corpus contributes\nabout 3M samples across four QA categories, one for general vision-language\nability and three for robotics-oriented spatial grounding, with representative\nexamples shown on the right.",
+                "position": 730
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.04988/2607.04988v1/x7.png",
+                "caption": "Figure 7:Overview of the four real-world tasks.The first three evaluate\ninstruction following, where the robot brings a specified tube to a specified target,\nnamely a box in Sort Tubes, a hole of a tube rack in Insert Tubes, and a position on the\nopposite side in Move Tubes. MOF is a long-horizon chemistry procedure. In each panel,\ncolored outlines mark the task-relevant tubes and targets.",
+                "position": 807
+            },
+            {
+                "img": "https://arxiv.org/html/2607.04988/2607.04988v1/x8.png",
+                "caption": "Figure 8:Real-world results across instruction-following and long-horizon tasks.We report overall success rates on Sort Tubes, Insert Tubes, Move Tubes, and MOF, comparingπ0.5\\pi_{0.5}, Motus, and InternVLA-A1.5.",
+                "position": 819
+            },
+            {
+                "img": "https://arxiv.org/html/2607.04988/2607.04988v1/x9.png",
+                "caption": "Figure 9:Generalization to seen and out-of-distribution instruction bindings.We decompose performance into seen vs. OOD combinations across the three instruction-following tasks.",
+                "position": 822
+            },
+            {
+                "img": "https://arxiv.org/html/2607.04988/2607.04988v1/x10.png",
+                "caption": "Figure 10:Training efficiency analysis.Comparison of SFT loss curves under identical settings.",
+                "position": 1458
+            },
+            {
+                "img": "https://arxiv.org/html/2607.04988/2607.04988v1/x11.png",
+                "caption": "Figure 11:Foresight-conditioned future rollouts from the frozen world model.The model predicts future frames (t∼t+4t\\sim t+4) conditioned on foresight embeddings extracted from the VLM context, demonstrating both accurate motion prediction and physically consistent scene evolution.",
+                "position": 1472
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion and Limitations",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AContributors",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.04988/2607.04988v1/figures/test_tube.png",
+                "caption": "Figure 12:Test-tube sorting task.From left to right: (left) the raw scene, containing orange- and blue-tipped plastic tubes and a left and right box; (middle) the seen bindings present in the training demonstrations; and (right) the held-out bindings, evaluated only at test time, where the arm-to-color assignment is reversed. In (middle) and (right), each tube and its target box are drawn in matching outline colors.",
+                "position": 1535
+            },
+            {
+                "img": "https://arxiv.org/html/2607.04988/2607.04988v1/x12.png",
+                "caption": "Figure 13:The long-horizon MOF task.The first panel gives the full instruction, and the remaining panels show the 13 sequential subtasks together with the final completed state, from inserting the funnel and pouring the liquid to stoppering the flask and switching on the stirrer. White outlines mark the object or target involved in each step.",
+                "position": 1559
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

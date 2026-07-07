@@ -1,0 +1,123 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05391/2607.05391v1/figures/SOTA.png",
+                "caption": "Figure 1:Overall Performance Results.Our proposed framework,LLM-as-a-Verifier, achieves state-of-the-art performance across coding, robotics, and medical domains: Terminal-Bench V2 (86.5%), SWE-Bench Verified (78.2%), RoboRewardBench (87.4%), and MedAgentBench (73.3%).",
+                "position": 352
+            },
+            {
+                "img": "https://arxiv.org/html/2607.05391/2607.05391v1/x1.png",
+                "caption": "Figure 2:Multiple modalities, many applications, one unified verification framework.We present LLM-as-a-Verifier, a general-purpose framework that provides fine-grained feedback for any modality without requiring additional training. By leveraging the full distribution of scoring-token logits, our method captures evaluation uncertainty and enables verification to scale along three dimensions: score granularity, repeated evaluation, and criteria decomposition. The resulting fine-grained feedback can be used for test-time scaling, progress tracking, and reinforcement learning.",
+                "position": 359
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05391/2607.05391v1/x2.png",
+                "caption": "Figure 3:Scaling paradigms for large language models.",
+                "position": 369
+            },
+            {
+                "img": "https://arxiv.org/html/2607.05391/2607.05391v1/x3.png",
+                "caption": "Figure 4:Verification Scaling.We find that verification accuracy consistently improves as we scale across multiple dimensions: (1) the granularity of score tokens, (2) the number of repeated evaluations, and (3) the decomposition of evaluation criteria. Verification accuracy is measured as the pairwise accuracy of the verifier in assigning a higher score to the ground-truth successful solution than to failed solutions for the same task on Terminal-Bench V2.",
+                "position": 375
+            }
+        ]
+    },
+    {
+        "header": "2Preliminaries",
+        "images": []
+    },
+    {
+        "header": "3Proposed Approach: LLM-as-a-Verifier",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05391/2607.05391v1/figures/oracle_bon_plot.png",
+                "caption": "Figure 5:Oracle Pass@KKreaches 98.9% on Terminal-Bench V2.",
+                "position": 439
+            },
+            {
+                "img": "https://arxiv.org/html/2607.05391/2607.05391v1/x4.png",
+                "caption": "Figure 6:Probabilistic Pivot Tournament.A five-stage pipeline for selecting the best ofNNcandidates under a constrained verification budget.(1) Candidates:the pool{τ1,…,τN}\\{\\tau_{1},\\dots,\\tau_{N}\\}to be ranked.(2) Ring pass:a random Hamiltonian cycle scores theNNadjacent pairs so every candidate appears once in the “A” slot and once in “B”, canceling the model’s positional bias.(3) Pivot selection:candidates are ranked by their ring-pass scoresw(i)w_{(i)}, and the top-kkcandidates form the pivot set𝒫\\mathcal{P}.(4) Pivot tournament:everynon-pivot–vs–pivotandpivot–vs–pivotpair is scored via Eq.3.2, concentrating the budget on uncertain top candidates and cutting cost from𝒪​(N2)\\mathcal{O}(N^{2})to𝒪​(N​k2)\\mathcal{O}(Nk^{2}).(5) Selection:comparisons are aggregated into win masswiw_{i}and countcic_{i}, and the candidate with the highest normalizedwi/ciw_{i}/c_{i}is returned.",
+                "position": 494
+            }
+        ]
+    },
+    {
+        "header": "4Verification Scaling",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05391/2607.05391v1/x5.png",
+                "caption": "Figure 7:Verifier (continuous) vs. Judge (discrete)on Terminal-Bench V2 acrossk∈{1,4,16}k\\in\\{1,4,16\\}repeated evaluations.Left:Pairwise verification accuracy. The verifier achieves74.7%74.7\\%atk=1k{=}1and improves to77.5%77.5\\%atk=16k{=}16, consistently outperforming the judge across all evaluation budgets.Right:Tie rate. The judge produces ties in26.7%26.7\\%of comparisons atk=1k{=}1due to coarse discrete scoring, decreasing to5.5%5.5\\%atk=16k{=}16as averaging breaks ties. In contrast, the verifier yields zero ties.",
+                "position": 662
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05391/2607.05391v1/x6.png",
+                "caption": "Figure 8:We observe a strong correlation between the chronological progression of code generation steps and the scores from LLM-as-a-Verifier. The example task above requires the agent to run MNIST inference. The successful trajectory follows a coherent sequence of events—Readmodel.py→\\rightarrowInstall g++ compiler→\\rightarrowInstall CPU-only torch→\\rightarrowUpdatehidden_dim→\\rightarrowDONE and exhibits consistently increasing verifier scores. In contrast, the failed trajectory is characterized by erroneous behaviors—it unnecessarily installs the largetorchvisionpackage, which exhausts the available disk space and hits a compilation error—resulting in significantly lower scores. Results are shown for thepytorch-model-clitask from Terminal-Bench V2, using Gemini 2.5 Pro with Terminus 2 and Gemini 2.5 Flash as the verifier.",
+                "position": 821
+            }
+        ]
+    },
+    {
+        "header": "6Fine-grained Verifier Signals as a Proxy for Task Progress",
+        "images": []
+    },
+    {
+        "header": "7Dense Reward for Reinforcement Learning",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05391/2607.05391v1/x7.png",
+                "caption": "Figure 9:LLM-as-a-Verifier improves RL sample efficiency.Success rate versus training steps for off-policy (left) and on-policy (right) reinforcement learning, comparing sparse-reward baselines with dense rewards from LLM-as-a-Verifier.Left:Aπ0\\pi_{0}policy fine-tuned on the LIBEROketchuptask with DSRL-SAC. The verifier progress reward (Eq.7.1) achieves the same success rate using≈1.8×\\approx 1.8\\timesfewer environment steps and reaches a higher final success rate (0.760.76vs.0.690.69).Right:Qwen3-8B fine-tuned on MATH with GRPO. The verifier reasoning reward (Eq.7.2) improves sample efficiency by≈1.1×\\approx 1.1\\times. Results are averaged over multiple seeds (LIBEROn=5n{=}5, MATHn=3n{=}3).",
+                "position": 923
+            }
+        ]
+    },
+    {
+        "header": "8Discussion",
+        "images": []
+    },
+    {
+        "header": "9Related Work",
+        "images": []
+    },
+    {
+        "header": "10Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix ALimitations and Future Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BAdditional Results and Analyses",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05391/2607.05391v1/figures/roborewardbench.png",
+                "caption": "Figure 10:Trajectory-preference accuracy improves consistently as the number of repeated evaluationskkincreases, rising from81.5%81.5\\%atk=1k{=}1to87.4%87.4\\%atk=8k{=}8. LLM-as-a-Verifier outperforms LLM-as-a-Judge and prior reward models (TOPReward, RoboReward-8B, Robometer-4B) across all budgets, with gains saturating at largerkk.",
+                "position": 1417
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

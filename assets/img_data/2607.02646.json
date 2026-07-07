@@ -1,0 +1,113 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.02646/2607.02646v1/x1.png",
+                "caption": "",
+                "position": 268
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02646/2607.02646v1/x2.png",
+                "caption": "",
+                "position": 283
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02646/2607.02646v1/x3.png",
+                "caption": "",
+                "position": 286
+            }
+        ]
+    },
+    {
+        "header": "1 Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.02646/2607.02646v1/x4.png",
+                "caption": "Figure 1:EVA-Client across the manipulation-policy lifecycle.A left-to-right view of the broader pipeline around EVA-Client, spanning connected robot embodiments, data collection, external policy training, deployment, and real-robot evaluation.(1) Embodiment:physical serial-arm platforms outside EVA-Client, namelyAgileX Piper, ARX R5, Franka, UR5e, AgiBot G2, and Galaxea R1-lite, connect to one robot-agnostic backend through a single description class each (Section4).(2) Data collection:a human teleoperates the robot while EVA-Client captures each demonstration, quality-checks it, and replays it for inspection, then exports it in the LeRobot format as training-ready data (Section7).(3) Policy training:external frameworks such as openpi(Black et al.,2026), StarVLA(Ye et al.,2026a;Community,2026), GR00T(NVIDIA et al.,2025), and Dream-Zero(Ye et al.,2026b)consume the collected data and return a checkpoint; EVA-Client trains no models itself.(4) Deployment:EVA-Client serves the trained checkpoint on real hardware, using inference scheduling, overlap smoothing, and inverse kinematics to turn action chunks into a smooth command stream rather than the jerky pause-and-go of naive synchronous execution (Section6).Bottom band, real-robot evaluation:the deployed policy is scored on physical robots under a standardized, fully logged protocol (Section8). EVA-Client covers the client-side data collection, deployment, and evaluation workflows; robot embodiments and policy training remain external.",
+                "position": 297
+            }
+        ]
+    },
+    {
+        "header": "2 Related Work",
+        "images": []
+    },
+    {
+        "header": "3 Framework Overview",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.02646/2607.02646v1/x5.png",
+                "caption": "Figure 2:Where EVA-Client sits in the deployment pipeline.EVA-Client mediates between signal sources and robot execution.Left:signal sources include trained policy systems such as openpi(Black et al.,2026), StarVLA(Ye et al.,2026a;Community,2026), GR00T(NVIDIA et al.,2025), and Dream-Zero(Ye et al.,2026b), as well as human teleoperation. Model-based sources receive instructions and observations from EVA-Client and return actions or action chunks; teleoperation provides actions directly.Center:EVA-Client exposes this process through Debug, Collect, and Evaluation workflows.Right:robot execution backends turn actions into robot commands and return synchronized observations over ROS 1/2 or ZMQ before reaching the robot hardware (Section4). The source and execution sides remain narrow and replaceable, so a new policy source, teleoperation source, or robot backend can be added without rewriting the whole deployment stack.",
+                "position": 439
+            }
+        ]
+    },
+    {
+        "header": "4 Backends and Hardware",
+        "images": []
+    },
+    {
+        "header": "5 Operation Model",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.02646/2607.02646v1/x6.png",
+                "caption": "Figure 3:The EVA-Client web console across its usage modes.A single browser interface drives the whole deployment. A persistent tab bar selects among five tabs, namely the three primary usage modes Debug, Collect, and Eval, plus a Replay tab and a read-only Result viewer (Section8); a status bar reports the active robot, transport, session state, and per-call inference latency. Every mode shares the same layout: a left control panel, a center Viser-based(Yi et al.,2025)3D scene rendering the live dual-arm state and executed trajectories, and, on the right, the time-synchronized camera streams, one overhead and two wrist views, that form each observation frame. This 3D scene also doubles as the rendering target for the open-loop and sim-to-real modes.(a) Debug:selects the execution mode (real/sim/step) and inference strategy, then runs the policy, here in open-loop simulation, with control/inference rates and the latency capkmaxk_{\\max}, the maximum number of stale actions to discard (Section6), exposed as tuning fields.(b) Collect:records a teleoperated episode into a training-format dataset, then replays it for pass/fail QC with a free-text note (Section7).(c) Eval:runs the scored-trial protocol of Section8, with a model label, a per-trial success tally, and a milestone checklist scored live.(d) Result:the read-only result viewer, showing per-checkpoint statistics and side-by-side checkpoint comparison (Section8). The Replay tab reuses the same open-loop viewer to review recorded episodes: dataset replay (Section4) and Collect quality control (Section7). The same console thus spans inspection, data collection, and evaluation without leaving the page.",
+                "position": 526
+            }
+        ]
+    },
+    {
+        "header": "6 Inference Strategies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.02646/2607.02646v1/image/play_ptable_tennis.png",
+                "caption": "(a)Table tennis, a high-dynamics task.A Piper arm returns a ball, shown as a filmstrip whose frames advance left-to-right, top-to-bottom. The task stresses real-time responsiveness: under synchronous execution the pause-and-go stall keeps the arm from tracking the fast ball, so the rally does not get going in our deployment, whereas the rally shown here runs under asynchronous scheduling. EVA-Client keeps the control loop running while inference proceeds in a background thread, using latency-compensated chunk scheduling so that fast, reactive motions stay aligned with live observations.",
+                "position": 567
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02646/2607.02646v1/image/play_ptable_tennis.png",
+                "caption": "(a)Table tennis, a high-dynamics task.A Piper arm returns a ball, shown as a filmstrip whose frames advance left-to-right, top-to-bottom. The task stresses real-time responsiveness: under synchronous execution the pause-and-go stall keeps the arm from tracking the fast ball, so the rally does not get going in our deployment, whereas the rally shown here runs under asynchronous scheduling. EVA-Client keeps the control loop running while inference proceeds in a background thread, using latency-compensated chunk scheduling so that fast, reactive motions stay aligned with live observations.",
+                "position": 570
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02646/2607.02646v1/image/fold_cloth.png",
+                "caption": "(b)Cloth folding, a long-horizon stability task.The same Piper arm folds a cloth on a tabletop, progressing spread  folded; the filmstrip frames advance left-to-right, top-to-bottom. The task stresses temporal coherence over many steps: EVA-Client blends overlapping action chunks into a smooth command stream, keeping the trajectory stable across the extended sequence. This fold runs under asynchronous execution, whose overlap blending keeps the long-horizon trajectory stable.",
+                "position": 576
+            },
+            {
+                "img": "https://arxiv.org/html/2607.02646/2607.02646v1/x7.png",
+                "caption": "Figure 5:Two asynchronous smoothing strategies on a shared timeline.Both panels read left-to-right in time, with successive inference calls stacked top-to-bottom; each call starts from an observation (markedStart Inferencein (a),Policy Queryin (b)) and returns only after aninference delay, so consecutive chunks overlap in time.(a) Asynchronous prefetch with linear-overlap blending:when a new chunk arrives, its leading actions (disposed) are dropped to compensate for the steps already executed during the inference delay. The overlap window (fused) is linearly blended between thePrevious Actionand the new prediction, and the remainingfresh tailis appended unchanged.(b) ACT-style temporal ensembling:rather than discarding earlier predictions, every chunk that covers the current control timestep contributes to the executed action. At eachensemble slicethe overlapping predictions are combined by an exponentially weighted average over all chunks active at that instant into the executedEnsemble Action(red). Following ACT, the weighting favors earlier (older) predictions; with the default decay the weights are nearly uniform.",
+                "position": 618
+            }
+        ]
+    },
+    {
+        "header": "7 Data Collection",
+        "images": []
+    },
+    {
+        "header": "8 Evaluation and Logging",
+        "images": []
+    },
+    {
+        "header": "9 Limitations and Roadmap",
+        "images": []
+    },
+    {
+        "header": "10 Conclusion",
+        "images": []
+    },
+    {
+        "header": "Author List",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

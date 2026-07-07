@@ -1,0 +1,196 @@
+{
+    "paper_title": "CONFLUX: A Latent Diusion Model for 3D Chest-CT Synthesis with RL Post-Training",
+    "authors": [
+        "Max Van Puyvelde",
+        "Halil Ibrahim Gulluk",
+        "Wim Van Criekinge",
+        "Olivier Gevaert"
+    ],
+    "sections": [
+        {
+            "title": "Abstract",
+            "content": "Controllable generative models of 3D medical images can synthesize volumes with specified clinical attributes, but this demands samples that are simultaneously high-fidelity, natively 3D, and faithful to the requested conditioning. We present CONFLUX, a latent diffusion model for chest computed tomography (CT): a 3D variational autoencoder compresses each volume, and a rectified-flow transformer generates in the latent space. Generation is conditioned on structured radiological metadata (18 abnormality findings, sex, age, and reconstruction kernel) through adaptive layer normalization. The model leads strong volumetric baselines on tri-planar Frechet distance (FID 32.3 vs. 74.6 for MAISI) while exposing direct control over clinical attributes. To strengthen that control we add an online reinforcement-learning post-training stage (group-relative policy optimization) that rewards how reliably a classifier recovers the requested findings from each generated volume. Judged by a separate, independent classifier, post-training removes 47% of the shortfall relative to real-scan reliability. We release the model and a ~200k synthetic chest-CT dataset with conditioning metadata spanning a wide variety of clinical findings."
+        },
+        {
+            "title": "Start",
+            "content": "6 2 0 2 3 ] . [ 1 8 9 9 2 0 . 7 0 6 2 : r CONFLUX: Latent Diffusion Model for 3D Chest-CT Synthesis with RL Post-Training Max Van Puyvelde1,2, H. Ibrahim Gulluk3, Wim Van Criekinge2, and Olivier Gevaert1 1 Department of Biomedical Data Science, Stanford University School of Medicine 2 Department of Mathematical Modelling, Statistics & Bioinformatics, Ghent University 3 Department of Electrical Engineering, Stanford University maxvpuyv@stanford.edu, gulluk@stanford.edu, wim.vancriekinge@ugent.be, ogevaert@stanford.edu Abstract. Controllable generative models of 3D medical images can synthesize volumes with specified clinical attributes, but this demands samples that are simultaneously high-fidelity, natively 3D, and faithful to the requested conditioning. We present CONFLUX, latent diffusion model for chest computed tomography (CT): 3D variational autoencoder compresses each volume, and rectified-flow transformer generates in the latent space. Generation is conditioned on structured radiological metadata (18 abnormality findings, sex, age, and reconstruction kernel) through adaptive layer normalization. The model leads strong volumetric baselines on tri-planar Fréchet distance (FID 32.3 vs. 74.6 for MAISI) while exposing direct control over clinical attributes. To strengthen that control we add an online reinforcement-learning posttraining stage (group-relative policy optimization) that rewards how reliably classifier recovers the requested findings from each generated volume. Judged by separate, independent classifier, post-training removes 47% of the shortfall relative to real-scan reliability. We release the model and 200k synthetic chest-CT dataset with conditioning metadata spanning wide variety of clinical findings. Keywords: Medical image synthesis Latent diffusion Rectified flow Controllable generation Reinforcement learning."
+        },
+        {
+            "title": "Introduction",
+            "content": "Generative models of 3D medical images are used to augment under-represented cohorts, share data under privacy constraints, and synthesize counterfactual volumes. Each use requires the model to be controllable: sample requested to exhibit set of clinical attributes must realize them. Chest CT, which is volumetric, high-resolution, and described by structured radiological metadata, is M. Van Puyvelde and H. I. Gulluk are joint first authors; W. Van Criekinge and O. Gevaert are joint senior authors. 2 M. Van Puyvelde et al. an especially hard case; model that is both high-fidelity and controllable on it is directly useful for cohort augmentation and controlled study design. High-resolution synthesis has converged on latent rectified-flow design: an autoencoder compresses the signal and single-stream transformer trained under flow-matching objective generates in the learned latent space [15,13,3,2]. We present CONFLUX, natively 3D instance of this design for chest CT, conditioned on structured radiological metadata (abnormality findings, sex, age, and reconstruction kernel) through adaptive layer normalization. We show it is competitive with strong volumetric baseline on distribution-level quality while exposing direct control over clinical attributes. Flow matching trains the model so its outputs reproduce the data distribution for each conditioning vector, an aggregate property that holds over many samples but is not guaranteed for any single one. The objective rewards overall realism and never checks whether an individual generated volume exhibits its requested findings, so sample can look realistic yet under-express or omit one. The gap is observable post hoc: classifier trained on real volumes reads requested attributes from generated samples less reliably than from real ones, but the likelihood objective cannot target it. Reinforcement learning (RL) optimizes it directly, maximizing an explicit reward on the models own samples. Grouprelative policy optimization has recently been adapted from language models to flow-matching image generators [10,20]; we adapt it to 3D structured-attribute medical synthesis as post-training stage that improves conditioning faithfulness, verified by an independent judge model. Contributions. controllable 3D latent rectified-flow model for chest CT. 3D convolutional VAE and single-stream rectified-flow transformer conditioned directly on structured radiological metadata through adaLN modulation, with synthesis quality competitive with strong 3D CT diffusion baseline (Sec. 3.13.2, Sec. 4.1). RL post-training that improves conditioning faithfulness. grouprelative policy optimization stage that fine-tunes the flow model against faithfulness reward, improving how reliably requested findings appear in generated volumes. The gain is verified by an independent held-out judge; to our knowledge it is the first GRPO post-training of 3D medical flow model (Sec. 3.3, Sec. 4.3). released model and synthetic dataset. The trained model together with 200,000-volume controllable, faithfulness-optimized synthetic chestCT dataset whose conditioning metadata spans wide variety of findings (Sec. 4.4)."
+        },
+        {
+            "title": "2 Related Work",
+            "content": "Latent diffusion compresses volumes with an autoencoder and learns diffusion or flow model over the latent representation [15]. The image-generation architecture has converged on the diffusion transformer [13], trained under rectified-flow Latent Diffusion for 3D Chest-CT Synthesis with RL Post-Training 3 / flow-matching objectives [11,9,3] with adaptive-normalization conditioning, as in recent open systems [2]. In 3D medical imaging, conditional latent diffusion has been applied to brain MRI [14,17] and to whole-body and chest CT [5,18,6]; MAISI, 3D CT latent diffusion model with maskand metadata-based conditioning [5], is our reference competitor for synthesis quality (Sec. 4.1). Treating denoising as multi-step decision process enables policy-gradient fine-tuning of diffusion models against non-differentiable rewards [1,4]. Grouprelative policy optimization (GRPO) [16], which replaces learned value function with group-relative advantage, was adapted to flow-matching generators by Flow-GRPO [10] via an ODE-to-SDE conversion, and to several visual generation settings by DanceGRPO [20]; subsequent work studies the stability of the importance ratio in this regime [19]. Faithfulness, the agreement between requested and realized attributes, is commonly measured by scoring generated samples with classifier trained on real data [14]."
+        },
+        {
+            "title": "3 Method",
+            "content": "CONFLUX is three-stage latent diffusion model  (Fig. 1)  : VAE compresses CT volume to low-resolution latent representation (Sec. 3.1); single-stream rectified-flow transformer generates in that latent space (Sec. 3.2); and third stage post-trains this model to improve its faithfulness to the requested conditioning (Sec. 3.3)."
+        },
+        {
+            "title": "3.1 Latent autoencoder",
+            "content": "Generating directly in voxel space is costly, so the first stage learns compact latent representation in which the flow model operates. 3D convolutional variational autoencoder encodes each preprocessed volume R1DHW into diagonal-Gaussian latent RCD/f H/f W/f (mean and per-element variance from an encoder E), downsampling by =8 per spatial axis to C=16 channels; deeper decoder reconstructs ˆx = G(z). Both use group-normalized residual blocks with 3D self-attention block at the lowest resolution, the encoder decoder asymmetry following latent-diffusion autoencoders [15]. Training minimizes an ℓ1 reconstruction loss, KullbackLeibler regularizer toward (0, I) (weight 106), and tri-planar LPIPS perceptual loss [21] averaged over slices along the three canonical planes (LPIPS is 2D). After training E, are frozen. Rectified-flow training assumes near-unit-variance targets, so the flow model operates on the normalized latent = (z m) with single global scale and shift estimated from the training latents, inverted as = z/s + before decoding or scoring (values in Table 4)."
+        },
+        {
+            "title": "3.2 Conditional rectified-flow transformer",
+            "content": "The second stage is single-stream transformer that generates latent embedding from Gaussian noise sample. Under the rectified-flow formulation, 4 M. Van Puyvelde et al. Fig. 1: CONFLUX architecture. Stage 1: 3D convolutional VAE (f =8, C=16; 216176200 16272225) encodes CT volume to latent representation and is frozen thereafter. Stage 2: single-stream rectified-flow transformer (L=12, d=768, patch size p=2) is trained from scratch over the normalized latent space by flow matching; patchified tokens carry 3D axial RoPE and are modulated block-wise by the structured metadata vector (Eq. (1)) through adaLN-zero, and sample is drawn by integrating the Euler ODE from t=1 to t=0 and decoding with the frozen Stage-1 decoder. Stage 3: GRPO post-training draws group of rollouts per prompt with the stochastic sampler (Eq. (2)), scores each by the frozen findings-reward classifier (Eq. (3)), and turns the group-relative advantages into clipped, KL-anchored policy update against the frozen pre-RL reference. data latent z0 and noise ϵ (0, I) are joined by the straight-line path zt = (1 t) z0 + ϵ (t=0 data, t=1 noise), travelled at the constant velocity ϵ z0. The network vθ( zt, t, c) is trained to predict this velocity by minimizing its expected squared error against the target ϵ z0, and at sampling time the predicted velocity field is integrated from noise back to data latent. The latent volume is patchified into tokens with 3D axial rotary position embeddings; conditioning enters through adaptive layer-normalization (adaLN-zero). The conditioning vector concatenates the available structured metadata, = (cid:2) cfind {0, 1}18, csex {0, 1}, cage 6, cker 15 (cid:3) R42, (1) i.e. 18 binary findings, sex, one-hot age decade (k the k-simplex vertices), and one-hot reconstruction kernel. For classifier-free guidance [8] is dropped to null embedding with probability 0.1 during training; sampling integrates the Latent Diffusion for 3D Chest-CT Synthesis with RL Post-Training 5 probability-flow ODE = vθ dt from t=1 to t=0 on time-shifted Euler grid. Training uses precomputed latent moments, so is never evaluated in stage two."
+        },
+        {
+            "title": "3.3 Reinforcement-learning post-training",
+            "content": "Flow matching trains the generator to match the data distribution, but supplies no signal that particular requested attribute is realized in given sample. The post-training stage adds that signal: it samples volumes from the model, scores how well each matches its requested conditioning, and updates the model to increase that agreement, adapting Flow-GRPO [10] to this setting. Policy-gradient updates require probability for each sampling step, which the deterministic ODE sampler does not provide, so we replace it with stochastic sampler that preserves the models marginals while injecting noise at each step, zt+t = zt + d( zt, t) + σ(t)(cid:112)t ξ, = vθ + σ(t)2 2t (cid:0) zt + (1 t)vθ (cid:1), (2) (t < 0, action noise ξ (0, I)). Each step is now Gaussian draw, giving -step rollout tractable log-probability. Its per-step term is averaged over the d2.4105 latent dimensions rather than summed: summation over so many dimensions inflates the ratio between the updated and sampling policies and destabilizes training, known failure mode of flow-model RL. The reward measures how faithfully generated volume realizes its requested findings, read by frozen classifier fϕ, r( z0, c) = (cid:88) ωg ℓg (cid:0)fϕ(z), cg (cid:1), = z0/s + m, (3) g{find,sex,age,ker} the negative weighted cross-entropy between predicted and requested conditioning, with the latent un-normalized first because fϕ is trained on raw autoencoder latents. This classifier is compact 3D convolutional network (group-normalized convolutional blocks, global average pooling, and linear head over the 18 findings) trained on real latent representations; the independent judge used in evaluation (Sec. 4.3) shares this architecture but scores decoded volumes at the voxel level. We optimize the findings group only (ωfind=1, the others 0); the unweighted groups serve as specificity check (Sec. 4). For each step we draw conditioning vectors and rollouts per vector and form group-relative advantages in the standard way, subtracting each prompts mean reward and dividing by the batch-wide standard deviation (more stable than per-group estimate at the small affordable here). The policy is updated with the usual clipped PPO surrogate on the per-step importance ratio πθ/πold θ , penalized by Kullback Leibler divergence to the frozen pre-RL reference πref . With one on-policy epoch the clip is inactive and this penalty is the sole brake on drift; the configuration is given in Table 4. 6 M. Van Puyvelde et al. Fig. 2: CONFLUX samples. Generated volumes conditioned on real CT-RATE metadata; coronal (top) and axial (bottom) mid-slices, lung window. (a) F, 40 50: cardiomegaly, lung nodule, mosaic attenuation; (b) M, 70+: pleural effusion, opacity, consolidation; (c) M, 2030 and (d) M, 3040: no abnormality; (e) M, 3040: lung nodule, bronchiectasis. Not all listed findings appear in the shown mid-slice. More samples with per-volume conditioning are in Appendix C."
+        },
+        {
+            "title": "4 Experiments",
+            "content": "We use CT-RATE [7], chest-CT corpus with paired structured metadata and 18 NLP-extracted abnormality labels. Volumes are cropped to lung bounding box and resized to 216176200 with intensities in [1, 1]. quality-control pass removes scans failing thresholds on lung fraction, leftright balance, and voxel spacing, and removes feet-first and bone-kernel acquisitions; the autoencoder trains on the QC-passing set (40,800 volumes) and the flow model on onescan-per-patient subset of 18,417, with 3,039 patient-disjoint volumes held out for validation. Because the 18 findings are NLP-extracted rather than expertannotated, faithfulness is measured against these predicted labels."
+        },
+        {
+            "title": "4.1 Synthesis quality",
+            "content": "We measure distribution-level quality with tri-planar 2D-FID (Inception-v3 pool3 features on evenly spaced axial/coronal/sagittal slices, averaged), complemented by density and coverage [12] on the same tri-planar features (k=5; fidelity vs. manifold coverage) and diversity (mean pairwise MS-SSIM among generated volumes) against the real floor. Each method is scored on =501 generated volumes against the held-out validation reference, with identical lung windowing and seed. Competitors are MAISI [5], 3D CT latent diffusion model, and GenerateCT [6], text-conditional 3D chest-CT generator; VAE reconstruction upper-bounds any latent model on our autoencoder. Fig. 2 shows generated volumes across range of conditioning profiles, with matching coronal and axial views. Our model leads both baselines  (Table 1)  : tri-planar FID 32.3 against 74.6 (MAISI) and 145.4 (GenerateCT), approaching the 22.6 VAE-reconstruction Latent Diffusion for 3D Chest-CT Synthesis with RL Post-Training 7 Table 1: Synthesis quality vs. 3D CT baselines (N =501; 95% bootstrap CI). Tri-planar and axial 2D-FID (), density and coverage [12] (), and diversity (pairwise MS-SSIM, real floor 0.41). VAE reconstruction is the autoencoder upper bound; best generative result in bold. FIDax Coverage Diversity Density FIDtri Method GenerateCT [6] 0.009.002 MAISI [5] 0.017.003 CONFLUX (ours) 32.31.9 24.71.3 0.056.006 0.105.008 VAE recon (ceiling) 0.466.015 145.42.3 70.23.1 55.62.9 74.63.3 0.008.002 0.016. 0.161.010 18.91.3 22.61.8 0.486 0.471 0.507 0.453 ceiling. Every FID and density/coverage gap to ours is significant (unpaired bootstrap, 95% CIs exclude zero); our samples are 3.5 denser and cover 6 more of the real manifold than MAISI. Diversity sits near the real floor for all methods (0.51 ours vs. 0.41 real; collapse would approach 1). Competitors are resampled into our lung space, inflating their cross-plane FID, so the resize-robust axial plane is the cleanest comparison and still favors ours (24.7 vs. 55.6 and 70.2)."
+        },
+        {
+            "title": "4.2 Reward classifier",
+            "content": "The GRPO reward is frozen classifier that reads the 18 findings from the latent (Sec. 3.3), so its accuracy bounds the quality of the reward signal. On the real validation split it reaches macro AUROC 0.793 over the 18 labels, above every CT-CLIP variant reported on the same CT-RATE benchmark [7]  (Table 2)  , outperforming CT-CLIP zero-shot on 17/18 findings. It does so while scoring the 8-compressed latent rather than full-resolution CT, indicating the tokenizer preserves the diagnostic signal. The comparison is not fully controlled (we score one-scan-per-patient subset from the latent; the baselines, the full validation split at full resolution), but the dataset, labels, findings, and metric are identical."
+        },
+        {
+            "title": "4.3 Conditioning faithfulness",
+            "content": "We measure faithfulness as agreement between requested and realized conditioning, read by classifier on the generated samples. The reward classifier operates in the latent space and is the model optimized by GRPO; because using it for evaluation is circular, we judge instead with an independent image-space classifier trained on decoded real volumes and never used as the reward. We generate from 200 fixed validation prompts with 4 samples each at 50 ODE steps and report macro average precision (AP) and macro AUROC over the 18 findings. Post-training raises both under the independent judge  (Table 3)  : AP 0.3300.344 and AUROC 0.6840.699. The absolute gains are small, but so is the headroom: the judge reads real CT at only AP 0.360, so the gain already recovers 47% of the base-to-real gap. paired-by-prompt bootstrap (B=2000), 8 M. Van Puyvelde et al. Table 2: Per-finding AUROC on CT-RATE (real validation): our latent classifier vs. CT-CLIP variants and CT-Net [7]. Top 8 findings by our AUROC; macro over all 18 (full table in Table 5). Best per row in bold. Finding Ours CT-Net CT-CLIPzs CT-CLIPft Cardiomegaly Pleural effusion Arterial wall calcif. Coronary artery calcif. Interlobular septal thick. Pericardial effusion Mosaic attenuation Bronchiectasis 0.92 0.91 0.91 0.91 0.88 0.83 0.81 0.78 0.79 0.77 0.63 0.63 0.73 0.65 0.74 0.57 0.86 0.90 0.85 0.85 0.77 0.77 0.77 0.65 0.92 0.93 0.87 0.86 0.80 0.78 0.78 0.61 Macro (all 18) 0.793 0.629 0.731 0.756 Table 3: Conditioning faithfulness under the independent image-space judge, findings macro over 18 labels (n=800 generated). The real-data ceiling is the judge scored on real volumes; and its 1 s.e. come from paired-by-prompt bootstrap, both gains significant. Headroom recovered is as fraction of the base-to-ceiling gap. Base (pre-RL) CONFLUX Real-data ceiling AP 0.330 0.344 0.360 AUROC 0.684 0.699 0.746 (CONFLUX base) +0.0140.008 +0.0150.006 Headroom recovered 47% 24% which cancels prompt-difficulty noise, confirms both gains significant (p=0.042 and 0.014). The unweighted groups (sex, age, kernel) stay unchanged within noise, so the gain is specific to the optimized findings."
+        },
+        {
+            "title": "4.4 Model and dataset release",
+            "content": "We release the trained model and, conditioning it on the real CT-RATE metadata proportions, 200,000-volume synthetic chest-CT dataset. Each volume is paired with its conditioning vector, spanning wide variety of findings, for cohort augmentation and conditional study design at scale unavailable in real corpora. The dataset is available at https://huggingface.co/datasets/gevaertlab/ conflux-chest-ct and the model checkpoints at https://huggingface.co/ gevaertlab/conflux. Latent Diffusion for 3D Chest-CT Synthesis with RL Post-Training"
+        },
+        {
+            "title": "5 Conclusion",
+            "content": "We presented CONFLUX, controllable, natively 3D latent rectified-flow model for chest CT, conditioned on structured radiological metadata, that leads strong 3D baselines on quality while giving direct control over clinical attributes. An RL post-training stage raises conditioning faithfulness, the first GRPO posttraining of 3D medical flow model to our knowledge. We release the model and 200,000-volume synthetic chest-CT dataset."
+        },
+        {
+            "title": "References",
+            "content": "1. Black, K., Janner, M., Du, Y., Kostrikov, I., Levine, S.: Training diffusion models with reinforcement learning. In: ICLR (2024) 2. Black Forest Labs: FLUX. https://blackforestlabs.ai (2024), technical report 3. Esser, P., Kulal, S., Blattmann, A., et al.: Scaling rectified flow transformers for high-resolution image synthesis. In: ICML (2024) 4. Fan, Y., et al.: DPOK: Reinforcement learning for fine-tuning text-to-image diffusion models. In: NeurIPS (2023) 5. Guo, P., Zhao, C., Yang, D., et al.: MAISI: Medical AI for synthetic imaging. arXiv preprint arXiv:2409.11169 (2024) 6. Hamamci, I.E., Er, S., et al.: GenerateCT: Text-conditional generation of 3d chest CT volumes. In: ECCV (2024) 7. Hamamci, I.E., et al.: Developing generalist foundation models from multimodal dataset for 3D computed tomography. arXiv preprint arXiv:2403.17834 (2024) 8. Ho, J., Salimans, T.: Classifier-free diffusion guidance. In: NeurIPS Workshop (2021) 9. Lipman, Y., Chen, R.T.Q., Ben-Hamu, H., Nickel, M., Le, M.: Flow matching for generative modeling. In: ICLR (2023) 10. Liu, J., et al.: Flow-GRPO: Training flow matching models via online RL. arXiv preprint arXiv:2505.05470 (2025) 11. Liu, X., Gong, C., Liu, Q.: Flow straight and fast: Learning to generate and transfer data with rectified flow. In: ICLR (2023) 12. Naeem, M.F., Oh, S.J., Uh, Y., Choi, Y., Yoo, J.: Reliable fidelity and diversity metrics for generative models. In: ICML (2020) 13. Peebles, W., Xie, S.: Scalable diffusion models with transformers. In: ICCV (2023) 14. Pinaya, W.H.L., et al.: Brain imaging generation with latent diffusion models. In: MICCAI Workshop DGM4MICCAI (2022) 15. Rombach, R., Blattmann, A., Lorenz, D., Esser, P., Ommer, B.: High-resolution image synthesis with latent diffusion models. In: CVPR (2022) 16. Shao, Z., et al.: Deepseekmath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 (2024) 17. Van Puyvelde, M., Gulluk, I., Van Criekinge, W., Gevaert, O.: BrainG3N: dual-purpose tokenizer for controllable 3D brain MRI generation. arXiv preprint arXiv:2606.19651 (2026) 18. Wang, H., et al.: 3D MedDiffusion: 3D medical latent diffusion model for controllable and high-quality medical image generation. arXiv preprint arXiv:2412.13059 (2024) 10 M. Van Puyvelde et al. 19. Wang, J., Liang, J., Liu, J., et al.: GRPO-guard: Mitigating implicit over-optimization in flow matching via regulated clipping. arXiv preprint arXiv:2510.22319 (2025) 20. Xue, Z., et al.: DanceGRPO: Unleashing GRPO on visual generation. arXiv preprint arXiv:2505.07818 (2025) 21. Zhang, R., Isola, P., Efros, A.A., Shechtman, E., Wang, O.: The unreasonable effectiveness of deep features as perceptual metric. In: CVPR (2018) Latent Diffusion for 3D Chest-CT Synthesis with RL Post-Training"
+        },
+        {
+            "title": "A Training Parameters",
+            "content": "Table 4: Training configuration for the three stages. Latent moments are cached; the post-training SDE uses the FLUX time-shifted Euler grid; the reward classifier and reference policy are frozen. Per-channel latent std is 1.272.48. Stage Autoencoder Flow transformer GRPO post-training Hyperparameter Value 8 16 768 12 12 2 0.5509 0.1869 downsampling factor latent channels hidden width depth attention heads patch size latent norm. scale latent norm. shift prompts per step 2 rollouts per prompt 16 SDE steps 10 action noise σ(t) 0.5 PPO clip ϵ 0.2 KL weight βKL 0.03 inner epochs 1 learning rate 3106 M. Van Puyvelde et al. Per-finding reward-classifier accuracy Table 5: Per-finding AUROC on CT-RATE (real validation), all 18 findings: our latent classifier vs. CT-CLIP variants and CT-Net [7]. Sorted by our AUROC; best per row in bold. Finding Ours CT-Net CT-CLIPzs CT-CLIPft Cardiomegaly Pleural effusion Arterial wall calcif. Coronary artery calcif. Interlobular septal thick. Pericardial effusion Mosaic attenuation Bronchiectasis Atelectasis Consolidation Medical material Lung opacity Hiatal hernia Emphysema Lymphadenopathy Peribronchial thick. Pulmonary fibrotic seq. Lung nodule 0.92 0.91 0.91 0.91 0.88 0.83 0.81 0.78 0.76 0.76 0.76 0.76 0.75 0.73 0.72 0.71 0.70 0. 0.79 0.77 0.63 0.63 0.73 0.65 0.74 0.57 0.61 0.66 0.66 0.60 0.55 0.54 0.61 0.53 0.52 0.55 0.86 0.90 0.85 0.85 0.77 0.77 0.77 0.65 0.68 0.72 0.72 0.63 0.70 0.74 0.70 0.69 0.57 0.57 0.92 0.93 0.87 0.86 0.80 0.78 0.78 0.61 0.69 0.75 0.75 0.69 0.72 0.75 0.70 0.71 0.65 0.65 Macro (all 18) 0.793 0. 0.731 0.756 Latent Diffusion for 3D Chest-CT Synthesis with RL Post-Training"
+        },
+        {
+            "title": "C Additional samples and conditioning",
+            "content": "Fig. 3: CONFLUX samples. Forty synthetic chest CT volumes drawn at random from the model, each as coronal (top) and axial (bottom) mid-slice in lung window, numbered 039; per-patient conditioning is given in Table 6. The range of body habitus, anatomy, and abnormality reflects the diversity and realism of generated volumes; matching coronal/axial views show cross-plane 3D coherence. 14 M. Van Puyvelde et al. Table 6: Conditioning metadata for each synthetic volume in Fig. 3. # Sex Age Kernel Conditioned abnormalities"
+        },
+        {
+            "title": "0 F 0–20 Br40f none\n1 F 70+ YA",
+            "content": "calcification, Cardiomegaly, Arterial wall Coronary artery wall calcification, Lymphadenopathy, Atelectasis, Lung nodule, Lung opacity"
+        },
+        {
+            "title": "7 F 20–30 A\n8 M 60–70 YA\n9 F 40–50 YA",
+            "content": "Consolidation, Bronchiectasis Atelectasis, Lung nodule Arterial wall calcification, Lung opacity Arterial wall calcification, Hiatal hernia, Lymphadenopathy, Atelectasis, Lung nodule, Pulmonary fibrotic sequela, Consolidation Lymphadenopathy, Lung nodule Lymphadenopathy, Lung nodule, Lung opacity Lymphadenopathy, Lung nodule Coronary artery wall calcification, Lung nodule, Lung opacity, Pulmonary fibrotic sequela 14 70+ Bl56f Arterial wall calcification, Coronary artery wall calcification, Emphysema, Atelectasis, Lung nodule, Pulmonary fibrotic sequela, Mosaic attenuation pattern Arterial wall calcification, Coronary artery wall calcification, Atelectasis"
+        },
+        {
+            "title": "20 M 50–60 YA\n21 F 40–50 YA\n22 M 40–50 EA\n23 F 50–60 Br40f Cardiomegaly, Lymphadenopathy, Consolida-",
+            "content": "tion Latent Diffusion for 3D Chest-CT Synthesis with RL Post-Training 15 # Sex Age Kernel Conditioned abnormalities"
+        },
+        {
+            "title": "24 F 60–70 YA",
+            "content": "Arterial wall calcification, Lymphadenopathy, Lung nodule, Pulmonary fibrotic sequela, Mosaic attenuation pattern Coronary artery wall calcification Lung opacity, Consolidation"
+        },
+        {
+            "title": "37 F 40–50 Br40f none\n38 M 20–30 Br40f none\nnone\n39 F 30–40 YA",
+            "content": "16 M. Van Puyvelde et al. Fig. 4: CONFLUX samples (continued). further 40 synthetic chest CT volumes drawn at random, each coronal (top) and axial (bottom) mid-slice in lung window, numbered 039; per-patient conditioning is given in Table 7. Latent Diffusion for 3D Chest-CT Synthesis with RL Post-Training 17 Table 7: Conditioning metadata for each synthetic volume in Fig. 4. # Sex Age Kernel Conditioned abnormalities"
+        },
+        {
+            "title": "1 F 20–30 YB\n2 M 50–60 L\n3 M 20–30 YA\n4 M 50–60 EA",
+            "content": "Medical material, Atelectasis, Lung nodule, Lung opacity Lung nodule Arterial wall calcification, Atelectasis Lung opacity, Interlobular septal thickening Hiatal hernia, Atelectasis, Lung nodule, Pulmonary fibrotic sequela Arterial wall calcification, Lung opacity"
+        },
+        {
+            "title": "5 M 50–60 EA\n6 F 20–30 Bl56f Arterial wall calcification, Cardiomegaly, Peri-\ncardial effusion, Coronary artery wall calcifica-\ntion, Hiatal hernia, Lymphadenopathy, Lung\nnodule\n7 M 30–40 Bl57d Emphysema, Atelectasis\n8 F 50–60 Br40f none\n9 F 30–40 Br40f none\n10 M 40–50 Bl56f Hiatal hernia, Lymphadenopathy, Atelectasis,",
+            "content": "Lung nodule, Bronchiectasis"
+        },
+        {
+            "title": "11 F 30–40 Bl57d none\n12 M 50–60 L\n13 M 50–60 EA\n14 F 30–40 Br60f Medical material, Emphysema, Pulmonary fi-",
+            "content": "Lymphadenopathy, Lung opacity Lung nodule brotic sequela"
+        },
+        {
+            "title": "18 F 60–70 YA",
+            "content": "Emphysema, Lung opacity, Consolidation Emphysema, Atelectasis, Lung nodule, Peribronchial thickening Arterial wall calcification, Hiatal hernia, Atelectasis, Lung opacity Emphysema"
+        },
+        {
+            "title": "19 F 40–50 YA\n20 F 70+ Br40f Arterial wall calcification, Coronary artery\nwall calcification, Lymphadenopathy, Lung\nnodule, Pulmonary fibrotic sequela\nLung\nBronchiectasis",
+            "content": "opacity, Peribronchial"
+        },
+        {
+            "title": "21 M 20–30 YA",
+            "content": "thickening,"
+        },
+        {
+            "title": "22 F 40–50 Br40f Coronary artery wall calcification, Lung nod-",
+            "content": "ule"
+        },
+        {
+            "title": "24 F 50–60 YA",
+            "content": "fication, Lymphadenopathy Arterial wall calcification, Lymphadenopathy, Emphysema, Atelectasis 25 2030 Br40f Lymphadenopathy, Lung nodule, Lung opacity 18 M. Van Puyvelde et al. # Sex Age Kernel Conditioned abnormalities"
+        },
+        {
+            "title": "26 M 60–70 B",
+            "content": "Arterial wall calcification, Cardiomegaly, Pericardial effusion, Lymphadenopathy, Emphysema, Atelectasis, Lung opacity, Pulmonary fibrotic sequela, Pleural effusion, Peribronchial thickening, Bronchiectasis"
+        },
+        {
+            "title": "27 F 30–40 Br40f none\n28 M 60–70 B",
+            "content": "Arterial wall calcification, Coronary artery wall calcification, Hiatal hernia, Lung opacity 29 3040 Bl56f Lymphadenopathy, Lung opacity, Bronchiectasis"
+        },
+        {
+            "title": "Lung opacity",
+            "content": "Latent Diffusion for 3D Chest-CT Synthesis with RL Post-Training 19 Fig. 5: CONFLUX samples (continued). further 40 synthetic chest CT volumes drawn at random, each coronal (top) and axial (bottom) mid-slice in lung window, numbered 039; per-patient conditioning is given in Table 8. 20 M. Van Puyvelde et al. Table 8: Conditioning metadata for each synthetic volume in Fig. 5. # Sex Age Kernel Conditioned abnormalities"
+        },
+        {
+            "title": "3 F 50–60 YA",
+            "content": "Lung opacity Arterial wall calcification, Coronary artery wall calcification, Atelectasis, Lung nodule, Pulmonary fibrotic sequela Arterial wall calcification, Coronary artery wall calcification, Emphysema, Pulmonary fibrotic sequela Lung nodule, Lung opacity, Pulmonary fibrotic sequela"
+        },
+        {
+            "title": "4 F 40–50 YA Medical material, Lung nodule\n5 F 20–30 YA",
+            "content": "Pericardial effusion, Pleural effusion, Peribronchial thickening, Consolidation"
+        },
+        {
+            "title": "7 M 50–60 YA",
+            "content": "calcification, Hiatal"
+        },
+        {
+            "title": "13 M 70+ Br40f Arterial wall",
+            "content": "calcification, Cardiomegaly, Coronary artery wall calcification, Lymphadenopathy, Emphysema, Lung opacity, Pleural effusion, Peribronchial thickening, Consolidation"
+        },
+        {
+            "title": "17 M 40–50 B",
+            "content": "Consolidation Coronary artery wall calcification, Pulmonary fibrotic sequela"
+        },
+        {
+            "title": "18 F 60–70 Bl56f Atelectasis, Lung opacity\n19 M 30–40 Br40f Lymphadenopathy, Emphysema",
+            "content": "Latent Diffusion for 3D Chest-CT Synthesis with RL Post-Training 21 # Sex Age Kernel Conditioned abnormalities"
+        },
+        {
+            "title": "20 M 20–30 other none\n21 F 70+ Br60f Arterial wall calcification, Coronary artery\nwall\nhernia, Lym-\nphadenopathy, Emphysema, Lung nodule,\nLung opacity, Consolidation",
+            "content": "calcification, Hiatal"
+        },
+        {
+            "title": "22 F 50–60 Bl56f Lung nodule\n23 F 70+ YA",
+            "content": "Coronary artery wall calcification, Hiatal hernia, Atelectasis, Pleural effusion"
+        },
+        {
+            "title": "25 M 40–50 Bl56f Lung nodule, Lung opacity\n26 M 50–60 B",
+            "content": "Arterial wall calcification, Coronary artery wall calcification, Lymphadenopathy, Emphysema, Lung nodule, Pulmonary fibrotic sequela"
+        },
+        {
+            "title": "28 M 70+ YA",
+            "content": "calcification, Hiatal fibrotic sequela Arterial wall calcification, Coronary artery wall hernia, Lymphadenopathy, Lung nodule, Lung opacity, Pulmonary fibrotic sequela 29 5060 Bl56f Medical material, Arterial wall calcification, Coronary artery wall calcification, Hiatal hernia, Emphysema, Lung nodule, Pulmonary fibrotic sequela, Bronchiectasis Medical material, Consolidation, Bronchiectasis Lung nodule, Lung opacity 31 4050 YA 32 2030 Br40f Lung opacity, Consolidation 33 3040 34 5060 EA 35 3040 Bl56f Lymphadenopathy, Emphysema, Atelectasis, Lymphadenopathy, Consolidation Lung nodule"
+        },
+        {
+            "title": "36 M 60–70 B",
+            "content": "Lung nodule Arterial wall calcification, Coronary artery wall calcification, Atelectasis, Lung nodule, Mosaic attenuation pattern"
+        },
+        {
+            "title": "37 M 30–40 Br40f none\n38 M 60–70 B\n39 F 40–50 YA",
+            "content": "Lung nodule, Pulmonary fibrotic sequela Emphysema, Lung nodule, Lung opacity, Pulmonary fibrotic sequela"
+        }
+    ],
+    "affiliations": [
+        "Department of Biomedical Data Science, Stanford University School of Medicine",
+        "Department of Electrical Engineering, Stanford University",
+        "Department of Mathematical Modelling, Statistics & Bioinformatics, Ghent University"
+    ]
+}

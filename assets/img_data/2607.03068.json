@@ -1,0 +1,128 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.03068/2607.03068v1/figs/teaser_ade.png",
+                "caption": "Figure 1:One switch, cleaner supervision.A selected ADE20K 1/8 win\n(input||GT||UniMatch V2||PixCon;red={=}error vs. GT).\nPixCon’s clean-positiveρF=0\\rho_{\\mathrm{F}}{=}0branch, one switch over UniMatch V2, leaves far fewer\nerror contours while matching it in aggregate (Pascal 1/887.9087.90, a 3-seed mean) at no test-time\ncost. Full set: Fig.5.",
+                "position": 340
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.03068/2607.03068v1/x1.png",
+                "caption": "Figure 2:The PixCon architecture.PixCon couples two branches over a shared\nDINOv2-B encoder and DPT decoder, trained end-to-end under one objective.Consistency branch (top).A weak view of an unlabeled image passes through the EMA\nteacher to produce a pseudo-labely^\\hat{y}and confidencecc; a strict maskℳ:c≥0.95\\mathcal{M}{:}\\,c{\\geq}0.95filters it, and two CutMix strong views with complementary\nchannel dropout are trained to agree (ℒu\\mathcal{L}_{u}). This branch adopts the weak-to-strong\ndesign of UniMatch V2[34].Clean-positive contrastive branch (bottom, ours).The fused decoder feature of eachlabeledimage is projected by a headgϕg_{\\phi}to a unit-norm embeddingzz. Theclean-positive filteradmits a pixel as an anchor only when it is labeledandthe student already predicts its label correctly (arg⁡max⁡logits=y\\arg\\max\\,\\text{logits}{=}y); admitted\nanchors populate the per-class clean-positive bankℬk\\mathcal{B}_{k}and drive a supervised InfoNCE lossℒpix\\mathcal{L}_{\\mathrm{pix}}. Because anchors are guaranteed correct, the bank’s contamination\nrate is zero by construction (ρF=0\\rho_{\\mathrm{F}}{=}0, Sec.3.3), the property that\ndistinguishes PixCon from confidence-filtered contrastive methods. The two branches share encoder/decoder weights\nand are optimised jointly asℒ=12​(ℒx+ℒu)+λpix​ℒpix\\mathcal{L}{=}\\tfrac{1}{2}(\\mathcal{L}_{x}{+}\\mathcal{L}_{u}){+}\\lambda_{\\mathrm{pix}}\\mathcal{L}_{\\mathrm{pix}}.",
+                "position": 531
+            },
+            {
+                "img": "https://arxiv.org/html/2607.03068/2607.03068v1/x2.png",
+                "caption": "Figure 3:Why clean positives matter.Schematic of the supervised-InfoNCE gradient on\nan anchorzaz_{a}of classaa.(a)A confidence-filtered bank (ReCo,\nU2PL) admits a small fractionρF\\rho_{\\mathrm{F}}of confidently-wrong\nentries, pixels of another classbbenqueued underaa. These act as false positives and\ncontribute a gradient component (red) pullingzaz_{a}towardthe wrong-class region, so\nthe net update (black) is deflected.(b)PixCon admits an entry only when it is\nlabeledandthe student already predicts it correctly, soρF=0\\rho_{\\mathrm{F}}{=}0by\nconstruction and the gradient is pure signal toward the true class-aadensity. At\nfoundation-model strength the false-positive component would otherwise be the dominant noise\nterm (Sec.3.3).",
+                "position": 665
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.03068/2607.03068v1/x3.png",
+                "caption": "Figure 4:Consistent per-epoch margin (3 seeds).EMA-teacher mIoU over training (Pascal,\nDINOv2-Base; thin lines per seed, bold the 3-seed mean). At 1/8 (right) the PixCon (green) band sits\nabove UniMatch V2 (blue) across seeds and leads in41/4141/41all-live epochs; at 1/16 (left) the bands\noverlap more, matching the smaller+0.39+0.39gain. Beyond the all-live window the means run over fewer\nthan three live seeds (early stopping) and are not used for the margin claim.",
+                "position": 1078
+            },
+            {
+                "img": "https://arxiv.org/html/2607.03068/2607.03068v1/x4.png",
+                "caption": "Figure 5:Qualitative wins on Pascal VOC 1/8.Six per-image PixCon-vs-UniMatch V2\ncomparisons at the cell of our robust multi-seed gain (DINOv2-Base, EMA-teacher, seed 0), as blocks\nofinput||GT||UniMatch V2 repro||PixCon;red contoursoutline disagreement with GT (void ignored; components<0.5%{<}0.5\\%suppressed). ADE20K wins are in\nFig.6; the full sixteen-image Pascal and Cityscapes sets are in the\nsupplementary.",
+                "position": 1310
+            },
+            {
+                "img": "https://arxiv.org/html/2607.03068/2607.03068v1/x5.png",
+                "caption": "Figure 6:ADE20K 1/8: eight PixCon wins.Per-image PixCon-vs-UniMatch V2 comparisons\n(150-class palette), ranked by per-image error difference, in the sameinput||GT||UniMatch V2||PixConformat as Fig.5;red contoursmark disagreement with GT. Even though the two models tie in aggregate on ADE20K\n(+0.13+0.13mIoU, Table3), PixCon replaces UniMatch V2’s large scene-parsing\nmislabellings with the correct class, visible per-image gains the aggregate mIoU does not capture.\nTwo blocks of four; the water-tower example (top right) is the teaser (Fig.1).",
+                "position": 1330
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AExtended Gradient-Quality Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix BNegative Result: Per-Class Adaptive Thresholds at Foundation-Model Strength",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.03068/2607.03068v1/x6.png",
+                "caption": "Figure 7:The bottleneck has moved to the encoder, and PixCon adds a lever on top of\nit.Pascal VOC 1/8 mIoU versus total model size (log axis) for representative SSSS methods,\ngrouped by backbone family (prior-work accuracies from the published numbers; prior-work\nparameter counts are standard backbone sizes, approximate, while the DINOv2 sizes24.824.8M/97.597.5M are as reported). Switching a ResNet-101 pipeline to a DINOv2 encoder buys far\nmore than a decade of method design did at fixed backbone. PixCon (green star) sits at the\nDINOv2-B operating point and addsnoappreciable parameters over its UniMatch V2-B\nbaseline, a2×1×12{\\times}1{\\times}1projection head and a≈1.4{\\approx}1.4MB bank, yet lifts our\ncompute-matched repro to thereportedUniMatch V2-B 1/8 figure (87.9087.90, a+0.89+0.893-seedmeangap that is partly variance reduction; Sec.4.2).\nOur runs are compute-matched and below the full UniMatch V2 budget, so the green star’s\nposition reflects that budget, not a like-for-like comparison with the full-budget dots.",
+                "position": 2069
+            }
+        ]
+    },
+    {
+        "header": "Appendix CImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DPseudocode",
+        "images": []
+    },
+    {
+        "header": "Appendix EFull Per-Class Results",
+        "images": []
+    },
+    {
+        "header": "Appendix FAdditional Qualitative Comparisons",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.03068/2607.03068v1/x7.png",
+                "caption": "Figure 9:Complete qualitative set: sixteen PixCon wins.All sixteen Pascal VOC 1/8\nvalidation images with the largest per-image error advantage of PixCon over the UniMatch V2\nreproduction (DINOv2-Base, EMA-teacher predictions, seed 0), as two side-by-side blocks ofinput||ground truth||UniMatch V2||PixCon; the bottom strip is\nthe shared class palette.Red contoursmark connected regions where a prediction\ndisagrees with ground truth (void ignored; components<0.5%{<}0.5\\%of the image suppressed). The\nsix rows of Fig.5are the top block here. Throughout, the recurring\nbaseline failure is a part-level class confusion on an already-localised object or a large\nspurious region; PixCon’s panels carry far fewer red contours, i.e. it corrects these without\nintroducing new errors.",
+                "position": 2571
+            },
+            {
+                "img": "https://arxiv.org/html/2607.03068/2607.03068v1/x8.png",
+                "caption": "Figure 10:Cityscapes qualitative (1/16): near-identical, PixCon marginally cleaner.Six Cityscapes val images with the largest per-image error advantage of PixCon over the\nUniMatch V2 reproduction (DINOv2-Base, EMA-teacher predictions, seed 0), as two side-by-side\nblocks ofinput||ground truth||UniMatch V2||PixCon; standard\n19-class palette, ignore shown white.Red contoursmark connected regions where a\nprediction disagrees with ground truth. Consistent with the aggregate tie, the two columns are\nnearly identical: PixCon’s advantage here is a handful of small boundary corrections (fewer red\ncontours on a few building/wall/sidewalk regions), not the large class fixes seen on Pascal.",
+                "position": 2594
+            }
+        ]
+    },
+    {
+        "header": "Appendix GBoundary/Interior Error, Contamination, and Bank Coverage",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.03068/2607.03068v1/x9.png",
+                "caption": "Figure 11:Feature geometry of the shared fused decoder embedding(Pascal 1/8; seed 0 shown,\nmetrics in Table9are 3-seed means).Top:per-class 2-D t-SNE of pixel\nembeddings for UniMatch V2 vs PixCon (independent fits, so only cluster structure is comparable, not\nabsolute position).Bottom:class-centroid cosine-similarity matrices (2020foreground\nclasses, shared colour scale, diagonal blanked); PixCon’s off-diagonal is cooler with fewer bright\nconfusable-pair cells (mean off-diagonal0.409→0.3880.409\\!\\to\\!0.388at this seed).",
+                "position": 2838
+            }
+        ]
+    },
+    {
+        "header": "Appendix HTraining Dynamics, Per-Class Breakdown, and Sensitivity",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.03068/2607.03068v1/x10.png",
+                "caption": "Figure 12:The gain is broad, not rare-class-specific.Per-class IoU change (PixCon−-UniMatch V2 reproduction),mean over 3 seedswith±\\pmstd error bars, on Pascal VOC 1/16 (left) and 1/8 (right), DINOv2-Base, classes\nsorted by baseline difficulty (hardest at top). Green bars are gains, red are regressions.\nThe net improvement is broad rather than localised, and the largest movers span the frequency\nrange: at 1/8 (net+0.89+0.89) the biggest gains are tvmonitor+3.9+3.9, sofa+2.9+2.9, chair+2.4+2.4,\ncar+1.7+1.7; at 1/16 (net+0.39+0.39) sofa+4.6+4.6, chair+2.8+2.8, pottedplant+1.9+1.9, with\nregressions (tvmonitor−4.1-4.1, bus−1.9-1.9). Several per-class deltas carry large seed-to-seed\nstd (error bars), so we read them as indicative, not individually significant: the evidence\npoints to a diffuse embedding-space regularisation, not a targeted rare-class fix\n(Sec.H.2).",
+                "position": 2894
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
