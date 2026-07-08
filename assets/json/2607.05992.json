@@ -1,0 +1,812 @@
+{
+    "paper_title": "PluraMath: Extending Mathematical Reasoning Evaluation Beyond High-Resource Languages",
+    "authors": [
+        "Daryna Dementieva",
+        "Nikolay Babakov",
+        "Kathy Hämmerl",
+        "Ilseyar Alimova",
+        "Jindřich Libovický",
+        "Shu Okabe",
+        "Miras Baisbay",
+        "Lukas Edman",
+        "Abrorkhon Inomkhujaev",
+        "Antonia Karamolegkou",
+        "Mateusz Lango",
+        "Volkan Özer",
+        "Nikola Selic",
+        "Subhankar Swain",
+        "Tsedeniya Kinfe Temesgen",
+        "Galit Bary Weisberg",
+        "Alexander Fraser"
+    ],
+    "sections": [
+        {
+            "title": "Abstract",
+            "content": "Mathematical reasoning has become a central task for evaluating and tuning reasoning Large Language Models (LLMs), yet existing benchmarks remain heavily biased toward high-resource languages, with English and Chinese dominating both pre-training corpora and evaluation suites. The recently released PolyMath (Wang et al., 2025) dataset represents a significant step forward, yet its coverage is still limited to 18 only high-resource languages. To address this gap, we introduce PluraMath, an extension of PolyMath to 18 additional {underrepresented languages spanning 6 language families -- ranging from mid-resource to extreme low-resource settings. We constructed the dataset through a human-curated pipeline, where native speakers thoroughly validated pre-computed translations. Using PluraMath, we then benchmark 27 reasoning LLMs across four model scales -- small, mid-size, large, and closed-source ensembles -- probing the multilingual mathematical reasoning capabilities of state-of-the-art models under diverse linguistic conditions. Our fine-grained analysis confirms a persistent gap in mathematical reasoning performance between high-resource and underrepresented languages, with stronger results largely associated with better instruction-following ability. We fully open-source our dataset, data acquisition pipeline, and evaluation framework, with the goal of lowering the barrier to multilingual benchmark development for underrepresented communities."
+        },
+        {
+            "title": "Start",
+            "content": "PLURAMATH: Extending Mathematical Reasoning Evaluation Beyond High-Resource Languages Daryna Dementieva1,2* Nikolay Babakov4 Kathy Hämmerl1,2 Ilseyar Alimova5 Jindˇrich Libovický6 Shu Okabe1,2 Miras Baisbay7 Lukas Edman1,2 Abrorkhon Inomkhujaev1 Antonia Karamolegkou8 Mateusz Lango6 Volkan Özer1,2 Nikola Selic Subhankar Swain9 Tsedeniya Kinfe Temesgen1,2 Galit Bary Weisberg10 Alexander Fraser1,2,3 1Technical University of Munich (TUM) 2Munich Center for Machine Learning (MCML) 3Munich Data Science Institute (MDSI) 4Independent Researcher 5Applied AI Institute 6Charles University 7Nazarbayev University 8Inria 9Indian Institute of Technology, Kharagpur (IIT Kharagpur) 10German University of Digital Science"
+        },
+        {
+            "title": "Abstract",
+            "content": "Mathematical reasoning has become central task for evaluating and tuning reasoning Large Language Models (LLMs), yet existing benchmarks remain heavily biased toward high-resource languages, with English and Chinese dominating both pre-training corpora and evaluation suites. The recently released PolyMath (Wang et al., 2025) dataset represents significant step forward, yet its coverage is still limited to 18 only high-resource languages. To address this gap, we introduce PLURAMATH, an extension of PolyMath to 18 additional underrepresented languages spanning 6 language familiesranging from mid-resource to extreme low-resource settings. We constructed the dataset through human-curated pipeline, where native speakers thoroughly validated precomputed translations. Using PLURAMATH, we then benchmark 27 reasoning LLMs across four model scalessmall, mid-size, large, and closed-source ensemblesprobing the multilingual mathematical reasoning capabilities of state-of-the-art models under diverse linguistic conditions. Our fine-grained analysis confirms persistent gap in mathematical reasoning performance between high-resource and underrepresented languages, with stronger results largely associated with better instructionfollowing ability. We fully open-source our dataset, data acquisition pipeline, and evaluation framework, with the goal of lowering the barrier to multilingual benchmark development for underrepresented communities."
+        },
+        {
+            "title": "Introduction",
+            "content": "Both the pretraining and the evaluation of large language models (LLMs) remain heavily skewed towards English and set of high-resource languages (Joshi et al., 2020a; Ghosh et al., 2025). Mathematical reasoning is no exception: the popular benchmarks are either English-onlyGSM8K (Cobbe * Correspondence: daryna.dementieva@tum.de Figure 1: Plurafrom Latin, more: our extension of PolyMath (Wang et al., 2025) 4-level mathematical reasoning benchmark to 18 underrepresented languages through comprehensive human annotation of pre-computed translations. et al., 2021), AIME, MathArena (Balunovic et al., 2025), OMEGA (Sun et al., 2025)or Chineseonly (Wei et al., 2023; Zhong et al., 2024). Recent multilingual efforts such as PolyMath (Wang et al., 2025), MGSM8KInstruct (Chen et al., 2024), and MathNet (Alshammari et al., 2026) broaden coverage but still concentrate on the high-resource languages, leaving underrepresented ones untested. At the same time, growing amount of recent work shows that mathematical reasoning ability does not transfer easily across languages, even with translation or pivot-language prompting. For instance, models exhibit reasoning-answer misalignment that is more severe in non-Latin scripts as in Latin scripts (Ovalle et al., 2025); latent reasoning pathways remain English-centred even across typologically diverse languages (Liu et al., 2026). Thus, truly democratized for multiple languages LLMs development progress therefore requires evaluation benchmarks that stress-test reasoning models in genuinely diverse linguistic settings, including the long tail."
+        },
+        {
+            "title": "Language",
+            "content": "L1 Spk. (M)"
+        },
+        {
+            "title": "Language Family",
+            "content": "Trans. Math Instr. Model"
+        },
+        {
+            "title": "Source\nLanguage",
+            "content": "# Ann. hi tr pl uk uz or am el kk cs he sr tt sk ca cv hsb dsb"
+        },
+        {
+            "title": "Hindi\nTurkish\nPolish\nUkrainian\nUzbek\nOdia\nAmharic\nGreek\nKazakh\nCzech\nHebrew\nSerbian\nTatar\nSlovak\nCatalan\nChuvash\nUpper Sorbian\nLower Sorbian",
+            "content": "600.0 80.0 45.0 40.0 35.0 35.0 32.0 13.0 13.0 10.0 9.0 8.2 5.5 5.0 4.0 1.0 0.013 0.007 4 4 4 3 3 1 2 3 3 4 3 4 1 3 4 1 1 1 IE Indo-Aryan Turkic IE Slavic IE Slavic Turkic IE Indo-Aryan AA Semitic IE Hellenic Turkic IE Slavic AA Semitic IE Slavic Turkic IE Slavic IE Romance Turkic IE Slavic IE Slavic"
+        },
+        {
+            "title": "English\nEnglish\nEnglish\nRussian\nEnglish\nEnglish\nEnglish\nEnglish\nRussian\nGerman\nEnglish\nEnglish\nRussian\nEnglish\nSpanish\nRussian\nGerman\nGerman",
+            "content": "1 2 1 2 1 1 1 2 2 1 2 1 2 1 1 1 1 1 # Rev. <10 179 427 14 500 <10 126 27 500 173 34 370 390 305 222 496 379 440 Number of L1 speakers Language class (Joshi et al., 2020b)"
+        },
+        {
+            "title": "Language family",
+            "content": "> 100M 10100M 110M < 1M"
+        },
+        {
+            "title": "4 Underdogs: much unlabeled, less labeled\n3 Rising Stars: strong web, few labels\n2 Hopefuls: some labeled data, support\n1 Scraping-Bys: little data, few labels",
+            "content": "IE Slavic IE Indo-Aryan IE Hellenic IE Romance Turkic AA Semitic Table 1: Overview of languages in PLURAMATH. L1 speaker counts (in millions) are approximate, sourced from Ethnologue. Lang Class follows the resource taxonomy of Joshi et al. (2020b) (14). indicates the language is indicates if not for the university level. IE = Indo-European; AA = used for mathematics teaching in region; Afro-Asiatic. We cover diversity of underrepresented languages including quite low-resource ones. We address this gap by extending PolyMath (Wang et al., 2025) to 18 underrepresented languages from 6 language families. Crucially, rather than relying on machine-translation-only pipelines or with LLM-based post-editing, we conduct full human rigorous check of pre-computed translations by native speakers for our benchmark. Our main contributions are as follows: We release PLURAMATH, novel multilingual mathematical reasoning benchmark that extends PolyMath to 18 underrepresented languages from 6 language families  (Table 1)  . We open-source the full data acquisition and validation pipeline, including annotators guidelines and quality-control procedures. We then evaluate 27 modern reasoning models under three prompting setups, spanning small, mid-sized, large open-weight, and closedsource systems, to assess multilingual mathematical reasoning across diverse linguistic conditions and compare performance against high-resource base languages. We conduct comprehensive analysis of models performance, reasoning behavior, and error patterns, identifying correlations with models families, language categories, and translation-related capabilities, complemented by human evaluation. Our findings confirm persistent gap in mathematical reasoning performance between highresource and underrepresented languages. Although reasoning behavior varies across models, including reasoning in either English or the target language, performance gains are only weakly associated with translation capability and are not substantially improved by prompting in high-resource languages. Instead, stronger results primarily correlate with general instruction-following ability, with larger models consistently achieving better performance with shorter reasoning. The dataset, prompts, analysis code, and annotation instructions are publicly released.1,2,3 We hope that our obtained dataset, extension methodology, and error analysis will support further progress on multilingual mathematical reasoning. 1(cid:128) Website: tum-nlp.github.io/pluramath 2 PLURAMATH: tum-nlp/PluraMath 3 Code and details: TUM-NLP/pluramath"
+        },
+        {
+            "title": "2.1 Mathematical Reasoning Benchmarks",
+            "content": "Early benchmarks for evaluating mathematical reasoning in language models have been overwhelmingly English-centric. GSM8K (Cobbe et al., 2021) established the standard for grade-school word problems, while OpenWebMath (Paster et al., 2024) curated 14.7B tokens of English mathematical web text. Beyond grade school, English-only resources have probed competition-level mathematics through AIME (the American Invitational Mathematics Examination), MathArena (Balunovic et al., 2025), and OMEGA (Sun et al., 2025). Adjacent reasoning evaluations follow the same pattern: HumanEval (Chen et al., 2021) for English code generation and MME-Reasoning (Yuan et al., 2025) for multimodal logical reasoning are similarly English-centred. The principal exceptions have come from Chinese CMATH (Wei et al., 2023) and AGIEval (Zhong et al., 2024). Multilingual mathematical benchmarks have only recently begun to emerge, but their language coverage remains skewed towards mostly high-resource languages. PolyMath (Wang et al., 2025) covers 18 languages across four difficulty tiers, from K-12 to Olympiad, and is among the most diverse benchmarks of its kind. Nevertheless, the great majority of its languages are highresource and already well-served by pretraining corpora. MGSM8KInstruct and the contemporaneous MSVAMP test set (Chen et al., 2024) translate GSM8K and SVAMP into ten languages with similar high-resource bias. MathNet (Alshammari et al., 2026) is the most ambitious effort to date, providing over 30K Olympiad problems across 47 countries and 17 languages. Despite this progress, the long tail of the worlds languagesparticularly low-resource languagesremains absent from the reasoning evaluation Ghosh et al. (2025)."
+        },
+        {
+            "title": "Reasoning",
+            "content": "A growing amount of work examines how reasoning quality varies across languages and whether observed cross-lingual gaps reflect reasoning competence or surface artefacts. et al. (2021) provide an early findings by category-annotating multilingual NLI and showing that transfer performance correlates with reasoning type and language similarity. More recent diagnostic work establishes that high task accuracy can mask reasoning that fails to support the models own conclusions: Ovalle et al. (2025) introduce human-validated framework over 65K traces from Global-MMLU and find that non-Latin-script outputs exhibit at least twice the reasoning-answer misalignment of Latinscript outputs, with low-resource languages frequently arriving at correct answers through incoherent traces. Liu et al. (2026) confirm this showing that latent reasoning in large reasoning models is uneven across 11 languages and broadly aligns with an English-centred internal pathway. Several studies already attempt to close these gaps through cross-lingual reasoning transfer. common strategy routes reasoning through highresource pivot, either by translating inputslike MathOctopus (Chen et al., 2024)or by aggregating traces across languages. Thus, Rajaee et al. (2026a) propose Best-of-L, cross-lingual outcome reward model that ranks reasoning candidates across languages and improves accuracy on MGSM over single-language reward modeling. Some work propose edits directly on parameters: MAEC (Chen et al., 2025) decomposes language-agnostic abilityrelated weights from LLMs and recombines them with language-specific weights via simple addition and subtraction, transferring mathematical and scientific competencies into low-resource languages without additional training."
+        },
+        {
+            "title": "Benchmarks",
+            "content": "Given the high cost of native data collection, translation has become the dominant approach for scaling multilingual evaluation. Recent benchmarks such as BenchMAX (Huang et al., 2025) and MMLU-ProX (Xuan et al., 2025) combine machine translation with LLM-based selection and native-speaker post-editing. For reasoning, Issaka et al. (2026) show that LLMs translation quality strongly correlates with downstream benchmark performance, though this relationship weakens on reasoning-intensive tasks such as MGSM. Similarly, Rajaee et al. (2026b) demonstrate that naively applying chain-of-thought reasoning during translation degrades quality, suggesting that translation and reasoning are distinct capabilities. Machine-translated benchmarks often lose cultural and pragmatic nuance, especially in low-resource languages underrepresented in pretraining data. In contrast, we rely on thorough human control of pre-computer translations by native speakers for all midand low-resource languages."
+        },
+        {
+            "title": "3 PLURAMATH Collection",
+            "content": "We build upon the PolyMath (Wang et al., 2025) dataset, which consists of four difficulty levels low, medium, high, and topwith 125 samples per level, for total of 500 tasks per language. Our data acquisition pipeline consists of three stages: (i) producing first-draft translation through automatic systems; (ii) manual verification by native speakers; and (iii) automated and manual LATEX checking together with final error analysis. All annotators were fully informed about the goals of the project and were provided with written instructions, the full text of which is reproduced in Appendix B."
+        },
+        {
+            "title": "3.1 Language Stakeholders Selection",
+            "content": "For every selected language we recruited native speakers (i.e., speakers whose mother tongue is the target language) who additionally hold higher-education degree in Computer Science or Mathematicsat least at the Masters level, and in most cases at the PhD level. For languages requiring more checks, the primary stakeholder recruited additional native speakers (Bachelors or Masters level in Computer Science or Mathematics) to confirm the annotations and perform second pass over the data."
+        },
+        {
+            "title": "3.2 Translation Pre-computation",
+            "content": "Translation Models and Language Pair Selection We asked each language stakeholder to recommend the source language and translation system that, in their empirical experience and after small pilot on handful of PolyMath tasks, yielded the most accurate translations into their target language. The resulting language pairs and systems are summarised in Table 1. Automated Translation For most languages, proprietary systems such as DeepL or Gemini were selected. For smaller set of languages, stakeholders preferred open-weights LLMs that are specifically tuned for given language pair and that exhibit very few translation artefacts in their domain for instance, salamandraTA-7b-instruct for SpanishCatalan and sarvam-m for EnglishHindi and EnglishOdia. For closed-source systems, we report the budget spent on obtained translations in Appendix G."
+        },
+        {
+            "title": "3.3 Manual Translation Verification",
+            "content": "Annotators were asked to verify three properties of every translated task: (i) the fluency and adequacy of the natural-language content; (ii) the correctness of the mathematical terminology with respect to both the target language and its mathematical conventions; and (iii) the strict equivalence of the LATEX code to that of the source."
+        },
+        {
+            "title": "3.4 Post-polishing",
+            "content": "We performed an additional automated and manual pass to verify the LATEX code and the completeness of every translation. The automated check verifies (i) that the LATEX code compilesi.e. that all $ delimiters are correctly opened and closedand (ii) that all command names and reserved keywords remain in English and unaltered. The corresponding scripts are released for public use."
+        },
+        {
+            "title": "3.5.1 PLURAMATH Statistics\nTable 1 summarizes the PLURAMATH data creation\nprocess with dataset examples in Appendix C. The\nextent of required revisions varied substantially\nacross languages, largely depending on language\nfamily and the maturity of available NLP and ma-\nchine translation technologies. To ensure quality,\nwe conducted a second annotation pass for nearly\nhalf of the languages.",
+            "content": "We also compare task lengths between highresource PolyMath languages and our target languages in Figure 2, with complete analysis provided in Appendix D. Tokenization was performed using the Qwen3-4B base model. Length differences are strongly influenced by language family: Hindi, Odia, and Amharic exhibit notably longer sequences, whereas Latinand Cyrillic-based languages remain closer to the distributions observed in high-resource counterparts."
+        },
+        {
+            "title": "3.5.2 Encountered Errors\nTypical Translation Problems. The required\ncorrections across languages fall into four main\ncategories: (i) LATEX corruption, including trans-\nlated command names, identifiers, and malformed\n$-delimited expressions; (ii) incorrect mathemati-\ncal terminology, often involving generic substitu-\ntions or cross-linguistic leakage between related\nlanguages; (iii) morphological and syntactic issues\nin morphologically rich languages, such as agree-\nment, word order, and overly literal phrasing; and\n(iv) residual hallucinations, including untranslated\ntokens and incorrect entity substitutions. Correc-\ntion effort varied substantially and correlated with",
+            "content": "4 TUM-NLP/pluramath/blob/main/check_latex.ipynb Figure 2: Comparison of math task lengths across high-resource languages from PolyMath (English and Russian) and five newly added languages in PLURAMATH, using Qwen3-4B tokenization. Task lengths vary substantially across language families. complete comparison for all languages is provided in Appendix D. both linguistic distance from the source language and target-language resource availability, ranging from minimal editing (e.g., Ukrainian, Greek, Hebrew) to extensive revision (e.g., Slovak, Tatar, Kazakh). In several cases, specialized languagepair models, including TartuNLP, sarvamai, and salamandraTA, outperformed closed-source systems due to the languages targeted adaptation. Problems in the Original PolyMath During annotation and subsequent evaluation, we identified several inconsistencies in the original PolyMath dataset, including translation errors in non-English subsets and incorrect answers in the English data. We summarize the main issues in Appendix and will report them to the PolyMath HuggingFace repository via pull request."
+        },
+        {
+            "title": "4 Reasoning LLMs Benchmarking",
+            "content": "To evaluate broad range of reasoning capabilities comparing 4 high-resource and our 18 languages performance, we benchmark 27 state-ofthe-art reasoning-oriented LLMs spanning multiple model families, training paradigms, parameter scales from sub-billion open-weight models to frontier proprietary APIs. The selection covers diverse architectural designs, post-training strategies, and levels of model accessibility. Models details, direct links to all checkpoints, and their corresponding licenses are provided in Appendix A."
+        },
+        {
+            "title": "4.1 Prompt Design",
+            "content": "We evaluate each model under three prompting settings: Base (problem and solution in the target language), Base+EN-CoT (target-language problem with reasoning instructed in English), and Backtranslated (problem translated back with NLLB model (NLLB Team et al., 2024) into the original high-resource language with instructions in that language). The Base setting follows the original PolyMath setup (Wang et al., 2025), while the latter two probe whether shifting reasoning to highresource language reduces performance gaps. The Base prompt is shown below; all prompt templates, language-specific instructions, and full examples for the Ukrainian case are provided in Appendix E."
+        },
+        {
+            "title": "Base Prompt Template",
+            "content": "{Problem in the target language} {Closing instruction in the target language} (Original: Note: Please put the final answer in the $ boxed{}$.)"
+        },
+        {
+            "title": "4.2 Evaluation Metric",
+            "content": "For per-level scores, we used exact match accuracy of the text in the boxed{}. For the aggregated score per language overall, we used the difficultyweighted accuracy across all levels as defined in the original PolyMath benchmark (Wang et al., 2025). Specifically, let {ai}4 i=1 denote the per-level accuracies for the four difficulty levels (low, medium, high, top), and let the weights be defined as w1 = 1 and wi = 2, wi 1 for = 2, 3, 4. The aggregated benchmark score per language is then given by: DW-ACC = (cid:80)4 i=1 wi ai (cid:80)4 i=1 wi = 4 (cid:88) i=1 1 (cid:18) 2 15 (cid:19) ai . (1)"
+        },
+        {
+            "title": "4.3 Hyperparameters Selection",
+            "content": "and different reasoning models Before running the full evaluation, we conducted hyperparameter search on the highresource PolyMath languages using subset (gpt-oss-120b, of large Qwen3-235B, exand plored temperature selecting reasoning_effort=medium temperature=0.1, and max_completion_tokens=2k as the best overall configuration across languages. This setup was used for all subsequent experiments. Full hyperparameters search details and results are provided in Appendix F. Qwen3-30B). We reasoning_effort ultimately settings, ) r ( m s u l r u )"
+        },
+        {
+            "title": "R\nH",
+            "content": "( m e o - H"
+        },
+        {
+            "title": "Len",
+            "content": "Avg. dsb hsb cv ca sk tt sr he cs kk el am or uz uk pl tr hi Lang"
+        },
+        {
+            "title": "Len",
+            "content": "Avg. es ru de en 4 1 4 4 3 4 . 6 2 4 6 3 4 1 9 8 3 1 . 6 1 6 2 1 7 3 7 . 5 1 0 . 7 6 . 7 2 3 . 5 1 2 . 0 3 1 . 8 1 3 . 6 2 1 . 7 4 . 8 2 6 . 7 2 9 . 8 2 8 . 9 2 6 . 8 2 6 . 8 3 . 6 2 3 . 2 3 3 . 6 2 1 . 9 2 1 . 8 2 0 0 5 . 4 6 2 0 0 1 3 . 5 6 2 0 . 5 2 . 5 1 0 0 1 0 0 1 6 9 3 . 6 6 7 . 4 1 0 0 1 0 0 1 7 . 5 6 2 8 . 6 0 0 1 0 0 1 1 . 6 5 2 0 0 1 2 . 6 2 5 . 4 1 8 . 4 1 0 0 1 0 0 1 0 0 3 . 6 7 2 0 . 6 1 0 0 1 0 0 1 . 6 6 2 0 0 1 5 . 5 6 2 0 0 8 . 6 7 2 0 0 1 3 . 5 5 2 5 . 7 6 . 5 1 3 . 6 1 3 . 5 1 0 0 1 0 0 1 0 0 0 0 1 9 9 9 . 6 7 2 2 . 4 1 0 0 7 9 7 . 5 5 2 4 . 3 1 0 0 1 0 0 0 . 7 5 2 3 . 7 1 0 0 1 0 0 1 5 . 6 2 5 . 6 1 0 0 1 0 0 1 9 . 6 7 2 . 6 1 0 0 1 0 0 1 7 . 6 7 2 5 . 6 0 0 1 9 9 0 . 6 6 2 1 . 6 1 0 0 L L L L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "0 8 7 8 3 2 2 5 3 8 0 6 6 2 2 7 3 8 0 6 1 2 3 8 2 3 0 3 6 4 1 2 8 9 1 3 5 4 0 0 6 7 6 6 4 3 6 1 1 4 8 2 1 5 1 7 8 1 2 4 9 1 7 8 1 0 6 9 1 9 2 4 7 7 1 3 7 4 7 4 4 5 1 8 5 3 8 0 3 9 4 5 0 1 8 1 8 . 0 5 . 0 8 . 1 4 . 4 . 1 1 . 3 1 . 5 8 . 6 9 . 2 8 . 2 . 0 5 . 7 0 . 4 9 . 4 8 . 0 5 0 . 0 0 0 . 1 4 1 1 . 0 0 1 . 0 9 3 0 . 2 8 1 8 . 2 7 3 . 3 4 6 4 . 1 0 4 2 . 0 4 1 . 0 8 3 9 . 5 7 3 5 . 2 9 3 . 4 8 2 4 . 0 1 2 0 . 0 7 . 0 5 1 2 . 0 3 2 4 . 0 3 7 . 2 0 2 9 . 3 0 4 2 . 3 5 2 . 1 7 4 5 . 0 3 2 1 . 0 0 7 . 5 8 3 5 . 2 6 5 5 . 5"
+        },
+        {
+            "title": "N\nE",
+            "content": "7 7 2 1 5 8 5 2 7 ."
+        },
+        {
+            "title": "N\nE",
+            "content": "1 6 4 1 8 0 6 1 5 . 5 T 5 8 4 4 2 7 1 4 2 2 9 1 9 2 . 7 5 . 3 6 . 2 1 6 . 3 1 5 5 5 . 1 3 0 . 5 6 2 8 . 2 8 7 0 5 . 3 4 3 3 . 5 6 2 8 . 2"
+        },
+        {
+            "title": "N\nE",
+            "content": "6 2 6 3 0 7 1 4 ."
+        },
+        {
+            "title": "N\nE",
+            "content": "7 6 2 1 8 2 3 2 3 . 6 1 6 6 6 1 9 9 2 6 4 8 8 8 8 2 5 0 6 6 0 8 1 9 9 4 8 7 8 5 . 4 8 . 6 5 . 9 8 . 4 1 . 6 1 6 . 7 1 1 . 5 0 3 9 . 7 1 0 7 3 . 7 6 2 . 7 7 2 8 . 9 5 3 0 . 6 4 0 7 2 . 4 3 6 9 . 7 0 2 . 9 2 4 9 . 4 4 4 3 . 0 0 . 0 0 3 . 0 4 1 8 . 0 9 0 . 0 3 3 1 . 1 0 2 2 . 2 1 1 . 2 9 3 4 . 1 1 4 1 . 0 6 0 . 0 5 4 4 . 1 2 3 3 . 3 8 2 . 2 6 3 4 . 4 8 6 9 . 1 0 3 . 3 3 2 9 . 1 0 6 6 . 6 5 1 . 8 0 8 9 . 3 1 6 3 . 3 8 0 . 9 3 3 7 . 2 5 4 7 . 2 1 9 . 4 3 . 6 1 8 . 1 1 6 . 6 1 3 . 7 1 0 . 6 1 7 . 6 8 3 6 . 6 9 3 6 . 7 8 2 8 . 8 2 7 4 3 . 5 5 3 4 . 7 7 8 . 3 9 2 8 4 3 . 4 8 4 8 . 7 2 3 . 3 0 4 7 3 6 . 6 1 6 . 8 9 2 7 . 3 8 2 9 4 . 9 8 4 5 . 8 9 2 . 3 8 2 0 5 6 . 7 7 4 9 . 8 2 2 . 3 6 2 8 4 3 . 4 2 6 . 7 9 2 7 . 3 0 3 8 4 9 . 1 4 1 . 7 7 2 1 . 4 8 2 2 . 0 6 . 8 1 1 . 2 1 4 . 2 1 8 . 5 1 6 3 9 . 1 6 5 . 7 8 2 7 . 4 2 3 1 5 . 6 4 4 5 . 8 9 2 4 . 4 8 7 3 6 . 8 2 4 7 . 8 9 2 8 . 7 2 8 3 9 . 7 6 4 1 . 9 0 7 . 3 7 2 1 5 4 . 7 8 3 4 . 0 3 9 . 2"
+        },
+        {
+            "title": "N\nE",
+            "content": "5 6 6 1 7 4 8 2 7 ."
+        },
+        {
+            "title": "N\nE",
+            "content": "6 9 7 1 7 0 2 2 2 . 8 T 4 3 5 4 6 6 1 1 4 2 0 8 8 8 . 7 9 . 3 0 . 8 1 2 . 9 1 8 . 5 1 6 . 7 0 5 7 . 7 9 3 6 . 8 9 2 2 . 6 2 0 5 8 . 7 4 3 7 . 8 9 9 . 3 6 2 1 5 7 . 7 6 3 4 . 8 2 6 . 3 8 2 0 5 5 . 9 2 6 . 6 3 2 7 . 3 4 2 3 . 0 2 1 . 2 9 1 8 . 4 1 2 5 . 0 9 3 . 2 2 2 7 . 5 3 2 7 . 9 7 3 . 0 1 4 8 7 . 3 7 2 0 . 4 7 8 . 0 2 2 7 . 9 0 4 6 . 3 9 4 . 4 7 1 3 . 1 4 3 0 . 0 3 . 2 5 1 1 . 0 5 1 2 . 2 3 7 . 4 0 2 7 . 6 2 3 2 . 8 3 7 . 3 6 2 3 . 2 2 1 2 . 0 9 9 . 7 6 3 7 . 4 1 3 1 . 3 0 7 . 0 2 2 0 . 0 0 4 . 1 1 5 . 0 7 2 8 . 0 8 1 2 . 1 8 8 . 3 4 3 1 . 4 4 4 0 . 3 5 3 . 0 0 4 0 . 0 9 4 0 . 7 5 6 . 4 6 4 3 . 2 3 2 5 . 0 9 0 . 1 4 2 4 . 1 0 1 9 . 0 2 1 . 2 8 2 2 . 4 0 2 2 . 2 9 . 9 5 7 6 . 3 9 2 2 . 0 0 . 0 6 4 7 . 9 7 3 7 . 3 7 3 . 3 5 1 4 . 2 9 3 . 0 0 7 . 1 7 1 . 0 4 2 0 . 2 4 2 . 3 6 1 2 . 7 6 3 . 7 6 7 0 . 4 8 2 . 2 2 1 0 . 0 3 5 5 . 0 1 4 2 . 5 2 3 5 . 0 1 1 8 . 1 6 4 0 . 0 0 6 . 2 6 1 . 1 4 2 1 . 2 6 2 3 . 5 2 3 . 7 7 3 5 . 9 8 7 1 . 3 7 5 . 2 4 1 4 . 0 7 3 7 . 8 5 1 . 4 2 3 3 . 9 3 4 4 . 0 4 0 . 0 0 4 . 0 8 2 . 0 3 1 . 1 6 1 6 . 0 3 1 1 . 6 2 6 . 3 5 3 2 . 3 8 2 3 . 1 2 0 . 0 4 5 9 . 5 2 4 1 . 5 5 0 . 8 3 3 7 . 1 1 4 0 . 0 1 . 2 3 1 2 . 0 8 2 3 . 2 0 5 . 5 2 2 2 . 8 4 3 7 . 0 1 9 6 . 3 7 2 1 . 0 0 1 9 . 0 6 6 . 0 4 3 0 . 1 2 1 3 . 0 3 . 0 9 1 0 . 0 0 2 3 . 5 6 8 . 2 5 3 2 . 1 8 5 0 . 0 4 . 0 7 1 . 0 8 3 7 . 0 2 8 . 1 5 1 3 . 1 1 3 5 . 2 9 8 . 1 7 3 1 . 0 9 5 . 0 4 5 . 0 5 1 5 . 0 6 2 4 . 1 3 8 . 1 6 1 2 . 1 8 6 . 7 1 0 . 3 1 3 4 . 1 9 3 0 . 0 4 . 1 0 1 0 . 0 6 2 3 . 2 2 8 . 5 2 2 7 . 8 1 5 5 . 0 1 1 1 . 3 6 2 5 . 0 9 1 6 . 3 3 2 . 5 2 2 1 . 0 2 2 6 . 2 7 9 . 0 1 4 . 8 6 3 0 . 9 9 8 . 3 8 2 ) 4 ( m h w - O ) 5 3 7 ( h w - O 8 . 2 1 0 . 0 4 5 3 . 9 6 4 0 . 2 3 1 . 9 8 3 1 . 0 0 1 0 . 2 4 7 . 2 3 2 4 . 3 4 3 0 . 6 3 . 9 4 3 0 . 2 8 4 6 . 8 2 1 . 4 0 4 4 . 1 9 0 . 3 4 5 . 1 5 2 4 . 3 9 3 1 . 7 2 . 5 1 3 7 9 . 0 1 6 4 . 6 2 3 . 2 7 3 1 . 0 2 2 3 . 4 2 1 . 8 2 5 1 . 4 0 3 5 . 9 1 8 . 3 7 1 1 . 0 1 5 4 . 8 3 4 . 5 2 3 9 . 3 8 1 6 . 0 2 7 . 0 3 1 8 . 1 1 5 5 7 . 8 2 9 . 5 3 2 1 . 6 9 2 5 . 2 6 . 6 9 2 6 . 6 1 9 . 6 4 3 5 . 0 3 . 8 4 3 0 . 3 1 3 . 6 9 5 . 1 2 4 . 6 9 2 7 . 8 1 8 . 6 0 3 . 1 2 4 . 7 8 3 1 . 9 1 3 . 1 1 2 . 5 5 2 2 . 6 9 2 9 . 2 1 6 . 4 6 . 3 1 6 . 8 5 3 0 . 1 2 7 . 7 9 5 . 6 8 2 2 . 2 1 8 . 2 1 7 . 6 0 6 . 9 1 3 4 4 . 4 8 2 2 . 6 3 7 . 9 6 3 9 . 4 8 2 8 7 1 . 3 3 0 . 8 9 2 1 . 0 1 3 3 1 . 0 3 3 6 0 . 5 1 4 2 . 8 9 8 . 7 8 2 9 . 3 2 4 3 4 3 . 8 2 2 . 6 3 2 4 6 8 . 1 3 0 . 9 0 3 3 . 0 1 4 . 0 8 3 0 . 5 6 3 9 3 0 . 1 3 6 6 3 . 4 2 3 1 . 7 8 4 . 9 4 3 0 . 4 3 3 6 6 9 . 3 3 0 . 8 9 2 9 . 8 1 3 9 . 5 3 3 6 8 . 5 4 3 6 . 7 8 3 . 0 1 1 4 1 . 6 2 3 4 4 1 . 3 3 5 . 4 6 1 7 . 8 6 3 4 . 7 3 6 7 2 . 5 1 4 3 . 6 5 2 . 9 0 3 0 . 5 0 3 4 4 3 . 8 2 5 . 5 2 2 5 . 8 1 3 4 . 9 2 2 6 1 . 5 1 3 1 . 8 9 8 . 8 2 3 2 . 5 5 3 3 4 9 . 7 2 8 . 5 3 2 0 . 1 1 9 3 9 . 6 3 4 4 2 . 4 7 2 1 . 6 3 8 . 9 5 3 7 . 6 2 3 2 6 0 . 5 3 0 . 7 7 2 0 . 0 1 8 3 7 . 6 3 / a i - O r - o 4 . 0 5 1 0 . 1 5 1 3 . 7 1 3 . 0 7 1 8 . 1 0 2 7 . 3 2 0 . 4 6 1 4 . 6 8 6 1 . 6 2 3 . 3 5 1 6 . 0 4 1 7 . 9 3 5 . 3 7 2 7 . 4 0 2 4 . 7 3 0 . 0 0 9 . 2 5 1 1 . 4 2 5 . 0 1 2 4 . 4 0 2 8 . 7 3 4 . 8 3 7 6 . 2 9 3 8 . 1 1 0 . 0 3 5 3 . 9 5 4 9 . 4 4 5 . 8 7 3 2 3 4 1 8 8 2 2 1 ."
+        },
+        {
+            "title": "N\nE",
+            "content": "3 1 2 1 5 8 4 3 0 . 0 2 3 5 7 7 4 1 8 ."
+        },
+        {
+            "title": "N\nE",
+            "content": "8 5 0 1 1 9 6 2 2 . 1 T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L 1 5 1 2 3 9 1 4 4 5 7 8 5 1 1 . 2 5 . 1 6 7 1 2 4 1 3 . 0 1 6 1 6 2 6 2 1 6 . 0 1 8 8 1 2 1 9 1 3 . 8 1 3 1 9 8 1 9 8 4 1 8 1 3 5 . 4 4 . 2 9 6 7 4 1 5 1 0 . 0 2 8 7 7 1 6 3 2 . 4 3 6 6 9 5 5 1 3 . 0 1 7 . 3 3 0 . 0 0 2 . 7 6 2 5 . 0 9 1 . 2 0 2 8 . 7 7 2 5 . 4 1 1 6 . 1 1 9 7 2 . 3 5 2 6 . 5 2 2 . 2 0 2 9 . 0 1 2 4 5 . 4 7 5 . 5 1 8 6 7 . 0 5 1 0 . 0 7 . 5 1 2 2 . 0 6 1 0 . 2 3 5 . 7 6 2 9 . 9 6 4 7 . 6 1 5 . 3 6 2 7 . 2 1 1 0 . 0 6 . 9 7 3 0 . 5 0 3 8 . 4 8 1 . 3 3 5 0 . 0 0 9 . 6 5 2 . 0 4 2 1 . 2 3 2 7 . 6 6 9 . 7 9 3 7 . 4 8 3 0 . 0 3 . 7 6 2 0 . 4 5 2 0 . 2 5 2 . 8 8 2 1 . 9 8 3 8 . 0 1 3 . 3 2 8 5 . 3 6 2 8 8 9 . 2 3 7 . 4 9 1 1 . 3 9 1 7 . 8 8 6 . 3 1 3 7 . 1 1 6 5 1 . 5 9 1 . 4 9 1 7 . 0 1 6 3 7 . 3 4 4 . 9 4 3 5 . 1 - Q - t - 1 3 - 3 - t i 2 - 5 . 3 Q 6 . 2 - O 4 - 3 - e 4 - 5 . 3 Q 8 . 0 - 5 . 3 Q 2 . 1 - 5 . 2 B 4 . 1 - O o k T - 7 - 3 - O 8 - 3 Q - 8 2 5 0 - 1 8 - 3 - t i 4 1 - 3 - t i 0 2 - - B 9 - 5 . 3 Q 0 3 - N - 3 t N 3 - 5 3 - 5 . 3 Q 1 3 - 4 - e L T L L L 7 6 6 8 7 6 1 2 . 7 7 0 6 1 0 9 5 2 7 . 2 2 1 7 9 7 4 4 3 8 . 4 6 2 1 9 6 2 3 6 . 7 5 7 6 1 5 7 1 1 . 0 1 0 8 5 4 0 8 1 5 . 5 . 6 9 2 5 . 1 2 4 . 9 3 3 0 . 2 9 . 5 9 2 7 . 2 2 8 . 6 8 2 6 . 4 4 6 2 . 4 9 2 7 . 7 9 2 3 . 0 4 3 8 . 5 5 2 4 6 4 . 5 1 6 . 8 0 3 3 . 9 2 3 5 . 4 9 4 6 9 . 4 1 3 6 . 7 8 2 4 7 . 4 6 2 6 . 6 6 2 4 . 0 1 6 . 0 2 3 9 . 4 7 2 4 3 9 . 6 6 0 7 - l - t - 1 0 1 - 2 2 1 - 5 . 3 Q 0 2 1 - - B 2 2 - 5 3 2 - 3 Q 2 . 3 - S D 5 . 2 - K 1 0 4 8 4 8 7 . 8 2 6 2 2 4 6 3 6 3 3 . 6 9 4 2 7 1 3 2 . 6 2 . 8 2 3 . 5 2 7 . 7 2 5 . 3 3 0 0 1 9 . 6 2 0 0 1 4 . 5 6 2 0 0 1 7 . 6 2 0 0 1 2 . 6 5 2 8 . 5 1 4 . 5 3 . 6 1 3 . 7 1 0 0 1 0 0 1 0 0 1 0 0 5 . 4 - a - a s - 5 . 2 - m 4 . 5 - y u d g - u fi s s c E . a"
+        },
+        {
+            "title": "M\ny\nl\no\nP\nm\no\nr\nf",
+            "content": "s e o - h e g l"
+        },
+        {
+            "title": "H\nT\nA\nM\nA\nR\nU\nL\nP\nr\nu\no\nn\no\ns\nt\nl\nu\ns\ne\nr",
+            "content": "s e o d g g i o s : 2 a g o l d i s r n ; ) + 0 4 0 , t d a ( - W d e d l . ) m ; % ( r a m t o - s h v ) a ; % , W - ( f . t l h n o p b - c n e . n a e e a r o e t l g o e s c ) c - h ( d t n a l ) c - ( n N d c a a w t i e n , ) s + n e , k ( n o r g a h - , W a a - a t p w l a a a . u l g d e r n e a n L h g i n m r e a o Figure 3: Math answer correctness distributions per language (a) and per model (b). We compare high-resource and target PLURAMATH languages across all prompting settings; the same for models, we analyze performance stability for the base prompting and differences between languages groups. Extended versions: Figures 11, 12 in Appendix."
+        },
+        {
+            "title": "4.4 PLURAMATH Benchmarking Results",
+            "content": "Aggregated DW-ACC scores across all four difficulty levels are reported in Table 2, with per-level results in Appendix H.1. In addition to task accuracy, we report the proportion of responses adhering to the required boxed{} format, aggregated reasoning length and the dominant language used in models outputs for both high-resource and our target languages. We also report fully API costs and budget spent on our experiments in Appendix G. Math Answers Correctness The distribution of results across languages (Figure 3) and the comparison between high-resource and PLURAMATH languages confirm persistent gap in mathematical reasoning performance across language categories. We compute the Spearman correlation between languages class  (Table 1)  and math reasoning benchmark rankings, obtaining ρ = 0.646 with = 0.0038. This result indicates that the level of language support in current language technologies strongly correlates with downstream mathematical reasoning performance. The magnitude of the gap varies substantially across languages. Greek and Polish show the smallest differences relative to high-resource languages (+0.67), whereas the average gap is +2.15, reaching +4.86 for Chuvash and Ahmaric. Smaller models often exhibit unstable performance across language groups, while larger recent systems, and especially proprietary models such as GPT-5.4 and Claude-Haiku-4.5, remain considerably more stable across all evaluated languages. Reasoning Length Comparison comparison of model reasoning lengths is shown in Appendix H.2. The gap between language groups is relatively modest, with models often generating shorter outputs for PLURAMATH languages due to failure to reach correct solutions. Notably, the best-performing models, Claude-Haiku-4.5 and GPT-5.4, often produce correct answers with substantially shorter reasoning traces, indicating that longer reasoning does not necessarily correspond to better performance. Prompts Choice Comparison Figure 3 also compares the effects of different prompting strategies across languages; full results are in Appendix H.3. Overall, alternative prompting designs yield limited improvements for most models."
+        },
+        {
+            "title": "4.5 Correlation with Translation Capabilities",
+            "content": "To examine whether gains in reasoning are related to underlying translation capabilities, we conduct a"
+        },
+        {
+            "title": "Model",
+            "content": "Q1 Q2 Q3 Q4 Q5 High-resource (EN, RU) gemma-3-4B Ministral-3-8B Nemotron3_30B gpt-oss-120b DeepSeek-V3.2 0 3 0 21 3 99 23 42 7 100 94 100 45 93 100 77 100 100 100 45 0 3 18 6 PLURAMATH (11 underrepresented languages) gemma-3-4B Ministral-3-8B Nemotron3_30B gpt-oss-120b DeepSeek-V3.2 2 3 1 16 3 89 25 9 11 35 49 65 26 71 66 63 47 83 64 6 5 2 12 11 77 31 27 69 33 73 57 56 64 30 Figure 4: (A): Correlations with translations capabilities analysis. (B): Human reasoning assessment results. case study on subset of models using both reasoning and non-thinking modes for translation tasks on the FLORES+ (NLLB Team et al., 2024) dev and Sorbian shared-task (Okabe et al., 2025) splits. Correlation analyses are shown in Figure 4 (a), with detailed translation results in Appendix J. Overall, we observe negative correlation between CHRF++ scores and output length (r = 0.16, < 0.01), further confirming that longer reasoning traces do not necessarily improve translation quality. Translation quality is moderately correlated with both math task accuracy (r = +0.45, 8) and instruction-following performance < 10 4), suggesting that some (r = +0.35, < 10 models are generally more reliable at adhering to task requirements. In contrast, gains from ENCOT prompting (r = +0.11, = 0.21), the tendency to answer in English versus the target language (rpb = +0.07, = 0.36), and language class (ρ = +0.08, = 0.36) show little correlation with translation capability, indicating that other cross-lingual reasoning mechanisms play larger role."
+        },
+        {
+            "title": "4.6 Human Assessment of Reasoning",
+            "content": "Finally, we conduct human evaluation of selected models using 12 instances per difficulty level across two high-resource and (N) target languages. Annotators assessed whether correct answers appeared despite extraction failures (Q1), reasoning language compliance with the target (Q2), coherence and step-by-step validity of reasoning (Q3), consistency between reasoning and final answers (Q4), if correct answer appeared at some point in reasoning (Q5), and if the model finished reasoning at all (Q6). Aggregated results are reported in Figure 4 (b), with details provided in Appendix I. Reasoning quality declines for underrepresented languages, with models less consistently reasoning in the target language and producing less coherent explanations. With the exception of gemma, models frequently switch to English during reasoning. Moreover, all modelsparticularly Nemotronoften generate disfluent or incoherent reasoning and responses, including cases when the final answer was never produced during the reasoning. Across all language groups, models also frequently fail to complete their reasoning within the 2k token limit of our setup. These findings indicate that substantial improvements in multilingual reasoning capabilities are still required."
+        },
+        {
+            "title": "5 Conclusion",
+            "content": "We introduced PLURAMATH, an extension of four-level mathematical reasoning benchmark to 18 underrepresented languages spanning six language families. We presented multilingual benchmark construction pipeline combining automatic translation for initial drafts with rigorous human evaluation and correction. Using this benchmark, we conducted large-scale evaluation of 27 modern reasoning LLMs. The performance gap persists between high-resource and our languages. We further compared standard prompting with EN-CoT and backtranslation strategies, finding that these interventions rarely yield consistent gains. Our analyses also indicate that stronger reasoning performance is not substantially correlated with translation capability, but is more closely associated with general instruction-following ability. Human evaluation further reveals that many models generate repetitive, incomplete, or non-fluent reasoning traces, whereas top-performing proprietary systems achieve substantially better results with shorter and concise reasoning. We hope that PLURAMATH and its accompanying analyses will support future research on multilingual and cross-lingual reasoning."
+        },
+        {
+            "title": "Limitations",
+            "content": "Our work has several limitations. First, despite covering 18 underrepresented languages, the benchmark remains far from exhaustive. Nevertheless, we hope the presented pipeline can serve as practical framework for extending reasoning benchmarks to additional digitally represented languages. Second, our approach depends on the availability of at least minimal machine translation resources, such as WMT-supported systems. For many extremely low-resource languages, benchmark construction would require fully manual translation and annotation, substantially increasing the cost and complexity of data creation. Third, advanced mathematical concepts covered by higher difficulty levels may not be commonly taught in all target-language educational contexts, raising questions about the practical relevance of such evaluations for some languages. At the same time, multilingual mathematical benchmarks may help future LLM systems support access to advanced education in underrepresented languages. Fourth, our evaluation uses singlegeneration pass@1 setup rather than multiple generations strategies and such scores aggregation as pass@k, which may underestimate the capabilities of some models. For some high-resource languages and difficulty levels, our experiments yielded lower results than those reported in PolyMath (Wang et al., 2025), likely due to the only pass@1 over the benchmark. However, the primary objective of this work is to highlight the performance gap between high-resource and underrepresented languages and demonstrate the diversity of model behaviors across different model families and scales. Finally, we do not investigate continued pretraining or domain adaptation on multilingual mathematical corpora. Future work could explore how to collect and balance mathematical training data for underrepresented languages in order to improve multilingual reasoning performance."
+        },
+        {
+            "title": "Ethics Statement",
+            "content": "Annotator Well-being We took explicit measures to support annotator well-being, both in workload management and recognition of contributions. All annotation was conducted on non-profit basis by academic researchers and independent contributors motivated to support their native languages. Most contributors are acknowledged through coauthorship. To reduce annotation burden, we first generated high-quality machine translations for each language pair, allowing annotators to focus on verification and correction rather than translation from scratch. Depending on translation quality, annotators were given two to four weeks to complete their assignments with flexible scheduling. This process resulted in manageable workload and positive collaborative environment. LLM Usage Our evaluation involved extensive testing of dozens of LLMs across 22 languages, which likely incurred substantial computational and environmental costs. To maximize the longterm value of these experiments, we plan to release the generated reasoning traces and model outputs, subject to license compliance. We hope these resources will support future research, including knowledge distillation into smaller and more accessible models that may better serve underrepresented language communities and have smaller environmental cost. Benchmark Data Contamination Finally, we do not systematically investigate potential benchmark contamination in large-scale models. Since PolyMath (Wang et al., 2025) was released in mid 2025, some newer flagship LLMs may already have been exposed to portions of the benchmark during training. In addition, certain tasks originate from widely used mathematics textbooks and wellknown olympiad problem sets, making incidental memorization possible across multiple languages. deeper analysis of contamination effects remains an important direction for future work, and we hope that the release of our multilingual benchmark will facilitate such studies beyond high-resource languages."
+        },
+        {
+            "title": "Acknowledgments",
+            "content": "We express an enormous gratitude for all annotators and supporters of the project. Firstly, we are grateful for our collaboration with the WITAJ-Sprachzentrum and thank Anita Hendrichowa, Marko Mˇeškank, and Kryštof Peršín, in particular, for their annotations of the Upper Sorbian and Lower Sorbian splits. Secondly, the translation to Catalan has been promoted by the Aina Project. We are also grateful to Šimon Kapusta for the help in Slovak translations check. The work of authors on Czech and Slovak splits was supported by the project CZ.02.01.01/00/23_020/0008518 of the Czech Ministry of Education, Youth and Sports. Finally, we warmly thank Alexander Antonov for the annotation of the Chuvash split. This work was co-funded by the European Union (ERC, EPICAL, 101141712 and ERC, NG-NLG, 101039303). Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the European Research Council. Neither the European Union nor the granting authority can be held responsible for them."
+        },
+        {
+            "title": "References",
+            "content": "Shaden Alshammari, Kevin Wen, Abrar Zainal, Mark Hamilton, Navid Safaei, Sultan Albarakati, William T. Freeman, and Antonio Torralba. 2026. MathNet: global multimodal benchmark for mathIn International ematical reasoning and retrieval. Conference on Learning Representations (ICLR). ArXiv:2604.18584. Alexander Amini, Anna Banaszak, Harold Benoit, Arthur Böök, Tarek Dakhran, Song Duong, Alfred Eng, Fernando Fernandes, Marc Härkönen, Anne Harrington, Ramin M. Hasani, Saniya Karwa, Yuri Khrustalev, Maxime Labonne, Mathias Lechner, Valentine Lechner, Simon Lee, Zetian Li, Noel Loo, and 14 others. 2025. LFM2 technical report. CoRR, abs/2511.23404. Anthropic. 2025. System Card: Claude Opus 4 and Claude Sonnet 4. Technical report, Anthropic. Accessed: May 2026. Mislav Balunovic, Jasper Dekoninck, Ivo Petrov, Nikola Jovanovic, and Martin T. Vechev. 2025. Matharena: Evaluating llms on uncontaminated math competitions. CoRR, abs/2505.23281. Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Pondé de Oliveira Pinto, Jared Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, Alex Ray, Raul Puri, Gretchen Krueger, Michael Petrov, Heidy Khlaaf, Girish Sastry, Pamela Mishkin, Brooke Chan, Scott Gray, and 39 others. 2021. Evaluating large language models trained on code. CoRR, abs/2107.03374. Nuo Chen, Zinan Zheng, Ning Wu, Ming Gong, Dongmei Zhang, and Jia Li. 2024. Breaking language barriers in multilingual mathematical reasoning: Insights and observations. In Findings of the Association for Computational Linguistics: EMNLP 2024, Miami, Florida, USA, November 12-16, 2024, Findings of ACL, pages 70017016. Association for Computational Linguistics. Zhipeng Chen, Kun Zhou, Liang Song, Wayne Xin Zhao, Bingning Wang, Weipeng Chen, and Ji-Rong Wen. 2025. Extracting and combining abilities for building multi-lingual ability-enhanced large language models. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing, EMNLP 2025, Suzhou, China, November 4-9, 2025, pages 1756317580. Association for Computational Linguistics. Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, Christopher Hesse, and John Schulman. 2021. Training verifiers to solve math word problems. CoRR, abs/2110.14168. DeepSeek-AI. 2025. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning. CoRR, abs/2501.12948. Akash Ghosh, Debayan Datta, Sriparna Saha, and Chirag Agarwal. 2025. survey of multilingual reasoning in language models. In Findings of the Association for Computational Linguistics: EMNLP 2025, Suzhou, China, November 4-9, 2025, pages 8920 8936. Association for Computational Linguistics. Xu Huang, Wenhao Zhu, Hanxu Hu, Conghui He, Lei Li, Shujian Huang, and Fei Yuan. 2025. Benchmax: comprehensive multilingual evaluation suite for large language models. In Findings of the Association for Computational Linguistics: EMNLP 2025, Suzhou, China, November 4-9, 2025, pages 16751 16774. Association for Computational Linguistics. Sheriff Issaka, Erick Rosas Gonzalez, Lieqi Liu, Evans Kofi Agyei, Lucas Bandarkar, Nanyun Peng, David Ifeoluwa Adelani, Francisco Guzmán, and Saadia Gabriel. 2026. Translation as scalable proxy for multilingual evaluation. CoRR, abs/2601.11778. Albert Q. Jiang, Alexandre Sablayrolles, Arthur Mensch, Chris Bamford, Devendra Singh Chaplot, Diego de Las Casas, Florian Bressand, Gianna Lengyel, Guillaume Lample, Lucile Saulnier, Lélio Renard Lavaud, Marie-Anne Lachaux, Pierre Stock, Teven Le Scao, Thibaut Lavril, Thomas Wang, Timothée Lacroix, and William El Sayed. 2023. Mistral 7b. CoRR, abs/2310.06825. Pratik Joshi, Sebastin Santy, Amar Budhiraja, Kalika Bali, and Monojit Choudhury. 2020a. The state and fate of linguistic diversity and inclusion in the NLP world. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, ACL 2020, Online, July 5-10, 2020, pages 62826293. Association for Computational Linguistics. Pratik Joshi, Sebastin Santy, Amar Budhiraja, Kalika Bali, and Monojit Choudhury. 2020b. The state and fate of linguistic diversity and inclusion in the NLP world. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, pages 62826293, Online. Association for Computational Linguistics. Karthikeyan K, Aalok Sathe, Somak Aditya, and Monojit Choudhury. 2021. Analyzing the effects of reasoning types on cross-lingual transfer performance. In Proceedings of the 1st Workshop on Multilingual Representation Learning, pages 8695, Punta Cana, Dominican Republic. Association for Computational Linguistics. Yihong Liu, Raoyuan Zhao, Hinrich Schütze, and Michael A. Hedderich. 2026. Large reasoning models are (not yet) multilingual latent reasoners. CoRR, abs/2601.02996. NLLB Team, Marta R. Costa-jussà, James Cross, Onur Çelebi, Maha Elbayad, Kenneth Heafield, Kevin Heffernan, Elahe Kalbassi, Janice Lam, Daniel Licht, Jean Maillard, Anna Sun, Skyler Wang, Guillaume Wenzek, Al Youngblood, Bapi Akula, Loic Barrault, Gabriel Mejia Gonzalez, Prangthip Hansanti, and 20 others. 2024. Scaling neural machine translation to 200 languages. Nature, 630(8018):841846. NVIDIA. 2026. Nemotron 3 nano omni: Efficient and open multimodal intelligence. CoRR, abs/2604.24954. Shu Okabe, Daryna Dementieva, Marion Di Marco, Lukas Edman, Katharina Haemmerl, Marko Mˇeškank, Anita Hendrichowa, and Alexander Fraser. 2025. Findings of the WMT 2025 shared task LLMs with limited resources for Slavic languages: MT and QA. In Proceedings of the Tenth Conference on Machine Translation, pages 503519, Suzhou, China. Association for Computational Linguistics. Team OLMo, Pete Walsh, Luca Soldaini, Dirk Groeneveld, Kyle Lo, Shane Arora, Akshita Bhagia, Yuling Gu, Shengyi Huang, Matt Jordan, Nathan Lambert, Dustin Schwenk, Oyvind Tafjord, Taira Anderson, David Atkinson, Faeze Brahman, Christopher Clark, Pradeep Dasigi, Nouha Dziri, and 21 others. 2025. 2 olmo 2 furious. CoRR, abs/2501.00656. OpenAI. 2025. gpt-oss-120b & gpt-oss-20b model card. CoRR, abs/2508.10925. OpenAI. 2026. Openai GPT-5 system card. CoRR, abs/2601.03267. Anaelia Ovalle, Candace Ross, Sebastian Ruder, Adina Williams, Karen Ullrich, Mark Ibrahim, and Levent Sagun. 2025. Beg to differ: Understanding reasoning-answer misalignment across languages. CoRR, abs/2512.22712. Keiran Paster, Marco Dos Santos, Zhangir Azerbayev, and Jimmy Ba. 2024. Openwebmath: An open dataset of high-quality mathematical web text. In The Twelfth International Conference on Learning Representations, ICLR 2024, Vienna, Austria, May 7-11, 2024. OpenReview.net. Sara Rajaee, Rochelle Choenni, Ekaterina Shutova, and Christof Monz. 2026a. Best-of-l: Cross-lingual reward modeling for mathematical reasoning. In Findings of the Association for Computational Linguistics: EACL 2026, Rabat, Morocco, March 24-29, 2026, Findings of ACL, pages 19301939. Association for Computational Linguistics. Sara Rajaee, Sebastian Vincent, Alexandre Berard, Marzieh Fadaee, Kelly Marchisio, and Tom Kocmi. 2026b. Unlocking reasoning capability on machine translation in large language models. CoRR, abs/2602.14763. Yiyou Sun, Shawn Hu, Georgia Zhou, Ken Zheng, Hannaneh Hajishirzi, Nouha Dziri, and Dawn Song. 2025. OMEGA: can llms reason outside the box in math? evaluating exploratory, compositional, and transformative generalization. CoRR, abs/2506.18880. Gemini Team. 2023. Gemini: family of highly capable multimodal models. CoRR, abs/2312.11805. Gemma Team. 2025a. Gemma 3 technical report. CoRR, abs/2503.19786. Kimi Team. 2025b. Kimi K2: open agentic intelligence. CoRR, abs/2507.20534. Qwen Team. 2025c. Qwen3 technical report. CoRR, abs/2505.09388. Yiming Wang, Pei Zhang, Jialong Tang, Haoran Wei, Baosong Yang, Rui Wang, Chenshu Sun, Feitong Sun, Jiran Zhang, Junxuan Wu, Qiqian Cang, Yichang Zhang, Fei Huang, Junyang Lin, Fei Huang, and Jingren Zhou. 2025. Polymath: Evaluating mathematical reasoning in multilingual contexts. CoRR, abs/2504.18428. Tianwen Wei, Jian Luan, Wei Liu, Shuang Dong, and Bin Wang. 2023. CMATH: can your language model pass chinese elementary school math test? CoRR, abs/2306.16636. Weihao Xuan, Rui Yang, Heli Qi, Qingcheng Zeng, Yunze Xiao, Aosong Feng, Dairui Liu, Yun Xing, Junjue Wang, Fan Gao, Jinghui Lu, Yuang Jiang, Huitao Li, Xin Li, Kunyu Yu, Ruihai Dong, Shangding Gu, Yuekang Li, Xiaofei Xie, and 13 others. 2025. Mmluprox: multilingual benchmark for advanced large language model evaluation. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing, EMNLP 2025, Suzhou, China, November 4-9, 2025, pages 15131532. Association for Computational Linguistics. Jiakang Yuan, Tianshuo Peng, Yilei Jiang, Yiting Lu, Renrui Zhang, Kaituo Feng, Chaoyou Fu, Tao Chen, Lei Bai, Bo Zhang, and Xiangyu Yue. 2025. Mmereasoning: comprehensive benchmark for logical reasoning in mllms. CoRR, abs/2505.21327. Wanjun Zhong, Ruixiang Cui, Yiduo Guo, Yaobo Liang, Shuai Lu, Yanlin Wang, Amin Saied, Weizhu Chen, and Nan Duan. 2024. Agieval: human-centric benchmark for evaluating foundation models. In Findings of the Association for Computational Linguistics: NAACL 2024, Mexico City, Mexico, June 16-21, 2024, Findings of ACL, pages 22992314. Association for Computational Linguistics. Rui-Jie Zhu, Zixuan Wang, Kai Hua, Tianyu Zhang, Ziniu Li, Haoran Que, Boyi Wei, Zixin Wen, Fan Yin, He Xing, Lu Li, Jiajun Shi, Kaijing Ma, Shanda Li, Taylor Kergan, Andrew Smith, Xingwei Qu, Mude Hui, Bohong Wu, and 14 others. 2025. Scaling latent reasoning via looped language models. CoRR, abs/2510.25741."
+        },
+        {
+            "title": "A Details and Licensing of Resources",
+            "content": "In this section, we provide details about used LLMs for the experiments as well as all details, direct links, and licenses of all used resources. A.1 Short Summary of LLMs Families Used for the Experiments Qwen The Qwen series from Alibaba (Team, 2025c) has become one of the most widely adopted open-weight backbones for reasoning research, owing to its strong multilingual coverage, competitive math and code performance, and an actively maintained range of dense and Mixture-of-Experts variants. We include Qwen3.5 checkpoints at 0.8B, 2B, 4B, 9B, and the 35B-A3B, 122B-A10B MoE configurations as well as the older version of Qwen3 with the biggest 235B-A22B MoE variant. LiquidAI LFM The Liquid Foundation Models (Amini et al., 2025) depart from the standard Transformer template by combining attention with structured state-space and convolutional blocks, yielding favourable memory and latency characteristics at small scales. The LFM2.5-1.2B-Thinking variant is interesting as low-resource reasoning baseline. ByteDance Ouro The Ouro family (Zhu et al., 2025) introduces looped language models, in which shared block of parameters is iterated multiple times during inference to amortise reasoning depth without increasing the parameter count. We test the 1.4B and 2.6B Thinking checkpoints to measure how this recurrence-style compute trades off against conventional depth-scaling. DeepSeek DeepSeek-R1 (DeepSeek-AI, 2025) pioneered large-scale reinforcement learning with verifiable rewards (RLVR) for open-weight reasoning, and its distilled checkpoints have become standard reference points. We evaluate the R1-Distill-Qwen-1.5B, R1-0528-Qwen3-8B, and R1-Distill-LLama-70B distillates as well as full V3.2 MoE version, providing both small-scale distillation evidence and frontier open MoE comparison. Ministral / Mistral Mistrals Ministral line (Jiang et al., 2023) targets efficient on-device and edge inference while inheriting the reasoning post-training recipe from the larger Mistral models. We include the recent 3B, 8B, and 14B Reasoning-2512 releases. Google Gemma Gemma (Team, 2025a) is Google DeepMinds open-weight family derived from the same research stack as Gemini. The Gemma-3 4B and Gemma-4 31B variants allow us to compare Gemini-aligned training recipe against other lineages at matched parameter budgets. Nemotron 3 Nano Omni is multimodal large language model developed by NVIDIA (NVIDIA, 2026) that jointly processes video, audio, images, and text for tasks such as question answering, summarization, transcription, OCR, and document understanding. We use the Reasoning variant of the Nemotron series Nemotron-3-Nano-Omni-30B-A3B-Reasoning. AllenAI OLMo OLMo (OLMo et al., 2025) is, to our knowledge, the most fully open frontier-style series, releasing not only weights but also data, training code, and intermediate checkpoints. The OLMo3-7B-Think allow examining whether full transparency comes at measurable reasoning cost. OpenAI gpt-oss The gpt-oss series (OpenAI, 2025) are OpenAIs open-weight Mixture-of-Experts re asoning models, released under permissive license and explicitly tuned for chain-of-thought workloads. The 20B and 120B checkpoints anchor the open-weight side of the comparison at the upper end. Moonshot Kimi Kimi-K2.5-Thinking (Team, 2025b) is Moonshot AIs frontier MoE reasoning model, notable for its very long native context window and aggressive RL post-training. Closed-source frontier models To upper-bound the comparison, we include API-only models from the three major frontier labs: Anthropics Claude-Haiku-4.5 (Anthropic, 2025), OpenAIs GPT-5.4 (OpenAI, 2026), and Googles Gemini-2.5-Flash (Team, 2023). A.2 Direct Links and Licensing Information for All Resources Used in This Work Below is an overview of the licenses and direct repositories of every resource used in this work  (Table 3)  . The licenses associated with the models and datasets are consistent with the intended use of conducting academic research on multilingual mathematical reasoning for positive societal impact. Closed-source models are accessed exclusively through their respective official APIs in compliance with each providers terms of service."
+        },
+        {
+            "title": "PLURAMATH\nPolyMath",
+            "content": "FLORES+ Sorbian MT Dev Set Qwen3.5-0.8B LFM2.5-1.2B-Thinking Ouro-1.4B-Thinking R1-Distill-Qwen-1.5B Qwen3.5-2B Ouro-2.6B Ministral-3-3B Gemma-3-E4B Qwe3-4B base Qwen3.5-4B OLMo-3-7B-Think R1-0528-Qwen3-8B Ministral-3-8B Qwen3.5-9B Ministral-3-14B gpt-oss-20b Nemotron3-Nano-30B Gemma-4-31B Qwen3.5-35B-A3B R1-Distill-LLama-70B gpt-oss-120b Qwen3.5-122B-A10B Qwen3-235B-A22B DeepSeek-V3.2 Kimi-K2.5 Claude-Haiku-4.5 Gemini-2.5-Flash GPT-5.4 Apache-2.0 Apache-2. CC-BY-SA-4.0 CC-BY-NC-SA-4.0 hf.co/datasets/tum-nlp/PluraMath hf.co/datasets/Qwen/PolyMath github.com/QwenLM/PolyMath hf.co/datasets/openlanguagedata/flores_plus github.com/TUM-NLP/llms-limited-resources2025/tree/main/Sorbian Open-weight models small ( 4B) Apache-2.0 LFM Open License Apache-2.0 MIT Apache-2.0 Apache-2.0 Mistral Research License Gemma License Apache 2.0 Apache-2. hf.co/Qwen/Qwen3.5-0.8B hf.co/LiquidAI/LFM2.5-1.2B-Thinking hf.co/ByteDance/Ouro-1.4B-Thinking hf.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B hf.co/Qwen/Qwen3.5-2B hf.co/ByteDance/Ouro-2.6B-Thinking hf.co/mistralai/Ministral-3-3B-Reasoning-2512 hf.co/google/gemma-3-4b-it hf.co/Qwen/Qwen3.5-4B hf.co/Qwen/Qwen3.5-4B Open-weight models mid (735B) Apache-2.0 MIT Apache 2.0 Apache 2.0 Apache 2.0 Apache-2.0 nvidia-open-model-agreement Gemma License Apache-2.0 hf.co/allenai/Olmo-3-7B-Think hf.co/deepseek-ai/DeepSeek-R1-0528-Qwen3-8B hf.co/mistralai/Ministral-3-8B-Reasoning-2512 hf.co/Qwen/Qwen3.5-9B hf.co/mistralai/Ministral-3-14B-Reasoning-2512 hf.co/openai/gpt-oss-20b hf.co/nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16 hf.co/google/gemma-4-31B hf.co/Qwen/Qwen3.5-35B-A3B Open-weight models large (API-served) MIT Apache-2.0 Apache 2.0 Apache 2.0 MIT Modified MIT hf.co/deepseek-ai/DeepSeek-R1-Distill-Llama-70B hf.co/openai/gpt-oss-120b hf.co/Qwen/Qwen3.5-122B-A10B hf.co/Qwen/Qwen3-235B-A22B hf.co/deepseek-ai/DeepSeek-V3.2 hf.co/moonshotai/Kimi-K2.5 Closed-source models (API only)"
+        },
+        {
+            "title": "Proprietary\nProprietary\nProprietary",
+            "content": "anthropic.com/claude/haiku ai.google.dev/gemini-api/docs/models/gemini-2.5-flash openai.com/index/introducing-gpt-5-"
+        },
+        {
+            "title": "Additional Models Used for Translation",
+            "content": "tartuNLP/Qwen2.5-3B-Instruct-hsb-dsb BSC-LT/salamandraTA-7b-instruct Sarvamai DeepL NLLB CC-BY-4.0 Apache-2.0 Apache-2.0 Proprietary CC-BY-NC-4.0 hf.co/tartuNLP/Qwen2.5-3B-Instruct-hsb-dsb hf.co/BSC-LT/salamandraTA-7b-instruct hf.co/sarvamai/collections https://www.deepl.com/en/products/api hf.co/facebook/nllb-200-distilled-600M Table 3: Overview of the licenses and direct links of the resources utilized in this work."
+        },
+        {
+            "title": "B Translations Annotator Instructions",
+            "content": "Below we reproduce, the written instructions that were shared with every language stakeholder at the start of the project. Instructions for Language Stakeholders PLURAMATH Project Motivation. We extend the PolyMath mathematical-reasoning benchmark (https:// huggingface.co/datasets/Qwen/PolyMath) beyond resource-rich languages and evaluate the performance of current large language models (LLMs) of various families and sizes on these languages. Language stakeholders contribute to the project on research basis and are rewarded with co-authorship of the resulting paper. Tasks for Language Stakeholders. 1. Translation preparation. Recommend the most suitable automatic translation system, so we can generate the first version of the benchmark. We are able to use paid versions of DeepL, Gemini, or Google Translate. Apart from proprietary models, or in case very specific translation system is chosen, it is very helpful if the stakeholder can run the translation themselves. 2. Translation check. Only the question texts need to be checked; answers are typically numeric or LaTeX expressions and are universal. The check should be carried out by native speakers: at least one, preferably two. Translation guidelines: Text outside LaTeX code must be fully and correctly translated, using the appropriate target-language terminology. Text inside LaTeX code must remain inor be reverted tothe original English. Please use the helper notebook to identify lines with an unbalanced number of $ delimiters or otherwise broken LaTeX, then fix them so that the LaTeX is identical to the source. Please record the number of instances that required correction. 3. Reasoning proof-of-concept study. Take only the first task of each difficulty level. Run it through several popular models, e.g., ChatGPT (GPT-5), Gemini, Claude, and Qwen34B / Qwen3-30B-Thinking (the latter via the HuggingFace interface). Goal: assess whether the models can comprehend the reasoning task at all in the target language. Compile short report of your findings."
+        },
+        {
+            "title": "C PLURAMATH Tasks Examples",
+            "content": "We provide example instances from PLURAMATH for each difficulty level: low 5, medium 6, high 7, and top 8, alongside their corresponding original English tasks from PolyMath. Figure 5: Examples of translated math problem from low level to our PLURAMATH languages. Figure 6: Examples of translated math problem from medium level to our PLURAMATH languages. Figure 7: Examples of translated math problem from high level to our PLURAMATH languages. Figure 8: Examples of translated math problem from top level to our PLURAMATH languages."
+        },
+        {
+            "title": "D PLURAMATH and PolyMath Math Tasks Length Comparison",
+            "content": "We compare math task lengths between high-resource PolyMath languagesEnglish, Spanish, Russian, and Germanand the newly introduced languages in PLURAMATH. Tokenization was performed with Qwen3-4B model. Mean and standard deviation statistics are reported in Tables 4,5,6,7, with box plots shown in Figure 9. Task lengths vary substantially across language families: Slavic languages exhibit relatively similar distributions, whereas Indo-Aryan languages such as Hindi and especially Odia, as well as the Semitic language Amharic and Turkic languages, have considerably longer inputs. These length differences may introduce additional challenges for task comprehension and long-context reasoning."
+        },
+        {
+            "title": "Low\nMedium\nHigh\nTop",
+            "content": "60 22 96 53 114 78 118 62 76 29 106 56 131 83 137 72 90 34 115 63 144 89 154 80 81 32 112 61 140 86 146 75 Table 4: Length (tokens) per problem (mean std) for the four high-resource languages from PolyMath, by difficulty level."
+        },
+        {
+            "title": "Odia",
+            "content": "Low 219 86 Medium 194 119 High 279 159 Top 317 181 84 32 115 62 144 88 153 78 90 35 117 64 151 92 161 82 126 47 135 76 179 104 195 103 106 41 126 69 163 99 180 91 471 187 346 236 536 308 604 Table 5: Length (tokens) per problem (mean std) for our PLURAMATH target languages (1/3), by difficulty level."
+        },
+        {
+            "title": "Hebrew Serbian",
+            "content": "Low 211 76 Medium 190 115 High 278 161 Top 298 169 228 93 190 116 278 161 311 187 149 56 158 88 217 120 241 129 100 39 121 68 163 97 177 91 81 32 110 59 136 86 143 73 118 45 123 67 157 69 181 Table 6: Length (tokens) per problem (mean std) for our PLURAMATH target languages (2/3), by difficulty level."
+        },
+        {
+            "title": "Slovak",
+            "content": "Catalan Chuvash U. Sorbian L. Sorbian Low 139 53 Medium 154 86 High 204 114 Top 226 119 102 41 121 68 161 96 173 91 85 33 110 59 139 88 148 77 141 54 148 85 206 119 219 118 112 45 129 71 171 100 182 115 47 130 73 173 101 187 100 Table 7: Length (tokens) per problem (mean std) for our PLURAMATH target languages (3/3), by difficulty level. Figure 9: Fuul box-plot comparison of math task sample lengths between four high-resource languages from PolyMath and the 18 newly introduced languages in PLURAMATH."
+        },
+        {
+            "title": "E Prompt Templates and Examples",
+            "content": "This section gives the full text of all prompts used in the experiments together with specific illustrative examples in Ukrainian. Throughout, HR denotes the high-resource pivot language (English by default; for non-English HR baselines such as German, Russian, or Spanish we substitute the language name in the directive). E.1 Templates 1. Base Problem and instruction in the target language. The model is free to reason in any language but is asked to place the final answer in $boxed{}$."
+        },
+        {
+            "title": "Base",
+            "content": "{problemtgt} {closing_instructiontgt} 2. Base+EN-CoT Problem in the target language; an additional system-level directive instructs the model to perform its chain-of-thought in English while still placing the final answer in $boxed{}$. Base+EN-CoT boxed{}$. [System] You are solving mathematical problem. Reason step by step in English, then write the final answer in $ [User] {problemtgt} 3. Backtranslated The problem is first machine-translated from the target language back to the highresource language using model, then presented to the model entirely in the high-resource language."
+        },
+        {
+            "title": "Backtranslated",
+            "content": "{problemHR} {closing_instructionHR} E.2 Prompts Example in Ukrainian We illustrate every prompt template on concrete problem from the low-difficulty level in Ukrainian. Native (Ukrainian) Качки Дженет несуть по 16 яєць на день. Вона їсть три на снiданок щоранку пече кекси для своїх друзiв щодня, використовуючи чотири. Решту вона щодня продає на фермерському ринку по 2 $ за свiже качине яйце. Скiльки в доларах вона заробляє на фермерському ринку щодня? Примiтка: Будь ласка, вставте остаточну вiдповiдь в $ boxed{}$."
+        },
+        {
+            "title": "English reference for illustration purpose only",
+            "content": "Janets ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers market? boxed{}$. Note: Please put the final answer in $ Native+EN-CoT (Ukrainian problem English CoT) [System] You are solving mathematical problem. Reason step by step in English, then write the final answer in [User] Качки Дженет несуть по 16 яєць на день. Вона їсть три на снiданок щоранку пече кекси для своїх друзiв щодня, використовуючи чотири. Решту вона щодня продає на фермерському ринку по 2 $ за свiже качине яйце. Скiльки в доларах вона заробляє на фермерському ринку щодня? boxed{}. Backtranslated (Ukrainian English via MT) Janets ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers market? Note: Please put the final answer in boxed{}. E.3 Per-Language Closing Instructions To keep the input fully monolingual under in Base prompt, we translated the closing instructions recommended in the original PolyMat (Wang et al., 2025) to keep the final output structured. Native speakers verified each translation. We list all 18 target-language directives in Table 10. Figure 10: The translated per language final instructions which were added in the end of main tasks. English original: Note: Please put the final answer in the $boxed{}$."
+        },
+        {
+            "title": "F Hyperparameter Search",
+            "content": "We performed two-stage hyperparameter search before running the main multilingual evaluation. All scores in this appendix are reported with the metrics described in Section 4.2: per-level scores are exactmatch accuracies of the content of the $boxed{}$ expression, and the rightmost column of each table reports PolyMaths difficulty-weighted accuracy (DW-ACC) aggregated over all four difficulty levels with weights {1, 2, 4, 8}. Stage 1 choosing the reasoning effort (English only). We first searched for an appropriate reasoning effort setting using only the English split of PolyMath. For each of the three reasoning models considered, we ran the supported reasoning-effort levels (low, medium, high) at fixed sampling temperature. Results are reported in Table 8. Stage 2 temperature sweep on high-resource languages. Using the reasoning-effort settings selected in Stage 1, we then ran narrower temperature sweep on three high-resource languages (English, German, Russian). The resulting configurations and per-language scores are shown in Table 9. The low+temperature= 0.5 configuration was run on English only as sanity check on temperature sensitivity and was not extended to the other two languages."
+        },
+        {
+            "title": "Low Medium High",
+            "content": "Top DW-ACC"
+        },
+        {
+            "title": "High",
+            "content": "gpt-oss-120b Qwen3-235B Qwen3-30B gpt-oss-120b Qwen3-235B Qwen3-30B gpt-oss-120b Qwen3-235B Qwen3-30B 79.2 93.6 92.8 77.6 92.8 93.6 83.2 93.6 89. 39.2 4.0 7.2 44.8 3.2 7.2 32.0 4.8 7.2 28.0 0.0 3.2 31.2 0.0 3.2 13.6 0.0 2. 13.6 0.0 0.8 9.6 0.0 0.8 4.0 0.0 0.8 25.2 6.8 8.4 24.6 6.6 8.5 15.6 6.9 8. Table 8: Effect of reasoning effort on English-only PolyMath performance. Per-level scores are exact-match accuracies (%) of the content of boxed{}; the DW-ACC column reports the difficulty-weighted accuracy aggregated over all four levels with weights {1, 2, 4, 8}."
+        },
+        {
+            "title": "Effort",
+            "content": "Temp. Model"
+        },
+        {
+            "title": "Low",
+            "content": "0."
+        },
+        {
+            "title": "Low",
+            "content": "0."
+        },
+        {
+            "title": "Low",
+            "content": "0.5 Medium 0.1 Medium 0.3 gpt-oss-120b Qwen3-235B Qwen3-30B gpt-oss-120b Qwen3-235B Qwen3-30B gpt-oss-120b Qwen3-235B Qwen3-30B gpt-oss-120b Qwen3-235B Qwen3-30B gpt-oss-120b Qwen3-235B Qwen3-30B 79.2 93.6 92.8 79.2 92.8 91.2 80.0 93.6 93.6 77.6 92.8 93. 79.2 93.6 91.2 39.2 4.0 7.2 40.0 3.2 7.2 38.4 3.2 5.6 44.8 3.2 7.2 41.6 3.2 6. 28.0 0.0 3.2 27.2 0.0 1.6 28.8 0.0 2.4 31.2 0.0 3.2 28.8 0.0 3.2 13.6 0.0 0. 8.8 0.0 0.8 10.4 0.0 0.8 9.6 0.0 0.8 9.6 0.0 0.8 25.2 6.8 8.4 22.6 6.6 7. 23.7 6.7 8.1 24.6 6.6 8.5 23.6 6.7 8.2 61.6 87.2 87.2 63.2 87.2 87.2 62.4 88.0 87.2 65.6 85.6 86.4 32.8 9.6 11.2 36.8 8.8 11.2 43.2 9.6 10. 43.2 7.2 12.0 29.6 1.6 4.0 31.2 1.6 4.0 32.0 1.6 5.6 28.8 0.8 4. 11.2 0.0 0.8 8.8 0.0 0.8 8.0 0.0 0.8 9.6 0.0 0.8 22.3 7.5 8. 22.1 7.4 8.8 22.7 7.6 9.1 22.9 6.9 8.9 66.4 91.2 89.6 69.6 92.0 88. 63.2 92.8 88.8 58.4 91.2 89.6 36.8 11.2 8.8 41.6 11.2 12.0 41.6 10.4 10.4 42.4 8.8 12.8 27.2 4.0 4.8 28.8 4.8 4.0 28.0 4.0 3. 27.2 4.8 4.0 12.8 0.0 0.8 16.0 0.0 0.8 8.8 0.0 0.8 8.8 0.0 0. 23.4 8.6 8.9 26.4 8.9 9.0 21.9 8.6 8.6 21.5 8.5 9.2 Table 9: Hyperparameter search on high-resource languages (English, German, Russian) across all four PolyMath difficulty levels. Each configuration combines reasoning-effort setting (low or medium) with sampling temperature. Per-level scores are exact-match accuracies (%); the DW column reports the difficulty-weighted accuracy aggregated over all four levels with weights {1, 2, 4, 8} (denominator 15). dash () marks configurations not run for the given language."
+        },
+        {
+            "title": "G Closed Models Inference Budget",
+            "content": "First, we utilized commercial closed-source APIs for precomputing translations. For 10 PLURAMATH languages, we used the DeepL API at total cost of ($63.82), while Gemini API usage across three models amounted to approximately ($11.60). We estimate the cost of the benchmark from output-token pricing, which dominates spend for reasoning models. The dataset contains = 4 difficulty levels with = 125 tasks each, giving = = 500 problems. We cap every reasoning trace at = 2,000 output tokens, so single model produces = 5102 2103 = 106 output tokens per language, i.e. exactly one million tokens. The benchmark covers ℓ = 22 languages and = 3 prompt designs. Let cm be the price (USD) per one million output tokens for model m. Because each model emits exactly 106 tokens per language, the cost of evaluating under single prompt design across all languages reduces to and full three-design sweep costs C3 C1 = cm ℓ 106 = ℓ cm = 66 cm. = cm ℓ = 22 cm, Evaluation protocol. To keep the budget tractable we run the full three-design sweep only for the open-weight mid-sized models and the two cheapest large open-weight models, where the marginal cost is negligible. The remaining large modelsincluding all proprietary endpointsare evaluated under the single base prompt design. Table 10 reports the per-model breakdown. Under this protocol the adopted budget is $236.94 (full thee-prompts design group for open-source models) + $724.90 (base-only group for bigger and closed models) = $961.84."
+        },
+        {
+            "title": "Access",
+            "content": "$/1M out 1 design ( 22) 3 designs ( 66)"
+        },
+        {
+            "title": "Model",
+            "content": "Full three-prompts design GPT-OSS-20B Gemma-4-31B-it Qwen3.5-35B-A3B DeepSeek-R1-Distill-70B Nemotron-3-Nano-30B-A3B GPT-OSS-120B DeepSeek-V3.2 Subtotal (full sweep)"
+        },
+        {
+            "title": "Open\nOpen\nOpen\nOpen\nOpen\nOpen\nOpen",
+            "content": "Base prompt design only Open Qwen3.5-122B-A10B Kimi-K2.5 Open Qwen3-235B-A22B-Thinking Open Claude-Haiku-4.5 Gemini-2.5-Flash GPT-5.4 Subtotal (base only)"
+        },
+        {
+            "title": "Adopted budget",
+            "content": "0.14 0.38 1.00 0.80 0.80 0.19 0.28 2.40 2.25 2.30 16.00 2.50 15.00 3.08 8.36 22.00 17.60 17.60 4.18 6.16 52.80 49.50 50.60 352.00 55.00 165.00 9.24 25.08 66.00 52.80 52.80 12.54 18.48 236.94 724. 961.84 Table 10: Estimated inference budget (USD). Costs are derived from output-token pricing: each model emits = 106 tokens per language (N = 500 problems, = 2,000 tokens per trace), so the cost of one prompt design across ℓ = 22 languages is 22 cm and full three-design sweep is 66 cm. Large and proprietary models are evaluated under single base prompt design only. Batched decoding halves the GPT-5.4 line item from $330.00 to $165.00. Detailed Per-Difficulty-Level and Per-Prompting-Ablations Results Here, we present details results per levels and prompts designs as well as additional results visualizations. Per difficulty levels results: Appendix H.1, models reasoning length comparison: Appendix H.2, per prompting types results: Appendix H.3. H.1 Per-Difficulty-Level Results Results for each difficulty level in terms of math answer correctness: low  (Table 11)  , medium  (Table 12)  , high  (Table 13)  , and top  (Table 14)  . Additionally, we put here box-plots results comparison per language (Figure 11) and per model (Figure 12). Overall, most models achieve relatively strong performance on low-level tasks, followed by substantial decline on higher difficulty levels. Even at the lowest level, Odia, Amharic, and Chuvash remain the most challenging underrepresented languages. For higher difficulty levels, only the gpt-oss variants and the proprietary GPT-5.4 and Claude-Haiku-4.5 models maintain consistently non-zero performance. ) r ( m s u l r r )"
+        },
+        {
+            "title": "R\nH",
+            "content": "( m e o - H"
+        },
+        {
+            "title": "Len",
+            "content": "Avg. dsb hsb cv ca sk tt sr he cs kk el am or uz uk pl tr hi Lang"
+        },
+        {
+            "title": "Len",
+            "content": "Avg. es ru de en ) ( m i - O T"
+        },
+        {
+            "title": "N\nE",
+            "content": "5 0 7 9 9 4 1 8 6 8 0 2 7 2 6 . 7 4 . 4 1 7 4 7 6 2 1 8 ."
+        },
+        {
+            "title": "N\nE",
+            "content": "0 1 1 1 5 3 2 2 2 . 1 T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L L L T 5 2 2 8 7 9 1 9 . 9 1 3 0 5 0 6 1 1 4 . 2 3 4 3 4 7 6 5 . 1 4 2 2 8 8 7 7 0 . 2 5 1 1 3 2 5 8 1 3 . 0 4 4 7 2 6 4 8 6 . 5 2 2 1 6 4 4 0 3 3 . 2 8 5 3 2 0 5 8 . 1 6 6 4 8 7 9 4 4 . 8 4 4 0 5 8 3 1 1 7 . 1 5 6 3 8 3 7 9 8 . 3 7 2 6 1 1 2 8 3 . 5 3 9 2 4 4 1 0 1 5 . 6 7 7 5 3 1 7 7 1 4 . 8 4 3 0 3 1 1 6 . 6 6 0 5 3 4 9 5 6 . 5 6 3 1 8 4 4 1 2 8 . 4 5 1 4 8 0 0 7 4 . 8 7 7 0 6 2 7 9 8 . 2 8 7 1 6 2 3 2 1 8 . 2 5 7 3 1 7 2 8 . 8 6 4 8 3 2 8 9 4 . 9 7 5 6 3 8 1 0 . 9 7 4 . 1 4 0 . 0 0 0 . 4 5 2 8 . 0 7 6 . 1 7 7 8 . 0 9 2 0 . 0 4 . 6 5 3 8 . 0 8 5 6 . 9 4 6 . 7 1 0 . 0 2 4 4 7 4 2 . 9 8 . 0 2 3 9 3 9 8 . 6 1 0 . 4 2 7 6 7 8 . 0 0 1 0 . 0 0 2 . 8 1 8 . 0 4 5 0 . 0 7 3 0 . 8 3 8 . 4 6 9 2 . 3 7 1 8 . 9 6 8 . 0 2 2 5 4 . 4 1 0 8 0 . 0 4 . 4 5 8 . 8 2 1 7 8 . 4 4 0 5 0 . 0 6 3 2 . 7 6 5 0 . 0 4 . 2 3 1 0 . 0 5 5 0 . 3 6 4 . 2 2 3 8 . 6 1 2 . 9 1 2 0 . 0 0 2 9 0 . 0 8 . 6 1 4 . 8 1 0 . 2 3 3 3 2 . 1 1 0 1 5 0 . 0 5 3 1 5 0 . 4 5 6 . 5 6 6 0 . 0 0 8 . 0 1 0 . 0 9 3 6 . 7 1 3 9 0 . 0 6 . 1 2 1 4 0 . 0 1 5 2 . 5 2 . 1 3 4 . 0 1 0 . 2 3 6 . 9 2 4 . 0 3 0 . 6 8 . 2 3 3 8 2 8 0 . 2 7 6 . 3 5 2 8 6 8 5 4 . 6 6 3 7 8 9 9 8 2 . 7 4 0 . 8 2 2 . 5 5 6 6 8 9 6 7 5 4 . 6 1 3 5 7 8 . 6 3 7 0 . 6 7 4 . 2 6 6 . 3 3 6 . 3 3 2 . 3 8 . 0 6 8 . 8 4 0 . 4 6 0 0 1 4 9 4 6 3 8 9 9 9 5 9 5 9 8 . 6 1 8 . 0 2 4 8 . 0 7 5 0 . 6 2 4 . 2 5 1 6 . 1 6 2 0 . 6 4 0 . 4 6 6 0 . 0 0 6 . 8 1 0 . 0 3 1 0 . 8 6 5 6 0 . 0 1 7 0 . 0 2 2 . 5 3 0 . 6 3 8 . 4 0 . 2 1 4 . 8 1 6 . 5 6 4 7 2 8 6 4 7 4 9 0 . 0 0 5 7 0 . 4 6 . 9 4 8 7 9 6 6 . 7 1 0 . 2 7 6 . 3 6 . 7 3 2 . 9 5 9 1 0 0 1 9 9 2 7 9 8 . 0 9 1 8 . 0 8 9 2 . 7 3 0 . 4 2 7 6 3 0 . 0 6 5 7 0 . 0 5 5 4 5 0 . 0 9 2 . 5 1 2 9 0 . 0 0 0 . 8 5 6 . 5 3 4 2 . 3 4 4 . 0 1 8 5 1 6 . 5 7 7 0 . 0 0 6 . 1 2 4 . 2 8 . 2 3 0 . 8 2 0 5 0 . 0 8 3 2 . 7 5 8 . 0 2 4 . 8 1 0 . 6 1 4 . 4 5 6 . 9 4 . 2 4 6 . 9 4 8 . 6 5 6 . 1 4 4 . 6 4 8 . 8 6 . 7 3 8 . 4 2 4 . 2 4 2 . 3 4 2 . 1 5 6 . 5 0 . 6 3 3 9 4 9 6 8 5 9 0 5 9 9 9 8 9 3 9 5 9 6 5 9 0 9 7 9 7 9 8 9 6 2 9 4 . 2 9 2 0 . 0 2 6 6 . 1 4 0 . 0 4 4 2 . 1 3 0 . 0 4 4 8 8 8 . 0 7 6 0 . 0 0 8 8 . 1 7 4 . 8 5 2 . 5 3 3 6 4 . 0 1 2 6 4 6 . 1 6 7 0 . 4 0 6 0 . 9 8 2 . 3 6 0 . 0 3 8 0 . 6 0 . 6 3 6 . 7 1 0 . 0 4 5 4 0 . 4 9 8 4 8 . 4 6 8 2 3 0 . 2 9 7 4 0 . 0 8 9 4 . 2 8 0 . 0 0 . 4 6 8 . 8 8 8 . 4 8 0 . 2 7 4 . 6 6 4 . 2 0 0 1 0 0 1 3 9 9 9 0 0 1 9 7 9 0 0 1 8 . 0 0 1 0 . 0 8 0 . 0 0 2 6 . 1 2 2 3 0 . 0 1 0 . 0 0 5 8 . 0 6 2 0 . 4 6 2 . 5 7 8 9 6 . 3 5 2 . 7 6 6 . 9 4 2 . 7 1 6 0 . 0 5 9 2 . 7 8 9 9 4 2 . 1 1 9 3 8 . 8 8 9 9 8 5 8 . 7 3 8 3 0 . 0 7 8 2 . 3 8 8 . 0 0 0 1 9 9 2 . 1 3 2 . 7 2 4 . 2 4 8 . 2 0 . 2 5 8 . 2 5 0 . 2 5 6 . 1 6 4 . 6 4 2 . 9 8 . 6 5 0 . 8 4 4 . 8 3 2 . 1 5 2 . 5 5 4 . 0 8 . 2 5 6 . 1 4 ) 5 3 7 ( h w - O 6 8 9 7 9 8 9 8 9 0 0 1 9 8 9 6 9 8 9 9 9 4 . 2 4 4 . 6 0 . 2 1 4 . 2 6 2 . 7 4 2 . 5 3 8 . 8 4 6 . 5 2 . 5 7 8 . 8 6 6 . 5 8 1 5 9 9 0 0 5 9 0 0 1 4 9 0 . 0 7 3 6 . 1 9 1 4 9 8 9 8 9 8 8 9 4 . 0 5 8 . 6 5 6 . 7 7 4 . 6 6 8 . 8 2 6 4 6 8 7 8 6 8 9 8 . 6 0 . 2 7 2 . 5 3 4 . 4 7 6 . 3 7 2 . 7 6 0 . 4 6 . 7 7 6 . 5 4 0 . 4 2 6 . 3 5 2 . 5 7 0 . 6 6 . 9 4 2 . 7 6 0 9 4 9 4 7 0 3 9 2 9 0 4 4 9 8 7 2 1 8 1 9 1 9 2 7 0 9 9 4 9 6 8 6 6 5 5 4 . 4 5 8 . 6 2 . 1 1 4 . 2 8 2 . 9 7 4 5 8 . 0 8 3 1 9 0 . 2 1 0 . 2 1 9 3 1 4 6 8 . 0 3 3 4 9 8 9 8 . 4 6 8 . 8 6 8 3 6 6 9 6 . 5 0 5 2 . 3 0 . 4 8 2 . 5 7 2 . 3 8 4 . 2 8 0 . 8 4 6 . 7 8 . 4 8 2 . 7 8 8 . 4 8 6 . 9 8 2 . 3 8 7 9 9 0 0 1 0 0 1 0 0 1 0 . 4 6 4 . 4 8 . 0 6 8 . 2 1 8 . 6 5 2 9 9 8 8 4 4 8 7 8 7 0 . 0 4 5 7 6 . 1 6 4 8 9 9 9 8 9 7 8 9 4 . 2 2 8 . 6 3 8 . 2 7 4 . 4 5 2 . 5 1 8 6 6 0 9 8 7 2 8 2 . 5 4 . 2 6 6 . 3 3 8 . 0 8 8 . 0 8 4 . 4 7 6 . 5 8 . 0 8 2 . 1 7 4 . 2 8 4 . 8 7 8 . 4 8 4 . 8 0 . 8 8 4 . 2 8 2 . 3 8 8 . 8 8 4 . 6 8 6 4 8 3 7 3 9 4 9 9 8 6 6 9 2 9 7 9 1 9 5 9 3 7 9 6 9 4 9 8 9 8 9 2 . 9 4 . 0 3 6 . 5 2 4 . 4 5 4 . 4 5 2 . 3 4 4 . 4 4 . 4 5 4 . 6 4 0 . 8 4 8 . 6 5 0 . 2 5 8 . 2 2 . 3 6 8 . 0 6 8 . 6 5 2 . 5 5 2 . 3 4 4 8 9 5 9 4 9 9 9 0 0 1 8 8 9 2 9 8 9 9 9 5 9 4 6 9 8 9 9 9 9 9 4 9 4 . 4 6 . 7 5 6 . 5 4 0 . 2 7 6 . 3 7 6 . 5 6 6 . 1 6 . 7 7 6 . 3 7 0 . 2 7 6 . 7 7 5 9 8 1 9 0 0 1 0 0 1 5 9 0 0 1 0 0 9 9 0 0 1 0 0 1 0 . 8 0 9 6 . 9 6 . 3 7 4 . 2 8 2 . 3 8 6 . 7 7 6 . 3 7 8 0 0 1 0 0 1 9 9 9 9 0 0 1 4 . 4 4 . 4 5 0 . 6 1 0 . 4 6 8 . 0 6 0 . 6 7 2 . 5 8 . 2 7 4 . 4 5 0 . 4 8 2 . 9 5 6 . 9 6 4 . 0 8 . 0 8 8 . 2 7 6 . 5 6 8 . 6 7 8 . 2 7 0 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 0 0 1 0 0 1 0 0 1 0 0 1 8 9 0 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 . 4 2 . 7 4 2 . 3 4 2 . 3 6 0 . 6 5 4 . 6 4 6 . 1 6 . 5 6 6 . 9 4 4 . 4 5 6 . 5 6 6 . 7 5 6 . 1 8 . 0 6 8 . 0 6 8 . 6 5 0 . 0 6 0 . 2 5 A / a i - O 8 9 8 . 2 6 8 9 9 6 . 7 7 5 9 9 9 6 . 7 8 3 6 . 1 8 2 . 3 8 6 . 5 6 6 . 9 8 6 . 5 6 . 9 6 2 . 1 9 4 . 0 9 0 9 8 8 8 2 9 4 9 6 8 4 9 4 9 7 4 9 3 9 3 8 8 9 1 9 0 . 6 9 8 6 9 4 . 2 8 3 9 4 9 4 . 6 4 9 8 5 1 8 0 8 4 9 6 6 8 2 . 9 7 0 . 0 8 8 . 0 8 2 . 9 7 8 . 2 4 8 6 8 8 8 4 9 5 9 8 . 8 0 . 8 8 5 9 4 9 2 . 1 5 6 . 7 5 4 . 0 4 . 8 5 0 . 0 6 8 . 4 4 0 . 2 5 4 . 4 5 6 . 5 2 . 5 5 0 . 6 5 2 . 1 5 6 . 3 5 0 . 2 5 0 . 2 4 . 2 6 0 . 8 6 4 . 6 4 9 8 4 9 0 7 8 7 8 4 9 7 9 4 9 8 8 9 5 8 5 8 1 8 0 9 4 4 9 4 9 8 8 8 9 8 . 4 8 0 0 8 . 4 8 9 9 9 9 0 0 1 7 9 8 8 9 9 9 8 9 5 9 7 9 9 7 9 0 . 0 8 4 . 2 8 4 . 4 9 6 . 7 7 2 . 1 2 . 1 9 8 . 6 5 6 . 7 7 8 . 6 7 6 . 9 8 2 . 3 8 . 4 8 5 9 2 . 7 8 2 9 9 9 0 0 7 9 0 0 1 0 0 1 0 0 1 0 0 1 0 0 0 0 1 2 . 9 5 0 . 8 6 4 . 2 8 8 . 6 7 6 . 7 4 . 8 7 2 . 7 8 2 . 3 8 2 . 1 7 2 . 1 7 8 . 4 6 . 5 4 4 . 2 6 6 . 3 5 4 . 4 7 0 . 0 6 4 . 8 6 . 9 4 6 . 5 8 0 . 8 6 0 0 1 6 . 9 8 8 1 9 6 . 3 7 0 0 1 3 9 0 . 6 7 0 0 4 9 8 . 0 8 0 0 1 7 9 2 9 2 6 . 7 7 8 . 6 7 2 . 5 7 0 0 1 0 0 1 0 0 7 9 6 . 9 8 0 0 1 6 9 0 . 2 9 0 0 4 9 6 9 6 9 0 9 3 9 5 7 9 8 9 7 9 8 . 8 6 8 . 0 8 2 . 3 2 . 5 7 2 . 7 6 0 . 4 8 4 . 2 8 4 . 2 8 6 . 5 2 . 1 7 0 0 1 0 0 1 0 0 1 0 0 1 0 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 6 . 5 8 0 0 1 2 . 5 7 4 . 6 8 6 . 3 7 u - o 6 . 1 8 8 . 6 7 6 . 9 6 8 . 6 5 4 . 4 7 2 . 9 9 9 0 0 1 8 . 4 8 0 0 1 0 0 1 0 0 0 0 1 2 . 7 8 0 . 4 8 6 . 5 8 2 . 9 7 L L L T L L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L L L T L L L L 9 8 6 8 1 5 6 ."
+        },
+        {
+            "title": "N\nE",
+            "content": "3 0 4 1 9 0 4 3 0 . 0 1 8 4 8 4 7 4 . 8 7 4 7 9 2 3 2 1 0 . 4 2 8 2 7 4 8 1 6 . 9 2 9 3 4 1 5 7 6 . 5 8 1 9 1 5 1 3 8 . 9 3 6 4 2 2 5 6 . 6 6 5 3 3 3 6 7 1 2 . 8 4 7 5 4 7 5 5 1 6 . 3 9 4 7 8 1 9 2 6 . 2 3 8 4 1 0 1 3 6 . 7 8 7 6 1 1 6 4 7 2 4 . 1 7 6 2 3 3 6 4 . 4 8 6 9 5 5 4 5 8 . 4 8 2 5 0 1 8 2 6 6 . 4 5 0 4 2 3 8 4 . 4 8 9 8 3 6 3 6 1 4 . 5 5 0 . 0 4 6 0 . 0 0 8 . 4 5 1 0 . 0 8 . 8 2 8 . 2 5 8 9 0 . 0 0 3 0 . 0 0 4 . 2 8 2 . 7 6 6 . 3 7 4 . 0 8 8 6 . 5 6 8 3 7 8 . 0 0 2 8 8 . 0 6 6 3 9 8 . 8 4 0 0 . 2 3 6 . 9 2 0 . 8 2 8 . 8 2 7 7 6 4 8 5 5 0 . 8 8 0 . 4 8 8 . 6 7 6 . 3 3 9 0 9 8 8 4 9 0 . 4 8 8 . 6 8 . 8 6 6 . 9 8 9 9 9 9 9 9 0 0 0 . 4 8 0 . 0 2 8 . 8 6 6 . 3 9 4 9 7 9 8 0 0 1 4 . 6 4 8 . 2 5 6 . 9 4 0 . 4 2 9 2 9 5 9 9 8 2 . 9 7 4 . 8 8 . 4 6 0 . 2 7 2 8 4 . 0 3 3 6 8 . 2 0 0 1 3 4 0 . 0 2 8 . 4 8 6 . 7 9 9 0 0 1 6 6 0 7 2 . 5 9 0 0 1 7 4 7 0 . 4 4 0 . 6 5 0 . 6 5 8 . 6 2 . 9 3 6 . 3 5 9 8 8 9 7 9 2 0 . 2 9 6 . 5 6 6 . 5 8 4 . 4 9 9 9 8 0 0 1 9 9 0 . 8 8 0 . 8 8 6 . 3 7 6 . 9 8 9 9 9 9 9 0 0 1 8 . 0 6 2 . 3 0 . 0 6 4 . 4 7 7 7 5 7 2 8 0 8 . 8 8 0 . 8 8 6 . 7 7 2 . 3 8 4 9 5 5 9 5 8 8 . 0 6 0 . 6 5 4 . 0 5 4 . 4 4 9 5 9 7 9 2 9 5 . 1 - Q - t - 1 3 - 3 - t i B 4 - 3 - e 4 - 5 . 3 Q 2 - 5 . 3 Q 6 . 2 - O 8 . 0 - 5 . 3 Q 2 . 1 - 5 . 2 L 4 . 1 - O o i - 7 - 3 - O 8 - 3 Q - 8 2 5 0 - 1 8 - 3 - t i 4 1 - 3 - t i b 0 2 - - B 9 - 5 . 3 Q 0 3 - N - 3 t N 3 - 5 3 - 5 . 3 Q 1 3 - 4 - e 0 7 2 9 6 0 . 9 7 8 3 2 0 0 4 6 . 9 6 0 8 0 1 8 6 0 2 2 . 9 5 7 1 8 2 6 2 0 . 2 9 6 6 5 8 4 7 6 . 8 8 1 3 6 0 8 9 2 . 1 6 6 . 7 4 . 0 9 2 . 3 6 8 . 4 8 0 0 1 8 9 0 0 8 9 4 . 4 7 0 . 4 6 4 . 2 6 6 . 7 7 0 0 0 0 1 0 0 1 0 0 1 0 . 6 5 0 . 0 6 2 . 1 6 . 9 6 8 9 8 9 6 9 4 9 4 . 4 8 . 2 9 0 . 8 8 8 . 2 9 8 9 8 9 8 4 9 6 . 9 8 2 . 3 8 6 . 5 8 0 . 6 9 3 3 9 4 9 9 9 0 . 4 6 8 . 2 5 6 . 5 4 . 2 8 7 8 1 9 2 9 2 9 0 7 - l - t - 1 B 0 1 - 2 2 1 - 5 . 3 Q 0 2 1 - - B 2 2 - 5 3 2 - 3 Q 2 . 3 - S D 5 . 2 - K 7 8 2 2 0 . 4 6 9 4 3 7 2 8 8 . 8 7 6 4 8 2 1 0 . 2 7 2 . 9 6 . 3 5 0 . 0 6 2 . 3 8 0 0 1 0 0 1 0 0 0 0 1 8 . 4 8 2 . 1 7 8 . 6 7 4 . 2 8 6 6 9 4 9 4 9 0 . 2 7 6 . 3 7 6 . 9 8 . 2 7 0 0 1 0 0 1 0 0 1 0 0 1 5 . 4 - a - a h F - 5 . 2 - m 4 . 5 - e e ) a ; % ( r a s w l h . a"
+        },
+        {
+            "title": "M\ny\nl\no\nP\nm\no\nr\nf",
+            "content": "s e o - h e g H A P n l r t r - b u fi - : 1 1 a ) c - ( g o l d i i e a ; ) % 0 0 1 0 , t d p ( a fi p - t y u s c g a l . ) m ; % ( a n p t o - s g n c e A . h h e m c t - c d s . n a e e a o c e t l g o e s c ) c - h ( a e w n l ) l y a o p ("
+        },
+        {
+            "title": "N\nE\nd\ne\nd\no\nc",
+            "content": "e g r n a o t , ) s + n e , k ( n o r g a h , r a a a - a t p w l . ) u l r e u ( o"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L L L T ) r ( m s u l r u )"
+        },
+        {
+            "title": "R\nH",
+            "content": "( m e o - H"
+        },
+        {
+            "title": "Len",
+            "content": "Avg. dsb hsb cv ca sk tt sr he cs kk el am or uz uk pl tr hi Lang"
+        },
+        {
+            "title": "Len",
+            "content": "Avg. es ru de en"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "4 9 5 0 2 4 2 4 6 7 0 1 7 2 9 0 2 2 1 7 1 9 9 3 0 8 2 3 0 5 7 7 9 1 8 8 1 4 0 7 6 4 4 6 4 8 1 0 . 1 9 . 0 1 . 3 4 . 1 4 . 2 . 5 4 . 8 3 3 6 9 5 6 1 1 . 0 1 8 3 1 7 9 1 4 . 2 9 9 0 0 2 2 5 2 4 7 1 3 4 . 0 3 . 0 0 5 5 8 7 7 1 8 . 2 6 6 1 4 7 2 3 0 2 3 5 9 9 1 0 . 4 8 . 5 4 7 0 1 9 9 6 2 5 . 5 1 2 4 1 1 9 5 1 7 . 0 1 9 9 1 4 4 9 1 2 3 3 7 9 1 8 . 8 7 . 6 . 1 4 4 0 . 0 0 0 . 4 3 0 . 0 1 1 0 . 0 2 3 8 . 4 3 2 . 1 1 8 2 0 . 8 5 6 0 . 0 8 4 . 2 5 2 0 . 0 0 4 . 2 0 8 . 0 0 1 0 . 0 8 1 2 . 7 5 0 . 8 2 3 8 . 8 1 7 0 . 0 4 0 . 0 8 1 8 . 0 1 2 8 . 0 3 8 . 0 9 1 4 . 4 1 4 . 4 1 4 3 0 . 6 6 4 . 6 9 1 8 3 6 . 1 3 8 . 8 8 1 0 . 0 2 0 . 0 8 . 0 2 1 0 . 4 0 2 0 . 0 2 4 . 2 7 1 0 . 8 2 4 8 . 4 3 4 . 2 4 3 0 . 0 8 2 0 . 0 1 8 . 4 0 2 2 . 3 9 5 8 . 8 0 0 . 0 0 1 4 . 2 3 1 6 . 5 0 6 . 1 7 0 . 0 4 2 . 3 4 . 2 0 3 0 . 0 0 2 . 3 8 . 0 9 8 . 0 5 2 . 7 2 6 . 3 1 2 . 1 1 2 6 5 2 6 . 3 1 8 . 2 5 8 8 . 0 9 3 7 2 . 3 3 6 . 1 7 1 0 . 0 0 2 . 3 2 8 . 0 4 1 8 . 0 1 1 0 . 4 3 6 . 5 2 2 4 . 6 3 4 6 . 1 2 0 . 0 4 2 . 3 3 2 4 . 2 8 . 0 4 0 . 0 1 1 4 . 6 0 0 . 0 0 6 . 1 7 2 . 0 0 2 . 3 8 . 0 5 1 0 . 0 9 . 5 2 1 4 . 2 4 3 0 . 0 2 . 3 8 2 . 3 8 1 8 . 0 8 . 8 5 1 4 . 4 1 8 . 2 1 4 3 9 8 . 2 1 6 . 3 1 6 . 3 1 5 7 8 . 0 0 8 7 6 . 1 0 1 2 8 4 . 2 1 8 . 0 2 8 . 0 0 1 0 . 2 8 . 0 4 1 0 . 0 4 2 0 . 4 3 0 . 0 1 0 . 0 2 2 . 0 2 0 . 0 8 3 8 . 5 8 . 0 5 1 8 . 6 1 2 . 1 1 2 . 1 8 . 6 1 8 . 6 1 6 . 3 1 8 3 8 . 0 4 6 . 1 2 0 3 4 . 6 2 2 0 . 3 6 2 0 . 8 2 4 0 . 0 1 3 3 6 . 1 7 0 . 0 2 1 8 . 4 5 2 6 2 6 . 5 3 0 . 0 7 0 . 0 0 4 . 2 6 . 1 5 1 0 . 0 6 6 . 1 8 . 8 2 4 2 . 7 8 4 8 . 0 1 8 . 0 6 0 . 0 3 3 8 . 4 4 6 . 5 7 2 8 . 6 1 6 . 7 1 8 . 2 1 2 . 1 7 4 6 3 6 2 0 3 ) 4 ( m i - O 4 . 2 6 0 . 0 0 2 . 3 6 6 . 1 9 8 . 0 4 4 . 6 0 1 4 . 0 1 4 8 . 2 1 0 8 4 . 2 0 1 0 . 0 1 2 . 3 3 2 4 . 2 3 2 0 . 4 2 8 . 0 8 6 . 1 4 1 0 . 0 2 . 7 9 6 8 . 0 6 2 8 . 0 7 0 . 0 0 4 . 2 5 8 . 0 8 0 . 0 0 2 2 . 7 4 1 8 . 4 3 8 . 4 3 4 8 . 0 1 4 0 . 0 6 . 1 5 7 4 . 2 0 1 6 . 1 2 8 . 0 9 0 . 4 0 1 0 . 0 0 . 8 8 7 6 . 1 4 1 2 . 3 6 0 . 0 0 0 . 0 2 0 . 0 2 0 . 0 2 8 . 8 4 1 0 . 0 1 0 . 4 7 1 8 . 4 7 8 . 0 1 6 . 1 8 0 . 0 0 6 . 3 1 6 . 3 5 5 0 3 0 . 0 1 1 4 . 2 0 8 . 4 0 1 4 . 2 1 1 8 . 0 2 . 7 0 1 0 . 0 2 0 . 0 5 0 . 0 0 8 . 4 7 8 . 0 6 0 . 0 4 1 0 . 8 2 1 4 . 4 1 2 0 . 2 1 6 . 3 1 0 . 2 1 4 . 0 1 4 8 6 . 7 5 7 6 . 1 0 1 7 7 8 . 7 8 7 6 . 1 3 3 ) 5 3 7 ( t e - O 8 . 0 1 0 . 0 3 3 0 . 0 1 0 . 0 1 2 8 . 2 1 4 . 0 1 3 0 . 4 3 2 3 3 6 . 1 2 2 0 . 4 0 . 0 2 0 . 0 4 3 6 . 7 3 4 . 6 8 4 0 . 0 2 0 . 8 0 . 0 9 6 . 1 5 8 . 1 3 8 . 0 2 0 . 0 1 0 . 2 0 . 0 4 0 . 0 2 0 . 4 3 2 . 5 1 8 . 2 1 8 . 6 1 6 . 3 1 6 . 3 0 5 8 . 4 6 1 8 . 0 5 0 0 . 8 2 2 8 . 0 1 1 5 4 . 8 8 . 0 5 2 3 0 . 0 8 . 0 3 2 4 0 . 8 3 4 8 . 6"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L 6 . 5 2 2 . 7 2 0 . 6 1 8 . 0 8 . 8 2 4 . 0 3 4 . 8 1 0 . 8 2 6 . 9 2 2 . 7 2 . 1 3 0 . 0 2 4 . 0 3 0 . 0 2 0 . 2 3 4 . 2 4 . 2 2 8 . 8 2 2 6 0 . 8 8 3 4 . 3 2 6 . 1 8 7 8 5 6 . 3 1 4 6 . 5 6 1 0 . 4 7 5 6 6 6 . 8 3 0 . 8 9 1 6 . 1 2 5 8 7 5 4 . 0 1 8 . 2 1 7 3 4 . 0 1 4 6 . 1 3 1 7 4 2 . 7 2 1 6 . 4 1 4 5 8 . 8 4 4 8 . 8 6 6 . 1 4 2 5 3 8 5 6 5 8 . 2 6 . 7 1 6 . 3 1 3 6 4 . 0 1 5 1 8 . 0 1 0 5 8 . 8 5 1 . 1 8 4 4 6 . 9 5 1 8 . 8 4 5 0 . 8 5 3 0 . 8 4 0 . 4 6 1 8 5 6 . 7 1 4 4 0 . 3 1 4 . 2 0 1 7 3 8 . 8 8 6 . 9 5 1 2 . 3 9 2 1 6 4 . 5 3 6 . 5 0 1 8 . 0 6 3 4 0 . 4 4 5 2 . 7 2 1 4 . 2 6 9 5 6 . 9 2 4 8 . 2 1 7 1 4 . 9 7 3 0 4 3 6 4 . 0 1 2 . 1 8 . 6 1 4 3 6 . 9 4 1 0 . 0 6 4 5 3 2 . 1 1 4 . 0 1 7 1 0 . 6 6 1 0 . 0 4 1 / r h w - O 6 3 1 1 3 5 7 2 8 . 6 8 9 2 5 5 3 6 9 1 1 7 6 1 3 7 3 4 3 1 3 1 3 9 5 9 1 0 0 2 5 1 8 1 0 . 4 . 6 2 . 1 6 . 0 8 . 7 4 . 6 0 0 . 0 0 4 . 6 1 1 8 . 0 0 . 0 4 0 . 8 3 1 2 . 3 8 0 . 0 0 0 . 4 7 8 . 0 0 . 0 6 0 . 8 1 1 4 . 2 2 0 . 0 0 4 . 0 1 6 1 8 . 0 4 6 . 1 5 2 . 7 2 1 2 . 7 7 0 . 0 0 8 . 4 8 4 . 2 8 . 0 3 0 . 8 4 1 0 9 5 1 2 6 1 2 . 5 6 4 4 8 0 5 1 8 . 4 1 3 1 4 6 9 1 6 . 0 4 . 8 1 2 . 5 0 . 2 1 2 . 5 1 2 6 3 5 4 3 4 8 . 2 1 8 . 2 1 4 . 4 1 2 . 9 1 7 7 8 . 7 4 7 0 . 0 0 1 4 8 6 . 9 2 8 0 . 0 2 6 0 1 1 1 0 2 0 5 2 9 5 1 4 . 1 4 . 1 2 1 5 8 8 7 1 0 . 5 1 5 9 1 8 8 8 3 4 . 8 1 4 3 9 7 1 0 . 5 1 8 . 0 4 6 . 1 8 . 0 2 0 . 0 1 2 . 3 6 . 1 3 8 . 0 2 4 . 2 8 . 0 2 4 . 0 1 2 . 5 1 6 . 3 1 2 4 0 . 6 1 4 . 2 2 8 5 6 2 2 . 7 0 0 . 0 2 0 3 6 . 5 2 2 8 8 . 0 5 4 . 2 2 2 . 5 1 9 5 0 4 . 0 3 4 . 4 3 4 . 0 3 4 . 4 3 9 5 6 . 5 3 5 3 7 5 0 6 1 6 6 . 7 2 . 5 1 0 ."
+        },
+        {
+            "title": "N\nE",
+            "content": "6 7 3 1 9 1 0 3 4 ."
+        },
+        {
+            "title": "N\nE",
+            "content": "1 6 6 1 9 8 3 2 6 . 5 1 T 0 9 1 4 2 9 1 2 1 5 6 9 0 . 9 2 . 1 0 . 2 1 0 . 2 1 6 1 8 . 6 7 1 6 . 1 7 5 3 8 . 4 1 6 . 1 1 1 5 4 2 . 3 8 . 0 2 5 . 1 - Q - t - 1 3 - 3 - t i 4 - 3 - e 4 - 5 . 3 Q 2 - 5 . 3 Q 6 . 2 - O 8 . 0 - 5 . 3 Q 2 . 1 - 5 . 2 B 4 . 1 - O o k T - 7 - 3 - O 8 - 3 Q - 8 2 5 0 - 1 8 - 3 - t i 4 1 - 3 - t i 0 2 - - B 9 - 5 . 3 Q 0 3 - N - 3 t N 3 - 5 3 - 5 . 3 Q 1 3 - 4 - e 8 2 2 3 0 0 2 0 . 8 3 2 0 1 7 8 4 8 . 9 2 1 9 1 9 6 2 3 9 9 3 6 0 2 3 0 . 4 3 . 7 2 2 3 4 1 0 3 . 5 1 6 4 1 3 9 0 2 2 . 6 8 . 8 6 1 2 . 1 0 . 8 6 1 2 . 5 3 0 . 2 1 6 2 4 . 2 1 6 . 7 1 8 . 4 2 1 7 8 . 8 8 8 7 8 . 4 1 7 2 . 1 1 4 . 4 1 8 9 1 8 7 8 . 4 4 5 6 . 9 9 3 4 6 . 1 1 1 0 . 4 5 8 . 1 1 8 . 6 3 7 6 0 . 4 6 2 2 . 1 7 1 6 . 9 2 2 4 . 4 3 2 . 7 8 8 . 4 2 6 . 5 4 1 8 . 6 3 0 . 4 1 8 . 2 3 4 . 0 1 4 1 0 . 6 3 8 . 7 2 2 . 5 3 6 . 5 6 1 0 . 8 8 4 . 6 4 1 2 . 3 2 8 . 2 3 8 . 4 2 0 . 2 6 2 4 . 4 3 0 . 8 2 1 8 . 4 0 6 . 1 2 4 . 2 2 8 . 8 6 1 0 . 2 3 6 4 . 6 8 3 8 . 8 8 1 5 4 6 . 9 0 . 4 6 3 7 2 . 0 2 8 . 8 5 1 1 7 0 . 2 2 6 . 9 7 1 2 7 4 . 6 4 0 . 8 4 1 2 7 6 . 5 9 2 4 . 3 1 1 4 6 . 1 6 1 0 . 4 5 6 8 . 8 3 4 2 . 7 6 1 2 6 . 1 1 1 2 . 3 6 6 6 2 . 2 2 6 . 9 8 1 5 4 8 . 0 6 . 1 4 5 4 6 . 1 8 2 . 4 5 6 0 . 4 9 2 2 . 7 3 8 . 6 1 0 . 6 1 2 . 5 1 6 . 3 1 0 . 0 2 8 . 2 4 . 4 1 4 . 8 1 6 . 3 1 8 . 2 1 8 . 6 1 4 . 4 0 . 6 1 0 . 2 1 2 . 5 1 8 . 6 1 0 . 6 1 2 . 5 0 3 6 . 5 4 3 8 3 4 . 6 1 8 2 8 . 4 1 4 4 2 0 . 4 2 0 3 8 . 4 1 2 8 1 6 . 5 6 1 3 0 . 8 9 1 2 3 6 . 4 1 4 2 6 . 5 1 2 3 2 6 . 9 1 0 3 0 . 8 1 2 7 2 6 . 0 3 6 2 8 . 8 2 2 8 1 2 . 4 1 4 2 0 . 8 0 2 9 2 0 . 0 2 8 2 4 . 6 4 1 8 2 2 . 6 1 5 7 2 2 5 0 1 2 . 3 4 9 9 1 4 2 9 2 4 9 . 3 9 2 2 6 6 1 . 0 3 2 . 9 3 4 . 6 4 2 . 1 3 4 . 6 4 0 . 0 8 . 4 4 4 . 2 4 4 . 2 4 6 . 1 4 0 . 4 4 6 . 5 6 . 5 4 4 . 2 4 0 . 4 4 8 . 8 4 2 . 9 3 6 . 9 2 . 3 4 0 0 1 0 . 4 7 0 0 1 6 . 7 6 . 9 2 6 . 9 2 0 0 1 0 0 1 5 8 . 4 9 9 4 . 2 7 6 . 9 2 4 . 4 3 0 0 1 0 0 1 0 0 1 6 . 5 0 0 1 0 . 4 4 0 . 2 3 8 . 8 2 0 0 0 0 1 0 0 1 0 . 4 6 4 . 0 3 9 0 . 4 5 9 9 4 . 2 9 9 8 . 4 6 0 0 1 4 . 2 4 . 6 2 0 . 8 2 8 . 8 2 2 . 1 3 8 9 4 . 9 9 0 . 4 0 0 1 4 . 2 3 2 . 7 5 6 . 3 3 5 2 . 5 3 0 0 1 0 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 9 9 8 . 4 6 0 . 8 2 0 0 1 9 8 . 4 0 0 1 0 . 4 7 2 . 7 2 8 . 2 3 0 0 1 0 0 1 8 9 0 . 4 8 . 8 2 0 0 1 u - o T T L L L 7 8 1 2 2 0 2 8 . 7 2 0 3 1 2 1 7 2 4 . 1 4 7 0 2 3 8 8 3 9 3 5 0 3 8 0 . 4 0 . 8 8 4 3 9 0 0 2 8 . 5 1 5 5 1 3 8 0 2 2 . 4 . 6 4 1 0 . 6 3 3 7 6 . 1 4 8 . 8 7 1 4 . 4 1 2 2 6 . 1 4 4 2 . 7 9 1 4 . 0 1 8 1 8 . 4 1 2 . 3 4 6 . 5 2 1 8 . 4 4 3 7 4 . 2 2 6 . 9 4 1 4 7 8 . 0 0 2 . 3 9 2 . 5 1 2 . 5 1 6 . 7 1 2 . 5 6 2 4 . 6 0 1 5 2 0 . 4 1 3 2 2 . 7 0 1 2 2 2 . 7 2 0 7 - l - t - 1 0 1 - 2 2 1 - 5 . 3 Q 0 2 1 - - B 2 2 - 5 3 2 - 3 Q 2 . 3 - S D 5 . 2 - K 6 5 2 8 1 0 1 8 . 5 4 5 4 0 4 1 2 0 4 2 . 3 8 1 2 3 1 5 0 . 3 6 . 5 4 2 . 3 4 8 . 4 4 6 . 9 4 0 0 1 2 . 4 9 9 2 . 3 4 0 0 1 0 . 6 0 0 1 4 . 2 4 8 . 2 3 0 . 2 4 . 4 3 8 . 2 3 0 0 1 0 0 1 0 0 1 0 0 5 . 4 - a - a s - 5 . 2 - m 4 . 5 - e e ) a ; % ( r a s w s e a . a"
+        },
+        {
+            "title": "M\ny\nl\no\nP\nm\no\nr\nf",
+            "content": "s e o - h e g l"
+        },
+        {
+            "title": "H\nT\nA\nM\nA\nR\nU\nL\nP",
+            "content": "r o u g p p - b u fi - d : 2 b ) c - ( i k b e r i r n ; ) % 0 5 0 , t d p ( c fi p - t o a c d e d l . ) m ; % ( r a m a f - s g n h r A . h h e m c p b - c n e . n a e s r u c t t b l y o s c ) c - h ( d t n a l ) l y a o p ("
+        },
+        {
+            "title": "N\nE\nd\ne\nd\no\nc",
+            "content": "e g r n a o t , ) s + n e , k ( n o r g a h , r a a a - a t p w l . ) u l r e u ( o ) r ( m s u l r u )"
+        },
+        {
+            "title": "R\nH",
+            "content": "( m e o - H"
+        },
+        {
+            "title": "Len",
+            "content": "Avg. dsb hsb cv ca sk tt sr he cs kk el am or uz uk pl tr hi"
+        },
+        {
+            "title": "Len",
+            "content": "Avg. es ru de en"
+        },
+        {
+            "title": "N\nE",
+            "content": ""
+        },
+        {
+            "title": "N\nE",
+            "content": "L"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L L L T L 2 0 6 0 1"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "6 3 7 1 5 7 2 6 8 1 6 3 7 1 2 4 4 0 7 2 3 3 6 1 9 9 1 3 6 1 6 0 8 1 3 6 2 4 7 9 8 4 6 2 3 9 1 0 3 0 7 9 1 6 1 1 0 1 0 2 4 0 3 0 5 2 3 8 1 3 7 4 9 1 5 5 2 8 2 4 1 2 0 5"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "1 2 6 6 9 1 7 9 3 6 9 1 5 8 6 6 4 2 3 4 . 4 1 2 1 4 1 5 2 9 1 4 . 2 . 0 3 . 0 4 . 0 2 . 0 0 . 0 0 . 9 . 2 3 . 3 1 . 0 0 . 0 0 . 0 3 . 4 . 0 0 . 2 3 . 3 2 . 0 0 . 0 8 0 . 0 0 8 . 0 0 1 0 . 0 9 0 . 0 3 2 8 . 0 6 0 . 0 3 4 . 2 4 5 0 . 0 0 2 0 . 0 4 0 . 0 7 3 0 . 4 4 1 0 . 0 7 4 . 2 7 0 . 0 4 1 0 . 0 0 . 0 7 0 . 0 0 1 0 . 0 0 6 . 1 9 0 . 4 7 1 6 . 1 7 0 . 0 4 2 0 . 0 1 2 0 . 0 9 4 . 2 0 1 0 . 0 8 3 2 . 3 8 . 2 1 2 . 5 1 3 3 4 . 2 5 1 6 . 2 0 . 0 9 6 8 2 6 . 1 1 6 . 1 3 8 . 0 3 4 7 7 1 1 7 0 2 8 . 1 0 7 4 8 0 3 8 . 8 1 7 6 9 7 2 3 4 0 1 5 1 3 3 0 4 1 2 2 1 2 0 0 1 4 1 1 2 . 1 1 . 2 3 . 6 6 . 1 8 . 4 6 . 5 2 8 . 0 3 6 . 1 2 4 5 8 . 3 5 2 . 3 3 0 . 8 0 1 2 . 8 2 0 5 6 . 1 9 3 2 . 3 6 . 5 5 1 8 . 0 6 2 8 . 0 0 . 0 0 0 . 0 3 1 8 . 0 2 0 . 0 6 2 8 . 0 6 1 6 . 1 0 6 . 1 8 3 0 . 0 1 2 0 . 0 9 0 . 0 4 4 6 . 1 8 1 0 . 0 7 8 . 0 4 1 0 . 4 8 5 8 . 0 0 0 . 0 2 0 . 0 8 4 6 . 5 4 6 . 9 6 6 6 . 1 2 4 2 . 3 4 . 6 0 1 0 . 0 9 1 0 . 0 6 . 1 7 6 . 1 2 0 . 0 0 0 . 0 1 6 . 1 2 6 . 5 0 8 . 4 7 7 0 . 0 0 0 . 0 0 . 0 8 6 . 5 0 1 0 . 0 0 . 0 0 0 . 0 4 2 0 . 0 0 . 0 4 0 . 0 6 1 0 . 0 8 . 0 1 0 . 4 9 4 . 6 6 0 . 0 1 0 . 0 1 0 . 0 4 0 . 4 2 1 6 . 1 6 0 . 0 0 . 0 6 0 . 0 0 0 . 0 6 . 1 8 1 0 . 0 1 8 . 0 3 2 . 3 3 2 6 . 1 2 2 0 . 0 0 . 0 3 3 0 . 0 8 3 2 . 3 0 0 . 0 0 2 0 . 0 0 1 0 . 2 1 6 . 1 6 . 7 1 4 1 2 . 3 8 1 2 . 3 0 . 0 2 2 3 4 . 6 0 3 0 . 4 0 . 0 2 5 2 2 . 7 6 4 . 2 3 8 . 0 4 1 6 . 1 0 . 2 1 0 . 4 4 8 . 8 2 2 . 3 1 8 . 4 2 7 1 0 . 0 1 0 . 0 2 . 7 3 1 6 . 1 7 6 4 2 . 6 2 . 3 3 4 . 6 0 1 6 . 0 1 7 4 4 . 2 4 1 8 . 4 4 . 2 6 8 . 0 8 2 0 . 0 0 . 0 5 1 0 . 0 1 0 . 0 0 . 0 1 8 . 0 3 0 . 0 6 . 5 5 6 8 . 0 1 0 . 0 0 . 0 4 3 0 . 4 0 1 0 . 0 0 . 0 0 6 . 9 4 1 4 . 2 7 6 . 5 6 0 . 0 1 2 . 7 0 6 . 9 4 1 0 . 0 0 8 . 0 2 . 7 6 1 6 . 1 5 1 8 . 5 2 0 . 0 0 0 . 6 0 . 0 1 2 0 . 3 0 . 0 1 4 . 6 8 . 0 2 6 0 . 2 0 . 0 2 0 . 0 4 4 . 6 0 1 6 . 4 4 . 6 0 3 8 . 0 0 0 . 0 0 0 . 0 4 8 . 0 0 . 0 5 6 . 1 4 0 . 4 0 0 . 4 5 6 0 . 0 1 0 . 0 0 . 0 1 2 8 . 4 0 1 8 . 0 4 . 2 5 1 0 . 0 2 1 0 . 0 0 . 0 8 0 . 0 6 1 0 . 0 0 . 0 5 6 . 1 6 3 4 . 2 2 0 . 0 2 0 . 0 2 0 . 0 5 6 . 1 4 1 0 . 0 6 4 . 6 6 . 7 1 4 . 8 1 0 . 6 1 8 . 6 1 7 2 . 7 7 2 6 . 5 6 . 0 2 7 2 2 . 3 1 3 2 . 3 0 . 0 2 4 2 6 . 5 6 0 . 4 4 0 . 0 3 3 2 6 . 3 2 2 . 3 3 0 . 0 2 8 . 1 2 0 . 0 0 8 . 0 3 0 . 5 1 0 . 0 0 2 . 3 3 4 . 8 8 . 4 2 6 0 . 0 0 0 . 6 6 . 1 0 2 8 . 0 4 2 0 . 5 0 . 0 3 0 . 0 7 1 0 . 7 1 6 . 1 7 5 8 . 0 9 0 . 7 3 0 . 0 0 0 . 0 4 0 . 0 2 8 . 0 4 1 0 . 0 2 4 . 2 2 8 . 0 0 3 0 . 0 8 1 0 . 2 8 . 0 0 8 0 . 0 4 0 . 8 0 . 0 3 0 . 0 1 0 . 2 8 . 4 4 5 0 . 0 2 0 . 9 1 0 . 0 0 0 . 0 1 0 . 0 2 0 . 0 1 8 . 0 1 2 . 2 2 4 . 6 4 7 0 . 0 0 0 . 5 8 . 0 6 6 . 1 2 0 . 1 1 0 . 0 3 2 . 3 3 8 . 6 2 . 3 9 6 8 . 0 1 ) ( m i - O ) 5 3 7 ( m i - O 0 . 0 1 0 . 0 8 4 . 6 2 2 8 . 0 3 2 . 7 2 0 . 0 0 1 0 . 0 4 3 6 . 1 7 0 . 0 0 1 0 . 0 6 0 . 8 3 6 . 1 4 3 4 . 2 2 8 . 0 5 0 . 0 2 0 . 0 7 4 8 . 0 2 0 . 0 7 1 0 . 0 6 4 . 2 2 4 6 . 1 2 6 6 . 1 2 0 . 0 0 0 . 0 2 2 0 . 0 4 1 0 . 4 3 0 . 0 4 0 . 0 4 2 . 7 1 2 . 7 1 6 4 . 2 2 8 . 0 0 . 0 0 0 . 0 6 3 6 . 5 4 8 . 0 1 0 . 0 5 0 . 0 0 . 0 7 6 . 5 9 3 0 . 0 4 . 2 6 8 . 0 2 2 . 1 1 0 3 8 . 0 3 2 . 3 3 0 . 0 0 2 2 . 7 2 2 6 . 5 6 0 . 0 A / a i - O . 1 3 4 . 6 2 6 . 1 3 0 . 4 4 . 2 3 8 . 4 2 4 . 2 5 1 6 . 1 0 . 0 9 2 . 3 6 6 . 1 2 . 1 1 8 . 0 2 0 . 2 1 0 . 4 7 4 . 2 4 . 2 3 0 . 2 1 4 4 0 . 2 6 . 5 6 2 . 7 1 4 . 2 0 1 2 4 6 . 5 4 . 2 3 0 . 8 3 1 8 . 9 6 4 6 . 1 6 2 . 3 8 . 4 6 6 . 1 3 1 9 3 8 . 2 4 . 2 2 2 . 7 8 1 2 . 8 2 2 0 . 0 4 8 . 0 6 . 5 0 2 8 . 0 8 1 1 4 8 . 3 2 8 . 0 2 4 . 6 0 1 8 . 8 1 9 1 0 . 0 0 0 . 0 0 . 4 8 0 . 0 7 2 4 4 . 2 2 . 3 3 0 . 4 7 4 . 4 1 7 1 0 . 0 0 0 . 0 0 . 8 5 1 4 . 2 4 1 u - o 0 . 2 0 . 0 4 6 . 1 2 0 . 7 0 . 0 0 6 . 1 2 4 . 2 0 . 4 8 5 0 . 0 0 0 . 0 0 . 0 0 1 2 . 7 1 1 0 . 0 8 . 0 5 6 . 9 1 1 0 . 9 2 8 . 4 5 0 . 0 1 4 . 3 6 . 9 8 1 0 . 0 1 0 . 0 4 . 6 0 1 2 . 3 4 1 0 . 8 2 0 . 0 0 0 . 0 2 0 . 7 1 0 . 0 7 0 . 0 1 2 . 2 1 2 . 3 6 5 0 . 0 2 1 0 . 3 0 . 0 1 4 0 . 8 4 2 8 . 8 1 2 . 3 4 1 6 . 7 1 9 2 0 . 5 2 8 . 4 5 0 . 0 6 4 . 2 6 . 1 2 2 4 0 . 0 5 8 . 2 0 . 8 4 1 8 . 0 0 2 2 9 1 5 8 1 6 . 9 2 4 0 9 4 6 9 0 5 8 . 0 1 9 1 6 7 6 8 . 7 1 4 . 0 4 . 0 3 8 . 2 1 0 . 6 3 4 . 4 3 0 . 4 2 6 . 3 4 . 0 3 6 . 3 3 4 . 6 2 0 . 2 3 2 . 1 3 0 . 8 6 . 5 2 0 . 6 3 2 . 1 3 4 . 0 3 2 . 7 2 0 0 0 . 0 2 0 0 1 0 . 0 2 4 8 . 0 2 4 . 8 1 8 . 6 1 2 . 5 1 0 0 0 0 1 0 0 1 0 0 1 8 . 0 2 4 . 8 0 0 1 8 . 0 1 0 0 1 6 . 1 2 . 9 1 6 . 7 1 0 0 1 0 . 0 1 0 . 6 0 0 1 8 . 0 2 0 0 1 0 . 1 0 0 1 8 . 0 3 0 0 1 0 . 0 0 . 0 2 6 . 7 1 4 . 8 1 0 . 6 1 9 6 . 1 4 4 . 4 1 0 0 1 0 0 1 0 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 9 8 8 . 0 4 8 . 6 1 0 0 1 9 8 . 0 2 0 . 0 2 0 0 1 0 0 1 0 . 1 6 . 7 1 0 0 1 0 0 1 4 . 2 0 0 6 . 1 3 4 . 8 1 2 2 . 9 1 0 0 0 0 1 9 9 8 . 0 1 0 . 0 2 0"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T T L L L 0 3 0 1 5 8 8 2 8 ."
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "9 2 2 1 0 1 5 3 0 . 0 T"
+        },
+        {
+            "title": "N\nE",
+            "content": ""
+        },
+        {
+            "title": "N\nE",
+            "content": "L 4 5 1 3 4 7 1 5 8 4 1 7 1 3 7 1 9 5 9 5 5 6 9 8 1 8 6 2 2 1 9 1 6 1 4 7 3 5 1 3 1 0 6"
+        },
+        {
+            "title": "N\nE",
+            "content": "5 1 1 8 0 0 2 7 6 2 9 9 2 3 0 9 1 2 9 9 1 3 4 5 1 9 3 4 6 2 7 5 9 6 . 2 4 . 0 0 . 0 0 . 3 4 . 6 4 . 0 . 0 4 . 0 0 . 0 0 . 6 6 . 0 2 . 8 . 0 9 3 0 . 0 0 2 . 3 0 . 0 4 1 0 . 0 0 2 . 3 6 . 9 4 5 4 . 6 8 6 0 . 0 8 . 0 1 0 . 0 4 6 . 5 1 8 . 0 2 2 . 1 1 0 5 0 . 0 0 0 . 0 0 4 . 2 2 0 . 0 0 . 0 0 2 . 3 3 6 . 5 0 0 . 4 3 7 0 . 0 0 0 . 0 0 . 0 0 4 . 6 1 1 8 . 0 0 . 0 0 6 . 1 3 4 0 . 0 4 . 2 2 0 . 0 7 0 . 0 4 . 2 2 4 . 6 0 1 6 . 9 6 0 . 0 0 0 . 0 0 0 . 0 6 . 5 9 8 . 0 4 6 . 9 8 8 . 0 5 1 0 . 0 0 4 . 2 6 . 1 2 0 . 0 0 2 . 3 0 . 4 7 6 . 5 8 7 0 . 0 8 . 0 1 0 . 0 2 4 . 6 0 . 0 0 0 . 4 4 9 2 9 1 3 8 3 6 . 9 6 6 6 1 3 7 7 2 8 . 4 2 9 5 4 9 1 3 1 9 5 9 1 8 . 3 0 . 6 . 7 1 6 . 1 2 2 . 9 1 0 . 0 2 6 2 8 . 9 2 0 . 4 4 0 . 0 0 9 2 . 3 5 1 8 . 4 5 0 . 0 0 3 8 . 4 6 1 0 . 4 4 0 . 1 7 2 4 . 2 0 2 4 . 2 0 . 0 0 5 . 1 - Q - t - 1 3 - 3 - t i 2 - 5 . 3 Q 6 . 2 - O 4 - 3 - e 4 - 5 . 3 Q 8 . 0 - 5 . 3 Q 2 . 1 - 5 . 2 B 4 . 1 - O o k T - 7 - 3 - O 8 - 3 Q - 8 2 5 0 - 1 8 - 3 - t i 4 1 - 3 - t i 0 2 - - B 9 - 5 . 3 Q 0 3 - N - 3 t N 3 - 5 3 - 5 . 3 Q 1 3 - 4 - e 2 8 8 7 0 2 4 . 2 2 6 9 4 5 5 4 . 9 2 6 4 7 1 9 3 5 1 1 4 8 9 3 0 4 1 9 2 1 2 2 9 9 9 0 2 2 . 6 . 1 2 . 7 2 . 2 6 . 1 2 4 . 6 0 . 4 6 0 . 8 2 4 . 2 2 0 . 2 6 . 1 2 2 . 1 3 3 4 8 . 0 8 . 0 1 2 . 7 0 1 4 . 2 3 4 6 . 1 4 0 . 4 5 4 . 0 1 6 . 1 5 7 4 4 . 2 6 . 1 2 2 . 7 9 2 . 3 6 4 0 . 0 0 0 . 0 0 0 . 0 1 6 . 1 2 0 7 - l - t - 1 0 1 - 2 2 1 - 5 . 3 Q 0 2 1 - - g 2 2 - 5 3 2 - 3 Q 2 . 3 - S D 5 . 2 - K 3 5 1 3 0 1 1 8 . 3 3 1 3 6 4 3 9 6 4 . 0 2 6 1 9 7 5 6 . 8 1 6 . 9 2 2 . 1 3 0 . 6 4 . 8 3 9 9 0 . 0 2 0 0 1 8 . 1 0 0 1 8 . 0 2 0 0 1 0 . 0 4 . 8 1 8 . 6 1 4 . 8 1 8 . 0 2 0 0 0 0 1 0 0 1 0 0 1 5 . 4 - a - a s - 5 . 2 - m 4 . 5 - G t o ) a ; % ( r a s s s c E . a"
+        },
+        {
+            "title": "M\ny\nl\no\nP\nm\no\nr\nf",
+            "content": "s e o - h e g H A P n l r t r - b u fi - H : 3 1 a ) c - ( i k b d i i e a ; ) % 0 4 , t d p ( c fi p - t o r a o g a l . ) m ; % ( r a m t o - s g n c e . h h h a l e e - c n e . n a e e a o t e t b l f l l ) c - h ( d e w n l ) l y a o p ("
+        },
+        {
+            "title": "N\nE\nd\ne\nd\no\nc",
+            "content": "e g r n a o t , ) s + n e , k ( n o r g a h , r a a a - a t p w l . ) u l r e u ( o ) r ( m s u l r u )"
+        },
+        {
+            "title": "R\nH",
+            "content": "( m e o - H"
+        },
+        {
+            "title": "Len",
+            "content": "Avg. dsb hsb cv ca sk tt sr he cs kk el am or uz uk pl tr hi"
+        },
+        {
+            "title": "Len",
+            "content": "Avg. es ru de en T"
+        },
+        {
+            "title": "N\nE",
+            "content": "0 0 5 3 2 5 2 5 9 5 0 6 4 2 0 6 1 6 1 7 1 8 0 4 5 4"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "1 5 3 8"
+        },
+        {
+            "title": "N\nE",
+            "content": "9 4 1 0 3 7 1 9 2 3 8 4"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "1 7 5 0 8"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "0 2 7 7"
+        },
+        {
+            "title": "N\nE",
+            "content": "9 7 4 7 9 1 4 7 2 9 3 2 3 6 3 3 9 4"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "7 2 6 7 2 3 2 1 2 5 5 0 2 2 9 3 1 2"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "5 1 6 6"
+        },
+        {
+            "title": "N\nE",
+            "content": "9 3 1 8 2 0 2 3 2 5 7 4"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "2 2 2 7"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "9 1 1 3"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "6 5 4 7"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "8 7 3 1 1 2 6 6 6 7 9 1 2 . 0 0 . 0 1 . 0 1 . 0 . 0 0 . 0 8 . 0 0 . 2 0 . 0 0 . 0 . 0 9 . 0 3 . 0 4 . 0 9 . 2 2 . 0 . 0 2 . 0 5 . 5 1 . 0 0 . 0 1 . 5 . 0 9 9 1 1 4 3 0 2 9 . 0 8 . 0 7 4 0 . 0 0 . 0 8 0 . 0 8 1 0 . 6 2 0 . 0 9 0 . 0 6 1 8 . 9 6 0 . 0 9 1 0 . 0 6 2 0 . 4 3 6 . 1 5 1 8 . 0 7 2 0 . 7 0 . 4 0 3 0 . 0 0 3 0 . 4 0 . 0 0 7 0 . 0 4 6 . 3 5 0 . 0 0 4 0 . 0 2 0 . 3 3 0 . 0 0 1 0 . 0 5 1 0 . 0 0 . 0 0 1 0 . 0 4 1 0 . 4 1 0 . 0 9 8 . 0 8 1 0 . 6 7 0 . 0 8 1 0 . 0 8 1 0 . 7 2 8 . 0 4 1 8 . 0 4 2 8 . 7 0 . 4 2 2 8 . 0 0 3 0 . 0 0 . 0 5 4 0 . 0 2 2 . 3 5 0 . 0 3 4 0 . 0 2 0 . 6 2 0 . 0 9 2 0 . 0 3 1 0 . 0 0 . 0 1 1 0 . 0 8 1 0 . 7 2 0 . 0 1 1 8 . 0 7 3 6 . 9 4 0 . 0 2 2 0 . 0 8 4 0 . 7 3 0 . 0 9 1 0 . 0 8 3 0 . 5 1 8 . 0 2 6 6 . 1 8 5 0 . 0 0 . 0 5 4 8 . 0 1 1 0 . 8 7 0 . 0 8 4 0 . 0 6 0 . 9 2 6 . 1 5 0 . 0 7 0 . 6 0 . 0 0 0 . 0 6 0 . 2 0 . 0 1 4 . 2 5 3 0 . 6 8 0 . 0 2 0 . 0 0 0 . 8 8 . 0 2 1 0 . 0 3 0 . 1 4 . 2 4 0 . 0 3 1 0 . 0 0 . 0 4 0 . 0 0 2 . 4 1 0 . 0 3 0 . 0 0 0 . 7 0 . 0 4 1 0 . 0 0 0 . 0 0 . 0 0 0 . 0 0 0 . 0 0 . 0 0 0 . 0 0 0 . 0 0 1 0 . 0 0 0 . 0 0 0 . 0 0 . 0 0 0 . 0 0 0 . 0 0 1 0 . 0 0 0 . 0 0 0 . 0 0 . 0 0 0 . 0 0 0 . 0 0 1 0 . 0 0 0 . 0 0 0 . 0 0 . 0 0 0 . 0 9 0 . 0 6 . 1 4 1 0 . 0 0 2 0 . 2 0 . 0 2 1 0 . 0 8 1 8 . 8 3 0 . 0 4 1 0 . 0 3 4 0 . 7 3 8 . 0 3 1 0 . 0 1 2 0 . 6 1 0 . 4 8 1 6 . 1 1 5 0 . 0 0 . 0 3 2 8 . 0 8 0 . 0 4 8 . 0 2 1 8 . 0 1 0 . 9 1 6 . 1 3 0 . 0 7 8 . 4 2 0 . 0 2 0 . 0 2 0 . 4 1 0 . 0 0 0 . 0 1 2 . 1 7 0 . 0 6 0 . 0 1 0 . 3 4 8 . 0 6 0 . 0 2 0 . 6 4 . 2 2 0 . 0 2 3 0 . 0 0 . 0 4 0 . 0 7 0 . 1 1 0 . 0 2 0 . 0 0 0 . 3 1 8 . 0 3 1 6 . 1 1 2 0 . 0 0 . 0 4 0 . 0 5 2 0 . 4 8 . 0 4 8 . 0 5 8 . 1 7 0 . 0 2 0 . 0 1 0 . 0 4 6 . 1 3 1 0 . 0 2 6 . 8 2 8 . 4 3 1 8 . 0 5 2 8 . 1 0 . 0 4 0 . 0 0 8 . 8 3 0 . 0 4 0 . 0 0 0 . 7 0 . 0 2 1 0 . 0 0 3 0 . 0 0 . 0 2 8 . 0 5 1 0 . 4 0 . 0 1 8 . 0 0 1 0 . 5 7 0 . 0 3 0 . 0 1 0 . 7 2 6 . 1 6 0 . 0 3 4 . 0 2 4 . 6 5 1 6 . 1 5 2 0 . 0 0 . 0 3 0 . 0 0 0 . 1 5 0 . 0 3 0 . 0 1 0 . 4 1 8 . 0 0 1 0 . 0 2 1 0 . 0 0 . 0 7 0 . 0 0 2 0 . 1 0 . 0 9 4 . 2 5 3 8 . 1 3 0 . 0 6 0 . 0 6 0 . 6 4 8 . 0 2 2 8 . 0 9 0 . 3 8 . 4 2 1 6 . 1 4 4 0 . 0 0 . 0 5 0 . 0 1 0 . 7 4 0 . 0 4 0 . 0 0 0 . 0 1 8 . 0 2 0 . 0 4 2 0 . 0 0 . 0 3 0 . 0 5 2 0 . 2 0 . 0 1 6 . 1 8 8 . 0 8 0 . 0 2 0 . 0 1 0 . 9 4 8 . 0 0 2 8 . 0 4 0 . 1 1 8 . 4 3 1 4 . 2 8 1 0 . 0 0 . 0 3 8 . 0 0 1 8 . 2 4 8 . 0 6 0 . 0 1 8 . 3 1 8 . 0 2 2 ) 4 ( a h w - O 0 . 0 5 0 . 8 1 0 . 0 0 3 8 . 0 7 0 . 2 0 . 0 1 2 0 . 0 3 1 6 . 8 5 0 . 0 2 1 6 . 1 0 0 1 0 . 0 0 . 0 0 0 . 0 0 0 1 0 . 0 0 . 0 0 0 . 0 0 0 . 0 0 1 0 . 0 0 0 . 0 8 0 . 4 8 0 . 0 9 0 . 0 1 1 0 . 5 0 . 0 6 0 . 0 6 2 . 0 7 0 . 0 0 1 0 . 0 7 1 0 . 0 0 . 0 2 0 . 0 4 1 0 . 3 0 . 0 0 4 . 2 6 2 0 . 4 7 0 . 0 2 0 . 0 4 0 . 3 1 0 . 0 2 0 . 0 0 1 0 . 2 0 . 0 1 8 . 0 7 4 . 9 7 0 . 0 3 0 . 0 4 0 . 6 0 . 0 3 0 . 0 9 0 . 2 0 . 0 0 6 . 1 8 1 8 . 5 6 0 . 0 2 ) 5 3 7 ( h w - O 0 . 0 9 0 . 0 7 2 6 . 1 3 0 . 0 1 1 0 . 0 7 4 . 2 8 . 0 5 4 0 . 0 1 0 . 0 1 0 . 0 0 0 . 0 0 0 . 0 0 . 0 0 0 . 0 0 0 . 0 0 0 0 . 0 0 0 1 0 . 0 0 0 . 0 0 . 0 1 3 0 . 0 8 1 0 . 0 7 0 . 0 5 0 . 0 6 0 . 0 0 . 0 9 4 0 . 0 0 0 . 0 0 0 . 0 2 0 . 0 1 4 8 . 0 8 . 0 5 0 . 0 2 6 . 5 7 8 . 0 6 3 8 . 0 1 0 . 0 0 . 0 2 0 . 0 4 0 . 4 2 0 . 0 3 0 . 0 4 8 . 0 8 . 0 3 2 8 . 0 1 0 . 0 0 . 0 2 0 . 0 6 8 . 0 4 0 . 0 3 0 . 0 3 6 . 1 2 . 3 3 3 8 . 0 2 0 . 0 A / a i - O 0 . 9 0 . 4 4 1 0 . 0 4 1 0 . 2 0 . 0 4 1 0 . 0 4 1 0 . 0 0 . 0 0 0 1 0 . 0 0 0 . 0 0 . 0 0 0 . 0 0 0 . 0 2 . 3 4 1 0 . 0 4 0 . 2 0 . 0 4 8 . 0 9 8 . 6 4 . 0 1 8 3 0 . 0 3 0 . 0 0 . 0 0 1 8 . 0 2 8 . 2 2 . 3 0 1 0 . 0 1 0 . 0 0 . 0 4 1 8 . 0 6 1 0 . 1 0 . 4 4 1 0 . 0 3 0 . 0 8 . 0 6 0 . 0 6 u - o 0 . 0 8 1 0 . 0 0 8 . 0 0 . 0 4 2 0 . 0 7 0 . 0 0 . 0 8 2 . 3 6 6 0 . 0 8 0 . 0 2 0 . 0 8 4 0 . 0 6 6 . 1 5 1 6 . 1 6 2 . 3 5 8 . 0 0 1 0 . 0 0 0 . 0 2 0 . 0 1 8 . 8 2 4 0 . 0 3 0 . 0 0 0 . 0 8 1 0 . 0 5 L 2 9 9 4 9 9 2 2 . 0 7 6 1 1 8 6 4 0 ."
+        },
+        {
+            "title": "N\nE",
+            "content": "3 9 4 8 2"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "0 2 1 6"
+        },
+        {
+            "title": "N\nE",
+            "content": "L 4 8 5 8 8 1 3 4 3 8 3 8 1 6 1 4 2 8"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "3 1 0 6"
+        },
+        {
+            "title": "N\nE",
+            "content": "7 0 1 0 9 9 1 9 6 2 9 4 3 3 2 6 2 5 6"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "5 2 9 1 9 3 1 6 1 4 4 7 1 6 5 3 3 5 8 1 3 7 5 4 9 9 3 T"
+        },
+        {
+            "title": "N\nE",
+            "content": "L T"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "3 1 1 6"
+        },
+        {
+            "title": "N\nE",
+            "content": "L 3 5 4 4 0 2 1 2 8 4 9"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "2 2 0 2"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "0 9 9"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "6 4 6 5"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "2 6 9 1 1 2 6 6 3 5 9 1 0 . 0 0 . 0 0 . 0 0 . 4 . 2 6 . 4 0 . 0 0 . 0 0 . 0 0 . 0 . 0 0 . 2 6 . 4 0 . 0 0 . 0 4 . 8 . 8 0 . 0 0 . 0 0 . 0 4 . 0 9 8 5 1 9 3 0 0 . 1 0 . 0 7 3 0 . 0 0 0 . 2 0 . 0 8 0 . 0 1 0 . 0 2 . 7 8 6 8 . 4 7 7 0 . 1 0 . 0 0 0 . 0 6 8 . 4 1 0 . 0 1 4 . 6 5 6 4 . 8 1 0 . 0 7 1 0 . 0 0 0 . 2 0 . 0 0 8 . 8 9 3 0 . 2 0 . 0 0 0 . 0 2 8 . 7 0 . 0 4 1 0 . 0 0 0 . 1 0 . 0 2 0 . 0 1 0 . 1 4 . 2 2 2 8 . 4 1 7 0 . 1 0 . 0 0 0 . 0 4 6 . 0 1 0 . 0 2 8 . 0 2 6 . 7 1 8 . 0 1 1 0 . 0 0 0 . 2 8 . 0 5 8 . 8 8 3 0 . 2 0 . 0 0 0 . 0 7 0 . 1 8 . 0 1 3 0 . 0 0 0 . 1 0 . 0 8 0 . 0 1 0 . 0 0 . 0 4 1 2 . 3 1 8 0 . 1 0 . 0 2 0 . 0 3 0 . 2 1 0 . 0 2 8 . 0 5 3 2 . 3 1 8 . 0 2 1 0 . 0 0 0 . 3 8 . 0 1 0 . 8 7 3 0 . 0 0 . 0 0 0 . 0 2 8 . 3 0 . 0 7 1 0 . 0 0 0 . 1 0 . 0 0 0 . 0 2 0 . 1 0 . 0 3 1 6 . 5 1 9 0 . 0 0 . 0 0 0 . 0 2 6 . 6 0 . 0 0 0 . 0 5 2 . 3 1 4 . 2 4 1 0 . 0 0 0 . 0 0 . 0 0 6 . 9 6 3 0 . 0 0 . 0 0 0 . 0 0 0 . 3 5 . 1 - Q - t - 1 3 - 3 - t i 4 - 3 - e 4 - 5 . 3 Q 2 - 5 . 3 Q 6 . 2 - O 8 . 0 - 5 . 3 Q 2 . 1 - 5 . 2 B 4 . 1 - O o i - 7 - 3 - O 8 - 3 Q - 8 2 5 0 - 1 8 - 3 - t i 4 1 - 3 - t i 0 2 - - B 9 - 5 . 3 Q 0 3 - N - 3 t N 3 - 5 3 - 5 . 3 Q 1 3 - 4 - e 0 7 - l - t - 1 0 1 - 2 2 1 - 5 . 3 Q 2 2 - 5 3 2 - 3 Q 0 2 1 - - g 2 . 3 - S D 5 . 2 - K"
+        },
+        {
+            "title": "H\nT\nO",
+            "content": "4 6 1 3 7 1 1 3 . 5 1 T 5 3 3 4 5 9 1 5 2 . 4 9 1 7 1 6 1 . 3 8 . 6 1 8 . 6 1 0 0 1 0 . 2 4 . 2 0 0 1 0 0 1 0 . 0 2 . 3 0 0 1 8 . 8 7 9 0 . 0 4 . 2 0 0 1 2 . 9 1 9 9 0 . 0 0 . 4 0 0 1 0 . 0 0 0 1 0 . 0 0 . 0 0 0 1 8 . 6 1 0 . 6 1 6 . 7 1 4 . 8 2 . 9 1 0 . 0 2 0 . 6 1 9 9 0 . 0 4 . 2 0 0 1 0 0 1 0 . 0 3 2 . 0 0 1 0 0 1 0 . 0 1 8 . 4 0 0 0 0 1 8 . 0 3 8 . 4 0 0 1 0 0 0 . 0 1 0 . 4 0 0 1 0 0 1 0 . 1 4 . 2 0 0 1 8 9 8 . 0 2 . 3 0 0 1 0 . 0 0 0 1 0 . 0 0 . 0 0 0 1 0 . 6 1 6 . 1 2 8 . 6 1 6 . 7 4 . 8 1 0 0 1 6 . 1 2 2 . 3 0 0 0 0 1 0 . 0 2 8 . 4 0 0 1 0 0 0 . 0 2 0 . 4 0 0 1 0 0 1 0 . 2 4 . 2 0 0 1 0 0 1 0 . 0 0 . 4 0 0 1 T 6 4 1 7 4 0 4 . 7 1 2 2 7 4 2 0 0 5 0 . 1 9 8 1 4 7 5 8 . 3 2 . 9 4 . 4 1 2 . 5 1 8 . 0 2 0 0 1 6 . 1 2 . 3 0 0 1 0 0 1 0 . 0 3 2 . 0 0 1 0 0 1 6 . 1 3 0 . 4 0 0 0 0 1 8 . 0 2 8 . 4 0 0 1 5 . 4 - a - a h F - 5 . 2 - m 4 . 5 - e e ) a ; % ( r a s w l h . a"
+        },
+        {
+            "title": "M\ny\nl\no\nP\nm\no\nr\nf",
+            "content": "s e o - h e g l"
+        },
+        {
+            "title": "H\nT\nA\nM\nA\nR\nU\nL\nP\nr\nu\no\nn\no\ns\nt\nl\nu\ns\ne\nr",
+            "content": "g p p - b u fi - : 4 1 a ) c - ( i n a i n s r n ; ) % 5 2 0 , t d p ( c c fi p - t y u s c n h l . ) m ; % ( r n p t o - s g n c e A . h h e m c t - c n t . n a e e a o t t t l g o e s c ) c - h ( d e w n l , ) l y a o p ("
+        },
+        {
+            "title": "N\nE\nd\ne\nd\no\nc",
+            "content": "e g r n a o t , ) s + n e , k ( n o r g a h , r a a a - a t p w l . t a a p o u e a u fl - d r g o i"
+        },
+        {
+            "title": "H\nT\nO\nr\no",
+            "content": ", ) u l r e u ( o Figure 11: Aggregated DW=ACC base prompting scores distributions per all languages across all models and all levels.We observe clear trend in mean scores that correlates with language resource rankings, with severely underrepresented languages exhibiting low performance even on low-difficulty tasks. Figure 12: Answers correctness scores distributions for base prompting per languages types across all models per each level. Smaller models exhibit substantial performance degradation on underrepresented languages, whereas larger and proprietary models remain comparatively stable across language groups. H.2 Models Reasoning Length Comparison Visualization We report here the distributions of reasoning traces and answers length per language (Figure 13) and per model (Figure 14) for aggregated metrics and per each level. We used Qwen3-4B base model for tokenization. Overall, reasoning lengths do not differ substantially across languages types. For underrepresented languages, models often generate slightly longer outputs for the lower level, but then for otherseven shorter outputs, likely due to failing to reach correct solutions. Notably, the top-performing models exhibit nearly equivalent reasoning lengths and variation across both high-resource and underrepresented languages, while producing substantially more concise outputs overall. Figure 13: Distribution of reasoning and answers length for base prompting per language. Figure 14: Distribution of models reasoning and answers length for base prompting across languages types. H.3 Per-Prompting-Ablations Results This section reports the full per-language and per-prompt breakdown of the aggregated results in Table 15. For every model we report four prompt designs: Base the problem is presented and solved entirely in the target language. EnCoT the problem is given in the target language but the system prompt instructs the model to perform its chain-of-thought in English as the best performing high-resource language. Backtr. the problem is machine-translated back to the corresponding high-resource language and solved there. We compare three prompting strategies exclusively on open-weight models. Backtranslation into high-resource language yields only marginal improvements for the LFM model and does not improve performance for the remaining systems. For several mid-sized models, including Gemma-3-4b and Nemotron3-Nano-30B, as well as the larger gpt-oss-120b, EN-CoT prompting improves performance for some languages. However, these gains may be partly from the additional instruction to reason step-by-step rather than from the language switch itself. Overall, no substantial stable improvements in average performance are observed with other than base prompting strategies. Qwen3.5-0.8B LFM2.5-1.2B R1-Distill-Qwen-1.5B Ouro-1.4B Qwen3.5-2B Ouro-2.6B Ministral-3-3B Gemma-3-4B Qwen3.5-4B OLMo-3-7B-Think Ministral-3-8B Qwen3.5-9B gpt-oss-20b Nemotron3-Nano-30B Gemma-4-31B Qwen3.5-35B-A3B High-resource"
+        },
+        {
+            "title": "Model",
+            "content": "n Prompt u r"
+        },
+        {
+            "title": "R\ngH\ns Av\ne",
+            "content": "i l z o l s r t a b s d"
+        },
+        {
+            "title": "L\ngT\nAv",
+            "content": "Open-weight small ( 4B)"
+        },
+        {
+            "title": "Base\nEnCoT\nBT",
+            "content": "4.7 3.7 0.0 0.0 4.0 4.7 7.3 5.9 2.0 1.9 8.2 7.9 9.1 9.2 3.1 2.4 0.0 0.0 0.2 0.5 6.9 4.9 2.1 1.1 6.7 7.5 7.9 7.1 0.7 3.0 0.0 0.0 0.2 0.0 5.7 5.0 2.0 1.0 7.5 7.3 3.7 3.6 0.0 0.0 0.5 0.7 7.2 5.3 2.1 1.4 7.8 7.0 3.1 3.2 0.0 0.0 1.2 1.5 6.8 5.3 2.1 1.3 7.5 7.4 0.4 0.9 0.1 0.0 0.0 2.2 0.1 0.1 1.7 2.9 2.6 3. 0.5 0.6 0.5 4.4 5.2 3.2 9.9 14.5 10.3 7.8 6.4 9.8 1.5 9.8 9.0 0.4 0.2 0. 1.0 1.4 1.2 0.3 1.0 1.7 3.3 1.8 2.1 1.8 0.7 0.3 5.7 5.0 2.8 4.0 6.4 0. 0.5 0.3 0.1 3.6 4.1 2.4 0.1 0.5 2.0 5.2 3.8 3.6 2.6 1.0 0.4 0.9 6.2 3. 1.4 2.4 0.2 0.0 0.0 3.4 0.0 0.1 0.1 1.4 2.0 4.0 2.3 1.4 1.6 5.8 5.9 6. 0.1 0.2 0.0 0.5 0.5 0.6 0.5 1.7 0.9 0.5 0.8 0.7 1.4 0.7 0.1 1.8 2.2 1. 8.4 1.2 8.7 7.3 10.4 4.4 0.5 3.3 1.2 13.3 10.8 6.7 11.6 10.6 8.4 Base 9.0 10.5 7.6 EnCoT 12.7 11.9 12.2 12.3 12.3 11.0 9.4 13.4 11.8 7.9 2.8 BT 5.7 6.3 6. 9.0 6."
+        },
+        {
+            "title": "Base\nEnCoT\nBT",
+            "content": "2.9 2.7 3.5 1.8 3.5 2.0 3.2 1.7 2.6 1.7 1.1 3.1 1.8 0. 3.8 2.1 0.5 3.1 1.8 2.9 3.0 1.8 0.1 1.2 0.4 0.0 0.0 0.0 2.1 0.1 0.2 1. 0.4 0.5 2.7 0.7 0.4 0.6 1.8 1.9 3.0 1.3 2.1 1.4 2.5 6.1 4.2 1.8 1.6 1. 0.1 0.0 0.0 0.9 1.4 1.4 1.0 0.6 1.1 0.6 0.0 1.6 0.3 0.2 0.5 0.3 0.1 2. 0.0 2.3 0.9 1.7 1.9 0.3 0.0 0.0 3.8 0.2 0.0 3.3 2.1 1.9 5.1 2.3 0.7 1. 5.5 5.2 6.2 8.2 8.7 3.0 0.4 0.5 0.3 0.0 0.0 2.5 0.2 0.1 0.2 0.4 0.5 3. 1.1 0.9 1.1 0.6 1.6 3.3 6.1 7.5 2.0 1.8 1.7 0.3 0.0 0.0 2.3 1.1 0.2 0. 2.6 2.9 2.7 2.1 1.0 0.6 5.3 5.3 2.9 7.3 7.3 1.4 2.4 0.9 0.2 0.0 0.0 3. 0.0 0.0 2.7 1.7 1.8 5.8 2.0 1.3 1.1 3.0 3.3 5.8 7.2 7.6 2.7 0.5 0.2 0. 1.0 1.2 2.2 0.9 0.8 2.6 1.4 1.8 4.0 2.1 1.0 0.6 4.2 5.2 4.3 2.2 6.7 1. 0.7 0.6 0.3 0.0 0.0 2.9 0.5 0.4 0.1 1.4 0.5 3.0 0.8 0.9 1.1 1.2 0.8 4. 3.8 5.8 2.1 5.3 10.7 3.6 4.1 9.5 9.0 12.6 8.6 10.4 11.0 10.3 7.4 3.7 5.9 3.5 10.3 2.7 7.1 8.2 7.4 9. 1.3 2.0 0.0 0.0 0.0 1.4 0.1 0.5 1.5 2.3 2.2 2.7 2.2 0.8 0.5 4.7 5.1 3. 6.7 7.4 1.0 0.3 0.3 0.4 0.2 0.4 0.3 0.5 0.0 0.0 2.1 0.0 0.0 2.8 0.0 0.0 3.5 0.3 0.5 0.5 0.8 0.2 0.9 0.5 0.2 0.3 0.3 0.3 4.8 0.3 0.7 3.6 0.5 0.6 5.1 0.3 0.9 2.3 0.0 0.4 1.1 0.0 0.4 1.1 0.0 0. 5.7 1.1 2.7 6.1 1.2 2.1 6.2 0.5 0.4 9.7 2.2 3.9 8.1 2.7 6.2 1.4 0.2 0.1 8.2 10.3 2.1 3.2 8.4 11.7 5.5 7.5 9.0 1.3 2.9 5.3 2.8 1.4 0.5 3.6 2.3 2.2 3.2 1.9 1. 3.1 1.4 1.1 4.0 2.3 1.8 3.6 1.8 0.7 3.0 1.2 1.7 3.7 1.8 0.5 3.7 1.4 1.2 2.1 0.7 1.0 2.1 0.2 0. Open-weight mid (735B)"
+        },
+        {
+            "title": "Base\nEnCoT\nBT",
+            "content": "5.1 5.9 4.7 5.0 2.7 4.5 5.6 5.4 1.8 2.8 2.2 3.3 3.9 1. 4.6 4.9 2.0 3.8 4.3 2.4 10.7 8.7 8.8 9.6 10.9 10.0 9.3 9.4 4.5 8.4 10.1 9.0 9.1 9.7 11.8 9.4 8.9 9.1 9.3 8.3 6.9 4.0 3.7 3.5 3.6 1.9 5.0 2.7 4.5 2.0 4.2 2.5 4.9 2.5 1.4 3.5 2.6 0.5 3.7 2.0 1.0 5.4 2.3 2.8 0.1 0.1 0.0 8.1 8.5 3. 4.1 2.3 0.3 1.4 1.5 1.8 1.5 1.9 4.4 3.4 1.7 1.1 0.1 0.1 0.1 2.7 2.1 2. 3.4 1.7 0.8 2.8 2.9 3.7 9.3 8.8 7.9 5.0 2.3 1.9 1.3 1.5 2.0 5.9 6.9 6. 5.1 2.6 1.0 2.5 2.9 1.2 2.4 3.3 3.3 0.2 0.2 0.1 8.7 10.5 9.7 9.8 9.4 7.5 6.6 8.4 5.5 4.1 2.3 0. 5.2 2.6 1.9 3.7 2.1 0.7 0.3 0.4 1.6 7.0 7.4 7.6 4.6 2.1 1.4 2.3 2.7 1. 7.9 7.7 4.9 4.7 2.7 0.7 4.0 0.1 0.5 4.6 0.1 0.5 3.6 0.0 0.2 9.7 1.4 5.7 9.3 1.7 4.3 9.1 1.1 2.8 3.6 3.3 2.5 2.2 1.9 1.3 2.1 0.3 0.2 17.6 15.8 19.2 18.0 17.7 15.8 12.4 12.1 18.6 10.2 15.2 9.3 16.7 16.0 17.3 16.6 11.8 16.3 14.9 12.7 4.4 13.6 12.6 13.7 Base EnCoT 18.8 16.7 17.0 16.0 17.1 15.9 11.7 12.2 15.9 11.5 14.2 7.7 15.1 15.1 14.9 16.3 11.5 16.1 15.4 10.2 5.4 11.8 12.4 13.0 6.8 BT 4.5 10.2 9.4 8.7 11.5 4.7 8.4 3.0 4.0 6.5 6.1 7. 9.2 6.3 9.4 2.9 4.6 5. 9. 7."
+        },
+        {
+            "title": "3.9\nBase\nEnCoT 11.3 11.1 11.6 13.3 11.8 11.1 8.3 11.1 11.3 6.7\n4.2\nBT",
+            "content": "7.8 4.1 8.2 7.7 7.4 5. 6.4 6.5 7.9 6.6 8."
+        },
+        {
+            "title": "Base\nEnCoT\nBT",
+            "content": "6.6 8.1 3.7 2.8 7.4 7.8 3.6 2.3 8.7 7.9 3.9 3.1 8.6 8.5 4.2 3.0 8.4 7.7 2.8 2.9 2.1 1.3 9.1 8.1 2.6 3.7 2.6 0. 8.7 7.8 3.1 3.8 2.6 0.8 8.5 7.8 7.3 4.4 2.2 2.6 7.5 7.4 2.6 4.7 3.0 0. 0.9 1.6 3.4 6.4 6.8 2.1 2.3 2.0 1.1 4.3 8.9 4.3 7.6 2.0 3.8 11.0 6.1 10.0 10.3 10.0 3.1 5.1 3.6 3. 6.2 3.7 6.7 7.5 9.7 6. 7.6 7.9 1.7 4.1 2.9 0.7 7.1 6.7 4.8 4.1 2.4 2.4 7.6 7.0 4.7 3.7 2.2 2. 6.9 6.6 4.2 3.2 2.2 0.9 8.5 7.5 4.3 3.8 2.1 2.3 8.6 7.6 3.0 3.7 2.5 0. 6.8 7.3 5.9 3.3 2.6 1.9 5.3 9.8 4.7 7.4 7.3 2.7 3.8 2.9 0.5 6.6 1.9 3.5 9.5 3.9 7.1 5.9 1.1 2. 7.6 3.3 5.3 7.1 5.4 6.3 7.2 1.2 1.8 3.8 1.9 2.8 2.3 2.2 1.9 2.5 0.2 0.2 2.5 5.3 1.8 5.0 5.7 1.6 2.8 2.4 0.3 R1-Distill-Llama-70B"
+        },
+        {
+            "title": "Base\nEnCoT\nBT",
+            "content": "6.8 7.2 5.9 7.6 9.4 8.9 6.5 7.7 Open-weight large / API 6.7 7.7 3. 6.5 7.3 3.0 7.7 6.2 8.6 7.5 10.0 7.1 2.0 7.5 4.4 5.2 4.6 2.7 1.3 2.7 1.8 7.4 9.1 6.4 6.8 6.9 7. 6.4 6.3 3.9 6.3 7.3 5.0 8.3 7.5 4.3 6.9 8.1 7.0 6.6 7.4 3.4 6.1 6.6 5.1 7.4 7.1 5.7 5.5 2.0 1. 6.1 5.9 1.6 gpt-oss-120b DeepSeek-V3.2 24.6 22.7 22.0 21.5 22.7 19.6 12.8 12.2 21.0 13.6 14.6 12.9 19.1 21.3 18.7 21.5 13.0 20.5 16.6 12.5 8.1 17.9 17.6 16.3 Base EnCoT 21.1 23.9 20.9 21.8 21.9 20.7 14.1 13.9 20.3 13.7 14.7 12.5 20.6 23.4 20.9 21.0 13.7 19.3 16.8 11.7 9.9 19.0 18.7 16.9 7.4 BT 6.4 11.9 2.6 5.4 7.8 11.1 7. 7.8 10.2 8.3 7.2 6.7 4.2 8.6 4. 4.9 8.5 9."
+        },
+        {
+            "title": "Base\nEnCoT\nBT",
+            "content": "10.6 10.4 9.3 10.3 10.1 10.0 9.8 11.0 8.8 8.4 9.0 9.6 8.2 7.8 9.0 9.8 5.0 9.5 9.8 6. 8.5 4.9 8.5 9.8 4.2 9.2 9.2 4.1 8.7 10.3 8.9 8.1 9.2 8.6 6.9 8.4 2.6 9.4 10.4 10.3 7.8 10.1 9.7 9.0 9.2 9.6 8.7 8.5 8.4 8.0 2.3 2.6 5.2 8.2 6. 9.7 7.5 9.4 6.7 9.2 5.4 9.8 8.7 2.5 9.5 9.0 5.4 Table 15: DW-Acc metric for prompting techniques comparison. AvgHR and AvgTL (shaded) are the macro-averages over the four high-resource and the 18 PLURAMATH target languages. For each model and each column, the best-performing prompting technique is shown in bold. BT is defined only for the target languages. 0.8 0.5 0.0 0.0 0.0 0.4 0.1 0.3 0.0 1.0 0.6 0.3 0.1 0.0 0.1 2.0 2.1 0. 2.8 4.6 0.0 3.3 5.8 1.8 1.4 0.4 0.1 0.2 0.5 0.0 5.9 5.7 2.1 2.5 1.2 0. 0.8 0.7 0.1 0.5 0.6 2.1 0.4 0.4 1.1 1.8 1.6 2.8 1.4 0.7 0.6 3.1 3.6 3. 5.1 6.2 1.4 6.8 9.3 5.4 2.9 1.6 1.1 1.8 2.1 1.5 7.5 7.1 5.4 4.0 2.1 1. 5.5 7.8 4.5 7.2 7.1 3.5 3.5 2.4 1.2 6.4 7.0 4.0 3.3 2.0 4.5 5.2 7.8 8.1 3.9 2.8 7.2 7."
+        },
+        {
+            "title": "I Human Assessments Results per All Levels",
+            "content": "Here, we present the detailed results of an additional human evaluation of model answers and reasoning traces across languages. The evaluation includes five models of varying sizes: gemma-3-4B, Ministral-3-8B, Nemotron3-30B, gpt-oss-120B, and DeepSeek-V3.2. We evaluate two high-resource languagesEnglish and Russianas well as 11 languages from PLURAMATH: Hindi, Turkish, Polish, Ukrainian, Odia, Greek, Kazakh, Czech, Tatar, Chuvash, Lower Sorbian. The annotation was limited to this subset of languages due to annotators time constraints prior to submission; however, it will be expanded in future stages of this research. Still, we are covering the vast majority of the languages from all our experiments. For each language, we selected randomly 12 (10%) samples per each level per each model. Meaning, each annotator had to go through 48 distinct tasks across 5 models. The annotation interface used for this evaluation is shown in Figure 15. The evaluation criteria are detailed below: Q1 For incorrect predictions: was the answer essentially correct but mismarked due to formatting or added explanation? (Y/N/NA) Q2 Reasoned in target language? (Y/N/Partial) Q3 Reasoning sound and step-by-step? (Y/N/Partial) Q4 Final answer consistent with reasoning? (Y/N/NA) Q5 If no final answer was extracted, does the correct answer appear in the reasoning? (Y/N/NA) Q6 Did the reasoning finish? (Y/N) Figure 15: Interface used for the human assessment of models answers and reasoning part. Table 16 presents extended aggregated human evaluation results per all levels. Appendix I.1 illustrates more examples of both successful and problematic models behaviors for one target language. Q1 Q2 Q4 Q5 Q"
+        },
+        {
+            "title": "H U",
+            "content": "H gemma-3-4B Ministral-3-8B Nemotron3_30B gpt-oss-120b DeepSeek-V3. 0 low medium 0 0 high 0 top low 0 medium 8 0 high 0 top low 0 medium 0 0 high 0 top low 50 medium 33 14 high 9 top 0 low medium 10 0 high 0 top 1 6 2 4 8 1 0 1 2 0 0 46 21 6 8 4 6 2 1 100 100 96 100 75 8 8 62 29 33 42 12 0 0 17 100 100 100 100 94 84 89 89 51 23 15 20 5 5 6 22 10 3 6 58 32 23 24 100 96 92 88 100 100 100 67 38 33 42 100 100 96 75 100 100 100 100 73 42 38 42 73 67 64 35 20 22 27 89 75 61 56 88 50 43 43 100 78 88 62 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 82 57 54 67 85 55 51 57 35 39 55 98 76 75 70 95 50 31 4 91 0 0 0 0 0 0 20 0 0 0 100 0 20 12 100 0 9 0 23 4 2 0 14 8 5 3 4 3 0 17 19 12 6 62 13 5 1 100 75 67 67 100 8 17 67 25 8 8 100 75 67 33 100 25 8 0 91 71 61 70 95 55 46 71 49 53 49 100 67 47 40 88 22 6 1 Table 16: Human evaluation per difficulty level. Cells are % Yes among applicable annotations (Partial = 0.5 for Q2Q3; NA/blank excluded). H: high-resource (RU); U: underrepresented (10 PluraMath languages). I.1 PLURAMATH Answers and Reasoning Traces Examples We present examples of model outputs, reasoning traces, and corresponding human annotation analyses. For illustration, we use Ukrainian examples covering all models included in the annotation process: gpt-oss-120b, DeepSeek-V3.2, nemotron3_nano_omni_30ba3b, Ministral-3-8B-Reasoning-2512, and gemma-3-4b. Figure 17 presents an example of correct prediction and reasoning trace from gpt-oss-120b; however, the model performs its reasoning in English. Figure 16 shows case where the predicted answer was semantically correct but marked incorrect due to formatting differences preventing an exact match. Overall, gpt-oss-120b predominantly reasoned in English across all evaluated languages. Figure 16: Example of correct answer and reasoning from gpt-oss-120b. Figure 17: Example of correct reasoning and semantically correct but mismatched answer from gpt-oss-120b. DeepSeek-V3.2 typically reasoned in the target language, as illustrated by the Ukrainian example in Figure 18. However, the model frequently produced excessively long reasoning traces with repetitive self-verification loops. In the shown example, the model arrived at the correct answer but continued generating additional verification steps and failed to complete the final response properly. Figure 18: DeepSeek-V3.2 typically reasoned in the target language, but quite often did not finish correct answer generation due to repetitive self-checking loops. Nemotron3_nano_omni_30ba3b frequently produced non-fluent reasoning traces (Figure 20), often mixing the target language with other languages (Figure 19). The model also commonly failed to complete its reasoning process, although it still generated final answer in $boxed{}$ format, sometimes appearing effectively random. Figure 19: Example of mixed languages reasoning and not so fluent answer from nemotron3_nano_omni_30ba3b. In contrast to gpt-oss-120b, which consistently reasoned in English, and DeepSeek-V3.2, which predominantly reasoned in the target language, Ministral-3-8B-Reasoning-2512 exhibited mixed Figure 20: Nemotron3_nano_omni_30ba3b could also produce absolutely non-fluent reasoning with even leaked control tokens. behavior, alternating between target-language and primarily English reasoning. Most incorrect predictions resulted from incomplete reasoning traces as in Figure 21. Finally, gemma-3-4b consistently reasoned in the target language and, even when producing incorrect answers, generated coherent reasoning traces containing flawed intermediate steps (Figure 22). Figure 21: Example of the unfinished reasoning from Ministral-3-8B-Reasoning-2512. Figure 22: Gemma-3-4b consistently reasoned fluently and in the target language, but there could have been wrong reasoning steps."
+        },
+        {
+            "title": "Models",
+            "content": "We evaluate set of reasoning models on machine translation using the FLORES+ (NLLB Team et al., 2024) dev split. For the Sorbian languages, we acquire test sets from the authors of Okabe et al. (2025) and sample 300 items from the 4000 segments. For the languages present in FLORES+, we run machine translation both from and into English, whereas for the two Sorbian languages we only run translation from German. We tested subset of seven opensource tested models: Qwen3.5-0.8B with reasoning and no-think mode, Ministral-3-3B and Ministral-3-14B with reasoning and nothink mode, Nemotron-3-Nano-Omni-30B, Qwen3.5-35B-A3B, gpt-oss-120B, Qwen3.5-122B-A10B, and DeepSeek-V3.2."
+        },
+        {
+            "title": "We inference models either",
+            "content": "API models are called with locally or via API calls. reasoning_effort=medium to match the mathematical reasoning experiments, and limited to maximum output length of 2048 tokens. With locally inferenced models, we have more fine-grained control: We use the recommended decoding parameters when specified, set the maximum number of output tokens to 4096, and use maximum thinking token budget of 2048. When models use up the full thinking token budget, we forcedly stop the reasoning trace by inserting Ill stop thinking and provide my answer now., followed by the appropriate reasoning-end-string."
+        },
+        {
+            "title": "Parameter",
+            "content": "Default Qwen3.5 Ministral temperature top_p top_k min_p repetition_penalty presence_penalty max_tokens thinking_token_budget 0.6 0.95 20 0 1.05 4096 2048 1.0 0.95 20 0.0 1.0 1.5 4096 2048 0.7 0.95 1.05 4096 2048 Table 17: Sampling parameters for local models for translation capabilities assessment. We evaluate the models performance using chrF++, since this metric supports all our target languages full results in Table 18. Additionally, we calculate the mean length of the MT and thinking outputs  (Table 19)  , and the percentage of empty outputs  (Table 20)  . Explicit examples of models behavior for the translation task are in Figure 23. Our results show rather poor chrF++ scores throughout, though with some variation across language pairs and models. For instance, Olmo consistently adds the most additional information to the machine translation output, leading to long answers and low chrF++ scores. How long the models thought was more determined by the model than by the language pair, with weak negative correlation of reasoning length and chrF++. The smaller, locally-inferenced models very frequently used up the full thinking token budget, while GPT-OSS-120B and DeepSeek-V3.2 were more discerning. Translation into the two Sorbian languages achieved some of the best chrF++ scores, but this must be attributed to these segments being shorter on average. Figure 23: Translation with reasoning models example for the Ukrainian sample. Some models tend to hallucinate additional information or add in the output unnecessary explanation; bigger models translate better, but tend to paraphrase additionally. 3.5-0.8 Q"
+        },
+        {
+            "title": "Direction",
+            "content": "T) (N 3.5-0.8 Q en en en en en en en en Into English (X Amharic Catalan Chuvash Czech Dutch Greek Hebrew Hindi Kazakh Odia Polish Romanian Serbian Slovak Tatar en Ukrainian Uzbek en en en en en en en en en) 1.3 7.5 1.8 4.0 8.5 8.0 5.7 1.1 5.8 1.6 6.8 6.3 2.1 6.5 3.7 2.8 1.1 Out of English (en Amharic en Catalan en Chuvash en Czech en Dutch en Greek en Hebrew en Hindi en Kazakh en Odia en Polish en Romanian en Serbian en Slovak en Tatar en Ukrainian en Uzbek en X) 0.7 1.8 1.1 1.0 1.2 0.8 0.8 1.7 1.2 1.9 4.3 1.5 2.6 1.5 0.9 1.1 1."
+        },
+        {
+            "title": "German pivot\nde\nde",
+            "content": "L. Sorbian U. Sorbian 4.3 1.2 8.8 9.9 8.7 9.8 10.6 9.7 10.0 9.2 9.4 9.8 10.3 9.8 8.9 9.4 9.8 9.8 9.5 7.8 9.0 11.8 11.7 7.9 8.4 8.9 8.3 9.7 7.4 10.8 10.7 6.7 11.6 9.2 8.4 7.2 16.1 15. T) (N Ministral-3 Ministral-3 9.3 9.2 9.1 10.0 10.7 9.4 8.6 8.8 9.7 8.4 10.1 9.3 8.6 9.1 9.3 9.6 8.9 12.1 8.3 10.4 12.4 8.1 10.1 9.0 5.8 11.9 7.5 11.9 11.3 10.4 12.3 10.4 12.0 11. 14.6 17.6 5.2 7.7 5.9 6.7 8.1 7.3 7.2 7.1 6.9 4.8 7.0 7.5 5.8 6.5 6.9 6.8 5.7 1.7 7.8 4.7 8.3 6.9 4.8 5.0 5.5 4.3 1.6 8.4 6.5 11.1 8.6 4.7 8.5 3.4 5.4 5.7 T) (N 4 MinistralB 4 Ministral-1 0 n-3 otro B o-3-"
+        },
+        {
+            "title": "M\nL\nO",
+            "content": "B 5 3.5-3 Q 0 2 s-1 pt-o B 2 2 3.5-1 Q 1.0 2.1 0.9 2.2 1.6 1.4 1.1 1.5 1.4 1.1 2.4 2.1 1.5 1.6 1.2 1.8 1.1 1.4 1.0 1.2 1.1 1.4 1.4 1.0 1.2 1.3 1.4 1.0 1.2 1.3 1.2 1.3 1.4 1.1 1.2 1. 5.3 9.7 8.5 9.2 10.4 9.9 10.0 9.0 9.2 9.6 9.4 9.3 9.5 8.7 9.3 10.1 8.4 5.8 9.2 4.1 9.0 6.2 10.3 6.8 4.2 7.3 4.8 12.9 11.7 12.2 12.7 5.4 10.8 8.3 16.4 9.7 2.1 6.4 2.2 7.8 8.1 6.7 6.0 8.0 7.1 3.4 7.6 7.3 4.9 7.3 7.0 8.0 4.1 3.3 8.3 1.8 10.1 7.1 8.8 6.6 6.0 9.5 4.8 11.8 10.8 10.5 9.5 2.6 10.2 8.2 3.3 5. 2.9 8.6 5.9 8.7 10.7 9.4 9.1 4.6 8.7 5.8 9.7 9.1 8.6 9.0 8.1 9.8 8.6 0.6 5.4 1.0 5.6 6.5 6.5 2.5 3.5 2.2 3.6 8.1 6.6 1.8 9.6 1.1 6.4 2.6 2.0 1.1 9.7 8.9 9.4 8.8 9.9 8.9 9.3 9.2 9.2 8.9 9.9 9.3 10.0 9.3 9.2 10.1 9.1 5.0 9.8 7.2 12.4 6.4 9.4 9.3 3.8 7.2 3.5 11.3 10.8 11.1 10.8 5.9 10.4 7.1 11.6 8.9 11.3 9.1 10.2 9.2 9.2 9.5 9.8 9.2 9.7 9.4 8.6 9.5 9.1 9.3 0. 5.9 9.5 10.1 12.4 7.2 9.3 10.0 7.9 9.1 8.4 11.8 10.9 11.6 11.7 9.1 11.4 9.7 0.0 1.6 0.0 2.3 9.6 7.2 4.5 0.0 4.1 4.3 4.6 6.7 4.3 2.2 4.4 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 18.1 12.7 7.0 14.1 13.3 0. 3.2 k-V p 9.8 9.1 9.2 9.4 10.4 9.4 9.0 9.5 10.2 0.0 10.5 9.7 9.5 9.0 9.3 9.4 9.1 6.1 9.1 7.6 12.2 7.0 9.1 10.4 6.9 9.2 8.2 11.8 11.2 11.5 12.4 7.9 8.0 10.2 14.5 15.6 Table 18: CHRF++ translation quality per model and translation direction. Rows are translation directions grouped into en, en X, and German-pivot (Sorbian) directions; columns are models (NT = non-thinking variant). Cell shading encodes CHRF++ (pale deep teal); the best model per direction is in bold. Higher is better. 3.5-0.8 Q"
+        },
+        {
+            "title": "Direction",
+            "content": "T) (N 3.5-0.8 Q T) (N Ministral-3 Ministral-3 T) (N 4 Ministral-1 4 Ministral-1 0 n-3 otro N o-3-"
+        },
+        {
+            "title": "M\nL\nO",
+            "content": "B 5 3.5-3 Q 0 2 s-1 pt-o B 2 2 3.5-1 Q en en en en en en en en Into English (X Amharic Catalan Chuvash Czech Dutch Greek Hebrew Hindi Kazakh Odia Polish Romanian Serbian Slovak en Tatar Ukrainian Uzbek en en en en en en en en Out of English (en Amharic en Catalan en Chuvash en Czech en Dutch en Greek en Hebrew en Hindi en Kazakh en Odia en Polish en Romanian en Serbian en Slovak en Tatar en Ukrainian en Uzbek en en) 6,464 8,299 7,350 8,090 8,473 7,779 7,626 7,666 7,643 6,908 8,284 8,317 7,866 8,094 7,533 7,983 8,144 X) 7,232 7,944 8,314 8,218 8,294 8,061 7,733 7,362 8,204 7,683 8,227 7,987 8,002 8,260 7,978 7,829 8, 154 134 152 132 132 140 136 156 144 152 135 135 135 135 147 135 150 7,953 3,829 6,904 4,117 3,731 4,718 4,625 4,516 5,073 7,363 3,788 3,970 4,144 4,515 5,350 4,153 5,485 5,236 129 4,627 146 5,275 188 5,691 143 5,442 146 9,162 155 108 8,005 134 10,013 6,231 156 7,084 138 5,965 139 5,030 141 6,192 160 5,523 131 6,313 145 4,983 136 6,594 206 8,031 10,747 345 7,893 8,661 189 9,616 10,477 283 8,895 8,684 189 8,587 7,616 180 8,998 8,592 193 7,864 8,802 192 8,329 7,928 192 9,230 9,698 207 7,970 6,268 278 8,622 8,012 189 8,533 7,776 185 7,932 8,844 208 8,749 9,318 197 8,660 9,979 208 8,335 198 7,701 9,082 216 10,612 6,601 5,432 501 157 10,745 10,113 515 10,219 11,049 149 11,523 10,875 154 10,666 10,479 8,808 11,709 266 9,337 11,144 224 8,267 11,764 403 9,297 10,570 365 411 8,848 5,084 178 11,413 10,896 207 10,793 9,956 154 10,906 11,343 163 12,054 10,578 412 9,641 11,155 9,312 9,548 174 659 10,150 10,"
+        },
+        {
+            "title": "German pivot\nde\nde",
+            "content": "L. Sorbian U. Sorbian 9,115 9,170 67 80 4,519 4,795 211 12,161 12,288 246 12,349 12, 747 195 676 179 195 199 192 195 209 471 175 182 234 194 224 184 261 245 141 748 140 145 228 128 348 231 407 144 142 139 162 366 135 220 257 245 561 138 249 134 133 141 133 135 147 195 133 136 142 136 196 137 159 490 272 1,324 233 181 283 917 614 1,058 271 305 362 1,258 327 1,471 342 1,000 7,129 9,308 7,821 9,041 9,252 9,294 8,774 8,554 8,948 7,400 9,500 9,282 9,084 9,191 8,716 9,206 9, 5,902 9,251 7,665 8,904 9,488 8,565 8,102 8,119 7,910 6,668 9,168 9,259 8,737 8,876 7,839 8,757 8,704 1,254 867 2,540 822 761 879 882 903 1,068 1,004 821 815 893 869 1,203 843 1,119 950 966 1,840 939 952 926 783 678 993 949 904 874 1,028 966 1,210 852 1,134 2,723 3,950 2,927 3,909 4,035 3,743 3,612 3,393 3,596 2,873 3,999 3,972 3,742 3,898 3,456 3,848 3,814 2,236 3,895 2,907 3,519 3,896 3,647 3,141 3,156 3,143 2,465 3,693 3,874 3,319 3,498 3,016 3,446 3,352 3.2 k-V S D 1,172 931 1,289 1,129 920 1,305 1,303 1,192 1,098 992 1,158 948 1,204 1,081 1,166 1,065 1,149 1,107 915 1,098 1,054 942 994 964 989 960 957 962 913 1,081 923 988 906 994 858 975 8,288 8,353 1,717 1, 3,404 3,394 966 1,002 Table 19: Mean generation length (tokens) per model and translation direction, summing the answer/translation output and the reasoning (thinking) trace. Rows are translation directions grouped into en, en X, and German-pivot (Sorbian) directions; columns are models (NT = non-thinking variant). Larger values indicate longer total generations. 3.5-0.8 Q"
+        },
+        {
+            "title": "Direction",
+            "content": "T) (N 3.5-0.8 Q T) (N Ministral-3 Ministral-3 T) (N 4 Ministral-1 4 Ministral-1 o-3-"
+        },
+        {
+            "title": "M\nL\nO",
+            "content": "en) en en en en en en en en Into English (X Amharic Catalan Chuvash Czech Dutch Greek Hebrew Hindi Kazakh Odia Polish Romanian Serbian Slovak en Tatar Ukrainian Uzbek en en en en en en en en Out of English (en Amharic en Catalan en Chuvash en Czech en Dutch en Greek en Hebrew en Hindi en Kazakh en Odia en Polish en Romanian en Serbian en Slovak en Tatar en Ukrainian en Uzbek en 0 / 0 0 / 0 0 / 0 0 / 0 0 / 0 0 / 0 0 / 0 0 / 0 0 / 0 0.5 / 0.2 0 / 0 0 / 0 0 / 0 0 / 0 0 / 0 0 / 0 0 / 0 X) 0.1 / 0 0 / 0 0.1 / 0 0.1 / 0 0 / 0 0 / 0 0 / 0 0 / 0 0 / 0 0.2 / 0 0 / 0 0 / 0 0 / 0 0.2 / 0 0 / 0 0 / 0 0.2 / 0 0 / 100 21 / 0 0 / 100 0.1 / 0 0 / 100 0.9 / 0 0 / 100 0.1 / 0 0 / 0 0 / 100 0 / 100 0.3 / 0 0 / 100 0.5 / 0 0 / 100 0.3 / 0 0 / 100 0.6 / 0 39 / 0 0 / 100 0 / 100 0.2 / 0 0 / 0 0 / 100 0 / 100 0 / 0 0 / 100 0.1 / 0 0 / 100 0.2 / 0 0 / 100 0.3 / 0 0 / 100 0.4 / 42 / 0 0 / 100 0 / 100 0.7 / 0 0 / 100 5.0 / 0 0 / 100 4.4 / 0 0 / 100 2.2 / 0 29 / 0 0 / 100 20 / 0 0 / 100 0 / 100 32 / 0 0 / 100 7.9 / 0 0 / 100 17 / 0 0 / 100 5.5 / 0 0 / 100 1.2 / 0 0 / 100 4.5 / 0 0 / 100 3.6 / 0 0 / 100 12 / 0 0 / 100 1.4 / 0 12 / 0 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 1.5 0 / 0 0 / 0.4 0 / 0 0 / 0 0 / 0.1 0 / 0.4 0 / 0 0 / 0.4 0 / 1.9 0 / 0 0 / 0 0 / 0 0 / 0 0 / 0.8 0 / 0 0 / 0.1 0 / 100 0.2 / 5.0 0 / 0.3 0 / 100 0 / 100 0 / 6.8 0 / 100 0.1 / 5.9 0 / 0.4 0 / 100 0 / 9.0 0 / 100 0 / 100 0.3 / 8.6 0 / 100 0.1 / 5.3 0 / 100 0.2 / 7.2 0 / 6.4 0 / 100 0 / 2.8 0 / 100 0 / 0.6 0 / 100 0 / 6.9 0 / 100 0 / 7.5 0 / 100 0 / 6.4 0 / 100 0 / 1.7 0 / 100 0 / 6.4 0 / 100 61 / 0 10 / 0 20 / 0 10 / 0 9.0 / 0 11 / 0 7.8 / 0 7.9 / 0 10 / 0 69 / 0 7.4 / 0 9.1 / 0 7.0 / 0 9.0 / 0 9.6 / 0 8.0 / 0 9.4 / 0 97 / 0 12 / 0 78 / 0 25 / 0 14 / 0 46 / 0 44 / 0 48 / 0 33 / 0 81 / 0 21 / 0 14 / 0 36 / 0 24 / 0 48 / 0 12 / 0 20 / 0 n-3 otro 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 60 / 100 0 / 100 5 3.5-3 Q 0 2 s-1 pt-o B 2 2 3.5-1 Q 3.2 k-V S D 7.2 / 0 5.5 / 0 0 / 0 1.5 / 0 53 / 0 5.3 / 0 0.1 / 0 1.1 / 0 0 / 0 0.8 / 0 0 / 0 2.2 / 0 0 / 0 2.1 / 0 0 / 0 3.1 / 0 0 / 0 2.7 / 0 0 / 0 4.7 / 0 0 / 0 1.5 / 0 0 / 0 1.6 / 0 0 / 0 2.8 / 0 0 / 0 1.5 / 0 0 / 0 3.1 / 0 2.0 / 0 0.3 / 0 2.2 / 0 76 / 76 1.0 / 0 99 / 0 0 / 0 90 / 0 1.2 / 0 100 / 0 0.9 / 0 93 / 0 0 / 0 92 / 0 1.7 / 0 99 / 63 1.7 / 0 93 / 0 1.1 / 0 99 / 0 98 / 0 0.6 / 0 99 / 0 3.2 / 3.2 1.0 / 0 96 / 0 0 / 0 90 / 0 1.1 / 0 92 / 0 0.7 / 0 93 / 0 0.8 / 0 98 / 0 0.6 / 0 95 / 0 0.9 / 0 97 / 0 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0.1 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 0 / 100 59 / 100 0 / 100 0 / 100 0 / 100 4.3 / 0 4.8 / 0 3.4 / 0 4.3 / 0 3.6 / 0 4.3 / 0 3.7 / 0 3.9 / 0 3.6 / 0 4.6 / 0 3.6 / 0 4.0 / 0 5.6 / 0 4.6 / 0 4.4 / 0 3.6 / 0 3.9 / 100 / 0 22 / 0 99 / 0 0.1 / 0 100 / 0 40 / 0 100 / 0 0 / 0 99 / 0 0 / 0 100 / 0 0.4 / 0 100 / 0 0.1 / 0 100 / 0 0 / 0 100 / 0 0 / 0 100 / 0 0.6 / 0 100 / 0 0 / 0 99 / 0 0 / 0 100 / 0 0.1 / 0 100 / 0 0.3 / 0 100 / 0 0.1 / 0 100 / 0 0.1 / 0 0.2 / 0 100 / 31 1.3 / 0 0 / 0 0.7 / 0 0.7 / 0 0.2 / 0 0.3 / 0 0.4 / 0 0.4 / 0 0.2 / 0 76 / 76 0.2 / 0 0 / 0 0.8 / 0 0.1 / 0 0.3 / 0 64 / 64 0.2 /"
+        },
+        {
+            "title": "German pivot\nde\nde",
+            "content": "L. Sorbian U. Sorbian 0 / 0 0 / 0 0 / 100 1.0 / 0 0 / 100 1.0 / 0 0 / 100 0 / 6.3 0 / 100 1.0 / 8.0 46 / 0 61 / 0 / 100 0 / 100 0 / 100 0 / 100 2.0 / 0 4.3 / 0 2.0 / 0 1.7 / 0 99 / 0 100 / 0 0 / 0 0 / Table 20: Empty-output rate (%) per model and translation direction, reported as answer / thinking: the left value is the share of empty answer/translation outputs, the right value the share of empty reasoning traces. Rows are translation directions grouped into en, en X, and German-pivot directions; columns are models (NT = nonthinking variant, which by construction emits no reasoning, hence 100% empty thinking). Lower is better."
+        },
+        {
+            "title": "K Discovered Problems in PolyMath Dataset",
+            "content": "While annotating PolyMath (Wang et al., 2025) and assessing the associated human reasoning traces, our annotators identified number of errors in the original release. We group them into (i) incorrect reference answers in the English source and (ii) translation and localization errors in the multilingual subsets. We report all instances below and will contribute the corresponding corrections as pull request to the original dataset. K."
+        },
+        {
+            "title": "Incorrect Reference Answers",
+            "content": "We found three items in the English split whose gold answers are incorrect. The corrected values follow from the problem statements and were verified by our annotators. These errors propagated in other languages of PolyMath benchmark. low-en-94. Problem. In neighborhood, the number of rabbits pets is twelve less than the combined number of pet dogs and cats. If there are two cats for every dog, and the number of dogs is 60, how many pets in total are in the neighborhood? Original answer: 348. Corrected answer: 195. high-en-122. Problem. Let a, b, and be positive real numbers satisfying ab + bc + ca = abc. Determine the minimum value of aabc + bbca + ccab. Original answer: 729. Corrected answer: 328. top-en-118. Problem. Consider the surface of cube side length s. Let be one of the vertices of the cube, and the collection of points on that are at most 2 away from , where distance is measured along the surface. Divide the area of by the area of S, leaving the answer in its exact form. Original answer: π + 3 3 3 . Corrected answer: 2π 3 + 3 . 12 K.2 Translation and Localization Errors Beyond the answer errors, we observed recurring problems in the translated subsets. We label each instance with one or more of the following error types: (U) untranslated source-language content; (L) LATEX/formatting error; (T) terminology error or inconsistency; (M) mistranslation, including factual distortion; (I) information loss relative to the source; (C) calque or unidiomatic phrasing; (S) symbol/notation placement; and (X) cross-lingual misalignment between subsets. German (de). high-de-79 (U): the otherwise German statement still contains untranslated English text. high-de-81 (L): the predicate gut is typeset in math mode ($gut$) instead of as emphasized text. medium-de-12 (T): inconsistent terminology within single itemKisten vs. Boxen for the containers and Kugel vs. Ball for the balls. medium-de-39 (L): missing commas in the conditional clause. low-de-17 (M): 35 Wochen pro Woche (35 weeks per week) is nonsensical; the source specifies 35 hours per week, so the item is factually distorted. low-de-26 (C): unidiomatic 3 Paar Shorts; natural German would not use Paar here (cf. 3 Shorts). low-de-110 (M): the localized problem is incoherent in both the German and the Czech versions and does not yield solvable task. Russian (ru). low-ru-87 (I): relative to the English source, the final question omits information, leaving the requested quantity ambiguous. The English item asks for an annual salary, and the gold answer (9360) is the annual figure; the Russian rendering drops the word annual (годовая), so solver cannot tell whether monthly or an annual amount is wanted. English (source). company pays each of its employees $600 in month. The company has policy of increasing the salaries of each of its employees by 10% of the initial salary every year for those who have stayed in the company for five years. If Sylvie just clocked 5 years in the company last December, what is her annual salary after three more years of service? (Gold answer: 9360.) Russian (as released). Компания платит каждому из своих сотрудников 600 $ в месяц. В компании действует политика ежегодного повышения заработной платы на 10 % от начальной для каждого сотрудника, проработавшего в компании пять лет. Если Сильви отработала в компании 5 лет в прошлом декабре, сколько составит её заработная плата спустя ещё три года работы? Explanation. . . . how much will her salary be after another three years of work? the qualifier annual present in the source is absent, and the monthly rate ($600) is also given, so the target unit is underspecified. Spanish (es). The Spanish subset shows several recurring issues: (M) Mistranslations, e.g. intersecta for interseca, and secesión (secession) for sucesión (sequence). (T) Incorrect terminology, e.g. casco convexo instead of envoltura convexa for convex hull. (T) Context-unaware term choices, e.g. suministros for supplies, which is wrong in context. (C) English calques, e.g. se está poniendo demasiado pesada for is getting too heavy, poor choice here. (S) Currency/unit symbols placed before rather than after the numeric amount. (M) Nonsensical translations, e.g. low-es-110. (X) high-es-46: the Spanish and Vietnamese entries are swapped in the release; the content occupying the Spanish slot is in fact Vietnamese, whose LATEX formatting has additionally been altered. Finally, the Spanish subset predominantly uses Latin American Spanish rather than Peninsular Spanish."
+        },
+        {
+            "title": "L LLMs Usage in This Work",
+            "content": "Finally, we clarify the role of LLMs in this workwhere they were used and where they were not. Neural machine translation systems were used only to generate initial translation drafts for the target languages. All subsequent quality assessment and refinement were performed exclusively through human correction, without automated post-editing systems. Claude was actively used to assist with code development, while ChatGPT was used for language editing and polishing. All research ideas, experimental design, analyses, and findings were developed solely by the authors."
+        }
+    ],
+    "affiliations": [
+        "Applied AI Institute",
+        "Charles University",
+        "German University of Digital Science",
+        "Independent Researcher",
+        "Indian Institute of Technology, Kharagpur (IIT Kharagpur)",
+        "Inria",
+        "Munich Center for Machine Learning (MCML)",
+        "Munich Data Science Institute (MDSI)",
+        "Nazarbayev University",
+        "Technical University of Munich (TUM)"
+    ]
+}
