@@ -1,0 +1,93 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Background",
+        "images": []
+    },
+    {
+        "header": "3Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05147/2607.05147v1/x1.png",
+                "caption": "Figure 1:The DSpark architecture and decoding cycle.Given prompt tokensABC, the target model executes one step to generate the next tokenD, which serves as the anchor for the drafting phase. UsingDas the input, DSpark employs a heavy parallel backbone and a lightweight sequential head to generate draft tokensEFGHalong with their corresponding confidence scoresc1c_{1}–c4c_{4}. The Hardware-Aware Prefix Scheduler then evaluates these scores to retain the prefixEFGand drop the low-confidence tokenH.\nFinally, the target model verifies the scheduled prefix in parallel. As illustrated,EandFare accepted whileGis rejected, prompting the model to generate a corrected tokenG∗to complete the current round.",
+                "position": 681
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05147/2607.05147v1/x2.png",
+                "caption": "Figure 2:Position-wise conditional acceptance.We report the empirical conditional acceptance rate for each draft position, averaged across benchmarks within each domain using the Qwen3-4B target model. Unlike standard prefix survival, this metric isolates the baseline predictive quality at positionkkby removing the penalty of previous rejections. Notice that the autoregressive drafter (Eagle3) remains stable or trends upward, while the parallel drafter (DFlash) suffers suffix decay.",
+                "position": 1265
+            },
+            {
+                "img": "https://arxiv.org/html/2607.05147/2607.05147v1/x3.png",
+                "caption": "Figure 3:Effect of drafter depth.With proposal length fixed, DSpark’s performance improves as drafter layers are added. Notably, a shallow 2-layer DSpark outperforms a deeper 5-layer DFlash baseline, highlighting the parameter efficiency of sequential modeling.",
+                "position": 1305
+            },
+            {
+                "img": "https://arxiv.org/html/2607.05147/2607.05147v1/x4.png",
+                "caption": "Figure 4:Effect of proposal length and latency overhead.DSpark consistently outperforms DFlash across various block sizes (left three panels). The rightmost panel demonstrates that the sequential head introduces minimal latency overhead during serving.",
+                "position": 1308
+            },
+            {
+                "img": "https://arxiv.org/html/2607.05147/2607.05147v1/x5.png",
+                "caption": "Figure 5:Confidence threshold sweep.A threshold of 0 corresponds to standard fixed-length verification. As the threshold increases, the overall acceptance rate steadily rises because the confidence head effectively prunes tokens that would ultimately be rejected (hashed bars).",
+                "position": 1344
+            },
+            {
+                "img": "https://arxiv.org/html/2607.05147/2607.05147v1/x6.png",
+                "caption": "Figure 6:The Reliability Diagram on Alpaca Dataset.While the raw confidence estimator achieves strong discrimination, its predictions are inherently overconfident. Applying post-hoc calibration helps to align the prefix survival probabilities with empirical acceptance rates. The shaded background histogram represents the frequency distribution of sample counts across different confidence bins.",
+                "position": 1347
+            }
+        ]
+    },
+    {
+        "header": "5Real-World Deployment of DSpark",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.05147/2607.05147v1/x7.png",
+                "caption": "Figure 7:Throughput vs. TPS.Aggregate output token throughput against per-request generation speed (tok/s/user) under live traffic.\nIn our production deployment, DSpark improves the observed throughput–interactivity frontier relative to the MTP-1 baseline under the measured traffic and engine configurations.",
+                "position": 1438
+            },
+            {
+                "img": "https://arxiv.org/html/2607.05147/2607.05147v1/x8.png",
+                "caption": "Figure 8:Load-adaptive throughput and verification budgets.Top row (a, b): Aggregate output throughput across varying levels of system concurrency. Bottom row (c, d): The average target verification budget allocated per request. As concurrent load increases, the dynamic scheduler automatically restricts the per-request verification length to prevent resource contention.",
+                "position": 1479
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendices",
+        "images": []
+    },
+    {
+        "header": "Appendix ACounterexample: Selection Bias Without Early-Stopping",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
