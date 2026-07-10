@@ -1,0 +1,129 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.08770/2607.08770v1/x1.png",
+                "caption": "Figure 1.Event-based video generation.We leverage pre-trained video diffusion priors to address three distinct inverse problems within a single architecture. Depending on the input condition, our model performs: (a)Video Reconstruction, recovering high-fidelity textures from sparse event streams, (b)Video Prediction, generating long-term sequences from a single start frame with minimal drift via our autoregressive unrolling strategy, and (c)Video Frame Interpolation, achieving zero-shot adaptation to synthesize intermediate frames by leveraging event dynamics as temporal guidance.",
+                "position": 333
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.08770/2607.08770v1/x2.png",
+                "caption": "Figure 2.Challenges in event-based video generation.We highlight failure cases in state-of-the-art methods:\n(a) Reconstruction: Regression-based methods (e.g., E2VID+(Stoffregen et al.,2020)) suffer from “regression-to-the-mean,” causingblurry texturesand detail loss.\n(b) Prediction: Direct video diffusion (e.g., VDM-EVFI(Chen et al.,2025a)) on long sequences suffers from error accumulation, leading to severecolor temporal drift.\n(c) Interpolation: Existing networks (e.g., CBMNet-Large(Kim et al.,2023)) fail to capture complex intermediate motion, producing significantghosting artifacts. Our method leverages video diffusion priors to ensure high-fidelity and stable generation across all tasks.",
+                "position": 377
+            }
+        ]
+    },
+    {
+        "header": "2.Related Work",
+        "images": []
+    },
+    {
+        "header": "3.Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.08770/2607.08770v1/x3.png",
+                "caption": "Figure 3.Autoregressive Unrolling.To bridge the domain gap between training and inference, we employ an iterative training strategy. Initially, the model is trained with Ground Truth (GT) context frames for convergence (left). Subsequently, we activate the unrolling mechanism by performing an inference pass to generate predictions, which then replace the GT context frames for fine-tuning (right). This iterative feedback loop forces the model to adapt to its own generation errors, mitigating error accumulation during long video generation.",
+                "position": 474
+            },
+            {
+                "img": "https://arxiv.org/html/2607.08770/2607.08770v1/x4.png",
+                "caption": "Figure 4.Overview of our training pipeline.To enhance robustness against sensor variations, input event voxels undergo Event Voxel Density Augmentation, and the first frame, context frames, and current video frames are synchronously resized and cropped to ensure spatial alignment. All inputs are encoded into latents via a frozen 3D VAE. These latents are aligned and fused through frame dimension concatenation and channel dimension concatenation. Finally, we expand and fully fine-tune the First Projection Layer to accommodate the additional event channels, while the DiT backbone is efficiently fine-tuned using LoRA.",
+                "position": 494
+            },
+            {
+                "img": "https://arxiv.org/html/2607.08770/2607.08770v1/x5.png",
+                "caption": "Figure 5.Reencoding Alignment\nand Cross Residual Correction.To address temporal misalignment caused by the discrepancy between latent-space and pixel-space flipping, we propose Reencoding Alignment. The denoised latents,Z^0f​w​d\\hat{Z}_{0}^{fwd}andZ^0b​w​d\\hat{Z}_{0}^{bwd}, are decoded into pixel space, flipped temporally (F​l​i​pp​i​xFlip_{pix}), and then re-encoded via the 3D VAE to yield the aligned latentsZ~0f​w​d\\tilde{Z}_{0}^{fwd}andZ~0b​w​d\\tilde{Z}_{0}^{bwd}. To mitigate information loss inherent in this re-encoding process, we employ Cross Residual Correction. We calculate the residual difference between the original and the re-encoded latents (e.g., the subtraction nodeZ^0f​w​d−Z¯0f​w​d\\hat{Z}_{0}^{fwd}-\\bar{Z}_{0}^{fwd}) and inject this detail information into the opposite branch. Specifically, the forward residual is added to the backward aligned latentsZ~0b​w​d\\tilde{Z}_{0}^{bwd}to produce the final corrected latentsZ0′⁣b​w​dZ^{\\prime bwd}_{0}, and symmetrically, the backward residual is injected intoZ~0f​w​d\\tilde{Z}_{0}^{fwd}to obtainZ0′⁣f​w​dZ^{\\prime fwd}_{0}. This symmetric Cross Injection mechanism promotes temporal consensus between branches while preserving fine-grained details. Light-colored boxes represent information loss.",
+                "position": 545
+            }
+        ]
+    },
+    {
+        "header": "4.Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.08770/2607.08770v1/x6.png",
+                "caption": "Figure 6.Qualitative comparisons on ECD(Mueggler et al.,2017), MVSEC(Zhu et al.,2018), and HQF(Stoffregen et al.,2020)datasets.Our LongE2V recovers high-frequency textures where regression baselines (E2VID+, HyperE2VID) suffer from blurring (Row 1). In prediction tasks, we avoid the severe noise accumulation and ghosting artifacts (red arrow) seen in VDM-EVFI (Rows 2–3), maintaining superior structural fidelity and temporal stability.",
+                "position": 861
+            },
+            {
+                "img": "https://arxiv.org/html/2607.08770/2607.08770v1/x7.png",
+                "caption": "Figure 7.Zero-shot interpolation on BS-ERGB and HQF.Baselines (TLXNet+, CBMNet-Large) suffer from structural collapse or blur under large motion (Top), whereas our LongE2V captures accurate dynamics. On fine text (Bottom), our Reencoding Alignment eliminates the ghosting seen in baselines, ensuring legibility.",
+                "position": 878
+            },
+            {
+                "img": "https://arxiv.org/html/2607.08770/2607.08770v1/x8.png",
+                "caption": "Figure 8.Qualitative ablation on reconstruction.Top: Ablated variants;Bottom: Full Method. w/o Pretrained prior yields noise; w/o Context causes structural ambiguity; w/o Autoregressive unrolling leads to point artifacts (drift); and w/o Adaptive context switch causes grid artifacts. Our method ensures stable, high-fidelity results.",
+                "position": 962
+            },
+            {
+                "img": "https://arxiv.org/html/2607.08770/2607.08770v1/x9.png",
+                "caption": "Figure 9.Visual ablation on interpolation.w/o Reencoding Alignmentcauses ghosting due to latents misalignment;w/o Cross Residual Correctionblurs fine details due to VAE loss; andw/o Event Voxel Density Augmentationyields artifacts from density mismatch. OurFull Methodrestores sharp, coherent details comparable toGround Truth.",
+                "position": 1050
+            },
+            {
+                "img": "https://arxiv.org/html/2607.08770/2607.08770v1/x10.png",
+                "caption": "Figure 10.Text-Guided Event Video Colorization.Left to Right: Input events; standard reconstruction (geometry baseline); text-stylized frames; and a temporal XT-slice (atred line). The results demonstrate our model effectively decouples event-driven motion from text-defined appearance, while the XT-slice confirms the generated textures are temporally coherent.",
+                "position": 1123
+            }
+        ]
+    },
+    {
+        "header": "5.Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.08770/2607.08770v1/x11.png",
+                "caption": "Figure 11.Additional qualitative comparisons on ECD(Mueggler et al.,2017), MVSEC(Zhu et al.,2018), and HQF datasets(Stoffregen et al.,2020).",
+                "position": 2542
+            },
+            {
+                "img": "https://arxiv.org/html/2607.08770/2607.08770v1/x12.png",
+                "caption": "Figure 12.Additional zero-shot interpolation results on BS-ERGB(Tulyakov et al.,2021)and HQF(Stoffregen et al.,2020)datasets.",
+                "position": 2547
+            }
+        ]
+    },
+    {
+        "header": "Appendix ALimitations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.08770/2607.08770v1/x13.png",
+                "caption": "Figure 13.Limitations.(a) Failure cases under sparse or low-quality event streams. (b) Sensitivity to noise where ”hot pixel” is preserved or amplified in the reconstructed frames.",
+                "position": 2559
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAblation of Different Backbones",
+        "images": []
+    },
+    {
+        "header": "Appendix CLong-term temporal consistency.",
+        "images": []
+    },
+    {
+        "header": "Appendix DMore Implementation Details.",
+        "images": []
+    },
+    {
+        "header": "Appendix EInference Speed",
+        "images": []
+    },
+    {
+        "header": "Appendix FDataset sizes.",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
