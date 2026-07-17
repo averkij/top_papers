@@ -1,0 +1,132 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/assets/parrot_logo.png",
+                "caption": "",
+                "position": 346
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/x1.png",
+                "caption": "Figure 1:VideoChat3 achieves strong performance across diverse evaluation benchmarks, including temporal perception, long video understanding, and temporal grounding, while also supporting online proactive responses.",
+                "position": 363
+            }
+        ]
+    },
+    {
+        "header": "2Model Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/x2.png",
+                "caption": "Figure 2:VideoChat3 architecture with I3D-ViT.VideoChat3 follows the classical ViT–MLP Projector–LLM architecture, with I3D-ViT enabling efficient video encoding before visual tokens are passed to the LLM. Specifically, spatial2×22\\times 2merging and temporalTT-frame pooling reduce the visual sequence length by approximately a factor of4​T4T. Under the default setting ofT=4T=4, this yields a16×16\\timesspatiotemporal compression ratio; for clarity, the figure illustrates the mechanism withT=2T=2.",
+                "position": 442
+            },
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/x3.png",
+                "caption": "Figure 3:Illustration of the Adaptive Frame Resolution. State tokens control whether the next streaming window is encoded at a low or high pixel quota. In the soccer example, routine play is monitored at low cost; when players rush toward the goal, the Standby state enlarges the next window so the model can inspect whether the ball goes in before triggering Response.",
+                "position": 489
+            }
+        ]
+    },
+    {
+        "header": "3Dataset Construction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/x4.png",
+                "caption": "Figure 4:Source Distribution of VideoChat3-Academic2M.VideoChat3-Academic2M contains 2.27M caption/QA instances from six academic sources, dominated by LLaVA-Video[26], Spoken-MIT[27], and Vript[28].",
+                "position": 561
+            },
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/x5.png",
+                "caption": "Figure 5:Example of Annotation Enhancement from Concise Answers to Evidence-Grounded Responses.A short-phrase answer is rewritten into a temporally grounded, evidence-rich response that explains the observed actions and supports the final answer with video-specific cues. This illustrates how annotation enhancement increases supervision density while preserving the original semantic label.",
+                "position": 587
+            },
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/x6.png",
+                "caption": "Figure 6:Source Distribution of VideoChat3-LV116K.The panels summarize the collected long-video repository used to construct VideoChat3-LV116K, with 116.2K rows. The duration statistics reveal a clear temporal-scale gap: academic sources are mostly short clips, with mean durations from 3.0s to 59.0s, whereas our collected long-video shards average 156s to 1.3K seconds and extend to much longer maxima. This complementarity provides both reliable short-clip semantic anchors and long-range supervision for sparse evidence, cross-segment aggregation, and event-level reasoning.",
+                "position": 597
+            },
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/x7.png",
+                "caption": "Figure 7:Long-Video Data Synthesis Pipeline for VideoChat3-LV116k.The pipeline converts raw long videos into structured supervision through candidate filtering, temporal boundary segmentation, segment-level annotation, quality examination, and full-video annotation assembly. Instead of annotating an entire long video directly, it builds a validated segment-level evidence ledger, making sparse long-range events easier to capture and reason over.",
+                "position": 624
+            },
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/x8.png",
+                "caption": "Figure 8:Source composition and temporal coverage of VideoChat3-OL617K.Left:Distribution of 617,183 instances across 40 JSONL shards. StreamForest General and Streamo contribute 272,424 (44.1%) and 259,977 (42.1%) instances, respectively, while StreamForest Drive, Seeker, and Supplement provide the remaining data.Right:Minimum, mean, and maximum observed context spans for 438,902 records with timing information, shown on a logarithmic scale with zero-length spans placed at 1 second for visualization. Mean spans range from 12.7 seconds for StreamForest Drive to 153.5 seconds for Seeker, providing supervision across both short- and long-horizon causal streaming contexts. This diversity supports the evidence accumulation and response-timing behaviors used to construct proactive streaming QA supervision.",
+                "position": 669
+            }
+        ]
+    },
+    {
+        "header": "4Training",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/x9.png",
+                "caption": "Figure 9:State-transition supervision mask for streaming training.The output sequence consists of</Silence>,</Standby>, and</Response>. Blue arrows indicate the state-token positions whose losses are retained. We keep allTransformpositions, where the target state changes between adjacent windows, because they define the temporal decision boundaries. From the remaining continuation positions, we randomly select an equal number ofKeeppositions to provide supervision for maintaining the current state.",
+                "position": 1127
+            }
+        ]
+    },
+    {
+        "header": "5Evaluation",
+        "images": []
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/x10.png",
+                "caption": "Figure 10:Qualitative example of fine-grained video captioning.VideoChat3 describes the complete pole-vault sequence, covering the run-up, pole planting, takeoff, bar clearance, and landing.",
+                "position": 5131
+            },
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/x11.png",
+                "caption": "Figure 11:Qualitative example of long-video question answering.VideoChat3 retrieves a specific visual detail from an extended video and correctly identifies the color of the floor microphone stand.",
+                "position": 5135
+            },
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/x12.png",
+                "caption": "Figure 12:Qualitative example of temporal video reasoning.VideoChat3 recognizes events distributed across the video and arranges them in chronological order.",
+                "position": 5139
+            },
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/x13.png",
+                "caption": "Figure 13:Qualitative example of temporal video grounding.Given a language description, VideoChat3 accurately localizes the corresponding event, with only a minor boundary deviation from the ground-truth interval.",
+                "position": 5143
+            },
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/x14.png",
+                "caption": "Figure 14:Qualitative example of online proactive response.During streaming perception, VideoChat3 remains silent when relevant evidence is absent and produces timely responses once informative visual content appears.",
+                "position": 5147
+            },
+            {
+                "img": "https://arxiv.org/html/2607.14935/2607.14935v1/x15.png",
+                "caption": "Figure 15:Qualitative example of dense video captioning.VideoChat3 identifies multiple events throughout the video and generates temporally coherent descriptions that capture its evolving content.",
+                "position": 5151
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

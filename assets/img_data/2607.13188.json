@@ -1,0 +1,115 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.13188/2607.13188v1/x1.png",
+                "caption": "Figure 1:CO2Jumpin action: text and image co-author the answer.Three trajectories ofCO2Jumpon image editing, maze, and nonogram solving, showing the joint state at an intermediate stepttand at the final step. The image-editing panel highlights the core mechanism: at stepttthe text branch has already begun committing atarget-image bounding box in text for the new objectperson; by the final step the image branch has placed the hikerexactlyinside the finalized box (we overlay the bounding boxes from generated text on edited image). The text branchplanswhere the edit should land, and the image branchexecutesthat plan within the same denoising trajectory — no second forward pass, no external grounder. Maze and Nonogram show the same coupled-refinement pattern: partial-path and partial cell-fill commitments at stepttconverge with their text-side answers by the final step.",
+                "position": 377
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Background",
+        "images": []
+    },
+    {
+        "header": "3Related Work",
+        "images": []
+    },
+    {
+        "header": "4Self-Correcting Coupled Markov Jump Processes",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.13188/2607.13188v1/x2.png",
+                "caption": "Figure 2:CO2Jumpsampler.A single denoising step from𝐳t\\mathbf{z}_{t}to𝐳s\\mathbf{z}_{s}. From one forward pass, the model produces per-token Self-Confidence for both modalities; cross-modal attention𝐀timage→text\\mathbf{A}^{\\text{image}\\to\\text{text}}_{t}propagates text confidence to image positions, and an entropy-based gateλ\\lambdamixes self and cross signals into Coupled Confidence. TheDeathjump remasks the lowest-confidence committed tokens, and theBirthjump reveals the highest-confidence masked tokens under the noise schedule.",
+                "position": 550
+            }
+        ]
+    },
+    {
+        "header": "5Datasets and Benchmarks for Joint Multimodal Generation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.13188/2607.13188v1/x3.png",
+                "caption": "Figure 3:Dataset curation pipeline.ForJEdit-1M, raw editing pairs are augmented by an oracle Qwen3-VL-235B that produces both the per-image scene-graph understanding and the thinking trace. ForJMaze-200KandJNono-200K, source/target images and the structured understanding are produced algorithmically.",
+                "position": 831
+            },
+            {
+                "img": "https://arxiv.org/html/2607.13188/2607.13188v1/x4.png",
+                "caption": "Figure 4:JEdit-1Mtraining sample.A natural-language edit prompt (bottom) paired with the source and target images (right), the oracle Qwen3-VL-235B thinking trace, and the per-panel source/target scene-graph understanding. The bounding boxes and labels from MLLM’s grounding solution are overlaid on the corresponding images.",
+                "position": 853
+            }
+        ]
+    },
+    {
+        "header": "6Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.13188/2607.13188v1/x5.png",
+                "caption": "Figure 5:Scaling sampling steps.ImgEditBench (left) and\noverall mAP (right) vs. NFE.CO2Jumpis the only sampler with monotonically rising curves; the gap to baselines widens with NFE.",
+                "position": 1060
+            },
+            {
+                "img": "https://arxiv.org/html/2607.13188/2607.13188v1/x6.png",
+                "caption": "Figure 6:Qualitative comparison.Top left: Nonogram (red✗marks clue violations); Bottom left: Maze;\nRight: per-step MDM vs.CO2Jumptrajectory. OnlyCO2Jumpsatisfies all clues and paths, and its joint trajectory stays\nconsistent across both modalities.",
+                "position": 1235
+            },
+            {
+                "img": "https://arxiv.org/html/2607.13188/2607.13188v1/x7.png",
+                "caption": "Figure 7:(a)Per-step text/image entropy and the gateλimage\\lambda_{\\text{image}}. The image starts confident (source prior),\ntext starts uncertain;λimage\\lambda_{\\text{image}}rises from≈0.05\\approx 0.05to≈0.85\\approx 0.85as text commits.(b)Image-side remask events\nin (Self-Confidence, Cross Signal) space: most fire in the lower-left\nregion; a smaller hotspot at high-Self / low-Cross corresponds to\ncoupling-driven revocations.",
+                "position": 1359
+            }
+        ]
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix AQualitative Example fromCO2Jump: Joint Image Editing and Understanding",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.13188/2607.13188v1/x8.png",
+                "caption": "Figure 8:Joint image editing with concurrent understanding onJEdit-1M.Prompt, model-generated thinking trace, scene-graph source/target analyses, and the source/generated images with predicted bounding boxes overlaid (boxes are the model’s own text-side predictions, not ground truth). The text branch declares only theshellas a dynamic object — every other entity has identical bounding boxes in the source and target analyses — and the image branch realizes exactly this localized texture edit: scaly→\\tosmooth on the shell, with body, limbs, ground and rock preserved.",
+                "position": 1418
+            }
+        ]
+    },
+    {
+        "header": "Appendix BQualitative Example fromCO2Jump: Maze Solving",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.13188/2607.13188v1/x9.png",
+                "caption": "Figure 9:Joint maze solving onJMaze.CO2Jump’s thinking trace and answer (left) alongside the input maze (top right; green start, red end) and the solved maze with the blue path overlaid (bottom right). The text branch first reasons globally about which corridors are dead-ends and which form the main artery, then commits the path as an explicit(r,c)(r,c)coordinate sequence; the image branch traces precisely that sequence on the grid in the same denoising trajectory.",
+                "position": 1430
+            }
+        ]
+    },
+    {
+        "header": "Appendix CQualitative Example fromCO2Jump: Nonogram Solving",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.13188/2607.13188v1/x10.png",
+                "caption": "Figure 10:Joint nonogram solving onJNono.CO2Jump’s thinking trace and answer (left) alongside the input puzzle (top right; row clues at left margin, column clues at top margin) and the solved grid with cells filled black (bottom right). The text branch reasons in a bidirectional, constraint-propagation style — starting from the most globally-constrained rows and columns and using each forced fill to tighten the other dimension — before committing the per-row filled-cell ranges; the image branch fills exactly those ranges on the grid in the same denoising trajectory, satisfying every clue.",
+                "position": 1442
+            }
+        ]
+    },
+    {
+        "header": "Appendix DSystem Prompts for Dataset Curation",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
