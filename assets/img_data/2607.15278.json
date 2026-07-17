@@ -1,0 +1,156 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x1.png",
+                "caption": "Figure 1:Comparison of video generation paradigms. Streaming autoregressive diffusion models are efficient but commit too early for reliable multi-step reasoning, while bidirectional diffusion supports global revision but requires costly dense fixed-sequence denoising. HDR performs hierarchical denoising before streaming output: coarse layers maintain high-level hypotheses, finer layers refine them into visual states, and sparse hierarchical attention keeps generation efficient.",
+                "position": 312
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x2.png",
+                "caption": "Figure 2:Overview of HDR. Video latents are organized into a tree-structured hierarchy across multiple temporal resolutions. During training, each hierarchy token is corrupted along a flow-matching path and HDR Video DiT is optimized with a layer-wise objective. During inference, all tree tokens are flattened into a coarse-to-fine autoregressive order.SHAP(Sparse Hierarchical Attention Pattern) defines a structured attention mask over this flattened sequence: each token attends only to fixed local, parent-level, and first-frame contexts rather than the full video sequence. Generated tokens are written into a shared KV cache and reused by later tokens across hierarchy levels, enabling multi-scale information propagation with low temporal attention cost.",
+                "position": 371
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x3.png",
+                "caption": "Figure 3:Visualization of the six multi-step video reasoning benchmarks: maze navigation, Tower of Hanoi, one-line drawing, sliding puzzle, Sokoban, and water pouring. Each task requires logical consistency across multiple reasoning steps rather than only local visual plausibility.",
+                "position": 514
+            },
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x4.png",
+                "caption": "Figure 4:Qualitative comparison between Baseline (CausalForcing) and HDR on Maze and One-line tasks. CausalForcing makes an early local commitment that leads to failure, while HDR performs hierarchical planning before committing to the final trajectory.",
+                "position": 866
+            },
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x5.png",
+                "caption": "Figure 5:Hierarchical layer importance. Curves show mean performance with one-standard-deviation bands. Increasing active hierarchy layers from 1 to 6 consistently improves HDR over CausalForcingZhuet al.(2026), showing that each layer contributes to the full coarse-to-fine reasoning process.",
+                "position": 882
+            },
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x6.png",
+                "caption": "(a)Denoising-step reduction. HDR remains more robust than both CausalForcingZhuet al.(2026), the streaming AR diffusion baseline, and bidirectional diffusion.",
+                "position": 893
+            },
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x6.png",
+                "caption": "(a)Denoising-step reduction. HDR remains more robust than both CausalForcingZhuet al.(2026), the streaming AR diffusion baseline, and bidirectional diffusion.",
+                "position": 896
+            },
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x7.png",
+                "caption": "(b)Data reduction. HDR degrades more gracefully than bidirectional diffusion as the training data scale decreases from the full set to 10% and 2%.",
+                "position": 901
+            },
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x8.png",
+                "caption": "Figure 7:Physical-world robot maze experiment. We fine-tune both CausalForcingZhuet al.(2026)and HDR using only 50 real-world robot maze videos, then use an inverse dynamics model (IDM) to convert generated videos into executable robot actions. HDR maintains strong success rates across easy, medium, hard, and OOD mazes, where OOD mazes contain diagonal or stacked wooden blocks.",
+                "position": 930
+            },
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x9.png",
+                "caption": "Figure 8:RoboDojo environments and HDR-WAM executions. The figure presents representative tabletop manipulation environments from the RoboDojo simulation benchmark together with executions produced by HDR-WAM. The model achieves particularly strong performance on Long-Horizon tasks, reaching a score of9.859.85and a success rate of4.75%4.75\\%, demonstrating its ability to maintain coherent task structure over extended interactions.",
+                "position": 950
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AHDR-WAM Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x10.png",
+                "caption": "Figure 9:Overview of the HDR-WAM actor. The model combines sparse episode-level visual context with a local action-conditioned rollout, then arranges episode, local visual, and action tokens in a joint sequence. The attention mask separates visual denoising from executable action prediction: action tokens attend to action tokens and clean visual conditions, while visual tokens denoise future observations under language, proprioception, and grouped action context.",
+                "position": 1740
+            }
+        ]
+    },
+    {
+        "header": "Appendix BBenchmark and Eval Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CEntropy-Matched versus Fully Denoised Hierarchies",
+        "images": []
+    },
+    {
+        "header": "Appendix DTime Complexity Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix EComparison with SOTA Closed-source Models",
+        "images": []
+    },
+    {
+        "header": "Appendix FFull Table of Ablations",
+        "images": []
+    },
+    {
+        "header": "Appendix GVisualization of Hierarchical Intermediate Predictions",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x11.png",
+                "caption": "Figure 10:Visualization of HDR’s hierarchical intermediate predictions. Columns labeled L1, L2, and L3 show cleanx0x_{0}predictions before noise is added at different hierarchy levels, while the rightmost block shows the final generated output. The progression from coarse layers to fine layers illustrates how HDR first forms high-level plans and then refines them into detailed video states.",
+                "position": 2833
+            }
+        ]
+    },
+    {
+        "header": "Appendix HFailure Case Studies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x12.png",
+                "caption": "Figure 11:Qualitative comparison across all six reasoning tasks where the streaming autoregressive diffusion baseline fails but HDR succeeds. For each task, the top row shows CausalForcing and the bottom row shows HDR. Red boxes and arrows mark the baseline’s failure points, while green boxes and arrows highlight HDR’s successful coarse-to-fine refinement. Across tasks, the baseline typically commits to an early local mistake, such as leaving the valid maze corridor, missing a required disk transfer, breaking path continuity, misplacing the blank tile, pushing the box away from the goal, or violating water-pouring constraints. In contrast, HDR maintains globally consistent task structure and reaches the correct final state.",
+                "position": 2854
+            },
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x13.png",
+                "caption": "Figure 12:Maze failure case of HDR. The model traces a plausible route and reaches the goal corridor, but a wall disappears near the end of the rollout, producing an invalid maze state despite otherwise correct multi-step planning.",
+                "position": 2868
+            },
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x14.png",
+                "caption": "Figure 13:Sokoban failure case of HDR. The box trajectory is largely correct and approaches the target, but a wall disappears near the end of the rollout, making the final scene physically inconsistent.",
+                "position": 2871
+            },
+            {
+                "img": "https://arxiv.org/html/2607.15278/2607.15278v1/x15.png",
+                "caption": "Figure 14:Water-pouring failure case of HDR. The model nearly completes the tube grouping correctly, but orange liquid collapses into red, yielding a visually plausible yet invalid final arrangement.",
+                "position": 2874
+            }
+        ]
+    },
+    {
+        "header": "Appendix IBaselines and Implementation Details",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
