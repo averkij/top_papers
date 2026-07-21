@@ -1,0 +1,154 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.18213/2607.18213v1/x1.png",
+                "caption": "Figure 1:(Left) Prior work[swepruner2026]uses a separatePrunermodel conditioned on an explicit goal-hint query the agent must write at every turn. (Right) SWE-Pruner Pro prunes directly from the agent’s own internal representations, with no external scoring model.",
+                "position": 363
+            }
+        ]
+    },
+    {
+        "header": "2Motivation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.18213/2607.18213v1/x2.png",
+                "caption": "Figure 2:Linear probe on the agent backbone’s frozen last-layer hidden states. (Left) Two-dimensional projection along the LDA discriminant axis and an orthogonal direction. (Right) Distribution of probe scores. The two classes have visibly different means but overlap in the middle band.",
+                "position": 403
+            },
+            {
+                "img": "https://arxiv.org/html/2607.18213/2607.18213v1/x3.png",
+                "caption": "",
+                "position": 412
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.18213/2607.18213v1/x4.png",
+                "caption": "Figure 3:Overview of SWE-Pruner Pro.Top (Agent Trajectory):at each turn the agent backbone prefills[history,ct,rt][\\text{history},c_{t},r_{t}]; only the new tool-response tokens are forwarded, and SWE-Pruner Pro reads their last-layer hidden states{hi}\\{h_{i}\\}off this prefill at no extra forward onrtr_{t}.Bottom (SWE-Pruner Pro head):the head scores eachhih_{i}, aggregates the binarised scores into per-line keep-or-prune decisions, and the pruned responser~t\\tilde{r}_{t}replacesrtr_{t}in the next turn.",
+                "position": 435
+            },
+            {
+                "img": "https://arxiv.org/html/2607.18213/2607.18213v1/x5.png",
+                "caption": "Figure 4:Head architecture. The frozen backbone’s hidden stateshih_{i}receive an additive length-aware embedding indexed by the line countNN, then pass through a two-block feed-forward stack with LayerNorm and dropout to a per-token keep logit. Line decisions are produced by majority vote within each line at inference.",
+                "position": 453
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.18213/2607.18213v1/x6.png",
+                "caption": "Figure 5:Per-call pruning overhead relative to the immediately following generation step, broken down by trajectory.",
+                "position": 1165
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Limitations",
+        "images": []
+    },
+    {
+        "header": "Ethical Considerations",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ATraining Data",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.18213/2607.18213v1/x7.png",
+                "caption": "Figure 6:Data construction pipeline.\nRaw trajectories from five HuggingFace sources are parsed into a uniform per-step schema, light-filtered, then sub-sampled to a 50k diverse pool by quality-diversity selection, labelled per line byClaude Sonnet 4.6, and finally passed through a small human review pass that drops a few hundred of malformed labels.",
+                "position": 1237
+            }
+        ]
+    },
+    {
+        "header": "Appendix BTraining Details",
+        "images": []
+    },
+    {
+        "header": "Appendix COolong Benchmark Conversion",
+        "images": []
+    },
+    {
+        "header": "Appendix DPer-turn execution",
+        "images": []
+    },
+    {
+        "header": "Appendix EIn-server hidden-state extraction",
+        "images": []
+    },
+    {
+        "header": "Appendix FQualitative cases: per-line head scores on tool outputs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.18213/2607.18213v1/x8.png",
+                "caption": "Figure 7:Read case:view /testbed/snapshot_dbg_cli/__init__.py.Legend (shared by all four cases).The left score gutter encodes the head’s predicted keep probabilitypi=σ​(zi)p_{i}=\\sigma(z_{i}), fading from white (low) togreen(high).Gis filled when the gold annotator marked the line askeep;Pis filled when the head predictskeepatτ=0.5\\tau{=}0.5.\nPredicted-keep rows additionally get ayellow row washwith crisp black text; pruned rows are dimmed.Case.The head assigns the lowest scores in the response (0.25–0.48) to the license/docstring boilerplate—the omitted lines 2–13 and the visible# limitations under the Licenseplus the package docstring on lines 14–19—while concentrating mass at 0.51–0.66 on the imports, the__version__assignment, and the two function bodies (main,run_main), exactly the symbols the agent will reference when wiring its patch.\nThe path-header line 1 is also kept, anchoring the file identity for downstream turns.",
+                "position": 1727
+            },
+            {
+                "img": "https://arxiv.org/html/2607.18213/2607.18213v1/x9.png",
+                "caption": "Figure 8:Search case:cat -n /app/flask_1.1.1/src/flask/templating.py | grep -A 25 ’def render_template_string’.\nThe head allocates the highest scores to the function’s executable body—the_app_ctx_stacklookup, theupdate_template_contextcall, and the final_render(…)return—which together fully specify how a string template is dispatched.\nThe intervening docstring lines are conservatively pruned even though the annotator keeps them; the head prioritises the call sequence over the prose as the authoritative spec.",
+                "position": 1750
+            },
+            {
+                "img": "https://arxiv.org/html/2607.18213/2607.18213v1/x10.png",
+                "caption": "Figure 9:Listing case:ls -la /home/legacy_admin/configs/{cron,db,secrets}/.\nThe head keeps the issued command and every actual file (backup_schedule.cron,database.conf,api_keys.env), which are the only artefacts the agent will need to act on.\nThe remaining eight over-keeps are concentrated on group boundaries rather than scattered noise: the three directory-path headers (/cron/:,/db/:,/secrets/:), two of the threetotal 12summaries, two leading.entries, and the closing shell prompt. The head still cleanly prunes the redundant..parents, blank separators, and the thirdtotal 12, so its conservative bias on this listing costs structural boilerplate, not signal.",
+                "position": 1768
+            },
+            {
+                "img": "https://arxiv.org/html/2607.18213/2607.18213v1/x11.png",
+                "caption": "Figure 10:Test case:python test_fix.py(lollipop-jsonschema).\nThe head locks onto the outer frames of the stack trace: theTracebackheader, the<module>andtest_listcall sites, the publicjson_schemaentry, the offendingset(any_of_validators[0].choices)expression, and the terminalTypeError: unhashable type: ’list’(the highest-scoring line in the response at0.710.71). The intervening inner-dispatch frame (js = _json_schema(...)on line 78 of the same file) is conservatively pruned, since it only forwards into the line that already carries the highest keep score.\nThe four passing lines (String OK,Integer OK,Float OK,Boolean OK) are kept too, providing the contrast that localises the bug to the list path. The trailing harness footer (cwd, exit-code banner) prunes cleanly.",
+                "position": 1786
+            }
+        ]
+    },
+    {
+        "header": "Appendix GQualitative cases: where F1 disagrees with the LLM judge",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.18213/2607.18213v1/x12.png",
+                "caption": "Figure 11:F1 can rank a useless head above a useful one.A5252-line view ofpdm/resolver/providers.py; the agent is investigating a recursion bug inregister_provider(L50). Per-sample balanced focal (PSBF, green) keeps3030lines covering imports, theTYPE_CHECKINGblock, the provider registry, and the bodies ofget_provider,provider_arguments, andregister_provider;BCE(red) keeps only44isolated lines (L31, L34, L38, L50), namely the variable and function signatures, with no bodies.",
+                "position": 1812
+            },
+            {
+                "img": "https://arxiv.org/html/2607.18213/2607.18213v1/x13.png",
+                "caption": "Figure 12:The same failure mode on a second case.A3434-line view ofpandas/core/internals/managers.pyshowing the start ofquantile().Focal(green) keeps the function signature plus the docstring sections explaining reduction semantics and the comment block at the start of the body;BCE(red) keeps only the parameter list (L3–L10) as a contiguous high-precision block with no docstring and no body.",
+                "position": 1818
+            }
+        ]
+    },
+    {
+        "header": "Appendix HPrompts",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
