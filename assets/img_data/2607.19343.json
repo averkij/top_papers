@@ -1,0 +1,142 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.19343/2607.19343v1/x1.png",
+                "caption": "Figure 1:Masked Visual Actions.We finetune a video model to condition on masked trajectories of robots, representing robot actions as pixel-space masked motions. Efficiently finetuned on only 15 hours of data, a single checkpoint of the model can act as an action-conditioned forward model to simulate robotic interactions with diverse and unseen embodiments. By conditioning it on object motion, it can also act as an inverse model that synthesizes the robot motion needed to achieve the desired outcome. We showcase the efficacy of our model for policy evaluation, model-based-planning, and action extraction where the video model acts as a policy.",
+                "position": 309
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.19343/2607.19343v1/x2.png",
+                "caption": "Figure 2:Comparing action representations for learning.Low-dimensional robot actions are compact, but embodiment-specific and not aligned with the image observations used by video models. End-effector poses or robot skeletons are more visual, but remain sparse and require the model to infer geometry, contact, and interaction effects. Our masked visual actions provide dense, image-aligned conditioning, making robot motion and action directly visible, yielding a more learnable representation across embodiments and object interaction.",
+                "position": 356
+            }
+        ]
+    },
+    {
+        "header": "3Masked Visual Actions",
+        "images": []
+    },
+    {
+        "header": "4Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.19343/2607.19343v1/x3.png",
+                "caption": "Figure 3:Applications.The masked visual actions allow using the video model as a forward model, conditioned on robot actions, or as an inverse model that predicts the robot motion that satisfies the object trajectory. The forward model can be used for planning and choosing the best trajectory sampled from a policy, or policy evaluation. On the other hand, the inverse modeling can be combined with an inverse dynamics model to estimate robot actions from the generated video.",
+                "position": 475
+            },
+            {
+                "img": "https://arxiv.org/html/2607.19343/2607.19343v1/x4.png",
+                "caption": "Figure 4:Dataset construction.(a) to train our model, we need a reference frame of the initial scene, and the masked visual actions, and train it to reproduce a realistic video of the robot executing the input actions. (b) We use segmentation-based approach by segmenting the robot arm from robotics datasets as the masked visual actions. (c) However, to allow the user to provide arbitrary action trajectory at inference, the model needs to also accept simulated mesh visualization of those actions. As a result, we also include rendering-based dataset. Given that DROID also contains the robot state at each timestep, we render the robot URDF that matches the original video to construct masked visual actions.",
+                "position": 478
+            },
+            {
+                "img": "https://arxiv.org/html/2607.19343/2607.19343v1/x5.png",
+                "caption": "Figure 5:Generalization to unseen embodiment.While using the raw action state such as in Ctrl-world[25]can work well within the training domain, it collapses on unseen embodiments. However, our method can generalize well to unseen embodiments.",
+                "position": 521
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.19343/2607.19343v1/x6.png",
+                "caption": "Figure 6:Comparing baselines on DROID.Using image-to-video[63]or even trajectory conditioned video generation[13]with GT tracks fails to execute the robot motion or preserve the input scene. On the other hand, our model can competitively match and outperform models that take the raw robot actions[25]while maintaining generalization.",
+                "position": 541
+            },
+            {
+                "img": "https://arxiv.org/html/2607.19343/2607.19343v1/x7.png",
+                "caption": "Figure 7:Comparing action conditioning.Training a video model on different conditioning signals on DROID such as masked visual actions, end effector visualization, or skeleton all work well within the training domain. However, when going beyond the training distribution, such as using a custom end-effector, the models trained on skeleton and end effector position would hallucinate the robot seen in training or transform the robot to match the training. Furthermore, on unseen embodiments such as bimanual robots in BEHAVIOR, using masked actions generalizes gracefully, while other conditioning signals transform and disfigure the robot.",
+                "position": 634
+            },
+            {
+                "img": "https://arxiv.org/html/2607.19343/2607.19343v1/x8.png",
+                "caption": "Figure 8:Application on Planning.By rolling out multiple trajectories from a pretrained diffusion policy, we can evaluate each trajectory by simulating the actions with the video model, and then using a VLM judge to pick the best action trajectory. We observe consistent improvement in task success when using the video model to roll out and choose best action sequences, as well as the positive correlation with the number of samples evaluated at test time. This demonstrates the ability of the model to simulate counterfactuals given the same initial condition.",
+                "position": 743
+            },
+            {
+                "img": "https://arxiv.org/html/2607.19343/2607.19343v1/x9.png",
+                "caption": "Figure 9:Robocasa policy evaluation.Video-model rollouts consistently track ground-truth success rates across RoboCasa tasks.",
+                "position": 764
+            },
+            {
+                "img": "https://arxiv.org/html/2607.19343/2607.19343v1/x9.png",
+                "caption": "Figure 9:Robocasa policy evaluation.Video-model rollouts consistently track ground-truth success rates across RoboCasa tasks.",
+                "position": 767
+            },
+            {
+                "img": "https://arxiv.org/html/2607.19343/2607.19343v1/x10.png",
+                "caption": "Figure 10:Real world policy evaluation.Rolling out real-world demonstrations with our video model produces videos with success progress closely aligned with what is observed in the real world execution.",
+                "position": 777
+            },
+            {
+                "img": "https://arxiv.org/html/2607.19343/2607.19343v1/x11.png",
+                "caption": "Figure 11:Action extraction.Even without task-specific video-model training, inverse modeling recovers competitive robot behavior.",
+                "position": 792
+            }
+        ]
+    },
+    {
+        "header": "6Discussion and Conclusions",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix Overview",
+        "images": []
+    },
+    {
+        "header": "Appendix AProject webpage",
+        "images": []
+    },
+    {
+        "header": "Appendix BReproducibility",
+        "images": []
+    },
+    {
+        "header": "Appendix CFull quantitative results",
+        "images": []
+    },
+    {
+        "header": "Appendix DAdditional training details",
+        "images": []
+    },
+    {
+        "header": "Appendix EVLM Evaluation Protocol",
+        "images": []
+    },
+    {
+        "header": "Appendix FPolicy and Inverse-Dynamics Training Details",
+        "images": []
+    },
+    {
+        "header": "Appendix GRobot Data Collection",
+        "images": []
+    },
+    {
+        "header": "Appendix HReal World Tasks Rubrics",
+        "images": []
+    },
+    {
+        "header": "Appendix IAdapting Baselines to Unseen Embodiments",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
