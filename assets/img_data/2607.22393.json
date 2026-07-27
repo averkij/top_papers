@@ -1,0 +1,179 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x1.png",
+                "caption": "",
+                "position": 314
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x2.png",
+                "caption": "",
+                "position": 314
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x3.png",
+                "caption": "",
+                "position": 314
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x4.png",
+                "caption": "",
+                "position": 319
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x5.png",
+                "caption": "Figure 2:SceneActBench’s shared agent–environment loop.Each task provides standardised PNG views or sampled video frames from one of three datasets, together with anonymised GLB assets when applicable. Through a shared core MCP interface, the VLM inspects the scene, executes Blender code, renders, and revises until it stops or the task budget ends. The final task-specific output—a GLB scene, animated GLB or scene states, or a JSON camera pose—is evaluated once against hidden 3D ground truth; no evaluator feedback reaches the agent. The evaluator panel lists the primary metric for each task.",
+                "position": 524
+            }
+        ]
+    },
+    {
+        "header": "3Benchmark",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x6.png",
+                "caption": "Figure 3:Layout.Given one or∼{\\sim}11 calibrated reference views and standardised furniture objects at the origin, the agent maps 2D evidence into each object’s metric world position and rotation about the vertical axis (yaw). It renders from the known reference cameras and updates this 3D pose hypothesis from visual residuals for up to 30 steps. The final layout is scored once against hidden ground truth usingADD-Ssurface distance in metres.",
+                "position": 680
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x7.png",
+                "caption": "Figure 4:Camera.Given one reference image of an already-arranged scene with known field of view but hidden camera extrinsics, the agent maintains a 6-DoF pose hypothesis, renders from it, and updates camera position and orientation from image residuals for up to 30 steps. The final JSON pose is scored once against hidden ground truth using position error in metres andAEin degrees.",
+                "position": 706
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x8.png",
+                "caption": "Figure 5:Articulated.Given one closed, unlabelled GLB and 32 ordered open–close reference frames from a fixed viewpoint, the agent selects movable meshes, infers each joint’s type, axis, pivot, and range, and applies whole-object transforms while render-checking the motion for up to 60 steps. It exports 32 whole-scene GLB states. The evaluator matches the exported states to hidden ground truth by opening degree and reports the maximum error across movable parts usingMPE.",
+                "position": 732
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x9.png",
+                "caption": "Figure 6:Reconstruction.Given∼{\\sim}11 calibrated room views and an empty Blender scene, the agent identifies and counts furniture objects, hypothesizes each object’s geometry, metric size, pose, and Base Color, and builds meshes with Blender code. It renders from the known cameras and revises geometry, placement, and color from visual residuals for up to 35 steps. The final furnished scene is scored once against hidden ground truth usingF@5%at a per-object diagonal-relative threshold.",
+                "position": 760
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x10.png",
+                "caption": "Figure 7:Dynamic.Given sampled frames from a 144-frame reference video, a component GLB library, and a known reference camera, the agent reconstructs the static layout, places each mover at its start, and keyframes every trajectory. It renders the multi-object motion and revises layout, start poses, and keyframes from visual residuals for up to 80 steps. The final animated GLB is scored once against hidden ground truth usingMMEacross movers and staticLE.",
+                "position": 789
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x11.png",
+                "caption": "Figure 8:Task contributions explain the Overall gaps.Each bar shows one main-table task-score difference divided by five, and the five bars sum to the hatched Overall gap. The callout separates the Doubao–Claude Opus Dynamic contribution intoraceloop,factory, and the other eight scenes. This is an exact linear decomposition, not an independent experiment.",
+                "position": 1026
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x12.png",
+                "caption": "Figure 9:Input-condition sensitivity varies by configuration.Cells show the change in fixed-reference task score from the base to the alternate condition. Layout compares multi-view with single-view input across 100 paired cases; Dynamic compares photo-realistic with low-poly input across 10 paired scenes. Positive values favour the alternate condition, which remains excluded from Overall.",
+                "position": 1046
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x13.png",
+                "caption": "Figure 10:Denominator-aware failure stages.Each cell reports the stage success rate and exact success/denominator count; the bar encodes the same rate. Rows marked†\\daggeruse conditional denominators: Articulated type and direction require measurable rigid motion, and Dynamic direction requires eligible matched non-loop movers. Reconstruction denominators are ground-truth targets. Camera counts cases that avoid simultaneousPE≥4\\mathrm{PE}\\geq 4m andAE≥90∘\\mathrm{AE}\\geq 90^{\\circ}zero-credit caps. A0/00/0entry denotes no eligible evidence, not successful recovery.",
+                "position": 1063
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x14.png",
+                "caption": "Figure 11:Task-balanced effective interaction budget.Each point is one configuration. The horizontal axis averages realised steps divided byMaxStepswithin each task and then equally across the five tasks; the vertical axis is Overall. The broken horizontal axis omits 40–68%, an interval containing no evaluated configuration. Marker area encodes task-balanced tool calls per run, and labels identify configurations. The Spearman association is descriptive, not causal.",
+                "position": 1080
+            }
+        ]
+    },
+    {
+        "header": "5Limitations",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ABenchmark Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BEvaluation Protocol",
+        "images": []
+    },
+    {
+        "header": "Appendix CEvidence Behind the Main Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x15.png",
+                "caption": "(a)Low-poly Dynamic at matched times.",
+                "position": 2584
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x15.png",
+                "caption": "(a)Low-poly Dynamic at matched times.",
+                "position": 2587
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x16.png",
+                "caption": "(b)Photo-realistic Dynamic under the paired reference condition.",
+                "position": 2593
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x17.png",
+                "caption": "(c)Articulated motion from closed to open and back.",
+                "position": 2599
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x18.png",
+                "caption": "(a)Layout onDiningRoom-13034. All outputs use the reference camera. Most recover the main arrangement. MiniMax M3 collapses it.",
+                "position": 2610
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x18.png",
+                "caption": "(a)Layout onDiningRoom-13034. All outputs use the reference camera. Most recover the main arrangement. MiniMax M3 collapses it.",
+                "position": 2613
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x19.png",
+                "caption": "(b)Camera alignment onBedroom-6995. Re-renders vary in crop and heading.",
+                "position": 2619
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x20.png",
+                "caption": "(c)Reconstruction by Doubao Seed 2.0 Pro High. Each output uses its reference camera.",
+                "position": 2625
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x21.png",
+                "caption": "Figure 14:Step-budget sensitivity.(a) Overall and (b–f) task scores across MaxSteps values. Each checkpoint uses the same per-case scoring rule. Direct labels in panel (a) identify configurations, and colours are shared across panels.",
+                "position": 9248
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22393/2607.22393v1/x22.png",
+                "caption": "Figure 15:Representative agent-completion traces.Each row is one scored episode. Colours distinguish input reads, code edits, and render checks along the agent step axis. Dots denote isolated calls, rounded segments combine consecutive same-type calls, red rings indicate tool errors, and diamonds mark self-stopping. Selected annotations and log excerpts provide trace context; right-side values report exact event totals and task metrics.",
+                "position": 9363
+            }
+        ]
+    },
+    {
+        "header": "Appendix DPrompt Templates",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
