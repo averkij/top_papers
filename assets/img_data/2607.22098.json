@@ -1,0 +1,128 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.22098/2607.22098v1/x1.png",
+                "caption": "Figure 1:(a) Long reasoning traces containirrelevantandrepetitivesteps, which hurt hallucination detection; removing them yields clear improvements, as validated with supervised probing[3]using the last-layer embeddings.\n(b) Confidence-based signals fail to distinguish informative and noisy steps, as their score distributions overlap heavily.\n(c) NaivekkNN-based on raw step embeddings can identify irrelevant steps but fails to separate repetitive from informative ones.\nExperiments are based on AIME 2024[26]with Qwen3-8B[64]. We annotate the reasoning steps into informative, irrelevant, and repetitive categories. Annotation details are in AppendixA.3.",
+                "position": 324
+            }
+        ]
+    },
+    {
+        "header": "2Problem setup",
+        "images": []
+    },
+    {
+        "header": "3Understanding noisy reasoning steps for hallucination detection",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.22098/2607.22098v1/x2.png",
+                "caption": "Figure 2:Attention scores from the final-answer token to each reasoning step on a representative AIME 2024[26]example with Qwen3-8B[64]. Irrelevant and repetitive steps receive low attention, while informative steps receive high attention. The computation of attention scores is detailed in Section4.1.",
+                "position": 406
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22098/2607.22098v1/x3.png",
+                "caption": "Figure 3:(a) Cosine similarity between the answer embedding from the retained earliest/latest steps and that from the full reasoning trace. (b) Hallucination detection performance of linear probing based on the retained earliest/latest steps. Results on AIME 2024[26]with Qwen3-8B[64].",
+                "position": 419
+            }
+        ]
+    },
+    {
+        "header": "4Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.22098/2607.22098v1/x4.png",
+                "caption": "Figure 4:Overview of the REDE framework for hallucination detection in LRMs.During training, REDE scores each reasoning step via final-answer attention and learns a lightweight projectionfϕf_{\\phi}that maps step embeddings into a denoised representation space where informative and noisy steps are well separated. During inference, step embeddings are projected byfϕf_{\\phi}and noisy steps are filtered via distance-based scoring for downstream hallucination detection.",
+                "position": 433
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.22098/2607.22098v1/x5.png",
+                "caption": "Figure 5:(a)Cross-dataset transferability ofReDe.Each row corresponds to a source dataset, and each column corresponds to a target dataset. (b)Scalability to larger LRMs.On Qwen3-32B and DeepSeek-R1-Distill-Qwen-32B,ReDeoutperforms state-of-the-art baselines on TruthfulQA.",
+                "position": 977
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22098/2607.22098v1/x6.png",
+                "caption": "Figure 6:Ablation studies.(a) Effect of individual loss components, (b) effect of drop ratioζ\\zeta, (c) effect of output dimensiond′d^{\\prime}, and (d) effect of training layer. Results are based on TruthfulQA using Qwen3-8B with supervised probing. The orange horizontal line denotes the performance of using the unfiltered reasoning trace.",
+                "position": 1154
+            }
+        ]
+    },
+    {
+        "header": "6Related work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional experimental details",
+        "images": []
+    },
+    {
+        "header": "Appendix BAdditional ablation studies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.22098/2607.22098v1/x7.png",
+                "caption": "Figure 12:t-SNE visualization of step embeddings under each ablated loss variant on AIME 2024[26]with Qwen3-8B.Orangeandbluepoints denote noisy and informative steps, respectively.",
+                "position": 2930
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22098/2607.22098v1/x8.png",
+                "caption": "Figure 13:Effect of loss weightsλdisperse\\lambda_{\\text{disperse}}andλseparate\\lambda_{\\text{separate}}on hallucination detection on TruthfulQA with Qwen3-8B, evaluated with supervised probing.λ=0\\lambda=0indicates the corresponding loss is removed.",
+                "position": 2976
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22098/2607.22098v1/x9.png",
+                "caption": "Figure 14:Effect of the layer used to compute the attention score in Eq.1. Results are on TruthfulQA with Qwen3-8B, evaluated with supervised probing. The orange horizontal line denotes the performance of using the unfiltered reasoning trace.",
+                "position": 3119
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAdditional analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.22098/2607.22098v1/x10.png",
+                "caption": "Figure 15:Sample 1 (incorrect answer).ReDestep-level filtering on a tetrahedron inradius problem fromMathwith Qwen3-8B.Green: kept;gray: filtered.\nDetection scores are from supervised probing[3].\nAfter filtering 70% of the steps, the score increases from 0.41 to 0.86, correctly flagging the hallucinated response.",
+                "position": 3257
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22098/2607.22098v1/x11.png",
+                "caption": "Figure 16:Sample 2 (correct answer).ReDestep-level filtering on a complex-number optimization problem fromMathwith Qwen3-8B.Green: kept;gray: filtered.\nDetection scores are from supervised probing[3].\nAfter filtering 71% of the steps, the score decreases from 0.77 to 0.28, correctly reducing the false-positive rate.",
+                "position": 3264
+            },
+            {
+                "img": "https://arxiv.org/html/2607.22098/2607.22098v1/x12.png",
+                "caption": "Figure 17:Answer embeddings on TruthfulQA with Qwen3-8B via supervised probing[3]. Left: original full traces, where truthful and hallucinated responses overlap heavily. Right: afterReDedenoising, the two groups become clearly more separable.",
+                "position": 3275
+            }
+        ]
+    },
+    {
+        "header": "Appendix DBroader impact and limitations",
+        "images": []
+    },
+    {
+        "header": "Appendix ETheoretical analysis",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
