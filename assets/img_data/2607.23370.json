@@ -1,0 +1,144 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "IIntroduction",
+        "images": []
+    },
+    {
+        "header": "IIRelated Work",
+        "images": []
+    },
+    {
+        "header": "IIIData Construction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/Gemini_Generated_Image_y2dobfy2dobfy2do.png",
+                "caption": "Figure 1:End-to-end data construction and feature engineering pipeline.\nThree heterogeneous sources — yfinance OHLCV, Reddit FinBERT sentiment, and\nU.S. Treasury/Google News CryptoBERT daily sentiment — are independently\npre-processed and aligned via inner join on UTC hour to produce the final3,491×233{,}491\\times 23feature matrix used for all experiments.",
+                "position": 778
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig7_regime_distribution.png",
+                "caption": "Figure 2:Regime distribution in the July–September 2025 test window.\n59.4% of hours are classified as volatile (rolling volatility above the\nglobal median); 40.6% are stable. The test-window skew toward volatile\nconditions arises from the corrective market phase following the late-2024\nbull run.",
+                "position": 949
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig9_sentiment_over_time.png",
+                "caption": "Figure 3:Reddit /r/Bitcoin hourly FinBERT sentiment (bar) overlaid on BTC\nclosing price (orange line) across the full 14-month study window. Notable\ncorrelations between sentiment shifts and price trend reversals are visible\nin late 2024 and mid-2025.",
+                "position": 956
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig8_regime_vs_price.png",
+                "caption": "Figure 4:Bitcoin closing price (dark blue, left axis) and 24-hour rolling\nvolatility (orange, right axis) with volatile-regime periods shaded. The\nshaded bands correspond toσt>median​(𝝈)\\sigma_{t}>\\mathrm{median}(\\boldsymbol{\\sigma}).\nThe price surge of late 2024 and the correction of early 2025 coincide with\nsustained volatile-regime windows. Note the sharp volatility spike in\nJuly 2024 that corresponds to a sudden intra-day drawdown, characteristic\nof a market-state transition.",
+                "position": 962
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig11_correlation_heatmap.png",
+                "caption": "Figure 5:Pearson correlation heatmap of all features and target labels.\nOrange cells indicate positive correlation; blue cells indicate negative\ncorrelation. The absolute price levels (open, high, low, close, MA-7, MA-30)\nform a near-unity cluster, confirming collinearity that motivates normalisation\nand sequence modelling. Rolling volatility exhibits moderate negative\ncorrelation (−0.37-0.37) with price levels and strong positive correlation\n(+0.74+0.74) with the regime label. Sentiment features show weak but positive\ncorrelation with price levels (~+0.08+0.08), and the\nbullish/bearish pair displays a strong inverse relationship (−0.74-0.74) as\nexpected. Target labels show near-zero linear correlation with all features,\nconsistent with the near-efficient nature of hourly Bitcoin.",
+                "position": 1006
+            }
+        ]
+    },
+    {
+        "header": "IVProposed Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/Gemini_Generated_Image_xk9hwhxk9hwhxk9h.png",
+                "caption": "Figure 6:Dual-branch Regime-Aware Multi-Modal Learning architecture.\nThe price branch encodes a 24-hour OHLCV sequence via a two-layer BiLSTM;\nthe sentiment branch encodes 24-hour FinBERT Reddit aggregates via a\nsymmetric BiLSTM. A regime-conditioned sigmoid gatewt=σ​(θr⋅rt)w_{t}=\\sigma(\\theta_{r}\\cdot r_{t})adaptively weights both 32-dimensional embeddings\nbefore a feedforward binary classifier.",
+                "position": 1212
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/Gemini_Generated_Image_r9dtp2r9dtp2r9dt.png",
+                "caption": "Figure 7:Adaptive Fusion Gate behaviour across market regimes. During stable\nperiods (left), price dynamics dominate with a high price weight (≈0.8\\approx 0.8) and low sentiment weight (≈0.2\\approx 0.2). During volatile periods\n(right), the gate shifts to upweight sentiment (≈0.9\\approx 0.9) and\ndownweight price (≈0.1\\approx 0.1), reflecting the greater predictive\ninformativeness of crowd sentiment during high-uncertainty episodes.",
+                "position": 1219
+            }
+        ]
+    },
+    {
+        "header": "VExperimental Setup",
+        "images": []
+    },
+    {
+        "header": "VIResults",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig1_baseline_3h.png",
+                "caption": "Figure 8:Metric comparison across all four models on the 3-hour prediction\nhorizon.RAMLachieves the best F1 (0.55) and AUC (0.51), with the most\nbalanced recall profile. The sentiment-only model (B2) achieves the highest\nraw F1 via inflated recall (0.91) but the lowest AUC (0.49), indicating a\ndegenerate majority-class prediction strategy.",
+                "position": 1870
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig2_baseline_6h.png",
+                "caption": "Figure 9:Metric comparison on the 6-hour prediction horizon. The price-only\nmodel (B1) collapses catastrophically (recall: 0.09, F1: 0.16), demonstrating\nthe near-total failure of pure technical analysis at this horizon.RAMLachieves the best F1 among models with calibrated recall (>0.50>0.50).",
+                "position": 1877
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig3_f1_auc_3h.png",
+                "caption": "Figure 10:F1 (blue) and AUC (orange) as a function of model variant on the\n3-hour task.RAMLis the only model achieving both F1 and AUC simultaneously\nabove the random baseline (dashed). The F1 dip at Static Concat and the AUC\ndip at Sentiment-only illustrate the distinct failure modes of each approach.",
+                "position": 1937
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig4_f1_auc_6h.png",
+                "caption": "Figure 11:F1 and AUC on the 6-hour task. Price-only B1 exhibits the most\nextreme F1 degradation (0.16), reflecting near-total recall collapse at the\nlonger horizon.RAMLmaintains the most consistent F1 trajectory while\nB3 achieves marginally higher AUC at this horizon.",
+                "position": 1943
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig10_cm_Price-only_3h.png",
+                "caption": "(a)B1: Price-only",
+                "position": 1968
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig10_cm_Price-only_3h.png",
+                "caption": "(a)B1: Price-only",
+                "position": 1971
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig10_cm_Sentiment-only_3h.png",
+                "caption": "(b)B2: Sentiment-only",
+                "position": 1976
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig10_cm_Static_Concat_3h.png",
+                "caption": "(c)B3: Static Concat",
+                "position": 1981
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig10_cm_Regime-Aware_3h.png",
+                "caption": "(d)RAML (Proposed)",
+                "position": 1986
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig12_radar_chart.png",
+                "caption": "Figure 13:Radar chart comparing all four models across Precision, Recall,\nAccuracy, AUC, and F1 on the 3-hour prediction horizon. The sentiment-only\nmodel (grey) dominates the recall dimension but collapses on AUC.RAML(dark blue) traces the most uniformly expanded polygon across all\nfive dimensions, reflecting its balanced and calibrated performance profile.",
+                "position": 2032
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig5_ablation_3h.png",
+                "caption": "Figure 14:Ablation metric profiles on the 3-hour horizon. Removing the\nsentiment branch (A1, orange) is the most damaging single change in terms of\nAUC and precision. Removing the regime gate (A2) or fusion weighting (A3)\ninflates recall via class-bias collapse, masking real calibration degradation.\nThe fullRAMLmodel uniquely achieves superior AUC while maintaining\nbalanced recall.",
+                "position": 2154
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23370/2607.23370v1/fig6_ablation_6h.png",
+                "caption": "Figure 15:Ablation metric profiles on the 6-hour horizon. The catastrophic\nrecall collapse of A3 (No Fusion Weight, recall: 0.08, F1: 0.14) demonstrates\nthat concatenation within a dual-branch architecture is not equivalent to\nadaptive weighting. At the longer horizon, the mode of fusion is the single\nmost critical architectural decision.",
+                "position": 2162
+            }
+        ]
+    },
+    {
+        "header": "VIIDiscussion",
+        "images": []
+    },
+    {
+        "header": "VIIIConclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
