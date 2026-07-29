@@ -1,0 +1,92 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.26037/2607.26037v1/x1.png",
+                "caption": "Figure 1:Wonderenables interactive world exploration from images and videos.Given a single image,Wonderturns it into a navigable world where users can move the camera to explore both visible regions and plausible unseen areas beyond the input view. Given a video,Wonderconstructs a dynamic world that preserves the source motion while allowing users to freely change the camera trajectory, enabling camera-controllable 4D video exploration.",
+                "position": 315
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Training Data",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.26037/2607.26037v1/x2.png",
+                "caption": "Figure 2:Data curation pipeline.We construct a unified data engine for image-to-world (I2W) and video-to-world (V2W) training. We first collect videos from public datasets and self-rendered UE/Blender environments, then perform multi-duration clipping, collision filtering, and rule-based quality screening to build a raw video pool. Each clip is further enriched with hierarchical VLM captions and camera poses estimated by Depth Anything 3 (DA3), from which we derive discrete camera actions. To improve trajectory quality and action coverage, we apply Gaussian pose smoothing and temporal augmentations such as reverse playback and speed resampling. A final VLM-based quality check removes visually degraded clips and sequences with unnatural camera motion, yielding the curated static and dynamic datasets used for controllable world-model training.",
+                "position": 362
+            }
+        ]
+    },
+    {
+        "header": "4WonderWorld Model",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.26037/2607.26037v1/x3.png",
+                "caption": "Figure 4:Camera control using Pixel-Space Coordinate Field.Prior camera-control methods are either implicit, encoding camera poses with an MLP(Bai et al.,2025a)or RoPE(Wang et al.,2026a), or explicit, re-rendering reconstructed point clouds(Team et al.,2026b). The former is data-hungry and often imprecise, while the latter is accurate but view-limited and fails when the camera explores unseen regions.\nOur lattice representation combines the strengths of both. We construct a pixel-space coordinate field with a colored spherical environment map at infinity and a dense 3D lattice scaffold inside it. A lightweight renderer converts arbitrary camera trajectories into pixel-aligned lattice videos that encode viewing direction and metric translation. Concatenating these renders with noisy scene inputs provides precise, streamable, and exploration-friendly camera control for world modeling.",
+                "position": 408
+            },
+            {
+                "img": "https://arxiv.org/html/2607.26037/2607.26037v1/x4.png",
+                "caption": "Figure 5:Sparse context forcing and sparse inference.Left: during ODE initialization, we train the causal student with a unified attention layout for I2V and V2V. Source-video tokens attend only to the first source frame and themselves, while target-video tokens combine teacher-forced clean context and diffusion-forced predicted context. To prepare the student for sparse-memory inference, we randomly drop eligible non-local context edges in both ground-truth and prediction regions, while preserving required anchors such as self-attention, first-frame anchors, and recent context.\nRight: at inference time, the source video is cached as a reference stream, and each target chunk attends to a constant-size set of memories, including itself, recent target chunks, first-frame anchors, current/source references, and additional source/target chunks selected by pooled query-key similarity.",
+                "position": 464
+            },
+            {
+                "img": "https://arxiv.org/html/2607.26037/2607.26037v1/x5.png",
+                "caption": "Figure 6:Distillation framework with Mixture-of-Students and GAN Control Regularization.(a) The causal few-step student autoregressively rolls out video chunks under camera controls. The generated rollout is perturbed with noise and evaluated by a frozen bidirectional teacher and a trainable critic, whose score difference provides the DMD gradient for updating the student.\n(b) To increase student-side capacity, we specialize different generators for different denoising stages. The 4-step sampler usesG1G_{1}for coarse structure,G2G_{2}for structure refinement, andG3G_{3}for detail refinement and final reconstruction, while sharing the same streaming KV cache to avoid extra inference latency.\n(c) To improve camera fidelity, we introduce a control discriminator built from low-frequency teacher feature differences. Real and fake noised latents are passed through the frozen teacher with the same camera condition. Intermediate features are compared with the first-layer feature, downsampled into low-frequency maps, and aggregated by a register-token discriminator to distinguish camera-consistent real samples from student rollouts.",
+                "position": 550
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.26037/2607.26037v1/x6.png",
+                "caption": "Figure 7:Navigation into diverse images.",
+                "position": 776
+            },
+            {
+                "img": "https://arxiv.org/html/2607.26037/2607.26037v1/x7.png",
+                "caption": "Figure 8:Navigation into diverse images.",
+                "position": 781
+            },
+            {
+                "img": "https://arxiv.org/html/2607.26037/2607.26037v1/x8.png",
+                "caption": "Figure 9:Visual comparison of Image-to-Video world modeling performance.We evaluate the memory capability of each model with a revisit trajectory. Specifically, the camera first pans right to observe a target region, then pans left to move away, and finally pans right again to revisit the same region. We compare the two frames captured at the same camera position to assess whether the scene content is consistently preserved. Most prior models struggle to retrieve long-term visual memory, leading to inconsistent structures or changed appearances after revisiting. RELIC(Hong et al.,2025)and LingBot-World(Robbyant Team,2026)further suffer from degraded visual quality under long-horizon rollout, highlighting the difficulty of maintaining both memory consistency and generation quality over extended interactive exploration.",
+                "position": 806
+            },
+            {
+                "img": "https://arxiv.org/html/2607.26037/2607.26037v1/x9.png",
+                "caption": "Figure 10:Visual comparison of Video-to-Video world modeling performance.Due to errors in the point clouds reconstructed by external pose-estimation models and the limited exploration space of point-cloud representations, Inspatio-World(Team et al.,2026b)often struggles to produce plausible camera motion and to preserve dynamic objects under large viewpoint changes.",
+                "position": 827
+            },
+            {
+                "img": "https://arxiv.org/html/2607.26037/2607.26037v1/x10.png",
+                "caption": "Figure 11:Navigation into videos.",
+                "position": 836
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
