@@ -1,0 +1,728 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x1.png",
+                "caption": "Figure 1:Overview of Chimera’s architecture and scaling framework.Chimeracouples a hybrid-linear-global diffusion architecture (top left) with a Chinchilla-style scaling methodology (top right).\nThe lower panels show both contributions: the architecture improves pre-training compute efficiency (A1) and long-sequence memory/latency efficiency (A2), while the scaling framework enables reliable cross-scale hyperparameter transfer (S1) and yields a predictable loss-compute frontier (S2).",
+                "position": 393
+            }
+        ]
+    },
+    {
+        "header": "2ChimeraOverview",
+        "images": []
+    },
+    {
+        "header": "3ChimeraArchitecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x2.png",
+                "caption": "Figure 2:Illustration of theChimeraarchitecture.Chimerais a single-stream latent diffusion Transformer in which text tokens and noised visual tokens are concatenated into a unified sequence and processed jointly. Each block combines a sparse Mixture-of-Experts feed-forward network with either a KDA layer or a MLA layer. Before each KDA update, a modality-aware short convolution (mShortConv) mixes local context in each modality’s native geometry. Timestep information is injected through AdaLN modulation. Each block applies sandwich-style RMSNorm (pre- and post-normalization), while identity hyper-connections (iHC) wrap each sublayer to stabilize signal propagation.",
+                "position": 541
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x3.png",
+                "caption": "(a)",
+                "position": 776
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x3.png",
+                "caption": "(a)",
+                "position": 779
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x4.png",
+                "caption": "(b)",
+                "position": 784
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x5.png",
+                "caption": "(c)",
+                "position": 790
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x6.png",
+                "caption": "Figure 4:Conceptual comparison of local-mixing designs in vision modality.Conventional 1D short convolution is paired with multi-axis scanning for vision modeling, whereas our modality-aware short convolution models spatial-temporal locality under a single scan pattern",
+                "position": 836
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x7.png",
+                "caption": "Figure 5:Expert load balance during training.We plot the batch-levelMaxVio\\operatorname{MaxVio}(Eq.22), averaged over all MoE layers. With auxiliary-loss-free balancing,MaxVio\\operatorname{MaxVio}stays around0.50.5throughout training; without it,MaxVio\\operatorname{MaxVio}rises above55, approaching the collapse bound ofN/K−1=6N/K-1=6.",
+                "position": 902
+            }
+        ]
+    },
+    {
+        "header": "4Scaling Recipe",
+        "images": []
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x8.png",
+                "caption": "Figure 6:RepresentativeChimeramodel family.Left: total versus activated parameters, showing the parameter expansion. Right: model width versus FFN hidden width, showing the configurations covered by the scaling study. The family is not a strict fixed-aspect-ratio scaling ladder; instead, it spans feasible combinations of width, depth, and FFN capacity while keeping the high-level architecture fixed. We primarily fix the depth and study the scaling of width. All markers use the same diameter; hue denotes depth, while within-depth color intensity increases logarithmically with activated parameter count. The proxy and final training model are highlighted separately. Exact configurations are provided in AppendixB.",
+                "position": 1293
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x9.png",
+                "caption": "(a)HeteroP: width transfer.",
+                "position": 1349
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x9.png",
+                "caption": "(a)HeteroP: width transfer.",
+                "position": 1352
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x10.png",
+                "caption": "(b)HeteroP: depth transfer.",
+                "position": 1357
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x11.png",
+                "caption": "(c)SP: width sweep.",
+                "position": 1363
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x12.png",
+                "caption": "(d)SP: depth sweep.",
+                "position": 1368
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x13.png",
+                "caption": "(a)Training-loss envelope.",
+                "position": 1397
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x13.png",
+                "caption": "(a)Training-loss envelope.",
+                "position": 1400
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x14.png",
+                "caption": "(b)Envelope-optimal model size.",
+                "position": 1405
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x15.png",
+                "caption": "(c)Envelope-optimal training tokens.",
+                "position": 1410
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x16.png",
+                "caption": "(d)IsoFLOP loss profiles.",
+                "position": 1416
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x17.png",
+                "caption": "(e)IsoFLOP-optimal model size.",
+                "position": 1421
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x18.png",
+                "caption": "(f)IsoFLOP-optimal training tokens.",
+                "position": 1426
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x19.png",
+                "caption": "(a)Training-loss envelope.",
+                "position": 1444
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x19.png",
+                "caption": "(a)Training-loss envelope.",
+                "position": 1447
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x20.png",
+                "caption": "(b)Envelope-optimal model size.",
+                "position": 1452
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x21.png",
+                "caption": "(c)Envelope-optimal training tokens.",
+                "position": 1457
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x22.png",
+                "caption": "(d)IsoFLOP loss profiles.",
+                "position": 1463
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x23.png",
+                "caption": "(e)IsoFLOP-optimal model size.",
+                "position": 1468
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x24.png",
+                "caption": "(f)IsoFLOP-optimal training tokens.",
+                "position": 1473
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x25.png",
+                "caption": "Figure 10:IsoFLOP surfaces of the image diffusion loss over model size and image:video data sample ratio.For each of eight compute budgets from101810^{18}to101910^{19}FLOPs, we fit a quadratic surface to the losses of runs spanning both model sizes and mixture ratios. Each circle marks an experimental data point, and the star marks the fitted optimum under that budget.",
+                "position": 1573
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x26.png",
+                "caption": "Figure 11:Compute-optimal image:video ratio versus training compute.The image-loss optimum drifts slowly from about4:14{:}1toward3:13{:}1(exponent−0.08-0.08), while the video-loss optimum stays at1:11{:}1, the most video-heavy mixture in the fitted range.",
+                "position": 1592
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x27.png",
+                "caption": "Figure 12:Compute efficiency under matched training conditions.We calculate the compute efficiency across 2B instantiations of Wan2.1, Z-Image, Chimera-dense, and the complete Chimera configuration trained with the deterministic dataloader and a compute budget of5×10205\\times 10^{20}FLOPs.",
+                "position": 1618
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples/p000081-s000000.jpg",
+                "caption": "Figure 13:Qualitative text-to-image samples fromChimera.All images are generated at1344×8641344\\times 864resolution with classifier-free guidance scale44, using prompts that range from short phrases to long, detailed descriptions.",
+                "position": 1634
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples/p000023-s000000.jpg",
+                "caption": "",
+                "position": 1637
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples/p000061-s000000.jpg",
+                "caption": "",
+                "position": 1638
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples/p000079-s000000.jpg",
+                "caption": "",
+                "position": 1640
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples/p000198-s000000.jpg",
+                "caption": "",
+                "position": 1641
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples/p000217-s000000.jpg",
+                "caption": "",
+                "position": 1642
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples/p000297-s000000.jpg",
+                "caption": "",
+                "position": 1644
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples/p000340-s000000.jpg",
+                "caption": "",
+                "position": 1645
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples/p000235-s000000.jpg",
+                "caption": "",
+                "position": 1646
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples/p000294-s000000.jpg",
+                "caption": "",
+                "position": 1648
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples/p000370-s000000.jpg",
+                "caption": "",
+                "position": 1649
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples/p000369-s000000.jpg",
+                "caption": "",
+                "position": 1650
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples/p000004-s000000.jpg",
+                "caption": "",
+                "position": 1652
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples/p000012-s000000.jpg",
+                "caption": "",
+                "position": 1653
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples/p000018-s000000.jpg",
+                "caption": "",
+                "position": 1654
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/2k_4k/4k_p000014.jpg",
+                "caption": "Figure 14:Zero-shot high-resolution generation.Our model generate images at 4K (left panel) and 2K (right panel) resolutions in a zero-shot manner.",
+                "position": 1660
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/2k_4k/2k_p000488.jpg",
+                "caption": "",
+                "position": 1669
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/2k_4k/2k_p000417.jpg",
+                "caption": "",
+                "position": 1669
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/2k_4k/4k_p000092.jpg",
+                "caption": "",
+                "position": 1675
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/2k_4k/2k_p000033.jpg",
+                "caption": "",
+                "position": 1680
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/2k_4k/2k_p000036.jpg",
+                "caption": "",
+                "position": 1680
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000176_f00.jpg",
+                "caption": "Figure 15:Qualitative text-to-video samples fromChimera.Each row shows five evenly spaced frames of one8181-frame video generated at448×288448\\times 288resolution with classifier-free guidance scale88, with time proceeding from left to right.",
+                "position": 1686
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000176_f20.jpg",
+                "caption": "",
+                "position": 1689
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000176_f40.jpg",
+                "caption": "",
+                "position": 1690
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000176_f60.jpg",
+                "caption": "",
+                "position": 1691
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000176_f80.jpg",
+                "caption": "",
+                "position": 1692
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000495_f00.jpg",
+                "caption": "",
+                "position": 1694
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000495_f20.jpg",
+                "caption": "",
+                "position": 1695
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000495_f40.jpg",
+                "caption": "",
+                "position": 1696
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000495_f60.jpg",
+                "caption": "",
+                "position": 1697
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000495_f80.jpg",
+                "caption": "",
+                "position": 1698
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000706_f00.jpg",
+                "caption": "",
+                "position": 1700
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000706_f20.jpg",
+                "caption": "",
+                "position": 1701
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000706_f40.jpg",
+                "caption": "",
+                "position": 1702
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000706_f60.jpg",
+                "caption": "",
+                "position": 1703
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000706_f80.jpg",
+                "caption": "",
+                "position": 1704
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000710_f00.jpg",
+                "caption": "",
+                "position": 1706
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000710_f20.jpg",
+                "caption": "",
+                "position": 1707
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000710_f40.jpg",
+                "caption": "",
+                "position": 1708
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000710_f60.jpg",
+                "caption": "",
+                "position": 1709
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000710_f80.jpg",
+                "caption": "",
+                "position": 1710
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000000_f00.jpg",
+                "caption": "",
+                "position": 1712
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000000_f20.jpg",
+                "caption": "",
+                "position": 1713
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000000_f40.jpg",
+                "caption": "",
+                "position": 1714
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000000_f60.jpg",
+                "caption": "",
+                "position": 1715
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/gen_samples_video/p000000_f80.jpg",
+                "caption": "",
+                "position": 1716
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x28.png",
+                "caption": "(a)Absolute FID.",
+                "position": 1722
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x28.png",
+                "caption": "(a)Absolute FID.",
+                "position": 1725
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x29.png",
+                "caption": "(b)FID change from 5 s.",
+                "position": 1730
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x30.png",
+                "caption": "(c)Absolute FVD.",
+                "position": 1735
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x31.png",
+                "caption": "(d)FVD change from 5 s.",
+                "position": 1740
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_wan_t00.png",
+                "caption": "(a)The bowl slowly tips from upright to its side and remains at rest while rice grains pour out in a steady stream, cascading downward and spreading forward across the counter, some grains bouncing slightly before settling into a small mound; the countertop stays stationary.",
+                "position": 1764
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_wan_t00.png",
+                "caption": "(a)The bowl slowly tips from upright to its side and remains at rest while rice grains pour out in a steady stream, cascading downward and spreading forward across the counter, some grains bouncing slightly before settling into a small mound; the countertop stays stationary.",
+                "position": 1767
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_wan_t06.png",
+                "caption": "",
+                "position": 1771
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_wan_t12.png",
+                "caption": "",
+                "position": 1771
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_wan_t18.png",
+                "caption": "",
+                "position": 1771
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_wan_t24.png",
+                "caption": "",
+                "position": 1771
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_wan_t30.png",
+                "caption": "",
+                "position": 1771
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_hunyuan_t00.png",
+                "caption": "",
+                "position": 1776
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_hunyuan_t06.png",
+                "caption": "",
+                "position": 1776
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_hunyuan_t12.png",
+                "caption": "",
+                "position": 1776
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_hunyuan_t18.png",
+                "caption": "",
+                "position": 1776
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_hunyuan_t24.png",
+                "caption": "",
+                "position": 1776
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_hunyuan_t30.png",
+                "caption": "",
+                "position": 1776
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_arceus_t00.png",
+                "caption": "",
+                "position": 1781
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_arceus_t06.png",
+                "caption": "",
+                "position": 1781
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_arceus_t12.png",
+                "caption": "",
+                "position": 1781
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_arceus_t18.png",
+                "caption": "",
+                "position": 1781
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_arceus_t24.png",
+                "caption": "",
+                "position": 1781
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p155_arceus_t30.png",
+                "caption": "",
+                "position": 1781
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_wan_t00.png",
+                "caption": "(b)The rose’s petals gradually unfurl outward from the center in a slow, natural opening motion while the background stays fixed; no other movement occurs.",
+                "position": 1787
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_wan_t06.png",
+                "caption": "",
+                "position": 1791
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_wan_t12.png",
+                "caption": "",
+                "position": 1791
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_wan_t18.png",
+                "caption": "",
+                "position": 1791
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_wan_t24.png",
+                "caption": "",
+                "position": 1791
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_wan_t30.png",
+                "caption": "",
+                "position": 1791
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_hunyuan_t00.png",
+                "caption": "",
+                "position": 1796
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_hunyuan_t06.png",
+                "caption": "",
+                "position": 1796
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_hunyuan_t12.png",
+                "caption": "",
+                "position": 1796
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_hunyuan_t18.png",
+                "caption": "",
+                "position": 1796
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_hunyuan_t24.png",
+                "caption": "",
+                "position": 1796
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_hunyuan_t30.png",
+                "caption": "",
+                "position": 1796
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_arceus_t00.png",
+                "caption": "",
+                "position": 1801
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_arceus_t06.png",
+                "caption": "",
+                "position": 1801
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_arceus_t12.png",
+                "caption": "",
+                "position": 1801
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_arceus_t18.png",
+                "caption": "",
+                "position": 1801
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_arceus_t24.png",
+                "caption": "",
+                "position": 1801
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/figures/long_video_comparisons/p171_arceus_t30.png",
+                "caption": "",
+                "position": 1801
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x32.png",
+                "caption": "Figure 18:Memory and latency growth with tokens.We compare3:13{:}1KDA/MLA and MHA/MLA backbones with 2B activated parameters.",
+                "position": 1985
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x33.png",
+                "caption": "Figure 19:Component-wise pre-training compute efficiency.",
+                "position": 2010
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x34.png",
+                "caption": "(a)SP training-loss envelope.",
+                "position": 2022
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x34.png",
+                "caption": "(a)SP training-loss envelope.",
+                "position": 2025
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x35.png",
+                "caption": "(b)Envelope-optimal model size.",
+                "position": 2030
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x36.png",
+                "caption": "(c)Envelope-optimal training tokens.",
+                "position": 2035
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x37.png",
+                "caption": "(d)SP IsoFLOP loss profiles.",
+                "position": 2041
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x38.png",
+                "caption": "(e)IsoFLOP-optimal model size.",
+                "position": 2046
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x39.png",
+                "caption": "(f)IsoFLOP-optimal training tokens.",
+                "position": 2051
+            }
+        ]
+    },
+    {
+        "header": "6Related Works",
+        "images": []
+    },
+    {
+        "header": "7Future Exploration and Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ANotation",
+        "images": []
+    },
+    {
+        "header": "Appendix BRepresentative Model Configurations",
+        "images": []
+    },
+    {
+        "header": "Appendix CVisual RoPE Analysis: Protocol and Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x40.png",
+                "caption": "(a)",
+                "position": 4492
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x40.png",
+                "caption": "(a)",
+                "position": 4495
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x41.png",
+                "caption": "(b)",
+                "position": 4500
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x42.png",
+                "caption": "(c)",
+                "position": 4506
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x43.png",
+                "caption": "(d)",
+                "position": 4512
+            },
+            {
+                "img": "https://arxiv.org/html/2607.28611/2607.28611v1/x44.png",
+                "caption": "(e)",
+                "position": 4518
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
