@@ -1,0 +1,123 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.23783/2607.23783v1/x1.png",
+                "caption": "Figure 1:Overview.𝒩0\\mathcal{N}_{0}-TWAMis pre-trained on large-scale self-collected real-robot manipulation data with synchronized per-finger tactile\nstreams. An MoT with three per-modality experts (video, tactile,\nand action) predicts the future vision and tactile, then predicts the action from\nthem, so touch is bothpredicted(a predicted future) andobserved(an\nobserved present). Across contact-rich benchmarks in simulation and on real robots,𝒩0\\mathcal{N}_{0}-TWAMoutperforms prior world-action and vision-language-action baselines.",
+                "position": 359
+            }
+        ]
+    },
+    {
+        "header": "2Model",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.23783/2607.23783v1/x2.png",
+                "caption": "Figure 2:Overview of𝒩0\\mathcal{N}_{0}-TWAM.Multi-view RGB and tactile streams are encoded into latent tokens and processed by three per-modality experts (video,tactile,action) that interact only through a single shared self-attention at every layer, ordered by the frame-id causal cascade: the video and tactile experts co-generate the predicted future scene and future contact, and the action expert denoises the action chunk conditioned on the just-predicted pair. The language instruction enters the video and\naction experts through cross-attention, but not the tactile expert. A lightweight observed pathway\n(right) encodes theobservedcurrent tactile and cross-attends into the\naction tokens before the action head (§2.2); the denoised actions\nare decoded and executed.",
+                "position": 473
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23783/2607.23783v1/x3.png",
+                "caption": "Figure 3:Joint self-attention maskover two chunks, with each V/T block\nschematically collapsing the two latent frames. Each token appears as a\nkey twice, noisy (solid) and clean (hatched); rows are queries, columns keys, colored\nby the key’s modality. Within a chunk the noisy video and tactile co-generate with each\nother, and the noisy action additionally attends to their clean copies; each new chunk\nattends to the whole clean history, and no token ever attends a future chunk.",
+                "position": 694
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23783/2607.23783v1/x4.png",
+                "caption": "",
+                "position": 703
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23783/2607.23783v1/x5.png",
+                "caption": "Figure 4:The two tactile pathways.Touch enters𝒩0\\mathcal{N}_{0}-TWAMin two ways. As apredictedsignal, it is generated in the VAE latent space shared with video and\ndenoised by the tactile expert as a foresight target. As anobservedsignal, it\nis read in force\nspace: a frozen estimatorgθg_{\\theta}maps the raw tactile image to a three-axis\nforce map[fx,fy,fz][f_{x},f_{y},f_{z}]→\\toa NeoForce[56]tactile encoder\n(warm-started, fine-tuned) produces representation tokens→\\tocross-attended\ninto the action stream through the zero-initialized port of\nEq. (7). An optional reconstruction term anchors the fine-tuned\nrepresentation to the force field.",
+                "position": 856
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23783/2607.23783v1/x6.png",
+                "caption": "Figure 5:Tactile-punctuated long-horizon execution.(a) Training:a long-horizon demonstration, drawn as gripper aperture and\ntactile magnitude‖f‖\\|f\\|over time, is segmented at contact events into sub-task\nclips. The tactile trace also reports whether each graspsucceeds: a gripper\ncan close without loading any force, so a failed grasp shows an aperture dip but no\ntactile rise, and the one signal that delimits sub-tasks also confirms them. Each clip\nis labeled with a short instruction (“Pick up the Cup”, “Pour the Tea”, …) and\npost-trained through the existing text pathway.(b) Inference:a lightweight\nscheduler holds the sub-task queue;𝒩0\\mathcal{N}_{0}-TWAMruns on the current sub-task prompt and\nexecutes it, and when tactile feedback signals the sub-task is complete the scheduler\nadvances to the next prompt, looping through the queue.",
+                "position": 982
+            }
+        ]
+    },
+    {
+        "header": "3Data",
+        "images": []
+    },
+    {
+        "header": "4Training and Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.23783/2607.23783v1/x7.png",
+                "caption": "Figure 6:Qualitative simulation rollout(Insert Hole): the model’spredictedfuture (top) against theground-truthrollout (bottom). In each\nblock the multi-view RGB scene sits above its tactile stream; the predicted scene and\ncontact track the real execution across the insertion.",
+                "position": 1609
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23783/2607.23783v1/Figure/real_robot_tasks_strip.png",
+                "caption": "Figure 8:The real-robot task suite.Eight contact-rich tasks on two\nembodiments: four single-arm tasks on a Flexiv (top row) and four dual-arm tasks on a\nPiPER (bottom row). Six of the eight are drawn from NeoReal[56].",
+                "position": 1731
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23783/2607.23783v1/x8.png",
+                "caption": "Figure 10:Two renderings of the same tactile stream.One observed rollout: the\ntop row is the RGB scene, shared by both renderings; below it the same contact appears\nas the simulator’s smoothcleanfield and as ourgel-renderedrendering, a silvery, speckled gel with grain noise and depth shading that matches the\nlook of a real vision-based sensor. Only the tactile rendering differs.",
+                "position": 1941
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23783/2607.23783v1/x9.png",
+                "caption": "",
+                "position": 1959
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23783/2607.23783v1/x10.png",
+                "caption": "",
+                "position": 1969
+            },
+            {
+                "img": "https://arxiv.org/html/2607.23783/2607.23783v1/x11.png",
+                "caption": "Figure 11:Predicting future touch(lemon-tea grasp). Top row: the model’spredictedfuture; bottom row: theground truth. From left to right, the\nthird-person and right-wrist RGB views, then the tactile image and the contact-flow\nmap for each of the two gripper fingers (rl,rr). The predicted tactile\nand flow match the observed sensor, so foresight extends to contact, not only to the\nvisual scene.",
+                "position": 1979
+            }
+        ]
+    },
+    {
+        "header": "5Related Work",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Contributors",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix APer-task ablation results",
+        "images": []
+    },
+    {
+        "header": "Appendix BPer-task tactile-realism results",
+        "images": []
+    },
+    {
+        "header": "Appendix CPer-modality training dynamics",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2607.23783/2607.23783v1/x12.png",
+                "caption": "Figure 12:Per-modality pre-training loss(first 18k steps).\nVideo, action, and tactile flow-matching losses of the MoT backbone;\nthe+UMImarker is where the hand-collected UMI data is mixed in. The video loss\nrises and converges higher afterward, while the tactile loss is essentially unchanged.",
+                "position": 3994
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
