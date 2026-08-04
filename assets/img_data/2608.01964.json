@@ -1,0 +1,151 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/pic/benchmark_figure.png",
+                "caption": "Figure 1:Left: LongHorizon-Harness improves long-horizon execution across benchmarks and backbones.With the same backbone and execution backend, it lifts WeaveBench PassRate from 51.8% to 80.7%, Terminal-Bench 2.1 from 69.7% to 77.2%, and OSWorld 2.0 binary completion by3.0×3.0\\times, and the gains transfer from Qwen 3.7-Plus to Claude Opus 4.7.Right: Audited state transitions.Instead of one continuously growing session that judges its own progress, amanagerre-plans the next subtask from audited facts, a fresh-contextexecutorperforms it, and a read-onlyauditorcertifies what actually changed in the environment. Audit reports are the only cross-round memory, and interchangeable backends (e.g., Claude Code, Codex) serve each role.",
+                "position": 361
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/pic/mea_overview_v6.png",
+                "caption": "",
+                "position": 365
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/pic/mea_main_edited_hd4x.png",
+                "caption": "Figure 2:Overview of LongHorizon-Harness.LongHorizon-Harness processes a long-horizon task𝒯\\mathcal{T}through repeatedManage-Execute-Auditrounds, shown by the\ndashed box and numbered flow ❶–❸. Themanagerreads task stateSiS_{i}and constructs subtask\ncontractcic_{i}, which specifies the goal, acceptance criteria,\nboundary constraints, and relevant prior evidence (❶).\nThe manager may instead request user information or authorization\nthrough theaskroute. The selected GUI or CLIexecutorperforms the subtask in a fresh, budget-bounded\ncontext and modifies the environment (❷). Theauditorindependently inspects the resulting environment\nthrough read-only tools and produces audit reportviv_{i}(❸). The manager usesviv_{i}to update the task state\nbefore the next round.",
+                "position": 413
+            }
+        ]
+    },
+    {
+        "header": "2Method",
+        "images": []
+    },
+    {
+        "header": "3Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/pic/terminal_bench_rank_figure.png",
+                "caption": "Figure 3:Results on Terminal-Bench 2.1.LongHorizon-Harness retains Claude Code as its executor backend and improves success rate from 69.7% to 77.2%. Values marked with∗are externally reported metrics.",
+                "position": 1085
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/pic/tokens_effort_figure.png",
+                "caption": "Figure 4:Cost–performance frontier on OSWorld 2.0.Binary completion (left) and partial score (right) versus average output tokens per task.\nColored curves show the official results under different reasoning-effort settingsosworld2, with marker size indicating the reasoning effort.\nThe blue star denotes LongHorizon-Harness with Qwen 3.7-Plus, and the dashed arrow shows its improvement over the official single-action Qwen 3.7-Plus baseline.",
+                "position": 1150
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x1.png",
+                "caption": "Figure 5:Token consumption by role.Average tokens per task consumed by the manager, executor, and auditor in LongHorizon-Harness, compared with the corresponding baseline.\nSegment labels report the fraction consumed by each role.\nAll LH-Harness roles use Qwen 3.7-Plus.\nWeaveBench and Terminal-Bench 2.1 report total tokens, whereas OSWorld 2.0 reports output tokens because the official provides only output-token statisticsosworld2.",
+                "position": 1156
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x2.png",
+                "caption": "Figure 6:Performance gains across task types.LongHorizon-Harness (blue) is compared with the same-model baseline (gray) across WeaveBench domains (left), OSWorld 2.0 capability tags (middle), and Terminal-Bench 2.1 categories (right).\nThe rightmost column of each panel reports the absolute performance change in points.\nBlue connectors indicate improvements, and red connectors indicate regressions.\nParenthesized values report the number of OSWorld tasks or Terminal-Bench trajectories in each category.",
+                "position": 1170
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x3.png",
+                "caption": "Figure 7:Recovering from a stalled interaction.The case isWEB_task_16, a WebRTC simulcast-layer audit.Top:The Claude Code baseline recognizes that Wireshark’s\n“Decode As” dialog is unresponsive, but continues retrying the same\ninteraction for more than 400 steps and obtains a score of 0.59.Bottom:LongHorizon-Harness records the unresolved evidence gaps\nin the task state. Subsequent execution rounds collect the missing\nchart- and packet-level evidence, resulting in a score of 0.92.",
+                "position": 1523
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x4.png",
+                "caption": "Figure 8:Auditing apparent completion.The case isDOC_task_2, which requires heading-style\nnormalization.Top:The Claude Code baseline edits the document XML directly\nand terminates with a visually plausible result. Because the required\nLibreOffice workflow is not followed, the result receives a score of\n0.00.Bottom:LongHorizon-Harness applies the heading styles through\nthe prescribed GUI workflow and rechecks the document. The auditor then\nparses the document XML to confirm the final style of all 15 headings,\nobtaining a score of 0.89.",
+                "position": 1534
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x5.png",
+                "caption": "Figure 9:Preserving pre-repair evidence.InDOC_task_4, the agent must repair a Calc VLOOKUP formula while preserving before-and-after evidence.Top:The Claude Code baseline records initial formula errors but edits the spreadsheet before completing the required pre-repair evidence, leaving the final file and evidence sequence inconsistent and scoring 0.45.Bottom:LongHorizon-Harness keeps the missing pre-repair evidence as a pending requirement, records it before modification, and audits the full nine-screenshot sequence, scoring 0.87.",
+                "position": 1548
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x6.png",
+                "caption": "Figure 10:Continuing from verified progress.WEB_task_10is a Lighthouse performance-optimization task.Top:The Claude Code baseline completes the core optimization but gets stuck during DevTools evidence collection, fails to produce all required deliverables, and scores 0.53.Bottom:LongHorizon-Harness preserves the verified optimization state, delegates the remaining evidence requirements to later rounds, and audits the final screenshot and metadata, scoring 0.85.",
+                "position": 1555
+            }
+        ]
+    },
+    {
+        "header": "4Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ADetailed Experimental Setup",
+        "images": []
+    },
+    {
+        "header": "Appendix BDetailed Experimental Results",
+        "images": []
+    },
+    {
+        "header": "Appendix CAdditional Case Studies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x7.png",
+                "caption": "Figure 11:Desktop workflow case. LongHorizon-Harness creates the rich note, recovers from failed GUI interactions by updating the task state, and verifies the reproduced rendering bug through screenshot evidence.",
+                "position": 2418
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x8.png",
+                "caption": "Figure 12:Document-processing case. The harness verifies the underlying ODT structure instead of relying on visual formatting, ensuring that all headings are semantically normalized.",
+                "position": 2428
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x9.png",
+                "caption": "Figure 13:Game-analysis case. GUI replay identifies the illegal PGN transition, while file-level auditing checks that the final reports are consistent with the board evidence.",
+                "position": 2438
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x10.png",
+                "caption": "Figure 14:Web-diagnostics case. LongHorizon-Harness combines browser charts, tooltip evidence, and Wireshark inspection into a single audited evidence chain.",
+                "position": 2448
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x11.png",
+                "caption": "Figure 15:Data-analysis case. The harness rejects mislabeled evidence, captures the correct Airflow views, and audits whether each screenshot supports the required diagnosis.",
+                "position": 2458
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x12.png",
+                "caption": "Figure 16:DevOps case. The harness links management-UI symptoms to queue and binding evidence, then verifies the repaired routing state across GUI and CLI views.",
+                "position": 2468
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x13.png",
+                "caption": "Figure 17:Spatial/CAD case. The harness combines DXF-level inspection, LibreCAD layer repair, print-preview evidence, and screenshot-integrity checks.",
+                "position": 2478
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x14.png",
+                "caption": "Figure 18:Design case. LongHorizon-Harness grounds visual quality comparison in real GIMP state, including histograms and side-by-side rendered outputs.",
+                "position": 2488
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x15.png",
+                "caption": "Figure 19:Terminal-Bench build case. LongHorizon-Harness turns a multi-condition build task into an explicit acceptance contract and verifies the final SQLite installation with gcov evidence.",
+                "position": 2503
+            },
+            {
+                "img": "https://arxiv.org/html/2608.01964/2608.01964v1/x16.png",
+                "caption": "Figure 20:Terminal-Bench reverse-engineering case. The harness preserves exploratory evidence as audited facts and verifies the final independent C implementation against behavior, compilation, size, and independence constraints.",
+                "position": 2513
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
