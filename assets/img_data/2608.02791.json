@@ -1,0 +1,82 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "IIntroduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.02791/2608.02791v1/x1.png",
+                "caption": "Figure 1:The trilemma of segmentation in MLLMs.Embedding prediction may harm dialogue abilities. Next-token prediction methods are either fast with poor segmentation performance or achieve superior performance at the cost of inference speed, particularly when generating rich content (e.g., chain-of-thought or patch-wise classification).",
+                "position": 289
+            },
+            {
+                "img": "https://arxiv.org/html/2608.02791/2608.02791v1/x2.png",
+                "caption": "Figure 2:Comparison of MLLM-based segmentation paradigms.(a) Embedding Prediction: Pixel-level supervision for external mask decoding[21,51]may degrade the MLLM’s general dialogue capabilities.(b) Next-Token Prediction: Autoregressively generates textual mask representations[56,41,25], forcing a trade-off between poor segmentation performance (for sparse outputs) and slow inference (for rich outputs).(c) Our All-Mask Prediction: We decouple dialogue generation (autoregressive) from mask generation (non-autoregressive). By simultaneously predicting all mask tokens as patch-wise classifications in a single pass, our paradigm resolves the segmentation trilemma, uniting preserved dialogue abilities, high segmentation performance and fast inference speed.",
+                "position": 588
+            },
+            {
+                "img": "https://arxiv.org/html/2608.02791/2608.02791v1/x3.png",
+                "caption": "Figure 3:STAMPversusSTAMPlusin multi-target segmentation.(a)STAMPmust repeat its single-target prediction for each object, and ambiguous referring expressions may yield incorrect masks.(b)STAMPlusfirst generates a structured target list and then predicts all target IDs jointly in one shared structured mask map.",
+                "position": 616
+            }
+        ]
+    },
+    {
+        "header": "IIRelated Work",
+        "images": []
+    },
+    {
+        "header": "IIIMethod",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.02791/2608.02791v1/x4.png",
+                "caption": "Figure 4:TheSTAMPPipeline.Phase 1 (Dialogue Generation):The MLLM autoregressively generates a conversational response, emitting a special<SEG>token to trigger Phase 2.Phase 2 (Binary All-Mask Prediction):Triggered by<SEG>, image-aligned[MASK]tokens are prefilled and fused with their corresponding image-patch features. A single non-autoregressive forward pass with hybrid attention predicts their foreground/background labels simultaneously; the resulting patch mask can optionally prompt a frozen SAM for refinement.",
+                "position": 759
+            },
+            {
+                "img": "https://arxiv.org/html/2608.02791/2608.02791v1/x5.png",
+                "caption": "Figure 5:TheSTAMPlusPipeline.Phase 1 (Structured Target Generation):The MLLM generates a target list at the single-target, multi-category, or multi-instance granularity requested by the instruction; each entry receives an ID and may include a bounding box for instance disambiguation.Phase 2 (Structured All-Mask Prediction):Image-aligned[MASK]tokens are classified simultaneously in one non-autoregressive forward pass, with the output classes dynamically bound to the target IDs specified by theclsfields generated in Phase 1.",
+                "position": 800
+            }
+        ]
+    },
+    {
+        "header": "IVExperiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.02791/2608.02791v1/x6.png",
+                "caption": "Figure 6:Qualitative comparison on referring segmentation.Each column corresponds to one query; from top to bottom, the rows show the input image, ground truth, and predictions fromSTAMP, Text4Seg, and LISA.",
+                "position": 1828
+            },
+            {
+                "img": "https://arxiv.org/html/2608.02791/2608.02791v1/x7.png",
+                "caption": "",
+                "position": 1834
+            },
+            {
+                "img": "https://arxiv.org/html/2608.02791/2608.02791v1/x8.png",
+                "caption": "Figure 8:Efficiency comparison across MLLM segmentation paradigms.Methods from the same paradigm are grouped by color; numbers following model names denote input resolution, and marker size indicates model scale.\nHigher and farther left is better. Latency is measured on a single NVIDIA A800 using the same test case for all methods.",
+                "position": 2736
+            },
+            {
+                "img": "https://arxiv.org/html/2608.02791/2608.02791v1/x9.png",
+                "caption": "Figure 9:Inference-time scaling with the number of target categories.STAMPand LISA repeat a separate prediction of similar cost for each category, resulting in a steep latency increase.\nThe additional cost ofSTAMPlusis concentrated in the Phase 1 autoregressive generation of the structured target list, while all categories share a single Phase 2 mask prediction, yielding a substantially smaller slope.\nLines show mean latency and shaded bands show the corresponding standard deviation; all measurements use a single NVIDIA H800 GPU.",
+                "position": 2748
+            }
+        ]
+    },
+    {
+        "header": "VConclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
