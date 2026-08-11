@@ -1,0 +1,127 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1.Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x1.png",
+                "caption": "Figure 1.KV-cache memory roofline. Decode throughput is capped by Token-KV intensity×\\timesKV-cache bandwidth (three-tier slope-1 roofs) and by the dense/sparse throughput ceilings.\nHigher Token-KV intensity means more KV reuse (e.g., GQA(Ainslieet al.,2023), MLA(DeepSeek-AI,2024)) or more KV sparsity (e.g., NSA(Yuanet al.,2025), DSA(DeepSeek-AI,2025)). It is defined as the tokens generated per decode pass per KV-cache byte transferred over HBM or off-GPU IOs.\nTwo throughput ceilings are determined by the maximum batch size and minimum time per output token (TPOT) bounded by compute and weight-loading time.",
+                "position": 399
+            },
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x2.png",
+                "caption": "Figure 2.The per-output-token decode latency (TPOT) breakdown of on-demand KV retrieval over PCIe (Qwen3-32B, one H100 SXM-HBM3 GPU, context length 32K, BF16). All latencies are computed from a roofline model, assuming 10% of the attended KV is fetched from CPU DRAM each step. The percentage above each bar denotes the KV retrieval overhead.",
+                "position": 409
+            }
+        ]
+    },
+    {
+        "header": "2.Background",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x3.png",
+                "caption": "Figure 3.Decode pipelines of dense attention, sparse attention, KV retrieval, and KV prefetching.",
+                "position": 459
+            }
+        ]
+    },
+    {
+        "header": "3.Motivation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x4.png",
+                "caption": "Figure 4.Top-20 KV-block prediction accuracy across model layers using the previous token vs. a lookahead token.",
+                "position": 544
+            },
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x5.png",
+                "caption": "Figure 5.Overview of the OasisKV architecture.",
+                "position": 630
+            }
+        ]
+    },
+    {
+        "header": "4.System Design",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x6.png",
+                "caption": "Figure 6.Per-layer agreement between the top-KKset predicted by the propagated draft query and the exact set of the true next-token query.\nThe profile uses Qwen3-8B on GSM8K with Tengyunw/qwen3_8b_eagle3 as the EAGLE-3 draft model.",
+                "position": 683
+            },
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x7.png",
+                "caption": "Figure 7.Look-ahead attention.\nLeft: the CPU full KV cache maps to two GPU caches —\ncompressed keys via per-block min/max pooling\nand the sparse KV working set via block-wise sparsification.\nRight: the attention kernel processes the normal and draft queries together over the sparse KV;\nthe draft query then scans the compressed keys to predict the next step’s top-KKblocks,\nwhich are prefetched from the CPU cache.",
+                "position": 687
+            },
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x8.png",
+                "caption": "Figure 8.The asynchronous prefetch pipeline across two decoding steps.\nRed arrows trace one layer’s chain: the draft query at stepttdrives top-KKprediction, KV selection, and KV transfer before that layer’s attention at stept+1t{+}1.",
+                "position": 725
+            },
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x9.png",
+                "caption": "Figure 9.Head-wise mapping between the bounded GPU working set and the CPU full-KV cache.\nThe original page tables retain their logical-to-physical translations.\nAn additional table maps each GPU logical block to a CPU logical block for every KV head.",
+                "position": 767
+            },
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x10.png",
+                "caption": "Figure 10.Remote partial fetching: apartial transferat admission (top) and anetwork fetchat decode (bottom). Numbered steps are described inSections4.4.1and4.4.2.",
+                "position": 830
+            },
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x11.png",
+                "caption": "Figure 11.Synthetic decode sweep over max concurrency at 16K and 32K context, on\nQwen3-8B (single H100) and Qwen3-235B (TP8, eight H100s). We compare OasisKV\nagainst dense attention on unmodified vLLM (labeledvLLM) and three\nhierarchical-KV baselines: ShadowKV, InfiniGen, and FreeKV. Rows: decode\nthroughput (TPS), running batch, and per-token latency (TPOT); each request\ngenerates 2,048 tokens. Arrows mark the OasisKV/vLLM ratio at max concurrency 256.",
+                "position": 883
+            }
+        ]
+    },
+    {
+        "header": "5.Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x12.png",
+                "caption": "Figure 12.Disaggregated serving over the offered request rate, Qwen3-8B, at 24K\n(left) and 32K (right) context with 2,048 output tokens. Top: decode\nthroughput. Bottom: average and peak host memory usage in the decode node.",
+                "position": 949
+            },
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x13.png",
+                "caption": "Figure 13.End-to-end decode throughput (bars, left axis) and AIME24 accuracy\n(avg@32, right axis), from dense to increasingly sparse (KKdecreasing),\nrelative to dense vLLM with FlashAttention-3 on the same model. Bar labels give\nthe speedup over dense; the dashed line marks dense accuracy.",
+                "position": 1035
+            },
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x14.png",
+                "caption": "Table 1.Accuracy under the same 2,048-token KV budget. Each retrieval method\nis read against the full-attention anchor of its own stack:Δ\\Deltais the\ndifference from that stack’s Full column (Quest, FreeKV vs. Full (HF); Ours\nvs. Full (vLLM)), never across stacks.",
+                "position": 1041
+            },
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x14.png",
+                "caption": "Figure 14.Network transfer under disaggregated serving, at 32K context and 2,048 output\ntokens. Configurations are full transfer (w/o RPF) and OasisKV with no fetch cap\n(Fetch All) or fetch ratios of 0.10 and 0.05. (a) Bytes transferred per request, split into the transfer at admission and the drift fetched during decode. (b) Utilized network bandwidth over time. Shaded curves show the per-second rate,\nand lines show 30 s rolling mean. (c) Bandwidth distribution.",
+                "position": 1565
+            },
+            {
+                "img": "https://arxiv.org/html/2608.08097/2608.08097v1/x15.png",
+                "caption": "Figure 15.Analytic TTFT speedup ofw/ RPFoverw/o RPFas prefix-cache hit rate rises, for anunloadedrequest. Curves are link rates.",
+                "position": 1589
+            }
+        ]
+    },
+    {
+        "header": "6.Related Work",
+        "images": []
+    },
+    {
+        "header": "7.Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
