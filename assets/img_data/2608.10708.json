@@ -1,0 +1,122 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "IIntroduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.10708/2608.10708v1/x1.png",
+                "caption": "Figure 2:Comparison of pretrained DA3-Base[11]with two test-time adaptation methods on a HiRoom[11](828786) scene, decomposed along camera pose error, depth error, and the resulting pointmap. +Free-Geometry[2], a representative implicit self-consistency method, fails to substantially improve both the camera pose and depth, and consequently offers only limited improvement in the resulting pointmap. In contrast,+Self-Geometry(Ours), which directly imposes explicit multi-view geometric constraints, yields consistent improvements across all three. In the depth error maps and pointmaps,Redregions denote prediction errors exceeding the benchmark threshold andgrayregions denote correctly reconstructed pixels.",
+                "position": 269
+            }
+        ]
+    },
+    {
+        "header": "IIRelated Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.10708/2608.10708v1/x2.png",
+                "caption": "Figure 3:Overview of Our ProposedSelf-GeometryPipeline.Self-Geometryadapts a frozen pretrainedVFMto a target scene through three complementary components. (i)GDO(Sec.III-B) formulates twoGT-freecorrespondence-guided losses, thepoint-to-pointMVC Loss(Eq. (2)) and thepoint-to-lineEC Loss(Eq. (3)), and appliesGD(Eq. (4)) to prevent thegradient conflictthat can arise between them. (ii)FAN(Sec.III-C) samples angularly diverse views viascene-scale-invariantSO(3) geodesic distances (Eq. (5)). (iii)Lightweight TTA(Sec.III-D) updates onlyLoRA(Sec.III-D) parameters inserted into the attention blocks of the pretrainedVFM. Together, these components operate as aGT-freeandPlug-and-playTTAthat imposes explicit multi-view geometric constraints on pretrainedVFMs.",
+                "position": 464
+            }
+        ]
+    },
+    {
+        "header": "IIIMethodology",
+        "images": []
+    },
+    {
+        "header": "IVExperiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.10708/2608.10708v1/x3.png",
+                "caption": "Figure 4:Qualitative comparison of pretrainedVFMsagainst our proposedSelf-Geometryacross representative scenes (rows:VGGT[30],π3\\pi^{3}[35],DA3-Giant[11]; scene identifier below each row).(a) Depth Estimation: from left to right, Reference RGB, GT depth, and depth error maps for Original, +TCO[39],+Free-Geometry[2], and+Self-Geometry(Ours).(b) Geometry Estimation: from left to right, GT fused pointcloud and geometry error maps for the same four methods.Redregions denote errors exceeding the benchmark threshold;grayregions denote correctly reconstructed pixels.Best viewed in zoom.",
+                "position": 1560
+            }
+        ]
+    },
+    {
+        "header": "VAblation Study",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.10708/2608.10708v1/x4.png",
+                "caption": "TABLE IV:Ablations forGDO(Sec.III-B) on VGGT[30]with ETH3D[21]. Block (i) togglesℒec\\mathcal{L}_{\\text{ec}}(Eq. (3)) andℒmvc\\mathcal{L}_{\\text{mvc}}(Eq. (2)); Block (ii) variesGD(Eq. (4)) strategies. Pose (AUC@1/3/30↑\\uparrow) and Geometry (F1↑\\uparrow; w/ p., w/o p.).Bold: best per column.",
+                "position": 1629
+            },
+            {
+                "img": "https://arxiv.org/html/2608.10708/2608.10708v1/x4.png",
+                "caption": "Figure 5:Visualization of our proposedGD(Eq. (4)) on VGGT[30]with ETH3D[21]. (a) Concept ofGDon a representative gradient pair. (b) Polar histogram of∠​(∇ℒec,∇ℒmvc)\\angle(\\nabla\\mathcal{L}_{\\mathrm{ec}},\\nabla\\mathcal{L}_{\\mathrm{mvc}})aggregated over all ETH3D scenes andTTAiterations, with obtuse bins inredand acute bins ingray. (c, d) Convergence ofℒmvc\\mathcal{L}_{\\mathrm{mvc}}andℒec\\mathcal{L}_{\\mathrm{ec}}acrossTTAiterations, w/GD:blue, w/o:red.",
+                "position": 1711
+            },
+            {
+                "img": "https://arxiv.org/html/2608.10708/2608.10708v1/x5.png",
+                "caption": "Figure 6:Visualization of our proposedPseudo-Correspondence Filtering(Sec.III-B) on VGGT[30]with the ETH3D[21]reliefscene, comparing Raw (gray),ℒec\\mathcal{L}_{\\mathrm{ec}}filter (red), andℒec\\mathcal{L}_{\\mathrm{ec}}+ℒmvc\\mathcal{L}_{\\mathrm{mvc}}filter (Ours,blue). (a) Filtering on a representative pair. (b) Reprojection error distribution across all pairs. (c) Downstream Precision, pose AUC@30, and geometry F1 (w/o p.).",
+                "position": 1816
+            },
+            {
+                "img": "https://arxiv.org/html/2608.10708/2608.10708v1/x6.png",
+                "caption": "TABLE VI:Ablations forFAN(Sec.III-C) on VGGT[30]with ETH3D[21]. Block (i) sweepsSO(3) bin width; Block (ii) variestarget view selection; Block (iii) variessource view orderingwithin each SO(3) bin. Pose (AUC@1/3/30↑\\uparrow) and Geometry (F1↑\\uparrow; w/ p., w/o p.).Bold: best per column.",
+                "position": 1825
+            },
+            {
+                "img": "https://arxiv.org/html/2608.10708/2608.10708v1/x6.png",
+                "caption": "Figure 7:Comparison of target view selection strategies on VGGT[30]with the ETH3D[21]courtyardscene. The top row shows the top-down view of the camera trajectory, with each view colored by its SO(3) bin index relative to the target view and the target view marked with ayellowstar; the bottom row shows the source view count per SO(3) bin. The two columns correspond to (a) an arbitrarily chosen target (v=0v=0) and (b) our proposedGRV(Sec.III-C) target (v∗=14v^{\\ast}=14).",
+                "position": 1933
+            }
+        ]
+    },
+    {
+        "header": "VIConclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "S.IGitHub Repository",
+        "images": []
+    },
+    {
+        "header": "S.IIPreliminary: Epipolar Geometry",
+        "images": []
+    },
+    {
+        "header": "S.IIITotal Loss Formulation",
+        "images": []
+    },
+    {
+        "header": "S.IVAlgorithm",
+        "images": []
+    },
+    {
+        "header": "S.VTraining Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.10708/2608.10708v1/x7.png",
+                "caption": "Figure S.1:Additional qualitative results on 7Scenes[23]: rows are six pretrainedVFMs, each showing the scene with the largest F1 improvement for thatVFM.(a) Depth Estimation: from left to right, Reference RGB, GT depth, and depth error maps.(b) Geometry Estimation: from left to right, GT fused pointcloud and geometry error maps. Both (a) and (b) show Original, +TCO[39],+Free-Geometry[2], and+Self-Geometry(Ours), wherered/graydenote errors above/within the benchmark threshold.Best viewed in zoom.",
+                "position": 3057
+            },
+            {
+                "img": "https://arxiv.org/html/2608.10708/2608.10708v1/x8.png",
+                "caption": "Figure S.2:Additional qualitative results on ScanNet++[36]: rows are six pretrainedVFMs, each showing the scene with the largest F1 improvement for thatVFM.(a) Depth Estimation: from left to right, Reference RGB, GT depth, and depth error maps.(b) Geometry Estimation: from left to right, GT fused pointcloud and geometry error maps. Both (a) and (b) show Original, +TCO[39],+Free-Geometry[2], and+Self-Geometry(Ours), wherered/graydenote errors above/within the benchmark threshold.Best viewed in zoom.",
+                "position": 3060
+            },
+            {
+                "img": "https://arxiv.org/html/2608.10708/2608.10708v1/x9.png",
+                "caption": "Figure S.3:Additional qualitative results on HiRoom[11]: rows are six pretrainedVFMs, each showing the scene with the largest F1 improvement for thatVFM.(a) Depth Estimation: from left to right, Reference RGB, GT depth, and depth error maps.(b) Geometry Estimation: from left to right, GT fused pointcloud and geometry error maps. Both (a) and (b) show Original, +TCO[39],+Free-Geometry[2], and+Self-Geometry(Ours), wherered/graydenote errors above/within the benchmark threshold.Best viewed in zoom.",
+                "position": 3063
+            }
+        ]
+    },
+    {
+        "header": "S.VILimitations",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
