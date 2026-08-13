@@ -1,0 +1,132 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.11045/2608.11045v1/teaser_arxiv.png",
+                "caption": "Figure 1:ReRound resolves ambiguous rounding with a learned diffusion prior.(a)The quantized floating-point weightw~=1.48\\widetilde{w}=1.48is in the\nmidpoint ambiguity region (blue interval) in the\nsense thatw~\\widetilde{w}is sufficiently near the midpoint1.51.5.\nAs a result, there is low confidence on whetherw~\\widetilde{w}should be\nrounded down to the floor11or up to the ceiling22.\nBut, under RTN, becausew~\\widetilde{w}is slightly closer to the floor11, in this case it will always be rounded to the floor.(b)For a given LLM, ReRound resolves midpoint ambiguity using a diffusion prior\n(a U-Net) learned from64×6464{\\times}64patches of all weight matrices in the\nLLM.\nSince this diffusion prior reflects the distribution of weights in the LLM,\nReRound uses it to guide the rounding.\nIn preparing for inference, the U-Net generates a collection of64×6464{\\times}64patches aroundw~\\widetilde{w}.\nThe generated patches will be designated as the reconstructedw~rec\\widetilde{w}_{\\mathrm{rec}}.\nSincew~rec\\widetilde{w}_{\\mathrm{rec}}reflects the distribution of weights of\nthe LLM, ReRound applies RTN tow~rec\\widetilde{w}_{\\mathrm{rec}}, rather thanw~\\widetilde{w}, whenw~rec\\widetilde{w}_{\\mathrm{rec}}is not far fromw~\\widetilde{w}.\nThus, in this example,w~=1.48\\widetilde{w}=1.48under ReRound will be rounded to\nthe ceiling22rather than the floor11, as shown in (a).",
+                "position": 311
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method: ReRound",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.11045/2608.11045v1/diffusion.png",
+                "caption": "Figure 2:Conditional weight reconstruction.During training, the diffusion model predicts\nnoise on a full-precision patchPP, conditioned on its stochastic\nlow-bit versionPlowP_{\\mathrm{low}}.During inference, reverse diffusion is\nconditioned on the deterministic RTN patchPcondP_{\\mathrm{cond}}.\nThe reconstructed patches formWrecW_{\\mathrm{rec}}, used only to guide\nrounding.",
+                "position": 595
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11045/2608.11045v1/reround.png",
+                "caption": "Figure 3:Reconstruction-guided rounding.The original quantized weightw~\\tilde{w}determines the RTN assignmentqrtnq_{\\mathrm{rtn}}and the opposite adjacent assignmentqaltq_{\\mathrm{alt}}.\nThe reconstructed weight in quantized space,w~rec\\tilde{w}_{\\mathrm{rec}}, proposes a change whenqrec=qaltq_{\\mathrm{rec}}=q_{\\mathrm{alt}}.\nThe proposal is accepted when its deviation fromw~\\tilde{w}lies\nwithin the position-dependent tolerance metricτpos​(r,τ)\\tau_{\\mathrm{pos}}(r;\\tau); otherwise, RTN is retained.",
+                "position": 703
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11045/2608.11045v1/svd_reround.png",
+                "caption": "Figure 4:Candidate selection via spectral preservation.Each candidate quantized integer weight matrixQτQ_{\\tau}is\nde-quantized to obtain the candidate weight matrixWτW_{\\tau}.\nReRound compares its leading singular values with those of the\nfull-precision matrixWWand selects the candidate with the smallest\nspectral discrepancy.\nThe illustration selectsτ⋆=τ2\\tau^{\\star}=\\tau_{2}.",
+                "position": 824
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Discussion and Limitations",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix AQuantization Notation",
+        "images": []
+    },
+    {
+        "header": "Appendix BSoftware Environment",
+        "images": []
+    },
+    {
+        "header": "Appendix CDiffusion Training and Inference Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DReRound Settings",
+        "images": []
+    },
+    {
+        "header": "Appendix EAdditional PTQ Results",
+        "images": []
+    },
+    {
+        "header": "Appendix FBaseline Implementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix GModels and Evaluation Protocol",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.11045/2608.11045v1/tau_curve.png",
+                "caption": "Figure 6:Visualization of the position-dependent tolerance\nmetric.We plotτpos​(r,τ)\\tau_{\\mathrm{pos}}(r;\\tau)for the illustrative tolerance\nparametersτ∈{0.15,0.25,0.35}\\tau\\in\\{0.15,0.25,0.35\\}with\n(1)β=8\\beta=8, (2)β=32\\beta=32, (3)β=64\\beta=64, and\n(4)β=128\\beta=128.\nTheblue shaded intervaldenotes the midpoint ambiguity regionr∈[0.4,0.6]r\\in[0.4,0.6], defined byδ=0.1\\delta=0.1, whereτpos​(r,τ)=τ\\tau_{\\mathrm{pos}}(r;\\tau)=\\tau.\nOutside this region, the tolerance metric decreases toward either\nadjacent quantized integer.\nLarger values ofβ\\betaproduce sharper decreases at the\nboundaries of the midpoint ambiguity region.",
+                "position": 2833
+            }
+        ]
+    },
+    {
+        "header": "Appendix HVisualization of the Position-Dependent Tolerance Metric",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.11045/2608.11045v1/Figures/smollm2_1p7b_w4_revision_heatmap.png",
+                "caption": "Figure 7:Matrix-wise RTN revision rates for SmolLM2 1.7B.Each cell shows the percentage of RTN assignments revised by ReRound\nfor one weight matrix; lighter and darker colors indicate lower and\nhigher revision rates, respectively.\nThe revisions are distributed nonuniformly across network depth and\nmatrix type, and the W3 and W4 patterns differ despite reusing the same\nreconstructed weights.\nThis shows that ReRound does not derive a fixed set of revisions from\nthe reconstruction alone.\nInstead, each matrix is evaluated under its bit-specific quantization\ngrid and spectral preservation objective.\nThe same color scale is used in both panels.",
+                "position": 2870
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11045/2608.11045v1/Figures/smollm2_1p7b_w3_revision_heatmap.png",
+                "caption": "",
+                "position": 2876
+            }
+        ]
+    },
+    {
+        "header": "Appendix IMatrix-Wise Revision of RTN Assignments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.11045/2608.11045v1/Figures/llama3p2_1b_w4_revision_heatmap.png",
+                "caption": "Figure 8:Matrix-wise RTN revision rates for Llama 3.2 1B.Each cell shows the percentage of RTN assignments revised by ReRound\nfor one weight matrix; lighter and darker colors indicate lower and\nhigher revision rates, respectively.\nAlthough W3 and W4 use the same reconstructed weights, they produce\ndifferent matrix-wise revision patterns.\nReRound evaluates the rounding candidates separately for each matrix\nand bit width, and selects the candidate that best preserves the\nleading singular values of the matrix.\nThe same color scale is used in both panels.",
+                "position": 2916
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11045/2608.11045v1/Figures/llama3p2_1b_w3_revision_heatmap.png",
+                "caption": "",
+                "position": 2922
+            }
+        ]
+    },
+    {
+        "header": "Appendix JContinuous Reconstruction for Low-Bit Rounding",
+        "images": []
+    },
+    {
+        "header": "Appendix KWeight Reconstruction and ReRound Procedures",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
