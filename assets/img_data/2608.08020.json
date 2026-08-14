@@ -1,0 +1,106 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.08020/2608.08020v2/x1.png",
+                "caption": "Figure 1:Reasoning topologies for test-time compute allocation.(Left)Parallel sampling treats traces as independent trials, leading to wrong answers in majority.(Center)Score-based pruning terminates unpromising paths but leaves the freed capacity idle, failing to actively shift the sampling distribution.(Right)Gambit actively reallocates compute: when low-scoring traces are pruned, it immediately branches from high-quality prefixes to amplify correct reasoning and saturate the compute budget.",
+                "position": 341
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Motivation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.08020/2608.08020v2/x2.png",
+                "caption": "Figure 2:Branching from a high-quality prefix versus independent sampling on a hard AIME 2025 problem (Q27).\nBranching 64 continuations from the top-ranked prefix achieves 87.5% pass@1 (14×14\\timesover 6.2% baseline) while sharing the parent’s KV-cache (green region) halves memory consumption.",
+                "position": 417
+            },
+            {
+                "img": "https://arxiv.org/html/2608.08020/2608.08020v2/x3.png",
+                "caption": "Figure 3:GPU memory utilization and latency profiles during reasoning with batch_size=256 traces on HMMT-25 Q7.\nParallel sampling exhausts KV-cache capacity, inflating latency by∼3×{\\sim}3\\times.\nPruning-only STEP(Liang et al.,2026)eliminates queueing but steadily loses concurrency.\nGambit maintains high utilization throughout at∼1.1×{\\sim}1.1\\timeslatency.",
+                "position": 433
+            }
+        ]
+    },
+    {
+        "header": "4Method: Gambit",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.08020/2608.08020v2/x4.png",
+                "caption": "Figure 4:End-to-end pipeline of Gambit on an AIME problem (capacityC=5C{=}5, swap sizeK=2K{=}2).During warmup,C=5C{=}5parallel traces are evaluated (color intensity denotes running scores¯∈[0,1]\\bar{s}\\in[0,1]).\nEveryΔ\\Deltasteps, a tournament ranks the active traces: theK=2K{=}2lowest-scoring traces are pruned (×\\boldsymbol{\\times}) and replaced by new branches spawned from the highest-scoring prefixes via prefix caching (green arrows). This zero-sum reallocation maintains exactlyCCactive traces throughout generation.\nUpon completion, answers are aggregated via a score-weighted majority vote, correctly selecting answer 29 (∑s¯=1.78\\sum\\bar{s}=1.78vs.1.431.43).",
+                "position": 480
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.08020/2608.08020v2/x5.png",
+                "caption": "Figure 5:Efficiency vs. Accuracy trade-offs over all benchmarks. (a) Average Latency vs. Accuracy. (b) Average Token Consumption vs. Accuracy. Gambit (Ours) dominates the efficiency frontier, achieving the highest accuracy with the lowest overall token footprint and highly competitive wall-clock latency.",
+                "position": 1043
+            },
+            {
+                "img": "https://arxiv.org/html/2608.08020/2608.08020v2/x6.png",
+                "caption": "Figure 6:Trace throughput on AIME-26. Gambit effectively doubles the completion rate.",
+                "position": 1055
+            }
+        ]
+    },
+    {
+        "header": "6Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.08020/2608.08020v2/x7.png",
+                "caption": "Figure 7:Distribution ofuniquetokens generated per completed trace on AIME-2026. By branching from shared high-quality KV-cache prefixes, Gambit drastically reduces the median number of new tokens required to explore alternative reasoning pathways compared to SC and STEP.",
+                "position": 1075
+            },
+            {
+                "img": "https://arxiv.org/html/2608.08020/2608.08020v2/x8.png",
+                "caption": "",
+                "position": 1080
+            }
+        ]
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.08020/2608.08020v2/x9.png",
+                "caption": "Figure 9:Pairwise ranking accuracy vs. fraction of reasoning steps used (k%k\\%).Higher accuracy indicates better separation of correct and incorrect traces given only a partial prefix.",
+                "position": 1805
+            },
+            {
+                "img": "https://arxiv.org/html/2608.08020/2608.08020v2/x10.png",
+                "caption": "Figure 10:Hyperparameter sensitivity of Gambit on AIME-25 with DeepSeek-R1-0528-8B (batch size 256,C=256C{=}256).\nEach panel varies one parameter while fixing the others to the selected configuration(K=16,Δ=200,w=12​K,r=0.9)(K{=}16,\\Delta{=}200,w{=}12\\mathrm{K},r{=}0.9).\nThe dashed line denotes the SC@256 baseline (83.3%).\nThe selected configuration (red circle) lies within a broad high-performing regime,\nconsistently outperforming the baseline.",
+                "position": 1960
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
