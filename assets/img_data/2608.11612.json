@@ -1,0 +1,221 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x1.png",
+                "caption": "Figure 1:Optimizer step time of Muon (excluding forward/backward pass) relative to AdamW for a 7B-parameter language model trained on four GH200s.\nEach colored bar adds one of our contributions on top of the previous one.\nTogether they reduce Muon’s cost from26×26\\timesAdamW to just4×4\\times.",
+                "position": 408
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2The Challenge of Scaling Muon",
+        "images": []
+    },
+    {
+        "header": "3Comparison with Related Work",
+        "images": []
+    },
+    {
+        "header": "4Gram Newton-Schulz",
+        "images": []
+    },
+    {
+        "header": "5Symmetric GEMM Kernels in CuteDSL",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x2.png",
+                "caption": "Figure 2:Left:Symmetric GEMM computes256×256256\\times 256tiles from the lower triangle and main diagonal, then transposes and copies each lower tile to the corresponding upper tile.Right:Our CuteDSL symmetric GEMM kernels benchmarked against cuBLAS GEMM kernels on Hopper and Blackwell GPUs.\nInput matrices𝑨,𝑩,𝑪{\\bm{A}},{\\bm{B}},{\\bm{C}}have dimensionsn×nn\\times n.\nFor large enoughnn, our kernels achieve a∼2×\\sim 2\\timesspeedup over cuBLAS, both with and without an epilogue addition of𝑪{\\bm{C}}.",
+                "position": 1184
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x3.png",
+                "caption": "",
+                "position": 1187
+            }
+        ]
+    },
+    {
+        "header": "6The Dion3 Update Rule",
+        "images": []
+    },
+    {
+        "header": "7Megabatching and Communication",
+        "images": []
+    },
+    {
+        "header": "8Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x4.png",
+                "caption": "Figure 3:Left:Final validation loss for 1B-parameter models trained on 100B tokens of ClimbMix with NorMuon or Dion3, as a function of row-selection fractionffand learning rateη\\eta.\nNorMuon isf=1f=1.\nBolded cell in each row shows bestη\\eta.\nOptimalη\\etas track the lineη​f=0.01\\eta\\sqrt{f}=0.01, shown in red on a log-log scale.\nNot shown:f=1,η=0.03f=1,\\eta=0.03(loss =2.2372.237) andf=1/32,η=0.04f=\\nicefrac{{1}}{{32}},\\eta=0.04(loss=2.191=2.191).Right:The same data reduced to two dimensions: validation loss as a function ofη​f\\eta\\sqrt{f}.\nFinal loss is minimized whenη​f≈0.01\\eta\\sqrt{f}\\approx 0.01.",
+                "position": 1587
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x5.png",
+                "caption": "",
+                "position": 1590
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x6.png",
+                "caption": "Figure 4:Validation loss curves for 1B-parameter models trained on 100B tokens of ClimbMix with NorMuon or Dion3 atf=1/2,1/8f=\\nicefrac{{1}}{{2}},\\nicefrac{{1}}{{8}}, or1/16\\nicefrac{{1}}{{16}}.\nEach optimizer uses its best learning rate fromFigure˜3.\nParentheses show final loss.\nAll Dion3 variants track below the fully-tuned NorMuon baseline throughout training, finishing about0.010.01points lower.",
+                "position": 1610
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x7.png",
+                "caption": "Figure 5:Validation loss over training at 14B for Dion3 (f=1/4f\\!=\\!\\nicefrac{{1}}{{4}},η=0.02\\eta\\!=\\!0.02) versus NorMuon (η=0.01\\eta\\!=\\!0.01), trained on 10B tokens of ClimbMix.\nDion3 tracks below NorMuon throughout.",
+                "position": 1685
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x8.png",
+                "caption": "Figure 6:Optimizer step time (excluding forward/backward pass) relative to standard Muon across model scales when training on 1 GH200 (left) and FSDP over 4 GH200s (right).\nEach colored line adds one of our contributions on top of the previous one; AdamW is shown for reference.\nLines show median over 25 steps and bands show interquartile range.\nAdding each of our contributions consistently reduces runtime; together they achieve a6×6\\timesspeedup for larger models.",
+                "position": 1704
+            }
+        ]
+    },
+    {
+        "header": "9Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAlternative Experiments on Gram Newton-Schulz",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x9.png",
+                "caption": "Figure 7:When training with Muon on a Hopper GPU, switching from standard Newton-Schulz to Gram Newton-Schulz preserves the validation perplexity throughout training (up to a 0.01 difference in GNS’s favor).\nSetup is described inSection˜A.1.",
+                "position": 2335
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/figures/blog_png/BJy11AZoWe.png",
+                "caption": "Figure 8:Newton-Schulz time per model weight for (1) standard Newton-Schulz implemented in pure PyTorch, (2) standard Newton-Schulz with our symmetric GEMM kernels, and (3) Gram Newton-Schulz with our kernels.\nWe test four architectures on a single Hopper (top) or Blackwell (bottom) GPU.\nSquare weights (𝑾Q{\\bm{W}}_{Q}or𝑾K{\\bm{W}}_{K}) benefit from the kernels.\nRectangular weights—especially those with a high aspect ratio (e.g. Up/Gate in Gemma-1B)—additionally benefit from Gram Newton-Schulz.",
+                "position": 2353
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/figures/blog_png/Bk1YJCZj-x.png",
+                "caption": "",
+                "position": 2357
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/figures/blog_png/optim_step.png",
+                "caption": "Figure 9:Optimizer step time for AdamW and Muon with three different Newton-Schulz routines on a single H100.\nGram Newton-Schulz with our symmetric kernels gives a1.31.3–2×2\\timesspeedup over standard Newton-Schulz.\nTimings include matrix splitting and recombination for QKV and MLP, learning rate scaling, weight updates, and the scalar optimizer (AdamW) step for non-2D weights.",
+                "position": 2375
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/figures/blog_png/B1w5VCZjbe.png",
+                "caption": "Figure 10:Estimated exposed Newton-Schulz time for one step of Kimi K2 with pipeline parallelism.\nWe measure the runtime of the exposed operations on a single Hopper (top) or Blackwell (bottom) GPU.\nGram Newton-Schulz with kernels is2×2\\timesfaster than standard Newton-Schulz.",
+                "position": 2393
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/figures/blog_png/HkQAVRZoWe.png",
+                "caption": "",
+                "position": 2397
+            }
+        ]
+    },
+    {
+        "header": "Appendix BStability of Gram Newton-Schulz",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/figures/gns_instability/llama_430_no_reset.png",
+                "caption": "Figure 11:Naive Gram Newton-Schulz used to train Llama-430M in half precision.\nNumerical instability wrecks training.",
+                "position": 2427
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x10.png",
+                "caption": "Figure 12:Evolution of eigenvalues of𝑹t{\\bm{R}}_{t},𝑸t{\\bm{Q}}_{t}, and𝑿t{\\bm{X}}_{t}in Naive Gram Newton-Schulz with(at,bt,ct)=(15/8,10/8,3/8)(a_{t},b_{t},c_{t})=(\\nicefrac{{15}}{{8}},\\nicefrac{{10}}{{8}},\\nicefrac{{3}}{{8}})as a function of the corresponding singular value of𝑿0{\\bm{X}}_{0}.Top:float64.Bottom:bfloat16.",
+                "position": 2451
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x11.png",
+                "caption": "",
+                "position": 2455
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x12.png",
+                "caption": "Figure 13:When𝑹t{\\bm{R}}_{t}evolves according to (4), negative eigenvalues diverge to−∞-\\infty.",
+                "position": 2502
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x13.png",
+                "caption": "Figure 14:Evolution of eigenvalues of𝑹t{\\bm{R}}_{t},𝑸t{\\bm{Q}}_{t}, and𝑿t{\\bm{X}}_{t}when all operations usefloat64except𝑹0=𝑿0​𝑿0⊤{\\bm{R}}_{0}={\\bm{X}}_{0}{\\bm{X}}_{0}^{\\top}, which usesbfloat16.",
+                "position": 2509
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x14.png",
+                "caption": "Figure 15:As the eigenvectors drift, the spectral norms of𝑹t{\\bm{R}}_{t},𝑸t{\\bm{Q}}_{t}, and𝑿t{\\bm{X}}_{t}diverge.",
+                "position": 2531
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x15.png",
+                "caption": "Figure 16:Restarting prevents the divergence of𝑹t{\\bm{R}}_{t}in half-precision.",
+                "position": 2558
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x16.png",
+                "caption": "Figure 17:Restarting curbs eigenvector drift.",
+                "position": 2567
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x17.png",
+                "caption": "Figure 18:Left:Min/max eigenvalue of𝑹t{\\bm{R}}_{t}and𝑸t{\\bm{Q}}_{t}without restarts.𝑹0{\\bm{R}}_{0}starts with a negative eigenvalue at−4⋅10−4-4\\cdot 10^{-4}.Right:Minimum eigenvalue of𝑹t{\\bm{R}}_{t}and condition number of𝑸t{\\bm{Q}}_{t}if restart is placed after iteration11,22,33, or44.\nRestarting after iteration22best controls the size of𝑸t{\\bm{Q}}_{t}.",
+                "position": 2591
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x18.png",
+                "caption": "",
+                "position": 2600
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x19.png",
+                "caption": "Figure 19:Gram Newton-Schulz with Polar Express coefficients and a restart after22iterations converges stably.",
+                "position": 2609
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/figures/gns_instability/X_final_unbounded.png",
+                "caption": "Figure 20:Theoretical behavior of both standard and Gram Newton-Schulz (Polar Express coefficients) when𝑿0{\\bm{X}}_{0}has singular values slightly above one.",
+                "position": 2633
+            }
+        ]
+    },
+    {
+        "header": "Appendix CKernel Implementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DAdditional Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x20.png",
+                "caption": "Figure 21:NCCLall_to_allover NVLink on4×4\\timesH100.Left:median all-to-all time versus payload per rank (sender) over 50 trials.\nFor small payloads, runtime is dominated by a fixed latency.Right:bus bandwidth versus payload per link (sender→\\rightarrowreceiver).\nBandwidth is near zero for small messages and does not reach8080–90%90\\%of its peak until the per-link payload is∼16{\\sim}16–3232MiB.\nAtworld_size=4\\texttt{world\\_size}=4, a256256KiB per-link payload achieves only∼10%{\\sim}10\\%of the peak bandwidth.",
+                "position": 3150
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x21.png",
+                "caption": "Figure 22:Validation loss at 1B for NorMuon and for Dion3 atf≈1f\\approx 1, on 100B tokens of ClimbMix.\nAs expected, Dion3 tracks NorMuon throughout, ending at2.21412.2141versus2.21462.2146.",
+                "position": 3247
+            },
+            {
+                "img": "https://arxiv.org/html/2608.11612/2608.11612v1/x22.png",
+                "caption": "Figure 23:Optimizer step time (excluding forward/backward pass) relative to standard Muon across model scales when training on 1 GH200 (left) and FSDP over 4 GH200s (right).\nEach colored line adds one of our contributions on top of the previous one; AdamW is shown for reference.\nLines show median over 25 steps and bands show interquartile range.\nCompare toFigure˜6.",
+                "position": 3260
+            }
+        ]
+    },
+    {
+        "header": "Appendix ECase Studies of End-to-End Training Time",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
