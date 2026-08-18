@@ -1,0 +1,82 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.15045/",
+                "caption": "Figure 1:Results overview. (a) Average scores on four streaming\nbenchmarks against open-source streaming baselines (details inTable6; the StreamingBench average covers its visual\ngroups, §6.2). (b) MOSS-VL against the best competing model on\nthe proactive streaming subsets—PA (Proactive Alerting, OmniMMI),\nPO (Proactive Output, StreamingBench), and FAR (Forward Active\nResponding, OVO-Bench), all testing whether the model speaks up\nunprompted at the right moment—and on selected offline strengths\n(details inTables6and5). Green = MOSS-VL; gray =\nthe labeled competitor.",
+                "position": 285
+            }
+        ]
+    },
+    {
+        "header": "2Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.15045/",
+                "caption": "Figure 2:MOSS-VL architecture. Images and video frames are encoded by\na 27-layer vision encoder at native dynamic resolution, then pooled2×22\\times 2and projected into visual tokens; text is tokenized alongside.\nThe LLM decoder (48 layers, initialized from Qwen3-8B) attends to visual\ntokens only through 12 tanh-gated cross-attention layers\n(Gated-XAttention, right inset), one in every four; the other 36\nself-attention layers operate on the text sequence alone, so visual\ntokens never join the decoded sequence. Cross-attention queries carry\ntext positions and keys carry three-axis XRoPE coordinates(t,h,w)(t,h,w).\nGates are zero-initialized scalars, so training starts from an intact\nlanguage backbone.",
+                "position": 517
+            },
+            {
+                "img": "https://arxiv.org/html/2608.15045/",
+                "caption": "Figure 3:XRoPE, the position encoding of the cross-attention channel.\nText tokens and visual patches share one three-axis coordinate space(t,h,w)(t,h,w), ordered by their logical position in the stream: a text\ntoken advances all three axes together, while a frame anchored at\ncoordinatetttiles its patches from(t,t,t)(t,t,t)at the top-left to(t,t+h−1,t+w−1)(t,t{+}h{-}1,t{+}w{-}1)at the bottom-right. The separator token\nclosing each frame on the vision side and that frame’s placeholder\ntoken in the text stream receive the same coordinate, so both channels\nadvance along a single shared timeline. Rotations are applied to\ntext-side queries and vision-side keys before they meet in\ncross-attention.",
+                "position": 530
+            }
+        ]
+    },
+    {
+        "header": "3Pre-Training",
+        "images": []
+    },
+    {
+        "header": "4Post-Training",
+        "images": []
+    },
+    {
+        "header": "5Infrastructure",
+        "images": []
+    },
+    {
+        "header": "6Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.15045/",
+                "caption": "Figure 4:Measured serving latency of MOSS-VL vs. Qwen3-VL-8B — the\nsame Qwen3-8B language backbone, isolating the vision-integration\narchitecture. Both models serve offline with SGLang on a single H200\n(TP=1, BF16, identical engine version) with an identical\ngeneration-length cap, which every run reaches; every point is the mean\nof five independent cold starts (error bars: sample std). (a, c) With ViT\noutput matched, the time-to-first-token (TTFT) gap widens from2.8×2.8\\timesto5.1×5.1\\timesas visual context grows, and end-to-end latency from1.9×1.9\\timesto4.3×4.3\\times. (b, d) On the same video\nat the same resolution and frame count: Qwen3-VL compresses the\ntemporal axis2×2\\times, whereas MOSS-VL forgoes temporal compression\nso that each arriving frame can be encoded immediately — carrying\nabout twice the vision tokens on the same input — yet it never\nfalls behind, and its lead grows with stream length. Slower latency\ngrowth follows from the append-only\ncross-attention design: visual tokens never enter the decoded sequence\n(§2).",
+                "position": 1477
+            },
+            {
+                "img": "https://arxiv.org/html/2608.15045/",
+                "caption": "Figure 5:MOSS-VL-Realtime in the wild: two screen-captured sessions from\nthe released live demo, running on a single H200, shown as frame strips\nwith excerpts of the model’s outputs on a shared timeline (long outputs\ntruncated with “…”;t=0t=0at the user instruction). (a) Under\na standing conditional instruction (“saygreat!whenever the\ncat touches the carrot, otherwise stay silent”), the model stays silent\nthroughout and fires exactly at each of the four contacts; the hollow\nmarker samples one of the silent spans, where the per-frame output is\nthe silence token. (b) Under a\nsingle instruction (“commentate the video live”), commentary begins\nwithin a second and tracks a free-kick sequence — set-up, the\nreferee’s whistle, the strike, the celebration, and the updated\nscoreline — in a professional broadcast register. Outputs are in\nChinese, the demo language; English translations of both sessions are\ngiven in AppendixA.2, and these and further live\ncases can be viewed on the official blog\n(https://openmoss.ai/MOSS-VL/).",
+                "position": 1816
+            }
+        ]
+    },
+    {
+        "header": "7Discussion",
+        "images": []
+    },
+    {
+        "header": "8Conclusion",
+        "images": []
+    },
+    {
+        "header": "Contributors",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AReal-Time Interaction Details",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
