@@ -1,0 +1,137 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/icon_compact.png",
+                "caption": "",
+                "position": 250
+            },
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/teaser_white_Riemann.png",
+                "caption": "Figure 1:Overview ofMatrix-Game 3.5. A real-time interactive world model for long-horizon generation with pose-aware representation, unified memory, and two-stage progressive distillation, achieving single-GPU 720p real-time generation at up to 20 FPS.",
+                "position": 301
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/fig1_injection_v2.png",
+                "caption": "Figure 2:Injection of camera\nprojection geometry into spatiotemporal RoPE.(a) Native PRoPE, designed for unordered multi-view images in novel-view\nsynthesis where no time axis is needed, splits the head dimension into disjoint\nblocks: camera projection takes half, and two quarter blocks encode the 2D patch\nrow and column; camera and position occupy disjoint subspaces and never multiply.\n(b)Tiled PRoPE, our design for video generation, tiles the camera projection\noverallchannels and multiplies it onto the full spatiotemporal RoPE (frame axis\nincluded), allocating no dedicated subspace, so the pretrained RoPE layout stays\nintact. (c) One attention link between\nframeii(query) and framejj(key/value):qqandkkare first RoPE-rotated,\nthen multiplied bytile⁡(Pi⊤)\\mathrm{tile}(P_{i}^{\\top})andtile⁡(Pj−1)\\mathrm{tile}(P_{j}^{-1}); a\nsingle softmax thus carries both the relative timeΔ​t=i−j\\Delta t=i-jand the\nrelative poseMi​j=Pi​Pj−1M_{ij}=P_{i}P_{j}^{-1}. Values are transported through the same\nrelative pose (v←P−1v\\!\\leftarrow\\!P^{-1},out←P\\mathrm{out}\\!\\leftarrow\\!P), with no\nlearnable parameters.",
+                "position": 361
+            },
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/fig_sequence_layout.png",
+                "caption": "Figure 3:The pose-aware token sequence.All token types share\none sequence, each carrying its own RoPE time and camera pose.Top:the cameras\nthat produce the sequence move along one trajectory\naround the scene, and the context frames (blue), the anchor (purple), and the noisy\ntarget frames (gray) each observe the scene from their own pose; the reference-token\nblock (teal) is a prefix for the dynamic subject, shown here linked to the character\nin the scene; its tokens\ninherit the camera pose of the current anchor rather than observing the scene from a pose\nof their own.Bottom:every camera maps\nstraight down to its position on the shared RoPE timeline. The context frames keep\ntheir true past RoPE times, separated from the generation window by a time jump\n(//); the anchor—the most recent latent frame—keeps its true RoPE time,\nimmediately preceding the generation window. The noisy target frames and the\npatch-memory tokens reuse thesametarget camera poses at thesameRoPE\ntime.",
+                "position": 395
+            },
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/mosaic_mechanism_v12.png",
+                "caption": "Figure 4:The patch-memory mechanism.(a)Lift to 3D:\nhistorical latent patches are back-projected into a common 3D space using\nmetric depth together with camera intrinsics and poses. (b)Frustum\nquery: the target camera frustum queries this patch cloud, and a z-buffer\nunder the target view keeps, for every target latent location, only the\nsurface closest to the camera while discarding occluded candidates. (c)Patch memory frame: the selected patches are scattered into an aligned\nmemory canvas under the target viewpoint; regions that are occluded or have\nnever been observed are left empty (black) and dropped from the memory token\nsequence; the diffusion model synthesizes them from the current latent,\ntext prompt, and surrounding context.",
+                "position": 432
+            },
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/decoupled_memory.png",
+                "caption": "Figure 5:Overview of the static-dynamic disentangled memory system. A motion-aware\nobject filter separates static scene observations from dynamic subjects.\nStatic regions are fused into the patch memory, while dynamic subjects are\nrepresented by reference-token memory. Subject-region masks are also\nused for context masking and an auxiliary training loss.",
+                "position": 477
+            },
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/distillation_fig1.png",
+                "caption": "Figure 6:Overview of our two-stage progressive distillation pipeline.First, causal adaptation uses teacher-forced perceptual flow matching to\nobtain a high-quality few-step causal initializer. Second, self-rollout DMD\ndirectly optimizes inference-time autoregression through a curriculum that\nprogressively distills classifier-free guidance, camera control, and\nmemory-conditioned generation.",
+                "position": 631
+            }
+        ]
+    },
+    {
+        "header": "3Data Infrastructure",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/metric_annotation_teaser_v4.png",
+                "caption": "Figure 7:Metric-scale geometric\nannotation.Left: the annotation pipeline — chunkwise VGGT-Omega inference\nover overlapping segments, per-segment metric anchoring with the Depth\nAnything 3 metric branch, and Sim(3) cross-segment alignment with a single\nglobal metric scale. Right: a reconstruction example — three views of the\nsame scene, each with its input frame and per-frame estimated metric\ndepth, and the three views\nback-projected into a shared metric frame (axes in estimated meters), yielding a\ncolored point cloud, a smoothed camera trajectory, and the\ncamera frusta of the three views. The pipeline outputs metric depth,\ncamera-to-world poses, camera intrinsics, and scale and quality\ndiagnostics.",
+                "position": 773
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/qualitative_results.png",
+                "caption": "Figure 8:Long-horizon generation in game-style environments.Columns show frames at 0, 15, 30, 45, and 60 seconds. Scene layout and local appearance remain coherent throughout extended camera motion. Red boxes in the 60-second frames mark regions that match content observed at 0 seconds,\nhighlighting long-term recall enabled by memory.",
+                "position": 1153
+            },
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/qualitative_results_real.png",
+                "caption": "Figure 9:Long-horizon generation in real-world environments.Columns show frames at 0, 15, 30, 45, and 60 seconds. The model maintains a realistic appearance and stable scene geometry across sustained camera motion. Red boxes in the 60-second frames mark regions that match content observed at 0 seconds, highlighting long-term recall enabled by memory.",
+                "position": 1157
+            },
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/qualitative_results_promptable.png",
+                "caption": "Figure 10:Prompt-controllable interactive generation.Columns show frames at 0, 15, 30, 45, and 60 seconds. From top to bottom, the user events are the appearance of a volcano, a dog, a train, and a UFO; each event is injected once and then carried forward by the per-segment prompt rewriting. For each rollout segment, a VLM combines the rollout context observed so far — including pose-ordered frames retrieved from the patch memory when available — with the camera motion and user event to rewrite a complete prompt for the next segment. The event is carried forward across segments while scene coherence and camera control are preserved.",
+                "position": 1160
+            },
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/Reference_token.png",
+                "caption": "Figure 11:Effect of dynamic-subject reference tokens.We compare matched rollouts with and without the reference-token prefix while\nkeeping all other conditions fixed. The reference frames (first column) are\ndrawn only from the causally available initialization and history, and the\nground-truth frame is shown only as an identity reference for visual\ncomparison — it is never provided to the model. Reference conditioning reduces identity and\nappearance drift under camera motion; the frames shown are taken 300–400 frames into the rollout. In the first, second, and third rows, respectively, it better preserves the soldier’s tactical vest, the protagonist’s back-mounted weapon, and the vehicle’s silver side trim.",
+                "position": 1166
+            },
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/qualitative_results_distilled.png",
+                "caption": "Figure 12:Long-horizon generation with the distilled model.Columns show frames at 0, 15, 30, 45, and 60 seconds. Rows cover four diverse outdoor environments spanning real-world and game scenes. The three-step causal student follows sustained camera motion while preserving scene structure, appearance, and fine detail throughout the rollout.",
+                "position": 1178
+            }
+        ]
+    },
+    {
+        "header": "5Related Work",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Appendix AText-Prompt Annotation Examples",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/prompt_annotation_cases_v3.png",
+                "caption": "Figure 13:Prompt-annotation examples.Each case\nshows one annotation window as four evenly spaced frames\n(left to right) with its window-level prompt below. Across game and real-world\nsources, the prompt describes the static scene and names\neach dynamic object together with its motion.",
+                "position": 1274
+            }
+        ]
+    },
+    {
+        "header": "Appendix BPreservation of RoPE’s Temporal Encoding under Tiled PRoPE",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/prope_analysis.png",
+                "caption": "Figure 14:Tiled PRoPE and the native RoPE act together in one attention kernel: temporal\nstructure is preserved, and pose similarity is rewarded. We use two synthetic trajectories here to illustrate the preservation (bottom row), and calculate frame-by-frame attention\nlogits for heatmap visualization (top row). (a) RoPE only (camera term off): the purely\ntemporal kernel, banded in frame offset. (b) Straight walk with tiled PRoPE: the map is nearly indistinguishable from (a) — the maximum change\nis empirically 1.3% of (a)’s dynamic range — adding the camera does not disrupt the\nframe-to-frame attention structure. (c) S-curve with tiled PRoPE: frames\nwith similar heading light up in blocks far from the diagonal, and\nopposite-heading frames darken. The camera raises attention exactly where\nviews are geometrically close, while the temporal ordering of (a) survives\nuntouched. This analysis was performed on the model fine-tuned from Wan2.2-TI2V-5B.",
+                "position": 1306
+            }
+        ]
+    },
+    {
+        "header": "Appendix CCamera Collision Avoidance via a Progressive 3D Occupancy Map",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.29910/2608.29910v1/collision_system.png",
+                "caption": "Figure 15:Camera collision avoidance via a progressive 3D occupancy\nmap.(a) The generated frames of a rollout segment, with the planned input\ntrajectory (blue) heading straight toward the statue. (b) Metric depth and\ncamera pose lift the observed surfaces into a unified 3D world frame and\naggregate them into voxels. (c) Voxels with enough surface observations are\nmarked as occupied (red); the planned trajectory (blue) that would pass into\nthis occupied region is corrected into an adjusted trajectory (green) that\nadvances laterally along the scene structure while staying outside a preset\nsafety margin.",
+                "position": 1323
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

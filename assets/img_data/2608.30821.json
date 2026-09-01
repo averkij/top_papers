@@ -1,0 +1,102 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.30821/2608.30821v1/teaser.png",
+                "caption": "Figure 1:Teaser.Given posed multi-view observations of a real indoor scene, our method constructs object-centric multi-view evidence, generates complete 3D assets, and places them into a composable reconstruction. The insets illustrate closed-loop rotation, translation, and scale refinement of object models against the observed scene geometry.",
+                "position": 305
+            }
+        ]
+    },
+    {
+        "header": "2Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.30821/2608.30821v1/pipeline.png",
+                "caption": "Figure 2:Overview of our method.Given posed scene observations, the parsing\nstage constructs an object-centric scene graph with per-object multi-view\nevidence and coarse 3D estimates. For each object, the multi-view evidence is\nused to synthesize a complete object-centric image, which is then lifted into a\n3D asset. GizmoAct places the asset through closed-loop 9-DoF gizmo manipulation, iteratively refining rotation, translation, and anisotropic scale until it decides that alignment is reached. The placed assets form an editable reconstruction of the captured scene.",
+                "position": 375
+            },
+            {
+                "img": "https://arxiv.org/html/2608.30821/2608.30821v1/gizmoact_observation.png",
+                "caption": "Figure 3:GizmoAct graphical observation and interaction trajectory.(a) The observation at one turn. The instruction block specifies the adjustment target and the referring cue; the main views pair the raw input image with renderings that overlay the asset, its yellow 3D box, and the gizmo showing the object’s local frame (red/green/blue axes), in which all edits are expressed. Semi-transparent green marks the model surface occluded by the scene point cloud. Auxiliary views add multi-view evidence, and orthographic views along the local axes support fine refinement. (b) A rollout in which the policy issues a flawed edit (red cross) and recovers from the resulting state (green checks). During SFT data construction, we simulate such cases through error injection and supervise only the recovery actions.",
+                "position": 516
+            },
+            {
+                "img": "https://arxiv.org/html/2608.30821/2608.30821v1/gizmoact_action_trajectory.png",
+                "caption": "Figure 4:Extended actions for coarse rotation.When the initial rotation error is large (step 1), the policy first issuesswitch_obs, which changes only the rendering mode: the next observation (step 2, enlarged in the bottom panel) shows the original-view pair together with six orthographic renderings of the asset along its signed local axes, exposing the sides the main views hide. From these views the policy predicts a singlepermute_axisaction, which selects one of the 24 axis-aligned reorientations and removes the dominant rotation residual in one step. The remaining error is repaired byupdate_pose(step 3) before the policy predictsstop(step 4). The dashed arrow marks the alternative of predicting the whole correction with a single regularupdate_pose, skipping the permutation, which is less accurate.",
+                "position": 603
+            }
+        ]
+    },
+    {
+        "header": "3Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.30821/2608.30821v1/gallery.png",
+                "caption": "Figure 5:Gallery of composed scenes.Four real captures reconstructed by Lucida, annotated with the number of captured frames and the room extent. For each scene, the left panel shows the composed object-centric scene with the capture trajectory and camera frusta overlaid; the right panels pair captured frames (top row) with renderings of the reconstructed scene from the same camera poses (bottom row). Every object is an individual complete asset, so the composed scenes are directly editable and simulation-ready.",
+                "position": 711
+            },
+            {
+                "img": "https://arxiv.org/html/2608.30821/2608.30821v1/qualitative_compare_rank-1-2.png",
+                "caption": "Figure 6:Qualitative comparison of object pose estimation on CA-1M, R2S-Object, and ADT.The leftmost column shows the scene image and a close-up with the target instance boxed. Blue renders the ground-truth model at the ground-truth pose; each method’s model, posed by its prediction, is rendered jointly with this blue reference, so their mutual occlusion—together with the three axis-aligned close-ups—reveals the pose accuracy, and the GT column shows the reference alone. Lucida aligns the generated assets more closely with the observed instances across categories, shape complexity, and viewpoints.",
+                "position": 1354
+            },
+            {
+                "img": "https://arxiv.org/html/2608.30821/2608.30821v1/qualitative_trajectory_rank-1.png",
+                "caption": "Figure 7:GizmoAct pose-refinement trajectories under different initializations.For each dataset we show a reference image with the target instance boxed, and closed-loop rollouts of the same policy initialized by Boxer, Any6D*, and SAM 3D. Each cell shows the observation at that step (main views on top, orthographic views below); arrow labels denote the predicted action: an axis permutation (P) or the rotation (R), translation (T), and scale (S) components ofupdate_pose. The finalstopaction is not shown. Any6D* uses only the depth-and-mask pose initialization from Any6D, without FoundationPose prediction or refinement. Across object categories and geometries, GizmoAct consistently refines each initialization to an accurate pose, outperforming the baseline estimates.",
+                "position": 1357
+            },
+            {
+                "img": "https://arxiv.org/html/2608.30821/2608.30821v1/figures/scene_level_exp1.png",
+                "caption": "Figure 8:Qualitative scene-level comparison.For each scene, we show the multi-view capture, a scanned reference view, the selected evaluation instances, and reconstructions rendered from the main, side, and top viewpoints. SceneGen and SAM 3D receive the same reference image and instance masks, whereas Lucida uses per-instance multi-view evidence. The asterisk marks our reconstruction restricted to the object instances included in the comparison.",
+                "position": 1360
+            },
+            {
+                "img": "https://arxiv.org/html/2608.30821/2608.30821v1/gizmoact_model_comparison_rank-3-4.png",
+                "caption": "Figure 9:Qualitative comparison of GizmoAct training strategies on two difficult examples.Each row shows the closed-loop rollout of the SFT, SFT (no context), or RL policy from the same initialization, evaluated as in\\Creftab:gizmoact-training-strategy; notation follows\\Creffig:qualitative-trajectory-rank-1. The SFT policies stop early with residual rotation errors or drift without converging, whereas RL keeps correcting the remaining rotation before stopping.",
+                "position": 1626
+            }
+        ]
+    },
+    {
+        "header": "4Related Work",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "Contributions",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2608.30821/2608.30821v1/qualitative_compare_rank-3-4.png",
+                "caption": "",
+                "position": 1773
+            },
+            {
+                "img": "https://arxiv.org/html/2608.30821/2608.30821v1/qualitative_trajectory_rank-2.png",
+                "caption": "",
+                "position": 1781
+            },
+            {
+                "img": "https://arxiv.org/html/2608.30821/2608.30821v1/qualitative_trajectory_rank-3.png",
+                "caption": "",
+                "position": 1789
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
