@@ -1,0 +1,156 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/teaser.png",
+                "caption": "Figure 1:Scal3R enables scalable online 3D reconstruction on long video streams.(a)Existing feed-forward models, such as CUT3R[82]and STream3R[40], regress absolute global poses (PtP_{t}) relative to a fixed first frame. This forces extrapolation far beyond its training distribution, resulting in catastrophic drift and geometric collapse on kilometer-scale sequences.(b)Scal3R reformulates the problem into a local multi-reference relative pose query (𝐓^t←rk\\hat{\\mathbf{T}}_{t\\leftarrow r_{k}}). By injecting lightweight learnable tokens into a frozen backbone and aggregating relative constraints via online Pose-Graph Optimization (PGO), Scal3R suppresses long-range drift and recovers globally consistent geometry. It requires only 8 hours of fine-tuning on a single GPU.",
+                "position": 317
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/motivation.png",
+                "caption": "Figure 2:Global pose regression fails under out-of-distribution sequences, while local geometry remains reliable.(a)Feed-forward models like CUT3R[82]produce accurate reconstructions for in-distribution frames (blue). However, they suffer from severe geometric collapse when extrapolating to unseen long-range trajectories (orange).(b)Our error correlation analysis reveals a critical decoupling. The global position error diverges catastrophically in the out-of-distribution region (red), while per-frame depth remains stable (blue). This finding suggests that the backbone’s local geometric representations are intact. This motivates Scal3R to freeze the base model and replace fragile global regression with stable multi-reference relative pose querying.",
+                "position": 360
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/pipeline.png",
+                "caption": "Figure 3:Overview of the Scal3R framework.For an incoming frameImaget\\text{Image}_{t}, a frozen encoder extracts dense image tokens. At the same time, historical camera tokens from selected reference frames (rk,rk−1,…r_{k},r_{k-1},\\dots) are projected using lightweight trainable MLPs to generate relative pose tokens. These tokens are concatenated and sent into a completely frozen 3D reconstruction decoder (e.g., CUT3R[82]or STream3R[40]). OurAsymmetric Attention Injectionmechanism is crucial as it ensures that relative pose tokens serve only as queries to extract geometric cues, while image tokens perform self-attention exclusively among themselves. This method preserves the original high-quality point cloud generation (XtX_{t}) through the frozen Point Head, while the trainable Relative Pose Head predicts robust multi-reference relative transformations (𝐓^t←rk\\hat{\\mathbf{T}}_{t\\leftarrow r_{k}}). Finally, an online inference backend (PGO and loop closure) aggregates these local constraints to produce a globally consistent trajectory.",
+                "position": 417
+            },
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/token_query.png",
+                "caption": "Figure 4:Asymmetric Attention Injection.Relative pose tokens are injected only\nas additional queries (Q′Q^{\\prime}), without modifying the keys and values of image tokens. This asymmetric design enables pose conditioning while preserving the pretrained image\nrepresentations intact.",
+                "position": 498
+            },
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/token_query.png",
+                "caption": "Figure 4:Asymmetric Attention Injection.Relative pose tokens are injected only\nas additional queries (Q′Q^{\\prime}), without modifying the keys and values of image tokens. This asymmetric design enables pose conditioning while preserving the pretrained image\nrepresentations intact.",
+                "position": 501
+            },
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/online_pgo.png",
+                "caption": "Figure 5:Inference pipeline and pose graph structure.To suppress accumulative drift in long sequences, incoming frames are registered via keyframe selection and pose-graph optimization over sequential, multi-reference (K=3K{=}3), and loop closure edges before being committed to the pose token buffer.",
+                "position": 506
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/vkitti_vis.png",
+                "caption": "Figure 6:Qualitative 3D reconstruction on Virtual KITTI.Comparison against CUT3R and STream3R on Scene 01 (332 m) and Scene 02 (113 m). While both baselines produce distorted or collapsed point clouds, Scal3R recovers scene geometry closely matching the ground truth across both sequences.",
+                "position": 1161
+            },
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/traj_vis.png",
+                "caption": "Figure 7:Qualitative trajectory comparison on KITTI long sequences.We visualize estimated camera trajectories on Seq. 00 and Seq. 05 against CUT3R, WinT3R, and STream3R. All baselines suffer from catastrophic drift, while Scal3R faithfully recovers the full loop structure with metric accuracy.",
+                "position": 1164
+            },
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/figures/scal3r_runtime.png",
+                "caption": "Figure 8:Per-frame runtime breakdown on KITTI.On both the CUT3R (left) and STream3R (right) backbones, the frozen forward pass dominates latency; keyframe selection, PGO, and loop detection together add only a small fraction.",
+                "position": 1167
+            },
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/loop_ablation.png",
+                "caption": "Figure 9:Robustness Analysis on KITTI.Scal3R maintains the lowest error across the full evaluation range, while competing methods suffer catastrophic divergence at moderate sequence lengths.",
+                "position": 1368
+            },
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/loop_ablation.png",
+                "caption": "Figure 10:Qualitative effect of loop closure on KITTI 07.Without loop closure, accumulated drift causes the trajectory to deviate from the ground-truth loop structure. With loop closure, Scal3R recovers a globally consistent trajectory.",
+                "position": 1374
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Overview",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.AImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix 0.BAdditional Visualizations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/more_pts_vis.png",
+                "caption": "Figure 11:More qualitative comparison on vKITTI.Scal3R produces globally consistent reconstructions with minimal trajectory drift, while baselines exhibit elongated or distorted point clouds.",
+                "position": 2387
+            },
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/more_pts_vis_tum.png",
+                "caption": "Figure 12:More qualitative comparison on TUM-Dynamic.Scal3R produces cleaner reconstructions with fewer ghosting artifacts from dynamic pedestrians on both backbones.",
+                "position": 2393
+            },
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/ablation_vis.png",
+                "caption": "Figure 13:Ablation visualizations on vKITTI.Removing keyframe selection or PGO each leads to distinct trajectory degradation.",
+                "position": 2412
+            },
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/ablation_vis_kitti.png",
+                "caption": "Figure 14:Ablation visualizations on KITTI.Disabling loop closure leaves visible gaps at revisited regions; the full system produces a globally consistent reconstruction.",
+                "position": 2418
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.CRuntime and Memory Profiling",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/figures/profile_pie_chart_best.png",
+                "caption": "Figure 15:Scal3R (CUT3R) runtime breakdown on KITTI.The model forward pass dominates latency in both configurations; all system-level components together add less than 10% overhead.",
+                "position": 2438
+            },
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/figures/profile_pie_chart_best_stream3r.png",
+                "caption": "Figure 16:Scal3R (STream3R) runtime breakdown on KITTI.The latency profile closely mirrors the CUT3R variant; system-level components remain lightweight across both backbones.",
+                "position": 2444
+            }
+        ]
+    },
+    {
+        "header": "Appendix 0.DAdditional Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/figures/kitti09_ours_vs_ttt.png",
+                "caption": "Figure 17:Qualitative effect of test-time training on KITTI Seq. 09.Adding TTT3R on top of Scal3R tightens the estimated trajectory against the ground truth, lowering ATE from 29.6 to 20.6.",
+                "position": 2860
+            },
+            {
+                "img": "https://arxiv.org/html/2609.04201/2609.04201v1/dynamic_atten_vis.png",
+                "caption": "Figure 18:Attention maps of relative pose query tokens on TUM-Dynamic.The pose query tokens attend primarily to static structures while implicitly down-weighting dynamic pedestrians, without any explicit motion segmentation.",
+                "position": 2877
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
