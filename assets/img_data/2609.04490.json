@@ -1,0 +1,87 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Methods",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.04490/2609.04490v1/figure1.jpg",
+                "caption": "Figure 1:Recurrent-state write-back in low-precision temporal\ninference.a,Seq2SeqLite: a 32-unit GRU encoder processes a high-noise\ntime-resolved fluorescence signal and initializes a 32-unit recurrent\ndecoder; the state is stored after every recurrent step and returned to the\nnext.b,Deterministic 4-bit write-back rounds each computed state to the\nnearest representable level, so proposed state changes below the half-step\nwrite boundary leave the stored state unchanged. Residual memory carries the\ndiscarded magnitude across steps; direction memory accumulates repeated\nsame-direction proposals.c,Lifetime RMSE for post-training write-back interventions on the\nQMem P2F checkpoint (trained with 4-bit state write-back) and state-precision\nsweeps of independently trained 4-bit-state and 8-bit-state reference GRUs.\nCircles: short lifetimeτ1\\tau_{1}; triangles: long lifetimeτ2\\tau_{2}; RMSE in\nnanoseconds, logarithmic axes.",
+                "position": 401
+            }
+        ]
+    },
+    {
+        "header": "3Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.04490/2609.04490v1/figure2.jpg",
+                "caption": "Figure 2:Temporal memory restores recurrent-state changes suppressed\nby coarse write-back.a,Decoder-state trajectories from the same 8-bit-state reference\nGRU under post-training deterministic 4-bit write-back and 4-bit write-back\nwith direction memory. Circles: raw computed state; colored lines: stored\nstate returned to the next step; dashed lines: 4-bit write boundaries;\ntriangles: direction-memory state transitions.b,Same-direction runs of consecutive sub-threshold proposed state\nchanges (bars: median completed run length; whiskers: to the 90th\npercentile) and the mean fraction of decoder state elements changing per\nstep. The 4-bit-state reference GRU and QMem P3 provide trained-interface\ncomparisons.c,Lifetime RMSE for the 8-bit-state reference GRU under native\n8-bit write-back and post-training 4-bit write-back with deterministic\nrounding, error feedback, residual memory, or direction memory. Circles:τ1\\tau_{1}; triangles:τ2\\tau_{2}; shading spans the native 8-bit RMSE. Panelsbandccover the complete 160,000-sample held-out test\npartition.",
+                "position": 621
+            }
+        ]
+    },
+    {
+        "header": "4Discussion",
+        "images": []
+    },
+    {
+        "header": "Supplementary material",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.04490/2609.04490v1/s1.jpg",
+                "caption": "Figure S1:Phase-resolved lifetime predictions across the QMem\nhardening trajectory.Predicted-versus-ground-truth lifetime distributions are shown for the\ncomplete 160,000-sample held-out test partition at P1, P2A, P2B, P2C, P2D,\nP2E, P2F, and P3. Blue and green density maps represent the local sample\ndensity forτ1\\tau_{1}andτ2\\tau_{2}, respectively, and the diagonal line\ndenotes ideal agreement between prediction and ground truth. The phase sequence shows how task-level behavior evolves as successive\ncomponents of the recurrent network are quantized. P2E, in which the\ncandidate activation is quantized while recurrent-state propagation remains\ncontinuous, shows substantial broadening with predictions beginning to\ncluster at discrete output levels. Introducing deterministic 4-bit\nrecurrent-state write-back at P2F further concentrates predictions at a\nsmall set of discrete lifetime levels and reduces sample-wise correspondence.\nSubsequent P3 fine-tuning restores the relationship between predicted and\nground-truth lifetimes. Common axis limits are used within each lifetime parameter to\nenable direct comparison across phases; predictions outside the displayed\ntask range are excluded from the density rendering rather than projected\nonto the plot boundaries.",
+                "position": 833
+            },
+            {
+                "img": "https://arxiv.org/html/2609.04490/2609.04490v1/s2.jpg",
+                "caption": "Figure S2:Per-unit recurrent-state usage across write-back\nconditions.Distributions across the 32 recurrent hidden units are shown for\ndeterministic P2F write-back, the fixed P2F error-feedback and\nstochastic-rounding interventions, and the native 4-bit and 8-bit reference\nmodels. Encoder and decoder units are shown in the upper and lower rows,\nrespectively.a,Recurrence-visible write probability, reported as100​[1−P​(W0)]100[1-P(W_{0})], whereP⁡(W0)P(W_{0})is the probability that an individual\nstored state element remains unchanged after a recurrent step.b,Entropy-derived effective level countNeffN_{\\mathrm{eff}},\nsummarizing the distribution of state levels visited by each recurrent\nunit.c,Number of distinct stored state levels occupied by each unit.\nIndividual circles represent recurrent units, diamonds indicate the median,\nand vertical lines span the interquartile range. Logarithmic vertical axes\nresolve the broad range of recurrent-state activity and occupancy.\nDeterministic P2F write-back produces the strongest suppression of\nrecurrence-visible decoder writes and the most restricted state-level\nusage, whereas error feedback and stochastic rounding increase recurrent\nactivity and state occupancy at the same fixed checkpoint. Condition colors\nare retained consistently across panels and with the main figures.",
+                "position": 853
+            }
+        ]
+    },
+    {
+        "header": "Supplementary Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.04490/2609.04490v1/figure4.jpg",
+                "caption": "Figure S3:An independently trained LSTM reproduces the write-back\nfailure and reveals state-specific sensitivity.a,Lifetime RMSE under native 8-bit write-back, deterministic 4-bit\nwrite-back on both recurrent states, 4-bit error feedback on both states,\nand continuous propagation.b,Interventions targeting only the cell stateccor only the\nhidden statehh(deterministic 4-bit or 4-bit error feedback) while the\nother state stays at 8-bit.c,Decoder diagnostics for the targeted state: fraction of proposed\nchanges inside the 4-bit write boundary, 90th-percentile same-direction run\nlength, state-changing writes, and sub-threshold writes that become visible.\nCircles:τ1\\tau_{1}; triangles:τ2\\tau_{2}; RMSE in nanoseconds, logarithmic\naxes.",
+                "position": 985
+            },
+            {
+                "img": "https://arxiv.org/html/2609.04490/2609.04490v1/figure3.jpg",
+                "caption": "Figure S4:State precision is not a monotonic control variable, and\nrecurrent-memory compatibility is learned.a,Post-training state-precision sweeps for independently trained\n8-bit-state and 4-bit-state reference GRUs; only the state write-back rule\nchanges while trained parameters stay fixed. The 4-bit-state sweep also\nincludes continuous propagation; native precision is marked. Circles:τ1\\tau_{1}; triangles:τ2\\tau_{2}.b,Decoder-state occupancy and lifetime error for the 4-bit-state\nreference GRU under native 4-bit versus 8-bit write-back; lines pair the\nsame decoder unit. Median occupied levels rise from 12 to 176.5 while RMSE\nworsens from 0.35/0.40 ns to 0.43/0.57 ns.c,Six stored bits per unit allocated as a 6-bit state, a 4-bit\nstate plus 2-bit residual memory, or a 4-bit state plus 2-bit direction\nmemory, compared under post-training intervention and matched training;\nlines connect matched training runs.",
+                "position": 1354
+            }
+        ]
+    },
+    {
+        "header": "Supplementary Methods for Reproducibility",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.04490/2609.04490v1/figure5.jpg",
+                "caption": "Figure S5:QMem progressively hardens the GRU to 4-bit operation with\nrecurrent-state quantization introduced last.a,QMem training sequence. Starting from full precision (P1),\n4-bit quantization is introduced sequentially for candidate kernels (P2A),\nreset-gate kernels (P2B), update-gate kernels (P2C), biases (P2D),\ncandidate activation (P2E), and recurrent state (P2F). Each quantizer remains\nactive in subsequent phases. P2F progressively moves the recurrent state onto the 4-bit grid over its\nfirst 15 epochs, after which deterministic 4-bit state write-back is\nretained. P3 continues training after the fully quantized GRU is repacked into the standard inference\ngraph. Numbers below each phase give the configured maximum epochs\n(Supplementary TableS1).b,Implemented GRU recurrence with the QMem quantization targets\nlocated on the corresponding operations. The recurrent state is stored throughQ4Q_{4}and returned asqtq_{t}to the next recurrent step.c,Unlike kernels, biases, and activation parameters, whose quantized\nvalues are reused across the sequence, the recurrent state is written again\nafter every step. Each stored state therefore conditions the following\nrecurrent computation, motivating the frozen write-back analyses in the main\ntext.",
+                "position": 1820
+            },
+            {
+                "img": "https://arxiv.org/html/2609.04490/2609.04490v1/s3.jpg",
+                "caption": "Figure S6:Training and validation dynamics across the QMem\nhardening trajectory.Training and validation mean absolute error (MAE) recorded during the\nprimary QMem trajectory are shown across P1, P2A, P2B, P2C, P2D, P2E, P2F,\nand P3. Solid and dashed curves denote training and validation values,\nrespectively, and vertical dotted lines indicate transitions between\nsuccessive hardening phases. P1 through P2E are shown in neutral gray, P2F\nis highlighted in orange at the introduction of recurrent-state\nquantization, and P3 is shown in graphite for the final repacked hard graph.\nEach phase is initialized from the best validation checkpoint of the\npreceding phase, with optimizer state reset between phases. Curves are\nplotted directly from the saved training history without smoothing.",
+                "position": 1866
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
