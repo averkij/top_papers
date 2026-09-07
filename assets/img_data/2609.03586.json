@@ -1,0 +1,151 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.03586/2609.03586v1/teaser-f.png",
+                "caption": "Figure 1.The Attention Triangle in Audio-Video Models.Top-left:baseline T2AV generation exhibits strong leakage; the pirate visually inherits parrot-like attributes and becomes the speaking source.Top-right:Ours-Text restores the pirate’s appearance, but speech remains incorrectly localized to the pirate.Bottom-left:Ours-AV correctly localizes speech to the parrot, but appearance leakage persists in the pirate.Bottom-right:Ours-Full jointly restores correct appearance and localizes speech to the intended source.\nThe prompt is shown below the figure.Four generated-video examples arranged in a two-by-two grid for a dockside scene with a pirate and a parrot. The baseline gives the pirate parrot-like visual attributes and makes the pirate speak. Ours-Text restores the pirate's appearance but leaves speech on the pirate. Ours-AV moves speech to the parrot but leaves the pirate's visual corruption. Ours-Full preserves the pirate's appearance and assigns speech to the parrot.",
+                "position": 312
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": []
+    },
+    {
+        "header": "2.Background and Related Work",
+        "images": []
+    },
+    {
+        "header": "3.Identifying the Triangle Problem",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.03586/2609.03586v1/figures/overview_text_icon.png",
+                "caption": "Figure 2.The Attention Triangle.Edge-specific biases promote attention to the intended speaker (green) and suppress leakage to the competing entity (red).Intendeddenotes amplified attention for prompt-designated pairings:source↔\\leftrightarrowsource,sound↔\\leftrightarrowsound, orsource↔\\leftrightarrowsound.Conflictingdenotes attenuated pairings between these signals and the competing source.\nThe agreement matrix𝐆V​A\\mathbf{G}_{VA}is defined in Eq.2; the intended and conflicting text-edge masks𝐌V​T\\mathbf{M}_{VT}and𝐌A​T\\mathbf{M}_{AT}are defined in Eqs.4and5, respectively.A triangular diagram with Text at the top, Audio at the lower left, and Video at the lower right. Text-audio and text-video edges receive positive bias for the intended source and negative bias for the competing source. The audio-video edge is gated to suppress cross-modal leakage. Green plus signs denote alignment with the intended source; red minus signs denote suppression of the competing source.",
+                "position": 410
+            },
+            {
+                "img": "https://arxiv.org/html/2609.03586/2609.03586v1/figures/overview_audio_icon.png",
+                "caption": "",
+                "position": 411
+            },
+            {
+                "img": "https://arxiv.org/html/2609.03586/2609.03586v1/figures/overview_video_icon.png",
+                "caption": "",
+                "position": 411
+            },
+            {
+                "img": "https://arxiv.org/html/2609.03586/2609.03586v1/t2v-vs-t2av.png",
+                "caption": "Figure 3.Cross-modal leakage in T2V vs T2AV generation.\nLeft:T2V. Middle:T2AV. Right: prompt. Adding audio induces both appearance and speaking leakage: in the puppet example, both the performer and puppet move their lips; in the dog and cat example, the dog shifts toward a cat-like appearance and both animals appear to speak.Two example rows compare text-to-video and text-to-audio-video outputs beside their prompts. In the puppet example, adding audio makes both the performer and puppet move their lips. In the dog-and-cat example, adding audio makes the dog more cat-like and makes both animals appear to speak.",
+                "position": 434
+            }
+        ]
+    },
+    {
+        "header": "4.Steering: Grounding Audio and Video Regions",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.03586/2609.03586v1/images/fig_mitigating.png",
+                "caption": "Figure 4.Mitigating audio-to-video attention leakage.Using the same prompt and random seed as in Figure1, we sum, for each video query, its attention weights over thespeech-activeaudio keys identified from the waveform shown at the bottom, then overlay the resulting spatial score on a representative frame.Left (baseline):high active-audio scores concentrate across the pirate’s face and chest, the visually canonical but prompt-incorrect human source.Right (ours):after attention-triangle steering, high scores concentrate sharply on the parrot, the entity designated by the prompt. The right panel is desaturated outside the high-scoring region to highlight the post-steering localization.Two attention-score overlays and a speech waveform compare baseline and steered generations of the pirate-and-parrot scene. During speech-active waveform intervals, baseline scores are concentrated over video-query locations on the pirate's face and chest, whereas scores after steering are concentrated on the parrot.",
+                "position": 510
+            }
+        ]
+    },
+    {
+        "header": "5.Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.03586/2609.03586v1/images/fig_v2a2v.png",
+                "caption": "Figure 5.Audio-mediated video-to-video leakage.Using the same prompt as in Figure1, we apply theV→A→VV\\to A\\to Vrow rollout in Eq.1, using𝐏V​A(ℓ)\\mathbf{P}_{VA}^{(\\ell)}for theV→AV\\to Arollout hop followed by𝐏A​V(ℓ+1)\\mathbf{P}_{AV}^{(\\ell+1)}for theA→VA\\to Vrollout hop. This exposes an indirect attention association between visual regions that is not represented by either individual cross-attention matrix alone.Left:seed mass on the parrot, the prompt-designated source.Middle:the resulting audio-token distribution after thev→av{\\to}ahop is diffuse rather than peaked, reflecting the 1D-to-2D dimensional mismatch (Sec.3).Right:after thea→va{\\to}vhop, mass has migrated onto the pirate, exposing the audio-mediated misrouting behind source-attribution leakage.Three panels trace composed video-to-audio-to-video attention in the pirate-and-parrot scene. Initial attention mass is seeded on the parrot. After the video-to-audio hop, mass is diffuse across audio tokens. After the audio-to-video hop, attention mass has migrated onto the pirate, revealing indirect source leakage.",
+                "position": 662
+            },
+            {
+                "img": "https://arxiv.org/html/2609.03586/2609.03586v1/comparsion1.png",
+                "caption": "Figure 6.Horse-neigh attribution.The prompt asks for a horse neigh that should be produced by the knight rather than the horse.\nThree representative frames are shown per method.\nAcross baselines and partial-edge variants the neigh is misattributed to the horse or the knight acquires horse-like visual features; Ours-Full both localizes the sound to the knight and preserves his appearance.\nZoomed regions indicate the active sound source.A qualitative grid compares generated frames from several baselines, partial-edge variants, and Ours-Full for a scene containing a knight and a horse. Baselines and partial variants either attribute the neigh to the horse or give the knight horse-like visual features. Ours-Full preserves the knight's appearance and attributes the neigh to him. Insets enlarge the apparent sound source.",
+                "position": 687
+            }
+        ]
+    },
+    {
+        "header": "6.Discussion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AManipulation In The Wild",
+        "images": []
+    },
+    {
+        "header": "Appendix BAdditional Qualitative Comparisons",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.03586/2609.03586v1/comparsion2.png",
+                "caption": "Figure 7.Furry-monster growl attribution.The prompt asks for a deep growl that should be produced by the teddy bear rather than the furry monster.\nThree representative frames are shown per method.\nBaselines and partial-edge variants either route the growl to the furry monster or cause the teddy to acquire monster-like visual features; Ours-Full preserves the teddy’s identity while binding the growl to it.\nZoomed regions indicate the active sound source.A qualitative grid compares generated frames from several baselines, partial-edge variants, and Ours-Full for a teddy bear beside a furry monster. Baselines and partial variants either attribute the growl to the monster or give the teddy monster-like visual features. Ours-Full preserves the teddy's identity and attributes the growl to it. Insets enlarge the apparent sound source.",
+                "position": 1760
+            }
+        ]
+    },
+    {
+        "header": "Appendix CQuantitative Evaluation Protocols",
+        "images": []
+    },
+    {
+        "header": "Appendix DUser Study",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.03586/2609.03586v1/images/user_study_screenshot_1.png",
+                "caption": "Figure 10.User-study interface.(a)Onboarding screen shown before each session, anchoring the annotators’ criteria with the parrot/pirate leading example: a side-by-side baseline-vs-steered pair illustrating the source-attribution and visual-leakage failures the study targets.(b)Per-trial annotation screen presenting two anonymized videos (Video A, Video B) generated from the same prompt and seed. The target sound and the intended source/silent-entity annotations are shown explicitly above the videos; annotators then answer three forced-choice questions (source attribution, visual leakage, and overall quality), each with the options Video A, Same, and Video B.Two screenshots of the user-study interface. The onboarding screen uses the pirate-and-parrot example to explain source-attribution and visual-leakage failures. The per-trial screen places two anonymized videos side by side, states the prompt, target sound, intended source, and silent entity, and asks forced-choice questions about source attribution, visual leakage, and overall quality.",
+                "position": 1919
+            },
+            {
+                "img": "https://arxiv.org/html/2609.03586/2609.03586v1/images/user_study_screenshot_2.png",
+                "caption": "",
+                "position": 1927
+            }
+        ]
+    },
+    {
+        "header": "Appendix EPrompts and Video Evidence",
+        "images": []
+    },
+    {
+        "header": "Appendix FLimitations",
+        "images": []
+    },
+    {
+        "header": "Appendix GAnalysis Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.03586/2609.03586v1/images/supp_ltx_attn_maps_dog_meow.png",
+                "caption": "Figure 11.Cross-modal attention routing in LTX-2.Each panel compares the unmodified baseline (upper internal row) with Ours-Full\n(lower internal row).\nColumns show the intended-source visual seed distributionπV\\pi_{V}, the\naudio-bridge attentionπA\\pi_{A}, and the returned visual massπV′\\pi^{\\prime}_{V}.\nLabels T, S, and R denote the percentage of mass assigned to the intended source, competing source, and\nresidual patches.Top:with the golden retriever as the intended source and the orange cat as the competing source, Ours-Full\nincreases intended-source mass from46.1%46.1\\%to90.3%90.3\\%and reduces competing-source mass\nfrom39.5%39.5\\%to6.6%6.6\\%.Bottom:with the polar bear as the intended source and the expedition leader as the competing source,\nintended-source mass increases from21.2%21.2\\%to88.6%88.6\\%, while competing-source mass falls\nfrom27.4%27.4\\%to2.3%2.3\\%.Two vertically stacked attention-map examples compare the baseline with Ours-Full. In the dog and cat example, returned intended-source mass rises from 46.1 to 90.3 percent and competing-source mass falls from 39.5 to 6.6 percent. In the polar bear and human example, returned intended-source mass rises from 21.2 to 88.6 percent and competing-source mass falls from 27.4 to 2.3 percent.",
+                "position": 2010
+            },
+            {
+                "img": "https://arxiv.org/html/2609.03586/2609.03586v1/images/supp_ltx_attn_maps_polar_bear_speaks.png",
+                "caption": "",
+                "position": 2012
+            },
+            {
+                "img": "https://arxiv.org/html/2609.03586/2609.03586v1/images/ovi_baseline_vs_steered.png",
+                "caption": "Figure 12.Representative Ovi comparisons.For each example, columns compare the Ovi baseline with Ours-Full, and\nrows show three matched timestamps.Left:the prompt assigns a woman’s voice to the man while the\nwoman remains silent.Right:the prompt assigns horse neighs to the pig while the horse\nremains silent.\nThe corresponding videos provide the audio comparison; these frames show\nthe visual context and temporal consistency of each output.Two side-by-side Ovi comparisons. The left block shows three matched frames of a man in black beside a woman in yellow under Baseline and Steered columns. The right block shows three matched frames of a pig beside a horse under Baseline and Steered columns.",
+                "position": 2037
+            }
+        ]
+    },
+    {
+        "header": "Appendix HSteering Design Details",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
