@@ -1,0 +1,163 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/teaser/teaser_05.png",
+                "caption": "Figure 1.We present Marigold  V2, a model and a cost-effective fine-tuning protocol that repurposes an open-source image-editing diffusion transformer (Qwen-Image-Edit) into a state-of-the-art monocular depth estimator in less than a week on a single 32GB GPU.\nOur protocol extends Marigold and its DiT follow-ups via novel Sinkhorn and representation alignment losses to sharpen details and improve geometry, while remaining affordable for individual practitioners and small labs.\nBeyond quantitative accuracy, Marigold  V2 excels qualitatively, as shown above: it faithfully reproduces sharp edges, fur, and hair-thin details, surpassing recent detail-oriented methods such as Pixel-Perfect Depth (PPD) and InfiniDepth, all while retaining the efficiency of a VAE-based model.Marigold V2 depth maps with sharp fine details versus prior methodsQualitative comparison of monocular depth estimation. Input photos are shown alongside depth maps from Marigold V2, Pixel-Perfect Depth, and InfiniDepth. Marigold V2 preserves fur, foliage, and hair-thin edges crisply, while the other methods blur or lose them.",
+                "position": 304
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": []
+    },
+    {
+        "header": "2.Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/overview/method_v03.png",
+                "caption": "Figure 2.Marigold  V2 training protocol.During Stage 1, only QLoRA adapter weights are fine-tuned, regularized by iREPA-depth, which already produces a strong model.\nStage 2 refines it further by adding SinkLoss and unfreezing the VAE decoder.\nAt inference, the deployed model requires just one forward pass through the VAE and the DiT.Architectural diagram illustrating our two-stage training protocolArchitectural diagram illustrating our two-stage training protocol, featuring a frozen VAE Encoder, DiT trained with QLoRA efficient training, and a VAE Decoder, frozen during stage 1 but trained during stage 2. There are multiple loss functions, including Sinkhorn and iREPA.",
+                "position": 417
+            }
+        ]
+    },
+    {
+        "header": "3.Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/irepa/irepa_eth_rgb.png",
+                "caption": "Figure 3.Impact of semantic feature losses.Input image, baseline prediction, with LPIPS loss, with iREPA-depth loss. The iREPA-depth variant removes artifacts most efficiently and improves fine details.An RGB image and three depth predictions arranged in a two-by-two grid.An RGB image of a hall with pillars alongside baseline, LPIPS, and iREPA depth predictions. The iREPA prediction has sharper structural details.",
+                "position": 510
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/irepa/irepa_eth_base.png",
+                "caption": "",
+                "position": 519
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/irepa/irepa_eth_lpips.png",
+                "caption": "",
+                "position": 527
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/irepa/irepa_eth.png",
+                "caption": "",
+                "position": 532
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/hypersim_gt_issue/0098_input_rgb.png",
+                "caption": "(a)HyperSim RGB Example",
+                "position": 565
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/hypersim_gt_issue/0098_input_rgb.png",
+                "caption": "(a)HyperSim RGB Example",
+                "position": 568
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/hypersim_gt_issue/0098_gt.png",
+                "caption": "(b)HyperSim Ground Truth",
+                "position": 571
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/qualitative_comparison/sinkloss_impact_v3.png",
+                "caption": "Figure 5.Qualitative impact of SinkLoss and VAE decoder unfreezing.The Stage-1 checkpoint is compared against two continued-training variants with an unfrozen VAE decoder, with and without SinkLoss. SinkLoss substantially reduces flying pixels while preserving fine detail.Example figure showing recovery of details when using our stage 2 trainingQualitative comparison of depth map results showing an input image followed by three training stages: Stage 1, Stage 2 with an unfrozen VAE but no SinkLoss, and Stage 2 with both an unfrozen VAE and SinkLoss, highlighting the reduction of artifacts.",
+                "position": 576
+            }
+        ]
+    },
+    {
+        "header": "4.Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/qualitative_comparison/dataset_comparison_v6.jpg",
+                "caption": "Figure 6.Qualitative comparison of state-of-the-art relative depth estimation methods across multiple datasets.Marigold  V2 trained with iREPA-depth and SinkLoss preserves fine details while keeping flying pixels to a minimum. Pixel-Perfect Depth produces fewer flying pixels overall but loses substantial detail. All methods use the same inference resolution without any resizing. Last row courtesy of Franco Sulli via Pexels.Qualitative comparison gridQualitative comparison grid showing relative depth estimation across eight diverse samples, comparing the proposed model against Infinidepth, Pixel-Perfect-Depth, and its own Stage 1 baseline.",
+                "position": 1165
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/qualitative_comparison/in_the_wild_v5.jpg",
+                "caption": "Figure 8.Qualitative comparison on in-the-wild images.Marigold  V2 preserves fine details better than the baselines across depth, surface normals, and albedo estimation. Rows 1, 2, and 6 are courtesy of cottonbro studio, VANNGO Ng, and Lucas Oliveira via Pexels, respectively.Qualitative comparison gridQualitative comparison grid showing relative depth estimation across five diverse samples, comparing the proposed model against Infinidepth, Pixel-Perfect-Depth, and its own Stage 1 baseline.",
+                "position": 1401
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/layered_depth/layered_depth_atrium_rgb.jpeg",
+                "caption": "Figure 9.See-through depth qualitative comparison.From left to right: input RGB, predictions of our base model and of our see-through model.",
+                "position": 1593
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/layered_depth/layered_depth_atrium_base.png",
+                "caption": "",
+                "position": 1594
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/layered_depth/layered_depth_atrium_see_through.png",
+                "caption": "",
+                "position": 1594
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/layered_depth/layered_depth_van_rgb.jpeg",
+                "caption": "",
+                "position": 1596
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/layered_depth/layered_depth_van_base.png",
+                "caption": "",
+                "position": 1596
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/layered_depth/layered_depth_van_see_through.png",
+                "caption": "",
+                "position": 1596
+            }
+        ]
+    },
+    {
+        "header": "5.Other Dense Regression Tasks",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/normals/rgb.png",
+                "caption": "Figure 10.Qualitative results: surface normals and albedo.Left: Input, angularℒ1\\mathcal{L}_{1},ℒ1\\mathcal{L}_{1}+ iREPA, and SinkLoss + iREPA. Right: Input and albedo prediction. Flowers image is courtesy of Rüveyda Akkaya via Pexels.",
+                "position": 1816
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/normals/angular1.png",
+                "caption": "",
+                "position": 1817
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/albedo/pexels-mihman-36846821-rgb.jpg",
+                "caption": "",
+                "position": 1817
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/normals/l1_irepa.png",
+                "caption": "",
+                "position": 1819
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/normals/sinkhorn_irepa.png",
+                "caption": "",
+                "position": 1819
+            },
+            {
+                "img": "https://arxiv.org/html/2609.08084/2609.08084v1/img/albedo/pexels-mihman-36846821-albedo.jpg",
+                "caption": "",
+                "position": 1819
+            }
+        ]
+    },
+    {
+        "header": "6.Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
