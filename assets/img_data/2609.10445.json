@@ -1,0 +1,154 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.10445/2609.10445v1/images/hf-logo.png",
+                "caption": "",
+                "position": 324
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.10445/2609.10445v1/images/scale_combined_metric.png",
+                "caption": "Figure 1:Performance and L2 Reasoning Rate in a combined metric averaged over four benchmarks: MIST-OEG, MGSM, Marco-Bench-MIF, and GlobalPIQA. For each benchmark, scores are averaged over all languages (not all might be supported by each model). GPT-4.1 (gpt-4-1-04-2025) is used as the judge across four rubrics of MIST-OEG. All models are evaluated by prepending an L2 reasoning phrase to the user prompt to incentivize L2 reasoning.M-Thinker-7B,R1-Distill-Qwen-7B-Multilingual,Magistral-Small-24B, andCommand A+are trained for L2 reasoning.Even the best L2 reasoning models at large scale fail to achieve perfect in-language reasoning, which shows how challenging the end-goal is.Tiny Aya L2-Thinker(ours), at 3.35B scale, achieves a decent score while being substantially smaller.",
+                "position": 395
+            },
+            {
+                "img": "https://arxiv.org/html/2609.10445/2609.10445v1/images/bridge_2.png",
+                "caption": "Figure 2:Our contribution: Creating target-language bridges between prompts and responses by optimizing multilingual reasoning capabilities through data augmentation, data mixing and carefully calibrated fine-tuning.",
+                "position": 414
+            }
+        ]
+    },
+    {
+        "header": "2Methodology",
+        "images": []
+    },
+    {
+        "header": "3Experimental Setup",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.10445/2609.10445v1/images/composition_by_region.png",
+                "caption": "Figure 3:Data composition of our multilingual reasoning data perTiny Ayaregions (Europe, Asia-Pacific, West Asia, Africa, South Asia) and data categories (Math, Science, and General)",
+                "position": 524
+            }
+        ]
+    },
+    {
+        "header": "4Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.10445/2609.10445v1/images/doomloop_facet_by_model_no_fit_1024_window.png",
+                "caption": "Figure 4:4-gram repetition score as our doomlooping proxy versus mean number of thinking tokens (log scale) across six benchmarks; error bars are ±1 s.d. across all the benchmark’s languages. Longer traces track more repetition: Qwen3.5-4B (LF) sits at the high-token, high-repetition extreme, whileTiny Aya L2-Thinkerreasons in far fewer tokens except for the competition-level PolyMath task, and shows markedly less repetition. Scores are length normalized, averaged across 1024-token windows.",
+                "position": 908
+            },
+            {
+                "img": "https://arxiv.org/html/2609.10445/2609.10445v1/images/resourcedness_tiers_lang_equal.png",
+                "caption": "Figure 5:Efficiency and coverage of L2 reasoning LLMs across tiers of language resourcedness.Tiers range from the highest-resourced (Tier 1) to the lowest-resourced (Tier 4) languages.Tiny Aya L2-Thinkermaintains broad L2 reasoning coverage across all four tiers, whereasM-Thinker-7BandMagistral-Small-24Bachieve lower L2 reasoning rates when evaluated on lower-resourced languages.Tiny Aya L2-Thinkeris also more token-efficient, using under2,0002{,}000thinking tokens on average, whileQwen3.5-4Buses far more, with token counts increasing toward the lower-resourced tiers. Values are averaged over the languages in each tier and over the benchmarks that include them.Tier 1:cs,de,en,es,fr,id,it,ja,nl,pl,pt,ru,tr,vi,zhTier 2:ar,bg,ca,el,fa,fi,he,hu,ko,no,ro,sk,sv,th,ukTier 3:bn,et,eu,gl,hi,hr,lt,mr,ms,ne,sl,sr,ta,te,urTier 4:am,cy,gu,ha,ig,jv,km,my,sn,sw,tl,wo,xh,yo,zu",
+                "position": 961
+            }
+        ]
+    },
+    {
+        "header": "5Analysis and Building Blocks",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.10445/2609.10445v1/images/all_benchmarks_region_avg_slope.png",
+                "caption": "Figure 6:Effect of language coverage across MGSM, Marco-Bench-MIF, and GlobalPIQA. Each panel shows, as coverage grows from the 1-Lang specialists to the 2-Lang regional models to the single All-Langs model, English/seen/unseen task accuracy and seen/unseen L2 reasoning rate. Task accuracy and seen LangID are flat within error bars (no interference), while unseen-language L2 reasoning rate rises monotonically, indicating that broader language coverage improves generalization to unseen languages.",
+                "position": 1052
+            },
+            {
+                "img": "https://arxiv.org/html/2609.10445/2609.10445v1/images/NR_EN_MR_sweep_combined_line_chart_2.png",
+                "caption": "Figure 7:Effect of the multilingual non-reasoning data fraction (L2 reasoning fixed at 10%; the remainder is English reasoning).Left:task accuracy.Middle:rate of reasoning in the target language (L2 reasoning rate).Right:empty thinking-trace rate. Solid lines are averaged over unseen languages, dashed over seen languages; one line per benchmark; bands show±1\\pm 1std across languages. A small non-reasoning fraction sharply improves both in-language reasoning and accuracy on unseen languages, with a sweet spot around 20–30% before the model starts skipping thinking at around 40%.",
+                "position": 1089
+            },
+            {
+                "img": "https://arxiv.org/html/2609.10445/2609.10445v1/images/en-sweep_all_benchmarks_4.png",
+                "caption": "Figure 8:English-reasoning sweep, averaged over all languages (English and our 44 translated languages). Starting from a multilingual-only model (0%), we add our extended English reasoning mix at increasing fractions (10%, 25%, 50%, 75%, 100%).Left:L2 reasoning rate. Math reasoning benchmarks (MGSM, PolyMath) stay stable, while non-math benchmarks (MIST-OEG, Marco-Bench-MIF, GlobalPIQA) show a dip at 10–25% (shaded region) before recovering as the English backbone grows.Right:Task accuracy (%, with MIST rescaled from its 1–7 scale). Math benchmarks, especially PolyMath (medium), gain substantially from a heavier English backbone via language transfer, whereas open-ended generation tasks are largely insensitive to the English fraction.",
+                "position": 1108
+            },
+            {
+                "img": "https://arxiv.org/html/2609.10445/2609.10445v1/images/data_pillars_ablation.png",
+                "caption": "Figure 9:Task accuracy and L2 reasoning rate both evolve as we add relevant data pillars: ER (English Reasoning), MR (Multilingual Reasoning), and NR (Non-Reasoning). ER was trained only with English Reasoning data. Adding Multilingual Reasoning data raises L2 Reasoning rate sharply as expected; and adding Non-Reasoning data further improves both metrics, shaping our final model,Tiny Aya L2-Thinker. Means are averaged across MGSM, PolyMath, MIST-OEG, Marco-Bench-MIF, and GlobalPIQA.",
+                "position": 1135
+            }
+        ]
+    },
+    {
+        "header": "6Related Work",
+        "images": []
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "8Limitations",
+        "images": []
+    },
+    {
+        "header": "Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ATraining",
+        "images": []
+    },
+    {
+        "header": "Appendix BTranslation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CBenchmarking Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DDecoding Settings",
+        "images": []
+    },
+    {
+        "header": "Appendix EBenchmark results by language",
+        "images": []
+    },
+    {
+        "header": "Appendix FDoomlooping score scatter plots",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.10445/2609.10445v1/images/doomloop_samples_scatter_all_benches.png",
+                "caption": "Figure 10:Per-sample doomlooping vs. thinking length. Each point is one non-empty thinking trace (log reasoning length vs. 4-gram repetition score where higher suggests more redundant traces).nnis the number of samples across all languages.Qwen3.5-4Bwith thinking-prefix language forcing produces systematically longer traces, whileTiny Aya L2-Thinkergenerates more efficient thinking traces, spending extra tokens only on hard math set (PolyMath).Magistral-Small-24Bsamples are more scattered and show weaker correlations between 4-gram repetition score and length of thinking traces.",
+                "position": 7327
+            }
+        ]
+    },
+    {
+        "header": "Appendix GAblations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.10445/2609.10445v1/images/training_strategies_pareto_grid.png",
+                "caption": "Figure 11:Pareto front of post-training strategies (mixing, merging, and sequential adaptation) for the task accuracy vs. L2 reasoning rate trade-off. Mixing is never dominated.",
+                "position": 7347
+            },
+            {
+                "img": "https://arxiv.org/html/2609.10445/2609.10445v1/images/combined_unseen_langid_with_merge.png",
+                "caption": "Figure 12:Thinking-language distribution on unseen languages, by region (rows) and benchmark (columns). Each cell stacks four bars—region specialist, All-Mix, sequential, and linearly merged specialists—split into target language, English, and other. Joint training falls back to English predictably; sequential training scatters the fallback across other languages; the merged model reasons almost entirely in English.",
+                "position": 7357
+            }
+        ]
+    },
+    {
+        "header": "Appendix HReasoning Errors",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
