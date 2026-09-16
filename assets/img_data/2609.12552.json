@@ -1,0 +1,217 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/ov_corpus_1.jpg",
+                "caption": "Figure 1:Overview.Left, RA-4M: three corpus images, the\nannotator, and one verified free-text relation per image.Middle,\nRelateAnything: its three inputs are separable (pixels, regions from any source,\npredicate strings); the regions and the five scored relations are model\noutput, and none of the predicates is among the 50 of VG150[Xu et al., 2017].Right, OV-SGG-Bench: six chance-corrected axes (centre chance, rim perfect,\nrings 0.25 apart) and the composite over A1, A2, A4, A5 and A6. The baseline\ndrawn is OvSGTR, the one system runnable on every axis and so the only one that can carry a composite; on A1 the stronger baseline is ROBIN-3B, andTab.3reports the best available on each axis. A5 isEq.4at equal graph length (§6.5).",
+                "position": 471
+            },
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/ov_corpus_2.jpg",
+                "caption": "",
+                "position": 473
+            },
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/ov_corpus_3.jpg",
+                "caption": "",
+                "position": 473
+            },
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/ov_corpus_2_masks.jpg",
+                "caption": "",
+                "position": 482
+            }
+        ]
+    },
+    {
+        "header": "2Related work",
+        "images": []
+    },
+    {
+        "header": "3The RelateAnything model",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/teaser_frame.jpg",
+                "caption": "Figure 2:Overview of RelateAnything.Band 1, the visual path.The frame goes to the\nbackbone and, unchanged, to whatever produces the regions; that producer is\nnot part of the model and its class labels are discarded. One query per box\npools the patch map, five pooled features form each ordered pair, and the\nsampled pairs are refined against one another and against the scene.Band 2, the text path and the score.Predicate strings supplied at\ninference are embedded once by a frozen encoder into a bank of unit vectors\nthat no learned layer transforms; a gate maps each embedding to the weightαp\\alpha_{p}mixing the two branches (§A.3).Band 3,\nthe loss, training only: one annotated pair scored against six predicates in\nits batch, the annotated string and its synonyms forming one positive, a\nnegative the corpus often co-annotates with the label discounted, the\ndirectional inverse never. Frame, regions and relations are those ofFig.1.",
+                "position": 876
+            },
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/textspace_combined.png",
+                "caption": "Figure 3:Direction in the text embedding space.Left two panels: pairwise\ncosines of twenty spatial predicates under the teacher and under the distilled\nstudent, same colour scale. Right two: ten spatial synonym families (107\nsurface forms) under t-SNE[van der Maaten and Hinton, 2008], same settings for both. The teacher’s\nmatrix is a near-uniform block above 0.8 in whichabove/belowis\nas close asabove/on top of, and its t-SNE panel interleaves the\nmembers of each inverse pair. The student retains the synonym blocks, drives\nthe inverse blocks to near zero and splits each inverse pair into two\nclusters. Statistics inTab.16(§B.2).",
+                "position": 1060
+            }
+        ]
+    },
+    {
+        "header": "4RA-4M: a verified free-text relation corpus",
+        "images": []
+    },
+    {
+        "header": "5OV-SGG-Bench: analysis of scene-graph evaluation and a cross-dataset protocol",
+        "images": []
+    },
+    {
+        "header": "6Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/a5_qual_1.jpg",
+                "caption": "Figure 5:Two graphs on the same boxes.Two PSG test images from the A5 run,\nthe shared YOLO-World boxes of A4 drawn and numbered, and the top ten\nrelations each system emits from the benchmark’s 56 predicates. Object names\nare the detector’s, shown for the reader only.onis set in\ngrey; each predicate carries its surprisal in bits under the PSG training\nmarginal, whichEq.4credits when the judge accepts it.\nThe baseline’s graphs consist mostly ofon; ours convey more per\nrelation and include claims a judge rejects.",
+                "position": 2347
+            },
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/a5_qual_2.jpg",
+                "caption": "",
+                "position": 2380
+            }
+        ]
+    },
+    {
+        "header": "7Analysis: decoupling object and relation prediction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/anyregion_yoloe.png",
+                "caption": "Figure 6:One relation model behind two unrelated region sources.Both rows use\none checkpoint at the same calibrated operating point (p≥0.45p\\geq 0.45, at which\nit emits PSG’s own density of 6.0 edges per image,§D.5) over\nthe same 19,103-predicate vocabulary; only the region source differs. Top:\nYOLOE[Wang et al., 2025a]run prompt-free over 4,585 tags returns seven named\nsegments, from which the model reads eight edges;food truckandcourtyardare names no scene-graph vocabulary contains. Bottom: FastSAM[Zhao et al., 2023]has a single class, so its twelve segments carry an index and\nno name, and the model still returnswearing clothing,holdingandcarrying person wearing. Names in the top row are drawn for the\nreader and never reach the model. Both panels use a proxy-scale development\ncheckpoint; they illustrate the interface rather than the operating quality.",
+                "position": 2833
+            },
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/anyregion_fastsam.png",
+                "caption": "",
+                "position": 2835
+            },
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/contact_feeding_1.png",
+                "caption": "Figure 7:The interaction region is an object feature.Cosine similarity to the\nquery patch (red dot), last state, per-image mean-centred. Left three panels:\nthe query is the subject patch nearest the object within their intersection,\nthe hand. Right three: the query is on the object, the bird. Before fine-tuning the hand query highlights the whole person; after, it highlights hand\nand bird, and an interaction region has emerged. Querying the bird yields the\nsame region, and retrieving theverbfrom it fails (Tab.28inApp.F): the region encodes which object is handled, not what is\nbeing done with it.",
+                "position": 2868
+            },
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/contact_feeding_2.png",
+                "caption": "",
+                "position": 2878
+            },
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/contact_feeding_3.png",
+                "caption": "",
+                "position": 2882
+            },
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/contact_feeding_4.png",
+                "caption": "",
+                "position": 2889
+            },
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/contact_feeding_5.png",
+                "caption": "",
+                "position": 2893
+            },
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/contact_feeding_6.png",
+                "caption": "",
+                "position": 2897
+            }
+        ]
+    },
+    {
+        "header": "8Analysis: in-domain versus cross-dataset measurement",
+        "images": []
+    },
+    {
+        "header": "9Inference cost",
+        "images": []
+    },
+    {
+        "header": "10Discussion and limitations",
+        "images": []
+    },
+    {
+        "header": "11Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AArchitecture and training details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/backbone_pca.png",
+                "caption": "Figure 9:Last-state patch features before and after relation fine-tuning,\nprojected by a single PCA fitted jointly per row (columns: image,\npre-trained, fine-tuned). Fine-tuning sharpens object-versus-background\nboundaries and part texture within objects; it does not introduce structure\nthat spans an object pair. The effect is quantified inFig.26(App.F).",
+                "position": 4664
+            },
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/deform_qual.png",
+                "caption": "Figure 10:Sampling locations of the deformable read, for one PSG-val\npair,airplane parked on roadat score 0.99. Left: attention mass\nsplatted at half-patch width. Then, per anchor (subject, object, union,\ncontact), the sampled points. The subject anchor carries 56% of the mass and\nreads the runway around the aircraft; the object and union anchors sample\nmostly outside their boxes and carry 6% each.",
+                "position": 4690
+            }
+        ]
+    },
+    {
+        "header": "Appendix BTraining objective",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/confusion_psg.png",
+                "caption": "Figure 12:Confusion of exact-string top-1 predictions on PSG test, for\nthe 22 most frequent annotated predicates: the model’s graph-constrained\ntop-1 prediction at every annotated pair, with rows normalised. The\noff-diagonal mass is not random:in front ofis predicted asbeside(0.28) andin(0.22),enclosingasbeside(0.48),attached toasbeside(0.28) andon(0.23), andcarryingaswearing(0.33). These are neighbours or entailments\nof the annotated string, and are scored as misses.",
+                "position": 5130
+            }
+        ]
+    },
+    {
+        "header": "Appendix CCorpus details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/qual_compare.png",
+                "caption": "Figure 16:The same images and boxes under both annotation layers. Top: the\nsource layer assertscabinet on speaker, whereas ours reads the\nsupport relations in the correct direction and adds semantics the closed\nschema cannot express (camera capturing monitor). Bottom: the source\nlayer contains the invertedcarriage pulling horse, ourshorse\npulling carriage,bench part of carriageandperson sitting on\nbench. Predicates in blue are semantic-pass outputs, those in grey verified\nspatial-pass outputs.",
+                "position": 5635
+            }
+        ]
+    },
+    {
+        "header": "Appendix DProtocol details",
+        "images": []
+    },
+    {
+        "header": "Appendix EAdditional results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/figures/lvis_qual.png",
+                "caption": "Figure 22:Regions from a detector prompted with the LVIS vocabulary,\nwhich the relation model never saw. YOLOE[Wang et al., 2025a]with all 1,198 LVIS\nclasses[Gupta et al., 2019]on MegaSG validation images, with the boxes passed to the\nreleased model unchanged and a 35-predicate vocabulary. The names on the\nboxes are the detector’s and are shown for the reader only; the edges are\nthose retained at the released operating point.",
+                "position": 6469
+            }
+        ]
+    },
+    {
+        "header": "Appendix FRepresentation probes",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.12552/2609.12552v1/backbone.png",
+                "caption": "Figure 26:Effect of relation fine-tuning on the DINOv3 backbone(ViT-S/16+, 200 PSG-val images). (a) Linear CKA between the pre-trained and\nfine-tuned features decreases monotonically with depth, to 0.58 at the last\nstate, whereas two fine-tuned runs underdifferentrecipes agree at\n0.94, which indicates that the task rather than the recipe determines where\nthe features go. (b) Relative weight drift is small and uniform (6–9% per\nblock for attention and MLP, 1% for the normalisation parameters) except in\nthe last block, where the query and key projections move by 23% and 18%,\nso the change is concentrated in last-block routing. (c) The learned fusion\nover the three taps shifts from 86% on the last state to 51%, recruiting\nthe mid-depth taps. (d) Patch similarity margins over unrelated regions: the\nmargin tosame-classobjects grows at every depth, whereas the margin\nto therelation partneris unchanged.",
+                "position": 6835
+            }
+        ]
+    },
+    {
+        "header": "Appendix GBackbone scaling",
+        "images": []
+    },
+    {
+        "header": "Appendix HAblations and negative results",
+        "images": []
+    },
+    {
+        "header": "Appendix IInference cost details",
+        "images": []
+    },
+    {
+        "header": "Appendix JGeneration prompts",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
