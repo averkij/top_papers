@@ -1,0 +1,440 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/te_teaser_graphic.png",
+                "caption": "Figure 1:TrackEverythingtracksallpoints acrossallframes of long videos (1000+ frames) in 3D world-coordinate space.Left:a persistent, voxel-de-duplicated 3D scene representation grows with unique scene content rather than video length, remaining practical while prior all-frame dense 3D trackers run out of memory.Right:for each input video (top) we show the output dense 3D tracks (bottom). Trails are shown for dynamic points; static content is rendered as a 3D point cloud.",
+                "position": 319
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/te_arch_sep2.png",
+                "caption": "Figure 2:TrackEverything architecture.TrackEverything processes videos in sliding windows of lengthLL.Encoding:Video frames are encoded and unprojected into a world-coordinate 3D feature cloud using depths/pointmaps from sensors or geometry predictors.Endpoint Refinement:Conditioned on source/target position embeddings and 3D WAFT feature sampling, a recurrent transformer iteratively predicts each point’s 3D offsetΔ​𝐱\\Delta\\mathbf{x}at the target timestep, visibility, and a static/dynamic classification.Trajectory Refinement:Trajectories for dynamic points are initialized via constant-velocity interpolation and refined via within-track temporal self-attention and cross-attention from track summary tokens ([cls]) to the scene cloud.Output and De-duplication:At window boundaries, points arriving at identical 3D voxels are merged by mean-pooling before initializing the subsequent window, bounding representation size across long videos.",
+                "position": 386
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": []
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_d32e4f23eb40/ours_f1.jpg",
+                "caption": "Figure 4:Qualitative comparison against baselines.TrackEverything tracks every visible point across time, including newly emerging content. Notice that only one cow is visible in the first frame, while the second cow emerges later. Sparse trackers need human-specified queries and are usually demoed with a first-frame grid; densifying queries over later frames quickly becomes prohibitive (Figure3). First-frame dense trackers have the same blind spot by design. In all visualizations, we show trails for dynamic points only; the method tracks all points and accounts for camera motion, but we omit static-point trails in the 2D renderings for clarity.",
+                "position": 1109
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_d32e4f23eb40/ours_f2.jpg",
+                "caption": "",
+                "position": 1118
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_d32e4f23eb40/ours_f3.jpg",
+                "caption": "",
+                "position": 1119
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_d32e4f23eb40/spav2-f1.jpg",
+                "caption": "",
+                "position": 1125
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_d32e4f23eb40/spav2-f2.jpg",
+                "caption": "",
+                "position": 1126
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_d32e4f23eb40/spav2-f3.jpg",
+                "caption": "",
+                "position": 1127
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_d32e4f23eb40/cotracker-f1.jpg",
+                "caption": "",
+                "position": 1133
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_d32e4f23eb40/cotracker-f2.jpg",
+                "caption": "",
+                "position": 1134
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_d32e4f23eb40/cotracker-f3.jpg",
+                "caption": "",
+                "position": 1135
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_d32e4f23eb40/deltav2-f1.jpg",
+                "caption": "",
+                "position": 1141
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_d32e4f23eb40/deltav2-f2.jpg",
+                "caption": "",
+                "position": 1142
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_d32e4f23eb40/deltav2-f3.jpg",
+                "caption": "",
+                "position": 1143
+            }
+        ]
+    },
+    {
+        "header": "5Limitations",
+        "images": []
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Generative AI Disclosure",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/deduplication_sliding_window.png",
+                "caption": "Figure 5:Sliding-window tracking and cross-window de-duplication pipeline.Top row (Windowii):A temporal window of frames is processed by TrackEverything to predict dense 3D tracks across all points.\nAt the final timestep of the window, the predicted 3D point locations (here 46k points) are voxelized by quantizing coordinates into spatial voxels and mean-pooling co-located tokens. This cross-frame de-duplication prunes redundant surface observations (reducing point count from 46k to 16k).Bottom row (Windowi+1i+1):When the subsequent frame window arrives, its frames are lifted into a 3D point cloud using a feedforward geometry predictor (or sensor depths).\nThese newly observed points are concatenated with the de-duplicated points carried over from previous windows (serving as persistent 3D scene memory) to construct the active set of points to track.\nTrackEverything then produces dense 3D trajectories for all points across all timesteps of Windowi+1i+1.\nBy chaining sliding-window processing with boundary de-duplication, TrackEverything tracks extended video sequences while bounding active token counts to unique physical scene geometry rather than video duration.",
+                "position": 1906
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/waft.png",
+                "caption": "Figure 6:3D WAFT projection and iterative refinement dynamics.Top:Projections across time under zero-velocity initialization. Source points initialized at frameT=0T=0(red dots) are projected to future timesteps (T=7T=7andT=15T=15) using camera extrinsics and intrinsics. Red dots denote projected 2D locations under the zero-velocity prior (𝐱tgt(0)=𝐱src\\mathbf{x}_{\\mathrm{tgt}}^{(0)}=\\mathbf{x}_{\\mathrm{src}}in world space); green dots mark true ground-truth (GT) locations, with green arrows atT=15T=15indicating displacement error. For static objects, camera projection accounts for ego-motion and aligns projected points near GT; for dynamic objects, world motion leads to significant spatial offset.Bottom:Zoomed-in patches across refinement iterations (Iter∈{0,1,2}\\text{Iter}\\in\\{0,1,2\\}) atT=7T=7andT=15T=15.Static point (top):The zero-velocity initialization atIter=0\\text{Iter}=0already places the sampled point close to the true location. The bilinearly sampled target feature𝐠tgt\\mathbf{g}_{\\mathrm{tgt}}closely matches the source feature𝐠src\\mathbf{g}_{\\mathrm{src}}, signaling to the model that no large displacement is required and maintaining stability across iterations 1 and 2.Dynamic point (bottom):AtIter=0\\text{Iter}=0, the zero-velocity projection misses the moving object by multiple pixels (landing on the background), creating an appearance mismatch between𝐠src\\mathbf{g}_{\\mathrm{src}}and𝐠tgt\\mathbf{g}_{\\mathrm{tgt}}in the concatenated WAFT feature.\nDriven by this mismatch, the endpoint refiner iteratively updates 3D positions: byIter=1\\text{Iter}=1the point moves substantially closer, and byIter=2\\text{Iter}=2the sampled point locks onto the correct surface feature.",
+                "position": 1969
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_breakdance/ours_f1.jpg",
+                "caption": "Figure 7:Qualitative comparison against baselineson the Breakdance sequence\n(Dance-jump and hand manipulation continue on the following pages).\nRows show TrackEverything, SpatialTracker-v2, CoTracker3, and DeltaV2; time advances left to right.\nTrackEverything tracks every visible point across time, including newly emerging content.\nSparse trackers need human-specified queries and are usually demoed with a first-frame grid;\ndensifying queries over later frames quickly becomes prohibitive (Figure3).\nFirst-frame dense trackers have the same blind spot by design.\nIn all visualizations, we show trails for dynamic points only; the method tracks all points and accounts for camera motion, but we omit static-point trails in the 2D renderings for clarity.",
+                "position": 2061
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_breakdance/ours_f2.jpg",
+                "caption": "",
+                "position": 2073
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_breakdance/ours_f3.jpg",
+                "caption": "",
+                "position": 2074
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_breakdance/spav2-f1.jpg",
+                "caption": "",
+                "position": 2080
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_breakdance/spav2-f2.jpg",
+                "caption": "",
+                "position": 2081
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_breakdance/spav2-f3.jpg",
+                "caption": "",
+                "position": 2082
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_breakdance/cotracker-f1.jpg",
+                "caption": "",
+                "position": 2088
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_breakdance/cotracker-f2.jpg",
+                "caption": "",
+                "position": 2089
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_breakdance/cotracker-f3.jpg",
+                "caption": "",
+                "position": 2090
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_breakdance/deltav2-f1.jpg",
+                "caption": "",
+                "position": 2096
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_breakdance/deltav2-f2.jpg",
+                "caption": "",
+                "position": 2097
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_breakdance/deltav2-f3.jpg",
+                "caption": "",
+                "position": 2098
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_dance_jump/ours_f1.jpg",
+                "caption": "Figure 8:Qualitative comparison against baselines(continued).\nDance-jump sequence.",
+                "position": 2111
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_dance_jump/ours_f2.jpg",
+                "caption": "",
+                "position": 2123
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_dance_jump/ours_f3.jpg",
+                "caption": "",
+                "position": 2124
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_dance_jump/spav2-f1.jpg",
+                "caption": "",
+                "position": 2130
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_dance_jump/spav2-f2.jpg",
+                "caption": "",
+                "position": 2131
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_dance_jump/spav2-f3.jpg",
+                "caption": "",
+                "position": 2132
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_dance_jump/cotracker-f1.jpg",
+                "caption": "",
+                "position": 2138
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_dance_jump/cotracker-f2.jpg",
+                "caption": "",
+                "position": 2139
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_dance_jump/cotracker-f3.jpg",
+                "caption": "",
+                "position": 2140
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_dance_jump/deltav2-f1.jpg",
+                "caption": "",
+                "position": 2146
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_dance_jump/deltav2-f2.jpg",
+                "caption": "",
+                "position": 2147
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/davis_dance_jump/deltav2-f3.jpg",
+                "caption": "",
+                "position": 2148
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_963a498a493b/ours_f1.jpg",
+                "caption": "Figure 9:Qualitative comparison against baselines(continued).\nHand-manipulation sequence.",
+                "position": 2155
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_963a498a493b/ours_f2.jpg",
+                "caption": "",
+                "position": 2167
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_963a498a493b/ours_f3.jpg",
+                "caption": "",
+                "position": 2168
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_963a498a493b/spav2-f1.jpg",
+                "caption": "",
+                "position": 2174
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_963a498a493b/spav2-f2.jpg",
+                "caption": "",
+                "position": 2175
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_963a498a493b/spav2-f3.jpg",
+                "caption": "",
+                "position": 2176
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_963a498a493b/cotracker-f1.jpg",
+                "caption": "",
+                "position": 2182
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_963a498a493b/cotracker-f2.jpg",
+                "caption": "",
+                "position": 2183
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_963a498a493b/cotracker-f3.jpg",
+                "caption": "",
+                "position": 2184
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_963a498a493b/deltav2-f1.jpg",
+                "caption": "",
+                "position": 2190
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_963a498a493b/deltav2-f2.jpg",
+                "caption": "",
+                "position": 2191
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablations_paper/mevis_963a498a493b/deltav2-f3.jpg",
+                "caption": "",
+                "position": 2192
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/ablation_combined.jpg",
+                "caption": "Figure 10:Qualitative ablations of iterative refinement and WAFT.(a) Without iterative refinement, tracks are noisier and less coherent; with refinement, trajectories follow motion more cleanly.\n(b) Without WAFT, tracks drift with long stray trails on fast motion; with WAFT, trajectories remain tightly localized on the moving subject.",
+                "position": 2198
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/davis_breakdance-flare_f1.jpg",
+                "caption": "Figure 11:Static/Dynamic Classification.Points classified as dynamic are shown in red, static in blue.\nTime advances left to right. Notice how in the last example, the model correctly classifies some tigers as static while others as dynamic, and the static/dynamic assignment shifts as objects start or stop moving within a window.",
+                "position": 2203
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/davis_breakdance-flare_f2.jpg",
+                "caption": "",
+                "position": 2212
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/davis_breakdance-flare_f3.jpg",
+                "caption": "",
+                "position": 2213
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/davis_breakdance-flare_f4.jpg",
+                "caption": "",
+                "position": 2214
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/davis_breakdance-flare_f5.jpg",
+                "caption": "",
+                "position": 2215
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/davis_dance-jump_f1.jpg",
+                "caption": "",
+                "position": 2221
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/davis_dance-jump_f2.jpg",
+                "caption": "",
+                "position": 2222
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/davis_dance-jump_f3.jpg",
+                "caption": "",
+                "position": 2223
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/davis_dance-jump_f4.jpg",
+                "caption": "",
+                "position": 2224
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/davis_dance-jump_f5.jpg",
+                "caption": "",
+                "position": 2225
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/davis_tennis_f1.jpg",
+                "caption": "",
+                "position": 2231
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/davis_tennis_f2.jpg",
+                "caption": "",
+                "position": 2232
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/davis_tennis_f3.jpg",
+                "caption": "",
+                "position": 2233
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/davis_tennis_f4.jpg",
+                "caption": "",
+                "position": 2234
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/davis_tennis_f5.jpg",
+                "caption": "",
+                "position": 2235
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/mevis_2fbec459efc2_f1.jpg",
+                "caption": "",
+                "position": 2241
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/mevis_2fbec459efc2_f2.jpg",
+                "caption": "",
+                "position": 2242
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/mevis_2fbec459efc2_f3.jpg",
+                "caption": "",
+                "position": 2243
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/mevis_2fbec459efc2_f4.jpg",
+                "caption": "",
+                "position": 2244
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/mevis_2fbec459efc2_f5.jpg",
+                "caption": "",
+                "position": 2245
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/mevis_b4d6cf8c922c_f1.jpg",
+                "caption": "",
+                "position": 2251
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/mevis_b4d6cf8c922c_f2.jpg",
+                "caption": "",
+                "position": 2252
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/mevis_b4d6cf8c922c_f3.jpg",
+                "caption": "",
+                "position": 2253
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/mevis_b4d6cf8c922c_f4.jpg",
+                "caption": "",
+                "position": 2254
+            },
+            {
+                "img": "https://arxiv.org/html/2609.30222/2609.30222v1/figures/static_dynamic/mevis_b4d6cf8c922c_f5.jpg",
+                "caption": "",
+                "position": 2255
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
