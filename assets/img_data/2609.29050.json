@@ -1,0 +1,119 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.29050/2609.29050v1/assets/pku_logo.png",
+                "caption": "",
+                "position": 376
+            },
+            {
+                "img": "https://arxiv.org/html/2609.29050/2609.29050v1/assets/szu_logo.png",
+                "caption": "",
+                "position": 376
+            },
+            {
+                "img": "https://arxiv.org/html/2609.29050/2609.29050v1/assets/qq_logo.png",
+                "caption": "",
+                "position": 376
+            },
+            {
+                "img": "https://arxiv.org/html/2609.29050/2609.29050v1/assets/logo_slca_grpo_square.png",
+                "caption": "",
+                "position": 378
+            },
+            {
+                "img": "https://arxiv.org/html/2609.29050/2609.29050v1/assets/hf_logo.png",
+                "caption": "",
+                "position": 423
+            }
+        ]
+    },
+    {
+        "header": "1  \nIntroduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.29050/2609.29050v1/case_study_main_tex.png",
+                "caption": "Diagnostic cases.Unified reward aggregation can misassign credit across tool and summary segments. Left: an unnecessary tool call is paired with a correct delivery summary. Right: correct tool evidence is paired with an incorrect refund summary. Under standard GRPO, the mixed advantage can reward bad tool use or penalize good tool use.",
+                "position": 451
+            }
+        ]
+    },
+    {
+        "header": "2  \nRelated Work",
+        "images": []
+    },
+    {
+        "header": "3  \nMethodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.29050/2609.29050v1/framework_arch.png",
+                "caption": "Figure 1:Overview of theSLCA-GRPOFramework.\n(Top) Infrastructure: SGLS enables scalable exploration via schema-constrained simulation, generating interleaved trajectories.\n(Middle) Signal: HierR decouples feedback into dense execution rewards (Rtool{\\color[rgb]{0.418,0.3711,0.8203}R^{\\mathrm{tool}}}) and terminal outcome rewards (Rsum{\\color[rgb]{0.3711,0.6406,0.3047}R^{\\mathrm{sum}}}).\n(Bottom) Optimization: SLCA decouples segment-wise advantages. By normalizing and routing advantages independently (A^tool{\\color[rgb]{0.418,0.3711,0.8203}\\hat{A}^{\\mathrm{tool}}}vs.A^sum{\\color[rgb]{0.3711,0.6406,0.3047}\\hat{A}^{\\mathrm{sum}}}), it blocks the defined summary-to-tool support path within each policy update.",
+                "position": 508
+            }
+        ]
+    },
+    {
+        "header": "4  \nExperiments",
+        "images": []
+    },
+    {
+        "header": "5  \nConclusion",
+        "images": []
+    },
+    {
+        "header": "6  \nLimitations",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional Formalism and Proofs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.29050/2609.29050v1/comparison_grpo.png",
+                "caption": "Figure 4:Mechanism of Cross-Segment Credit Misattribution and segment-locked routing. Unified advantage broadcast leaks summary rewards into tool tokens, whereas SLCA blocks this path by routing segment-wise advantages only to their corresponding tokens.",
+                "position": 1871
+            }
+        ]
+    },
+    {
+        "header": "Appendix BEmpirical Analysis of Optimization Stability",
+        "images": []
+    },
+    {
+        "header": "Appendix CDatasets and Training Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.29050/2609.29050v1/data_process.png",
+                "caption": "Figure 6:Data Processing Pipeline.The workflow applies strict relevance filtering and format check before isolating the evaluation set. The remaining training pool is split into SFT and RL partitions; the RL set combines native single-turn and decomposed multi-turn trajectories formatted for the SGLS.",
+                "position": 2740
+            },
+            {
+                "img": "https://arxiv.org/html/2609.29050/2609.29050v1/sgls_alignment.png",
+                "caption": "Figure 7:SGLS mock responses align with real-API outputs across three representative tool domains.The Semantic Mappingϕ⁡(o)\\phi(o)extracts schemas, facts, and logic, realizing three levels of alignment (Mapping Marks):Identical Valuefor deterministic tools (calculator),Identical Schemafor query-style tools (weather; individual values need not match a specific real-API snapshot but remain within plausible ranges),\nandSemantic Equivalencefor open-ended tools (search; factually consistent content differing only in phrasing).",
+                "position": 3013
+            }
+        ]
+    },
+    {
+        "header": "Appendix DAdditional Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.29050/2609.29050v1/case_study.png",
+                "caption": "Figure 9:Diagnostic Case Study: Resolving Cross-Segment Credit\nMisattribution on a parallel tool-use task.(Top) Reference trajectory and rewards.(Middle) Standard GRPO.The agent adopts a redundant,\ntrial-and-error trajectory (first issuing an unnecessarysearch_company_infocall, then retrieving the two stock\nprices throughserialget_stock_priceinvocations\nin separate turns), yet still produces a fluent, factually correct\ncomparison (Rsum=1.00{\\color[rgb]{0.3711,0.6406,0.3047}R_{\\mathrm{sum}}}{=}1.00). The tool-level decomposition\nexposes where the trajectory fails: theformatreward is\nunaffected (1.001.00), thekeyandvaluerewards\nremain high on the individual calls that do match the schema\n(1.001.00each), thenamereward is\ndiluted by the redundantsearch_company_infocall\n(0.800.80), and theparallelreward is0.00\\mathbf{0.00}because the two required stock-price queries are\nissued as separate sequential turns (further preceded by a redundant\nexploration call), rather than batched into a single parallel\ninvocation. Aggregated under the fixed weights above, this yieldsRtool=0.65{\\color[rgb]{0.418,0.3711,0.8203}R_{\\mathrm{tool}}}{=}0.65.\nBecause standard GRPO mergesRtool{\\color[rgb]{0.418,0.3711,0.8203}R_{\\mathrm{tool}}}andRsum{\\color[rgb]{0.3711,0.6406,0.3047}R_{\\mathrm{sum}}}into a single trajectory-level advantage, the high summary reward\ncan offset the structural tool penalty in the unified advantage, allowing\nthe inefficient pattern to be reinforced.(Bottom)SLCA-GRPO(Ours).The same model, trained under\nour advantage-isolation objective, produces a trajectory in which both tickers are\nknown a priori and issues asingle parallel tool callcovering AAPL and MSFT simultaneously. All five tool sub-rewards\nsaturate at1.001.00, givingRtool=1.00{\\color[rgb]{0.418,0.3711,0.8203}R_{\\mathrm{tool}}}{=}1.00while\npreservingRsum=1.00{\\color[rgb]{0.3711,0.6406,0.3047}R_{\\mathrm{sum}}}{=}1.00. By routingAtool{\\color[rgb]{0.418,0.3711,0.8203}A_{\\mathrm{tool}}}andAsum{\\color[rgb]{0.3711,0.6406,0.3047}A_{\\mathrm{sum}}}through separate optimization pathways, segment\nrouting keeps the summary signal from entering the tool-token update in\nthis example. The tool-execution score increases by+0.35+0.35while the\nsummary score remains1.001.00. The trajectory is qualitatively similar to\nthe representative single-runpred_tool_countincrease observed\nunder ToolPO on 8B (Figure8c); the two diagnostics\nuse different protocols.",
+                "position": 3975
+            }
+        ]
+    },
+    {
+        "header": "Appendix EPrompts",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
