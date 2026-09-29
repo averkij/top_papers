@@ -1,0 +1,117 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Background",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34060/2609.34060v1/figure/diagram.jpg",
+                "caption": "Figure 1:Overview of the context sharing convention and KVCMAS on an agent workflow edge from agentiito agentjj.\n(a) Agent trajectories interleave agent-specific prefix segments (PF) with shared context segments (PH). KVCMAS reuses the preceding agent’s KV cache for a PH segment when its correction is reliable and otherwise falls back to dense prefill.\n(b) KVCMAS matches the current cache representation to the online anchors of the corresponding shared segment and estimates the required KV cache correction by combining their low-rank corrections with similarity-based weights.\n(c) The corrected cache becomes the reference for the next workflow edge, chaining corrections along the agent workflow without constructing a separate context-free reference cache.",
+                "position": 342
+            }
+        ]
+    },
+    {
+        "header": "3Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34060/2609.34060v1/figure/obs_rank.png",
+                "caption": "Figure 2:Effective rank of the base cache and delta correction across layers and workloads.\nEffective rank is defined as the minimum rank retaining 90% of the singular-value energy.\nThe annotated values report the effective rank averaged across layers, and the dotted line marks rank 32.",
+                "position": 494
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34060/2609.34060v1/figure/obs_chain.png",
+                "caption": "Figure 3:KV cache reconstruction error normalized by the Frobenius norm of the target tensor, using a context-free reference (non-chained) and the source agent cache (chained).\nThe error is measured against the exact cache obtained through full prefill.\n(a) reports the error across layers, and (b) reports the error across agents in execution order A0→\\rightarrowA1→\\rightarrowA2→\\rightarrowA3, with an exact A0 cache under chained correction.",
+                "position": 520
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34060/2609.34060v1/figure/pareto.jpg",
+                "caption": "Figure 4:Benchmark accuracy and latency trade-off across the evaluated workloads.\nThe shaded region spans FullShared and NonShared, with the upper left indicating a better trade-off.\nOut-of-range results are placed on the plot boundaries and annotated with their values.\nKVCMAS consistently remains near the upper-left Pareto frontier.",
+                "position": 955
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34060/2609.34060v1/figure/matched_ttft_p50.png",
+                "caption": "Figure 5:Median (p50) TTFT under concurrent serving across shared context lengths and QPS.\nThe top row compares selective recomputation atρ=0.9\\rho=0.9with delta correction atρ=0.8\\rho=0.8, while the bottom row comparesρ=0.8\\rho=0.8withρ=0.6\\rho=0.6, respectively.\nKVComm runs out of memory at 8K and 32K shared context.",
+                "position": 985
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34060/2609.34060v1/figure/chained_ttft_p50.png",
+                "caption": "Figure 6:Median (p50) TTFT of chained and non-chained correction atρ=0.8\\rho=0.8across shared context lengths and QPS.\nNon-chained correction uses a context-free reference, while chained correction follows the preceding agent cache.",
+                "position": 992
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAnalysis of KV Cache Reuse",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34060/2609.34060v1/figure/obs_pf.png",
+                "caption": "Figure 7:Effective rank and reconstruction error of PF-induced delta corrections.\n(a) reports the layer-wise effective rank, defined as the minimum rank retaining 90% of the singular-value energy, together with the average across layers for each workload.\n(b) reports the relative reconstruction error as the retained rank increases.",
+                "position": 1677
+            }
+        ]
+    },
+    {
+        "header": "Appendix BMain Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34060/2609.34060v1/figure/matched_ttft_p90.png",
+                "caption": "Figure 8:Tail (p90) TTFT under concurrent serving across shared context lengths and QPS.\nThe reuse ratio configurations follow Figure5.",
+                "position": 2227
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34060/2609.34060v1/figure/chained_ttft_p90.png",
+                "caption": "Figure 9:Tail (p90) TTFT of chained and non-chained correction across shared context lengths and request rates atρ=0.8\\rho=0.8.\nChained correction reduces tail latency by avoiding the separate context-free reference prefill.",
+                "position": 3471
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34060/2609.34060v1/figure/matched_ttft_dec_p50.png",
+                "caption": "Figure 10:Median (p50) TTFT across request rates with 0.375K, 1.5K, and 6K shared generated tokens.\nThe non-generated shared context is fixed to 2K tokens.\nSelective recomputation atρ=0.9\\rho=0.9and0.80.8is matched with delta correction atρ=0.8\\rho=0.8and0.60.6, respectively.",
+                "position": 3635
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34060/2609.34060v1/figure/matched_ttft_dec_p90.png",
+                "caption": "Figure 11:Tail (p90) TTFT under the same accumulated-output configurations as Figure10.",
+                "position": 3642
+            }
+        ]
+    },
+    {
+        "header": "Appendix CAblation Studies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34060/2609.34060v1/figure/static.png",
+                "caption": "Figure 12:Single-stream TTFT, E2E throughput, and peak GPU memory across shared context lengths at matched reuse ratios.\nLower TTFT and memory and higher throughput indicate better efficiency.\nKVComm exceeds the NVIDIA A6000 48 GB memory capacity.",
+                "position": 4689
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34060/2609.34060v1/figure/rank.png",
+                "caption": "Figure 13:Effect of the base cache and delta correction ranks on accuracy and single-stream efficiency.\nThe upper panels report accuracy on MMLU and Video-MME, while the lower panels show TTFT, throughput, and peak GPU memory across rank combinations.\n“Full” denotes the corresponding uncompressed KV feature dimension, and the default(rC,rΔ)=(32,32)(r_{C},r_{\\Delta})=(32,32)is highlighted.",
+                "position": 5000
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

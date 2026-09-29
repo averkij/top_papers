@@ -1,0 +1,94 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Background",
+        "images": []
+    },
+    {
+        "header": "3Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34054/2609.34054v1/figure/diagram.jpg",
+                "caption": "Figure 1:Overview of KV cache construction in PReCache across consecutive agent turns.\n(A1–A3) PreLRShared uses the hidden states generated when each context segment is first processed to construct the LR caches for all agents, eliminating the separate full-length backbone processing over the accumulated contextLPL_{P}required by BaseShared.\n(B1–B5) ReBaseShared reconstructs the shared base cache from adapter-free hidden states to reduce dependency on the previous agent’s adapted representation.\nReBaseSharedDB(B2) schedules the adapted and adapter-free paths together during both prefill and decoding, whereas ReBaseSharedLP(B3–B4) performs adapter-free reconstruction as a contiguous prefill after the current agent’s turn.",
+                "position": 411
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34054/2609.34054v1/figure/err.jpg",
+                "caption": "Figure 2:Effect of reconstructing the shared base cache from adapter-free hidden states in Ministral-8B on a HotpotQA trajectory.\n(a) compares the previous agent’s and neutral base caches against the current agent’s base cache.\n(b) reports the layer-wise relative errors in the hidden states and base caches of PreLRShared and ReBaseShared.\n(c) reports the last-layer relative error across agent transitions and includes FullShared as a reference for entire KV cache reuse.",
+                "position": 481
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34054/2609.34054v1/figure/eff.png",
+                "caption": "Figure 3:Single-stream TTFT (↓\\downarrow) and per-request throughput (↑\\uparrow) over trajectory length for both backbones on a single A6000 GPU. ReBaseShared uses lazy prefill scheduling.",
+                "position": 770
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34054/2609.34054v1/figure/vllm.png",
+                "caption": "Figure 4:Serving TTFT percentiles (↓\\downarrow) and per-request throughput (↑\\uparrow) over request rate on vLLM with a fixed17.317.3k-token trajectory on a single A100 GPU. ReBaseShared uses double batching.",
+                "position": 791
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34054/2609.34054v1/figure/schedule.png",
+                "caption": "Figure 5:Efficiency comparison of LP and DB scheduling for ReBaseShared. The left panels report single-stream TTFT (↓\\downarrow) and per-request throughput (↑\\uparrow) over trajectory length. The right panels report p50 TTFT (↓\\downarrow) and per-request throughput (↑\\uparrow) over request rate with a fixed17.317.3k-token trajectory under concurrent serving.",
+                "position": 808
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34054/2609.34054v1/figure/memory.png",
+                "caption": "Figure 6:Peak GPU memory usage across trajectory lengths for LLaMA-3.1-8B.",
+                "position": 822
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAnalysis of Neutral Base Cache Reconstruction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34054/2609.34054v1/figure/cosim.png",
+                "caption": "Figure 7:Layer-wise geometry of neutral base cache reconstruction in ReBaseShared.\nEach quantity is computed per token and then averaged across tokens, prompts, and agent transitions.\nSolid and dashed lines represent base cache and hidden state measurements, respectively.\nAt the token level,ρ>2​cos⁡θ\\rho>2\\cos\\theta, or equivalentlyΓerr>1\\Gamma_{\\mathrm{err}}>1, indicates lower relative error for the neutral state than for the state constructed from the previous agent’s hidden states.",
+                "position": 1723
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAccuracy Benchmark Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34054/2609.34054v1/figure/pareto.png",
+                "caption": "Figure 8:Accuracy-latency trade-off for LLaMA-3.1-8B on HotpotQA. The panels compare benchmark accuracy with TTFT, model latency, and end-to-end latency, respectively. Higher accuracy and lower latency are preferred.",
+                "position": 1842
+            }
+        ]
+    },
+    {
+        "header": "Appendix CThroughput, TTFT, and Memory Usage",
+        "images": []
+    },
+    {
+        "header": "Appendix DLoRA Analysis",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
