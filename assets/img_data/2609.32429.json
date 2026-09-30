@@ -1,0 +1,94 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.32429/2609.32429v1/fig1.png",
+                "caption": "Figure 1:Aligning activations with quantizer geometry.Llama-3.2-3B layer 27 down-projection inputs,g=128g{=}128.(a–d)PrismQuant reduces the mean within-group range from1.761.76to0.840.84relative to Hadamard under matched asymmetric\nINT4 quantization.(e–g)Token/group traces illustrate the mechanism;\nthe dashed line marks the stored affine offset.",
+                "position": 448
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.32429/2609.32429v1/method.png",
+                "caption": "Figure 3:Overview of PrismQuant.Calibration takes the leading eigenvectorsVkV_{k}of the second momentΣ\\Sigmaand builds a rotation that turns them into per-group shared\nlevels, which the affine offsetzzrepresents outside the INT4 range.R1R_{1}is folded into the embedding, head, and all residual-facing weights;R2R_{2}is applied afterWVW_{V}and its transpose folded intoWOW_{O}so the V cache is quantized in the aligned basis; at the down-projection input only the rank-kkcorrectionI−W′​Y′⁣⊤I-W^{\\prime}Y^{\\prime\\top}and the block HadamardH128H_{128}run online (clock), withR4⊤R_{4}^{\\top}folded intoWDW_{D}.\nThe schematic uses right-acting row-vector rotations.",
+                "position": 770
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AExperimental Details and Additional Results",
+        "images": []
+    },
+    {
+        "header": "Appendix BTheoretical Foundations, Proofs, and Additional Method Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CRange Law and Metadata Budget",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.32429/2609.32429v1/fig3.png",
+                "caption": "Figure 4:From null-space geometry to a shared range law.(a)Standardized token projections at the Llama-3.2-3B layer-27 down input; arrows are the group-constant direction pulled back through each rotation.(b)Cumulative energy in the leading directions at seven layers.(c)Group range relative to paired Hadamard versus1−f\\sqrt{1-f}for 2,520 activation, 280 V-cache, and 112 multi-slot observations under one pooled fit; dashed is the identity.(d)The same fitted line on 5,342 Qwen3-30B-A3B experts held out of the fit: bin medians (Q1–Q3 bars) follow the dense reference line, and the scatter is widest for experts with fewer than 2,048 tokens.",
+                "position": 6827
+            }
+        ]
+    },
+    {
+        "header": "Appendix DEfficient Deployment and End-to-End Performance",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.32429/2609.32429v1/fig5.png",
+                "caption": "Figure 7:Practical efficiency of the compact PrismQuant implementation.The upper strip shows the two-kernelR4R_{4}computation followed by\nthe shared INT4 quantizer and GEMM; box widths do not represent time.(a)Eager prefill throughput relative to matched FP16,\nwith 2048 input tokens per sequence.(b,c)Matched CUDA Graph decode latency and peak allocated\nmemory on A40, using batch size 1 and a 2048-token prefix.(d)Local implementation ablations: pre-bound versus\ngeneric launches atT=1T=1, and completeR4R_{4}paths using\nTensor Core versus shuffle-based Kernel B atT=2048T=2048.\nEach ablation has its own reference; these are not whole-model\nspeedups.\nTiming centers are pooled medians; ablation centers are medians\nof paired-session ratios.\nWhiskers show session ranges, not confidence intervals.\nAll performance models use random weights.",
+                "position": 7237
+            }
+        ]
+    },
+    {
+        "header": "Appendix ELocal Activation Visualizations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.32429/2609.32429v1/matrixq.png",
+                "caption": "Figure 8:Local end-to-end activation magnitudes atq_projon Qwen3-8B-Base.Columns show Blocks 1, 13, 24, and 36; rows show the unrotated\nreference, Hadamard, PrismQuant (k=8k=8), and PrismQuant (k=maxk=\\max).\nThe window is sample 0, tokens 0–127, and channels 0–511,\nwithg=128g=128.\nHeights represent absolute input activations before quantization.\nLinear heights and square-root colors share limits across all\nfour rows within each column; the pale plane marksz=0z=0.\nThe rotated rows include upstream quantization effects.",
+                "position": 7774
+            },
+            {
+                "img": "https://arxiv.org/html/2609.32429/2609.32429v1/matrixd.png",
+                "caption": "Figure 9:Local end-to-end activation magnitudes atdown_projon Qwen3-8B-Base.The rotated rows are observed after the onlineR4R_{4}transform\nand before activation quantization.\nColumns show Blocks 1, 13, 24, and 36; rows show the unrotated\nreference, Hadamard, PrismQuant (k=8k=8), and PrismQuant (k=maxk=\\max).\nWe retain sample 0, tokens 0–127, and channels 0–511,\ncorresponding to four groups withg=128g=128.\nHeights are absolute activations, not centered residuals.\nEach column shares linear height limits and square-root color\nmapping across its four rows, with a palez=0z=0plane.",
+                "position": 7806
+            },
+            {
+                "img": "https://arxiv.org/html/2609.32429/2609.32429v1/matrixp.png",
+                "caption": "Figure 10:Paired-local activation magnitudes atq_projon Qwen3-8B-Base.All methods transform the same captured input tensor within\neach block, isolating the local effect of rotation.\nColumns show Blocks 1, 13, 24, and 36; rows show the unrotated\nreference, Hadamard, PrismQuant (k=8k=8), and PrismQuant (k=maxk=\\max).\nThe displayed window contains sample 0, tokens 0–127, and\nchannels 0–511, withg=128g=128and no pooling.\nHeights are linear and colors use square-root mapping,\nwith identical local limits across the four rows of each\ncolumn; the pale plane marksz=0z=0.",
+                "position": 7839
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]

@@ -1,0 +1,111 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.38057/2609.38057v1/rsi_teaser.png",
+                "caption": "Figure 1:EVO-WAM improves world action models through verified experience.Left: unseen tasks in simulation and long-horizon composite tasks in the real world.\nMiddle: the generate-verify-improve cycle, where learning from verified rollouts\nimproves task execution. Right: Cosmos3’s performance gains over successive rounds\nin simulation and the real world.",
+                "position": 390
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Preliminaries",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.38057/2609.38057v1/rsi_framework.png",
+                "caption": "Figure 2:Overview of EVO-WAM.(1) Generate:WAMr−1\\mathrm{WAM}_{r-1}autoregressively generates video-action-state trajectories from an initial scene\nand task instruction. (2) Verify: a VLM identifies task-completing prefixes, and an\nIDM checks their video-action consistency. (3) Improve: verified prefixes accumulated\nacross rounds are combined with the original training data to obtainWAMr\\mathrm{WAM}_{r}, which generates candidates for the next round.",
+                "position": 526
+            },
+            {
+                "img": "https://arxiv.org/html/2609.38057/2609.38057v1/rsi_verification.png",
+                "caption": "Figure 3:Video-action verification.(a) A VLM checks subgoals one at a time\nthrough description and judgment. (b) An IDM reconstructs actions from the generated videos and compares\nthem with WAM-generated actions at the fixed visual endpoint. Prefixes passing\nthis check undergo endpoint vote confirmation before entering training.",
+                "position": 602
+            },
+            {
+                "img": "https://arxiv.org/html/2609.38057/2609.38057v1/robotwin_task_performance.png",
+                "caption": "Figure 4:Unseen-task improvement in RoboTwin 2.0.(a) Example task scenes.\n(b) Cosmos3’s per-task success rates before self-training (Round 0) and after four rounds (Round 4).",
+                "position": 680
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.38057/2609.38057v1/RSI-task-flat_5.png",
+                "caption": "Figure 5:Real-robot tasks.Initial and goal scenes for three unseen composite tasks.",
+                "position": 1142
+            },
+            {
+                "img": "https://arxiv.org/html/2609.38057/2609.38057v1/real_robot_case_ducks.png",
+                "caption": "Figure 6:Placing two ducks.Top and bottom show real executions before and\nafter EVO-WAM. The middle shows generated candidates and their visual-goal and\nvideo-action consistency checks; prefixes passing both checks are used to update\nthe policy.",
+                "position": 1283
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ARelated Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BAdditional Experiments and Evaluation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.38057/2609.38057v1/real_robot_scene_settings.png",
+                "caption": "Figure 8:Initial configurations for physical evaluation.Three layouts\nfor Stack Bowls, three for Place Ducks, and two for Load the Air Fryer. Each task\nhas ten trials per evaluated policy: 3/3/4 across the three-layout tasks and 5/5\nacross the two air-fryer layouts.",
+                "position": 2726
+            },
+            {
+                "img": "https://arxiv.org/html/2609.38057/2609.38057v1/real_robot_case_bowls.png",
+                "caption": "Figure 9:Stacking three bowls.The instruction is: “Stack the pink bowl\non the blue bowl, then lift both together onto the white bowl.” Before shows the bowls still\nseparated. The imagined trajectories illustrate different stacking orders and\nverification outcomes; After shows the two successive stacking operations.",
+                "position": 3146
+            },
+            {
+                "img": "https://arxiv.org/html/2609.38057/2609.38057v1/real_robot_case_drawer.png",
+                "caption": "Figure 10:Loading the air fryer.The robot must pull the red handle to\nopen the drawer and transfer the bread from the plate into it. Before shows the\nbread still held by the gripper. Rollout 1 distorts the drawer and bread during\ntransfer, while Rollout 3 passes verification. After shows drawer opening,\nbread transfer, and release.",
+                "position": 3172
+            },
+            {
+                "img": "https://arxiv.org/html/2609.38057/2609.38057v1/generated_paired_execution.png",
+                "caption": "Figure 11:Generated completion and failed action execution.Top: the\nvideo generated by the 30,000-step Cosmos3 policy. Bottom: simulator execution\nof the same generated action sequence. Columns use the same action steps and\nshow the main view above the two wrist views. The generated stapler reaches the\nscale; the replayed stapler remains on the table. The last column is the end of\nthe 194-action replay. The visually accepted 120-action prefix has an IDM consistency\nerror of 0.00632283, exceeding the fixed threshold of 0.00418487, and is therefore\nrejected by the IDM.",
+                "position": 3677
+            }
+        ]
+    },
+    {
+        "header": "Appendix CImplementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.38057/2609.38057v1/verification_trace.png",
+                "caption": "Figure 12:A recorded verification trace for stacking bowls.The initial VLM\nscan proposes endpoints at step 165 (11 s) for the first subgoal and step 320\n(21.33 s) for the second.\nThe 320-action prefix passes the IDM\nthreshold, after which each endpoint receives two further assessments. Both\nsubgoals receive Accept/Accept/Reject, satisfying the two-of-three rule.\nFive complete 64-action windows are scored, and all 320 actions are retained for training. The\nimages show wrist and right external views; assessment also uses the left view.",
+                "position": 3965
+            },
+            {
+                "img": "https://arxiv.org/html/2609.38057/2609.38057v1/context_object_consistency.png",
+                "caption": "Figure 13:Object consistency during autoregressive rollout.Top: without global sink and context. Bottom: with both components.\nColumns show matched timestamps relative to each clip’s start. The yellow block\nis initially visible and is occluded by the arm at 10 s. At 12 s and 22 s,\nit is missing in the top row and preserved in the bottom row.\nEach frame shows the main camera view cropped from the source video; boxes and\nenlarged insets highlight the same fixed image region in both rows.",
+                "position": 4381
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
