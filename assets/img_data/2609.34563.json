@@ -1,0 +1,215 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/realvr_teaser_drawio_v4.png",
+                "caption": "Figure 1:ReaLVR connects visual evidence to latent reasoning.(a) ReaLVR identifies the stroller missed by LVR-7B in a complex scene; dashed boxes mark image details.\n(b) Visual and answer contrast determinewhat to preserveandwhere to supervise, during training only.\n(c) Replacing the top-8 tokens ranked by answer-to-token attention, with other states fixed, decreases correct-answer probability by 4 and 11 percentage points. The larger ReaLVR drop indicates greater local answer dependence.",
+                "position": 319
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Preliminaries",
+        "images": []
+    },
+    {
+        "header": "4ReaLVR: Outcome-Contrastive Evidence Credit",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/realvr_main_figure_v7_author.png",
+                "caption": "Figure 2:ReaLVR learns visual grounding on its own latent trajectory.The model first generates continuous latent states from the image and\nquestion. Relevant and mismatched visual prototypes specify what these\nstates should preserve. Correct and wrong answers are separately\nteacher-forced after the shared latent span; their attention contrast\ndetermines the supervision weights. The weights are detached, and the\nvisual loss trains the latent-generation process. Both supervision\nbranches are used only during training; inference follows the original\nLVR procedure.",
+                "position": 508
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/realvr_fig3_attention_comic_v4.png",
+                "caption": "Figure 3:Visual evidence and latent-token readout.Attention of\nLVR (a) and ReaLVR (b) onQwen2.5-VL-7B,\naveraged over all layers and heads and 200 HR-Bench-4K\nexamples, with image, question, and answer tokens averaged into\n8/4/4 bins and theK=8K=8latent positions shown individually.\nThe gray upper triangle is the causal mask: each query\ncan attend only to its own and earlier positions(Vaswani et al., 2017).\nEach row sums to one over allowed keys.\nGreen tick labels mark the same visual-evidence keys (44,66, and77),\nthe image bins overlapping the annotated ROI.\nThe narrow frames show latent queries reading these visual keys; the bottom\nframes show answer queries reading latent states. Panel (a) shows weak readout along both links; panel (b) shows stronger readout along both. Please see AppendixIfor further attention analyses.",
+                "position": 1040
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/realvr_fig4_counterfactual_chat_v4.png",
+                "caption": "Figure 4:Latent changes and answer updates after image edits.(a) Four edits of the same reference image.\n(b) Cosine distance between the mean-pooled latent trajectories for the original and edited inputs; zero denotes no change. Each point is the average over 512 original–edited pairs per edit type with the question held fixed, measured for both LVR and ReaLVR onQwen2.5-VL-7B. The broken vertical axis enlarges the LVR range to make its small fluctuations visible; values are unchanged.\n(c) Each user question is followed by the two model replies, read from\nthe original image to the edited image. See AppendixHfor more analysis.",
+                "position": 1060
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/realvr_fig6_slide7_chat_v5.png",
+                "caption": "Figure 5:Image and token views of the same three visual questions.ReaLVR and LVR on the same fence, bus, and icy-ground questions:\nimage saliency overlays (top) and token-pair maps (bottom).\nEach pair is labeled with its question and answer.",
+                "position": 1067
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/realvr_latent_readout_realcase_v3.png",
+                "caption": "Figure 6:A real visual answer and its latent-state text readout.ReaLVR (Gemma-3-12B) answers “27B” from an HR-Bench image (a).\nThe original vocabulary head reads each of its eight latent states as<, as it does all376376states from4747questions (b), yet\npredicts7after2,Bafter7, and</afterBduring answer generation (c). The latent\nreadouts do not form an intermediate explanation.",
+                "position": 1143
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ATraining Details and Hyperparameters",
+        "images": []
+    },
+    {
+        "header": "Appendix BThe Latent Evidence-Credit Gap",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/latent_credit_assignment_view.png",
+                "caption": "Figure B.1:From final reward to latent evidence credit.The output\nreward indicates whether the answer is correct. ReaLVR uses relevant and\nmismatched visual evidence to determine what the latent tokens should\npreserve, then contrasts ground-truth and wrong-answer readouts to determine\nwhere supervision should be stronger. Intervention separately evaluates\nwhether the answer depends on the latent tokens and is not part of the\ntraining objective.",
+                "position": 2560
+            }
+        ]
+    },
+    {
+        "header": "Appendix CExperimental and Training Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DUniform Bootstrap and Unassigned Mass",
+        "images": []
+    },
+    {
+        "header": "Appendix EDetached-Credit Gradient Decomposition",
+        "images": []
+    },
+    {
+        "header": "Appendix FLatent-Length Ablation",
+        "images": []
+    },
+    {
+        "header": "Appendix GAdditional Diagnostic Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/fig5b_slot_ablation_heatmap_comic.png",
+                "caption": "Figure G.1:Fixed-context latent-token dependence.Each cell gives the correct-answer probability after replacing the top-kkanswer-read latent tokens, with all remaining latent states held fixed.\nColumns increasekkfrom00to88. ReaLVR’s probability falls from0.700.70to0.590.59, the largest endpoint drop among the four methods.",
+                "position": 3157
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/attention_ratio_ours_monet_lvr_comic.png",
+                "caption": "Figure G.2:Target-region attention enrichment.Layer-wise answer attention on the annotated region relative to matched\nbackground windows. Values above11indicate target-region enrichment;\ngreen and red curves correspond to correct and incorrect generations,\nrespectively. Their overlap shows that alignment alone does not determine\nanswer correctness.",
+                "position": 3212
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/x1.png",
+                "caption": "",
+                "position": 3218
+            }
+        ]
+    },
+    {
+        "header": "Appendix HAdditional Qualitative Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/appendix_case01_token_saliency_large.png",
+                "caption": "Figure H.1:Attention and saliency cases (01–03).Top to bottom: the cap on a table, the bus beside a person, and the\nchair beside a tennis player.",
+                "position": 3848
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/appendix_case02_token_saliency_large.png",
+                "caption": "",
+                "position": 3850
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/appendix_case03_token_saliency_large.png",
+                "caption": "",
+                "position": 3850
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/appendix_case04_token_saliency_large.png",
+                "caption": "Figure H.2:Attention and saliency cases (04–06).Top to bottom: the object behind the blender, the furniture left of the\nheater, and a furniture-material comparison.",
+                "position": 3855
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/appendix_case05_token_saliency_large.png",
+                "caption": "",
+                "position": 3857
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/appendix_case06_token_saliency_large.png",
+                "caption": "",
+                "position": 3857
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/appendix_case07_token_saliency_large.png",
+                "caption": "Figure H.3:Attention and saliency cases (07–09).Top to bottom: pans left of the pots, the teddy-bear answer comparison,\nand a bear in water. In the middle example (Case 08), ReaLVR answers\n“teddy bear” and LVR-7B answers “blanket” to “What is touching the bed?”",
+                "position": 3862
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/case08_vsr_token_saliency_large.png",
+                "caption": "",
+                "position": 3864
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/appendix_case09_token_saliency_large.png",
+                "caption": "",
+                "position": 3864
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/case10_v7w_token_saliency_large.png",
+                "caption": "Figure H.4:Attention and saliency cases (10–12).Top to bottom: the object in front of an airplane’s front wheel,\nthe chair-and-bird scene, and the vehicle containing the pilot.",
+                "position": 3870
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/appendix_case11_token_saliency_large.png",
+                "caption": "",
+                "position": 3872
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/appendix_case12_token_saliency_large.png",
+                "caption": "",
+                "position": 3872
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/realvr_five_benchmark_cases_v1.png",
+                "caption": "Figure H.5:One question from each of the five benchmarks.Images, questions, and answers come from the official\ndatasets(Tong et al., 2024;Fu et al., 2024;Wang et al., 2025;Zhang et al., 2025).\nRobot bubbles show annotated answers, not recorded ReaLVR predictions;\nthe chart calculation is added for clarity.\nInsets enlarge source-image details, and the chart is cropped to the\nrelevant panel. Point and value labels are enlarged for readability.\nMultiple-choice options are omitted, and the chart question is shortened.",
+                "position": 3889
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/latent_slot_variance_map_comic.png",
+                "caption": "Figure H.6:Position-wise latent variation.(a) Cross-example variation. (b) Variation across questions about the same\nimage. Heatmap columns index latent positions11–1616.\n(c) Reported top-token variation gap:0.070.07for ReaLVR,0.020.02for Monet,\nand0.010.01for each LVR variant. ReaLVR concentrates more of the measured\nvariation at particular latent positions.",
+                "position": 3903
+            }
+        ]
+    },
+    {
+        "header": "Appendix IAttention Analysis Designs",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/realvr_attention_evidence_design_v2.png",
+                "caption": "Figure I.1:Visual evidence and answer readout.(a) Target-region attention relative to same-area background windows,\nshown by decoder layer and latent step;11means no preference.\nBoth heatmaps share a color scale.\n(b) Raw attention mass assigned to all image tokens before the answer.\n(c) Raw attention to each latent state from the query used to predict the\nfirst answer token, before that token is supplied.\nThe panels illustrate aggregate post-softmax quantities.",
+                "position": 3927
+            },
+            {
+                "img": "https://arxiv.org/html/2609.34563/2609.34563v1/realvr_attention_question_design_v2.png",
+                "caption": "Figure I.2:Question-dependent evidence selection.The photograph is HRBench-8K example 798(Wang et al., 2025).\nQ1 adapts its spatial-relation question; Q2 and both paraphrases are\nauthor-written. Dashed boxes mark the manually specified regions for\nthe boat-and-buildings question and the animal question.\nAll maps share a density scale normalized to a full-image mean of11.\nThe chart reports mean density within each question’s region and compares\nthat question with its paraphrase (Q​1′Q1^{\\prime}orQ​2′Q2^{\\prime}).\nThis uniform baseline differs from the matched-background baseline in\nFigureI.1.",
+                "position": 3942
+            }
+        ]
+    },
+    {
+        "header": "Appendix JPaired Counterfactual and Mass-Matched Mechanism Tests",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
