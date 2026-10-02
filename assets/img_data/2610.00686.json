@@ -1,0 +1,122 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.00686/2610.00686v1/teaser_results.png",
+                "caption": "Figure 1:From a prompt with “…orange basketball…” (left,\nuCO3D), our\nSemanTok tokenizer lets a 201M autoregressive (AR) model\ngenerate a video that keeps the ball’s shape and appearance through the\norbit with a budget of onlyk=4k{=}4tokens per latent frame.\nVideoFlexTok: at the same model’s size the ball\nis semantically misaligned, and even an11×11\\timeslarger AR model (2.29B) leaves\nits shape unstable up tok=64k{=}64. So the smaller, faster model on\nSemanTok\ntokens matches or beats the larger one of VideoFlexTok.\nRight (Kinetics-600, class “yoga”): both tokenizers at the same 2.29B AR\nsize, i.e., equal cost.\nSemanTok\nkeeps a complex body motion stable fromk=16k{=}16, and largerkkrefines its appearance and motion. Meanwhile\nVideoFlexTok\nchanges the scene\nbetweenk=4k{=}4andk=16k{=}16and poorly simulates body motion.\nBoth VideoFlexTok and SemanTok are variable-length: the AR model generates tokens coarse\nto fine, and any budgetkkdecodes to a video.\nSemanTok\nprioritizes semantic content in its first tokens, so a smallkkalready fixes what the clip contains.\nPipeline infig.2; videos on the project page.",
+                "position": 286
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.00686/2610.00686v1/overview.png",
+                "caption": "Figure 2:Overview.\n(1) Tokenizer training: encoder, FSQ, and diffusion decoder are trained\njointly, with nested dropout so that the decoder can reconstruct the clip\nfrom any token prefix.\nSemanTok keeps this VideoFlexTok recipe (orange) and adds semantic supervision from a frozen teacher: its features enter the encoder, and every retained prefix is trained to predict them (purple; details infig.3).\n(2) AR training and generation: with the tokenizer frozen, an AR model\nlearns to predict its tokens in time-first, coarse-to-fine order, and the\ndecoder trained in (1) renders any generated prefix as video.",
+                "position": 328
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.00686/2610.00686v1/architecture.png",
+                "caption": "Figure 3:The figure contrasts two tokenizer variants. VideoFlexTok\nprovides the base coarse-to-fine path\n(orange), while SemanTok changes\nits encoder input and adds a Dense DINO head and a Class DINO head\n(purple). A frozen VidTok VAE maps the clip to latents; each frame\nprojects its patches toeeand packs them withKKlearnable register tokens𝐫\\mathbf{r}:(et,0,…,et,P−1,rt,0,…,rt,K−1)(e_{t,0},\\ldots,e_{t,P-1},\\,r_{t,0},\\ldots,r_{t,K-1}), interleaved over\ntime. The time-causal encoder transforms the packed sequence, retaining\nonly the register-token outputs for FSQ; nested dropout forms the kept\ntoken prefix that conditions a time-causal decoder reconstructing VAE\nlatents under flow-matching and decoder-REPA losses. SemanTok concatenates frozen DINOv2 patch features with each\nVAE patch before projection, and adds a zero-initialized projection of\nthe matching DINO class token tort,0r_{t,0}. Readout queries in the Dense\nDINO head and Class DINO head cross-attend to the kept token prefix from\nframest′≤tt^{\\prime}\\leq t.",
+                "position": 466
+            }
+        ]
+    },
+    {
+        "header": "3Method",
+        "images": []
+    },
+    {
+        "header": "4Experimental Details",
+        "images": []
+    },
+    {
+        "header": "5Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.00686/2610.00686v1/guitar_seated_kt.png",
+                "caption": "Figure 7:2SemanTok stays ahead at both AR model sizes.Class-to-video rollouts for one Kinetics-600\nplaying-guitar label.\nAt 201M, SemanTok degrades slowly over time, while VideoFlexTok is sharp\nonly att=1t{=}1.\nVideos on the project page.",
+                "position": 774
+            },
+            {
+                "img": "https://arxiv.org/html/2610.00686/2610.00686v1/recon_idood.png",
+                "caption": "Figure 8:3SemanTok reconstructions on uCO3D from\nground-truth tokens recover the original object class at an earlierkkthan VideoFlexTok; for both in-distribution (ID) clips and\nout-of-distribution (OOD) clips.",
+                "position": 797
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "Reproducibility Statement",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AQualitative examples",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.00686/2610.00686v1/recon_uco3d_app.png",
+                "caption": "Figure 12:Tokenizer reconstruction on uCO3D from ground-truth tokens: two\nin-distribution clips and one out-of-distribution clip. PSNR and ClipV against\nVAE-GT; bold is best perkk. Videos:ReconstructionUCO3D.mp4,ReconstructionUCO3D_Flashlight.mp4.",
+                "position": 1387
+            },
+            {
+                "img": "https://arxiv.org/html/2610.00686/2610.00686v1/gen_uco3d_app.png",
+                "caption": "Figure 13:Text-to-video on uCO3D, 201M AR model; one rollout per tokenizer,\ndecoded from its firstkktokens per frame. Prompts: “A red fire\nextinguisher with a black handle and silver nozzle, sits on a countertop. It\nhas a white label on its side and a black strap around its middle.” and “A\nblack fedora hat with a short brim and small, round crown sits on a white\nsurface. It has two small holes at the top of the crown.”\nVideo:GenerationUCO3D_FireExtinguisher.mp4.",
+                "position": 1393
+            },
+            {
+                "img": "https://arxiv.org/html/2610.00686/2610.00686v1/recon_k600_app.png",
+                "caption": "Figure 14:Tokenizer reconstruction on Kinetics-600 from ground-truth tokens.\nPSNR against VAE-GT; bold is best perkk. Videos:ReconstructionK600_HockeyStop.mp4,ReconstructionK600_Luge.mp4.",
+                "position": 1402
+            },
+            {
+                "img": "https://arxiv.org/html/2610.00686/2610.00686v1/gen_k600_app.png",
+                "caption": "Figure 15:Class-to-video on Kinetics-600 (playing guitar) with a 49M AR model;\none rollout per tokenizer (the first evaluation sample of the class), decoded\nfrom its firstkktokens per frame. Video:GenerationK600_Guitar_49M.mp4.",
+                "position": 1407
+            },
+            {
+                "img": "https://arxiv.org/html/2610.00686/2610.00686v1/egg_arsize.png",
+                "caption": "Figure 16:Class-to-video on Kinetics-600 (cooking egg) across AR model sizes atk=16,32,64k{=}16,32,64, framet=9t{=}9. Each (size, tokenizer) is one rollout decoded\nfrom its firstkktokens per frame. SemanTok’s is the first evaluation sample\nof the class; VideoFlexTok’s is, per size, the one of its rollouts of the class\nclosest to SemanTok’s in ViCLIP embedding. Video:GenerationK600_CookingEgg_k16-64_ARsize.mp4.",
+                "position": 1413
+            },
+            {
+                "img": "https://arxiv.org/html/2610.00686/2610.00686v1/barbell_arsize.png",
+                "caption": "Figure 17:Text-to-video on uCO3D (out-of-distribution category) across AR model\nsizes atk=8,32,256k{=}8,32,256, framet=9t{=}9. Each (size, tokenizer) is that model’s\nevaluation rollout for the same prompt, decoded from its firstkktokens per\nframe. Prompt: “A light blue dumbbell with a hexagonal handle and a rounded\nhead sits on a surface. It has white text or numbers printed on its side, such\nas ‘Tone’ or ‘5 LB’. The overall color scheme is dominated by the blue of the\ndumbbell itself.” Video:GenerationUCO3D_Barbell_ARsize_x_k.mp4.",
+                "position": 1421
+            }
+        ]
+    },
+    {
+        "header": "Appendix BTokenizer reconstruction versus token budget",
+        "images": []
+    },
+    {
+        "header": "Appendix CWhere the tokenizers keep DINO semantics",
+        "images": []
+    },
+    {
+        "header": "Appendix DExperimental details",
+        "images": []
+    },
+    {
+        "header": "Appendix EGeneration and decoder REPA per AR size and budget",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
