@@ -1,0 +1,233 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/teaser_v7.png",
+                "caption": "Figure 1:Camera and object control from a single image.Top:the image is lifted into a background point cloud and\ncomplete rigid 3D geometry for each object, in which the user draws the\nobject and camera trajectories and, optionally, inserts a new object from\na reference image.Bottom:4Director generates videos that follow\nboth trajectories, with plausible object motion, consistent appearance and\nillumination, and the background revealed by the camera filled in.",
+                "position": 282
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/intro_v7.png",
+                "caption": "Figure 2:Control representations.Top:given an input\nimage and an object trajectory (a180∘180^{\\circ}turn in place), we compare\nfour control signals: a 2D bounding box, a 3D Gaussian blob, 3D point\ntrajectories, and our rigid 3D geometry.Bottom:capabilities of the compared representations\n(✓supported,✓ppartial,✗not supported,–not stated\nin the paper).",
+                "position": 323
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/pipeline_v6.png",
+                "caption": "Figure 3:Overview of 4Director.Left:each object is\nreconstructed once as a complete canonical mesh and moved by one rigid\ntransformation per frame; the meshes, a background point cloud and the\ncamera share one coordinate frame, in which the user prescribes the\ntrajectory of each object and the camera, and the scene is rendered to a\ndepth video (Sec.3.1).Right:theMotion Adapter, a trainable branch, injects this rigid rendering\ninto a pretrained video generator, which supplies appearance,\nillumination and non-rigid dynamics (Sec.3.2); it\nis trained onRealCOD-Rigid(Sec.4).",
+                "position": 549
+            }
+        ]
+    },
+    {
+        "header": "4TheRealCOD-RigidDataset",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/data_v3.png",
+                "caption": "Figure 4:RealCOD-Rigidannotation pipeline.From each clip\nwe estimate object masks, depth, and the camera trajectory, which together\ngive a dynamic 4D point cloud of the scene (4D Point Cloud – Dynamic);\nwe reconstruct\na canonical mesh for every masked object from the first frame\n(First Frame to 3D) and track 3D points on it as a rigid body\n(Rigid Body Tracking), which yields one rigid transformation per\nframe and aligns the canonical mesh to every frame (4D Point Cloud\n– Rigid 3D Geometry), giving the rigid 3D scene. Rendering it to a depth video yields the\ncontrol; the original clip is the training target, with its text description as\nthe prompt.",
+                "position": 687
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/IGIOU_v4.png",
+                "caption": "Table 1:Quantitative comparison on joint camera and object\ncontrol.(a) Visual quality and text alignment (FID, FVD, CLIP-SIM),\ncamera control (RotErr, TransErr) and object control (recognition rate,\nIG-IoU). Bestbold, second bestunderlined. (b)\nIdentity-Gated IoU on one frame: a vision–language judge decides whether\nthe generated object is still the same object; a valid frame contributes\nits mask IoU and an invalid frame zero (Eq.6).",
+                "position": 762
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/IGIOU_v4.png",
+                "caption": "(b)Identity-Gated IoU",
+                "position": 851
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/quali_v4.png",
+                "caption": "Figure 5:Qualitative comparison on joint camera and object\ncontrol.For each clip, the top row shows the input image and the\nprescribed trajectories, and the rows below show temporally aligned\nframes from the four baselines, 4Director and the source video.\nArrows mark the object heading, green in the source and red in the\ngenerated videos. Only 4Director completes the turn of the source video;\nthe baselines keep the original heading, turn only partway, blur or lose\nthe subject.",
+                "position": 1029
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/application_v3.png",
+                "caption": "Figure 6:Objects leaving and re-entering the view.Top left:the partial point cloud lifted from the input image; the camel walks out of\nthe camera’s view and comes back (blue arrows) while the camera stays\nfixed. For each method, the upper row is the control it receives and\nthe lower row the video generated from it. Only 4Director shows the empty\nframe while the camel is away and then brings the same camel back.",
+                "position": 1083
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/ablation_v6.png",
+                "caption": "Figure 7:Ablation on the control representation.Top:the source video and three\nalternative controls, each shown as the control video above the video\ngenerated from it; arrows mark the motorcycle heading, and only the rigid\n3D geometry follows the prescribed turn.Bottom:what each control\nencodes and its scores; the three arms are trained with the recipe of\n4Director, and the last row is 4Director as in\nTable1(a). Bestbold, second bestunderlined.",
+                "position": 1091
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion and Future Work",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AImplementation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BDataset Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CEvaluation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DLoRA Variant",
+        "images": []
+    },
+    {
+        "header": "Appendix EOcclusion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/occlusion.png",
+                "caption": "Figure 8:Occlusion.A plane is directed to fly under the bridge\nand behind its right tower.Rows 1–2:the control of SymphoMotion, a 2D box\nprojected from the 3D trajectory onto the rendered point cloud (red), and the video\nit generates.Rows 3–4:the depth control\nrendered from the rigid 3D scene and the video 4Director generates from it. Only with the depth\ncontrol does the tower hide the plane.",
+                "position": 3521
+            }
+        ]
+    },
+    {
+        "header": "Appendix FFailure Case",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/failure.png",
+                "caption": "Figure 9:Failure case.A breakdancer in a handstand is moved to\nthe right as one rigid body while the camera moves.Top:the rigid 3D scene rendered to\nRGB, for visualization only, and to the depth video that conditions the\nadapter; pixels without geometry are black in the RGB render and uniform\ngray in the depth video.Bottom:the generated dancer keeps the pose\nof the first frame throughout, following the rigid silhouette, instead of\ndancing.",
+                "position": 3542
+            }
+        ]
+    },
+    {
+        "header": "Appendix GInterfaces",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/figures/moge_omega_ui_a_authoring.png",
+                "caption": "(a)Identity",
+                "position": 3584
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/figures/moge_omega_ui_a_authoring.png",
+                "caption": "(a)Identity",
+                "position": 3587
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/figures/moge_omega_ui_b_geometry.png",
+                "caption": "(b)Geometry",
+                "position": 3590
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/figures/moge_omega_ui_viser_crop.png",
+                "caption": "(c)Trajectories",
+                "position": 3593
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/figures/user_study_form.png",
+                "caption": "Figure 11:One page of the user study.Left:the case and the\nfive anonymized results.Right:the three rating questions.",
+                "position": 3618
+            }
+        ]
+    },
+    {
+        "header": "Appendix HAuthored Trajectories and Insertions",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/Cloaked_Character.png",
+                "caption": "Figure 12:Authored camera and object trajectories (1/2).Each\npanel shows the input image and the authored trajectories on the left, the\ndepth control rendered from the rigid 3D scene in the upper row, and the\ngenerated video below it. None of these controls comes from a source\nvideo.",
+                "position": 3635
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/Ornate_Hall_Character.png",
+                "caption": "",
+                "position": 3637
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/Shielded_Warrior.png",
+                "caption": "",
+                "position": 3637
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/CourtyardRunner.png",
+                "caption": "",
+                "position": 3637
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/CrawlingBaby.png",
+                "caption": "Figure 13:Authored camera and object trajectories (2/2).As in\nFig.12. The generator supplies the non-rigid dynamics,\nillumination and background that the rigid control leaves unspecified.",
+                "position": 3644
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/skier.png",
+                "caption": "",
+                "position": 3646
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/Sports_Car.png",
+                "caption": "",
+                "position": 3646
+            }
+        ]
+    },
+    {
+        "header": "Appendix IAdditional Qualitative Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/dog.png",
+                "caption": "Figure 14:Camera and object motion.In the first two clips, the\ncamera follows a trajectory (the coloured frusta) while the object is\nmoved by its own rigid trajectory. In the third, the camera follows an arc\naround the subject and the object keeps its place, so the non-rigid dynamics come from the generator alone.",
+                "position": 3662
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/dog_agility.png",
+                "caption": "",
+                "position": 3664
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/berakdance.png",
+                "caption": "",
+                "position": 3664
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/koala.png",
+                "caption": "Figure 15:Object rotation with a static camera.The object is\nturned by180∘180^{\\circ}in place, with the camera held at the single frustum\non the left. The baselines keep the original heading or lose the subject,\nwhereas 4Director completes the turn and shows the side that turns into view.",
+                "position": 3670
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/boat.png",
+                "caption": "",
+                "position": 3672
+            },
+            {
+                "img": "https://arxiv.org/html/2610.02160/2610.02160v1/bear.png",
+                "caption": "",
+                "position": 3672
+            }
+        ]
+    },
+    {
+        "header": "Appendix JFuture Work Direction",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
