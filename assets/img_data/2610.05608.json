@@ -1,0 +1,309 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/title.png",
+                "caption": "",
+                "position": 351
+            }
+        ]
+    },
+    {
+        "header": "1  Introduction",
+        "images": []
+    },
+    {
+        "header": "2  Data Processing Pipeline",
+        "images": []
+    },
+    {
+        "header": "3  Kandinsky 6.0 Video Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/CrossDiTFusedBlock.png",
+                "caption": "Figure 1:Simplified scheme of a single Kandinsky 6.0 Video transformer block. The video (top) and audio (bottom) streams each apply self-attention, cross-attention to the text embeddings (T2V and T2A), cross-modal attention, and a feed-forward layer. In the V2A block, video queries attend to audio keys and values; in the A2V block, audio queries attend to video keys and values.",
+                "position": 841
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/CrossDiTFusedBlock_detailed.png",
+                "caption": "Figure 2:Detailed scheme of the Kandinsky 6.0 Video transformer block. Each stream has its own text encoder block and timestep embedding; the timestep embedding modulates every sub-layer through scale, shift, and gate parameters. In the cross-modal attention layers, video tokens use 3D RoPE and audio tokens use 1D RoPE.",
+                "position": 851
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sr/modules/SR_DiT.png",
+                "caption": "Figure 3:SR-DiT architecture. The noisy video latent, first-frame HQ anchor, and binary anchor mask are concatenated along the channel dimension and processed by timestep-modulated DiT blocks. The output head predicts the flow-matching velocity. The model operates without text conditioning.",
+                "position": 1078
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sr/modules/Latent_Upscaler.png",
+                "caption": "Figure 4:Latent Upscaler architecture: the×4\\times 4branch (left), the×2\\times 2branch (middle), and their building blocks (right). Both branches follow the K-VAE decoder geometry and map 64-channel LQ latents to upsampled 64-channel latents, preserving the temporal resolution. The outputs labeled ‘‘HQ latent’’ refer to the higher-resolution\nlatent grid; they retain degradations, which are subsequently\nremoved by SR-DiT.",
+                "position": 1190
+            }
+        ]
+    },
+    {
+        "header": "4  Training Stages",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/Training_pipeline.png",
+                "caption": "Figure 5:Training pipeline of Kandinsky 6.0 Video. The video stream (initialized from the pretrained Kandinsky 5.0 Video model) and the audio stream are first pre-trained separately, then fused and trained jointly in T2AV mode and in mixed T2AV/I2AV mode. Joint pre-training is followed by supervised fine-tuning with model soup, RL-based post-training, and distillation.",
+                "position": 1336
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/T2V_training.png",
+                "caption": "Figure 6:Input construction in T2AV (top) and I2AV (bottom) training modes. In I2AV mode, the latent of the reference frame is concatenated with the noisy video latents along the temporal axis and marked with mask value 1 (0 for the frames to be generated); a learnable Token Role Embedding (emb_ref/emb_video) is added to the patch-embedded tokens. In both modes, the text prompt is encoded by CLIP and a VLM, and audio latents are produced by the audio VAE.",
+                "position": 1737
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/I2V_training.png",
+                "caption": "",
+                "position": 1742
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/RL_reward.png",
+                "caption": "Figure 7:Reward phase of RL post-training. For each prompt, a group of videos with audio is generated with different random seeds and scored by eight reward terms. Each score is centered within the group and scaled by the batch-wide standard deviation, routed into separate video and audio advantages (sync terms enter both), clamped to[−5,5][-5,5], broadcast to the video and audio tokens, and rescaled to per-token rewardsrtoken∈[0,1]r_{\\text{token}}\\in[0,1], where 1 corresponds to a rollout far above the group mean and 0 far below it.",
+                "position": 1773
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/RL_training.png",
+                "caption": "Figure 8:Training phase of RL post-training. The rollout latent is re-noised and denoised by the current LoRA, the old LoRA, and the frozen base (SFT) model. Predictions of the current and old LoRA are combined into positive and negative predictions; their per-token MSE losses to the rollout latent are interpolated with the rewardsrtokenr_{\\text{token}}from the reward phase and aggregated with the region-wise attention weightsattn_wderived from A2V cross-attention. A KL term with respect to the base-model prediction regularizes training; the old LoRA is an exponential moving average of the current one.",
+                "position": 1803
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/distillation/distillation.png",
+                "caption": "Figure 9:Rollout strategies for adversarial training. Top: standard LADD, where the intermediate statextx_{t}is obtained by forward noising of the clean samplex0x_{0}and denoised in a single step with gradients. Middle: backward student rollout with gradients propagated through all denoising steps. Bottom: backward student rollout with gradients propagated only through the final steps.",
+                "position": 1976
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/distillation/distillation_2.png",
+                "caption": "Figure 10:Discriminator architecture used in Sim-LADD. Newly initialized Kandinsky 6.0 Video transformer blocks are attached as heads to intermediate blocks of the pretrained backbone; each head outputs separate video and audio scores.",
+                "position": 2039
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sr/SR_DiT_Training.png",
+                "caption": "Figure 11:SR-DiT training pipeline for restoring HQ video from degraded LQ latents with first-frame HQ anchor conditioning. Training combines a latent-space flow-matching loss with pixel-space reconstruction and anti-grid losses computed through the frozen K-VAE decoder. The diagram illustrates Stages 1-2; timestep sampling usesu∼U⁡[0,1]u\\sim U[0,1]followed byt=5​u/(1+4​u)t=5u/(1+4u).",
+                "position": 2182
+            }
+        ]
+    },
+    {
+        "header": "5  Inference",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/Inference.png",
+                "caption": "Figure 12:Output resolutions of Kandinsky 6.0 Video at inference. In SD mode, the base-model output is returned without changes; in Full HD mode, it is upscaled×\\times2.25 by the super-resolution model and then downscaled to the target Full HD resolution.",
+                "position": 2809
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sr/SR_Inference_with_Latent_Upscaler.png",
+                "caption": "Figure 13:Tiled SR inference with the Latent Upscaler. The LQ video is encoded once with K-VAE and split into overlapping latent tiles. Each tile is upscaled by the×2\\times 2or×4\\times 4LU, refined by SR-DiT, decoded, and merged using Hann-window blending. The denoising loop shown corresponds to the pre-distillation model; the final distilled model replaces this loop withπ\\pi-Flow DX policy sampling using two network evaluations (NFE=2{}=2).",
+                "position": 2812
+            }
+        ]
+    },
+    {
+        "header": "6  Optimizations and Consumer GPU Deployment",
+        "images": []
+    },
+    {
+        "header": "7  Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/vabench_radar.png",
+                "caption": "Figure 14:VABench radar chart. All metrics are normalized, with\ndesync and word error rate inverted so that a larger radius always\nindicates better performance.",
+                "position": 3355
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-k5-t2av.png",
+                "caption": "(a)Text-to-Video",
+                "position": 3553
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-k5-t2av.png",
+                "caption": "(a)Text-to-Video",
+                "position": 3556
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-k5-i2av.png",
+                "caption": "(b)Image-to-Video",
+                "position": 3559
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-kling-t2av.png",
+                "caption": "(a)Text-to-Video + Audio",
+                "position": 3574
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-kling-t2av.png",
+                "caption": "(a)Text-to-Video + Audio",
+                "position": 3577
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-kling-i2av.png",
+                "caption": "(b)Image-to-Video + Audio",
+                "position": 3580
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-ltx-t2av.png",
+                "caption": "(a)Text-to-Video + Audio",
+                "position": 3598
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-ltx-t2av.png",
+                "caption": "(a)Text-to-Video + Audio",
+                "position": 3601
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-ltx-i2av.png",
+                "caption": "(b)Image-to-Video + Audio",
+                "position": 3604
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-veo-t2av.png",
+                "caption": "(a)Text-to-Video + Audio",
+                "position": 3628
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-veo-t2av.png",
+                "caption": "(a)Text-to-Video + Audio",
+                "position": 3631
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-veo-i2av.png",
+                "caption": "(b)Image-to-Video + Audio",
+                "position": 3634
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-h3-t2av.png",
+                "caption": "(a)Text-to-Video + Audio",
+                "position": 3655
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-h3-t2av.png",
+                "caption": "(a)Text-to-Video + Audio",
+                "position": 3658
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-h3-i2av.png",
+                "caption": "(b)Image-to-Video + Audio",
+                "position": 3661
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-seedance-t2av.png",
+                "caption": "(a)Text-to-Video + Audio",
+                "position": 3682
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-seedance-t2av.png",
+                "caption": "(a)Text-to-Video + Audio",
+                "position": 3685
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-vs-seedance-i2av.png",
+                "caption": "(b)Image-to-Video + Audio",
+                "position": 3688
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-sft-vs-rl-t2av-speech.png",
+                "caption": "(a)Text-to-Video + Audio, speech-focused",
+                "position": 3693
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-sft-vs-rl-t2av-speech.png",
+                "caption": "(a)Text-to-Video + Audio, speech-focused",
+                "position": 3696
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-sft-vs-rl-t2av-general.png",
+                "caption": "(b)Text-to-Video + Audio, general domain",
+                "position": 3699
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-sft-vs-rl-i2av.png",
+                "caption": "(c)Image-to-Video + Audio, general domain",
+                "position": 3702
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/sbs/sbs-k6-distill-vs-full-i2av.png",
+                "caption": "Figure 22:Side-by-side comparison ofKandinsky 6.0 Video Pro\n(distilled)vsKandinsky 6.0 Video Pro (full). Light green — distilled, gray — ties,\ndark — full.",
+                "position": 3747
+            }
+        ]
+    },
+    {
+        "header": "8   Examples",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/examples/cosmos_storyboard.png",
+                "caption": "Figure 23:A 3D animated astronaut in a bulky white spacesuit walks across the\nsurface of an alien planet with glowing purple crystals and two distant\nplanets in the sky, turns to the camera, and speaks in awe:<S>I have definitely never seen anything like this on Earth.<E><AUDCAP>Soft, muffled footsteps on dusty alien soil; a gentle\nethereal hum with subtle crystalline chimes and a soft cinematic score.<ENDAUDCAP>",
+                "position": 3795
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/examples/dog_storyboard.png",
+                "caption": "Figure 24:A cartoon dog detective in a trench coat and fedora examines a\nstrange print through a magnifying glass, then looks up at the camera and\nsays:<S>I know who it is!<E><AUDCAP>Ambient night\ncity sounds, distant traffic, a suspenseful underscore, and a sharp gasp\nof realization.<ENDAUDCAP>",
+                "position": 3804
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/examples/formula_storyboard.png",
+                "caption": "Figure 25:A cartoon mad scientist in a neon-lit laboratory mixes two glowing\nliquids in a flask; the mixture foams up, and he turns to the camera in\npanic:<S>I mixed up the formula! How did this happen?!<E><AUDCAP>Hum of laboratory equipment, bubbling liquid, faint\nelectrical zaps, vigorous fizzing, and a sharp gasp of panic.<ENDAUDCAP>",
+                "position": 3811
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/examples/guitar_storyboard.png",
+                "caption": "Figure 26:A street musician plays acoustic guitar on a cobblestone square\nin warm late-afternoon light while a small crowd claps along.<AUDCAP>Melodic fingerpicked acoustic guitar with rhythmic\nsynchronized clapping and faint ambient sounds of a public square.<ENDAUDCAP>",
+                "position": 3819
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/examples/hammer_nail_storyboard.png",
+                "caption": "Figure 27:A gloved hand drives a metal nail into a wooden plank with a claw\nhammer in a sunlit forest. Each strike sends small wood chips flying.<AUDCAP>Loud metallic clinks and heavy resonant thuds at each\nstrike, with faint forest ambience and birds in the distance.<ENDAUDCAP>",
+                "position": 3826
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/examples/medic_storyboard.png",
+                "caption": "Figure 28:A young girl in a white medical coat with a stethoscope stands in\na bright hospital room and speaks to the camera:<S>When I grow up, I want to be a doctor!<E><AUDCAP>Quiet hospital room ambience, soft cheerful background\nmusic, and a clear, sweet, enthusiastic young voice.<ENDAUDCAP>",
+                "position": 3833
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/examples/pirate_storyboard.png",
+                "caption": "Figure 29:A pirate captain on the deck of a wooden sailing ship in rough\nseas lowers his spyglass and shouts toward the camera:<S>Land ahead!<E><AUDCAP>Crashing waves against the\nhull, creaking planks and rigging, strong wind, and a loud triumphant\nshout.<ENDAUDCAP>",
+                "position": 3841
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/examples/133_crops.jpg",
+                "caption": "Figure 30:An animated painting based on Valentin Serov’sGirl with Peaches(1887); the original painting is in the public\ndomain. The crops show the face and hair, the bow on the dress, and a\nfruit on the table. LU outputs remain visually close to the enlarged\ninput. SR sharpens hair strands and adds texture to the bow, fruit, and\ntablecloth, with finer detail at×4\\times 4than at×2\\times 2.",
+                "position": 3866
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/examples/122_crops.jpg",
+                "caption": "Figure 31:A tennis scene, frame 111.\nThe crops show the face, the racket, and the shoe with\nthe surrounding court surface.\nLU outputs remain visually close to the enlarged input.\nSR makes facial features, racket strings, and shoe and\ncourt textures more distinct, particularly at×4\\times 4.",
+                "position": 3874
+            },
+            {
+                "img": "https://arxiv.org/html/2610.05608/2610.05608v1/images/examples/val_1004_crops.jpg",
+                "caption": "Figure 32:An interview scene, frame 121.\nThe crops show the face and glasses, the hand,\nand the fabric of the jacket.\nLU outputs remain visually close to the enlarged input.\nSR sharpens facial features and glasses contours and\nenhances hair and fabric detail, with more pronounced\ntexture at×4\\times 4than at×2\\times 2.",
+                "position": 3882
+            }
+        ]
+    },
+    {
+        "header": "9  Related Work",
+        "images": []
+    },
+    {
+        "header": "10  Conclusion",
+        "images": []
+    },
+    {
+        "header": "11  Contributors and Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
