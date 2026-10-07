@@ -1,0 +1,129 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.04596/2610.04596v1/Figure1.png",
+                "caption": "Figure 1:Teacher disagreement alone does not reliably identify incorrect rollouts.For a distillation-only Qwen3-1.7B student evaluated with a frozen Qwen3-8B teacher: (a) average token-level teacher–student disagreement distinguishes correct from incorrect rollouts only at chance level on mathematics (AUROC0.500.50and0.490.49) and weakly on code (AUROC0.600.60); (b) aggregate disagreement becomes more predictive mainly when it also reflects response length; and (c) within an incorrect rollout, large disagreement can occur on ordinary tokens rather than on the token associated with the decisive error. These observations motivate DiffGate to use the verifier to determinewhichtrajectories receive teacher guidance, while the teacher provides the local token-level update direction. Further analysis is provided in Appendix SectionB.",
+                "position": 327
+            }
+        ]
+    },
+    {
+        "header": "3Background and Preliminaries",
+        "images": []
+    },
+    {
+        "header": "4Methodology",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.04596/2610.04596v1/Figure2.png",
+                "caption": "Figure 2:Overview of DiffGate.The student generates on-policy trajectories that receive sequence-level correctness feedback from a verifier and token-level guidance from a frozen teacher. DiffGate bounds the sampled-token teacher–student log-probability gap, applies teacher guidance only to failed trajectories, and scales its strength according to the group solve rate. The resulting token-level advantage combines local teacher guidance with the global GRPO outcome signal to update the student policy. See Algorithm1for details.",
+                "position": 407
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.04596/2610.04596v1/Figure3.png",
+                "caption": "Figure 3:Why DiffGate helps. Maths, 1.7B student; all methods use the same data, teacher, and step budget.(a)Student gradient norm over training: the bar denotes the median and the whisker spans minimum to maximum, shown on a log scale.(b)Policy entropy, shown as a five-step rolling mean; the dotted line marks0.10.1.(c)The two components of DiffGate’s update on failed rollouts: the applied teacher term per token (dark blue) and the magnitude of the GRPO advantage per token (light blue). The GRPO advantage is zero for an all-failure group and, withn=16n=16, is approximately0.250.25or larger for groups with11–88successes and approximately1.101.10or larger for groups with99or more successes, ignoring the smallε\\varepsilonterm; values are weighted by the measured frequency of each group type. The grey region indicates this approximate lower-bound contribution.(d)Applied teacher term per response token under difficulty-gated and additive weighting on the same rollouts.",
+                "position": 1070
+            },
+            {
+                "img": "https://arxiv.org/html/2610.04596/2610.04596v1/Figure4.png",
+                "caption": "Figure 4:Performance over training.avg@8 (top) and pass@8 (bottom) across training checkpoints for the 1.7B student on the code benchmarks in Table2. Step00denotes the base model (dotted line), enabling comparison of how each method improves accuracy and solution coverage.",
+                "position": 1086
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion and Limitations",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix Contents",
+        "images": []
+    },
+    {
+        "header": "Appendix ANotation and Conventions",
+        "images": []
+    },
+    {
+        "header": "Appendix BFailure Modes of On-Policy Distillation",
+        "images": []
+    },
+    {
+        "header": "Appendix CTheoretical Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix DImplementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.04596/2610.04596v1/figures/Figure5.png",
+                "caption": "Figure 5:Hyperparameter sweep, 1.7B student.Teacher strengthλ\\lambda(left) and difficulty sharpnessγ\\gamma(right), for mathematics (top) and code (bottom); avg@8 on the left axis, pass@8 on the right. Every point is DiffGate at a different setting, so this figure varies one constant rather than comparing arms. Hollow markers are the reported configurationλ=γ=1\\lambda=\\gamma=1.",
+                "position": 2820
+            }
+        ]
+    },
+    {
+        "header": "Appendix EAdditional Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.04596/2610.04596v1/figures/Figure6.png",
+                "caption": "Figure 6:Student gradient norm over training.Bars: median. Whiskers: minimum to maximum step, with the maximum printed above. Log scale.",
+                "position": 3403
+            },
+            {
+                "img": "https://arxiv.org/html/2610.04596/2610.04596v1/figures/Figure7.png",
+                "caption": "Figure 7:Teacher-side training dynamics: GRPO, OPD and DiffGate.Columns are the four model–domain settings. GRPO and DiffGate usen=16n{=}16rollouts and the outcome reward, DiffGate adding the gated teacher term; the two OPD baselines use one rollout per prompt and no reward. All four share data, teacher, and step budget. Faint traces are per-step values, bold lines are a five-step rolling mean. Rows: meanΔ\\Deltaover all response tokens, and the teacher’s log-likelihood of the student’s own samples.",
+                "position": 3571
+            },
+            {
+                "img": "https://arxiv.org/html/2610.04596/2610.04596v1/figures/Figure8.png",
+                "caption": "Figure 8:Reward-based routing of teacher guidance.the rows show: (1) the ratio of the all-token mean of−Δ-\\Deltato the failed-rollout mean of|Δ||\\Delta|, with the dotted line marking a ratio of11; (2) the fraction of the applied teacher contribution assigned to all-failure groups, together with the fraction of prompts belonging to such groups (dashed); (3) the effective gate factor, defined by the fraction of trajectories on which the gate fires multiplied by their mean difficulty weight; and (4) for DiffGate, the fraction of failed-rollout tokens on which the teacher signal opposes the outcome advantage.",
+                "position": 3769
+            },
+            {
+                "img": "https://arxiv.org/html/2610.04596/2610.04596v1/figures/Figure9.png",
+                "caption": "Figure 9:Training reward, response length and policy entropy.Rows: verifier pass rate of then=16n{=}16rollouts on each step’s training prompts; mean response length in tokens; mean token entropy of the student. Faint traces are per-step values, bold lines a five-step rolling mean. DiffGate is a dense retrain; the remaining arms are the original runs. The reverse-KL arm’s solve rate is a single-sample diagnostic, not the\nquantity it optimises.",
+                "position": 3924
+            },
+            {
+                "img": "https://arxiv.org/html/2610.04596/2610.04596v1/figures/Figure10.png",
+                "caption": "Figure 10:Performance over training.avg@8 (top) and pass@8 (bottom) on the benchmark sets of Tables1and2; step00is the base model (dotted line). GRPO and DiffGate were evaluated at steps5050and6262on code, and GRPO at steps5050,100100,150150and171171on mathematics; their other points are filled in as described in the text.",
+                "position": 4069
+            }
+        ]
+    },
+    {
+        "header": "Appendix FQualitative Examples",
+        "images": []
+    },
+    {
+        "header": "Appendix GLimitations and Future Work",
+        "images": []
+    },
+    {
+        "header": "Appendix HUse of Large Language Models (LLMs)",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
