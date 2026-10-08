@@ -1,0 +1,234 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/teaser_2.png",
+                "caption": "Figure 1:Teaser.We presentGRACE, a novel latent compression technique that fine-tunes pretrained video generation models, such as Wan2.1-14B(Wan et al., 2025), to generate from substantially fewer latent tokens (e.g., nearly𝟖×8\\timesfewer).(Top)Text-to-video (T2V) samples at 736p from Wan2.1-14B before compression and from GRACE, using the same prompt.(Bottom left)The same comparison at 480p.(Bottom right)On VBench-T2V(Huang et al., 2023;Huang et al., 2024), GRACE preserves the generation quality of Wan2.1-14B before compression and achieves higher scores than existing high-compression autoencoders(HaCohen et al., 2024;Zheng et al., 2026;He et al., 2026), while generating11.1×11.1\\timesfaster at 480p and15.5×15.5\\timesfaster at 736p. All models in the plot are evaluated at matched resolutions with 50 sampling steps. The plot reports text-to-video, and the speedups above are measured on image-to-video.",
+                "position": 310
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Preliminaries",
+        "images": []
+    },
+    {
+        "header": "4Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/main_architecture_v10.png",
+                "caption": "Figure 2:Overall architecture.Stage 1 trains the autoencoder. The frozen encoderℰ\\mathcal{E}maps the downsampled input to𝐳base\\mathbf{z}_{\\text{base}}, the residual encoderℰres\\mathcal{E}_{\\text{res}}maps the full-resolution input to𝐳res\\mathbf{z}_{\\text{res}}, and𝒟^\\hat{\\mathcal{D}}decodes both, whileℒalign\\mathcal{L}_{\\text{align}}matches the compressed latent to the pretrained latent inside the frozen DiT. The dashed box on the right of Stage 1 shows a simplified view of the blocks added toℰres\\mathcal{E}_{\\text{res}}and𝒟^\\hat{\\mathcal{D}}. Stage 2 adapts the DiT to the compressed latent with LoRA, denoising𝐳base\\mathbf{z}_{\\text{base}}at a lower noise level than𝐳res\\mathbf{z}_{\\text{res}}at every step, so the base is denoised first.",
+                "position": 428
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/tsne_pca_merged_real_final.png",
+                "caption": "Figure 3:Effect of the dual latent andℒalign\\mathcal{L}_{\\text{align}}.(a)single latent,(b)dual-latent representation withoutℒalign\\mathcal{L}_{\\text{align}}, and(c)ours, all generated at480×832×81480{\\times}832{\\times}81.(Left)latent distribution, projected with t-SNE and colored by kernel density, with its uniformity metrics(Yao et al., 2025)and the total VBench(Huang et al., 2023;Huang et al., 2024)score below, followed by T2V samples generated after Stage 2.(Right)spatio-temporal structure of the latent, shown as its principal components mapped to RGB under the input frames. More samples are in Figs.I.11andI.12.",
+                "position": 471
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/base-ahead_denoising.png",
+                "caption": "Figure 4:Denoising order.Each row shows the sampling steps of𝐳base\\mathbf{z}_{\\text{base}}and𝐳res\\mathbf{z}_{\\text{res}}(Left) and the generated frames (Right), withτ=1\\tau=1pure noise andτ=0\\tau=0clean.(Top)Both parts are denoised at the same noise level.(Bottom)𝐳base\\mathbf{z}_{\\text{base}}staysδ\\deltaahead of𝐳res\\mathbf{z}_{\\text{res}}in schedule timeuu(Eq.11) at every step.",
+                "position": 536
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/gen_main_qual_1.png",
+                "caption": "Table 2:Video generation on VBench(Huang et al., 2023;Huang et al., 2024)at480×832×81480{\\times}832{\\times}81.Notation follows Tab.1. Our method preserves the quality of Wan2.1-14B(Wan et al., 2025)before compression on both tasks while using nearly8×8\\timesfewer tokens and running11.1×11.1\\timesfaster. NFE counts the DiT forward passes per video over 50 sampling steps. Per-dimension scores are in AppendixD.1.",
+                "position": 672
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/gen_main_qual_high_res_1.png",
+                "caption": "Table 3:Video generation on VBench(Huang et al., 2023;Huang et al., 2024)at736×1280×81736{\\times}1280{\\times}81.Notation follows Tab.2. Per-dimension scores are in AppendixD.1.‡Measured with spatial tiling in the VAE encoder to avoid running out of memory when encoding the conditioning image at this resolution.",
+                "position": 824
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/convergence_comparison_2.png",
+                "caption": "Figure 7:Convergence during DiT adaptation.With and withoutℒalign\\mathcal{L}_{\\text{align}}; solid lines show EMA.",
+                "position": 991
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "AGRACE Autoencoder Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/detailed_arch_v3.png",
+                "caption": "Figure A.1:Detailed autoencoder architecture.ℰres\\mathcal{E}_{\\text{res}}adds a downsampling stage between its middle blocks and head, consisting of residual blocks and a strided causal convolution, paired with a parameter-free shortcut that folds space and time into channels.",
+                "position": 1913
+            }
+        ]
+    },
+    {
+        "header": "BGRACE Diffusion Model Details",
+        "images": []
+    },
+    {
+        "header": "CMore Details on Evaluation",
+        "images": []
+    },
+    {
+        "header": "DAdditional Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/user_study_screen_T2V.png",
+                "caption": "Figure D.1:User study interface for T2V samples.",
+                "position": 3120
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/user_study_screen_I2V.png",
+                "caption": "Figure D.2:User study interface for I2V samples.",
+                "position": 3123
+            }
+        ]
+    },
+    {
+        "header": "EAdditional Ablations",
+        "images": []
+    },
+    {
+        "header": "FAdditional Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/per-latent_analysis.png",
+                "caption": "Figure F.1:Reconstruction under latent noise.We noise𝐳base\\mathbf{z}_{\\text{base}}or𝐳res\\mathbf{z}_{\\text{res}}at levelτ\\tau, leave the other unchanged, and reconstruct.(a)Reconstruction quality on Panda-70M(Chen et al., 2024)at480×832×81480{\\times}832{\\times}81asτ\\taugrows, measured in PSNR and LPIPS.(b)Reconstructed frames at two levels ofτ\\tau, shown below the input and the noise-free reconstruction, with the first block noising𝐳base\\mathbf{z}_{\\text{base}}and the second noising𝐳res\\mathbf{z}_{\\text{res}}.",
+                "position": 3221
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/pca_split_main.png",
+                "caption": "Figure F.2:PCA visualization of the base and residual latents.Principal Component Analysis (PCA) of each part at f16t8p2, encoded from a480×832×81480{\\times}832{\\times}81video, for(a)𝐳base\\mathbf{z}_{\\text{base}},(b)𝐳res\\mathbf{z}_{\\text{res}}withoutℒalign\\mathcal{L}_{\\text{align}}, and(c)𝐳res\\mathbf{z}_{\\text{res}}withℒalign\\mathcal{L}_{\\text{align}}. Sinceℰ\\mathcal{E}is frozen,𝐳base\\mathbf{z}_{\\text{base}}is the same in both settings.",
+                "position": 3231
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/convergence_comparison_full.png",
+                "caption": "Figure F.3:Convergence of the base and the residual.Flow matching loss on the base channels (left) and the residual channels (right) during DiT adaptation, for the dual latent with and withoutℒalign\\mathcal{L}_{\\text{align}}. Each part is standardized with its own statistics. Faint curves show the raw loss and solid curves its EMA.",
+                "position": 3243
+            }
+        ]
+    },
+    {
+        "header": "GComputational Cost",
+        "images": []
+    },
+    {
+        "header": "HMore Discussion on Related Work",
+        "images": []
+    },
+    {
+        "header": "IAdditional Qualitative Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/480_i2v_1.png",
+                "caption": "Figure I.1:Additional image-to-video results.Samples from VBench-I2V(Huang et al., 2023;Huang et al., 2024)at480×832×81480{\\times}832{\\times}81, generated by the pretrained Wan2.1-14B(Wan et al., 2025)at f8t4p2, ours at f16t8p2, and DC-Gen(He et al., 2026)at f32t4p1, from the same conditioning frame and prompt.",
+                "position": 3325
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/480_i2v_2.png",
+                "caption": "Figure I.2:Additional image-to-video results (continued).Samples from VBench-I2V(Huang et al., 2023;Huang et al., 2024)at480×832×81480{\\times}832{\\times}81, generated by the pretrained Wan2.1-14B(Wan et al., 2025)at f8t4p2, ours at f16t8p2, and DC-Gen(He et al., 2026)at f32t4p1, from the same conditioning frame and prompt.",
+                "position": 3330
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/480_t2v_1.png",
+                "caption": "Figure I.3:Additional text-to-video results.Samples from VBench-T2V(Huang et al., 2023;Huang et al., 2024)at480×832×81480{\\times}832{\\times}81, generated by the pretrained Wan2.1-14B(Wan et al., 2025)at f8t4p2, ours at f16t8p2, and DC-Gen(He et al., 2026)at f32t4p1, from the same prompt.",
+                "position": 3336
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/480_t2v_2.png",
+                "caption": "Figure I.4:Additional text-to-video results (continued).Samples from VBench-T2V(Huang et al., 2023;Huang et al., 2024)at480×832×81480{\\times}832{\\times}81, generated by the pretrained Wan2.1-14B(Wan et al., 2025)at f8t4p2, ours at f16t8p2, and DC-Gen(He et al., 2026)at f32t4p1, from the same prompt.",
+                "position": 3342
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/736_t2v_1.png",
+                "caption": "Figure I.5:Additional high-resolution text-to-video results.Samples at736×1280×81736{\\times}1280{\\times}81, generated by the pretrained Wan2.1-14B(Wan et al., 2025)at f8t4p2, ours at f16t8p2, and DC-Gen(He et al., 2026)at f32t4p1, from the same prompt.",
+                "position": 3348
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/736_t2v_2.png",
+                "caption": "Figure I.6:Additional high-resolution text-to-video results (continued).Samples at736×1280×81736{\\times}1280{\\times}81, generated by the pretrained Wan2.1-14B(Wan et al., 2025)at f8t4p2, ours at f16t8p2, and DC-Gen(He et al., 2026)at f32t4p1, from the same prompt.",
+                "position": 3354
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/i2v_736p_ltx_qual_0.png",
+                "caption": "Figure I.7:Additional high-resolution image-to-video results.Samples at736×1280×81736{\\times}1280{\\times}81, generated by the pretrained Wan2.1-14B(Wan et al., 2025)at f8t4p2, ours at f16t8p2, and LTX-Video(HaCohen et al., 2024)0.9.7 at f32t8p1, from the same conditioning frame and prompt. The motion of LTX-Video tends to come from a global zoom or a slow camera movement over the conditioning frame, while the scene stays static.",
+                "position": 3360
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/i2v_736p_ltx_qual_1.png",
+                "caption": "Figure I.8:Additional high-resolution image-to-video results (continued).Samples at736×1280×81736{\\times}1280{\\times}81, generated by the pretrained Wan2.1-14B(Wan et al., 2025)at f8t4p2, ours at f16t8p2, and LTX-Video(HaCohen et al., 2024)0.9.7 at f32t8p1, from the same conditioning frame and prompt. The motion of LTX-Video tends to come from a global zoom or a slow camera movement over the conditioning frame, while the scene stays static.",
+                "position": 3366
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/i2v_736p_ltx_qual_2.png",
+                "caption": "Figure I.9:Additional high-resolution image-to-video results (continued).Samples at736×1280×81736{\\times}1280{\\times}81, generated by the pretrained Wan2.1-14B(Wan et al., 2025)at f8t4p2, ours at f16t8p2, and LTX-Video(HaCohen et al., 2024)0.9.7 at f32t8p1, from the same conditioning frame and prompt. The motion of LTX-Video tends to come from a global zoom or a slow camera movement over the conditioning frame, while the scene stays static.",
+                "position": 3372
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/736_t2v_style.png",
+                "caption": "Figure I.10:Generation in various styles.Text-to-video samples from ours at736×1280×81736{\\times}1280{\\times}81, generated from a single prompt with a different style suffix in each row.",
+                "position": 3378
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/pca_add_qual_0.png",
+                "caption": "Figure I.11:Additional latent PCA visualizations.Principal components of the fullC+C′C{+}C^{\\prime}latent at f16t8p2, encoded from480×832×81480{\\times}832{\\times}81videos, for(a)a single encoder,(b)ours withoutℒalign\\mathcal{L}_{\\text{align}}, and(c)ours, with the input frames on top. The three leading components are computed per clip and mapped to RGB, so colors are not comparable across panels.",
+                "position": 3382
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/pca_add_qual_1.png",
+                "caption": "",
+                "position": 3387
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/pca_add_qual_2.png",
+                "caption": "",
+                "position": 3389
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/pca_add_qual_3.png",
+                "caption": "Figure I.12:Additional latent PCA visualizations (continued).Principal components of the fullC+C′C{+}C^{\\prime}latent at f16t8p2, encoded from480×832×81480{\\times}832{\\times}81videos, for(a)a single encoder,(b)ours withoutℒalign\\mathcal{L}_{\\text{align}}, and(c)ours, with the input frames on top. The three leading components are computed per clip and mapped to RGB, so colors are not comparable across panels.",
+                "position": 3394
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/pca_add_qual_4.png",
+                "caption": "",
+                "position": 3399
+            },
+            {
+                "img": "https://arxiv.org/html/2610.10524/2610.10524v1/pca_add_qual_5.png",
+                "caption": "",
+                "position": 3401
+            }
+        ]
+    },
+    {
+        "header": "JLimitations",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
