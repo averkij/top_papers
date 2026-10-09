@@ -1,0 +1,448 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/teaser_final_v2.png",
+                "caption": "",
+                "position": 252
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/pipeline_fig_v3.png",
+                "caption": "Figure 2:SpaceFlowpipeline.Given editable geometric controls with local geometric conditioning strengthsτi\\tau_{i},SpaceFlowencodes the high-control regions and injects them into the sparse-structure flow process over a controlled time interval. The resulting structure is segmented with PartField[55], then per-part text or image conditions are routed to each part, and the latent is finally passed to an appearance flow model and refined with self-similarity guidance, producing a 3D asset with localized geometric and appearance control.",
+                "position": 416
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/hourglass_variant5.png",
+                "caption": "Figure 3:Local spatial control.Starting from the same \"hourglass\" superquadric primitive set and prompt, high control(τ=10)(\\tau\\!=\\!10)preserves the corresponding part’s input geometry, while low control(τ=3)(\\tau\\!=\\!3)allows generative variation. The four settings showcase independent control of the frame and sand.",
+                "position": 433
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/spacecontrol_vs_ours_v3.png",
+                "caption": "Figure 4:Spatial and appearance control in isolation.(a) Spatial control.Uniform control with SpaceControl either loses specified structure\n(τ=3\\tau\\!=\\!3) or constrains the full object (τ=10\\tau\\!=\\!10), whereasSpaceFlowpreserves the high-control regions and allows the generative\nprior to complete the low-control regions.(b) Appearance control on fixed geometry.Global conditioning can miss part-level cues or spread them beyond their\ntargets;SpaceFlowroutes each color or material cue to its target part\nwhile retaining coherent textures.",
+                "position": 483
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/texture_comparison_v3.png",
+                "caption": "",
+                "position": 489
+            }
+        ]
+    },
+    {
+        "header": "4Experimental Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/asset_gallery_compressed_transparent.png",
+                "caption": "Figure 5:Qualitative comparison of spatial and appearance control across diverse assets.Control (top):Input superquadric proxies with designated local control strengths (orange: high controlτi=10\\tau_{i}\\!=\\!10; gray: low controlτi=3\\tau_{i}\\!=\\!3) and localized part-level appearance prompts.SpaceControl[28]:Baselines under uniform control strengths (τ=3\\tau\\!=\\!3vs.τ=10\\tau\\!=\\!10), illustrating the trade-off between generative reinterpretation and strict adherence to the proxy geometry.Texture Baselines:Appearance baselines (TRELLIS[3]and GuideFlow3D[30]) built directly on our generated structure to isolate texture synthesis.Local Control (Ours):SpaceFlowprovides localized geometric control (generating text-aligned geometric details in low-control regions while preserving high-control shapes) alongside accurate part-level texture routing.",
+                "position": 703
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "6Acknowledgements",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Supplementary Material",
+        "images": []
+    },
+    {
+        "header": "Appendix S1Structure Generation and Guidance Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/StructureFM.png",
+                "caption": "Figure S1:Illustration of a single Conditioned Flow iteration.The process receives the low-control region maskMlowM_{\\text{low}}(derived from the bounding boxes), the high-control target latentz1highz_{1}^{\\text{high}}, and the current latent stateztz_{t}. The flow model predicts the next statezt+1z_{t+1}. Inside the high-control region (masked by1−Mlow1-M_{\\text{low}}), a weighted average of the target latentz1highz_{1}^{\\text{high}}and the predicted latentzt+1z_{t+1}is computed. This is combined with the unconstrained predictionzt+1z_{t+1}in the low-control region (masked byMlowM_{\\text{low}}) to formzt+1′z^{\\prime}_{t+1}. Finally, noise is added tozt+1′z^{\\prime}_{t+1}up to timesteptt(repeatedKKtimes) to update the latentztz_{t}for the subsequent step.",
+                "position": 1605
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/routed-cross-attention-highres.png",
+                "caption": "Figure S2:Routed cross-attention.Each text or image cue is encoded by a\nfrozen CLIP (text) or DINOv2 (image) encoder into its own key/value pairKi,ViK_{i},V_{i}. Within every cross-attention layer of the appearance\ntransformer, the latent queriesQQare partitioned by the routing\nvolume so that the voxels of a part attend only to their assigned\ncue—e.g.“red wings”routes to the wings while the global“plane”prompt covers the remaining voxels—and the per-region\noutputsHiH_{i}are recombined intoHoutH_{\\mathrm{out}}. This confines each\nappearance cue to its target part and reduces cross-part texture\nleakage.",
+                "position": 1610
+            }
+        ]
+    },
+    {
+        "header": "Appendix S2Appearance Generation Pipeline",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/partwise-appearance-pipeline-highres.png",
+                "caption": "Figure S3:Part-wise appearance pipeline.From the generated sparse\nstructure and the part-wise text or image cues, we decode the structure\ninto a mesh and extract a PartField triplane feature field. Active\nstructure voxels are clustered into semantic localities; each cluster\ncentroid is assigned to its nearest input superquadric, and the\nresulting map is rasterized into a condition-routing volume that stays\npart-consistent even where low-control geometry drifts from the\nscaffold. The appearance rectified-flow transformer then synthesizes the\nSLAT appearance latents under this routing.",
+                "position": 1632
+            }
+        ]
+    },
+    {
+        "header": "Appendix S3Superquadric Primitives",
+        "images": []
+    },
+    {
+        "header": "Appendix S4Dataset Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/dataset_fig.png",
+                "caption": "Figure S4:Dataset assets gallery.Ten representative assets from our 83-asset benchmark. Orange primitives designate high-control regions requiring strict geometric preservation, while white/gray primitives designate low-control regions intended for generative completion. Subtitles denote the target object concept.",
+                "position": 2117
+            }
+        ]
+    },
+    {
+        "header": "Appendix S5Vision-Language-Model Evaluation",
+        "images": []
+    },
+    {
+        "header": "Appendix S6User Study Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/user_study_last.png",
+                "caption": "Figure S5:User study interface screenshot.Screenshot of the evaluation interface to study participants during a trial. The interface displays the text prompt, the input geometric control shape with color-coded region guidelines, and two randomized, anonymous outputs for comparison.",
+                "position": 2316
+            }
+        ]
+    },
+    {
+        "header": "Appendix S7Additional Ablation Study",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/lowtau_variation.png",
+                "caption": "Figure S7:Qualitative local control strength continuum.We fix the protected primitives atτhigh=10\\tau_{\\mathrm{high}}=10and vary the editable-region strength overτlow∈{1,3,5,7,9}\\tau_{\\mathrm{low}}\\in\\{1,3,5,7,9\\}. Orange input primitives denote high control and gray input primitives denote low control. Lower values permit greater prompt-driven geometric freedom, whereas increasingτlow\\tau_{\\mathrm{low}}progressively strengthens adherence to the input geometry. Outputs are shown without texture to isolate geometric behavior.",
+                "position": 2341
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/shipcosine.png",
+                "caption": "Figure S8:Visualization of spatial feature distance.Left: input superquadrics (top; orange denotes high control and\ngray denotes low control) and the asset generated bySpaceFlow(bottom). Right: voxel-wise cosine distance between the generated\nasset’s PartField features and those of the nearest spatial match\nin the uniformly controlled (τ=10\\tau=10) reference. Feature\ndeviations concentrate primarily in the low-control region.",
+                "position": 2357
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/01_pickup_truck_input_sq.png",
+                "caption": "(a)“red metal truck with a white cabin and blue glass”",
+                "position": 2380
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/01_pickup_truck_input_sq.png",
+                "caption": "(a)“red metal truck with a white cabin and blue glass”",
+                "position": 2383
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/01_pickup_truck_routing.png",
+                "caption": "",
+                "position": 2385
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/02_baseball_bat_input_sq.png",
+                "caption": "(b)“light wood baseball bat with a black grip”",
+                "position": 2388
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/02_baseball_bat_routing.png",
+                "caption": "",
+                "position": 2390
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/03_green_glass_bottle_input_sq.png",
+                "caption": "(c)“green glass bottle with a brown cork stopper”",
+                "position": 2393
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/03_green_glass_bottle_routing.png",
+                "caption": "",
+                "position": 2395
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/04_kitchen_stand_mixer_input_sq.png",
+                "caption": "(d)“cream enamel mixer with a silver metal bowl and beater”",
+                "position": 2398
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/04_kitchen_stand_mixer_routing.png",
+                "caption": "",
+                "position": 2400
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/05_classic_steam_iron_input_sq.png",
+                "caption": "(e)“blue metal steam iron with a silver soleplate and black handle”",
+                "position": 2403
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/05_classic_steam_iron_routing.png",
+                "caption": "",
+                "position": 2405
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/06_toy_elephant_input_sq.png",
+                "caption": "(f)“blue wooden toy elephant with pink wooden ears”",
+                "position": 2408
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/06_toy_elephant_routing.png",
+                "caption": "",
+                "position": 2410
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/07_tripod_camping_stool_input_sq.png",
+                "caption": "(g)“silver metal stool with a green fabric seat”",
+                "position": 2413
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/07_tripod_camping_stool_routing.png",
+                "caption": "",
+                "position": 2415
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/08_enamel_coffee_mug_input_sq.png",
+                "caption": "(h)“white enamel mug with a blue handle”",
+                "position": 2418
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/routing_assets/08_enamel_coffee_mug_routing.png",
+                "caption": "",
+                "position": 2420
+            }
+        ]
+    },
+    {
+        "header": "Appendix S8Limitations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/failure_cases/limitation_geometry.jpg",
+                "caption": "Figure S10:Semantic-geometric conflict.Synthesizing a “person” over an input “bench” structure (left). Lacking a joint prior for conflicting modalities, the model generates unnatural distortions by embedding the bench’s high-control geometry inside the generated “person” (right).",
+                "position": 2434
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/failure_cases/1_condition_routing.png",
+                "caption": "(a)Frying pan – routing",
+                "position": 2459
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/failure_cases/1_condition_routing.png",
+                "caption": "(a)Frying pan – routing",
+                "position": 2462
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/failure_cases/fryingpan_result_azim40.png",
+                "caption": "(b)Frying pan – result",
+                "position": 2465
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/failure_cases/2_condition_routing.png",
+                "caption": "(c)Wood chair – routing",
+                "position": 2468
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/failure_cases/woodchair_result_azim220.png",
+                "caption": "(d)Wood chair – result",
+                "position": 2471
+            }
+        ]
+    },
+    {
+        "header": "Appendix S9Additional Qualitative Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/image-conditioned-examples.png",
+                "caption": "Figure S12:Additional qualitative results for image-conditioned appearance control.Each panel shows an input geometric structure (left), the object-level text prompt (bottom), and two reference images specifying the desired material, texture or style for the object or for particular parts. Dotted arrows indicate the part-level associations between the reference images and the corresponding target regions. We recommend zooming in to inspect the fine-grained structural and appearance details; for example, in the metal-toolbox example, the generated asset includes the small front latches visible in the reference image and renders them with a consistent metallic appearance. These examples illustrate howSpaceFlowtransfers reference-driven appearance cues to the corresponding regions while retaining the overall structure of the input object.",
+                "position": 2491
+            }
+        ]
+    },
+    {
+        "header": "Appendix S10Implementation Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/wood_chair_with_straight_legs_and_a_cushioned_seat_sq_view_1.png",
+                "caption": "(a)“wood chair with straight legs and a red cushioned seat and orange backrest”",
+                "position": 2552
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/wood_chair_with_straight_legs_and_a_cushioned_seat_sq_view_1.png",
+                "caption": "(a)“wood chair with straight legs and a red cushioned seat and orange backrest”",
+                "position": 2555
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/wood_chair_with_straight_legs_and_a_cushioned_seat_eval_view_1.png",
+                "caption": "",
+                "position": 2557
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/A_table_with_a_plant_sq_view_1.png",
+                "caption": "(b)“A table with a plant”",
+                "position": 2560
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/A_table_with_a_plant_eval_view_1.png",
+                "caption": "",
+                "position": 2562
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/white_elephant_toy_sq_view_1.png",
+                "caption": "(c)“white elephant toy with orange legs and cyan head”",
+                "position": 2565
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/white_elephant_toy_eval_view_1.png",
+                "caption": "",
+                "position": 2567
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/A_wooden_toy_of_a_person_sq_view_0.png",
+                "caption": "(d)“A wooden toy of a person with a yellow plastic head”",
+                "position": 2570
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/A_wooden_toy_of_a_person_eval_view_0.png",
+                "caption": "",
+                "position": 2572
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/A_bench_sq_view_1.png",
+                "caption": "(e)“A white bench with a red velvet seat and a black bottom on the legs”",
+                "position": 2575
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/A_bench_eval_view_1.png",
+                "caption": "",
+                "position": 2577
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/A_table_sq_view_0.png",
+                "caption": "(f)“A glass table with wooden legs”",
+                "position": 2580
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/A_table_eval_view_0.png",
+                "caption": "",
+                "position": 2582
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/A_plane_sq_view_1.png",
+                "caption": "(g)“A plane with the main wings red”",
+                "position": 2585
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/A_plane_eval_view_1.png",
+                "caption": "",
+                "position": 2587
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/A_bed_with_a_duvet_and_pillows_sq_view_1.png",
+                "caption": "(h)“A bed with a green velvet duvet, pillows and an oak bed frame”",
+                "position": 2590
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/A_bed_with_a_duvet_and_pillows_eval_view_1.png",
+                "caption": "",
+                "position": 2592
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/Lamp_with_Rectangular_base_sq_view_0.png",
+                "caption": "(a)“orange lamp with a cyan pole and a rectangular black base”",
+                "position": 2602
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/Lamp_with_Rectangular_base_sq_view_0.png",
+                "caption": "(a)“orange lamp with a cyan pole and a rectangular black base”",
+                "position": 2605
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/Lamp_with_Rectangular_base_eval_view_0.png",
+                "caption": "",
+                "position": 2607
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/A_trophy_sq_view_1.png",
+                "caption": "(b)“A gold trophy with a black marble base”",
+                "position": 2610
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/A_trophy_eval_view_1.png",
+                "caption": "",
+                "position": 2612
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/pool_table_sq_view_0.png",
+                "caption": "(c)“A white marble pool table with red billiard cloth”",
+                "position": 2615
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/pool_table_eval_view_0.png",
+                "caption": "",
+                "position": 2617
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/A_house_with_a_triangular_roof_sq_view_1.png",
+                "caption": "(d)“A white house with a triangular brick roof”",
+                "position": 2620
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/A_house_with_a_triangular_roof_eval_view_1.png",
+                "caption": "",
+                "position": 2622
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/chair_sq_view_0.png",
+                "caption": "(e)“white chair with a blue backrest”",
+                "position": 2625
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/chair_eval_view_0.png",
+                "caption": "",
+                "position": 2627
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/A_pick_up_truck_sq_view_1.png",
+                "caption": "(f)“A silver pick up truck with a red cab and red wheels”",
+                "position": 2630
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/A_pick_up_truck_eval_view_1.png",
+                "caption": "",
+                "position": 2632
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/classic_chair_with_a_slat_back_sq_view_0.png",
+                "caption": "(g)“blue classic chair with a black slat back”",
+                "position": 2635
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/classic_chair_with_a_slat_back_eval_view_0.png",
+                "caption": "",
+                "position": 2637
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments_sq/A_stool_with_a_pillow_sq_view_0.png",
+                "caption": "(h)“A brown leather stool with white horizontal slats connecting the legs”",
+                "position": 2640
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12399/2610.12399v1/figs/table_experiments/A_stool_with_a_pillow_eval_view_0.png",
+                "caption": "",
+                "position": 2642
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
