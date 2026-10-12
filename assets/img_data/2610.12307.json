@@ -1,0 +1,220 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/teaser.png",
+                "caption": "Figure 1:Test-time compute adjustment.BudgetPix dynamically scales inference costs, achieving a strong quality-efficiency tradeoff across JiT (top), MiniT2I (bottom left), PixelDiT (bottom right), 3 popular architectures for pixel-space image diffusion. Percentages show the fraction of tokens used.",
+                "position": 326
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/motivation.png",
+                "caption": "Figure 2:Uniform vs. content-adaptive tokenization.For a512×512512\\times 512image, uniform tokenization requires 1,024 tokens with16×1616\\times 16patches (a) and 256 tokens with32×3232\\times 32patches (c). BudgetPix adapts to visual content, requiring only 307 (b) and 127 (d) tokens. Baselines in (a) and (c) represent full-budget MiniT2I-L and JiT-L; BudgetPix in (b) and (d) operates at 30% and 50% budgets, respectively.",
+                "position": 329
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related work",
+        "images": []
+    },
+    {
+        "header": "3BudgetPix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/budgets.png",
+                "caption": "Figure 3:Overview.BudgetPix enables compute-adaptive pixel-space diffusion with three components: an encoder, a decoder, and flexible training and inference across token counts. The Encoder and Decoder (purple) are trained from scratch; the Transformer (blue) is initialized from existing baselines.",
+                "position": 412
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/overview_layout_a.png",
+                "caption": "Figure 4:Non-uniform layout construction.Given an image (the original imagexxduring training, or the denoising imagex^\\hat{x}during inference), the objective is to partition it into cells across multiple scales:p×pp\\times p,2​p×2​p2p\\times 2p, …,n​p×n​pnp\\times np, wheren=2jn=2^{j}forj≥1j\\geq 1. The process begins by dividing the image inton​p×n​pnp\\times npcells, which is the coarsest scale. For each cell, we construct a pixel intensity histogram and compute its entropyHH. IfH<τn​p+δH<\\tau_{np}+\\delta(whereτn​p\\tau_{np}is the scale-specific threshold andδ\\deltais a global offset), the cell remains a single token. Otherwise, it is subdivided into four cells of the next finer scale (n←n/2n\\leftarrow n/2). This recursive subdivision terminates atn=1n=1, corresponding to the minimum cell size ofp×pp\\times p.",
+                "position": 435
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/overview_model.png",
+                "caption": "Figure 5:BudgetPix Architecture.The encoder receives the noisy inputztz_{t}and its corresponding spatial layoutLL, converts the image into a sequence of multi-scale patches. The finestp×pp\\times ptokens route directly through the fine path, while coarser patches navigate a dedicated coarse path in both the encoder and decoder. In the encoder, each coarse patch undergoes simultaneous downscaling (top×pp\\times p) and splitting via a Patch Aggregator (inton2n^{2}sub-patches). These streams are processed through MLP layers and a scale mixer before being fused into a single coarse token. In the decoder, each denoised coarse patch is upscaled back to its target resolution (n​p×n​pnp\\times np). Concurrently, a Patch Refiner splits the patch into4×44\\times 4sub-patches, processes them through an MLP and a lightweight transformer, and fuses them with the upscaled patch to restore local texture. The central diffusion transformer is directly initialized from existing pixel-space models, modified only to operate across variable, dynamically determined token counts rather than a fixed count.",
+                "position": 455
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/qual_methods.png",
+                "caption": "Figure 6:Qualitative comparison across budgets, MiniT2I-L/16 at5122512^{2}.Same prompt and noise were used for all methods. BudgetPix generates image with high quality even at 10%.",
+                "position": 496
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "supplementary material",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional qualitative results across the budget",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/methods_000044.png",
+                "caption": "Figure 11:Every method across the budget: an umbrella.",
+                "position": 1729
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/methods_000099.png",
+                "caption": "Figure 12:Every method across the budget: a herd of cows.",
+                "position": 1732
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/methods_000031.png",
+                "caption": "Figure 13:Every method across the budget: a seamless vector pattern.",
+                "position": 1735
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/methods_000086.png",
+                "caption": "Figure 14:Every method across the budget: a pencil case and binoculars.",
+                "position": 1738
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/methods_000076.png",
+                "caption": "Figure 15:Every method across the budget: an ornate treasure chest.",
+                "position": 1741
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/methods_000053.png",
+                "caption": "Figure 16:Every method across the budget: three birds on a branch.",
+                "position": 1744
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/app_jit_l_1.png",
+                "caption": "Figure 17:BudgetPix on JiT-L/32 at5122512^{2}, one ImageNet class per row.",
+                "position": 1755
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/app_jit_l_2.png",
+                "caption": "Figure 18:BudgetPix on JiT-L/32 at5122512^{2}, one ImageNet class per row (continued).",
+                "position": 1758
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/app_minit2i_l.png",
+                "caption": "Figure 19:BudgetPix on MiniT2I-L/16 at5122512^{2}, one prompt per row.",
+                "position": 1769
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/app_minit2i_l_2.png",
+                "caption": "Figure 20:BudgetPix on MiniT2I-L/16 at5122512^{2}, one prompt per row (continued).",
+                "position": 1772
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/app_pixeldit.png",
+                "caption": "Figure 21:BudgetPix on PixelDiT-T2I at102421024^{2}, one prompt per row.",
+                "position": 1783
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/app_pixeldit_2.png",
+                "caption": "Figure 22:BudgetPix on PixelDiT-T2I at102421024^{2}, one prompt per row (continued).",
+                "position": 1786
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/app_pmf_l16.png",
+                "caption": "Figure 23:One-step samples, pMF-L/16 at2562256^{2}, one ImageNet class per row.",
+                "position": 1797
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/app_pmf_l16_2.png",
+                "caption": "Figure 24:BudgetPix on pMF-L/16 at2562256^{2}, one step, one ImageNet class per row.",
+                "position": 1800
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/app_pmf_l16_3.png",
+                "caption": "Figure 25:BudgetPix on pMF-L/16 at2562256^{2}, one step, one ImageNet class per row (continued).",
+                "position": 1803
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/app_layout_jit_1.png",
+                "caption": "Figure 26:BudgetPix on JiT-L/32 at5122512^{2}: samples and their layouts, one ImageNet class per row.",
+                "position": 1814
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/app_layout_jit_2.png",
+                "caption": "Figure 27:BudgetPix on JiT-L/32 at5122512^{2}: samples and their layouts, one ImageNet class per row (continued).",
+                "position": 1817
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/app_layout_minit2i_1.png",
+                "caption": "Figure 28:BudgetPix on MiniT2I-L/16 at5122512^{2}: samples and their layouts, one prompt per row.",
+                "position": 1828
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/app_layout_minit2i_2.png",
+                "caption": "Figure 29:BudgetPix on MiniT2I-L/16 at5122512^{2}: samples and their layouts, one prompt per row (continued).",
+                "position": 1831
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/app_layout_pixeldit_1.png",
+                "caption": "Figure 30:BudgetPix on PixelDiT-T2I at102421024^{2}: samples and their layouts, one prompt per row.",
+                "position": 1842
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/app_layout_pixeldit_2.png",
+                "caption": "Figure 31:BudgetPix on PixelDiT-T2I at102421024^{2}: samples and their layouts, one prompt per row (continued).",
+                "position": 1845
+            }
+        ]
+    },
+    {
+        "header": "Appendix BResults in full",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/layout_budget.png",
+                "caption": "Figure 38:The layout as the budget falls, JiT-L/32 at5122512^{2}, budget mode.",
+                "position": 3918
+            }
+        ]
+    },
+    {
+        "header": "Appendix CDetails of the method and the experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/user_study_form.png",
+                "caption": "Figure 39:User-study form on where a difference is first seen: its start and first question.",
+                "position": 5138
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/user_study_form_faithful.png",
+                "caption": "Figure 40:User-study form on which image is more faithful: its start and first question.",
+                "position": 5151
+            }
+        ]
+    },
+    {
+        "header": "Appendix DAblations on JiT-B",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/layout_evolution.png",
+                "caption": "Figure 41:Layout evolution during sampling, JiT-B/32 at5122512^{2}.",
+                "position": 6233
+            },
+            {
+                "img": "https://arxiv.org/html/2610.12307/2610.12307v1/pool_gallery.png",
+                "caption": "Figure 42:Pooled budget, JiT-B/32 at5122512^{2}, a mean of 128 tokens.",
+                "position": 6315
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
