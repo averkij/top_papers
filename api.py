@@ -237,7 +237,7 @@ def generate_image_for_paper(paper, img_name):
     generate_and_save_image(name=img_name, img_dir=img_dir, prompt=img_prompt)
 
 
-def get_categories(text, api="claude", model="claude-haiku-4-5"):
+def get_categories(text, api="claude", model="claude-haiku-5-5"):
     prompt_cls_1 = f"""Analyze the following research paper text and classify it into one or more relevant topics from the list below. Consider only information from the provided text. Don't add a tag if the topic is not directly related to the article.
 
 Topics:
@@ -494,7 +494,7 @@ Paper text to classify:\n\n"{text}"
     return categories
 
 
-def get_categories_additional(text, api="claude", model="claude-haiku-4-5"):
+def get_categories_additional(text, api="claude", model="claude-haiku-5-5"):
     prompt_cls = f"""You are an expert classifier of machine learning research papers. Analyze the following research paper text and classify it into one or more relevant categories from the list below.
 
 Categories:
