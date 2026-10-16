@@ -107,8 +107,7 @@ def get_text(
             messages=[
                 {"role": "user", "content": prompt},
             ],
-            temperature=temperature,
-        )
+        )  # temperature is deprecated for Haiku 5.5, so it is not sent
         text = message.content[0].text.strip('"')
     elif api == "mistral":
         log(f"Mistral request. Model: {model}. Prompt: {prompt}")
