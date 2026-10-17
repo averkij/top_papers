@@ -102,7 +102,9 @@ def get_text(
         log(f"Claude request. Model: {model}. Prompt: {prompt}")
         message = claude_client.messages.create(
             model=model,
-            max_tokens=4096,  # thinking tokens count toward the limit
+            max_tokens=4096,
+            thinking={"type": "disabled"},  # Haiku 5.5 thinks by default
+            output_config={"effort": "low"},
             system=system_prompt,
             messages=[
                 {"role": "user", "content": prompt},
