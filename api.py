@@ -102,13 +102,14 @@ def get_text(
         log(f"Claude request. Model: {model}. Prompt: {prompt}")
         message = claude_client.messages.create(
             model=model,
-            max_tokens=512,
+            max_tokens=4096,  # thinking tokens count toward the limit
             system=system_prompt,
             messages=[
                 {"role": "user", "content": prompt},
             ],
         )  # temperature is deprecated for Haiku 5.5, so it is not sent
-        text = message.content[0].text.strip('"')
+        # Haiku 5.5 may return thinking blocks before the answer
+        text = "".join(b.text for b in message.content if b.type == "text").strip('"')
     elif api == "mistral":
         log(f"Mistral request. Model: {model}. Prompt: {prompt}")
         base_url = "https://api.mistral.ai/v1/chat/completions"
