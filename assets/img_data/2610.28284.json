@@ -1,0 +1,82 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.28284/2610.28284v1/intro.png",
+                "caption": "Figure 1:From sensor-centric to surface-aware geometric positional encoding.Left:PRoPE(Li et al., 2025)assigns every token in a view the same camera\nprojectionP=K⁡[R∣𝐭]\\mathrm{P}=\\mathrm{K}[\\mathrm{R}\\mid\\mathbf{t}].Middle:RayRoPE(Wu et al., 2026)predicts a depthddfor each token and\nplaces it at a 3D point𝐗\\mathbf{X}along the camera ray, but does not model local\nsurface orientation.Right:HRoPE associates each patch with a slanted\ntangent plane and relates token pairs through the plane-induced homographyHi,u​Hj,v−1\\mathrm{H}_{i,u}\\mathrm{H}_{j,v}^{-1}(Eq.2), thereby encoding\nboth depth and local surface orientation in the attention comparison.",
+                "position": 288
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.28284/2610.28284v1/pipeline.png",
+                "caption": "Figure 2:Overview of HRoPE.Left:per-patch parameters(R,𝐭,𝐧,κ)(\\mathrm{R},\\mathbf{t},\\mathbf{n},\\kappa)are predicted from\npatch-level image features (Sec.3.3),\nwhere𝐧\\mathbf{n}andκ=1/d\\kappa=1/drepresent the local plane’s\nunit normal and inverse plane distance, respectively.\nTogether with intrinsicsK\\mathrm{K}, these parameters defineH=K⁡(R+κ​𝐭​𝐧⊤)\\mathrm{H}=\\mathrm{K}\\bigl(\\mathord{\\hbox{\\pagecolor{paramRT!12!white}\\raisebox{0.0pt}[0.6pt][1.5pt]{\\makebox[11.99998pt][c]{$\\textstyle\\color[rgb]{0.1211,0.6094,0.1016}\\vphantom{\\mathbf{n}^{\\top}}\\mathrm{R}$}}}}+\\mathord{\\hbox{\\pagecolor{paramKappa!12!white}\\raisebox{0.0pt}[0.6pt][1.5pt]{\\makebox[11.99998pt][c]{$\\textstyle\\color[rgb]{0.75,0.3047,0.4297}\\vphantom{\\mathbf{n}^{\\top}}\\kappa$}}}}\\mkern 1.0mu\\mathord{\\hbox{\\pagecolor{paramRT!12!white}\\raisebox{0.0pt}[0.6pt][1.5pt]{\\makebox[11.99998pt][c]{$\\textstyle\\color[rgb]{0.1211,0.6094,0.1016}\\vphantom{\\mathbf{n}^{\\top}}\\mathbf{t}$}}}}\\mkern 1.0mu\\mathord{\\hbox{\\pagecolor{paramN!12!white}\\raisebox{0.0pt}[0.6pt][1.5pt]{\\makebox[11.99998pt][c]{$\\textstyle\\color[rgb]{0.2031,0.3438,0.8125}\\vphantom{\\mathbf{n}^{\\top}}\\mathbf{n}^{\\top}$}}}}\\bigr)(Eq.5).Middle:token-specific transforms modulate the cross-view attention, yielding the relative factorHi,u​Hj,v−1\\mathrm{H}_{i,u}\\mathrm{H}_{j,v}^{-1}in each attention logit\n(Eq.4).Right:the transform is repeated block-diagonally\nover the geometric half of each head, while the remaining dimensions retain the22D rotary blocksΦx\\Phi_{x}andΦy\\Phi_{y}(Eq.17).",
+                "position": 394
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.28284/2610.28284v1/main_tempv2.png",
+                "caption": "Figure 3:Qualitative novel-view synthesis on RealEstate10K and CO3Dv2.Each row shows one scene or object. From left to right, the columns contain two input\nviews, predictions from LVSM, PRoPE, RayRoPE, and HRoPE, and the\nground-truth target view (GT).",
+                "position": 805
+            },
+            {
+                "img": "https://arxiv.org/html/2610.28284/2610.28284v1/plane_vis_fix_v3.png",
+                "caption": "Figure 5:Predicted local planes on RealEstate10K.Two scenes are shown side by side; within each scene, the two rows correspond to the reference views. For each view, the columns show the input image, predicted\nplane orientations overlaid on the image (Visual Plane), and per-patch normals\nencoded as a color map (Normal Map). The red boxes mark the same approximately\nplanar surface across views, where the predicted orientations remain locally\ncoherent and cross-view consistent.",
+                "position": 936
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2610.28284/2610.28284v1/attention.png",
+                "caption": "Figure 7:Applying HRoPE to Multi-view Attention.Here,τi,u\\tau_{i,u}denotes the token corresponding to image patchuuin viewii. A predictor maps each patch tokenτi,u\\tau_{i,u}to the\ntransformation parameters(Ri,u,𝐭i,u,𝐧i,u,κi,u)(R_{i,u},\\mathbf{t}_{i,u},\\mathbf{n}_{i,u},\\kappa_{i,u}),\nfrom whichHi,u=Ki​Ai,uH_{i,u}=K_{i}A_{i,u}is constructed. Queries are transformed\nbyℋi,u⊤\\mathcal{H}_{i,u}^{\\top}, while keys and values are transformed byℋj,v−1\\mathcal{H}_{j,v}^{-1}. The aggregated value is subsequently mapped\nto the query token’s frame byℋi,u\\mathcal{H}_{i,u}. Only one query–key\npair is shown for clarity.",
+                "position": 2040
+            },
+            {
+                "img": "https://arxiv.org/html/2610.28284/2610.28284v1/ex_re10k.png",
+                "caption": "Figure 8:Additional qualitative comparison on RealEstate10K.Each row is one scene. From left to right, the columns show novel views synthesized\nby LVSM, PRoPE, RayRoPE, and HRoPE (Ours), followed by the ground-truth target\nview (GT). All methods use the same backbone and inputs and differ only in their\npositional encoding.",
+                "position": 2512
+            },
+            {
+                "img": "https://arxiv.org/html/2610.28284/2610.28284v1/ex_co3dv2.png",
+                "caption": "Figure 9:Additional qualitative comparison on CO3Dv2.Each row is one object. From left to right, the columns show novel views synthesized\nby LVSM, PRoPE, RayRoPE, and HRoPE (Ours), followed by the ground-truth target\nview (GT). All methods use the same backbone and inputs and differ only in their\npositional encoding.",
+                "position": 2519
+            },
+            {
+                "img": "https://arxiv.org/html/2610.28284/2610.28284v1/eschernet_temp_v1.png",
+                "caption": "Figure 10:Additional qualitative comparison with EscherNet on Objaverse.Each row is one object. From left to right, the columns show three input views, the\nnovel views synthesized with CaPE and HRoPE (Ours), and the ground-truth target\nview (GT). Both methods use the same EscherNet backbone and inputs and differ only\nin their positional encoding.",
+                "position": 2526
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
