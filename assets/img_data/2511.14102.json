@@ -1,0 +1,141 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1.Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/mot02.png",
+                "caption": "Figure 1.Conventional offloading versusSpecter. Aligned quantized speculative decoding lays the foundation for accurate prefetching and efficient system design.Two diagrams and timelines contrast intra-token prefetching with multi-step speculative offloading. The conventional path alternates PCIe transfers and GPU inference, leaving idle intervals. The Specter path uses a quantized draft model to produce candidate tokens and an expert lookahead list, allowing expert prefetching to overlap with drafting and target verification.",
+                "position": 324
+            }
+        ]
+    },
+    {
+        "header": "2.Background and Motivation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/fidelity2.png",
+                "caption": "Figure 2.Expert-ID selection fidelity between an INT4 Qwen1.5-MoE\ndraft model and its FP16 target model.Three histograms show expert-ID match-rate distributions for all observations, per-layer means, and per-request means. The horizontal axes show match rate and the vertical axis shows frequency, both in percent. All three distributions concentrate around 90 to 92 percent, with a reported global mean of 90.8 percent.",
+                "position": 391
+            },
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/bg_challen.png",
+                "caption": "Figure 3.Increasing the speculative depth yields an approximately linear benefit in dense models, but a markedly nonlinear trend in MoE models, as deeper speculation rapidly increases I/O demand under memory constraints.Schematic timelines compare speculative decoding in dense and MoE models. Light blocks represent drafting, dark blocks represent verification, and an orange outline marks additional overhead. Increasing draft depth adds little verification time in the dense example, whereas the MoE example has a substantially longer verification interval and lower speedup because more experts are activated.",
+                "position": 463
+            },
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/expert_explosion1.png",
+                "caption": "Figure 4.Measured expert working-set growth with speculation depth.Three line charts plot distinct experts per layer against speculation depths of 1, 2, 4, 8, and 16 for DeepSeekV2-Lite, Qwen1.5-MoE, and Phi-3.5-MoE. Orange lines show the mean and shaded bands show the minimum-to-maximum range. Expert demand rises in all three models, with annotated growth factors of 5.29, 7.18, and 4.65, respectively.",
+                "position": 476
+            },
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/overview5.png",
+                "caption": "Figure 5.The high-level architecture ofSpecter. The system integrates a Speculative Inference Controller, a Predictive I/O Orchestrator, and a Streamlined Execution Engine to transform I/O latency into productive computation through proactive data orchestration and adaptive control.A layered diagram connects the speculative decoding workflow to three system modules and the memory hierarchy. The controller initializes models, profiles speculative depth, and manages decoding state. The execution engine dispatches fused drafting and reordered expert verification. The I/O orchestrator analyzes routing patterns, plans prefetches, and manages residency. GPU memory holds quantized experts, an expert cache, and shared parameters, while target expert weights reside in CPU memory and transfer over PCIe.",
+                "position": 485
+            }
+        ]
+    },
+    {
+        "header": "3.Specter: System Architecture and Design",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/data_layout.png",
+                "caption": "Figure 6.Overview of parameter distribution and data layout orchestration inSpecter.Diagram of parameter placement across GPU and CPU memory. The draft and target models share GPU-resident parameters and a KV cache. Quantized draft experts remain on the GPU, while full-precision target experts are prefetched or loaded from CPU memory into a GPU expert cache.",
+                "position": 542
+            },
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/offline_profile5.png",
+                "caption": "Figure 7.Speculative depth profiling results for DeepSeekV2-Lite, Qwen1.5-MoE and Phi-3.5-MoE. The reported TPOT is averaged over prompts and repeated runs.Three line plots show TPOT against speculation depth for DeepSeekV2-Lite, Qwen1.5-MoE, and Phi-3.5-MoE. Highlighted minima occur at depths 16, 8, and 16, respectively. Increasing speculation depth beyond these minima does not consistently reduce TPOT.",
+                "position": 576
+            },
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/state_manager.png",
+                "caption": "Figure 8.State lifecycle across one speculative\ndecoding iteration, including verifier-guided token commitment and\nshared-prefix KV management.State-transition diagram for one speculative decoding iteration. Persistent tokens and shared prefix KV states feed the draft and target models. Drafting creates temporary tokens and KV states; causally masked target verification produces verification states. Sampling commits accepted state to the persistent prefix, while temporary draft state is released.",
+                "position": 609
+            },
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/timeline-io-full.png",
+                "caption": "Figure 9.Execution timeline of adaptive ELB-guided prefetching during drafting.Timeline divided into Cold Start, Prefetch Overlap, and Final Cleanup. ELB counters collect routing metadata during draft computation. Snapshots at chunk boundaries trigger prefetch transfers on a separate CUDA I/O stream, overlapping adaptive draft chunks. The final chunk discards new routing metadata and clears the ELB before verification begins.",
+                "position": 699
+            },
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/prefill_blue.png",
+                "caption": "(a)Prefill latency comparison",
+                "position": 744
+            },
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/prefill_blue.png",
+                "caption": "(a)Prefill latency comparison",
+                "position": 747
+            },
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/decode_blue.png",
+                "caption": "(b)Decode latency comparison",
+                "position": 750
+            },
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/quant_latency_throughput.png",
+                "caption": "Figure 11.Impact of quantization-aware fused expert kernels on throughput and latency in MoE models.Grouped bar charts compare FP16, INT4, and fused INT4 execution for Qwen1.5-MoE and Phi-3.5-MoE. For both models, INT4 lowers TPOT and raises throughput relative to FP16, and fused INT4 further lowers TPOT and raises throughput.",
+                "position": 755
+            },
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/reorder.png",
+                "caption": "Figure 12.Comparison of conventional token-wise verification andSpecter’scache-aware expert-wise execution.Two diagrams compare token-wise and expert-wise verification. Naive computation traverses a token-by-expert grid and uses GEMV operations with experts in GPU or CPU memory. Reordering groups tokens by expert for GEMM computation and separates cache-hit and cache-miss experts around the expert cache.",
+                "position": 787
+            },
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/datasets.png",
+                "caption": "Figure 13.Dataset-induced expert-routing diversity on\nDeepSeekV2-Lite withK=16K=16. Left: mean distinct experts per layer of each dataset, with 10th–90th percentile ranges. Right: pairwise Jensen–Shannon distances between normalized routing distributions.Two panels compare five datasets. The bar chart shows distinct experts per layer with percentile intervals: HumanEval has the largest mean and WikiText-2 the smallest. The heat map shows zero self-distances and nonzero distances between different datasets, with WikiText-2 generally the most distinct.",
+                "position": 874
+            }
+        ]
+    },
+    {
+        "header": "4.Evaluation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/all_methods.png",
+                "caption": "Figure 14.End-to-end inference performance ofSpecterand other approaches on varying datasets, memory settings and models. The figures in the upper row represent experiments conducted under higher GPU memory conditions, while the figures in the bottom row represent experiments performed under lower GPU memory conditions. Under shared-weight accounting, the reference high/low memory budgets are 24/18 GB, 20/16 GB, and 40/32 GB for DeepSeekV2-Lite, Qwen1.5-MoE, and Phi-3.5-MoE, respectively.Six grouped bar charts show TPOT in milliseconds per token for seven systems across five datasets and their average. Columns represent DeepSeekV2-Lite, Qwen1.5-MoE, and Phi-3.5-MoE; rows represent high and low memory budgets. Specter has the lowest average TPOT in each panel, while Transformers has the highest.",
+                "position": 898
+            },
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/bs_exp2.png",
+                "caption": "Figure 15.TPOT and throughput scaling with batch size on DeepSeekV2-Lite and Qwen1.5-MoE.Four line charts compare Specter, SpecMoEOff, MO-SM, and Transformers as batch size increases from 1 to 32. Columns represent DeepSeekV2-Lite and Qwen1.5-MoE; the upper row shows throughput and the lower row shows TPOT on logarithmic vertical scales. Specter has the highest throughput and lowest TPOT at every displayed batch size.",
+                "position": 948
+            },
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/expert_explosion2.png",
+                "caption": "Figure 16.Expert working-set growth with batch size.Three line charts show mean distinct experts per layer and shaded minimum-to-maximum ranges for batch sizes 1, 2, 4, and 8. Expert counts increase for DeepSeekV2-Lite, Qwen1.5-MoE, and Phi-3.5-MoE, with Qwen1.5-MoE exhibiting the largest relative increase.",
+                "position": 1090
+            },
+            {
+                "img": "https://arxiv.org/html/2511.14102/2511.14102v2/figures/policy.png",
+                "caption": "Figure 17.Cache hit rates of different policies on DeepSeekV2-Lite under three GPU-memory budgets.Grouped bars compare cache hit percentages for LRU, LRU-S, SP-E, SP-L, and Specter at memory budgets of 16, 24, and 32 GB. Specter remains close to 100 percent and has the highest hit rate in each group. LRU and LRU-S improve as the memory budget increases, with LRU-S approaching the prefetch policies at 32 GB.",
+                "position": 1216
+            }
+        ]
+    },
+    {
+        "header": "5.Related Work",
+        "images": []
+    },
+    {
+        "header": "6.Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AArtifact Appendix",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
