@@ -1,0 +1,698 @@
+{
+    "paper_title": "RubatoCodec: Budgeted Adaptive Speech Tokenization with Streaming Decoding",
+    "authors": [
+        "Chihiro Arata",
+        "Shohei Taniguchi",
+        "Gouki Minegishi",
+        "Kan Hatakeyama-Sato"
+    ],
+    "sections": [
+        {
+            "title": "Abstract",
+            "content": "Neural speech codecs provide discrete tokens for speech generation. Lower frame rates shorten token sequences, but each token must then carry more linguistic and acoustic information. Variable-frame-rate codecs address this trade-off by adapting token allocation to speech content, but threshold-based allocation lets content determine the token count, so the sequence length a speech generator must produce varies across utterances and datasets at a fixed setting. We present RubatoCodec, a variable-frame-rate speech codec built on X-Codec-2 with an exact utterance-level event budget and streaming decoding. Its Adaptive Firing mechanism uses changes in codec features and waveform spectra to divide speech into variable-duration events without a learned boundary predictor. Discrete codes and an explicit duration represent each event, allowing a speech generator to predict and decode one event at a time. Controlled experiments show that adaptive allocation outperforms fixed-rate coding in reconstruction fidelity and intelligibility at low event rates. A model trained on large-scale multilingual speech achieves competitive reconstruction quality across English, Japanese, and Mandarin, with the best intelligibility preservation among the compared codecs on the evaluated English and Japanese benchmarks at comparable bitrates. In a matched text-to-speech comparison, the adaptive representation yields lower WER and higher UTMOS and UTMOSv2 with comparable speaker similarity. The speech generator also learns the codec's utterance-level event budget without an explicit generation-time rate constraint. These results demonstrate that budgeted adaptive speech representations support both high-quality reconstruction and streaming text-to-speech generation. Code and weights are available at https://github.com/third-intelligence/RubatoCodec and https://huggingface.co/third-intelligence/RubatoCodec."
+        },
+        {
+            "title": "Start",
+            "content": "RubatoCodec: Budgeted Adaptive Speech Tokenization with Streaming Decoding Chihiro Arata1, Shohei Taniguchi1, Gouki Minegishi1, and Kan Hatakeyama-Sato1 1Third Intelligence, Inc. Correspondence: chihiro.arata@third-intelligence.com"
+        },
+        {
+            "title": "Abstract",
+            "content": "Neural speech codecs provide discrete tokens for speech generation. Lower frame rates shorten token sequences, but each token must then carry more linguistic and acoustic information. Variable-frame-rate codecs address this trade-off by adapting token allocation to speech content, but threshold-based allocation lets content determine the token count, so the sequence length speech generator must produce varies across utterances and datasets at fixed setting. We present RubatoCodec, variable-frame-rate speech codec built on X-Codec-2 with an exact utterancelevel event budget and streaming decoding. Its Adaptive Firing mechanism uses changes in codec features and waveform spectra to divide speech into variable-duration events without learned boundary predictor. Discrete codes and an explicit duration represent each event, allowing speech generator to predict and decode one event at time. Controlled experiments show that adaptive allocation outperforms fixed-rate coding in reconstruction fidelity and intelligibility at low event rates. model trained on large-scale multilingual speech achieves competitive reconstruction quality across English, Japanese, and Mandarin, with the best intelligibility preservation among the compared codecs on the evaluated English and Japanese benchmarks at comparable bitrates. In matched text-to-speech comparison, the adaptive representation yields lower WER and higher UTMOS and UTMOSv2 with comparable speaker similarity. The speech generator also learns the codecs utterance-level event budget without an explicit generationtime rate constraint. These results demonstrate that budgeted adaptive speech representations support both high-quality reconstruction and streaming text-to-speech generation. Code and weights are available at https://github.com/third-intelligence/RubatoCodec and https://huggingface.co/third-intelligence/RubatoCodec."
+        },
+        {
+            "title": "1 Introduction",
+            "content": "Neural speech codecs encode waveforms as discrete tokens for reconstruction [13] and language-model-based generation, including AudioLM [4], VALL-E [5], and recent synthesis and spoken dialogue systems [69]. For generation, the codecs frame rate determines the temporal sequence length: ten seconds of speech requires 500 positions at 50 Hz. Lower rates shorten this sequence but require each position to represent longer acoustic interval. Recent tokenizers operate at 12.5 Hz [6, 8, 9], where each token spans 80 ms. At this resolution, where boundaries fall relative to speech content matters: fixed grid can merge rapid phonetic transition into single token while spending as many tokens on pause as on the transition. Speech is temporally nonstationary: pauses and steady vowels change slowly, whereas transitions change rapidly. Variable-rate representations and variable-frame-rate codecs exploit this by assigning different durations to frames [1015]. Threshold-based allocation, however, lets content determine the frame count, so rates vary"
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "across utterances and datasets at fixed setting [14, 15]. For example, one released threshold-based codec ranges from 46.1 to 81.5 events/s under single threshold across our five evaluation datasets (Section 5.4.1). Calibrating the threshold on representative data can match an average rate, but it neither fixes the count for an individual utterance nor preserves that average when the data distribution shifts. Sequence length, and with it downstream modeling cost, then cannot be determined from audio duration alone. An explicit event budget removes this dependence: placement adapts to content, while utterance duration determines the sequence length. Prescribed-count segmentation has been explored in codecs and speech representation methods [11, 12, 16]. We build on this principle with codec that uses deterministic firing signal to allocate events, learns duration-aware representations of those events, and decodes them causally. RubatoCodec separates the number of events from their placement. retention ratio 𝑅 fixes the number of events for 𝑇 latent frames at 𝐾 = round(𝑅𝑇) (Section 3.3.2), and Adaptive Firing places them by cumulative allocation of signal derived from latent dissimilarity and waveform spectral flux, without learned boundary predictor. The default 𝑅 = 0.25 yields 12.5 events/s on average from 50-Hz latent grid, with variable event durations. The name reflects the musical term rubato: local timing flexes while the overall tempo is preserved. RubatoCodec builds on X-Codec-2 [7], retaining its acoustic/semantic encoder and spectral synthesis backbone while introducing adaptive aggregation and causal decoding. Each event carries discrete codes and an explicit duration, allowing downstream model to predict and decode completed events incrementally. We evaluate the design through controlled codec comparisons, multilingual reconstruction, and downstream TTS training. Our contributions are: 1. Budgeted content-adaptive speech tokenization. Adaptive Firing combines an exact utterance-level event budget with cumulative allocation driven by latent dissimilarity and waveform spectral flux. An onset-anchored aggregator combines frame features and duration within each event to construct its quantizer input. Event boundaries require neither learned boundary predictor nor rate-penalty optimization. 2. Controlled analysis of adaptive allocation. Matched comparisons show reconstruction gains over fixedrate downsampling at low event rates, and placement-only comparison indicates that content-adaptive boundaries contribute to these gains. We also characterize how event rate and quantizer depth trade off at matched bitrates. 3. codeduration interface for streaming generation. Each event carries semantically supervised codes and an explicit duration, which causal decoder renders as they become available. Large-scale multilingual evaluation shows competitive reconstruction quality, including the best intelligibility preservation among the compared codecs on the evaluated English and Japanese benchmarks at comparable bitrates. In matched TTS training, the representation yields lower WER and higher UTMOS and UTMOSv2 scores with comparable speaker similarity, and the generator learns the codecs utterance-level event budget without an explicit rate constraint."
+        },
+        {
+            "title": "2.1 Neural speech codecs for language modeling",
+            "content": "SoundStream and EnCodec combine residual vector quantization with adversarial waveform reconstruction [1, 2]; DAC improves the quantization and reconstruction components [3]. Quantizer depth controls the information carried per temporal position. BigCodec instead studies high-capacity single-codebook representations at low bitrates [17]. Semantic supervision encourages codec tokens to retain linguistic content. SpeechTokenizer supervises the first RVQ layer with self-supervised features [18], while Mimi combines semantically distilled VQ with parallel acoustic RVQ [6]. X-Codec-2 fuses an acoustic encoder with frozen w2v-BERT 2.0 features and uses"
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "semantic reconstruction supervision [7]. RubatoCodec builds on this architecture, including its Vocos-style spectral decoder [19], and adopts the synthesis upsampling approach of Inworld TTS [20]. Low-frame-rate tokenizers reduce the temporal sequence length presented to generative model. Mimi and the publicly released Qwen3-TTS-Tokenizer-12Hz operate at 12.5 Hz with semantic supervision [6, 8], while MOSS-Audio-Tokenizer learns low-rate representation through jointly optimized reconstruction, adversarial, and audio-to-text objectives without an external semantic distillation teacher [9]."
+        },
+        {
+            "title": "2.2 Variable-frame-rate speech coding",
+            "content": "Early variable-rate discrete representations combine slow autoencoders with run-length coding [10]. Recent codecs adapt temporal resolution through hierarchy selection, merging, or boundary selection. TFC uses waveform-derived temporal entropy and utterance-level granularity ratios [11]; VARSTok clusters contiguous latent frames and encodes duration in token identity [13]; FlexiCodec merges frames using frozen SenseVoice features and adjusts rate through its merge threshold [14]. RubatoCodec constructs its firing signal from fused-latent dissimilarity and waveform spectral flux. CodecSlime constrains segment count through dynamic programming over feature distortion, adapting pretrained fixed-rate codec through its Melt-and-Cool procedure [12]. RubatoCodec instead normalizes its firing signal to the event budget and places boundaries by cumulative firing, without searching candidate segmentations. Its trainable codec components learn from scratch with adaptive allocation active throughout training. Elastic Time augments frozen audio autoencoder with learned latent predictor, using greedy or dynamicprogramming boundary selection to retain target number of anchor frames and reconstruct omitted frames [21]. It adjusts the frame rate of continuous latents at inference; RubatoCodec instead produces discrete codes with explicit durations for causal decoding. DTM-Codecs Path Length Equalization selects boundaries at successive thresholds of accumulated latent change [15]. Its fixed threshold lets total change determine the event count; RubatoCodec normalizes bounded increments to prescribed count. DyCAST uses character alignment or learned boundary predictor and supports transmitted durations, length-conditioned duration prediction, or free duration prediction [22]. Its total-length constraint concerns decoded durations, not the number of encoded events. Adaptive placement, inference-time rate adjustment, and exact event counts are distinct properties. FlexiCodec and DTM-Codec offer threshold-based adjustment; TFC, CodecSlime, and RubatoCodec enforce prescribed counts. The dynamic tokenizer in The WER Trap normalizes frame weights to prescribed token count before soft aggregation and FSQ [16]. It follows Continuous Integrate-and-Fire (CIF), which accumulates learned weights into feature sums and uses target-length normalization during training [23]. Beyond waveform coding, Once-for-All compression extends CIF to inference-time rate adjustment [24], and SpeechCLIP+ combines CIF with vector quantization and input-length-based targets [25]. RubatoCodec shares cumulative budget allocation but separates boundary placement from event representation: deterministic statistics set event boundaries, and an aggregator combines the onset feature, the mean of the enclosed frame features, and the duration for each event. Table 1 compares VFR codecs in terms of temporal allocation, event-count control, timing representation, and training procedure."
+        },
+        {
+            "title": "2.3 Duration-aware and streaming speech generation",
+            "content": "Variable-duration speech generation must model both content and timing. Run-length Transformers model compressed event sequences [10], while VARSTok includes duration in its vocabulary [13]. FlexiCodec predicts semantic tokens and frame lengths before flow-matching synthesis [14]; DyCAST also evaluates"
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table 1. Temporal allocation, event-count control, timing representations, and training procedures in VFR speech codecs. Training procedures describe the recipes reported in the respective papers."
+        },
+        {
+            "title": "Temporal allocation",
+            "content": "Event-count control"
+        },
+        {
+            "title": "Training procedure",
+            "content": "TFC [11]"
+        },
+        {
+            "title": "Resolution selection on\nwaveform entropy",
+            "content": "CodecSlime [12] DP segmentation on codec-feature distortion"
+        },
+        {
+            "title": "Hierarchical mask",
+            "content": "Single-stage"
+        },
+        {
+            "title": "Explicit lengths",
+            "content": "Multi-stage (3 stages) VARSTok [13] FlexiCodec [14] DTM-Codec [15] DyCAST [22]"
+        },
+        {
+            "title": "Similarity merging on\nSenseVoice features",
+            "content": "Threshold crossing on accumulated codec-latent change"
+        },
+        {
+            "title": "MMS character\nalignment or boundary\nprediction on WavLM\nfeatures",
+            "content": "Budget-normalized firing on latent change and waveform flux Content-dependent"
+        },
+        {
+            "title": "In token ID",
+            "content": "Content-dependent"
+        },
+        {
+            "title": "Explicit lengths",
+            "content": "Adaptation (pretrained WavTokenizer) Single-stage (frozen SenseVoice) Content-dependent"
+        },
+        {
+            "title": "Binary mask",
+            "content": "Single-stage Content-dependent"
+        },
+        {
+            "title": "Explicit or\npredicted lengths",
+            "content": "Multi-stage (4 stages; frozen WavLM)"
+        },
+        {
+            "title": "Explicit lengths",
+            "content": "Single-stage (frozen w2v-BERT 2.0) TTS with dynamic tokens and duration decoding [22]. QuarkAudio and FlexiSLM further explore adaptive representations for generation [26, 27]. Streaming synthesis additionally requires decoding path that can render available codes incrementally. Mimi and Qwen3-TTS-Tokenizer-12Hz provide low-rate representations for streaming synthesis [6, 8]. MOSS-Audio-Tokenizer uses causal Transformer encoding and decoding [9]. RubatoCodec supplies explicit event durations to causal waveform decoder. downstream model predicts codeduration pairs, which restore the decoding grid and can be synthesized as they become available."
+        },
+        {
+            "title": "3 RubatoCodec Architecture",
+            "content": "RubatoCodec retains X-Codec-2s acoustic/semantic encoding, feature fusion, semantic reconstruction pathway, and Transformer-based spectral synthesis backbone [7]. We modify the temporal bottleneck through Adaptive Firing, interval aggregation, hybrid residual quantization, and duration-aware grid reconstruction (Figure 1). Causal decoding enables incremental synthesis. RubatoCodec also uses factor-three upsampler inspired by Inworld TTS that raises the synthesis feature rate [20]."
+        },
+        {
+            "title": "3.1 Representation and signal path",
+            "content": "The encoder maps 16-kHz audio to 𝑇 feature vectors on nominal 50-Hz grid, with the aligned 44.1-kHz waveform serving as the reconstruction target. RubatoCodec partitions this grid into 𝐾 nonempty intervals, each called an event. Event 𝑖 is represented by 𝑄 quantizer indices c𝑖 = (𝑐𝑖,0, . . . , 𝑐𝑖,𝑄1), where 𝑄 is the number of quantizer layers (Section 3.4), and duration 𝑑𝑖 N+ giving the number of 20-ms grid frames it spans. Let 𝑝𝑖 be the index of the first grid frame of event 𝑖, with 𝑝0 = 0:"
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Figure 1. RubatoCodec architecture. The codec builds on the X-Codec-2 encoder and decoder backbone [7] and is shown at the default retention ratio of 0.25. Latent change and waveform spectral flux guide budgeted event allocation. The interval aggregator combines each events onset feature with learned correction based on that feature, the mean of its frame features, and its duration. Quantized event representations and durations restore the 50-Hz decoding grid; the Inworld-TTS-inspired upsampler increases the synthesis feature rate [20]. 𝑝𝑖 = 𝑑 𝑗, 𝑗<𝑖 𝐾 1 𝑖=0 𝑑𝑖 = 𝑇 . (1) Table 2 summarizes the architecture. The decoder emits 882𝑇 output samples because 44100/50 = 882."
+        },
+        {
+            "title": "3.2 Acoustic and semantic encoders",
+            "content": "Following X-Codec-2 [7], the acoustic encoder uses strided convolutions with base width 48, residual dilations 1, 3, 9, and Snake-beta activations to produce acoustic features 𝑎𝑡 . Its total waveform hop size is 320 samples at 16 kHz, corresponding to 50-Hz frame rate. frozen w2v-BERT 2.0 model [28] supplies layer-16 features 𝑏 𝑡 at the same 50-Hz frame rate. learned convolutional encoder transforms these into 𝑏𝑡 , which is fused with the acoustic features. The frozen features 𝑏 𝑡 also serve as the semantic reconstruction targets in Section 3.4. Writing the aligned streams as 𝑎𝑡 , 𝑏𝑡 R1024, their fusion is ℎ𝑡 = 𝑊prior [𝑎𝑡 ; 𝑏𝑡 ] + 𝑏prior R2048. (2)"
+        },
+        {
+            "title": "3.3 Adaptive Firing",
+            "content": "Adaptive Firing uses firing signal derived from latent dissimilarity and waveform spectral flux to partition the 50-Hz latent sequence into 𝐾 events. separate aggregator combines the frame features within each event into one vector; unlike CIF [23], the firing signal determines only the boundaries and does not weight the pooled features."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table 2. Main architecture in the default configuration. Tensor shapes omit the batch dimension."
+        },
+        {
+            "title": "Temporal rate",
+            "content": "Shape / specification"
+        },
+        {
+            "title": "Waveform input",
+            "content": "16 kHz"
+        },
+        {
+            "title": "50 Hz",
+            "content": "𝑇 1024; strides 2, 2, 4, 4, 5 Frozen w2v-BERT 2.0 [28] + semantic projection"
+        },
+        {
+            "title": "Adaptive segmentation and\naggregation",
+            "content": "Approximately 12.5 events/s Layer-16 features projected to 𝑇 1024 𝑇 2048 𝐾"
+        },
+        {
+            "title": "Same event sequence",
+            "content": "16 indices/event; 4,096 values/layer"
+        },
+        {
+            "title": "Causal Transformer backbone",
+            "content": "Causal transposed-convolution upsampler"
+        },
+        {
+            "title": "150 Hz",
+            "content": "𝑇 2048, followed by 2048 1024 projection 12 layers, width 1,024, 16 heads, MLP expansion 4 Factor 3, kernel"
+        },
+        {
+            "title": "Spectral projection and ISTFT",
+            "content": "44.1 kHz FFT 1,176; hop 294; 882𝑇 samples"
+        },
+        {
+            "title": "3.3.1 Firing signal",
+            "content": "The firing signal sums two mean-normalized components, multi-scale latent dissimilarity and log-mel spectral flux: 𝑠𝑡 = 𝑠latent 𝑡 + ( 𝑓 )𝑡 . (3) Here, denotes sequence-wise mean normalization, 𝑠latent component, and 𝑓𝑡 is the log-mel spectral flux. Each is defined below. Normalization. Define sequence-wise mean normalization for nonnegative scalar sequence 𝑣 as is the normalized multi-scale latent-dissimilarity 𝑡 (𝑣)𝑡 = 𝑣𝑡 max(𝜖, 𝑇 1 (cid:205)𝑢 𝑣𝑢) , 𝜖 = 108. (4) Latent dissimilarity. The multi-scale latent-dissimilarity component uses offset pairs = {(1, 0), (1, 1), (2, 1)}: ℓ𝑎,𝑏 𝑡 = max{0, 1 cos(ℎ𝑡 𝑎, ℎ𝑡+𝑏)}, 𝑠latent 𝑡 (𝑎,𝑏) = (cid:169) (cid:173) (cid:171) . (ℓ𝑎,𝑏)(cid:170) (cid:174) (cid:172)𝑡 (5) Unavailable edge comparisons are set to zero. This latent-dissimilarity component follows the use of feature dissimilarity for dynamic chunking [29], combining comparisons at multiple temporal offsets. Spectral flux. The waveform component is log-mel spectral flux. Let 𝑀𝑚,𝑡 denote the mel-spectrogram magnitude at mel bin 𝑚 and frame 𝑡, computed with 80 mel bins, 1,024-point STFT, and 320-sample hop at 16 kHz. The flux is"
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "𝑓𝑡 = 1 80 80 𝑚=1 (cid:12)log(𝑀𝑚,𝑡 + 105) log(𝑀𝑚,𝑡 1 + 105)(cid:12) (cid:12) (cid:12) . (6) Flux is computed using centered STFT with reflection padding. Its first value and final two values are set to zero to suppress boundary artifacts, after which the sequence is truncated or zero-padded on the right to match the latent-grid length. Normalization makes the combination depend on the relative temporal distributions of its components rather than their raw scales. The waveform component also provides an informative allocation signal early in training, before the acoustic encoder has learned meaningful features."
+        },
+        {
+            "title": "3.3.2 Budget-constrained event allocation",
+            "content": "For target retention ratio 0 < 𝑅 1, the integer event budget is 𝐾 = max{1, min(𝑇, round(𝑅𝑇))}. (7) Here, round() rounds half to even. The first frame always fires and consumes one unit of this budget, leaving 𝐿 = 𝑇 1 frames to receive 𝑀 = 𝐾 1 further event starts. For 𝑀 > 0, distribute the remaining budget over these 𝐿 frames using bounded increments 𝛿𝑡 = min(𝛼𝑠𝑡 , 1), 𝑇 1 𝑡=1 𝛿𝑡 = 𝑀. (8) 𝑢=1 We find 𝛼 by bisection, after expanding the upper bracket until the constraint is met or limit is reached. For cumulative increments 𝐶𝑡 = (cid:205)𝑡 𝛿𝑢, provisional event starts are the first crossings of thresholds 𝑗 1 2 , for 𝑗 = 1, . . . , 𝑀. The last threshold lies half unit below 𝑀, providing margin against endpoint rounding error. These cumulative threshold crossings follow the integrate-and-fire principle used in CIF [23]; here, bounded increments and the discrete position correction below enforce the prescribed number of distinct event starts. Let 𝑞 𝑗, for 𝑗 = 0, . . . , 𝑀 1, be the zero-based position of the ( 𝑗 + 1)-th threshold crossing among these 𝐿 frames. If threshold is not reached, its position is set to 𝐿. monotone correction handles coincident positions and unreachable thresholds: 𝑢 𝑗 = 𝑗 + max 0ℓ 𝑗 (𝑞ℓ ℓ), 𝑣 𝑗 = min(𝑢 𝑗, 𝐿 𝑀 + 𝑗), 𝑝 𝑗+1 = 1 + 𝑣 𝑗 . (9) The running maximum and capacity bound in (9) produce strictly increasing positions satisfying 0 𝑣 𝑗 𝐿 𝑀 + 𝑗 < 𝐿. Together with 𝑝0 = 0, these give exactly 𝐾 distinct event starts. For 𝐾 = 1, the single event covers the whole grid. Figure 2 illustrates the construction on short synthetic firing signal. Two cases need separate handling. When the firing signal over these 𝐿 frames is negligible, we use uniform increments 𝛿𝑡 = 𝑀/𝐿. When the equality in (8) is infeasible, we retain the increments returned by the bounded search and apply the same position correction in (9), preserving exactly 𝐾 nonempty events. The budget is defined over the 𝑇 encoder frames, corresponding to represented duration of 𝑇/50 seconds after any boundary padding. The utterance-average event rate on this grid is 50𝐾/𝑇. Away from the minimum-one-event clamp, (cid:12) (cid:12) (cid:12) (cid:12) 50𝐾 𝑇 50𝑅 (cid:12) (cid:12) (cid:12) (cid:12) 25 𝑇 events/s. (10)"
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Figure 2. Cumulative allocation for synthetic firing signal. The example uses 𝑇 = 20, 𝑅 = 0.25, and 𝐾 = 5. (a) Firing signal. (b) Cumulative bounded increments cross thresholds 0.5, 1.5, 2.5, and 3.5 at frames 3, 7, 12, and 17. (c) Together with the fixed start at frame 0, these crossings define five events spanning 3, 4, 5, 5, and 3 grid frames, respectively. All positions are computed from the displayed signal using equations (89); no position correction is needed in this example. When 𝑅𝑇 is integral, the grid-average event rate is exactly 50𝑅. Allocation costs 𝑂 (𝑇) per bisection iteration, plus linear-time threshold search and position correction. Event allocation is deterministic and non-differentiable. Reconstruction and representation losses train the features and interval aggregator through the selected event representations. Boundaries therefore evolve during training as the features change, while the event count is enforced directly without rate loss. The allocation constrains the total event count without imposing maximum event duration. Sustained high-change regions can receive multiple events on different grid frames."
+        },
+        {
+            "title": "3.3.3 Interval aggregation",
+            "content": "Define 𝑝𝐾 = 𝑇, 𝑑𝑖 = 𝑝𝑖+1 𝑝𝑖, and the mean of the latent frame features within event 𝑖: ℎ𝑖 = 1 𝑑𝑖 𝑝𝑖+1 1 𝑡= 𝑝𝑖 ℎ𝑡 . The quantizer input is the onset feature plus learned correction: 𝑔𝑖 = ℎ 𝑝𝑖 + MLP(cid:0)[ℎ 𝑝𝑖 ; ℎ𝑖; 𝐸𝑑 (min(𝑑𝑖, 64))](cid:1) . (11) (12) The residual connection from the onset feature preserves information at the event start; the learned correction incorporates the mean and duration. The learned duration embedding 𝐸𝑑 is indexed up to 64, without capping the actual event duration."
+        },
+        {
+            "title": "3.4.1 Residual quantization",
+            "content": "RubatoCodec uses 𝑄 = 16 quantizer layers. Layer zero is finite scalar quantization with levels [8, 8, 8, 8], yielding 84 = 4096 indices [30]. Layers 115 use DAC-style vector quantization with factorized 8-dimensional codebook lookup, normalized lookup vectors, and 4,096 entries per layer [3]. Each layer therefore requires 12 fixed-width index bits. Each layer quantizes the residual left by the preceding layers. With 𝑟𝑖,0 = 𝑔𝑖, the reconstructed event vector at depth 𝐷 is 𝑞𝑖, 𝑗 = 𝑄 𝑗 (𝑟𝑖, 𝑗), 𝑟𝑖, 𝑗+1 = 𝑟𝑖, 𝑗 𝑞𝑖, 𝑗, ˆ𝑔 (𝐷) 𝑖 = 𝐷1 𝑗=0 𝑞𝑖, 𝑗 . (13) Here, 𝑄 𝑗 denotes the quantizer at layer 𝑗. Using the first 𝐷 layers adjusts the number of code indices per event while retaining the same event boundaries and durations."
+        },
+        {
+            "title": "3.4.2 Semantic distillation",
+            "content": "Semantic supervision encourages the first layer to preserve linguistic information for downstream modeling. We adapt X-Codec-2s semantic reconstruction objective [7], sharing the motivation of Mimi [6] but using serial residual chain rather than parallel semantic and acoustic quantizers. training-only semantic head predicts frozen w2v-BERT 2.0 features from the first-layer reconstruction. Its input uses the same sparse 50-Hz grid composition and offset embeddings as the waveform decoder (Section 3.5). Durations determine the grid placement; no separate duration embedding is added to the head. The semantic head consists of linear projection from 2,048 to 1,024 dimensions followed by residual convolutional network with four layers of kernel size three. Symmetric padding gives the head access to four grid frames on either side, including neighboring events within that range. The heads output ˆ𝑏𝑡 is trained to match the frozen teacher features 𝑏 normalized masked mean squared error: 𝑡 at event starts using dimensionLsem = (cid:205)𝑡 𝑚𝑡 ˆ𝑏𝑡 𝑏 𝐷 𝑠 (cid:205)𝑡 𝑚𝑡 𝑡 2 , 𝑚𝑡 = 1[𝑡 {𝑝𝑖 }]. (14) Here, 𝐷 𝑠 is the feature dimension. The mask 𝑚𝑡 assigns one teacher target at each events onset, where its first-layer representation enters the grid, leaving the residual layers to encode additional waveform detail."
+        },
+        {
+            "title": "3.5 Causal grid decoding",
+            "content": "The decoder places each dequantized event vector at its starting grid position and uses learned empty vector between starts. Let 𝐸𝑟 denote the learned offset embedding. With offset 𝑟 = 𝑡 𝑝𝑖 inside event 𝑖, 𝑧𝑡 = (cid:40) + 𝐸𝑟 (0), ˆ𝑔 (𝐷) 𝑖 𝑒empty + 𝐸𝑟 (min(𝑟, 64)), 𝑟 = 0, 𝑟 > 0. (15) Duration 𝑑𝑖 sets the number of grid frames, and the offset embedding identifies their positions within the event. The causal decoder can attend to the onset feature to synthesize the audio for that event. Appendix A.3 compares this sparse input with repeating the event vector and supports the sparse design for signal fidelity."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "The decoder retains the X-Codec-2 Transformer backbone [7], with causal attention and convolutional dependencies. projection maps the 2,048-dimensional grid to this 1,024-dimensional backbone, which uses causal embedding convolution, 12 Transformer layers, rotary positions, and 16 attention heads. factor-three transposed-convolution upsampler, inspired by the super-resolution module in Inworld TTS [20], produces 150-Hz synthesis features. Vocos-style spectral head predicts magnitude and phase, followed by forward-window ISTFT with hop size of 294 samples for 44.1-kHz output [19]. Convolutions are left-padded, transposed convolutions are right-trimmed, and attention excludes future frames, so synthesis depends only on the current and preceding events. The ISTFT places each 1,176-sample synthesis window at the current frames hop position and extends it forward in time. Each frame finalizes the next 294 samples, carrying waveform and window-normalization overlap buffers into subsequent frames. With three synthesis frames per grid step, an event of duration 𝑑𝑖 accounts for 882𝑑𝑖 output samples. At startup, normalization assumes preceding silent windows, yielding 20-ms fade-in; at termination, the remaining window overhang is discarded rather than emitted as additional audio. During inference, the decoder periodically discards its cached states and rebuilds them from window of recent events beginning at an event onset, which limits long-utterance extrapolation. At each such history recomputation, short crossfade blends the audio decoded before and after the recomputation. Streaming decoding processes incoming events incrementally, reusing decoder states between history recomputations and briefly buffering audio for the crossfade."
+        },
+        {
+            "title": "3.6 Model size and bitrate",
+            "content": "RubatoCodec contains approximately 246.1M codec parameters: 72.3M in the encoding path, 172.7M in the decoding path, and 1.1M in the quantizer. The additional frozen w2v-BERT 2.0 encoder has approximately 580M parameters, bringing the complete model to approximately 826M. Token-to-waveform synthesis uses the decoding path and quantizer without the encoding components. Each event contains 𝐷 code indices of 12 bits each. For 𝐾 events over represented duration of 𝜏 = 𝑇/50 seconds, the content bitrate is 𝐵content = 12𝐷𝐾 𝜏 . (16) At 12.5 events per second, depths 1, 4, 8, and 16 correspond to content bitrates of 0.15, 0.60, 1.20, and 2.40 kbit/s, respectively. Timing bitrate is estimated from the empirical entropy ˆ𝐻 (𝑑) of event durations, pooled within each evaluation dataset (Section 5.1.2). The estimated total bitrate is 𝐵total = 𝐵content + (𝐾/𝜏) ˆ𝐻 (𝑑)."
+        },
+        {
+            "title": "4 Training Data and Optimization",
+            "content": "We train adaptive and fixed-rate architectures on shared English subset at 6.25, 12.5, and 25 events/s, and adaptive and uniform-stride models at 12.5 events/s for the placement comparison. We then train multilingual RubatoCodec on larger speech mixture for comparison with external codecs."
+        },
+        {
+            "title": "4.1 Objectives and phases",
+            "content": "Both settings combine reconstruction, semantic supervision, quantization, adversarial, and perceptual objectives: L𝐺 = 15Lmel + 5Lsem + LVQ + 1phase2(Ladv + LFM) + 1phase=3Lperc. (17)"
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Multi-resolution mel reconstruction. Following DAC [3], Lmel sums mean absolute log-mel differences at 44.1 kHz over eight resolutions: window lengths 32, 64, 128, 256, 512, 1024, 2048, 4096, quarter-window hops, and corresponding mel-bin counts 5, 10, 20, 40, 80, 160, 320, 640. Magnitudes are clamped to 105 before the base-10 logarithm. Semantic reconstruction. Equation (14) supervises the first layer with frozen w2v-BERT 2.0 layer-16 features. RubatoCodec evaluates the loss at event starts. For fixed-rate controls, the 50-Hz teacher features are averaged over nonoverlapping groups of 8, 4, or 2 frames to match the 6.25-, 12.5-, or 25-Hz latent grid, respectively. These averaged features serve both as inputs to the semantic encoder for feature fusion and as targets for the semantic loss, which is evaluated at every latent position. Quantization. LVQ sums squared-error commitment and codebook losses over residual VQ layers [3], with weights 0.25 and 1.0 and stop-gradients on the code vector and encoder representation, respectively. FSQ has neither loss [30]. Adversarial training and feature matching. We use HiFi-GANs multi-period discriminator with periods 2, 3, 5, 7, 11, 17, 23, 37 [31] and UnivNet-style multi-resolution STFT-magnitude discriminator [32] with FFT/window sizes 216, 348, 568, 920, 1494, 2414, 3908, 6328 and half-window hops. Least-squares GAN losses use target labels one for real audio and zero for reconstructed audio, while the generator targets one [31]. LFM sums mean absolute differences of intermediate activations across both discriminator families, with detached target features. Discriminator parameters remain fixed during generator updates. Perceptual reconstruction. Following Llasas late-stage waveform supervision [7], Lperc compares frozen speech-model features of target and reconstructed audio resampled to 16 kHz. We use wav2vec2-XLS-R-300M [33], averaging mean squared feature error over layers 1021. Gradients propagate through the frozen extractor to the codec. Training phases. The first 10% of updates use mel, semantic, and quantization losses; the next 75% add adversarial and feature-matching losses; the final 15% also use perceptual loss. Trainable codec components start from scratch, while both pretrained feature extractors remain frozen."
+        },
+        {
+            "title": "4.2 Training for architecture comparisons",
+            "content": "Fixed-rate controls downsample before quantization to produce uniformly spaced codes. The adaptive architecture retains the 50-Hz grid and aggregates features within variable-duration events, restoring their representations to that grid for decoding. The adaptive-versus-fixed-rate comparisons use the same approximately 5,000-hour English subset of HiFiTTS2s 44-kHz partition [34]. We verified that the full HiFiTTS-2 dataset has no speaker overlap with LibriSpeech test-clean. Models are trained separately at each target event rate for 100,000 steps using aligned six-second crops. Both models use global batch of 64 and the objectives in Section 4.1; detailed training settings are provided in Appendix C.1. The adaptive models use the budget-constrained allocation in Section 3.3.2, with retention ratios of 0.125, 0.25, and 0.5 for nominal event rates of 6.25, 12.5, and 25 Hz. Quantizer configuration, decoder depth and width, output sample rate, losses, and optimization are shared; encoder strides and synthesis upsampling differ to accommodate the temporal grids  (Table 3)  . To isolate the effect of adaptive event placement, we additionally train adaptive and uniform-stride aggregation models on the full English 44-kHz training partition of HiFiTTS-2 for one million steps, using nominal event rate of 12.5 Hz. Both retain the same 50-Hz encoder and decoder grids, interval aggregator, and hybrid residual quantizer. The uniform control forms four-frame events. The global batch remains 64. The firing-signal, decoder-causality, grid-composition, and firing-rule ablations are described in Appendix A."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table 3. Temporal configurations of the main architecture comparisons. Encoder hop sizes, FFT sizes, and ISTFT hop sizes are given in samples. Each adaptive rate uses separately trained model. Architecture Target event rate Retention ratio Encoder hop at 16 kHz Latent grid Decoder upsampling factors ISTFT FFT / hop Adaptive Fixed Fixed Fixed 6.25 / 12.5 / 25 Hz 6.25 Hz 12.5 Hz 25 Hz 0.125 / 0.25 / 0.5 320 2,560 1,280 50 Hz 6.25 Hz 12.5 Hz 25 Hz 3 4 3 4 3 3 2 1,176 / 294 2,352 / 588 1,176 / 294 1,176 /"
+        },
+        {
+            "title": "4.3 Multilingual model training",
+            "content": "The multilingual model is trained on approximately 375,000 hours of public and internal speech data. Public sources include Emilia-YODAS (English, Japanese, Chinese, German, French, and Korean) [35], the 44-kHz subset of HiFiTTS-2 [34], ReazonSpeech [36], The Peoples Speech (excluding ShareAlike-licensed data) [37], VoxPopuli [38], Multilingual LibriSpeech (excluding English) [39], Omnilingual ASR Corpus [40], and IndicVoices [41]. Combined with internal data, the mixture covers read, spontaneous, conversational, broadcast, and expressive speech. English, Japanese, and Chinese account for approximately 44%, 27%, and 13% of the training data, respectively, with other languages making up the remaining 16%. Waveforms are resampled to 16 kHz for encoding and 44.1 kHz for reconstruction targets, with aligned six-second random crops; shorter examples are zero-padded. The multilingual model uses retention ratio 0.25 and is trained for 1.5 million steps with global batch of 160, following the loss phases in Section 4.1. Optimization settings and loss schedules are detailed in Appendix C.1."
+        },
+        {
+            "title": "5.1.1 Datasets",
+            "content": "We evaluate speech reconstruction on five datasets covering English, Japanese, and Mandarin Chinese, with 10,563 utterances in total  (Table 4)  . The adaptive-versus-fixed comparisons use LibriSpeech test-clean, while the multilingual model and external codecs are evaluated across all five datasets. For VCTK, we use the silence-trimmed mic1 recordings and retain utterances with nonempty transcripts and durations between 1 and 40 seconds. We then randomly select 12 eligible utterances per speaker, yielding 1,308 utterances from 109 speakers. The same subset is used for all codecs."
+        },
+        {
+            "title": "5.1.2 Metrics",
+            "content": "Reconstruction-quality metrics use audio resampled to 16 kHz. Event rate and bitrate. We compute event rate and bitrate per utterance using the duration represented by the codecs temporal grid, and report their arithmetic means within each dataset. Event rate is the number of encoded events per second; for fixed-rate codecs, each frame counts as one event. Bitrate includes code-index and timing costs (Section 3.6). Explicit timing symbols are assigned their dataset-pooled empirical entropy per symbol; timing embedded in token indices is included in the code-index cost."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table 4. Speech reconstruction evaluation datasets."
+        },
+        {
+            "title": "Utterances Evaluation subset",
+            "content": "LibriSpeech [42] VCTK 0.92 [43]"
+        },
+        {
+            "title": "English",
+            "content": "JVS [44]"
+        },
+        {
+            "title": "Japanese",
+            "content": "JVNV [45]"
+        },
+        {
+            "title": "Japanese",
+            "content": "seed-tts-eval [46]"
+        },
+        {
+            "title": "Mandarin\nChinese",
+            "content": "2,620 Full test-clean split 1,308 3,000 1,615 Filtered mic1 recordings; 12 utterances per speaker nonpara30: 30 utterances from each of 100 speakers Full corpus: four speakers, six emotions, including nonverbal vocalizations 2,020 test-zh recordings Intelligibility. We report dWER for English and dCER for Japanese and Mandarin Chinese, comparing the ASR transcript of reconstructed speech against that of the original waveform. English and Japanese speech are transcribed with Whisper-large-v3 [47], and Mandarin with Paraformer-zh [48]. The same normalization is applied to both transcripts: Whispers English normalization for English, Whispers basic normalization with spaces removed for Japanese, and the seed-tts-eval procedure for Mandarin [46]. Lower dWER and dCER indicate better preservation of the original recordings ASR output. Speech quality. We measure PESQ-WB [49] and STOI [50] against the original waveform, together with the reference-free predictors UTMOSv2 [51] and DNSMOS [52]. The main tables use the overall-quality output of DNSMOS. Higher values are better for these metrics. For PESQ and STOI, the resampled waveforms are truncated to their common length from the start, without explicit delay correction or temporal warping. Speaker preservation. Speaker similarity (SIM) is the cosine similarity between embeddings of the original and reconstructed utterances, extracted with fine-tuned WavLM-Large speaker verification model [53]. Higher values indicate better preservation of speaker characteristics. For codec reconstruction, dWER and dCER are micro-averaged within each dataset: total edit counts are divided by total reference words or characters. Other reconstruction-quality scores are averaged over utterances."
+        },
+        {
+            "title": "5.1.3 Compared codecs",
+            "content": "Table 5 summarizes the evaluated codecs, including training data, pretrained components, rates, streaming support, and approximate parameter counts. Encoding-time feature models are counted separately from codec parameters. Public code, checkpoint, dataset, and evaluation-tool links are collected in Appendix D. TFC [11] is excluded from the empirical comparisons because we could not locate publicly available code or pretrained weights. VARSToks evaluated operating point falls below the bitrate range considered here and is omitted from the comparisons [13]. For DTM-Codec, we evaluate the released 80-Hz checkpoint using its stored threshold (approximately 0.1356), without recalibration on the evaluation datasets [15]. This label indicates nominal target rather than an enforced event rate. FlexiCodec is evaluated at merge thresholds of 0.91 and 1.0 [14]. CodecSlime is evaluated with FSQ18K at prescribed 40-Hz rate and at 80 Hz without merging [12]. For DyCAST, we evaluate character-aligned encoding and boundary prediction with minimum gap of one frame [22]. All DyCAST variants use the tokens-plus-utterance-length decoding mode: individual durations are predicted subject to the supplied total frame count, with 64 bits per event and 16-bit length field per utterance. Character alignment uses MMS with the matching English, Japanese, or Mandarin language adapter"
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table 5. Specifications of the evaluated codecs. WavLM distillation 12.5 Hz 24 Yes / Yes 79.3 WavLM distillation 12.5 Hz 24 Yes / Yes 153.7 Output (kHz) Causal enc. / dec. Codec params. (M) Extra enc. params. (M)a 24 Yes / Yes 14.9 24 No / No 74.7 16 No / No 159.4 24 No / No 80.6 16 No / No 242.2 580 24 No / Noc 1,284. 24 Yes / Yes 1,775 16 No / No 125.7 16 No / No 159. 16 No / No 215 234 16 No / No 268.8 964.8 (CA); (BP)d 44.1 No / Yes 246.1 580 Codec Training data Semantic features or supervision Event rate / allocation EnCodec [2] Speech, music, and general audio None DAC (24 kHz) [3] Speech, music, and None environmental audio, including VCTK BigCodec [17] LibriSpeech, 960 None WavTokenizer [54] Speech, music, and general audio None X-Codec-2 [7] Mimi [6] Emilia and Multilingual LibriSpeech, approximately 150k Moshi speech collection, 7M hb Frozen w2v-BERT 2.0 features 75 Hz 75 Hz 80 Hz 75 Hz 50 Hz MiMo-AudioTokenizer [55] Multitask audio training, >11M Joint semantic and acoustic objectives 25 Hz Joint audiotext language modeling 12.5 Hz MOSS-AudioTokenizer [9] Qwen3-TTSTokenizer-12Hz [8] Multilingual speech and general audio, 3M Qwen3-TTS speech collection, 5M hb DTM-Codec [15] LibriSpeech, 960 None CodecSlime [12] LibriSpeech, 960 None FlexiCodec [14] Libri-Light, 54k SenseVoice features DyCAST [22] LibriTTS, 585 WavLM features and CTC alignment RubatoCodec Multilingual speech, 375k w2v-BERT 2.0 feature fusion and first-codebook supervision 80-Hz target; dynamic token masking 40 / 80 Hz targets; exact segment count 12.5-Hz base; similarity-based merging Character alignment (CA) or boundary prediction (BP) 12.5 Hz nominal; exact utterance-level event budget Additional models required during encoding; training-only teachers are excluded. System-level training data; tokenizer-specific hours are not separately reported. Causal audio decoder followed by vocoder with look-ahead. MMS-1b-all CTC aligner, used only for character-aligned encoding (CA)."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table 6. Adaptive versus fixed-rate coding at 12.5 Hz on LibriSpeech test-clean. Depth denotes the number of active quantizer layers. Bold marks the best score within each quantizer depth. Codec Depth Bitrate (kbit/s) UTMOSv2 DNSMOS PESQ-WB STOI dWER (%) Fixed-rate Adaptive Fixed-rate Adaptive 8 8 16 16 1.20 1. 2.40 2.43 3.365 3.448 3.363 3.444 3.293 3.314 3.288 3.307 2.322 2. 2.442 2.556 0.915 0.917 0.923 0.929 0.84 0.80 0.72 0.62 SIM 0.776 0.757 0.810 0.807 and its audio-derived CTC predictions, without reference transcripts. Reconstruction uses the decoders native output length and boundary handling, with retrieval disabled. These encoding settings are held fixed across datasets; their realized event rates are reported in the result tables and compared in Section 5.4.1."
+        },
+        {
+            "title": "5.2.1 Adaptive versus fixed-rate architectures",
+            "content": "We compare the adaptive architecture with fixed-rate downsampling controls on LibriSpeech test-clean under the matched training conditions in Section 4.2. The architectures differ in temporal aggregation, latent-grid resolution, and decoder upsampling factors  (Table 3)  . Comparison at 12.5 Hz At the default event rate of 12.5 Hz, the adaptive codec additionally transmits event durations, which add approximately 0.028 kbit/s to the reported bitrate  (Table 6)  . At both depths, the adaptive codec improves every metric except SIM  (Table 6)  . The gains grow with depth: PESQ-WB rises by 0.057 at depth 8 and by 0.114 at depth 16, where dWER falls from 0.72% to 0.62%. SIM is lower by 0.019 and 0.003, respectively. The intelligibility advantage extends to single-codebook reconstruction, where dWER falls from 16.86% to 14.41% (Figure 3). These gains reflect the combined effects of interval aggregation, adaptive placement, and decoding on 50-Hz grid, compared with the controls 12.5-Hz grid. Comparisons at 6.25 and 25 Hz We also compare separately trained models at 6.25 and 25 Hz, using retention ratios 𝑅 = 0.125 and 𝑅 = 0.5 and one seed per configuration  (Table 7)  . At 6.25 Hz, the pattern matches 12.5 Hz: the adaptive codec improves every metric except SIM at both depths  (Table 7)  , most clearly at depth 16 (PESQ-WB 1.812 1.932, dWER 1.24% 1.08%). At 25 Hz, the difference narrows. The adaptive codec keeps higher UTMOSv2 and DNSMOS at both depths and higher PESQ-WB and STOI at depth 16, but the fixed-rate control has slightly lower dWER at both depths (0.52% versus 0.53% and 0.45% versus 0.47%) and higher SIM at depth 8, with equal SIM at depth 16. Figures 45 show the full depth sweeps."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Figure 3. Adaptive and fixed-rate reconstruction at 12.5 Hz on LibriSpeech test-clean. Each curve evaluates one trained model at quantizer depths 1, 2, 4, 8, and 16; the dWER axis is logarithmic. Table 7. Adaptive versus fixed-rate coding at 6.25 and 25 Hz on LibriSpeech test-clean. Each codec is trained separately at its target event rate using one training seed. Bold marks the best score within each event rate and quantizer depth. Event rate (Hz) Codec Depth Bitrate (kbit/s) UTMOSv2 DNSMOS PESQ-WB STOI dWER (%) SIM 6.25 Fixed-rate 6.25 Adaptive 6.25 Fixed-rate 6.25 Adaptive 25 Fixed-rate 25 Adaptive 25 Fixed-rate 25 Adaptive 8 8 16 16 8 8 16 0.60 0.62 1.20 1.22 2.40 2.44 4.80 4.84 3.290 3.342 3.300 3. 3.380 3.433 3.375 3.430 3.292 3.314 3.285 3.314 3.302 3.309 3.295 3. 1.715 1.784 1.812 1.932 2.828 2.815 2.951 2.980 0.870 0.872 0.881 0. 0.945 0.944 0.951 0.952 1.78 1.75 1.24 1.08 0.52 0.53 0.45 0. 0.582 0.567 0.627 0.621 0.885 0.879 0.906 0."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Figure 4. Adaptive and fixed-rate reconstruction at 6.25 Hz on LibriSpeech test-clean. Each curve evaluates one trained model at quantizer depths 1, 2, 4, 8, and 16; the dWER axis is logarithmic. Figure 5. Adaptive and fixed-rate reconstruction at 25 Hz on LibriSpeech test-clean. Each curve evaluates one trained model at quantizer depths 1, 2, 4, 8, and 16; the dWER axis is logarithmic."
+        },
+        {
+            "title": "5.2.2 Uniform-stride versus adaptive event placement",
+            "content": "To isolate event placement, we compare RubatoCodecs cumulative allocation (Section 3.3.2) with uniformstride control that starts an event every four frames. Both models share the 50-Hz latent grid, onset-anchored interval aggregator, hybrid residual quantizer, and causal decoder, and are trained for one million updates on the full English 44-kHz partition of HiFiTTS-2 (Section 4.2). Table 8. Reconstruction with uniform-stride and adaptive event placement on LibriSpeech test-clean. Bold marks the best score within each quantizer depth. Uniform-stride bitrates slightly exceed 1.2 and 2.4 kbit/s because final interval shorter than four frames still requires complete set of code indices. Event placement Depth Bitrate (kbit/s) UTMOSv2 DNSMOS PESQ-WB STOI dWER (%) Uniform stride Adaptive Uniform stride Adaptive 8 16 16 1.21 1.23 2.42 2.43 3.442 3.451 3.461 3.457 3.321 3. 3.309 3.317 2.655 2.681 2.957 2.989 0.932 0.933 0.949 0.949 0.70 0. 0.52 0.44 SIM 0.849 0.859 0.913 0.914 Adaptive placement gives higher SIM at every depth and higher PESQ-WB at every depth except 4 (Table 8; Figure 6). It also lowers dWER at every depth except 8, most clearly with one codebook (17.00% 11.64%); at depths 8 and 16, dWER is close (0.76% versus 0.70% and 0.44% versus 0.52%). STOI and MOS predictors show no consistent ordering. With aggregation and decoding held fixed, adaptive placement thus yields modest reconstruction gains, most consistently in speaker similarity, while uniform placement remains strong control. Figure 6. Uniform-stride and adaptive event placement across quantizer depths on LibriSpeech test-clean. Both models use nominal event rate of 12.5 Hz. Each curve evaluates one trained model at quantizer depths 1, 2, 4, 8, and 16; the dWER axis is logarithmic."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table 9. Adaptive coding at similar bitrates on LibriSpeech test-clean. Bold marks the best score within each bitrate group. Event rate (Hz) Depth Bitrate (kbit/s) UTMOSv2 DNSMOS PESQ-WB STOI dWER (%) 6.25 12.5 25 12.5 25 16 8 4 16 8 1.22 1.23 1. 2.43 2.44 3.381 3.448 3.387 3.444 3.433 3.314 3.314 3.324 3.307 3.309 1.932 2.379 2. 2.556 2.815 0.889 0.917 0.921 0.929 0.944 1.08 0.80 0.84 0.62 0.53 SIM 0.621 0.757 0.771 0.807 0."
+        },
+        {
+            "title": "5.2.3 Event rate and quantizer depth at similar bitrates",
+            "content": "Table 9 compares adaptive operating points with code-index rates of 1.2 or 2.4 kbit/s, trading event rate against quantizer depth. Total bitrates additionally include duration information. Near 1.2 kbit/s, 12.5 Hz at depth 8 nearly matches 25 Hz at depth 4 in PESQ-WB (2.379 versus 2.387), with slightly lower dWER (0.80% versus 0.84%) and higher UTMOSv2, but lower SIM (0.757 versus 0.771). At 6.25 Hz, even depth 16 falls well behind in fidelity and SIM. Near 2.4 kbit/s, 25 Hz at depth 8 is clearly ahead of 12.5 Hz at depth 16 (PESQ-WB 2.815 versus 2.556), with only UTMOSv2 favoring 12.5 Hz. The 12.5-Hz configuration thus halves the temporal sequence length relative to 25 Hz at nearly the same signal fidelity and intelligibility near 1.2 kbit/s. Hierarchical generators can trade temporal-backbone steps for codebook predictions in lighter within-event module [6, 8, 56]; Section 7.2 discusses this trade-off. We also vary the retention ratio at inference for the multilingual model trained at 12.5 Hz, without retraining. Higher event rates improve reconstruction fidelity and speaker similarity, whereas substantial rate reductions sharply degrade quality even at greater quantizer depths (Appendix A.5)."
+        },
+        {
+            "title": "5.3 Comparison with existing codecs",
+            "content": "We evaluate the multilingual RubatoCodec model trained at scale using the settings in Section 4.3, comparing its reconstruction quality with existing codecs across English, Japanese, and Mandarin Chinese."
+        },
+        {
+            "title": "5.3.1 English",
+            "content": "Tables 10 and 11 compare the multilingual model with external codecs on LibriSpeech and VCTK. Operating points were selected within 0.81.5 and 2.23.0 kbit/s on LibriSpeech, and the same configurations are used for VCTK. Figure 7 plots reconstruction quality against bitrate for these operating points. The allocation column describes the evaluated encoding setting: Adaptive denotes content-dependent event placement or durations, and Fixed denotes fixed temporal grid. FlexiCodec at 𝜏=1 and CodecSlime at 80 Hz use no temporal merging and are therefore labeled Fixed, although both codec families support adaptive allocation at other settings. RubatoCodec maintains adaptive placement at both depths. DyCASTs predicted durations can change local timing even when the total frame count is preserved. Its PESQ and STOI scores therefore also reflect temporal mismatch with the reference waveform. LibriSpeech test-clean RubatoCodecs strengths are intelligibility preservation and predicted quality: on LibriSpeech, it has the lowest dWER and highest UTMOSv2 in both bitrate bands, while the strongest comparators retain higher signal fidelity and speaker similarity  (Table 10)  . At depth 8, its dWER of 0.75% is below that of FlexiCodec at 𝜏=1 (0.83%), MiMo-Audio-Tokenizer at depth 6 (0.86%), and MOSS-Audio-"
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table 10. Reconstruction on LibriSpeech test-clean. Event rate is measured in coded events per second. Thick rules separate the bitrate bands described above. Bold and underline indicate the best and second-best scores in each of the two comparison bands, excluding GT; ties at displayed precision receive the same formatting. 𝐷 denotes the number of active quantizer layers; DTM-Codec labels are nominal targets, and CA/BP denote DyCASTs character-aligned/boundaryprediction settings. Codec / configuration Allocation Event rate (Hz) Bitrate (kbit/s) UTMOSv2 DNSMOS PESQ-WB STOI dWER (%) SIM GT Fixed X-Codec-2 FlexiCodec, 𝜏=0.91, 𝐷=8 Adaptive Fixed WavTokenizer, 75 Hz Adaptive DyCAST, CA Fixed BigCodec Mimi, 𝐷=8 Fixed Adaptive DyCAST, BP minimum gap 1 Fixed CodecSlime, FSQ18K, 80 Hz MiMo-Audio-Tokenizer, 𝐷=6 Fixed FlexiCodec, 𝜏=1, 𝐷=8 Fixed MOSS-Audio-Tokenizer, 𝐷=10 Fixed DTM-Codec, 80-Hz target EnCodec, 1.5 kbit/s DAC (24 kHz), 𝐷=2 RubatoCodec, 𝑫=8 Adaptive Fixed Fixed Adaptive Mimi, 𝐷=16 Fixed Fixed Qwen3-TTS-Tokenizer-12Hz MiMo-Audio-Tokenizer, 𝐷=13 Fixed FlexiCodec, 𝜏=1, 𝐷=16 Fixed MOSS-Audio-Tokenizer, 𝐷=20 Fixed Fixed EnCodec, 3 kbit/s DAC (24 kHz), 𝐷=4 Fixed RubatoCodec, 𝑫=16 Adaptive 50.0 8.3 75.0 14.2 80.0 12.5 17.4 80.0 25.0 12.5 12.5 81.5 75.0 75.0 12.5 12.5 12.5 25.0 12.5 12.5 75.0 75.0 12. 0.80 0.84 0.90 0.91 1.04 1.10 1.11 1.13 1.20 1.24 1.25 1.28 1.50 1.50 1.23 2.20 2.20 2.42 2.44 2.50 3.00 3.00 2.43 3.233 3.233 3.174 2.772 2.868 3.362 2.810 2.894 3.341 3.183 3.194 3.230 3.421 1.398 1.413 3.478 2.943 3.230 3.210 3.235 3.239 1.786 2.005 3. 3.272 3.299 3.307 3.342 3.316 3.333 3.159 3.318 3.327 3.291 3.284 3.217 3.334 2.425 2.717 3.327 3.175 3.273 3.288 3.277 3.203 2.765 3.116 3.314 4.644 1.000 0. 1.000 2.434 2.463 2.382 1.277 2.681 2.251 1.269 2.535 2.677 2.813 3.052 2.971 1.560 1.515 2.684 2.867 3.177 3.094 3.052 3.536 2.098 2.361 3.029 0.919 0.919 0.912 0.213 0.935 0.906 0.212 0.926 0.927 0.940 0.949 0.947 0.845 0.836 0.931 0.939 0.958 0.947 0.953 0.968 0.900 0.905 0.950 1.23 1.04 3.16 2.01 1.30 1.67 2.14 1.63 0.86 0.83 0.89 1.41 3.36 5.40 0. 0.96 0.53 0.67 0.76 0.62 1.15 1.77 0.50 0.821 0.777 0.682 0.769 0.844 0.735 0.773 0.744 0.848 0.846 0.904 0.871 0.601 0.496 0.871 0.874 0.941 0.896 0.902 0.954 0.798 0.742 0.928 Tokenizer at depth 10 (0.89%). MOSS, DTM-Codec, and FlexiCodec have higher PESQ-WB and STOI, MOSS has higher SIM, and DTM-Codec has the same SIM at displayed precision (0.871). At depth 16, dWER falls to 0.50%, slightly below Qwen3-TTS-Tokenizer-12Hz (0.53%), and DNSMOS is also highest. MOSS and Qwen retain higher PESQ-WB and SIM, whereas MiMo has higher PESQ-WB but lower SIM. VCTK VCTK follows the same pattern, with the highest UTMOSv2 and lowest dWER in both bands  (Table 11)  . At depth 8, dWER is 0.82% against 0.91% for FlexiCodec at 𝜏=1, and SIM (0.840) is below MOSS-Audio-Tokenizer and DTM-Codec (both 0.858) but above MiMo-Audio-Tokenizer at depth 6 (0.798). At depth 16, dWER (0.50%) is slightly below MOSS-Audio-Tokenizer (0.52%) and DNSMOS is highest, while MOSS and Qwen3-TTS-Tokenizer-12Hz retain higher fidelity and SIM, and MiMo-Audio-Tokenizer retains higher fidelity."
+        },
+        {
+            "title": "5.3.2 Japanese and Mandarin Chinese",
+            "content": "Tables 1213 and 14 evaluate the same model on Japanese and Mandarin, using dCER and the English tables allocation labels and comparison groups. The same codec configurations are retained across datasets, even when content-dependent rates move outside the nominal bitrate bands. Figure 8 plots the corresponding qualitybitrate comparisons."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table 11. Reconstruction on VCTK. Allocation labels, bitrate bands, and rank formatting follow Table 10. Configurations are grouped using their bitrate on this dataset. Codec / configuration Allocation Event rate (Hz) Bitrate (kbit/s) UTMOSv2 DNSMOS PESQ-WB STOI dWER (%) SIM GT FlexiCodec, 𝜏=0.91, 𝐷=8 Adaptive Adaptive DyCAST, CA Fixed X-Codec-2 Adaptive DyCAST, BP minimum gap 1 Fixed WavTokenizer, 75 Hz Fixed BigCodec Mimi, 𝐷=8 Fixed Fixed CodecSlime, FSQ18K, 80 Hz MiMo-Audio-Tokenizer, 𝐷=6 Fixed FlexiCodec, 𝜏=1, 𝐷=8 Fixed MOSS-Audio-Tokenizer, 𝐷=10 Fixed DTM-Codec, 80-Hz target EnCodec, 1.5 kbit/s DAC (24 kHz), 𝐷=2 RubatoCodec, 𝑫=8 Adaptive Fixed Fixed Adaptive Mimi, 𝐷=16 Fixed Qwen3-TTS-Tokenizer-12Hz Fixed MiMo-Audio-Tokenizer, 𝐷=13 Fixed FlexiCodec, 𝜏=1, 𝐷=16 Fixed MOSS-Audio-Tokenizer, 𝐷=20 Fixed Fixed EnCodec, 3 kbit/s DAC (24 kHz), 𝐷=4 Fixed RubatoCodec, 𝑫=16 Adaptive 7.0 11.0 50.0 13.6 75.0 80.0 12.5 80.0 25.0 12.5 12.5 80.2 75.0 75.0 12.5 12.5 12.5 25.0 12.5 12.5 75.0 75.0 12. 0.71 0.71 0.80 0.88 0.90 1.04 1.10 1.13 1.20 1.24 1.25 1.28 1.50 1.50 1.23 2.20 2.20 2.42 2.44 2.50 3.00 3.00 2.43 3.566 3.354 2.594 3.443 2.805 3.198 3.368 3.036 3.429 3.495 3.357 3.351 3.492 1.523 1.620 3.533 3.252 3.494 3.501 3.367 3.392 1.981 2.348 3. 3.202 3.191 3.179 3.190 3.226 3.208 3.243 2.908 3.223 3.087 3.166 3.029 3.230 2.498 2.930 3.235 2.926 3.107 3.104 3.168 3.009 2.790 3.112 3.222 4.644 1.000 0. 1.000 2.384 1.245 2.430 1.324 2.397 2.495 2.106 2.507 2.535 2.622 2.840 2.911 1.711 1.696 2.608 2.619 3.040 2.930 2.791 3.370 2.219 2.511 2.863 0.846 0.202 0.858 0.242 0.853 0.873 0.808 0.867 0.875 0.879 0.885 0.886 0.768 0.808 0.868 0.840 0.900 0.901 0.891 0.917 0.813 0.874 0.886 1.13 10.47 1.48 8.24 4.45 1.73 2.85 2.46 1.15 0.91 1.36 1.27 5.57 9.08 0. 1.03 0.60 0.66 0.76 0.52 1.38 2.21 0.50 0.738 0.625 0.758 0.692 0.662 0.787 0.666 0.704 0.798 0.809 0.858 0.858 0.551 0.493 0.840 0.827 0.919 0.861 0.871 0.932 0.750 0.722 0.907 JVS nonpara30 and JVNV RubatoCodec achieves the lowest dCER in both comparison groups on both Japanese datasets (Tables 1213). Its advantage is particularly pronounced on JVNV: dCER is 1.92% versus 5.44% for the next-best codec at depth 8, and 1.54% versus 3.01% at depth 16, extending its intelligibility preservation advantage to emotional speech containing nonverbal vocalizations. Predicted-quality rankings vary by dataset: RubatoCodec leads DNSMOS in both groups and UTMOSv2 at depth 8 on JVS, whereas MiMo-Audio-Tokenizer leads both predictors on JVNV. MOSS-Audio-Tokenizer retains an advantage in signal fidelity and speaker similarity. seed-tts-eval test-zh On seed-tts-eval test-zh, RubatoCodec shows competitive intelligibility preservation and speaker similarity, although the strongest comparators lead both bands  (Table 14)  . At depth 8, its dCER of 0.91% is close to FlexiCodecs 0.88% with substantially higher SIM (0.888 versus 0.804); only MOSS-Audio-Tokenizer achieves both lower dCER and higher SIM. At depth 16, dCER falls to 0.50%, behind MOSS-Audio-Tokenizer (0.38%) and Qwen3-TTS-Tokenizer-12Hz (0.45%) but ahead of MiMo-AudioTokenizer at depth 13 (0.53%). In this band, RubatoCodec also exceeds FlexiCodec on every metric and has the highest DNSMOS."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Figure 7. English reconstruction quality versus estimated bitrate. Stars denote RubatoCodec at depths 8 and 16; circles denote adaptive allocation and triangles fixed allocation for the other codecs. Colors identify codec families. The bitrate and dWER axes are logarithmic. Operating points match Tables 1011. Table 12. Reconstruction on JVS nonpara30. Event rates, bitrate grouping, and score highlighting follow Table 10. Codec / configuration Allocation Event rate (Hz) Bitrate (kbit/s) UTMOSv2 DNSMOS PESQ-WB STOI dCER (%) SIM GT Fixed X-Codec-2 FlexiCodec, 𝜏=0.91, 𝐷=8 Adaptive Fixed WavTokenizer, 75 Hz Adaptive DTM-Codec, 80-Hz target Fixed BigCodec Mimi, 𝐷=8 Fixed Fixed CodecSlime, FSQ18K, 80 Hz Adaptive DyCAST, BP minimum gap 1 MiMo-Audio-Tokenizer, 𝐷=6 Fixed FlexiCodec, 𝜏=1, 𝐷=8 Fixed MOSS-Audio-Tokenizer, 𝐷=10 Fixed Fixed EnCodec, 1.5 kbit/s DAC (24 kHz), 𝐷=2 Fixed RubatoCodec, 𝑫=8 Adaptive Mimi, 𝐷=16 Fixed Fixed Qwen3-TTS-Tokenizer-12Hz MiMo-Audio-Tokenizer, 𝐷=13 Fixed FlexiCodec, 𝜏=1, 𝐷=16 Fixed MOSS-Audio-Tokenizer, 𝐷=20 Fixed Fixed EnCodec, 3 kbit/s DAC (24 kHz), 𝐷=4 Fixed RubatoCodec, 𝑫=16 Adaptive 3.621 3.234 2.772 2.656 3.275 3.244 2.686 3.185 2.573 3.171 2.802 3.248 1.230 1.204 3.408 2.869 3.434 3.285 2.884 3.249 1.575 1.919 3. 3.334 3.312 3.292 3.336 3.354 3.348 3.096 3.345 3.321 3.304 3.276 3.240 2.426 2.821 3.358 3.124 3.275 3.317 3.274 3.224 2.763 3.146 3.349 4.644 0.999 0. 1.000 2.585 2.562 2.448 2.929 2.816 2.202 2.557 1.251 2.393 2.878 3.267 1.514 1.465 3.028 2.802 3.422 3.009 3.194 3.700 1.934 2.332 3.353 0.924 0.925 0.913 0.944 0.938 0.904 0.923 0.131 0.906 0.939 0.959 0.843 0.834 0.949 0.943 0.965 0.939 0.957 0.976 0.898 0.906 0.965 2.01 2.44 5.51 3.35 2.47 3.91 4.37 6.69 3.62 1.60 1.91 5.40 6.16 1. 2.07 0.95 1.60 1.25 1.35 2.52 2.76 0.77 0.829 0.736 0.711 0.838 0.803 0.700 0.679 0.736 0.790 0.795 0.916 0.578 0.515 0.905 0.852 0.943 0.862 0.868 0.959 0.796 0.760 0.942 50.0 8.5 75.0 63.3 80.0 12.5 80.0 18.0 25.0 12.5 12.5 75.0 75.0 12.5 12.5 12.5 25.0 12.5 12.5 75.0 75.0 12. 0.80 0.85 0.90 1.02 1.04 1.10 1.13 1.16 1.20 1.24 1.25 1.50 1.50 1.23 2.20 2.20 2.42 2.44 2.50 3.00 3.00 2."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table 13. Reconstruction on JVNV. Event rates, bitrate grouping, and score highlighting follow Table 10. Codec / configuration Allocation Event rate (Hz) Bitrate (kbit/s) UTMOSv2 DNSMOS PESQ-WB STOI dCER (%) SIM GT FlexiCodec, 𝜏=0.91, 𝐷=8 Adaptive Adaptive DTM-Codec, 80-Hz target Fixed X-Codec-2 Fixed WavTokenizer, 75 Hz Adaptive DyCAST, BP minimum gap 1 Fixed BigCodec Mimi, 𝐷=8 Fixed Fixed CodecSlime, FSQ18K, 80 Hz MiMo-Audio-Tokenizer, 𝐷=6 Fixed FlexiCodec, 𝜏=1, 𝐷=8 Fixed MOSS-Audio-Tokenizer, 𝐷=10 Fixed Fixed EnCodec, 1.5 kbit/s DAC (24 kHz), 𝐷=2 Fixed RubatoCodec, 𝑫=8 Adaptive Mimi, 𝐷=16 Fixed Fixed Qwen3-TTS-Tokenizer-12Hz MiMo-Audio-Tokenizer, 𝐷=13 Fixed FlexiCodec, 𝜏=1, 𝐷=16 Fixed MOSS-Audio-Tokenizer, 𝐷=20 Fixed Fixed EnCodec, 3 kbit/s DAC (24 kHz), 𝐷=4 Fixed RubatoCodec, 𝑫=16 Adaptive 7.5 46.1 50.0 75.0 15.3 80.0 12.5 80.0 25.0 12.5 12.5 75.0 75.0 12.5 12.5 12.5 25.0 12.5 12.5 75.0 75.0 12.5 0.75 0.77 0.80 0.90 0.98 1.04 1.10 1.13 1.20 1.24 1.25 1.50 1.50 1.23 2.20 2.20 2.42 2.44 2.50 3.00 3.00 2.43 2.526 1.742 2.523 2.369 1.769 1.797 2.439 1.913 2.225 2.681 1.811 2.396 1.070 0.860 2.628 1.974 2.638 2.708 1.930 2.383 1.266 1.280 2.651 3. 3.133 3.154 3.148 3.150 3.071 3.154 2.907 3.140 3.173 3.128 3.089 2.196 2.520 3.164 2.924 3.097 3.176 3.119 3.057 2.480 2.868 3.138 4.644 1.000 0.00 1. 1.718 2.081 1.944 1.846 1.178 2.109 1.848 1.896 2.295 2.062 3.032 1.373 1.256 2.650 2.414 3.041 2.949 2.309 3.496 1.719 1.901 3.032 0.817 0.862 0.858 0.842 0.156 0.871 0.826 0.851 0.872 0.862 0.917 0.779 0.759 0.907 0.877 0.931 0.911 0.885 0.941 0.841 0.861 0.929 9.06 14.82 6.15 12.48 11.67 6.87 11.34 12.01 7.88 5.52 5.44 10.27 15.26 1.92 8.66 3.01 4.21 3.02 3.96 4.23 6.64 1. 0.714 0.783 0.807 0.672 0.677 0.794 0.710 0.676 0.821 0.786 0.924 0.595 0.441 0.907 0.856 0.951 0.885 0.862 0.963 0.810 0.756 0.946 Table 14. Reconstruction on seed-tts-eval test-zh. Event rates, bitrate grouping, and score highlighting follow Table 10. Codec / configuration Allocation Event rate (Hz) Bitrate (kbit/s) UTMOSv2 DNSMOS PESQ-WB STOI dCER (%) SIM GT Fixed X-Codec-2 Fixed WavTokenizer, 75 Hz Fixed BigCodec Mimi, 𝐷=8 Fixed Fixed CodecSlime, FSQ18K, 80 Hz Adaptive DyCAST, BP minimum gap 1 MiMo-Audio-Tokenizer, 𝐷=6 Fixed FlexiCodec, 𝜏=1, 𝐷=8 Fixed MOSS-Audio-Tokenizer, 𝐷=10 Fixed DTM-Codec, 80-Hz target EnCodec, 1.5 kbit/s DAC (24 kHz), 𝐷=2 RubatoCodec, 𝑫=8 Adaptive Fixed Fixed Adaptive Mimi, 𝐷=16 Fixed Fixed Qwen3-TTS-Tokenizer-12Hz MiMo-Audio-Tokenizer, 𝐷=13 Fixed FlexiCodec, 𝜏=1, 𝐷=16 Fixed MOSS-Audio-Tokenizer, 𝐷=20 Fixed Fixed EnCodec, 3 kbit/s DAC (24 kHz), 𝐷=4 Fixed RubatoCodec, 𝑫=16 Adaptive 3. 2.783 2.406 2.850 2.397 2.840 2.337 2.862 2.528 2.842 2.783 1.225 1.209 2.811 2.562 2.930 2.893 2.619 2.860 1.485 1.763 2.858 3.203 3.217 3.258 3.237 3.035 3.236 3.253 3.218 3.175 3.108 3.213 2.357 2.662 3.240 3.068 3.209 3.205 3.171 3.085 2.655 3.043 3.231 4. 1.000 0.00 1.000 2.237 2.175 2.264 2.052 2.144 1.191 2.508 2.353 2.905 2.459 1.494 1.439 2.459 2.658 2.987 2.931 2.592 3.393 1.963 2.255 2.795 0.902 0.892 0.909 0.882 0.897 0.334 0.915 0.911 0.942 0.917 0.830 0.821 0. 0.924 0.951 0.938 0.930 0.963 0.889 0.895 0.939 1.09 2.96 1.55 2.16 2.52 7.08 0.69 0.88 0.56 2.27 4.58 5.93 0.91 0.80 0.45 0.53 0.63 0.38 1.29 1.55 0.50 0.853 0.747 0.800 0.732 0.692 0.729 0.870 0.804 0.928 0.824 0.617 0.544 0.888 0.871 0.952 0.906 0.866 0.964 0.810 0.778 0.934 50.0 75.0 80.0 12.5 80.0 18.1 25.0 12.5 12.5 80.3 75.0 75.0 12.5 12.5 12.5 25.0 12.5 12.5 75.0 75.0 12.5 0.80 0.90 1.04 1.10 1.13 1.16 1.20 1.24 1.25 1.27 1.50 1.50 1.22 2.20 2.20 2.42 2.44 2.50 3.00 3.00 2."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Figure 8. Japanese and Mandarin reconstruction quality versus estimated bitrate. Marker and color conventions follow Figure 7. The bitrate and dCER axes are logarithmic. Operating points match Tables 1213 and 14."
+        },
+        {
+            "title": "5.4.1 Event-rate control across datasets",
+            "content": "Table 15 compares event rates at the fixed settings in Section 5.1.3. RubatoCodec and CodecSlime prescribe event counts from input length [12]; DTM-Codecs accumulated-change thresholds [15], FlexiCodecs similarity thresholds [14], and DyCASTs alignment or boundary predictions [22] allow counts to vary with content. RubatoCodec and CodecSlime maintain their prescribed rates up to integer rounding. DTM-Codecs 80-Hz setting ranges from 46.1 to 81.5 events/s, and FlexiCodec at fixed threshold ranges from 7.0 to 8.5 events/s. These measurements illustrate the calibration problem noted in Section 1; an explicit budget instead determines counts directly from utterance length and target ratio. DyCASTs character-aligned rate is 11.014.2 Hz on LibriSpeech test-clean and VCTK, 4.4 Hz on JVS nonpara30, 3.9 Hz on JVNV, and 3.7 Hz on seed-tts-eval test-zh; its boundary predictor does not show this reduction. These alignment rates depend on audio-derived CTC predictions and language-specific character units."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table 15. Mean event rates (Hz) across datasets at fixed encoding settings. Rates follow Section 5.1.2. DTM-Codecs 80-Hz label denotes nominal target. System / setting LibriSpeech test-clean"
+        },
+        {
+            "title": "VCTK",
+            "content": "JVS nonpara30 JVNV seed-tts-eval test-zh RubatoCodec CodecSlime, FSQ18K, 40 Hz DTM-Codec, 80-Hz target FlexiCodec, 𝜏=0.91 DyCAST, character-aligned DyCAST, boundary predictor, min-gap 1 12.5 40.0 81.5 8.3 14.2 17.4 12.5 40.0 80.2 7.0 11.0 13.6 12.5 40.0 63.3 8.5 4.4 18. 12.5 40.0 46.1 7.5 3.9 15.3 12.5 40.0 80.3 7.2 3.7 18."
+        },
+        {
+            "title": "5.4.2 Adaptive Firing on real speech",
+            "content": "We analyze the multilingual models event durations across all five evaluation datasets: 10,563 utterances comprising 817,359 events. Each event contributes one duration, including the final event of each utterance. Figure 9 shows the pooled duration distribution and the fraction of events exceeding each duration within each dataset; Table 16 summarizes duration statistics by dataset. The pooled median duration is 80 ms, with 95% of events lasting at most 140 ms and 99% at most 260 ms. Longer events are uncommon: 4,395 events (0.538%) exceed 300 ms, accounting for 2.476% of the represented audio duration. The longest event lasts 1.14 s. The approximately 80-ms mean follows from the prescribed 12.5-Hz event budget; the distribution around that mean characterizes the nonuniform allocation. JVS and JVNV have shorter median durations (60 ms) and higher 95th percentiles (200 and 180 ms, respectively) than the English and Mandarin datasets (80-ms medians and 120140-ms 95th percentiles), despite nearly identical average event rates. JVNV has the largest proportion of events exceeding 300 ms (1.932%, compared with 0.363% on JVS) and the highest 99th percentile (360 ms). Figure 10 shows longer events spanning low-amplitude portions of the input, with shorter events distributed through the surrounding speech. To quantify this relationship across all five datasets, we compute input RMS amplitude in nonoverlapping 20-ms windows aligned to the codec grid. We classify an event as predominantly low-energy when at least 80% of its windows fall below 50 dBFS. This amplitude-based measure is proxy for near-silence rather than an annotated speech-activity or phonetic category. Of the 4,395 events longer than 300 ms, 4,394 (99.98%) are predominantly low-energy. Varying the threshold from 40 to 60 dBFS yields proportions of 94.0100.0% across the five datasets. At 50 dBFS, 99.97% Figure 9. Event durations in reconstructed-speech evaluation. Left: event-weighted distribution across all five datasets, with durations above 300 ms grouped in the final bin. Right: the percentage of events longer than each duration, shown separately for each dataset; both axes are logarithmic."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table 16. Event-duration statistics by dataset. Percentages are computed over encoded events."
+        },
+        {
+            "title": "Dataset",
+            "content": "LibriSpeech test-clean VCTK JVS nonpara30 JVNV seed-tts-eval test-zh Median (ms) 95th percentile (ms) 99th percentile (ms) Events >300 ms (%) 80 80 60 60 120 140 200 180 120 160 180 280 360 140 0.098 0.004 0.363 1.932 0.006 Figure 10. Adaptive event placement on English, Japanese, and Mandarin speech. The upper trace in each example is the input waveform, normalized by its peak amplitude; the lower strip partitions the same timeline into encoded events. Each rectangle begins at firing position and has width proportional to its duration. Alternating colors distinguish neighboring events. Events lasting at least 300 ms are labeled in milliseconds and shaded on the waveform. of frames within these long events are low-energy, compared with 25.2% of frames in the remaining events. These observations are consistent with allocating longer-duration events to low-energy regions while retaining the prescribed utterance-level event budget."
+        },
+        {
+            "title": "5.5 Computational efficiency",
+            "content": "We measure encoding and decoding throughput on single NVIDIA H200 with an utterance batch size of one, using the same 100 variable-length LibriSpeech test-clean utterances for each model. RTFx is the total input audio duration divided by the total processing time; higher values indicate faster processing. Timings exclude"
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table 17. Full-utterance encoding and decoding throughput for selected codecs. Codec / configuration X-Codec-2 [7] Mimi, 𝐷=16 [6] MOSS-Audio-Tokenizer, 𝐷=20 [9] Qwen3-TTS-Tokenizer-12Hz [8] DTM-Codec, 80-Hz target [15] CodecSlime, FSQ18K, 40 Hz [12] FlexiCodec, 𝜏=0.91, 𝐷=8 [14] DyCAST, BP minimum gap 1 [22] RubatoCodec, 𝐷=8 RubatoCodec, 𝐷=16 Encoding RTFx Decoding RTFx 72.7 219.7 161.9 416.3 471.7 25.7 95.8 165.8 70.9 71. 271.9 335.4 199.2 279.8 518.6 190.4 196.7 1019.6 446.8 427.4 two warmup utterances and input resampling, and synchronize the GPU around each measured call. Encoding includes required feature extraction and temporal allocation. We use the released inference implementations, including the Transformers implementation for Mimi. Throughput depends on numerical precision, software, CPU processing, and output rate. RubatoCodec decodes 44.1-kHz audio at 446.8 and 427.4 real time at depths 8 and 16  (Table 17)  , so quantizer depth has little effect on decoding throughput. Encoding reaches approximately 71 real time, including the frozen semantic feature extractor. Compared with X-Codec-2, which uses the same encoder backbone, RubatoCodec at depth 8 takes approximately 2.5% longer to encode the same audio. This indicates small overall encoding overhead, although the comparison does not separate Adaptive Firing from quantization differences. CodecSlimes 40-Hz encoding time includes its released CPU implementation of dynamic-programming segmentation. In separate 250-event streaming test using codes obtained from synthetic audio, event-by-event RubatoCodec decoding takes an average of 11.07 ms per event, including history recomputation and crossfading. At the nominal rate of 12.5 events/s, each event represents approximately 80 ms of audio on average, indicating sufficient average decoding throughput for real-time streaming synthesis on the tested hardware."
+        },
+        {
+            "title": "6.1 Generative interface",
+            "content": "We adapt the MOSS-TTS-Local-Transformer v1.5 implementation [56] to RubatoCodec (Figure 11), retaining its temporallocal autoregressive structure, reference-and-text input format, and continuation/stop prediction. We add duration embeddings to the temporal input and predict each events duration at the final local position, conditioned on all codebook tokens for that event. We use Qwen3-0.6B [57] in place of the Qwen3-4B temporal backbone and four-layer local Transformer. Reference speech and target text form the conditioning prefix, with the reference preceding the text. At text positions, only the text-token embedding contributes; at speech-event positions, the audio-slot token embedding is summed with the codebook and duration embeddings. Each completed event is fed back to the temporal Transformer to predict the next event. The first event is predicted from the state at the audio-start token following the conditioning prefix. Each event is represented by 𝑒𝑖 = (c𝑖, 𝑑𝑖). Given text 𝑦, optional reference 𝑟, and preceding events 𝑒<𝑖, the first local state predicts the continuation probability 𝑝(𝑎𝑖 = 1 𝑦, 𝑟, 𝑒<𝑖), where 𝑎𝑖 = 1 denotes continuation and 𝑎𝑖 = 0 denotes stop. Conditional on continuation, the next event follows"
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Figure 11. MOSS-TTS adapted to RubatoCodec, shown with eight codebooks. The temporal Transformer predicts each event from the conditioning prefix and the completed preceding events; the local Transformer then predicts continuation or stop, the codebook tokens, and finally the duration. Completed codeduration pairs can be passed to the causal RubatoCodec decoder for streaming synthesis. 𝑝(c𝑖, 𝑑𝑖 𝑦, 𝑟, 𝑒<𝑖, 𝑎𝑖 = 1) = 𝐷1 (cid:214) 𝑝(𝑐𝑖, 𝑗 𝑦, 𝑟, 𝑒<𝑖, 𝑎𝑖 = 1, 𝑐𝑖,< 𝑗) 𝑝(𝑑𝑖 𝑦, 𝑟, 𝑒<𝑖, 𝑎𝑖 = 1, c𝑖). 𝑗= (18) During training, speech events are labeled as continuation and the following end token as stop; codebook and duration losses apply only to speech events. During inference, generation terminates when stop is sampled. We also compared alternative positions for duration prediction in small ablation study; details are provided in Appendix B. Once the local Transformer has generated an events codebook tokens and duration, the causal codec decoder (Section 3.5) incrementally synthesizes the corresponding 𝑑𝑖/50 seconds of audio. Decoder state is reused across events, with brief buffering at history recomputations (Section 3.5)."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table 18. TTS results on the English seed-tts-eval benchmark. Both systems use eight codebooks at nominal event rate of 12.5 Hz. Bold marks the better score; ties share the formatting."
+        },
+        {
+            "title": "Codec",
+            "content": "Fixed-rate codec Adaptive codec WER (%) 3.20 3.10 SIM 0.392 0.392 UTMOS UTMOSv2 4.080 4.162 3.239 3."
+        },
+        {
+            "title": "6.2 TTS evaluation",
+            "content": "We compare TTS using the 100,000-update adaptive and fixed-rate codecs from Section 4.2, both with eight quantizer layers. Each encodes approximately 31,300 hours from HiFiTTS-2s English 44-kHz partition after reserving held-out speakers [34]. Both TTS models are trained for three epochs with Qwen3-0.6B temporal backbone and four-layer local Transformer, using matched initialization and training settings (Appendix C.2). For adaptive coding, utterances containing durations above 64 frames (1.28 s) are excluded, affecting approximately 0.07% of training utterances. We evaluate zero-shot voice cloning on the 1,088 English utterances in seed-tts-eval [46], using the same target texts and reference recordings for both systems. Following the benchmark protocol, WER is computed from Whisper-large-v3 transcriptions [47], and SIM is the cosine similarity of embeddings from the same fine-tuned WavLM-Large speaker verification model [53] between generated speech and the original reference recording. We additionally assess predicted speech quality with UTMOS [58] and UTMOSv2 [51]. Sampling settings are listed in Appendix C.2. TTS WER is macro-averaged over utterances, following the seed-tts-eval protocol; SIM, UTMOS, and UTMOSv2 are also averaged over utterances. The adaptive codec achieves lower WER and comparable speaker similarity, with higher UTMOS and UTMOSv2 scores  (Table 18)  ."
+        },
+        {
+            "title": "6.3 Generated event timing",
+            "content": "We examine generated event timing on the 1,088 English utterances in seed-tts-eval [46], drawing separate set of samples from the adaptive TTS model with the sampling settings in Appendix C.2. For an utterance with 𝑁 generated events and durations 𝑑𝑖 on the 50-Hz grid, the event rate is 50𝑁/(cid:205)𝑖 𝑑𝑖 events/s. Figure 12 shows that these rates concentrate near the codecs nominal rate of 12.5 events/s: the mean is 12.461, the median is 12.454, and the 5th95th percentile interval is 12.32912.609 events/s. Individual utterance rates range from 11.897 to 12.849 events/s. Generated sequences also follow the codecs budget rule: for 88.3% of utterances, the generated event count equals round(0.25 𝑇) for the generated grid length 𝑇 = (cid:205)𝑖 𝑑𝑖, and 99.9% are within one event, without an explicit generation-time rate constraint. Across 61,965 generated events, mean duration is 80.24 ms, the median is 80 ms, and the 5th95th percentile interval is 40140 ms (Figure 13). sparse tail contains 362 events (0.58%) above 300 ms, including two above one second; the maximum is 1.22 s. To characterize the long-duration tail, we use the same predominantly low-energy criterion as in Section 5.4.2: at least 80% of an events aligned 20-ms windows must have RMS amplitude below 50 dBFS. Of the 362 events longer than 300 ms, 361 (99.7%) meet this criterion; varying the threshold from 40 to 60 dBFS yields proportions of 99.4100%. All 98 first events and 32 last events in this subset are predominantly low-energy, as are 231 of the 232 interior events. Long events are disproportionately common at utterance boundaries: they account for 9.0% of first events and 2.9% of last events, compared with 0.39% of interior events. The long tail predominantly represents near-silence, concentrated at utterance boundaries. Informal listening also revealed an unnatural within-phrase pause associated with long event."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Figure 12. Generated event rates on English seed-tts-eval. Each observation is one utterance. The histogram uses 0.05-events/s bins centered on multiples of 0.05, and the dashed line marks the codecs nominal rate of 12.5 events/s. All 1,088 utterances are included. Figure 13. Generated event durations on English seed-tts-eval. Bars show the percentage of events at each 20-ms duration increment through 300 ms. The final, hatched bin groups all durations above 300 ms. All events, including the long tail, contribute to the reported mean, median, and range."
+        },
+        {
+            "title": "7.1 Adaptive allocation under an explicit budget",
+            "content": "An exact event budget leaves useful freedom to distribute temporal resolution within an utterance. This freedom matters most at lower event rates: the gains over fixed-rate downsampling appear at 6.25 and 12.5 Hz and narrow at 25 Hz (Section 5.2.1). Those comparisons change placement, interval aggregation, and decoding grid together, and the adaptive codec has lower speaker similarity there. With aggregation and grid held fixed, however, adaptive placement raises speaker similarity relative to uniform stride (Section 5.2.2). Although the two comparisons use different training data and lengths, this suggests that the SIM gap in Section 5.2.1 stems from interval aggregation and grid design rather than from placement itself. The uniform-stride comparison (Section 5.2.2) supports content-dependent event placement with aggregation and decoding grid held fixed. The firing-rule comparison (Appendix A.4) separately favors cumulative allocation over the tested level-thresholding rule. Cumulative allocation produces approximately uniform spacing under constant firing signal and adjusts that spacing with the cumulative bounded increments. Broad temporal coverage combined with content-dependent placement is one possible explanation for its performance, but these experiments do not isolate that mechanism. The firing analysis shows how the budget is used: events longer than 300 ms predominantly cover low-energy regions across all five datasets, leaving more events for the remaining speech (Section 5.4.2). Budgeted and threshold-based allocation also make different trade-offs. prescribed count gives predictable sequence lengths without dataset-specific calibration, but equally long utterances receive the same budget regardless of acoustic complexity. Threshold-based methods can instead spend more events on difficult utterances."
+        },
+        {
+            "title": "7.2 Temporal resolution and quantizer depth for speech generation",
+            "content": "Temporal resolution and quantizer depth are not interchangeable ways of spending bitrate budget. In the evaluated configurations, additional residual layers do not fully compensate for coarser segmentation: 12.5 Hz approaches 25 Hz near 1.2 kbit/s, but 6.25 Hz falls clearly behind, and 25 Hz regains fidelity advantage near 2.4 kbit/s (Section 5.2.3). For generation, these choices also distribute computation differently. Hierarchical models such as Moshi, Qwen3-TTS, and MOSS-TTS predict codebook tokens with smaller within-event module [6, 8, 56]. Increasing depth adds predictions there, whereas increasing event rate adds steps to the larger temporal backbone. The reconstruction results therefore motivate 12.5 Hz as practical compromise between quality and sequence length, without establishing it as optimal. Because RubatoCodecs waveform decoder still operates on 50-Hz grid, the shorter sequence reduces downstream modeling cost but not waveform-decoder computation. The inference-time ratio experiment (Appendix A.5) shows asymmetric tolerance to event rates outside the training setting: raising the rate improves reconstruction at additional bitrate, whereas aggressive reduction degrades it sharply even at greater quantizer depth. The model thus tolerates higher, but not lower, inference rates."
+        },
+        {
+            "title": "7.3 From encoded durations to generated timing",
+            "content": "The matched TTS comparison shows that codes and durations can be generated jointly while improving intelligibility and predicted quality over the fixed-rate codec (Section 6.2). Each completed event can be passed directly to the causal waveform decoder, so the same representation serves both temporal compression and incremental synthesis. The generator also learns the codecs utterance-level event budget. Generated event counts match the codecs budget rule for 88.3% of utterances and fall within one event for 99.9% (Section 6.3), so the generator offsets long events with short ones within each utterance. Generated sequence length therefore remains predictable,"
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "although no rate constraint is imposed during generation. Long events also predominantly correspond to low-energy regions in both encoded speech and generated audio under the same measurement criterion (Sections 5.4.2 and 6.3), indicating that the generator reproduces the codecs use of long events for near-silence. The concentration of long events at utterance boundaries is consistent with learning leading and trailing silence from HiFiTTS-2, although that training-data correspondence has not been measured directly. Pause placement, however, is not always natural: informal listening revealed an unnatural within-phrase pause associated with long event (Section 6.3). Efficiently representing silence and placing pauses naturally are therefore distinct modeling concerns."
+        },
+        {
+            "title": "7.4 Reconstruction quality and multilingual performance",
+            "content": "On the English benchmarks, RubatoCodec combines strong intelligibility preservation with high predictedquality scores, while the strongest comparators retain higher signal fidelity and speaker similarity (Section 5.3). On the Japanese benchmarks, its intelligibility advantage extends to both read and emotional speech, whereas predicted-quality rankings depend on the dataset. In Mandarin, intelligibility preservation remains competitive, although the strongest alternatives achieve lower dCER. These patterns distinguish preservation of linguistic content, speaker characteristics, and waveform detail; improvements in one need not imply improvements in the others. RubatoCodecs UTMOSv2 scores exceed those of the original recordings on LibriSpeech, indicating that higher predicted quality should not be interpreted as greater fidelity to the source. The 44.1-kHz output rate is synthesis capability, not evidence of full-band source recovery. Encoding uses 16-kHz input, so higher frequencies must be inferred. The English, Japanese, and Mandarin results establish reconstruction across languages with shared model and allocation rule. Combined with the cross-dataset rate analysis (Section 5.4.1), they demonstrate both predictable encoded sequence lengths and content preservation across the evaluated languages."
+        },
+        {
+            "title": "7.5 Scope and limitations",
+            "content": "The reported architecture comparisons use one trained model per configuration, and supporting architectural ablations have narrower coverage. In particular, firing-signal selection uses an early single-FSQ, low-bitrate design and smaller training budget; its ranking may change with the current residual quantizer and training scale (Appendix A.1). The placement comparison uses one seed and English read speech, so its robustness across training runs, languages, and recording conditions remains untested. Firing statistics characterize duration and energy associations, not phonetic alignment or optimal allocation, and do not separate the quality contribution of allocation within speech from that of allocation to low-energy regions. External codecs differ in training resources and operating points. Reporting realized rates and timing costs makes these differences visible but does not control them. All evaluated languages occur in RubatoCodecs training mixture, so the multilingual results do not establish unseen-language transfer or language robustness attributable solely to Adaptive Firing. Dataset differences also confound language, speakers, and recording conditions. TTS evidence covers one English audiobook corpus and codecs from the controlled comparison (Section 4.2). The comparison evaluates the complete representation and does not isolate the TTS contribution of adaptive placement. It also does not establish the quality attainable with the multilingual codec, broader data, or larger generator. Long events are more frequent in TTS than in the reconstruction evaluation, but the corpora differ. Human evaluation remains necessary to assess reconstruction and TTS preferences and pause naturalness."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "For the codec, the priority is signal fidelity at low event rates: how far improved acoustic representations and reconstruction objectives can close PESQ/STOI gaps without longer sequences, and when finer temporal resolution becomes necessary. Training with multiple retention ratios could broaden the inference-time tolerance observed in Appendix A.5, following adjustable-rate coding and sequence compression [14, 24]. Online encoding would further require causal acousticsemantic path and windowed or running budget in place of the utterance-level guarantee, trading buffering latency against placement quality and rate control. For generation, larger-scale TTS with the multilingual codec, broader data, and larger backbones would test whether reconstruction improvements carry over, and explicit durations could support utterance-length and pause control. Finally, applying Adaptive Firing to other codec backbones and to music or environmental sound would test its generality."
+        },
+        {
+            "title": "9 Conclusion",
+            "content": "We introduced RubatoCodec, speech codec that combines content-adaptive event placement, an exact utterance-level event budget, and streaming waveform decoding. By representing speech as discrete codes paired with durations, it allows temporal resolution to follow speech content while keeping sequence length predictable. Controlled experiments support the value of adaptive allocation for reconstruction at low event rates. Multilingual evaluation demonstrates competitive reconstruction quality, with the best intelligibility preservation among the compared codecs on the evaluated English and Japanese benchmarks at comparable bitrates. Signal fidelity remains an area for improvement relative to the strongest alternatives. In matched text-to-speech experiments, the adaptive representation improves intelligibility and predicted speech quality with comparable speaker similarity. The generator also learns the codecs utterance-level event budget without an explicit rate constraint. These results support budgeted adaptive speech tokenization as practical representation for both reconstruction and speech generation. Combining content-dependent timing with predictable sequence length provides basis for compact speech modeling and streaming synthesis."
+        },
+        {
+            "title": "Generative AI Use Disclosure",
+            "content": "Generative AI tools were used to help express the authors technical descriptions and arguments in English and improve the manuscripts clarity and readability. Their use was limited to writing and editing assistance; the original ideas, methods, and conclusions were developed by the authors. The authors reviewed and revised the text and take responsibility for its content."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "[1] N. Zeghidour, A. Luebs, A. Omran, J. Skoglund, and M. Tagliasacchi, SoundStream: An End-to-End Neural Audio Codec, IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 30, pp. 495507, 2022. [Online]. Available: https://doi.org/10.1109/TASLP.2021.3129994 [2] A. Défossez, J. Copet, G. Synnaeve, and Y. Adi, High Fidelity Neural Audio Compression, Transactions on Machine Learning Research, 2023. [Online]. Available: https://openreview.net/forum?id=ivCd8z8zR2 [3] R. Kumar, P. Seetharaman, A. Luebs, I. Kumar, and K. Kumar, High-Fidelity Audio Compression with Improved RVQGAN, in Advances in Neural Information Processing Systems, vol. 36, 2023, pp. 27 98027 993. [Online]. Available: https://proceedings.neurips.cc/paper_files/paper/2023/hash/58d0e78cf042af5876e12661087bea12-A bstract-Conference.html [4] Z. Borsos et al., AudioLM: Language Modeling Approach to Audio Generation, IEEE/ACM Transactions [Online]. Available: on Audio, Speech, and Language Processing, vol. 31, pp. 25232533, 2023. https://doi.org/10.1109/TASLP.2023. [5] C. Wang et al., Neural Codec Language Models are Zero-Shot Text to Speech Synthesizers, arXiv:2301.02111, 2023. [6] A. Défossez et al., Moshi: speech-text foundation model for real-time dialogue, arXiv:2410.00037, 2024. [7] Z. Ye et al., Llasa: Scaling Train-Time and Inference-Time Compute for Llama-based Speech Synthesis, arXiv:2502.04128, 2025. [8] H. Hu et al., Qwen3-TTS Technical Report, arXiv:2601.15621, 2026. [9] Y. Gong et al., MOSS-Audio-Tokenizer: Scaling Audio Tokenizers for Future Audio Foundation Models, arXiv:2602.10934, 2026. [10] S. Dieleman, C. Nash, J. Engel, and K. Simonyan, Variable-rate discrete representation learning, arXiv:2103.06089, 2021. [11] H. Zhang, Y. Guo, Z. Li, X. Hao, X. Chen, and K. Yu, Unlocking Temporal Flexibility: Neural Speech Codec with Variable Frame Rate, in Proceedings of Interspeech 2025, 2025, pp. 50035007. [Online]. Available: https://www.isca-archive.org/interspeech_2025/zhang25k_interspeech.html [12] H. Wang, Y. Guo, C. Shao, B. Li, and K. Yu, CodecSlime: Temporal Redundancy Compression of Neural Speech Codec via Dynamic Frame Rate, in ICASSP 2026 - 2026 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2026, pp. 17 01717 021. [Online]. Available: https://doi.org/10.1109/ICASSP55912.2026. [13] R.-C. Zheng et al., Say More with Less: Variable-Frame-Rate Speech Tokenization via Adaptive Clustering and Implicit Duration Coding, in Proceedings of the AAAI Conference on Artificial Intelligence, vol. 40, 2026, pp. 35 02135 029. [Online]. Available: https://ojs.aaai.org/index.php/AAAI/article/view/40807 [14] J. Li et al., FlexiCodec: Dynamic Neural Audio Codec for Low Frame Rates, in International Conference on Learning Representations, 2026, pp. 137 256137 283. [Online]. Available: https://proceedings.iclr.cc/paper_files /paper/2026/hash/ddeadff481e7ddf478234961ea7aae8b-Abstract-Conference.html [15] H. Sohn and J. Nam, DTM-Codec: Dynamic Token Masking for VFR Speech Coding with Efficient Boundary Selection, in Proceedings of Interspeech 2026 [Long Track], 2026, pp. 27612770. [Online]. Available: https://www.isca-archive.org/interspeech_2026/sohn26_interspeech.html [16] X. Zhang et al., The WER Trap: Shattering the Illusion of Unified Tokens in Speech Language Models, arXiv:2605.29209, 2026. [17] D. Xin, X. Tan, S. Takamichi, and H. Saruwatari, BigCodec: Pushing the Limits of Low-Bitrate Neural Speech Codec, arXiv:2409.05377, 2024. [18] X. Zhang, D. Zhang, S. Li, Y. Zhou, and X. Qiu, SpeechTokenizer: Unified Speech Tokenizer for Speech Language Models, in International Conference on Learning Representations, 2024, pp. 31 79831 818. [Online]. Available: https://proceedings.iclr.cc/paper_files/paper/2024/hash/86d1ab582afb247ccaa84bec4a7e24f7-Abstr act-Conference.html [19] H. Siuzdak, Vocos: Closing the Gap between Time-Domain and Fourier-Based Neural Vocoders for High-Quality Audio Synthesis, in International Conference on Learning Representations, 2024, pp. 25 71925 733. [Online]."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Available: https://proceedings.iclr.cc/paper_files/paper/2024/hash/6db0903efdfe9b1bbafb015c10990b78-Abstr act-Conference.html [20] O. Atamanenko et al., TTS-1 Technical Report, arXiv:2507.21138, 2025. [21] D. Bralios, P. Smaragdis, and M. Kim, Elastic Time: Dynamic Frame Rate Bottlenecks for Neural Audio Coding, in Proceedings of Interspeech 2026, 2026, pp. 41674172. [Online]. Available: https://www.isca-archive.org/interspeech_2026/bralios26_interspeech.html [22] L. Della Libera, C. Subakan, and M. Ravanelli, Beyond Fixed Frames: Dynamic Character-Aligned Speech Tokenization, arXiv:2601.23174, 2026. [23] L. Dong and B. Xu, CIF: Continuous Integrate-and-Fire for End-to-End Speech Recognition, in ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2020, pp. 60796083. [Online]. Available: https://doi.org/10.1109/ICASSP40776.2020. [24] H.-J. Chen, Y. Meng, and H.-y. Lee, Once-for-All Sequence Compression for Self-Supervised Speech Models, in ICASSP 2023 - 2023 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2023, pp. 15. [Online]. Available: https://doi.org/10.1109/icassp49357.2023.10095025 [25] H.-F. Wang et al., SpeechCLIP+: Self-supervised multi-task representation learning for speech via CLIP and speech-image data, in 2024 IEEE International Conference on Acoustics, Speech, and Signal Processing Workshops (ICASSPW), 2024, pp. 465469. [Online]. Available: https://doi.org/10.1109/ICASSPW62465.2024.10625827 [26] C. Liu et al., QuarkAudio Technical Report, arXiv:2512.20151, 2025. [27] J. Li et al., FlexiSLM: Spoken Language Model with Dynamic and Controllable Frame Rates, in Proceedings of the 2026 Conference on Empirical Methods in Natural Language Processing, 2026, arXiv:2606.31247; Accepted for publication. [28] Seamless Communication et al., Seamless: Multilingual Expressive and Streaming Speech Translation, arXiv:2312.05187, 2023. [29] S. Hwang, B. Wang, and A. Gu, Modeling, https://openreview.net/forum?id=ZbfLR9NbNF in International Conference on Learning Representations, 2026. Dynamic Chunking for End-to-End Hierarchical Sequence [Online]. Available: [30] F. Mentzer, D. Minnen, E. Agustsson, and M. Tschannen, Finite Scalar Quantization: VQ-VAE Made Simple, in International Conference on Learning Representations, 2024, pp. 51 77251 783. [Online]. Available: https://proc eedings.iclr.cc/paper_files/paper/2024/hash/e2dd53601de57c773343a7cdf09fae1c-Abstract-Conference.html [31] J. Kong, J. Kim, and J. Bae, HiFi-GAN: Generative Adversarial Networks for Efficient and High Fidelity Speech Synthesis, in Advances in Neural Information Processing Systems, vol. 33, 2020, pp. 17 02217 033. [Online]. Available: https://proceedings.neurips.cc/paper/2020/hash/c5d736809766d46260d816d8dbc9eb44-Abstract.html [32] W. Jang, D. Lim, J. Yoon, B. Kim, and J. Kim, UnivNet: Neural Vocoder with Multi-Resolution Spectrogram Discriminators for High-Fidelity Waveform Generation, in Proceedings of Interspeech 2021, 2021, pp. 22072211. [Online]. Available: https://www.isca-archive.org/interspeech_2021/jang21_interspeech.html [33] A. Babu et al., XLS-R: Self-supervised Cross-lingual Speech Representation Learning at Scale, in Proceedings of Interspeech 2022, 2022, pp. 22782282. [Online]. Available: https://www.isca-archive.org/interspeech_2022/ba bu22_interspeech.html [34] R. Langman et al., HiFiTTS-2: Large-Scale High Bandwidth Speech Dataset, in Proceedings of Interspeech 2025, 2025, pp. 47784782. [Online]. Available: https://www.isca-archive.org/interspeech_2025/langman25_inte rspeech.html [35] H. He et al., Emilia: Large-Scale, Extensive, Multilingual, and Diverse Dataset for Speech Generation, IEEE Transactions on Audio, Speech and Language Processing, vol. 33, pp. 40444054, 2025. [Online]. Available: https://doi.org/10.1109/TASLPRO.2025.3612835 [36] Y. Yin, D. Mori, and S. Fujimoto, ReazonSpeech: Free and Massive Corpus for Japanese ASR, in Proceedings of the 29th Annual Meeting of the Association for Natural Language Processing, 2023, pp. 11341139. [Online]. Available: https://anlp.jp/proceedings/annual_meeting/2023/pdf_dir/A5-3.pdf [37] D. Galvez et al., The Peoples Speech: Large-Scale Diverse English Speech Recognition Dataset for Commercial Usage, in Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks, vol. 1, 2021. [Online]. Available: https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/h"
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "ash/202cb962ac59075b964b07152d234b70-Abstract-round1.html [38] C. Wang et al., VoxPopuli: Large-Scale Multilingual Speech Corpus for Representation Learning, Semi-Supervised Learning and Interpretation, in Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers), 2021, pp. 9931003. [Online]. Available: https://aclanthology.org/2021.acl-long.80/ [39] V. Pratap, Q. Xu, A. Sriram, G. Synnaeve, and R. Collobert, MLS: Large-Scale Multilingual Dataset for Speech Research, in Proceedings of Interspeech 2020, 2020, pp. 27572761. [Online]. Available: https://www.isca-archive.org/interspeech_2020/pratap20_interspeech.html [40] Omnilingual ASR Team et al., Omnilingual ASR: Open-Source Multilingual Speech Recognition for 1600+ Languages, arXiv:2511.09690, 2025. [41] T. Javed et al., IndicVoices: Towards building an Inclusive Multilingual Speech Dataset for Indian Languages, in Findings of the Association for Computational Linguistics: ACL 2024, 2024, pp. 10 74010 782. [Online]. Available: https://aclanthology.org/2024.findings-acl.639/ [42] V. Panayotov, G. Chen, D. Povey, and S. Khudanpur, LibriSpeech: An ASR corpus based on public domain audio books, in 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2015, pp. 52065210. [Online]. Available: https://doi.org/10.1109/ICASSP.2015.7178964 [43] J. Yamagishi, C. Veaux, and K. MacDonald, CSTR VCTK Corpus: English Multi-speaker Corpus for CSTR Voice Cloning Toolkit (version 0.92), Dataset, version 0.92, 2019. [Online]. Available: https://doi.org/10.7488/ds/2645 [44] S. Takamichi, K. Mitsui, Y. Saito, T. Koriyama, N. Tanji, and H. Saruwatari, JVS corpus: free Japanese multi-speaker voice corpus, arXiv:1908.06248, 2019. [45] D. Xin, J. Jiang, S. Takamichi, Y. Saito, A. Aizawa, and H. Saruwatari, JVNV: Corpus of Japanese Emotional Speech with Verbal Content and Nonverbal Expressions, IEEE Access, vol. 12, pp. 19 75219 764, 2024. [Online]. Available: https://doi.org/10.1109/access.2024.3360885 [46] P. Anastassiou et al., Seed-TTS: Family of High-Quality Versatile Speech Generation Models, arXiv:2406.02430, 2024. [47] A. Radford, J. W. Kim, T. Xu, G. Brockman, C. McLeavey, and I. Sutskever, Robust Speech Recognition via Large-Scale Weak Supervision, in Proceedings of the 40th International Conference on Machine Learning, ser. Proceedings of Machine Learning Research, vol. 202. PMLR, 2023, pp. 28 49228 518. [Online]. Available: https://proceedings.mlr.press/v202/radford23a.html [48] Z. Gao, S. Zhang, I. McLoughlin, and Z. Yan, Paraformer: Fast and Accurate Parallel Transformer for Non-autoregressive End-to-End Speech Recognition, in Proceedings of Interspeech 2022, 2022, pp. 20632067. [Online]. Available: https://www.isca-archive.org/interspeech_2022/gao22b_interspeech.html [49] ITU-T, Perceptual evaluation of speech quality (PESQ): An objective method for end-to-end speech quality assessment of narrow-band telephone networks and speech codecs, ITU-T Recommendation P.862 (2001) and P.862.2 (2005), 2001, P.862.2. [Online]. Available: https://www.itu.int/rec/T-REC-P.862/en [50] C. H. Taal, R. C. Hendriks, R. Heusdens, and J. Jensen, An Algorithm for Intelligibility Prediction of TimeFrequency Weighted Noisy Speech, IEEE Transactions on Audio, Speech, and Language Processing, vol. 19, no. 7, pp. 21252136, 2011. [Online]. Available: https://doi.org/10.1109/TASL.2011.2114881 [51] K. Baba, W. Nakata, Y. Saito, and H. Saruwatari, The T05 System for The VoiceMOS Challenge 2024: Transfer Learning from Deep Image Classifier to Naturalness MOS Prediction of High-Quality Synthetic Speech, in 2024 IEEE Spoken Language Technology Workshop (SLT), 2024, pp. 818824. [Online]. Available: https://doi.org/10.1109/SLT61566.2024. [52] C. K. A. Reddy, V. Gopal, and R. Cutler, DNSMOS P.835: Non-Intrusive Perceptual Objective Speech Quality Metric to Evaluate Noise Suppressors, in ICASSP 2022 - 2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2022, pp. 886890. [Online]. Available: https://doi.org/10.1109/ICASSP43922.2022.9746108 [53] S. Chen et al., WavLM: Large-Scale Self-Supervised Pre-Training for Full Stack Speech Processing, IEEE Journal of Selected Topics in Signal Processing, vol. 16, no. 6, pp. 15051518, 2022. [Online]. Available: https://doi.org/10.1109/JSTSP.2022."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "[54] S. Ji et al., WavTokenizer: an Efficient Acoustic Discrete Codec Tokenizer for Audio Language Modeling, in International Conference on Learning Representations, 2025, pp. 93 80993 826. [Online]. Available: https://proc eedings.iclr.cc/paper_files/paper/2025/hash/ea1f5f0878d43ff4fb8bf64ef4a2326c-Abstract-Conference.html [55] Xiaomi LLM-Core Team, MiMo-Audio: Audio Language Models are Few-Shot Learners, arXiv:2512.23808, 2025. [56] Y. Gong et al., MOSS-TTS Technical Report, arXiv:2603.18090, 2026. [57] A. Yang et al., Qwen3 Technical Report, arXiv:2505.09388, 2025. [58] T. Saeki, D. Xin, W. Nakata, T. Koriyama, S. Takamichi, and H. Saruwatari, UTMOS: UTokyo-SaruLab System for VoiceMOS Challenge 2022, in Proceedings of Interspeech 2022, 2022, pp. 45214525. [Online]. Available: https://www.isca-archive.org/interspeech_2022/saeki22c_interspeech.html [59] I. Loshchilov and F. Hutter, Decoupled Weight Decay Regularization, in International Conference on Learning Representations, 2019. [Online]. Available: https://openreview.net/forum?id=Bkg6RiCqY7 [60] K. Jordan, Muon: An optimizer for hidden layers in neural networks, Keller Jordan blog, December 2024. [Online]. Available: https://kellerjordan.github.io/posts/muon/ [61] J. Liu et al., Muon is Scalable for LLM Training, arXiv:2502.16982, 2025."
+        },
+        {
+            "title": "A Supporting Codec Ablations",
+            "content": "A.1 Firing-signal selection We conducted this preliminary study before introducing residual vector quantization, using single FSQ codebook to compare candidate firing signals (Table A1). Each model was trained for 100,000 steps and evaluated on 200 utterances from HiFiTTS-2 validation split constructed by holding out speakers from the training subset. The scores serve primarily to compare signal choices within this early configuration; their absolute values do not characterize the final codec and are not directly comparable with the LibriSpeech test-clean results in Section 5.2.1. Latent dissimilarity and flux. Multi-scale latent dissimilarity and waveform flux are the two components described in Section 3.3.1: the latent-dissimilarity component in Equation (5) and log-mel spectral flux in Equation (6). Adjacent latent dissimilarity is the single-offset variant of Equation (5), using only (𝑎, 𝑏) = (1, 0), so it compares each latent frame with its immediate predecessor. The multi-scale-plus-flux row uses the firing signal defined in Equation (3). Learned difficulty. separate convolutional network takes the current and preceding latent frames and predicts nonnegative scalar reconstruction difficulty. During training, its target is the decoders framewise absolute log-mel reconstruction error, averaged over mel bins and normalized by its utterance mean. The network learns this target with mean-squared regression loss; during encoding, its prediction supplies the firing signal without requiring waveform reconstruction. In mixed-signal variants, each component is normalized to unit utterance mean before summation. We prioritize firing signals that require no additional trainable predictor. Among these candidates, multi-scale latent dissimilarity combined with spectral flux achieves the highest PESQ-WB, with STOI and speaker similarity comparable to flux alone, although dWER is slightly higher. Learned difficulty combined with flux yields lower dWER but requires an additional predictor and has lower speaker similarity. We therefore adopt the combined firing signal as balance between architectural simplicity and reconstruction quality in this exploratory comparison. A.2 Effect of causal decoding We compared the fully causal decoder architecture described in Section 3.5 with fully non-causal variant, keeping the rest of the codec architecture unchanged, at 12.5 events per second. The non-causal variant uses bidirectional attention, symmetric padding in its convolutional and transposed-convolutional layers, and symmetrically cropped overlap-add synthesis in the ISTFT. Each model was trained for 100,000 steps on the Table A1. Firing-signal ablations with single FSQ codebook. Bold marks the best score in each column."
+        },
+        {
+            "title": "Firing signal",
+            "content": "Adjacent latent dissimilarity Multi-scale latent dissimilarity Waveform flux Adjacent latent dissimilarity + flux Multi-scale latent dissimilarity + flux Learned difficulty Learned difficulty + flux Learned difficulty + multi-scale latent dissimilarity Learned difficulty + multi-scale latent dissimilarity + flux PESQ-WB STOI dWER (%) SIM 1.262 1.307 1.327 1.324 1.345 1.335 1.336 1.330 1. 0.787 0.804 0.810 0.808 0.810 0.811 0.813 0.810 0.811 3.30 2.81 2.20 2.53 2.31 2.31 1.36 1.86 2.04 0.397 0.458 0.447 0.426 0.454 0.412 0.418 0.412 0."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table A2. Reconstruction quality with fully non-causal and fully causal decoders. Bold marks the best score within each quantizer depth. Decoder Non-causal Causal Non-causal Causal Depth UTMOSv2 PESQ-WB STOI dWER (%) SIM 8 8 16 16 3.465 3.448 3.471 3.444 2.478 2. 2.651 2.556 0.923 0.917 0.933 0.929 0.76 0.80 0.60 0.62 0.792 0. 0.836 0.807 Table A3. Sparse grid composition versus repeating the event representation across its interval. Bold marks the best score within each quantizer depth. Grid composition Repeated event vector Sparse grid Repeated event vector Sparse grid Depth UTMOSv2 PESQ-WB STOI dWER (%) SIM 8 8 16 16 3.463 3.448 3.475 3. 2.324 2.379 2.507 2.556 0.915 0.917 0.926 0.929 0.84 0.80 0.65 0. 0.759 0.757 0.809 0.807 approximately 5,000-hour HiFiTTS-2 subset and evaluated on the 2,620 LibriSpeech test-clean utterances at quantizer depths 8 and 16. The causal model is the adaptive codec from Section 5.2.1. In Table A2, causal decoding reduces PESQ-WB relative to fully non-causal decoding by 0.099 at depth 8 and 0.095 at depth 16, with corresponding STOI decreases of 0.006 and 0.004 and SIM decreases of 0.035 and 0.029. UTMOSv2 is slightly lower. dWER is also slightly higher with causal decoding at both depths (0.80% versus 0.76% at depth 8 and 0.62% versus 0.60% at depth 16). These results support fully causal waveform synthesis with modest loss in reference-based reconstruction quality. A.3 Sparse versus repeated event representations This ablation tests whether the decoder benefits from receiving the event representation at every frame of its interval, rather than only at its start. We compare the sparse grid composition in Equation (15) with variant that replaces the learned empty vector at interior positions with the corresponding dequantized event representation, giving 𝑧𝑡 = ˆ𝑔 (𝐷) + 𝐸𝑟 (min(𝑟, 64)) throughout the interval. Both variants retain the same offset embeddings and fully causal decoder architecture. Each model was trained for 100,000 steps on the approximately 5,000-hour HiFiTTS-2 subset at 12.5 events per second and evaluated on the 2,620 LibriSpeech test-clean utterances at quantizer depths 8 and 16. The sparse model is the same adaptive codec used in Appendix A.2. 𝑖 Sparse composition improves PESQ-WB and STOI at both depths (Table A3), while repeated representations yield slightly higher SIM and UTMOSv2. Sparse composition also yields lower dWER at both depths. These results support sparse placement for signal fidelity. A.4 Firing decision rules This ablation compares cumulative allocation with level thresholding of the firing signal. Both models use the architecture in Section 3, including the firing signal defined in Equation (3), interval aggregation, hybrid residual quantizer, sparse decoding grid, and fully causal waveform decoder. Each model is trained from scratch for 100,000 steps on the approximately 5,000-hour HiFiTTS-2 subset using the settings in Section 4.2, with retention ratio 𝑅 = 0.25. Evaluation uses LibriSpeech test-clean."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table A4. Firing-rule comparison with the residual quantizer and causal decoder. Bold marks the best score within each quantizer depth. dWER follows Section 5.1.2. Firing rule Level thresholding Cumulative allocation Level thresholding Cumulative allocation Depth UTMOSv2 DNSMOS PESQ-WB STOI dWER (%) 8 8 16 16 3.299 3.448 3.319 3. 3.311 3.314 3.306 3.307 1.657 2.379 1.751 2.556 0.859 0.917 0.871 0. 5.62 0.80 3.33 0.62 SIM 0.613 0.757 0.649 0.807 Figure A1. Inference-time event-rate variation without retraining. All curves use the same model trained at 12.5 Hz, marked by the dashed vertical line. The horizontal axis shows the nominal inference event rate; colors and markers identify quantizer depth. The dWER axis is logarithmic. Level thresholding selects frames using an utterance-specific threshold at the signals (1 𝑅)-quantile, with the initial frame always retained. Training uses sigmoid gate with straight-through estimator, while inference uses hard decisions. Cumulative allocation uses the bounded cumulative allocation in Section 3.3.2 and enforces the prescribed event count without differentiating through boundary selection. The two rules differ in both event-count enforcement and the training gradient through boundary selection, so this comparison evaluates the complete firing rules rather than isolating placement alone. Cumulative allocation achieves higher PESQ-WB, STOI, speaker similarity, UTMOSv2, and DNSMOS and lower dWER than level thresholding at both depths (Table A4). These results favor cumulative allocation over the tested level-thresholding rule in this setting; they do not identify which difference between the rules causes the improvement. A.5 Inference-time event-rate variation We test whether the multilingual model trained at retention ratio 𝑅 = 0.25 can reconstruct speech at other event rates without retraining. We re-encode the same 2,620 LibriSpeech test-clean utterances with 𝑅 {0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40}, corresponding to nominal rates of 520 events/s on the 50-Hz grid. Only the retention ratio changes; model weights, the firing-signal definition, and decoding settings remain fixed. Each representation is decoded at depths 4, 8, and 16. Metrics and bitrate accounting follow Section 5.1.2. Table A5 shows an asymmetric response around the training rate. At depth 8, reducing the rate from 12.5 to 10 Hz lowers PESQ-WB from 2.684 to 2.421 and raises dWER from 0.75% to 1.11%. At 7.5 Hz, dWER reaches 3.29%; at 5 Hz, it rises to 45.66%. Greater quantizer depth mitigates the loss at intermediate rates, but depth 16 still has dWER of 27.55% at 5 Hz. Depth 4 is more sensitive to rate reduction (Figure A1). Increasing the rate above 12.5 Hz improves PESQ-WB, STOI, and SIM at all three depths, with diminishing gains. At depth 8, dWER decreases to 0.56% at 20 Hz. At depth 16, dWER remains near the training-rate"
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table A5. Reconstruction at inference ratios different from the training ratio. The training ratio is 0.25. Event rates and bitrates are measured utterance averages; bitrate includes duration information. Depth-4 results are shown in Figure A1. Inference ratio 0.10 0.15 0.20 0.25 (trained) 0.30 0.35 0.40 0.10 0.15 0.20 0.25 (trained) 0.30 0.35 0.40 Depth Event rate (Hz) Bitrate (kbit/s) PESQ-WB STOI dWER (%) SIM 8 8 8 8 8 8 8 16 16 16 16 16 16 5.0 7.5 10.0 12.5 15.0 17.5 20.0 5.0 7.5 10.0 12.5 15.0 17.5 20.0 0.50 0.74 0.98 1.23 1.47 1.71 1.96 0.98 1.46 1.94 2.43 2.91 3.39 3.88 1.214 1.799 2.421 2.684 2.811 2.895 2.944 1.271 2.105 2.803 3.029 3.118 3.173 3. 0.708 0.872 0.918 0.931 0.938 0.942 0.945 0.739 0.901 0.939 0.950 0.954 0.957 0.958 45.66 3.29 1.11 0.75 0.58 0.58 0.56 27.55 1.50 0.65 0.50 0.51 0.48 0.46 0.383 0.714 0.830 0.871 0.891 0.903 0.911 0.513 0.830 0.905 0.928 0.937 0.942 0. value of 0.50%, ranging from 0.46% to 0.51% across the higher rates. These quality gains also increase bitrate: depth-8 coding rises from 1.23 to 1.96 kbit/s between 12.5 and 20 Hz. The model therefore exhibits partial tolerance to unseen inference ratios, particularly when increasing the event rate, while aggressive rate reduction degrades reconstruction sharply."
+        },
+        {
+            "title": "B Duration Prediction Order",
+            "content": "This ablation compares four ways to predict event duration alongside codebook tokens. The independent-head variant predicts continuation, duration, and the first codebook token through three separate heads at the first local Transformer position; the remaining codes are predicted autoregressively without conditioning on the current duration. The other variants insert duration into the local autoregressive sequence before all codes, after the first (semantically supervised) code, or after all codes (Table B1). Duration is conditioned on preceding codes, and subsequent codes are conditioned on duration. The duration-last variant corresponds to Equation (18). All four models share Qwen3-0.6B temporal backbone [57], single-layer local Transformer, eight codebooks, and the same frozen codec. Each is trained for 20,000 steps on approximately 4,000 hours from the HiFiTTS-2 44-kHz subset [34], with global batch of 128 and training seed 42. AdamW [59] uses learning rates of 104 for the pretrained backbone and 3 104 for newly initialized modules, with 1,000 warmup steps followed by cosine decay. Reference speech is supplied with probability 0.9 and limited to 375 events. We evaluate duration cross-entropy on HiFiTTS-2 validation split with speakers held out from TTS training, and TTS WER on the 1,088 English utterances in seed-tts-eval [46]. Duration cross-entropy is not directly comparable across orders: duration-last conditions on all current-event codes, which may retain duration information from interval aggregation (Equation (12)). Its lower cross-entropy therefore reflects easier prediction under this conditioning rather than better modeling of temporal structure. We adopt duration-last prediction based on its lower duration cross-entropy and TTS WER in this small-scale comparison (Table B1)."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table B1. Effect of duration prediction structure and order. The codebook indices follow Equation (18). Lower values are better for both metrics; bold marks the best score in each column."
+        },
+        {
+            "title": "Independent head\nBefore all codes\nAfter the semantic code\nAfter all codes",
+            "content": "Parallel duration prediction; autoregressive codes 𝑑𝑖 𝑐𝑖,0 𝑐𝑖,7 𝑐𝑖,0 𝑑𝑖 𝑐𝑖,1 𝑐𝑖,7 𝑐𝑖,0 𝑐𝑖,7 𝑑𝑖 Duration CE (nats) WER (%) 0.9698 0.9737 0.8538 0.4265 4.71 4.43 4.40 4."
+        },
+        {
+            "title": "C Training Settings",
+            "content": "C.1 Codec training Table C1 provides the detailed settings for the architecture and placement comparisons in Section 4.2 and the multilingual model in Section 4.3. Each optimizer advances its own learning-rate schedule; discriminator updates begin in the adversarial phase. C.2 TTS training and sampling Table C2 provides the shared settings for the TTS comparison in Section 6.2. The temporal backbone and text embeddings are initialized from pretrained Qwen3-0.6B weights; the local Transformer and codec-specific embeddings and prediction heads are newly initialized. Losses are computed only on the target sequence, excluding the conditioning prefix and padding. Cross-entropy is averaged over valid positions within each batch for each head, and the resulting head losses are averaged with equal weights. For evaluation (Sections 6.26.3), codebook tokens and durations are sampled with temperature 0.8, top-p 0.95, and top-k 50; repetition penalty of 1.1 applies only to codebook tokens, using the history of the corresponding codebook. Continuation or stop is sampled from the binary distribution at temperature 1.0, without truncation or repetition penalty."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table C1. Training settings for the architecture and placement comparisons and multilingual model."
+        },
+        {
+            "title": "Training data",
+            "content": "Input / target sample rate Adaptive-versus-fixed comparisons Uniform-stride-versusadaptive placement"
+        },
+        {
+            "title": "Multilingual model",
+            "content": "HiFiTTS-2, 44-kHz subset; approximately 5,000 HiFiTTS-2, full English 44-kHz training partition Public and internal multilingual speech; approximately 375,000 16 / 44.1 kHz 16 / 44.1 kHz 16 / 44.1 kHz"
+        },
+        {
+            "title": "Crop duration",
+            "content": "6 6 6 s"
+        },
+        {
+            "title": "Training length",
+            "content": "100,000 steps 1,000,000 steps 1,500,000 steps"
+        },
+        {
+            "title": "Optimizers",
+            "content": "bfloat16 mixed precision; residual quantization in float32 bfloat16 mixed precision; residual quantization in float32 bfloat16 mixed precision; residual quantization in float32 Separate AdamW [59] for generator and discriminators; 𝛽 = (0.8, 0.9); weight decay 0.01 Separate AdamW [59] for generator and discriminators; 𝛽 = (0.8, 0.9); weight decay 0.01 Separate AdamW [59] for generator and discriminators; 𝛽 = (0.8, 0.9); weight decay 0."
+        },
+        {
+            "title": "Gradient clipping",
+            "content": "1.0 for each optimizer 1.0 for each optimizer 1.0 for each optimizer Learning-rate schedule"
+        },
+        {
+            "title": "Decoder backbone",
+            "content": "Quadratic warmup for 3,000 updates, then linear decay over 97,000 updates, for each optimizer Quadratic warmup for 3,000 updates, then linear decay over 997,000 updates, for each optimizer Quadratic warmup for 15,000 updates; linear decay over 1,485,000 generator / 1,335,000 discriminator updates Initial 105; peak 104; decay endpoint 2 105 Initial 105; peak 104; decay endpoint 2 105 Initial 105; peak 104; decay endpoint 2 10 010k: mel, semantic, and VQ; 10k85k: add adversarial and feature matching; 85k100k: add perceptual loss 0100k: mel, semantic, and VQ; 100k850k: add adversarial and feature matching; 850k1,000k: add perceptual loss 0150k: mel, semantic, and VQ; 150k1,275k: add adversarial and feature matching; 1,275k1,500k: add perceptual loss First-layer FSQ with 4,096 values; 15 residual VQ layers with 4,096 entries each First-layer FSQ with 4,096 values; 15 residual VQ layers with 4,096 entries each First-layer FSQ with 4,096 values; 15 residual VQ layers with 4,096 entries each Retained prefix depth sampled uniformly from 116 for each example Retained prefix depth sampled uniformly from 116 for each example Retained prefix depth sampled uniformly from 116 for each example 12 causal Transformer layers; width 1,024; 16 attention heads; MLP expansion 4 12 causal Transformer layers; width 1,024; 16 attention heads; MLP expansion 4 12 causal Transformer layers; width 1,024; 16 attention heads; MLP expansion Decoder regularization Dropout 0.1; attention dropout 0 Dropout 0.1; attention dropout 0 Dropout 0.1; attention dropout"
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table C2. TTS training settings shared by the adaptive and fixed-rate comparison."
+        },
+        {
+            "title": "Configuration",
+            "content": "HiFiTTS-2, 44-kHz English partition; approximately 31,300 [34] 12.5-Hz adaptive and fixed-rate codecs (Section 4.2)"
+        },
+        {
+            "title": "Temporal backbone",
+            "content": "Qwen3-0.6B [57]; 28 layers; hidden size 1,024; 16 query / 8 key-value heads"
+        },
+        {
+            "title": "Local Transformer",
+            "content": "4 layers; hidden size 1,024; 16 attention heads"
+        },
+        {
+            "title": "Codec representation",
+            "content": "8 codebooks; 4,096 entries per codebook"
+        },
+        {
+            "title": "Duration prediction",
+            "content": "Adaptive codec: final local position, after all 8 codes; durations 164 frames on the 50-Hz grid. Fixed-rate codec: known frame interval, without duration head"
+        },
+        {
+            "title": "Maximum target length",
+            "content": "1,024 speech events"
+        },
+        {
+            "title": "Speaker conditioning",
+            "content": "A different utterance from the same speaker, supplied with probability 0.9; at most 375 reference events"
+        },
+        {
+            "title": "Peak learning rates",
+            "content": "Learning-rate schedule"
+        },
+        {
+            "title": "Weight decay",
+            "content": "bfloat16 mixed precision Muon [60, 61] for hidden weight matrices; AdamW [59] for embeddings, output heads, and remaining parameters Muon momentum 0.95; AdamW 𝛽 = (0.9, 0.95), 𝜖 = 108 Pretrained backbone: 2 104; newly initialized modules: 8 104 Linear warmup for 1,000 steps, then constant learning rate; linear decay over the final 20% of training to 1% of the peak rate 0.1; excluded for normalization parameters, biases, and text, codebook, and duration embeddings"
+        },
+        {
+            "title": "Gradient clipping",
+            "content": "Global gradient norm 1."
+        },
+        {
+            "title": "Equal weights for all prediction heads",
+            "content": "3 epochs 42 Code, Models, and Data This appendix lists public sources for the codec implementations, pretrained components, evaluation tools, and datasets used in this study. Experimental configurations and data selection are described in Sections 46 and Appendix C. D.1 Codec implementations and checkpoints X-Codec-2 is also the architecture backbone of RubatoCodec; the evaluated codec configurations are listed in Table 5."
+        },
+        {
+            "title": "RubatoCodec",
+            "content": "Table D1. Codec implementations and checkpoints."
+        },
+        {
+            "title": "Proposed codec",
+            "content": "EnCodec [2]"
+        },
+        {
+            "title": "Codec baseline",
+            "content": "DAC [3]"
+        },
+        {
+            "title": "Codec baseline",
+            "content": "BigCodec [17]"
+        },
+        {
+            "title": "Codec baseline",
+            "content": "WavTokenizer [54]"
+        },
+        {
+            "title": "Codec baseline",
+            "content": "X-Codec-2 [7]"
+        },
+        {
+            "title": "Codec baseline",
+            "content": "Mimi [6]"
+        },
+        {
+            "title": "Codec baseline",
+            "content": "MiMo-Audio-Tokenizer [55]"
+        },
+        {
+            "title": "Code\nModel",
+            "content": "Code Model: 24 kHz Code Model: 24 kHz"
+        },
+        {
+            "title": "Code\nModel",
+            "content": "Code Model: 75 Hz"
+        },
+        {
+            "title": "Code\nModel",
+            "content": "MOSS-Audio-Tokenizer [9]"
+        },
+        {
+            "title": "Model and inference code",
+            "content": "Qwen3-TTS-Tokenizer-12Hz [8]"
+        },
+        {
+            "title": "Codec baseline",
+            "content": "DTM-Codec [15]"
+        },
+        {
+            "title": "Codec baseline",
+            "content": "CodecSlime [12]"
+        },
+        {
+            "title": "Codec baseline",
+            "content": "FlexiCodec [14]"
+        },
+        {
+            "title": "Codec baseline",
+            "content": "DyCAST [22]"
+        },
+        {
+            "title": "Code\nModel",
+            "content": "Code Model: 80 Hz"
+        },
+        {
+            "title": "Code\nModel",
+            "content": "D.2 Datasets The multilingual training mixture also includes internal data, as described in Section 4.3."
+        },
+        {
+            "title": "Third Intelligence",
+            "content": "Table D2. Datasets."
+        },
+        {
+            "title": "Resource",
+            "content": "HiFiTTS-2 [34]"
+        },
+        {
+            "title": "Source links",
+            "content": "Codec and TTS training / validation Dataset Emilia-YODAS [35]"
+        },
+        {
+            "title": "Multilingual codec training",
+            "content": "ReazonSpeech [36]"
+        },
+        {
+            "title": "Multilingual codec training",
+            "content": "The Peoples Speech [37]"
+        },
+        {
+            "title": "Multilingual codec training",
+            "content": "VoxPopuli [38]"
+        },
+        {
+            "title": "Multilingual codec training",
+            "content": "Multilingual LibriSpeech [39]"
+        },
+        {
+            "title": "Multilingual codec training",
+            "content": "Omnilingual ASR Corpus [40]"
+        },
+        {
+            "title": "Dataset",
+            "content": "IndicVoices [41] LibriSpeech [42] VCTK 0.92 [43] JVS [44] JVNV [45] seed-tts-eval [46]"
+        },
+        {
+            "title": "Dataset",
+            "content": "D.3 Pretrained components and evaluation tools Table D3. Pretrained components and evaluation tools."
+        },
+        {
+            "title": "Role in this study",
+            "content": "w2v-BERT 2.0 [28]"
+        },
+        {
+            "title": "Model",
+            "content": "wav2vec2-XLS-R-300M [33] Perceptual-loss feature extraction"
+        },
+        {
+            "title": "Model",
+            "content": "Qwen3-0.6B [57]"
+        },
+        {
+            "title": "TTS temporal backbone",
+            "content": "Whisper-large-v3 [47]"
+        },
+        {
+            "title": "English and Japanese ASR",
+            "content": "Paraformer-zh [48]"
+        },
+        {
+            "title": "Model",
+            "content": "WavLM-Large speaker verification [53]"
+        },
+        {
+            "title": "UniSpeech implementation\nSV checkpoint\nEvaluation instructions",
+            "content": "UTMOSv2 [51] UTMOS [58] DNSMOS [52] Muon [60]"
+        },
+        {
+            "title": "Speech naturalness evaluation",
+            "content": "UTMOSv2 implementation"
+        },
+        {
+            "title": "Code",
+            "content": "For speaker similarity, we use the speaker-verification checkpoint wavlm_large_finetune.pth with the UniSpeech ECAPA-TDNN head and WavLM-Large features, following the checkpoint distribution linked by seed-tts-eval. UTMOS uses the utmos22_strong model from SpeechMOS v1.2.0."
+        }
+    ],
+    "affiliations": [
+        "Third Intelligence, Inc."
+    ]
+}
