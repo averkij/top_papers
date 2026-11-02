@@ -262,13 +262,13 @@ for paper in tqdm(feed["papers"]):
             )
             # fallback
             if "error" in paper["data"]:
-                log("Fallback to OpenAI.")
+                log("Fallback to GPT via OpenRouter.")
                 paper["data"] = api.get_structured(
                     prompt=prompt,
                     system_prompt=system_prompt,
                     cls=api.ArticleFull,
                     temperature=0,
-                    model="gpt-4o",
+                    model="openai/gpt-6.1-terra",
                 )
 
             if not "error" in paper["data"]:
@@ -281,7 +281,7 @@ for paper in tqdm(feed["papers"]):
                     system_prompt=system_prompt_en,
                     cls=api.Article,
                     temperature=0,
-                    model="gpt-4o-mini",
+                    model="openai/gpt-6-luna",
                 )
                 # add Chinese desc
                 paper["data_zh"] = api.get_structured(
@@ -289,7 +289,7 @@ for paper in tqdm(feed["papers"]):
                     system_prompt=system_prompt_zh,
                     cls=api.Article,
                     temperature=0,
-                    model="gpt-4o-mini",
+                    model="openai/gpt-6-luna",
                 )
 
                 # TODO: add fallback
@@ -446,8 +446,8 @@ def fix_titles(title, sections):
 
             generated_title = api.get_text(
                 prompt=prompt,
-                api="openai",
-                model="gpt-4o-mini",
+                api="openrouter",
+                model="openai/gpt-6-luna",
                 system_prompt="You returning only one header for text. No explanations needed.",
                 temperature=0
             )
@@ -464,7 +464,7 @@ def fix_titles(title, sections):
     return api.get_structured(
         prompt=prompt,
         cls=api.List,
-        model="gpt-4o-mini",
+        model="openai/gpt-6-luna",
         system_prompt="You return object with field 'items' with list of strings and nothing else.",temperature=0
     )
 

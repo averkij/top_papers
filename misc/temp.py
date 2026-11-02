@@ -215,7 +215,7 @@ Paper text to classify:\n\n""{abs}"""
                 temperature=1.0,
             )
             paper["data"]["categories"] = api.get_json(
-                prompt_cls, api="openai", model="gpt-4o-mini", temperature=0.0
+                prompt_cls, api="openrouter", model="openai/gpt-6-luna", temperature=0.0
             )
         except Exception as e:
             paper["data"] = {"error": str(e)}

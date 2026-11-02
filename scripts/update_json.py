@@ -143,7 +143,7 @@ for json_path in prev_papers[1:]:
                 system_prompt=system_prompt_en,
                 cls=api.Article,
                 temperature=0,
-                model="gpt-4o-mini",
+                model="openai/gpt-6-luna",
             )
             # add Chinese desc
             paper["data_zh"] = api.get_structured(
@@ -151,7 +151,7 @@ for json_path in prev_papers[1:]:
                 system_prompt=system_prompt_zh,
                 cls=api.Article,
                 temperature=0,
-                model="gpt-4o-mini",
+                model="openai/gpt-6-luna",
             )
             
             paper["data"] = helper.rearrange_data(paper)

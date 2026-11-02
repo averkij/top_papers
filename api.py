@@ -6,7 +6,6 @@ from pathlib import Path
 
 import fal_client
 import numpy as np
-import openai
 from openai import OpenAI
 import requests
 from PIL import Image
@@ -22,7 +21,6 @@ openrouter_client = (
     else None
 )
 MISTRAL_KEY = os.getenv("MISTRAL_KEY")
-openai.api_key = os.getenv("OPENAI_KEY")
 
 XAI_API_KEY = os.getenv("XAIAPI_KEY")
 # client_xai = OpenAI(
@@ -42,6 +40,12 @@ class ArticleFull(BaseModel):
     desc: str
     emoji: str
     title: str
+
+
+def _get_openrouter_client():
+    if openrouter_client is None:
+        raise ValueError("OPENROUTER_API_KEY is required for OpenRouter requests.")
+    return openrouter_client
 
 
 def get_json(
@@ -73,7 +77,7 @@ def get_structured(
     doc = {"error": "Parsing error"}
     resp = ""
     try:
-        completion = openai.beta.chat.completions.parse(
+        completion = _get_openrouter_client().beta.chat.completions.parse(
             model=model,
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -81,7 +85,7 @@ def get_structured(
             ],
             response_format=cls,
             max_tokens=1024,
-            temperature=temperature,
+            extra_body={"reasoning": {"enabled": False}},
         )
         resp = completion.choices[0].message
         if resp.parsed:
@@ -100,8 +104,6 @@ def get_text(
     prompt, api, model, temperature=0.5, system_prompt="You are a helpful assistant."
 ):
     if api == "openrouter":
-        if openrouter_client is None:
-            raise ValueError("OPENROUTER_API_KEY is required for OpenRouter requests.")
         log(f"OpenRouter request. Model: {model}. Prompt: {prompt}")
         # Sonnet 5.5 requires reasoning; use low effort for review generation.
         reasoning = (
@@ -109,7 +111,7 @@ def get_text(
             if model == "anthropic/claude-sonnet-5.5"
             else {"enabled": False}
         )
-        completion = openrouter_client.chat.completions.create(
+        completion = _get_openrouter_client().chat.completions.create(
             model=model,
             max_tokens=4096,
             extra_body={"reasoning": reasoning},
@@ -117,7 +119,7 @@ def get_text(
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt},
             ],
-        )  # temperature is deprecated for Haiku 5.5, so it is not sent
+        )  # Current Claude and GPT models do not use temperature here.
         text = completion.choices[0].message.content
         if not text:
             raise ValueError("OpenRouter returned an empty response.")
@@ -139,17 +141,6 @@ def get_text(
         response = requests.post(base_url, headers=headers, json=payload)
         log(f"Mistral response. {json.dumps(response.json())}")
         text = response.json()["choices"][0]["message"]["content"]
-    elif api == "openai":
-        log(f"OpenAI request. Model: {model}. Prompt: {prompt}")
-        completion = openai.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt},
-            ],
-            temperature=temperature,
-        )
-        text = completion.choices[0].message.content
     elif api == "xai":
         log(f"XAI request. Model: {model}. Prompt: {prompt}")
         completion = client_xai.chat.completions.create(
@@ -176,8 +167,8 @@ def get_text(
 
 def get_embedding(text, size=256):
     try:
-        response = openai.embeddings.create(
-            input=text, model="text-embedding-3-small", encoding_format="float"
+        response = _get_openrouter_client().embeddings.create(
+            input=text, model="openai/text-embedding-3-small", encoding_format="float"
         )
         res = response.data[0].embedding[:256]
         res = normalize_l2(res)
@@ -244,7 +235,7 @@ def generate_image_for_paper(paper, img_name):
     title = paper["title"]
     abstract = paper["abstract"]
     prompt = f"Write a text with image prompt in style of surrealism and modern art based on the following paper. Use key themes and elements from it. Add instruction to write a text that reads as brief paper title as a label on some object on an image. Style: linear art on white background. Return only prompt and nothing else. Title: '{title}' Text: '{abstract}'"
-    img_prompt = get_text(prompt, api="openai", model="gpt-4o-mini", temperature=0.8)
+    img_prompt = get_text(prompt, api="openrouter", model="openai/gpt-6-luna", temperature=0.8)
     img_dir = os.path.join(con.IMG_DIR, paper["pub_date"].replace("-", ""))
     generate_and_save_image(name=img_name, img_dir=img_dir, prompt=img_prompt)
 

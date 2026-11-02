@@ -259,13 +259,13 @@ def generate_for_day(day_str):
                 )
                 # fallback
                 if "error" in paper["data"]:
-                    log("Fallback to OpenAI.")
+                    log("Fallback to GPT via OpenRouter.")
                     paper["data"] = api.get_structured(
                         prompt=prompt,
                         system_prompt=system_prompt,
                         cls=api.ArticleFull,
                         temperature=0,
-                        model="gpt-4o",
+                        model="openai/gpt-6.1-terra",
                     )
 
                 if not "error" in paper["data"]:
@@ -278,7 +278,7 @@ def generate_for_day(day_str):
                         system_prompt=system_prompt_en,
                         cls=api.Article,
                         temperature=0,
-                        model="gpt-4o-mini",
+                        model="openai/gpt-6-luna",
                     )
                     # add Chinese desc
                     paper["data_zh"] = api.get_structured(
@@ -286,7 +286,7 @@ def generate_for_day(day_str):
                         system_prompt=system_prompt_zh,
                         cls=api.Article,
                         temperature=0,
-                        model="gpt-4o-mini",
+                        model="openai/gpt-6-luna",
                     )
 
                     # rearrange localized data
