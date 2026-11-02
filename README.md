@@ -19,6 +19,10 @@ Welcome to the reviews repository for HF Daily Papers! This project gathers insi
 
 ## GitHub Actions Deployment
 
+Claude requests use [OpenRouter](https://openrouter.ai/docs/quickstart) through the existing OpenAI SDK. Set `OPENROUTER_API_KEY` in your local environment and add a repository Actions secret with the same name in GitHub. Both review workflows use this secret; `CLAUDE_KEY` is no longer required.
+
+The daily reviews and topic classification use `anthropic/claude-haiku-5.5`; user-requested reviews use `anthropic/claude-sonnet-5.5` with low reasoning effort. OpenAI requests, including structured output and embeddings, continue to use `OPENAI_KEY`.
+
 The project is deployed automatically using GitHub Actions with the following workflow:
 
 - **Workflow Name**: Issue Doomgrad Paper Review

@@ -210,8 +210,8 @@ Paper text to classify:\n\n""{abs}"""
             paper["data"] = api.get_json(
                 prompt,
                 system_prompt=system_prompt,
-                api="claude",
-                model="claude-sonnet-4-5-20250929",
+                api="openrouter",
+                model="anthropic/claude-sonnet-5.5",
                 temperature=1.0,
             )
             paper["data"]["categories"] = api.get_json(

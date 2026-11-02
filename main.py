@@ -275,8 +275,8 @@ for paper in tqdm(feed["papers"]):
             paper["data"] = api.get_json(
                 prompt=prompt,
                 system_prompt=system_prompt,
-                api="claude",
-                model="claude-haiku-5-5",
+                api="openrouter",
+                model="anthropic/claude-haiku-5.5",
                 temperature=1.0,
             )
             # fallback

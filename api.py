@@ -4,7 +4,6 @@ import os
 import re
 from pathlib import Path
 
-import anthropic
 import fal_client
 import numpy as np
 import openai
@@ -16,9 +15,11 @@ from pydantic import BaseModel
 import constants as con
 from helper import log
 
-CLAUDE_KEY = os.getenv("CLAUDE_KEY")
-claude_client = anthropic.Anthropic(
-    api_key=CLAUDE_KEY,
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+openrouter_client = (
+    OpenAI(api_key=OPENROUTER_API_KEY, base_url="https://openrouter.ai/api/v1")
+    if OPENROUTER_API_KEY
+    else None
 )
 MISTRAL_KEY = os.getenv("MISTRAL_KEY")
 openai.api_key = os.getenv("OPENAI_KEY")
@@ -98,20 +99,29 @@ def get_structured(
 def get_text(
     prompt, api, model, temperature=0.5, system_prompt="You are a helpful assistant."
 ):
-    if api == "claude":
-        log(f"Claude request. Model: {model}. Prompt: {prompt}")
-        message = claude_client.messages.create(
+    if api == "openrouter":
+        if openrouter_client is None:
+            raise ValueError("OPENROUTER_API_KEY is required for OpenRouter requests.")
+        log(f"OpenRouter request. Model: {model}. Prompt: {prompt}")
+        # Sonnet 5.5 requires reasoning; use low effort for review generation.
+        reasoning = (
+            {"effort": "low"}
+            if model == "anthropic/claude-sonnet-5.5"
+            else {"enabled": False}
+        )
+        completion = openrouter_client.chat.completions.create(
             model=model,
             max_tokens=4096,
-            thinking={"type": "disabled"},  # Haiku 5.5 thinks by default
-            output_config={"effort": "low"},
-            system=system_prompt,
+            extra_body={"reasoning": reasoning},
             messages=[
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt},
             ],
         )  # temperature is deprecated for Haiku 5.5, so it is not sent
-        # Haiku 5.5 may return thinking blocks before the answer
-        text = "".join(b.text for b in message.content if b.type == "text").strip('"')
+        text = completion.choices[0].message.content
+        if not text:
+            raise ValueError("OpenRouter returned an empty response.")
+        text = text.strip('"')
     elif api == "mistral":
         log(f"Mistral request. Model: {model}. Prompt: {prompt}")
         base_url = "https://api.mistral.ai/v1/chat/completions"
@@ -239,7 +249,7 @@ def generate_image_for_paper(paper, img_name):
     generate_and_save_image(name=img_name, img_dir=img_dir, prompt=img_prompt)
 
 
-def get_categories(text, api="claude", model="claude-haiku-5-5"):
+def get_categories(text, api="openrouter", model="anthropic/claude-haiku-5.5"):
     prompt_cls_1 = f"""Analyze the following research paper text and classify it into one or more relevant topics from the list below. Consider only information from the provided text. Don't add a tag if the topic is not directly related to the article.
 
 Topics:
@@ -496,7 +506,7 @@ Paper text to classify:\n\n"{text}"
     return categories
 
 
-def get_categories_additional(text, api="claude", model="claude-haiku-5-5"):
+def get_categories_additional(text, api="openrouter", model="anthropic/claude-haiku-5.5"):
     prompt_cls = f"""You are an expert classifier of machine learning research papers. Analyze the following research paper text and classify it into one or more relevant categories from the list below.
 
 Categories:
