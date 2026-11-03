@@ -1,0 +1,87 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.02897/2611.02897v1/teaser_.png",
+                "caption": "Figure 1:PhotoGuider turns a whole scene into a framed photograph and provides a reasoned explanation for its choice of framing.The four stages follow what a photographer actually does upon arriving at a scene: look around, settle on a direction, adjust the frame, and press the shutter. (1) Given a 360° panorama, the system scans look directions and (2) scores each using the proposed four photographic tokens: Subject, Composition, Integrity, and Aesthetics. The maximum fixes the camera direction. (3) The frame is then refined within that view, and (4) the final photograph is rendered natively from the panorama. The same four tokens also ground the explanation: our MLLM explainer is fine-tuned to cite these tokens and conditioned on their measured assessments. Below, two results show the selected crop and the produced explanation; phrases grounded in the four assessments are highlighted.",
+                "position": 242
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.02897/2611.02897v1/MethodOverview_.png",
+                "caption": "Figure 2:One set of photographic tokens, three uses.Each token yields one assessment score for a given frame, allowing the decision layer’s output to be separated into four interpretable metrics. These drive our entire pipeline by (1) scoring all view directions in a 360° scene, (2) ranking shortlisted framings and gating each refinement step, and (3) anchoring the fine-tuned MLLM’s explanations. An optional generalist MLLM acts only as a consultant during refinement.",
+                "position": 267
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.02897/2611.02897v1/TrainingOverview2_.png",
+                "caption": "Figure 3:The three learned components of PhotoGuider.We use single ground-truth crops from FCDB and top-rated crops from GAICD, with labels defined by the overlap (IoU) between candidate framings and reference crops.(1) Ranker.Candidates are scored using four LightGBM models (two regression and two ranking) operating on two feature tiers: a 17D core set (saliency, geometry) and a 60D full set (adding SAM object semantics, aesthetic scores, and CLIP prompts). Blending these model outputs yields three quality scores (qA,qB,qCq_{A},q_{B},q_{C}) to determine the optimal crop.(2) Refinement Gates.Six LightGBM gates adjust the selected crop by predicting IoU gains: one gate recenters the frame (via rule-of-thirds and CLIP-attention), four evaluate expansion (based on subject coverage, composition, scale-aesthetic variance, and golden ratio alignment), and a final gate shrinks the frame if no expansion triggers.(3) Explainer MLLM.It generates explanations conditioned on the crop, measured geometry, and ranker attributions. Training data drafts are filtered via four strict quality checks (unmasked geometry, numerical consistency, feature citations, and vocabulary validity).",
+                "position": 313
+            },
+            {
+                "img": "https://arxiv.org/html/2611.02897/2611.02897v1/TokenOverview_.png",
+                "caption": "Figure 4:Feature Partitioning and Token Definitions.The four tokens partition the 60 extracted features into disjoint subsets. Each reported score represents one such component, expressed as a percentile against the same quantity derived from training crops that match the human annotations most closely. The assessed frame is highlighted by the yellow box.",
+                "position": 317
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.02897/2611.02897v1/CroppingVisualization_.png",
+                "caption": "Figure 5:Examples from PhotoGuider on FCDB(Chen et al., 2017a)and FLMS(Fang et al., 2014)testing images.Green boxes are ground-truth crops from both datasets, and yellow boxes show crops from PhotoGuider. Bottom-right: IoU between the predicted and ground-truth crops.",
+                "position": 753
+            },
+            {
+                "img": "https://arxiv.org/html/2611.02897/2611.02897v1/PanoCropping_.png",
+                "caption": "Figure 6:Visual comparison of 360° view framing from the Poly Haven HDRI library.Score heatmaps are produced by each method across 120 look directions (24 pan × 5 tilt). Scores are displayed as percentile ranks, with red denoting highly favored directions and a star marking the peak score, alongside the corresponding rendered photograph. Each panel labels the chosen camera parameters (pan / tilt / field of view) and shows the percentage of participants who rated it first. Across 100 scenes, the first-place preference shares are 19.5%, 27.3%, and 53.2%, respectively.",
+                "position": 756
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAppendix",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.02897/2611.02897v1/DatasetBias_.png",
+                "caption": "Figure 7:Dataset Bias from FCDB and FLMS datasets.Each point is one crop selected by PhotoGuider, positioned by the contributions of two of the four photographic tokens. Normalized by the pooled standard deviation, the median-to-median displacement is 0.34 SD in the S-A plane and 0.47 SD in the C-I plane.",
+                "position": 2976
+            },
+            {
+                "img": "https://arxiv.org/html/2611.02897/2611.02897v1/explanationDemo_.png",
+                "caption": "Figure 8:An example from the human preference study on composition explanations.PhotoGuider, Venus, and ArtiMuse explain the same crop. The counts above each explanation indicate how many of the 50 participants selected it as best explaining the crop’s compositional aesthetics. Method names are shown for reference and were concealed during the study.",
+                "position": 3488
+            }
+        ]
+    },
+    {
+        "header": "Reproducibility Statement",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
