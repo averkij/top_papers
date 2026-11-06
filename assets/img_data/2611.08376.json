@@ -1,0 +1,160 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.08376/2611.08376v1/figs/fig1_teaser.png",
+                "caption": "Figure 1:Muir outperforms GDN-2 and Transformer on language modeling and long-context throughput while improving recall over GDN-2.(a) Sensitivity-allocated low-rank gates with FFN expansion drive the bulk of the validation NLL gain over GDN-2, while dynamic matched-filter readout drives the gain on extractive recall.\n(b) Across166​M–​1.34​B166\\text{M}\\text{--}1.34\\text{B}parameters, Muir lowers validation NLL by18.0​–​20.4​millinats18.0\\text{--}20.4\\text{ millinats}over GDN-2 and25.0​–​36.2​millinats25.0\\text{--}36.2\\text{ millinats}over Transformer.\n(c) On88TPU7x chips (0.5​M0.5\\text{M}tokens/step) at1.34​B1.34\\text{B}with our chunkwise kernel, Muir matches GDN-2 throughput despite an additional readout gate and a30.4%30.4\\%wider FFN, and trains1.64×1.64\\timesand2.74×2.74\\timesfaster than Transformer at16​K16\\text{K}and32​K,32\\text{K},respectively.",
+                "position": 371
+            }
+        ]
+    },
+    {
+        "header": "2Preliminaries",
+        "images": []
+    },
+    {
+        "header": "3Channel-Wise Gated Delta Memory Dynamics",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.08376/2611.08376v1/figs/fig2_toys.png",
+                "caption": "Figure 2:Matched-filter readout and low-rank erase gates improve synthetic associative retrieval and lower optimal erase strength.(a) Full whitening worsens retrieval error relative to unit gain (GDN-2), whereas half-power scaling and theCorollary3.8filter reduce error and shiftμ∗{\\mu}^{\\ast}from0.600.60to0.50,0.50,with theCorollary3.8filter matching the static oracle.\n(b) On a50/5050/50mixture of lagsℓ∈{2,80}\\ell\\in\\{2,80\\}atμ=0.60,{\\mu}=0.60,the lag-matched oracle outperforms the static oracle across all horizons, while theProposition3.6filter matches the lag-matched oracle atℓ=80\\ell=80and beats the static oracle on long and mixed horizons.\n(c) Low-rank erase gatesrbr_{b}outperform dense gates at every bottleneck rank on long-lag recall, whereas low-rank write gatesrwr_{w}degrade below dense atrw≤8r_{w}\\leq 8and recover oncerw≥16.r_{w}\\geq 16.",
+                "position": 843
+            }
+        ]
+    },
+    {
+        "header": "4Muir",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.08376/2611.08376v1/figs/fig3_architecture.png",
+                "caption": "Figure 3:Muir co-designs asymmetric low-rank gate parameterization and matched-filter query readout with MXU tile alignment and iso-parameter FFN reallocation.(a) Standard residual block with a Muir token mixer.\n(b) Within the Muir block,𝒙t{\\bm{x}}_{t}feeds linear-Conv\\mathrm{Conv}-SiLU\\mathrm{SiLU}pathways for(𝒒t,𝒌t,𝒗t)({\\bm{q}}_{t},{\\bm{k}}_{t},{\\bm{v}}_{t})alongside a single fused low-rank gate projection that produces all five gates(log⁡𝜶t,𝒃t,𝒈t,𝒘t,𝜸t).(\\log{\\bm{\\alpha}}_{t},{\\bm{b}}_{t},{\\bm{g}}_{t},{\\bm{w}}_{t},{\\bm{\\gamma}}_{t}).(c) Asymmetric gate ranks(rf,rb,rg,rw,rq)=(64,64,128,128,128)(r_{f},r_{b},r_{g},r_{w},r_{q})=(64,64,128,128,128)sum toRtot=512=2×256,R_{\\mathrm{tot}}=512=2\\times 256,which fills two256256-column MXU tiles in the fused down-projection and aligns(f,b)(f,b)and(g,w,q)(g,w,q)on128128-lane VMEM tile boundaries for batched up-projections.\n(d) Atd=2,048,d=2{,}048,replacing the dense(b,w)(b,w)gate matrices in GDN-2 cuts gate-projection parameters by4.5×4.5\\times; this either reduces per-layer parameters and FLOPs by14.6%14.6\\%at fixed FFN width, or frees+7.3​M+7.3\\text{M}parameters per layer to widen the FFN under an iso-parameter budget.",
+                "position": 874
+            },
+            {
+                "img": "https://arxiv.org/html/2611.08376/2611.08376v1/figs/fig4_kernel_design.png",
+                "caption": "Figure 4:Boundary-pivoted chunkwise kernel eliminates 3D decay tensors, division overflow, and VPU bottlenecks.(a) Memory hierarchy of a TPU7x chip.\n(b) On the256×256256\\times 256MXU, an unfused256×128256\\times 128right-hand side𝑽^\\hat{\\bm{V}}achieves only50%50\\%utilization due to zero-padded lanes, whereas the fused solve[𝑼𝒀]=𝑻−1​[𝑽^𝑲^⊙π]\\begin{bmatrix}{\\bm{U}}&{\\bm{Y}}\\end{bmatrix}={\\bm{T}}^{-1}\\begin{bmatrix}\\hat{\\bm{V}}&\\hat{\\bm{K}}_{\\odot\\pi}\\end{bmatrix}achieves100%100\\%utilization.\n(c) At chunk sizeC=256,C=256,leaf size8,8,anddk=dv=128,d_{k}=d_{v}=128,replacing naiveC×C×dkC\\times C\\times d_{k}3D VPU decay and sequential VPU triangular solves with boundary-pivoted MXU matrix multiplications, recursive block inversion, and a custom backward pass cuts forward-and-backward VPU compute by24×24\\timesand total kernel FLOPs by12%,12\\%,routing98%98\\%of chunkwise arithmetic onto the MXU.\n(d) Boundary-pivoted chunkwise execution combines pre-permutation VREG fusion for𝒒^t\\hat{\\bm{q}}_{t}and𝒗^t,\\hat{\\bm{v}}_{t},MXU cumulative log-decay, numerically stable VPU decay splitting, recursive block inversion of𝑻{\\bm{T}}on the MXU, and a packed MXU scan carrying𝑺0→𝑺C{\\bm{S}}_{0}\\to{\\bm{S}}_{C}in VMEM (saving𝑺0{\\bm{S}}_{0}only for backward).",
+                "position": 1115
+            }
+        ]
+    },
+    {
+        "header": "5Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.08376/2611.08376v1/figs/fig5_nll_curves.png",
+                "caption": "Figure 5:Muir consistently lowers validation NLL relative to GDN-2 and Transformer throughout𝟏𝟎𝟎​B\\bm{100\\text{B}}-token pretraining.Held-out FineWeb-Edu validation token NLL difference relative to GDN-2 across166​M–​1.34​B166\\text{M}\\text{--}1.34\\text{B}parameters as a function of training tokens.\nAll three Muir variants improve over GDN-2 within the first10​B10\\text{B}tokens and reach a12​–​20​mnat12\\text{--}20\\text{ mnat}reduction by100​B100\\text{B}tokens, while static and dynamic matched-filter readout provide additional reductions over Muir (no𝜸{\\bm{\\gamma}}).",
+                "position": 1261
+            },
+            {
+                "img": "https://arxiv.org/html/2611.08376/2611.08376v1/figs/fig6_recall.png",
+                "caption": "Figure 6:Muir improves synthetic single-needle, multi-hop, multi-needle, and real-world retrieval over GDN-2.(a) Averaged across the three single-needle tasks, all Muir variants mitigate the4​K4\\text{K}degradation of GDN-2 and extrapolate to8​K,8\\text{K},where unextended RoPE Transformer degrades beyond its4​K4\\text{K}training window.\n(b) On55-hop variable-binding chains, static𝜸{\\bm{\\gamma}}fails to match the varying hop lags, whereas dynamic𝜸t{\\bm{\\gamma}}_{t}leads all models at every context length.\n(c, d) When retrieving four values bound to a single key or four distinct keys queried jointly, dynamic𝜸t{\\bm{\\gamma}}_{t}matches or outperforms both GDN-2 and Transformer across1​K–​4​K.1\\text{K}\\text{--}4\\text{K}.(e) Averaged across the RULER tasks (a–d) by needle depth and context length, Muir achieves the largest gains over GDN-2 on early needles (0​–​40%0\\text{--}40\\%depth) at4​K–​8​K.4\\text{K}\\text{--}8\\text{K}.(f) On real-world document extraction at2​K,2\\text{K},Muir improves over GDN-2 on all six tasks, with dynamic𝜸t{\\bm{\\gamma}}_{t}driving69%69\\%of the gain.",
+                "position": 1678
+            },
+            {
+                "img": "https://arxiv.org/html/2611.08376/2611.08376v1/figs/fig7_longctx.png",
+                "caption": "Figure 7:Muir extrapolates to𝟏𝟐𝟖​K\\bm{128\\text{K}}-token documents and𝟏𝟎​M\\bm{10\\text{M}}-token streams with the lowest perplexity at a constant𝟐𝟓​MB\\bm{25\\text{ MB}}state.(a, c) Zero-shot from4​K4\\text{K}pretraining, Dynamic YaRN Transformer diverges past8​K8\\text{K}and unchunked evaluation exceeds HBM at≥128​K,\\geq\\!128\\text{K},while Muir (static𝜸{\\bm{\\gamma}}) drifts upward past32​K32\\text{K}; dynamic𝜸t{\\bm{\\gamma}}_{t}avoids this static-gain drift and outperforms GDN-2 across128​K128\\text{K}documents and10​M10\\text{M}-token streams (2,560×2{,}560\\timestraining length).\n(b, d) After a64​K64\\text{K}cooldown (0.3%0.3\\%of pretraining), Transformer improves through64​K64\\text{K}before unchunked evaluation exceeds HBM at≥128​K,\\geq\\!128\\text{K},static-𝜸{\\bm{\\gamma}}drift vanishes, and all Muir variants improve monotonically below GDN-2 through10​M10\\text{M}tokens (160×160\\timesbeyond cooldown).",
+                "position": 1726
+            },
+            {
+                "img": "https://arxiv.org/html/2611.08376/2611.08376v1/figs/fig8_longctx_niah.png",
+                "caption": "Figure 8:Static matched-filter readout extends passkey retrieval to𝟏​M\\bm{1\\text{M}}tokens both zero-shot and after a𝟔𝟒​K\\bm{64\\text{K}}cooldown.S-NIAH-1 accuracy across1010needle-depth bins and context lengths1​K–​1​M1\\text{K}\\text{--}1\\text{M}(256×256\\timespretraining length) at1.34​B1.34\\text{B}scale under (top) zero-shot evaluation from4​K4\\text{K}pretraining and (bottom) pure-text continual cooldown at64​K.64\\text{K}.Cooldown extends Dynamic YaRN Transformer from8​K8\\text{K}to32​K32\\text{K}before early-depth accuracy drops at64​K64\\text{K}and unchunked prefill exceeds HBM at≥128​K,\\geq\\!128\\text{K},whereas recurrent horizons change little under pure-text cooldown: GDN-2 collapses past4​K–​8​K,4\\text{K}\\text{--}8\\text{K},Muir (no𝜸{\\bm{\\gamma}}) fades past32​K,32\\text{K},Muir (dynamic𝜸t,{\\bm{\\gamma}}_{t},splitting(rw,rq)=(128,128)(r_{w},r_{q})=(128,128)for multi-lag recall) holds through32​K32\\text{K}before tapering at≥64​K,\\geq\\!64\\text{K},and Muir (static𝜸,{\\bm{\\gamma}},keepingrw=256r_{w}=256for single-lag lookup) maintains near-perfect recall to1​M1\\text{M}tokens in both regimes.",
+                "position": 1743
+            },
+            {
+                "img": "https://arxiv.org/html/2611.08376/2611.08376v1/figs/fig9_kernel_stability.png",
+                "caption": "Figure 9:Boundary-pivoted chunkwise execution eliminates decay overflow and maintains well-conditioned forward and backward passes.(a) Against an exactfloat64sequential reference, naive unpivotedfloat32decay factorization overflows and producesNaNon25%25\\%of heads, whereas the boundary-pivotedbfloat16andfloat32kernels match the reference to machine precision on both chunk outputs and final state.\n(b) Across synthetic stress regimes spanningκ2​(𝑻)∈[1,104],\\kappa_{2}({\\bm{T}})\\in[1,10^{4}],thebfloat16block-Neumann inverse stays near its precision floor throughout the well-conditioned regime (κ2​(𝑻)<40,\\kappa_{2}({\\bm{T}})<40,shaded), which contains the sampled100​B100\\text{B}-token checkpoints of GDN-2 and Muir (markers show medians).\n(c) Single-layer backward gradients (T=128,C=64,dk=16T\\!=\\!128,C\\!=\\!64,d_{k}\\!=\\!16) match thefloat64reference across all six inputs without log-decay drift.",
+                "position": 1774
+            }
+        ]
+    },
+    {
+        "header": "6Mechanistic Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.08376/2611.08376v1/figs/fig10_gate_sensitivity.png",
+                "caption": "Figure 10:Trained models exhibit the predicted write-erase sensitivity asymmetry under both SVD rank truncation and causal gate freezing.(a) Truncating each rank-128128gate projection of the uniform-rank Muir checkpoint via SVD (one gate at a time across all layers) shows that the decay (ff) and erase (bb) gates saturate by rank64,64,whereas the output (gg), write (ww), and readout gain (qq) gates require rank128.128.(b) Replacing the dynamic write gate with its token-averaged channel mean (𝒘t←𝒘¯{\\bm{w}}_{t}\\leftarrow\\bar{\\bm{w}}) across all layers degrades validation NLL14.5×14.5\\timesmore than freezing the erase gate (𝒃t←𝒃¯{\\bm{b}}_{t}\\leftarrow\\bar{\\bm{b}}) in both GDN-2 and Muir.",
+                "position": 2083
+            },
+            {
+                "img": "https://arxiv.org/html/2611.08376/2611.08376v1/figs/fig11_row_energy.png",
+                "caption": "Figure 11:Stationary state row energies obey the closed-form law and are balanced by fractional power-law readout gains.(a) Across state channels, the analytical fixed pointmj∗{m}_{j}^{\\ast}(5) closely tracks measured stationary row energymj=𝔼[∥𝑺t,j,:∥22]{m}_{j}=\\mathbb{E}[\\|{\\bm{S}}_{t,j,:}\\|_{2}^{2}]in both GDN-2 and Muir.\n(b) Across all heads, weighting state rows by the learned readout gain compresses the within-headp90/p10\\mathrm{p90}/\\mathrm{p10}energy spread by35%35\\%relative to GDN-2.\n(c) Within each head, learned static gains|γj||{\\gamma}_{j}|follow a fractional power lawγj∝ρj−p{\\gamma}_{j}\\propto{\\rho}_{j}^{-p}(p=0.35p=0.35) of stationary row RMSρj,{\\rho}_{j},intermediate between unit readout (p=0p=0) and full whitening (p=1p=1).",
+                "position": 2088
+            },
+            {
+                "img": "https://arxiv.org/html/2611.08376/2611.08376v1/figs/fig12_gamma_counterfactual.png",
+                "caption": "Figure 12:Readout-exponent sweeps and erase-logit shifts confirm the optimality of fractional power-law readout and the early-vs.-late erasure trade-off.(a) Replacing the learned static gain in each head with an RMS-matched power lawγj​(p)∝ρj−p{\\gamma}_{j}(p)\\propto{\\rho}_{j}^{-p}yields a U-shaped loss curve minimized near the learned exponent (p≈0.35p\\approx 0.35), outperforming both unit readout (p=0p=0) and full whitening (p=1p=1).\n(b) Shifting the pre-activation erase logit (𝒛tb←𝒛tb+δb{\\bm{z}}^{b}_{t}\\leftarrow{\\bm{z}}^{b}_{t}+\\delta_{b}) shows that weaker erasure degrades predictions across all positions, whereas stronger erasure leaves early tokens[0,16)[0,16)nearly unchanged while degrading late tokens[256,4​K).[256,4\\text{K}).",
+                "position": 2113
+            },
+            {
+                "img": "https://arxiv.org/html/2611.08376/2611.08376v1/figs/fig13_mv_hop_recall.png",
+                "caption": "Figure 13:Muir preserves early variable bindings and routes readout to the target hop at each answer step.(a) On 4-value MV-NIAH, Transformer drops on the final writeV4V_{4}and unit-readout recurrences degrade afterV1,V_{1},whereas Muir remains accurate acrossV1​–​V4.V_{1}\\text{--}V_{4}.(b) On 5-hop RULER VT, Transformer recalls only the root assignmentH1,H_{1},whereas Muir maintains accuracy across all five hopsH1​–​H5.H_{1}\\text{--}H_{5}.(c) Within-model root-needle (H1H_{1}) retention in𝑺t{\\bm{S}}_{t}from write milestones1s_{1}(100%100\\%) to query milestonetqt_{\\mathrm{q}}across1616held-out prompts (interquartile bands across prompts).\n(d) Within-model retention of written needlesH1​–​H5H_{1}\\text{--}H_{5}from each write (100%100\\%) across sequence milestoness1​–​s5s_{1}\\text{--}s_{5}totq.t_{\\mathrm{q}}.(e) Share of readout weight𝒒^t​𝑺t\\hat{\\bm{q}}_{t}{\\bm{S}}_{t}(over the haystack) on each needleH1​–​H5H_{1}\\text{--}H_{5}across the four answer-generation stepsA1​–​A4A_{1}\\text{--}A_{4}that chainH1→⋯→H5.H_{1}\\to\\dotsb\\to H_{5}.",
+                "position": 2214
+            }
+        ]
+    },
+    {
+        "header": "7Conclusion",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional Related Work",
+        "images": []
+    },
+    {
+        "header": "Appendix BSummary of Notation",
+        "images": []
+    },
+    {
+        "header": "Appendix COnline Regression Formulation",
+        "images": []
+    },
+    {
+        "header": "Appendix DMathematical Proofs",
+        "images": []
+    },
+    {
+        "header": "Appendix ESynthetic Memory Experiment Details",
+        "images": []
+    },
+    {
+        "header": "Appendix FChunkwise Kernel Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix GTraining Setup and Model Configurations",
+        "images": []
+    },
+    {
+        "header": "Appendix HEvaluation Protocols and Supplementary Results",
+        "images": []
+    },
+    {
+        "header": "Appendix IMechanistic Probe Protocols and Supplementary Diagnostics",
+        "images": []
+    },
+    {
+        "header": "Appendix JReference Implementation",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
