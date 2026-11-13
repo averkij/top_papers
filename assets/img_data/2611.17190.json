@@ -1,0 +1,185 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 1:Consensus capture on real footage. Unmasked ORB at the real-time budget (left) registers\na frame ten frames (0.33s0.33\\text{\\,}\\mathrm{s}) after the reference frame of case S2 (Table5).\nBoth panels show the same zoomed-in crop of the3840×21603840\\times 2160frame, centered on the largest\nmoving group; orange boxes\nare the vehicles that moved together between the two frames, with their motion. The estimate\nregisters the group back onto where it stood (capture fraction0.960.96), so its error, drawn\nas black arrows on a grid and magnified by the factor in the legend, carries the platoon’s motion\nacross the whole crop (10.0px10.0\\text{\\,}\\mathrm{p}\\mathrm{x}corner error against the reference estimator), while23%23\\text{\\,}\\mathrm{\\%}of its466466inliers\nlie on the moving vehicles (orange dots). The same pipeline under oriented-box masks (right)\nkeeps783783inliers, none on those vehicles, at a corner error of0.9px0.9\\text{\\,}\\mathrm{p}\\mathrm{x}. Both are re-registered\nwith the stored parameters and seed of the real-time campaign (Section7.3).",
+                "position": 409
+            }
+        ]
+    },
+    {
+        "header": "2Related work",
+        "images": []
+    },
+    {
+        "header": "3Problem setting",
+        "images": []
+    },
+    {
+        "header": "4Evaluation methodology",
+        "images": []
+    },
+    {
+        "header": "5Masking configurations and their annotations",
+        "images": []
+    },
+    {
+        "header": "6Part I: static benchmark",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 2:Part I. A scene frame is warped by a known geometric and photometric perturbation, and\nthe pipeline registers the warped copy back onto the original. The perturbation is the ground\ntruth, so no separate reference estimate is involved. The object annotations enter twice and for\ndifferent purposes: as the feature mask handed to the pipeline, and as the object boxes whose\nobject-level errors are scored.",
+                "position": 1891
+            },
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 3:One trial of the detector campaign, registered again\nwith the campaign’s stored parameters and seed. (a) The evaluation scene with the most objects,\neveryOBBoutlined. (b) Its perturbed copy in trial 0, with the sampled parameters above it and\na random sample of unmasked ORB’s inlier matches drawn between the two frames. (c, d) The dashed\ncrop of (a) with every ORB inlier unmasked and underOBBmasks, the masked area (eachOBBscaled about its center by1+m1+m,Table2) shaded; orange marks an inlier on an\nannotated object, blue one elsewhere. Nothing in the scene moves, so the inliers on vehicles are\ncorrect here; under masking ORB spends that share of its feature budget on the\nground.",
+                "position": 1921
+            },
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 4:Accuracy against compute on the tuning scenes, at the\nuntuned starting thresholds. Each panel is one pipeline; a line joins the downsampling ratios0.180.18,0.300.30,0.500.50and1.01.0at one feature budget (color and marker),\nunmasked (solid) or underOBBmasks (dashed), so a split between the two lines is a masking\neffect. A circle rings Part I’s operating point (1.01.0,80008000features), a square\nPart II’s offline one (0.500.50,20002000features) and a diamond its real-time one, the\ncheapest point of the grid (0.180.18,10001000features). Time is the median registration time\nper frame pair; mAA is drawn on a logarithmic scale of1−mAA1-\\text{mAA}, so the last hundredths\nbefore saturation stay visible. LoFTR has no point at full resolution, which exceeds the benchmark\nGPU’s memory.",
+                "position": 2048
+            }
+        ]
+    },
+    {
+        "header": "7Part II: dynamic benchmark",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 5:Part II. Every candidate registers the same frame pairs under each masking mode in turn,\nand the reference estimator registers them once, underOBBmasks. The reference\nestimator supplies pseudo-ground truth and its own error is measured againstGCP; that residual is the equivalence margin of the reference-relative pixel metrics. On the audited frames a homography fitted\nto the same points is an independent reference of its own, and the identity transform is scored on\nevery pair as the unstabilized baseline. The object annotations enter as the feature mask and,\nplaced by the reference estimator, as the evaluation region and as the object motion that the\ncapture fraction is read against.",
+                "position": 2443
+            },
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 6:The nine cases ofTable5at their reference\nframes, in cell order. Every object annotated in the reference frame is outlined by itsOBBand colored by what it did2222frames later, the longest offset the survey reads: displaced\nwith the largest group that moved together, displaced otherwise, found where it was, or not found.\nObjects are found again as the survey finds them, with the reference estimator’s transform as the\nplatform motion, as for the capture measure (Section4.5); arrows are\ndisplacements at true scale, and each panel counts the objects found, displaced and moving\ntogether; the low-moving cases show few displaced objects by definition. Each panel is one pair, whereas the survey’s descriptors average five offsets and remove\nthe platform motion by an affine fit to the background.",
+                "position": 2671
+            },
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 7:Audit of the reference estimator againstGCP. (a) Reference frame of case 2022-10-06_D9_AM3_S2 (Table6) with itsGCP, the static structure excluded from the reference-free measures (hatched), every\nobject’sOBBas produced by hbb2obb (dashed), the reference estimator’s feature mask (solid:\neachOBBscaled about its center by1+m1+m,Table2) and theOBBdilated byτ\\tau, which the reference-free measures exclude (shaded); the inset magnifies one\nobject at the frame’s resolution. Each arrow is a point’s residual at the case’s longest audited\noffset, drawn250250times its length. (b) The points with the smallest, median and largest of\nthose residuals in2121×\\times2121px windows: the reference frame beside the audited\nframe resampled into reference coordinates by𝐇~k→ref\\widetilde{\\mathbf{H}}^{k\\rightarrow\\mathrm{ref}}, with the reference point (++) and the\ncarried point (×\\times), whose distance is the residual. (c) Every audited point of every case\nagainst its time offset, pooled over the cases at each audited offset (box: quartiles and median;\nwhiskers: 5th and 95th percentiles), the four audit offset bins shaded alternately; the dashed line\nis the equivalence marginεfloor\\varepsilon_{\\mathrm{floor}}.",
+                "position": 2865
+            },
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 8:The capture fractionλ\\lambda(Eq.18) of every real-time\nmeasurement on a pair with a moving group, against the offset: one panel per pipeline, its title\ncounting the captured measurements, and a marker per masking mode. The dashed line is the capture\nthreshold of0.10.1and the shaded band the survey’s offsets of11to3131frames.\nThe axis is linear within the threshold and logarithmic beyond it, so a partial pull, a complete\ncapture (λ≈1\\lambda\\approx 1) and a breakdown far from zero are all visible. The offline regime\nis inFig.1, the captured share per offset bin inFig.2.",
+                "position": 2910
+            },
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 9:The offline counterpart ofFig.1: the captured unmasked measurement of the\noffline regime with the largest capture fraction within the survey’s offsets of11to3131frames whose registration reproduces its stored estimate, beside the same pipeline underOBBmasking, drawn as inFig.1.",
+                "position": 3054
+            },
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 10:Inlier ratio against the disagreement with the reference estimator, offline (top) and\nin real time (bottom). In each row, left, the density of frame pairs and pipelines, one panel per\nmasking mode, darker where more of them fall, on a logarithmic scale of the count; right, the\nSpearman coefficient between the two within each pipeline and case, one point per group, with\nthe median printed beside it and the number of positive coefficients under each masking mode.\nA negative coefficient means that a higher inlier ratio goes with a smaller\nerror.",
+                "position": 3115
+            },
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 11:Every candidate in the offline (top) and real-time (bottom) regime, pooled over the nine\ncases with equal weight per case. Left, mAA over[0,5][0,5]px against the reference estimator, on\na logarithmic scale of1−mAA1-\\text{mAA}, the identity dotted; right, theCTEagainst the homography fitted to theGCPof the audited frames, the marker at the median and the bar ending at the9090th percentile, with theGCPrepeatability dashed. A marker is filled when the\nconfiguration is in the column’s tie set under the analysis plan (Section4.9) and\nopen otherwise. Unmasked ORB’s real-time bar is set by one audited frame on which its estimate\nbroke down (Section7.3). Full rows inTables8,9,10and11.",
+                "position": 3158
+            }
+        ]
+    },
+    {
+        "header": "8Discussion",
+        "images": []
+    },
+    {
+        "header": "9Conclusion",
+        "images": []
+    },
+    {
+        "header": "CRediT authorship contribution statement",
+        "images": []
+    },
+    {
+        "header": "Declaration of competing interest",
+        "images": []
+    },
+    {
+        "header": "Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "Data and code availability",
+        "images": []
+    },
+    {
+        "header": "Declaration of generative AI and AI-assisted technologies in the manuscript preparation process",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ABenchmark protocol parameters",
+        "images": []
+    },
+    {
+        "header": "Appendix BPart I: further results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 1:mAA against the inlier threshold for every robust\nestimator, with the detector fixed (ORB, left; SIFT, right: one binary and one floating-point\ndescriptor),OBBmasking, on the evaluation scenes. Color follows the algorithm and the line\nstyle the OpenCV flag within it, so the three LO-RANSAC configurations share a hue.",
+                "position": 8123
+            },
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 2:mAA against in-plane rotation on the evaluation\nscenes,OBBmasking,5050trials per scene at each of nine magnitudes. LoFTR cannot run\nat full resolution on the benchmark GPU and is not shown.",
+                "position": 8148
+            }
+        ]
+    },
+    {
+        "header": "Appendix CPart II: further results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 1:The capture fraction of every offline measurement on a pair with a moving group, drawn asFig.8.",
+                "position": 8698
+            },
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 2:Share of the pairs with a moving group on which the\nestimate is captured (capture fractionλ≥0.1\\lambda\\geq 0.1,Eq.18), by offset\nbin, for every configuration captured at least once in either regime, all without\nmasking.",
+                "position": 8702
+            },
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 3:Direction of the registration error: the share of the corner error lying along the\ndominant motion axis,AAofEq.16, by masking mode, over the frame pairs\nwhose axis is defined (κ≥κmin\\kappa\\geq\\kappa_{\\min}), every pipeline pooled. Left, offline\nregime; right, real-time regime. Capture would move the unmasked distribution toward11,\naway from the masked ones.",
+                "position": 8708
+            }
+        ]
+    },
+    {
+        "header": "Appendix DThe analysis plan applied",
+        "images": []
+    },
+    {
+        "header": "Appendix EHorizontal-to-oriented box conversion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.17190/",
+                "caption": "Figure 1:Accuracy against time, one point per model\nconfiguration at its best grid point for the score shown, with the Pareto front dashed (the key\nbelow the panels names the checkpoints; + joins an ensemble). Left, meanIoU: the shaded band\nis one standard error of the mean about the leading configuration. Right, the share of boxes atIoU0.900.90or above,\nwhich does not saturate and orders the configurations the mean cannot separate. Times are a single\npass over the5050reference frames.",
+                "position": 8804
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
