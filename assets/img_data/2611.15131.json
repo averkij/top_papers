@@ -1,0 +1,117 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.15131/2611.15131v1/duo-teaser-editorial.png",
+                "caption": "Figure 1:Illustrative scenarios for full-duplex interaction withReciprocalWorldModel.",
+                "position": 332
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Architecture",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.15131/2611.15131v1/duo-architecture-chy.png",
+                "caption": "Figure 2:The framework ofDuov1.A joint causal diffusion transformer is conditioned on hidden states from the Intent Module, directly encoded user video and audio, a visual reference, and previously generated assistant media. The conversation media illustrate an offline, script-conditioned example.",
+                "position": 425
+            },
+            {
+                "img": "https://arxiv.org/html/2611.15131/2611.15131v1/fig3_chunking.png",
+                "caption": "Figure 3:ASR-aligned chunk construction and causal supervision.On a shared audiovisual timeline, user text is assigned to chunks by aligned token end times, while assistant text targets are assigned by speech onset. The token<blank>marks the absence of newly available user text. An assistant chunk with no new speech onset uses<wait>, even if speech from the preceding chunk continues. At chunkkk, the Intent Module predictsyky_{k}fromCkϕC^{\\phi}_{k}, using user inputs available through chunkk−1k-1. The initial outputy0y_{0}is fixed to<wait>. Only subsequent assistant targets contribute to the loss.",
+                "position": 503
+            }
+        ]
+    },
+    {
+        "header": "4Training Strategy",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.15131/2611.15131v1/fig5_training.png",
+                "caption": "Figure 4:Overview of Stage 1 (Intent Training) and Stage 2 (Realization Training).",
+                "position": 576
+            },
+            {
+                "img": "https://arxiv.org/html/2611.15131/2611.15131v1/fig6_rope_mask.png",
+                "caption": "Figure 5:Training sequence, positional encoding, and attention mask of the Realization Module.(a) The training contextCRC^{\\mathrm{R}}contains the reference, the shared global instruction, clean media of all chunks, and, for each chunk, the Intent Module hidden states followed by the noisy media. (b) Temporal RoPE positions in chunkkkfollow playback time in 25 ms units from the chunk startsks_{k}: text tokens and audio latents advance by one unit per index, and each video latent takes the start time of its frame span. (c) Causal attention mask. The noisy media of chunkkkread the reference, the shared instruction, clean media of earlier chunks, the hidden states of chunkkk, and themselves, but not the clean media of chunkkkor any later chunk.",
+                "position": 623
+            },
+            {
+                "img": "https://arxiv.org/html/2611.15131/2611.15131v1/duo-dmd-training.png",
+                "caption": "Figure 6:DMD training with dual rollout.The frozen Intent Module replays recorded assistant text and generates the final assistant turn from chunkk0k_{0}onward. Its hidden statesh^k\\hat{h}_{k}condition the Realization ModuleGθG_{\\theta}, which generates the latent windowzgenz_{\\mathrm{gen}}chunk by chunk. The frozen real score modelμreal\\mu_{\\mathrm{real}}and the trainable fake score modelμfake\\mu_{\\mathrm{fake}}evaluate the corrupted latent window to construct the targetzDMDz_{\\mathrm{DMD}}. Red arrows indicate gradients toGθG_{\\theta}. Orange arrows indicate gradients toμfake\\mu_{\\mathrm{fake}}andDD. Dashed outlines indicate optional components.",
+                "position": 749
+            }
+        ]
+    },
+    {
+        "header": "5Data Construction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.15131/2611.15131v1/duo-dual-view-pipeline.png",
+                "caption": "Figure 7:Screenplay-driven dual-view generation.Stage I turns sampled control cards into a validated structured screenplay and renders it, without another LLM call, into one t2v prompt per block. Stage II generates one split-screen audio-video block by block. Each later block starts from the previous block’s final frame (orange) and is anchored to the same opening segment of block 0 (blue), so identity and voice references are never re-chained through earlier continuations. Frames and dialogue in this figure come from one generated 30 s sample.",
+                "position": 813
+            },
+            {
+                "img": "https://arxiv.org/html/2611.15131/2611.15131v1/duo-brightness-drift.png",
+                "caption": "Figure 9:Error accumulation over a 60 s, ten-block rollout.Top: mean lumaY′Y^{\\prime}(0–255) of the full split-screen frame per block\n(table) and per frame (plot). Bottom: the split-screen frame at the\nmiddle of blocks 0, 3, 6, and 9. Base conditions each block only on the\nprevious final frame, and Ours adds the fixed block-0 picture-quality\nreference. Both runs share the same block 0 and screenplay.",
+                "position": 889
+            },
+            {
+                "img": "https://arxiv.org/html/2611.15131/2611.15131v1/record-data-2.png",
+                "caption": "Figure 10:Recorded data sources, interaction formatsThe six categories describe the recorded sources, with selected categories requiring further processing or synthesis to construct training examples.",
+                "position": 938
+            }
+        ]
+    },
+    {
+        "header": "6Streaming Pipeline and Acceleration",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.15131/2611.15131v1/duo-streaming-spaced-timeline-architecture.png",
+                "caption": "Figure 11:Streaming inference on eight GPUs.Time advances from left to right. The Intent Module runs its VLM with\nfour-way tensor parallelism (TP4) on GPU 0-3, alongside auxiliary ASR. The Realization Module executes the DiT on GPU 0-7 using tensor or sequence parallelism (TP/SP), while the streaming VAE uses 4-way spatial tiling on GPU 4-7.\nThe first visible execution of the Intent Module processes inputkk, which is omitted from the figure. The second execution processes inputk+1k+1. Hidden stateshkh_{k}from the Intent Module condition the Realization Module, which performs 4 denoising steps followed by a clean forward that commits the KV state.\nThe unified KV manager uses a sliding window for Intent Module KV and periodic resets for Realization Module KV. Chunkk+1k+1skips history reads but retains the clean write. Decoding overlaps intent inference on separate GPUs before generation resumes. KV boxes mark manager operations.",
+                "position": 1058
+            }
+        ]
+    },
+    {
+        "header": "7Evaluation and Showcase",
+        "images": []
+    },
+    {
+        "header": "8Conclusion",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.15131/2611.15131v1/duo-case-functions.png",
+                "caption": "Figure 12:Five functions of user–assistant interaction.Examples connect dialogue to plans, visible actions, shared solutions, social responses, and interactive customization. Panels (a)-(d) show offline, script-conditioned paired-video data. Panel (e) shows successive moments from a provided project demo.",
+                "position": 1225
+            },
+            {
+                "img": "https://arxiv.org/html/2611.15131/2611.15131v1/duo-cases-coordination.png",
+                "caption": "Figure 13:Decisions and coordination.Six additional script-conditioned paired-video examples illustrate how the user and assistant question a proposal, revise a plan, reason through constraints, explain visible evidence, and coordinate a shared task.",
+                "position": 1230
+            },
+            {
+                "img": "https://arxiv.org/html/2611.15131/2611.15131v1/duo-cases-responses.png",
+                "caption": "Figure 14:Grounded and social responses.Seven additional script-conditioned conversations connect visible context and dialogue to creative, instructional, and supportive behavior. Panels (a)-(f) show different conversations. Panel (g) shows two moments from one conversation.",
+                "position": 1233
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
