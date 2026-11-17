@@ -1,0 +1,205 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/figs/icons/globe.png",
+                "caption": "",
+                "position": 253
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/figs/icons/github.png",
+                "caption": "",
+                "position": 254
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/figs/icons/hf.png",
+                "caption": "",
+                "position": 255
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/figs/icons/mail.png",
+                "caption": "",
+                "position": 256
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/teaser_image.png",
+                "caption": "Figure 1:MovieRoll generates a minute-long video with continuous subject identity across six events.The sequence shows the same woman performing successive actions in one studio setting, with a new prompt every 10s. Each frame represents one event, and the text below summarizes its prompt.",
+                "position": 308
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3MovieRoll",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/overview_image.png",
+                "caption": "Figure 2:Overview of MovieRoll.Window-wise Teacher Forcing (WinTF) trains MovieRoll-Base through parallel window supervision conditioned on clean history and event prompts. After ODE initialization, Cumulative Long Tuning with Distribution Matching Distillation (CuLT-DMD) trains a few-step generator by averaging local gradients across long self-rollouts. Both models jointly denoise a rolling window, use hierarchical KV-cache compression (HieraKV) to retain history across layers, and rebuild the cache at a history threshold or prompt switch. Classifier-free guidance annealing (AnnealCFG) gradually reduces guidance during base-model denoising.",
+                "position": 383
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/winTF_image.png",
+                "caption": "Figure 3:WinTF learns rolling generation through parallel supervision of windows with progressive noise levels.Phase offsets expose the model to both short prefill windows and full decoding windows. Within each window, later chunks receive higher noise levels. The attention mask combines bidirectional interactions within a noisy window with access to clean preceding history, while isolating noisy windows from one another. This allows multiple windows to be trained in parallel, each conditioned on its own event prompt and preceding clean history.",
+                "position": 405
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/hierakv.png",
+                "caption": "Figure 4:Layer-dependent attention patterns motivate hierarchical history retention.In the WinTF-trained model, shallow layers distribute attention broadly across historical chunks, while deeper layers place relatively more attention on the sink and most recent chunks. The heatmap and lower entropy and coverage plots show this shift with depth. HieraKV follows these patterns by retaining full historical context in shallow layers and restricting deeper layers to the sink and most recent chunks.",
+                "position": 445
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/cult_dmd_image.png",
+                "caption": "Figure 5:CuLT-DMD combines supervision across a long rollout in each generator update.The top panel shows local distillation supervision from teacher and critic predictions. LongLive-style training updates the generator from individual windows while carrying detached history forward. CuLT-DMD instead keeps parameters fixed throughout the rollout and averages the local gradients before updating. This incorporates supervision from multiple temporal positions while retaining one local computation graph at a time.",
+                "position": 458
+            }
+        ]
+    },
+    {
+        "header": "4Infrastructure",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/FBCA_image.png",
+                "caption": "Figure 8:Flash Block-wise Causal Attention (FBCA) implements block-causal attention with efficient FlashAttention kernels.Each query block gathers its visible prefix, historical states, and current states into an independent attention sequence. KV unfolding and grouping organize these sequences within a per-call packing budget, and variable-length FlashAttention processes them before restoring the original block order. This preserves the required attention pattern while controlling the size of each packed buffer.",
+                "position": 603
+            }
+        ]
+    },
+    {
+        "header": "5Experiment",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/single_event_241f_image.png",
+                "caption": "Figure 10:Qualitative comparison of 10s single-event video generation.Under the same prompt of a mermaid combing her hair on a seaside rock, MovieRoll-Base and MovieRoll-Distilled retain recognizable subjects and consistent surroundings as poses and waves change. Rows compare methods evaluated under the same prompt, and columns show successive temporal intervals within each 241-frame video.",
+                "position": 883
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/single_event_image.png",
+                "caption": "Figure 11:Qualitative comparison of 30s single-event video generation.MovieRoll-Base and MovieRoll-Distilled preserve the facial features, clothing, and surroundings of a man eating at a bar as the action continues. Rows compare methods under the same prompt, and columns follow the 721-frame sequence, showing how subject and background consistency evolve during generation.",
+                "position": 1371
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/single_event_1441f_image.png",
+                "caption": "Figure 12:Qualitative comparison of 60s single-event video generation.MovieRoll-Distilled preserves the diver and underwater environment with relatively stable colors as generation continues. Rows compare methods under the same diver-and-wreck prompt, and columns follow successive 10s intervals of the 1441-frame videos.",
+                "position": 1374
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/multi_event_image.png",
+                "caption": "Figure 13:Qualitative comparison of 30s multi-event video generation.The sequence progresses from sketching a flower to observing a frog and raising a camera, with a prompt change every 10s. MovieRoll-Distilled depicts these action changes while retaining the botanist and rainforest setting. Each row shows one method, and each pair of columns corresponds to one event.",
+                "position": 1609
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/multi_event_1441f_image.png",
+                "caption": "Figure 14:Qualitative comparison of 60s multi-event video generation.The sequence develops from paddling to successive interactions with an otter, including surfacing beside the kayak, handling a rock, and approaching the hull. MovieRoll-Distilled depicts this event progression while maintaining a consistent lake setting. Rows compare methods under the same six sequential prompts, and each column represents one 10s event.",
+                "position": 1612
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/ablation_autoregressive_image.png",
+                "caption": "Figure 15:Ablation of autoregressive training strategies.The comparison includes chunk-wise teacher forcing, its self-resampling extension, and WinTF under the same coastal-scene prompt. As generation progresses, WinTF retains the cliff boundary and wave structure, while the chunk-wise variants lose scene detail or develop stronger changes in the colors of the coastal scene.",
+                "position": 1979
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/ablation_extrapolation_image.png",
+                "caption": "Figure 16:Ablation of long-horizon extrapolation strategies.All three strategies use the same Stage 1 MovieRoll-Base checkpoint to extend generation from 10s training clips to 30s videos. Full-history and sliding-window caching produce increasingly washed-out backgrounds, whereas KV recomputation preserves clearer subject and street details through the end of the sequence.",
+                "position": 1992
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/hierakv_vary_global_blocks_image.png",
+                "caption": "Figure 17:Memory and latency comparison across full-history and sink–recent attention allocations.The left plot shows slower cache-memory growth when fewer layers retain full history. At 18 cached chunks, the default HieraKV allocation of 6 global and 48 local layers reduces memory from 48.7 to 10.8 GiB and peak denoising-step latency from 33.8 to 15.8s relative to all-global attention. Measurements use MovieRoll-Base with CFG on one NVIDIA H20 GPU. Each timed denoising step includes both conditional and unconditional DiT evaluations. Timing excludes KV recomputation and VAE encoding/decoding.",
+                "position": 2005
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/ablation_hierakv_image.png",
+                "caption": "Figure 18:Ablation of HieraKV attention allocations.The comparison varies the allocation of 54 transformer blocks between full-history and sink–recent attention. With the default HieraKV allocation of 6 global and 48 local blocks, the rider and horse remain recognizable throughout the sequence. All-global attention progressively crops the subjects, while all-local attention shifts toward a close rear view.",
+                "position": 2008
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/ablation_cult_dmd_image.png",
+                "caption": "Figure 19:Ablation of CuLT-DMD training strategies.The 60s sequences compare LongLive-style training with CuLT-DMD using 241-frame or 721-frame Phase 2 rollouts. LongLive-style training shows larger changes in moon position and scale, while short-rollout CuLT-DMD develops stronger cloud-texture changes. Long-rollout CuLT-DMD maintains a more consistent moon-and-sky appearance in this example.",
+                "position": 2021
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/ablation_annealcfg_image.png",
+                "caption": "Figure 20:Ablation of CFG schedules.Rows compare constant, increasing, and decreasing guidance using the same MovieRoll-Base checkpoint. Guidance changes within each denoising trajectory. The default4→14\\rightarrow 1schedule retains clearer background detail, while constant guidance increases color saturation and increasing guidance from 1 to 4 distorts the subject in later frames.",
+                "position": 2034
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/gsb_single_event_image.png",
+                "caption": "Figure 21:User preference comparison for single-event video generation.MovieRoll-Distilled wins a majority of judgments against every evaluated baseline, with win rates from 67.0% to 90.3%. Each bar reports win, tie, and loss rates from the MovieRoll-Distilled perspective in same-prompt comparisons, pooling individual judgments across 10, 30, and 60s videos with ties included in the denominator.",
+                "position": 2048
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/gsb_multi_event_image.png",
+                "caption": "Figure 22:User preference comparison for multi-event video generation.MovieRoll-Distilled wins a majority of judgments against every evaluated baseline, with win rates from 62.3% to 81.9%. Each bar reports win, tie, and loss rates from the MovieRoll-Distilled perspective under the same prompt sequences, pooling judgments across 30s three-event and 60s six-event videos with ties included in the denominator.",
+                "position": 2051
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/showcase_base_image.png",
+                "caption": "Figure 23:Examples of 30s single-event videos generated by MovieRoll-Base.The six examples span human portraits, anthropomorphic performances, and fantastical settings, showing recognizable subjects as actions develop. Each two-row group follows one 721-frame video from left to right and then top to bottom. Frame indices and the accompanying prompt identify the progression within each example.",
+                "position": 2064
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/showcase_distilled_1_image.png",
+                "caption": "Figure 24:Examples of 60s single-event videos generated by MovieRoll-Distilled.This first set of six examples includes miniature ships, an origami dragon, and underwater performances. MovieRoll-Distilled preserves subject appearance as waves, steam, and gestures evolve. Each two-row group follows one 1441-frame video from left to right and then top to bottom, with frame indices overlaid and its prompt below.",
+                "position": 2070
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/showcase_distilled_2_image.png",
+                "caption": "Figure 25:Additional examples of 60s single-event videos generated by MovieRoll-Distilled.This second set of six examples spans miniature eruptions, animal performances, dragon close-ups, and landscapes. MovieRoll-Distilled retains appearance details alongside sustained scene activity. Each two-row group follows one 1441-frame video from left to right and then top to bottom, with frame indices overlaid and its prompt below.",
+                "position": 2076
+            },
+            {
+                "img": "https://arxiv.org/html/2611.21339/2611.21339v1/showcase_multi_event_image.png",
+                "caption": "Figure 26:Examples of multi-event video generation with sequential prompts.The upper examples show three-event, 30s videos from MovieRoll-Base, and the lower examples show six-event, 60s videos from MovieRoll-Distilled. Prompts change every 10s, with one frame representing each event. Both models retain recurring characters and settings as new interactions develop, such as a cat reacting to a robotic vacuum and a keeper responding to a seagull.",
+                "position": 2082
+            }
+        ]
+    },
+    {
+        "header": "6Conclusion and Limitations",
+        "images": []
+    },
+    {
+        "header": "7Discussion and Future Work",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix",
+        "images": []
+    },
+    {
+        "header": "Appendix AImplementation Details of Main Experiments",
+        "images": []
+    },
+    {
+        "header": "Appendix BHeliosBench Evaluation Protocol",
+        "images": []
+    },
+    {
+        "header": "Appendix CUser Study Protocol",
+        "images": []
+    },
+    {
+        "header": "Appendix DInfrastructure Details",
+        "images": []
+    },
+    {
+        "header": "Appendix EStreaming Video Prompt Rewriting Skill",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
