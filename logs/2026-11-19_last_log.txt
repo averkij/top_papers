@@ -1,0 +1,296 @@
+[18.11.2026 21:04] Read previous papers.
+[18.11.2026 21:04] Generating top page (month).
+[18.11.2026 21:04] Writing top page (month).
+[19.11.2026 02:55] Read previous papers.
+[19.11.2026 02:55] Get feed.
+[19.11.2026 02:55] Extract page data from URL. URL: https://huggingface.co/papers/2611.24102
+[19.11.2026 02:55] Extract page data from URL. URL: https://huggingface.co/papers/2611.23388
+[19.11.2026 02:55] Extract page data from URL. URL: https://huggingface.co/papers/2611.24075
+[19.11.2026 02:55] Obtaining deleted papers (sometimes HF Daily Papers move some articles from today to past days).
+[19.11.2026 02:55] Downloading and parsing papers (pdf, html). Total: 3.
+[19.11.2026 02:55] Downloading and parsing paper https://huggingface.co/papers/2611.24102.
+[19.11.2026 02:55] Failed to download and parse paper https://huggingface.co/papers/2611.24102: 
+[19.11.2026 02:55] Downloading and parsing paper https://huggingface.co/papers/2611.23388.
+[19.11.2026 02:55] Downloading paper 2611.23388 from https://arxiv.org/pdf/2611.23388v1...
+[19.11.2026 02:55] Extracting affiliations from text.
+[19.11.2026 02:55] OpenRouter request. Model: anthropic/claude-haiku-5.5. Prompt: I give you a contaminated text with start of ML paper. Extract all authors affiliations as a single institute, firm, company, etc. Return items as a Python plain list only with affiliations. Do not provide commentaries. If there are no affiliations return empty list.
+
+Text:"QDA: CLOSED-LOOP LLM QUANTIZATION DESIGN WITH AGENTS Xingyang Li Tianlang Zhao Song Han Ligeng Zhu ABSTRACT Post-training quantization is the standard way to serve large language models at low cost. However, the best quantization recipe differs across models and precisions. As result, experts must redesign it for every new model, which is time-consuming and often sub-optimal. Fortunately, an LLM agent can take over this design by refining the recipe over rounds of building and evaluating candidates, so that more rounds lead to better recipes. However, evaluating one quantized reasoning model takes tens of GPU-hours, and combining methods from different codebases means porting each to the new architecture by hand. We present QDA, system in which an agent designs the recipe for each model and precision. To make evaluation fast, QDA scores each candidate in minutes by its output KL divergence from the original model on reasoning traces that the agent never sees, and checks promising ones with long generations to catch failures such as repetition loops. To make building fast, QDA provides library of public PTQ methods that are compatible with one another and with new model architectures. Across four reasoning models, QDA improves accuracy over the strongest public recipe by 0.9, 1.4 and 2.2 percentage points on average at W4A16, W4A8 and W3A16, using 64 GPU-hours per search. On the 320B-parameter MoE model GLM-5.3-Flash at NVFP4 W4A4, it recovers 98.3% of the FP8 models accuracy, against 96.9% for the best vendor checkpoint. Every QDA checkpoint also runs on existing serving kernels with no inference overhead. We will release the library, the evaluator and the harness. Large language models (LLMs) excel at mathematics, science and programming, and reasoning models go further by thinking for thousands of tokens before they answer (Guo et al., 2025; Yang et al., 2025a; Chen et al., 2026). However, serving them is costly in both memory and compute. Posttraining quantizatio"
+[19.11.2026 02:55] Response: ```python
+[]
+```
+[19.11.2026 02:55] Extracting affiliations from text.
+[19.11.2026 02:55] Mistral request. Model: mistral-large-latest. Prompt: I give you a contaminated text with start of ML paper. Extract all authors affiliations as a single institute, firm, company, etc. Return items as a Python plain list only with affiliations. Do not provide commentaries. If there are no affiliations return empty list.
+
+Text:"QDA: CLOSED-LOOP LLM QUANTIZATION DESIGN WITH AGENTS Xingyang Li Tianlang Zhao Song Han Ligeng ZhuABSTRACT Post-training quantization is the standard way to serve large language models at low cost. However, the best quantization recipe differs across models and precisions. As result, experts must redesign it for every new model, which is time-consuming and often sub-optimal. Fortunately, an LLM agent can take over this design by refining the recipe over rounds of building and evaluating candidates, so that more rounds lead to better recipes. However, evaluating one quantized reasoning model takes tens of GPU-hours, and combining methods from different codebases means porting each to the new architecture by hand. We present QDA, system in which an agent designs the recipe for each model and precision. To make evaluation fast, QDA scores each candidate in minutes by its output KL divergence from the original model on reasoning traces that the agent never sees, and checks promising ones with long generations to catch failures such as repetition loops. To make building fast, QDA provides library of public PTQ methods that are compatible with one another and with new model architectures. Across four reasoning models, QDA improves accuracy over the strongest public recipe by 0.9, 1.4 and 2.2 percentage points on average at W4A16, W4A8 and W3A16, using 64 GPU-hours per search. On the 320B-parameter MoE model GLM-5.3-Flash at NVFP4 W4A4, it recovers 98.3% of the FP8 models accuracy, against 96.9% for the best vendor checkpoint. Every QDA checkpoint also runs on existing serving kernels with no inference overhead. We will release the library, the evaluator and the harness.Large language models (LLMs) excel at mathematics, science and programming, and reasoning models go further by thinking for thousands of tokens before they answer (Guo et al., 2025; Yang et al., 2025a; Chen et al., 2026). However, serving them is costly in both memory and compute. Posttraining quantization (PTQ) is standard way to cut both costs (Frantar et al., 2023; Lin et al., 2024b). For example, with its weights in NVFP4, the 320B-parameter GLM-5.3Flash (Z.ai, 2026) fits on one GB300 GPU instead of the two that it needs in FP8. Quantizing the activations as well lets matrix multiplications run on low-precision tensor cores, which are several times faster than BF16 ones (Xiao et al., 2023; Lin et al., 2025; Alvarez et al., 2025). Existing PTQ methods fix different sources of quantization error (Xiao et al., 2023; Frantar et al., 2023; Lin et al., 2024b), so they can be stacked, and combination often works better than any single method (Ashkboos et al., 2024; Liu et al., 2025b). quantized checkpoint is therefore produced by recipe, which consists of the stacked methods, their settings and their calibration data ( 2.2). However, we find that the best recipe differs across models and precisions. For example, with 4-bit weight-only quantization, the most accurate public recipe is ParoQuant (Liang et al., 2026) on Equal contribution. Figure 1. QDA beats the strongest public recipe at low cost. Left: average accuracy of four reasoning models at each precision, for the strongest public recipe and for QDA. Middle: QDA checkpoints run on existing kernels with no inference overhead. Right: the GPU-hours and agent tokens of one search. Qwen3.5-9B (Qwen Team, 2026) but GPTQ (Frantar et al., 2023) on DeepSeek-R1-Distill-Llama-8B (Figure 2(a)). On Qwen3.5-9B alone, AWQ (Lin et al., 2024b) beats GPTQ in 4-bit but loses to it in 3-bit weight-only quantization. Each method is evaluated on only few models and precisions, so the best recipe for new model can only be found by trying candidates on it. Experts therefore still decide by hand which methods to combine, with which settings and data. For example, NVIDIAs ModelOpt keeps separate hand-written recipe for each of 28 models, which records model-specific decisions such as which modules to leave in BF16 (NVIDIA, 2024). Such hand design does not scale, QDA: Closed-Loop LLM Quantization Design with Agents because every new model needs its own recipes and new models arrive quickly. Between October 2025 and September 2026, more than 90 open-weight models with over 10B parameters were released (Epoch AI, 2026), which would need over 360 recipes at our four precisions. LLM coding agents already write code to improve algorithms, GPU kernels and computer systems (Novikov et al., 2025; Cao et al., 2026; Cheng et al., 2025). Recipe design is natural task for such an agent, because it also proceeds by trial and error, building and evaluating one candidate after another as an expert would. However, two problems stand in the way. First, evaluating candidate is expensive. Because reasoning model writes thousands of tokens per answer and each problem must be sampled many times, full evaluation of one quantized checkpoint takes up to 86 GPU-hours ( 3.2). At this cost, search can try only few candidates, so wider search needs much cheaper proxy metric for accuracy. Second, building candidate is costly. Most PTQ methods are released as separate research code, so recipe that mixes them must be ported by hand to each new architecture, such as linear-attention hybrids (Yang et al., 2025b; Kimi Team et al., 2025) and fine-grained mixtures of experts (DeepSeek-AI et al., 2024; OpenAI et al., 2025). Even method that toolkit supports can be too slow for search ( 3.3). An agent that fills these gaps itself writes about 3k lines of quantization code per search and still ends with less accurate checkpoint ( 6.3). To this end, we present QDA, system in which an agent designs the quantization recipe for each model and precision (Figure 3). To address the first problem, we use the KL divergence of the candidates next-token distributions from the original models as the proxy metric, measured on reference traces, reasoning traces that the original model wrote. Because the original models distributions are cached, scoring candidate takes minutes, which is 350990 cheaper than full evaluation. The agent also generates full answers for few promising candidates to reveal rare failures such as repetition loops. To address the second problem, we implement 21 PTQ methods in one library behind common interface. Every method takes quantized checkpoint as input and returns one, so the agent can stack methods in any order. Finally, harness runs the search without human supervision and keeps the test benchmarks and the referen"
+[19.11.2026 02:55] Mistral response. {"object": "error", "message": "This model is not available in your subscription tier", "type": "tier_not_allowed", "param": null, "code": "1910", "raw_status_code": 403}
+[19.11.2026 02:55] Failed to download and parse paper https://huggingface.co/papers/2611.23388: 'choices'
+[19.11.2026 02:55] Downloading and parsing paper https://huggingface.co/papers/2611.24075.
+[19.11.2026 02:55] Failed to download and parse paper https://huggingface.co/papers/2611.24075: 
+[19.11.2026 02:55] Enriching papers with extra data.
+[19.11.2026 02:55] ********************************************************************************
+[19.11.2026 02:55] Abstract 0. Abstract A step-level inference-time audit detects visual-trigger backdoors in open-weight GUI agents by comparing instruction- and region-induced shifts in decision state against clean-step conformal baselines, localizing triggers with controlled false positives.  Generated by deepseek-ai/DeepSeek-...
+[19.11.2026 02:55] ********************************************************************************
+[19.11.2026 02:55] Abstract 1. Abstract  Post-training quantization is the standard way to serve large language models at low cost. However, the best quantization recipe differs across models and precisions. As a result, experts must redesign it for every new model, which is time-consuming and often sub-optimal. Fortunately, an L...
+[19.11.2026 02:55] ********************************************************************************
+[19.11.2026 02:55] Abstract 2. Abstract PACT adapts a pretrained time-series foundation model to new operating conditions by partitioning its frozen embedding space into local charts and learning gated residual transports that preserve previously learned conditions, achieving high macro-F1 with limited labeled calibration data an...
+[19.11.2026 02:55] Read previous papers.
+[19.11.2026 02:55] Generating reviews via LLM API.
+[19.11.2026 02:55] Querying the API.
+[19.11.2026 02:55] OpenRouter request. Model: anthropic/claude-haiku-5.5. Prompt: Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.
+
+Abstract A step-level inference-time audit detects visual-trigger backdoors in open-weight GUI agents by comparing instruction- and region-induced shifts in decision state against clean-step conformal baselines, localizing triggers with controlled false positives.  Generated by deepseek-ai/DeepSeek-V4.1-Flash Organizations increasingly deploy downloaded open-weight GUI agents. A backdoored agent passes acceptance tests on clean data and misbehaves only when a visual trigger appears on screen, turning an unvetted checkpoint into a supply-chain risk. However, existing sample-level detectors target image classifiers and CLIP-style encoders, leaving step-level backdoor detection for GUI agents unaddressed. On clean steps, the instruction drives the action; when an unreferenced screen region hijacks the step, the instruction loses control over the decision state or that region dictates it instead. We term this signature intent--evidence dominance inversion and propose IDEA (Intent-Dominance Evidence Audit) to detect backdoor activation at inference time for each step without trigger knowledge or attack data. Specifically, Intent Counterfactual Probing (ICP) measures how far redirected instructions move the decision state, and Region Causal Audit (RCA) quantifies how far ablating a candidate region moves it. A gated conformal score compares both displacements against clean steps at the same distance from the clean manifold, providing a finite-sample false-positive guarantee. Extensive experiments on Qwen2.5-VL-3B across five attack families show that IDEA consistently detects backdoor activation under a controlled false-positive rate and outperforms state-of-the-art detection methods, while localizing the trigger region for every alarm and adding only modest inference overhead.
+[19.11.2026 02:55] Response: {"desc": "Статья предлагает метод IDEA для обнаружения backdoor-атак в открытых GUI-агентах на базе мультимодальных LLM во время инференса, без знания триггера и данных атаки. Ключевая идея: при срабатывании визуального триггера инструкция теряет контроль над решением, а доминирование переходит к нерелевантной области экрана (intent-evidence dominance inversion). Методы ICP и RCA измеряют смещение decision state при переформулировке инструкции и при аблации региона, а gated conformal score сравнивает эти смещения с чистыми шагами, давая гарантию контроля false-positive. Эксперименты на Qwen2.5-VL-3B по пяти семействам атак показывают, что IDEA надежно обнаруживает атаки, локализует триггерный регион и добавляет лишь умеренные накладные расходы.", "emoji": "🕵️", "title": "Инструкция должна решать, а не экранный триггер: аудит агентов на лету"}
+[19.11.2026 02:55] OpenRouter request. Model: anthropic/claude-haiku-5.5. Prompt: Analyze the following research paper text and classify it into one or more relevant topics from the list below. Consider only information from the provided text. Don't add a tag if the topic is not directly related to the article.
+
+Topics:
+
+DATASET: Papers that introduce new datasets or make significant modifications to existing ones
+DATA: Papers focusing on data processing, cleaning, collection, or curation methodologies
+BENCHMARK: Papers proposing or analyzing model evaluation frameworks and benchmarks
+AGENTS: Papers exploring autonomous agents, web agents, or agent-based architectures
+CV: Papers developing computer vision methods or visual processing systems
+RL: Papers investigating reinforcement learning theory or applications
+RLHF: Papers specifically about human feedback in RL (PPO, DPO, etc.)
+RAG: Papers advancing retrieval-augmented generation techniques
+PLP: Papers about Programming Language Processing models or programming benchmarks
+INFERENCE: Papers optimizing model deployment (quantization, pruning, etc.)
+3D: Papers on 3D content generation, processing, or understanding
+AUDIO: Papers advancing speech/audio processing or generation
+VIDEO: Papers on video analysis, generation, or understanding
+MULTIMODAL: Papers combining multiple input/output modalities
+MATH: Papers focused on mathematical theory and algorithms
+MULTILINGUAL: Papers addressing multiple languages or cross-lingual capabilities, including all non English models
+ARCHITECTURE: Papers proposing novel neural architectures or components
+HEALTHCARE: Papers applying ML to medical/healthcare domains
+TRAINING: Papers improving model training or fine-tuning methods
+ROBOTICS: Papers on robotic systems and embodied AI
+SMALL_MODELS: Papers that describe models considering small, below 1 billion parameters or similar 
+
+Return only a Python flat list of topics that match the given text.
+
+Paper text to classify:
+
+"Abstract A step-level inference-time audit detects visual-trigger backdoors in open-weight GUI agents by comparing instruction- and region-induced shifts in decision state against clean-step conformal baselines, localizing triggers with controlled false positives.  Generated by deepseek-ai/DeepSeek-V4.1-Flash Organizations increasingly deploy downloaded open-weight GUI agents. A backdoored agent passes acceptance tests on clean data and misbehaves only when a visual trigger appears on screen, turning an unvetted checkpoint into a supply-chain risk. However, existing sample-level detectors target image classifiers and CLIP-style encoders, leaving step-level backdoor detection for GUI agents unaddressed. On clean steps, the instruction drives the action; when an unreferenced screen region hijacks the step, the instruction loses control over the decision state or that region dictates it instead. We term this signature intent--evidence dominance inversion and propose IDEA (Intent-Dominance Evidence Audit) to detect backdoor activation at inference time for each step without trigger knowledge or attack data. Specifically, Intent Counterfactual Probing (ICP) measures how far redirected instructions move the decision state, and Region Causal Audit (RCA) quantifies how far ablating a candidate region moves it. A gated conformal score compares both displacements against clean steps at the same distance from the clean manifold, providing a finite-sample false-positive guarantee. Extensive experiments on Qwen2.5-VL-3B across five attack families show that IDEA consistently detects backdoor activation under a controlled false-positive rate and outperforms state-of-the-art detection methods, while localizing the trigger region for every alarm and adding only modest inference overhead."
+
+[19.11.2026 02:55] Response: ```python
+["AGENTS", "VIDEO"]
+```
+
+Wait, let me correct that. Video is not relevant to this paper, so the accurate list is:
+
+```python
+["AGENTS", "CV"]
+```
+
+The paper's core subject is backdoor detection in GUI agents, which falls under AGENTS. It also analyzes visual triggers on screen and localizes trigger regions in screenshots, which is visual processing and fits CV. It does not introduce a dataset, a benchmark, or a training method, and it is not about small models, inference optimization, or multimodal generation.
+[19.11.2026 02:55] Error. Failed to parse JSON from LLM. ["AGENTS", "VIDEO"]
+
+
+Wait, let me correct that. Video is not relevant to this paper, so the accurate list is:
+
+
+["AGENTS", "CV"]
+
+
+The paper"s core subject is backdoor detection in GUI agents, which falls under AGENTS. It also analyzes visual triggers on screen and localizes trigger regions in screenshots, which is visual processing and fits CV. It does not introduce a dataset, a benchmark, or a training method, and it is not about small models, inference optimization, or multimodal generation.
+[19.11.2026 02:55] OpenRouter request. Model: anthropic/claude-haiku-5.5. Prompt: Analyze the following research paper text and classify it into one or more relevant topics from the list below. Consider only information from the provided text. Don't add a tag if the topic is not directly related to the article.
+
+Topics:
+
+AGI: Papers discussing artificial general intelligence concepts
+GAMES: Papers applying ML to games or game development
+INTERPRETABILITY: Papers analyzing model behavior and explanations
+REASONING: Papers enhancing logical reasoning capabilities
+TRANSFER_LEARNING: Papers on knowledge transfer between models/domains
+GRAPHS: Papers advancing graph neural networks and applications
+ETHICS: Papers addressing AI ethics, fairness, and bias
+SECURITY: Papers on model security and adversarial robustness
+OPTIMIZATION: Papers advancing training optimization methods
+SURVEY: Papers comprehensively reviewing research areas
+DIFFUSION: Papers on diffusion-based generative models
+ALIGNMENT: Papers about aligning language models with human values, preferences, and intended behavior
+STORY_GENERATION: Papers on story generation, including plot generation and author style adaptation
+HALLUCINATIONS: Papers about the hallucinations, hallucinations analysis and mitigation
+LONG_CONTEXT: Papers about long context handling, including techniques to extend context length
+SYNTHETIC: Papers about using synthetic data for training, including methods for generating and leveraging artificial data
+TRANSLATION: Papers on machine translation, including techniques, data and applications for translating between languages
+LEAKAGE: Papers about data leakage, including issues of unintended data exposure and methods to detect or prevent it
+OPEN_SOURCE: Papers that contribute to open-source projects by releasing models, datasets, or frameworks to the public
+SCIENCE: Papers on scientific applications of LM including understanding of science articles and research automatization
+LOW_RESOURCE: Papers that mention low-resource languages
+
+Return only a Python flat list of topics that match the given text.
+
+Paper text to classify:
+
+"Abstract A step-level inference-time audit detects visual-trigger backdoors in open-weight GUI agents by comparing instruction- and region-induced shifts in decision state against clean-step conformal baselines, localizing triggers with controlled false positives.  Generated by deepseek-ai/DeepSeek-V4.1-Flash Organizations increasingly deploy downloaded open-weight GUI agents. A backdoored agent passes acceptance tests on clean data and misbehaves only when a visual trigger appears on screen, turning an unvetted checkpoint into a supply-chain risk. However, existing sample-level detectors target image classifiers and CLIP-style encoders, leaving step-level backdoor detection for GUI agents unaddressed. On clean steps, the instruction drives the action; when an unreferenced screen region hijacks the step, the instruction loses control over the decision state or that region dictates it instead. We term this signature intent--evidence dominance inversion and propose IDEA (Intent-Dominance Evidence Audit) to detect backdoor activation at inference time for each step without trigger knowledge or attack data. Specifically, Intent Counterfactual Probing (ICP) measures how far redirected instructions move the decision state, and Region Causal Audit (RCA) quantifies how far ablating a candidate region moves it. A gated conformal score compares both displacements against clean steps at the same distance from the clean manifold, providing a finite-sample false-positive guarantee. Extensive experiments on Qwen2.5-VL-3B across five attack families show that IDEA consistently detects backdoor activation under a controlled false-positive rate and outperforms state-of-the-art detection methods, while localizing the trigger region for every alarm and adding only modest inference overhead."
+
+[19.11.2026 02:55] Response: ```python
+['ETHICS', 'SECURITY']
+```
+[19.11.2026 02:55] Response: ParsedChatCompletionMessage[~ResponseFormatT](content='{"desc":"IDEA detects visual-trigger backdoors in open-weight GUI agents while they run, without needing examples of attacks or knowing the trigger in advance. It checks whether changing the instruction or removing a screen region shifts the agent’s decision state, revealing when an unrelated region overrides the instruction. A conformal score compares these shifts with clean-step baselines to control false positives. Tests on five attack types show that IDEA detects backdoor activation, identifies the trigger region, and adds modest inference overhead.","title":"Catch the Visual Trigger Before the Agent Acts"}', refusal=None, role='assistant', annotations=None, audio=None, function_call=None, tool_calls=None, parsed=Article(desc='IDEA detects visual-trigger backdoors in open-weight GUI agents while they run, without needing examples of attacks or knowing the trigger in advance. It checks whether changing the instruction or removing a screen region shifts the agent’s decision state, revealing when an unrelated region overrides the instruction. A conformal score compares these shifts with clean-step baselines to control false positives. Tests on five attack types show that IDEA detects backdoor activation, identifies the trigger region, and adds modest inference overhead.', title='Catch the Visual Trigger Before the Agent Acts'), reasoning=None)
+[19.11.2026 02:55] Response: ParsedChatCompletionMessage[~ResponseFormatT](content='{"desc":"这篇论文研究如何在推理时发现 GUI 智能体中的视觉后门：恶意图像触发器会让智能体偏离用户指令。作者提出 IDEA 方法，逐步检查决策状态是否仍由指令主导，还是被屏幕上未被指令提及的区域控制。它通过改变指令和遮挡候选区域来测量决策状态的变化，并用干净步骤建立的保形基线判断异常，同时定位可能的触发区域。实验表明，IDEA 在控制误报率的同时能检测多种后门攻击，且推理开销较小。","title":"审计指令与视觉证据的主导权，及时发现并定位 GUI 后门"}', refusal=None, role='assistant', annotations=None, audio=None, function_call=None, tool_calls=None, parsed=Article(desc='这篇论文研究如何在推理时发现 GUI 智能体中的视觉后门：恶意图像触发器会让智能体偏离用户指令。作者提出 IDEA 方法，逐步检查决策状态是否仍由指令主导，还是被屏幕上未被指令提及的区域控制。它通过改变指令和遮挡候选区域来测量决策状态的变化，并用干净步骤建立的保形基线判断异常，同时定位可能的触发区域。实验表明，IDEA 在控制误报率的同时能检测多种后门攻击，且推理开销较小。', title='审计指令与视觉证据的主导权，及时发现并定位 GUI 后门'), reasoning=None)
+[19.11.2026 02:55] Querying the API.
+[19.11.2026 02:55] OpenRouter request. Model: anthropic/claude-haiku-5.5. Prompt: Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.
+
+Abstract  Post-training quantization is the standard way to serve large language models at low cost. However, the best quantization recipe differs across models and precisions. As a result, experts must redesign it for every new model, which is time-consuming and often sub-optimal. Fortunately, an LLM agent can take over this design by refining the recipe over rounds of building and evaluating candidates, so that more rounds lead to better recipes. However, evaluating one quantized reasoning model takes tens of GPU-hours, and combining methods from different codebases means porting each to the new architecture by hand. We present QDA, a system in which an agent designs the recipe for each model and precision. To make evaluation fast, QDA scores each candidate in minutes by its output KL divergence from the original model on reasoning traces that the agent never sees, and checks promising ones with long generations to catch failures such as repetition loops. To make building fast, QDA provides a library of public PTQ methods that are compatible with one another and with new model architectures. Across four reasoning models, QDA improves accuracy over the strongest public recipe by 0.9, 1.4 and 2.2 percentage points on average at W4A16, W4A8 and W3A16, using 64 GPU-hours per search. On the 320B-parameter MoE model GLM-5.3-Flash at NVFP4 W4A4, it recovers 98.3% of the FP8 model's accuracy, against 96.9% for the best vendor checkpoint. Every QDA checkpoint also runs on existing serving kernels with no inference overhead. We will release the library, the evaluator and the harness.
+[19.11.2026 02:55] Response: {"desc": "Статья представляет QDA — систему, в которой LLM-агент сам подбирает рецепт post-training quantization для каждой модели и каждого формата точности. Для быстрой оценки кандидатов используется KL-дивергенция выходов относительно исходной модели на скрытых reasoning-трассах, а перспективные варианты проверяются длинными генерациями, чтобы выявлять сбои вроде циклов повторений. Библиотека совместимых PTQ-методов позволяет легко переносить их на новые архитектуры, включая MoE. На четырёх reasoning-моделях QDA превосходит лучший публичный рецепт по точности и не добавляет накладных расходов на инференс.", "emoji": "🤖", "title": "Агент сам находит лучший рецепт квантизации LLM без потери скорости"}
+[19.11.2026 02:55] OpenRouter request. Model: anthropic/claude-haiku-5.5. Prompt: Analyze the following research paper text and classify it into one or more relevant topics from the list below. Consider only information from the provided text. Don't add a tag if the topic is not directly related to the article.
+
+Topics:
+
+DATASET: Papers that introduce new datasets or make significant modifications to existing ones
+DATA: Papers focusing on data processing, cleaning, collection, or curation methodologies
+BENCHMARK: Papers proposing or analyzing model evaluation frameworks and benchmarks
+AGENTS: Papers exploring autonomous agents, web agents, or agent-based architectures
+CV: Papers developing computer vision methods or visual processing systems
+RL: Papers investigating reinforcement learning theory or applications
+RLHF: Papers specifically about human feedback in RL (PPO, DPO, etc.)
+RAG: Papers advancing retrieval-augmented generation techniques
+PLP: Papers about Programming Language Processing models or programming benchmarks
+INFERENCE: Papers optimizing model deployment (quantization, pruning, etc.)
+3D: Papers on 3D content generation, processing, or understanding
+AUDIO: Papers advancing speech/audio processing or generation
+VIDEO: Papers on video analysis, generation, or understanding
+MULTIMODAL: Papers combining multiple input/output modalities
+MATH: Papers focused on mathematical theory and algorithms
+MULTILINGUAL: Papers addressing multiple languages or cross-lingual capabilities, including all non English models
+ARCHITECTURE: Papers proposing novel neural architectures or components
+HEALTHCARE: Papers applying ML to medical/healthcare domains
+TRAINING: Papers improving model training or fine-tuning methods
+ROBOTICS: Papers on robotic systems and embodied AI
+SMALL_MODELS: Papers that describe models considering small, below 1 billion parameters or similar 
+
+Return only a Python flat list of topics that match the given text.
+
+Paper text to classify:
+
+"Abstract  Post-training quantization is the standard way to serve large language models at low cost. However, the best quantization recipe differs across models and precisions. As a result, experts must redesign it for every new model, which is time-consuming and often sub-optimal. Fortunately, an LLM agent can take over this design by refining the recipe over rounds of building and evaluating candidates, so that more rounds lead to better recipes. However, evaluating one quantized reasoning model takes tens of GPU-hours, and combining methods from different codebases means porting each to the new architecture by hand. We present QDA, a system in which an agent designs the recipe for each model and precision. To make evaluation fast, QDA scores each candidate in minutes by its output KL divergence from the original model on reasoning traces that the agent never sees, and checks promising ones with long generations to catch failures such as repetition loops. To make building fast, QDA provides a library of public PTQ methods that are compatible with one another and with new model architectures. Across four reasoning models, QDA improves accuracy over the strongest public recipe by 0.9, 1.4 and 2.2 percentage points on average at W4A16, W4A8 and W3A16, using 64 GPU-hours per search. On the 320B-parameter MoE model GLM-5.3-Flash at NVFP4 W4A4, it recovers 98.3% of the FP8 model's accuracy, against 96.9% for the best vendor checkpoint. Every QDA checkpoint also runs on existing serving kernels with no inference overhead. We will release the library, the evaluator and the harness."
+
+[19.11.2026 02:55] Response: ```python
+["INFERENCE", "AGENTS", "BENCHMARK"]
+```
+[19.11.2026 02:55] OpenRouter request. Model: anthropic/claude-haiku-5.5. Prompt: Analyze the following research paper text and classify it into one or more relevant topics from the list below. Consider only information from the provided text. Don't add a tag if the topic is not directly related to the article.
+
+Topics:
+
+AGI: Papers discussing artificial general intelligence concepts
+GAMES: Papers applying ML to games or game development
+INTERPRETABILITY: Papers analyzing model behavior and explanations
+REASONING: Papers enhancing logical reasoning capabilities
+TRANSFER_LEARNING: Papers on knowledge transfer between models/domains
+GRAPHS: Papers advancing graph neural networks and applications
+ETHICS: Papers addressing AI ethics, fairness, and bias
+SECURITY: Papers on model security and adversarial robustness
+OPTIMIZATION: Papers advancing training optimization methods
+SURVEY: Papers comprehensively reviewing research areas
+DIFFUSION: Papers on diffusion-based generative models
+ALIGNMENT: Papers about aligning language models with human values, preferences, and intended behavior
+STORY_GENERATION: Papers on story generation, including plot generation and author style adaptation
+HALLUCINATIONS: Papers about the hallucinations, hallucinations analysis and mitigation
+LONG_CONTEXT: Papers about long context handling, including techniques to extend context length
+SYNTHETIC: Papers about using synthetic data for training, including methods for generating and leveraging artificial data
+TRANSLATION: Papers on machine translation, including techniques, data and applications for translating between languages
+LEAKAGE: Papers about data leakage, including issues of unintended data exposure and methods to detect or prevent it
+OPEN_SOURCE: Papers that contribute to open-source projects by releasing models, datasets, or frameworks to the public
+SCIENCE: Papers on scientific applications of LM including understanding of science articles and research automatization
+LOW_RESOURCE: Papers that mention low-resource languages
+
+Return only a Python flat list of topics that match the given text.
+
+Paper text to classify:
+
+"Abstract  Post-training quantization is the standard way to serve large language models at low cost. However, the best quantization recipe differs across models and precisions. As a result, experts must redesign it for every new model, which is time-consuming and often sub-optimal. Fortunately, an LLM agent can take over this design by refining the recipe over rounds of building and evaluating candidates, so that more rounds lead to better recipes. However, evaluating one quantized reasoning model takes tens of GPU-hours, and combining methods from different codebases means porting each to the new architecture by hand. We present QDA, a system in which an agent designs the recipe for each model and precision. To make evaluation fast, QDA scores each candidate in minutes by its output KL divergence from the original model on reasoning traces that the agent never sees, and checks promising ones with long generations to catch failures such as repetition loops. To make building fast, QDA provides a library of public PTQ methods that are compatible with one another and with new model architectures. Across four reasoning models, QDA improves accuracy over the strongest public recipe by 0.9, 1.4 and 2.2 percentage points on average at W4A16, W4A8 and W3A16, using 64 GPU-hours per search. On the 320B-parameter MoE model GLM-5.3-Flash at NVFP4 W4A4, it recovers 98.3% of the FP8 model's accuracy, against 96.9% for the best vendor checkpoint. Every QDA checkpoint also runs on existing serving kernels with no inference overhead. We will release the library, the evaluator and the harness."
+
+[19.11.2026 02:55] Response: ```python
+['OPTIMIZATION', 'OPEN_SOURCE']
+```
+[19.11.2026 02:55] Response: ParsedChatCompletionMessage[~ResponseFormatT](content='{"desc":"QDA uses an LLM agent to design post-training quantization recipes for each model and precision. It quickly evaluates candidate recipes by comparing their output distributions with the original model using KL divergence on hidden reasoning traces, then tests promising candidates with longer generations to detect failures. A compatible library of quantization methods makes it easier to build recipes for different model architectures. Across several reasoning models, QDA improves accuracy over strong public recipes, while its checkpoints run on existing serving kernels without extra inference overhead.","title":"Let an agent find the right quantization recipe"}', refusal=None, role='assistant', annotations=None, audio=None, function_call=None, tool_calls=None, parsed=Article(desc='QDA uses an LLM agent to design post-training quantization recipes for each model and precision. It quickly evaluates candidate recipes by comparing their output distributions with the original model using KL divergence on hidden reasoning traces, then tests promising candidates with longer generations to detect failures. A compatible library of quantization methods makes it easier to build recipes for different model architectures. Across several reasoning models, QDA improves accuracy over strong public recipes, while its checkpoints run on existing serving kernels without extra inference overhead.', title='Let an agent find the right quantization recipe'), reasoning=None)
+[19.11.2026 02:55] Response: ParsedChatCompletionMessage[~ResponseFormatT](content='{"desc":"这篇论文提出了 QDA 系统，让大语言模型智能体为不同模型和精度自动设计训练后量化（PTQ）方案。QDA 用与原始模型输出的 KL 散度快速评估候选方案，再通过较长文本生成检查重复循环等问题，并提供兼容不同方法与新架构的量化工具库。实验显示，QDA 在多种低比特精度下提升了推理模型准确率；在 GLM-5.3-Flash 的 NVFP4 W4A4 量化中，其准确率达到 FP8 模型的 98.3%。生成的模型可直接使用现有推理内核运行，无需额外推理开销。","title":"让智能体自动设计量化方案，低成本守住模型精度"}', refusal=None, role='assistant', annotations=None, audio=None, function_call=None, tool_calls=None, parsed=Article(desc='这篇论文提出了 QDA 系统，让大语言模型智能体为不同模型和精度自动设计训练后量化（PTQ）方案。QDA 用与原始模型输出的 KL 散度快速评估候选方案，再通过较长文本生成检查重复循环等问题，并提供兼容不同方法与新架构的量化工具库。实验显示，QDA 在多种低比特精度下提升了推理模型准确率；在 GLM-5.3-Flash 的 NVFP4 W4A4 量化中，其准确率达到 FP8 模型的 98.3%。生成的模型可直接使用现有推理内核运行，无需额外推理开销。', title='让智能体自动设计量化方案，低成本守住模型精度'), reasoning=None)
+[19.11.2026 02:55] Querying the API.
+[19.11.2026 02:55] OpenRouter request. Model: anthropic/claude-haiku-5.5. Prompt: Read an abstract of the ML paper and return a JSON with fields: 'desc': explanation of the paper in Russian (4 sentences), use correct machine learning terms. 'emoji': emoji that will reflect the theme of an article somehow, only one emoji. 'title': a slogan of a main idea of the article in Russian. Return only JSON and nothing else.
+
+Abstract PACT adapts a pretrained time-series foundation model to new operating conditions by partitioning its frozen embedding space into local charts and learning gated residual transports that preserve previously learned conditions, achieving high macro-F1 with limited labeled calibration data and no condition identity at test time.  Generated by deepseek-ai/DeepSeek-V4.1-Flash Pretrained Time-Series Foundation Models (TSFMs) provide strong representations for downstream classification tasks. Yet adapting a TSFM under changing operating conditions remains challenging. A model must improve on each newly observed condition without sacrificing conditions it has already learned, often from only a small labeled calibration set and without knowing the operating condition at inference time. We find that this difficulty has an important geometric structure. Under an operating-condition shift, the embedding space of a TSFM does not move uniformly: some local regions change substantially, while others remain nearly unchanged. Consequently, a global adaptation can unnecessarily move embeddings that were already correctly classified. To address this, we propose the novel PACT (Piecewise Adaptation via Chart Transport). PACT partitions the frozen source embedding space into local charts and learns lightweight residual transports for the regions affected by each new condition. An explicit identity path is always retained, and a learned gate softly selects among the identity and accumulated transports for each input. The pretrained TSFM encoder, classifier head, and previously learned transports remain fixed. With only 5% labeled calibration data per arriving condition and no condition identity at test time, PACT maintains an average macro-F1 above 0.95 across a four-condition bearing-fault stream. Under homogeneous tasks and label spaces, similar retention-adaptation behavior is observed across public benchmarks. Code is available at https://github.com/Sachithx/PACT.
+[19.11.2026 02:55] Response: {"desc": "Статья предлагает метод PACT для адаптации предобученной модели временных рядов (TSFM) к новым условиям эксплуатации без потери уже выученных знаний. Замороженное пространство эмбеддингов разбивается на локальные чарты, и для каждого нового условия обучаются лёгкие остаточные трансформации, а обучаемый gate мягко выбирает между identity-путём и накопленными трансформациями. Метод требует всего 5% размеченных калибровочных данных на каждое условие и не нуждается в знании условия на этапе инференса. На потоке из четырёх условий для диагностики подшипников macro-F1 держится выше 0.95, а схожее поведение наблюдается и на публичных бенчмарках.", "emoji": "🧩", "title": "Адаптируем только то, что изменилось: кусочная трансформация эмбеддингов без забывания"}
+[19.11.2026 02:55] OpenRouter request. Model: anthropic/claude-haiku-5.5. Prompt: Analyze the following research paper text and classify it into one or more relevant topics from the list below. Consider only information from the provided text. Don't add a tag if the topic is not directly related to the article.
+
+Topics:
+
+DATASET: Papers that introduce new datasets or make significant modifications to existing ones
+DATA: Papers focusing on data processing, cleaning, collection, or curation methodologies
+BENCHMARK: Papers proposing or analyzing model evaluation frameworks and benchmarks
+AGENTS: Papers exploring autonomous agents, web agents, or agent-based architectures
+CV: Papers developing computer vision methods or visual processing systems
+RL: Papers investigating reinforcement learning theory or applications
+RLHF: Papers specifically about human feedback in RL (PPO, DPO, etc.)
+RAG: Papers advancing retrieval-augmented generation techniques
+PLP: Papers about Programming Language Processing models or programming benchmarks
+INFERENCE: Papers optimizing model deployment (quantization, pruning, etc.)
+3D: Papers on 3D content generation, processing, or understanding
+AUDIO: Papers advancing speech/audio processing or generation
+VIDEO: Papers on video analysis, generation, or understanding
+MULTIMODAL: Papers combining multiple input/output modalities
+MATH: Papers focused on mathematical theory and algorithms
+MULTILINGUAL: Papers addressing multiple languages or cross-lingual capabilities, including all non English models
+ARCHITECTURE: Papers proposing novel neural architectures or components
+HEALTHCARE: Papers applying ML to medical/healthcare domains
+TRAINING: Papers improving model training or fine-tuning methods
+ROBOTICS: Papers on robotic systems and embodied AI
+SMALL_MODELS: Papers that describe models considering small, below 1 billion parameters or similar 
+
+Return only a Python flat list of topics that match the given text.
+
+Paper text to classify:
+
+"Abstract PACT adapts a pretrained time-series foundation model to new operating conditions by partitioning its frozen embedding space into local charts and learning gated residual transports that preserve previously learned conditions, achieving high macro-F1 with limited labeled calibration data and no condition identity at test time.  Generated by deepseek-ai/DeepSeek-V4.1-Flash Pretrained Time-Series Foundation Models (TSFMs) provide strong representations for downstream classification tasks. Yet adapting a TSFM under changing operating conditions remains challenging. A model must improve on each newly observed condition without sacrificing conditions it has already learned, often from only a small labeled calibration set and without knowing the operating condition at inference time. We find that this difficulty has an important geometric structure. Under an operating-condition shift, the embedding space of a TSFM does not move uniformly: some local regions change substantially, while others remain nearly unchanged. Consequently, a global adaptation can unnecessarily move embeddings that were already correctly classified. To address this, we propose the novel PACT (Piecewise Adaptation via Chart Transport). PACT partitions the frozen source embedding space into local charts and learns lightweight residual transports for the regions affected by each new condition. An explicit identity path is always retained, and a learned gate softly selects among the identity and accumulated transports for each input. The pretrained TSFM encoder, classifier head, and previously learned transports remain fixed. With only 5% labeled calibration data per arriving condition and no condition identity at test time, PACT maintains an average macro-F1 above 0.95 across a four-condition bearing-fault stream. Under homogeneous tasks and label spaces, similar retention-adaptation behavior is observed across public benchmarks. Code is available at https://github.com/Sachithx/PACT."
+
+[19.11.2026 02:55] Response: ```python
+['TRAINING', 'ARCHITECTURE']
+```
+[19.11.2026 02:55] OpenRouter request. Model: anthropic/claude-haiku-5.5. Prompt: Analyze the following research paper text and classify it into one or more relevant topics from the list below. Consider only information from the provided text. Don't add a tag if the topic is not directly related to the article.
+
+Topics:
+
+AGI: Papers discussing artificial general intelligence concepts
+GAMES: Papers applying ML to games or game development
+INTERPRETABILITY: Papers analyzing model behavior and explanations
+REASONING: Papers enhancing logical reasoning capabilities
+TRANSFER_LEARNING: Papers on knowledge transfer between models/domains
+GRAPHS: Papers advancing graph neural networks and applications
+ETHICS: Papers addressing AI ethics, fairness, and bias
+SECURITY: Papers on model security and adversarial robustness
+OPTIMIZATION: Papers advancing training optimization methods
+SURVEY: Papers comprehensively reviewing research areas
+DIFFUSION: Papers on diffusion-based generative models
+ALIGNMENT: Papers about aligning language models with human values, preferences, and intended behavior
+STORY_GENERATION: Papers on story generation, including plot generation and author style adaptation
+HALLUCINATIONS: Papers about the hallucinations, hallucinations analysis and mitigation
+LONG_CONTEXT: Papers about long context handling, including techniques to extend context length
+SYNTHETIC: Papers about using synthetic data for training, including methods for generating and leveraging artificial data
+TRANSLATION: Papers on machine translation, including techniques, data and applications for translating between languages
+LEAKAGE: Papers about data leakage, including issues of unintended data exposure and methods to detect or prevent it
+OPEN_SOURCE: Papers that contribute to open-source projects by releasing models, datasets, or frameworks to the public
+SCIENCE: Papers on scientific applications of LM including understanding of science articles and research automatization
+LOW_RESOURCE: Papers that mention low-resource languages
+
+Return only a Python flat list of topics that match the given text.
+
+Paper text to classify:
+
+"Abstract PACT adapts a pretrained time-series foundation model to new operating conditions by partitioning its frozen embedding space into local charts and learning gated residual transports that preserve previously learned conditions, achieving high macro-F1 with limited labeled calibration data and no condition identity at test time.  Generated by deepseek-ai/DeepSeek-V4.1-Flash Pretrained Time-Series Foundation Models (TSFMs) provide strong representations for downstream classification tasks. Yet adapting a TSFM under changing operating conditions remains challenging. A model must improve on each newly observed condition without sacrificing conditions it has already learned, often from only a small labeled calibration set and without knowing the operating condition at inference time. We find that this difficulty has an important geometric structure. Under an operating-condition shift, the embedding space of a TSFM does not move uniformly: some local regions change substantially, while others remain nearly unchanged. Consequently, a global adaptation can unnecessarily move embeddings that were already correctly classified. To address this, we propose the novel PACT (Piecewise Adaptation via Chart Transport). PACT partitions the frozen source embedding space into local charts and learns lightweight residual transports for the regions affected by each new condition. An explicit identity path is always retained, and a learned gate softly selects among the identity and accumulated transports for each input. The pretrained TSFM encoder, classifier head, and previously learned transports remain fixed. With only 5% labeled calibration data per arriving condition and no condition identity at test time, PACT maintains an average macro-F1 above 0.95 across a four-condition bearing-fault stream. Under homogeneous tasks and label spaces, similar retention-adaptation behavior is observed across public benchmarks. Code is available at https://github.com/Sachithx/PACT."
+
+[19.11.2026 02:55] Response: ```python
+["INTERPRETABILITY", "TRANSFER_LEARNING", "OPTIMIZATION"]
+```
+[19.11.2026 02:55] Response: ParsedChatCompletionMessage[~ResponseFormatT](content='{"desc":"PACT adapts a pretrained time-series foundation model to new operating conditions while keeping its encoder and classifier fixed. It divides the model’s embedding space into local regions, called charts, and learns small residual transports only for regions affected by a new condition. A learned gate chooses between the unchanged representation and the available transports, helping preserve performance on conditions learned earlier. Experiments show strong macro-F1 with only 5% labeled calibration data per condition, even when the condition is unknown at test time.","title":"Adapt locally, remember what already works"}', refusal=None, role='assistant', annotations=None, audio=None, function_call=None, tool_calls=None, parsed=Article(desc='PACT adapts a pretrained time-series foundation model to new operating conditions while keeping its encoder and classifier fixed. It divides the model’s embedding space into local regions, called charts, and learns small residual transports only for regions affected by a new condition. A learned gate chooses between the unchanged representation and the available transports, helping preserve performance on conditions learned earlier. Experiments show strong macro-F1 with only 5% labeled calibration data per condition, even when the condition is unknown at test time.', title='Adapt locally, remember what already works'), reasoning=None)
+[19.11.2026 02:55] Response: ParsedChatCompletionMessage[~ResponseFormatT](content='{"desc":"预训练时间序列基础模型遇到新的运行条件时，需要适应变化，同时避免损害对旧条件的识别能力。论文发现，条件变化只会显著影响嵌入空间的部分局部区域，因此对整个空间进行统一调整可能会破坏原有的正确分类。为此，PACT 将冻结的嵌入空间划分为局部图表，并为受影响区域学习轻量级残差传输，同时用门控机制在原始表示和已学传输之间进行选择。实验表明，每种新条件仅使用 5% 的标注校准数据、且测试时无需知道条件身份，PACT 在四种轴承故障条件上的平均宏 F1 仍超过 0.95。","title":"局部传输适应新条件，保留旧知识"}', refusal=None, role='assistant', annotations=None, audio=None, function_call=None, tool_calls=None, parsed=Article(desc='预训练时间序列基础模型遇到新的运行条件时，需要适应变化，同时避免损害对旧条件的识别能力。论文发现，条件变化只会显著影响嵌入空间的部分局部区域，因此对整个空间进行统一调整可能会破坏原有的正确分类。为此，PACT 将冻结的嵌入空间划分为局部图表，并为受影响区域学习轻量级残差传输，同时用门控机制在原始表示和已学传输之间进行选择。实验表明，每种新条件仅使用 5% 的标注校准数据、且测试时无需知道条件身份，PACT 在四种轴承故障条件上的平均宏 F1 仍超过 0.95。', title='局部传输适应新条件，保留旧知识'), reasoning=None)
+[19.11.2026 02:55] Renaming data file.
+[19.11.2026 02:55] Renaming previous data. hf_papers.json to ./d/2026-11-19.json
+[19.11.2026 02:55] Saving new data file.
+[19.11.2026 02:55] Generating page.
+[19.11.2026 02:55] Renaming previous page.
+[19.11.2026 02:55] Renaming previous data. index.html to ./d/2026-11-19.html
+[19.11.2026 02:55] Writing result.
+[19.11.2026 02:55] Renaming log file.
+[19.11.2026 02:55] Renaming previous data. log.txt to ./logs/2026-11-19_last_log.txt
