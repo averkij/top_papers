@@ -1,0 +1,123 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.26511/2611.26511v1/figure/teaser_v4.png",
+                "caption": "Figure 1.Direct3D-V3 generates diverse, high-fidelity 3D meshes by modeling raw SDF voxel grids directly with latent-free diffusion transformers, removing the VAE bottleneck used by latent diffusion pipelines.",
+                "position": 263
+            }
+        ]
+    },
+    {
+        "header": "1.Introduction",
+        "images": []
+    },
+    {
+        "header": "2.Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.26511/2611.26511v1/framework_v3.png",
+                "caption": "Figure 2.Framework of Direct3D-V3. Rather than compressing geometry into a learned latent representation, Direct3D-V3 trains and samples directly on raw SDF voxel grids. During training, we extract the SDF voxel grid and surface patch SDF values from the ground-truth mesh, and add Gaussian noise to the surface patch SDF values to form the DiT input𝐱t\\mathbf{x}_{t}. During inference, the first-stage model is used only to provide the surface patch indices; sampling then starts from Gaussian noise on these sparse patches, and the latent-free DiT predicts the clean SDF values directly in the native voxel domain. The patch-level DiT uses the noisy SDF signal, DINOv2 image tokens, and timestep embedding to reason efficiently over global shape semantics, while a lightweight voxel-level DiT refines voxel-level SDF values within each selected patch. In parallel, a camera prediction branch combines patch-level features with image tokens to regress normalized intrinsic and extrinsic parameters, encouraging the generated shape to remain spatially aligned with the conditioning image.",
+                "position": 324
+            }
+        ]
+    },
+    {
+        "header": "3.Latent-Free Diffusion Transformers for 3D Generation",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.26511/2611.26511v1/imr.png",
+                "caption": "Figure 4.Illustration of the Implicit Manifold Regularization (IMR). Without the decoder-induced geometric prior used in latent-based pipelines, a latent-free DiT can predict locally inconsistent TSDF fields, leading to abrupt zero-level crossings and non-watertight meshes after Marching Cubes. Since the surface manifold is implicitly defined by the zero level set of the TSDF, we regularize this manifold by penalizing neighboring voxels whose predicted SDF values differ by more than one voxel lengthη\\eta. This local constraint encourages coherent TSDF transitions around the surface, reducing holes and producing a more watertight extracted mesh while preserving the generated shape.",
+                "position": 478
+            }
+        ]
+    },
+    {
+        "header": "4.Application: Generative Reconstruction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.26511/2611.26511v1/reconst.png",
+                "caption": "Figure 5.Generative reconstruction pipeline. Given the input images, we use pre-trained predictors to estimate the corresponding foreground mask and normal map as auxiliary observations. The key reconstruction mechanism lies in how these cues are coupled with the latent-free DiT output: the mask calibrates the predicted camera, while the normal map drives direct refinement of the predicted SDF voxel grid.\nAt each guided sampling step, the DiT proposes a clean SDF grid together with an image-view camera. We first align the rendered mask with the estimated one to correct the camera, and then compare rendered surface normals with the\nestimated normal map to update the SDF values. The refined SDF is re-noised and passed back to the sampler, coupling observation-driven correction with the learned generative prior for the final reconstruction.",
+                "position": 589
+            }
+        ]
+    },
+    {
+        "header": "5.Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.26511/2611.26511v1/compare_gen_v3.png",
+                "caption": "Figure 7.Qualitative comparison with recent open-source image-to-3D generation methods.",
+                "position": 860
+            },
+            {
+                "img": "https://arxiv.org/html/2611.26511/2611.26511v1/single_reconst_v2.png",
+                "caption": "Figure 8.Qualitative comparison for single-view generative reconstruction. The figure compares reconstructed meshes from the same challenging input images.",
+                "position": 921
+            },
+            {
+                "img": "https://arxiv.org/html/2611.26511/2611.26511v1/mv_reconst.png",
+                "caption": "Figure 9.Qualitative comparison for multi-view generative reconstruction on scenes from the Tanks and Temples dataset.",
+                "position": 927
+            },
+            {
+                "img": "https://arxiv.org/html/2611.26511/2611.26511v1/ablation_core.png",
+                "caption": "Figure 10.Qualitative ablation of the core components. The patch-level DiT alone produces coarse and incomplete geometry. Adding the voxel-level DiT restores finer details but still leaves many holes; IMR greatly reduces these artifacts, and normal-rendering supervision further improves the quality.Qualitative comparison of core component ablations, showing improvements from patch-level DiT to voxel-level DiT, IMR, and normal-rendering supervision.",
+                "position": 1005
+            },
+            {
+                "img": "https://arxiv.org/html/2611.26511/2611.26511v1/camera.png",
+                "caption": "Figure 11.Qualitative ablation of the camera prediction branch. Adding the branch improves alignment between the generated mesh and the conditioning image, especially for structures visible from the conditioning view.Qualitative comparison showing that the camera prediction branch improves alignment between the conditioning image and generated mesh.",
+                "position": 1011
+            },
+            {
+                "img": "https://arxiv.org/html/2611.26511/2611.26511v1/first_stage.png",
+                "caption": "Figure 12.Ablation of first-stage surface patch indices at5123512^{3}resolution. Comparable results across a pre-trained VecSet DiT, a dense64364^{3}index predictor, and Hunyuan3D 2.1 indicate that the latent-free DiT is robust to different sources of surface patch indices.",
+                "position": 1063
+            }
+        ]
+    },
+    {
+        "header": "6.Conclusion and Limitations",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.26511/2611.26511v1/failure.png",
+                "caption": "Figure 13.Failure case of single-view generative reconstruction. When the first-stage surface indices are poorly aligned with the conditioning image, normal-guided SDF refinement operates on inaccurate sparse support and can distort the mesh.A failure case visualization showing distorted geometry caused by normal-guided SDF refinement on inaccurate first-stage surface indices.",
+                "position": 1074
+            }
+        ]
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AComputational Cost and Scaling",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.26511/2611.26511v1/more_vis.png",
+                "caption": "Figure 14.Additional visual results generated by Direct3D-V3.Additional generated meshes from Direct3D-V3, illustrating diverse shapes and surface details.",
+                "position": 1706
+            }
+        ]
+    },
+    {
+        "header": "Appendix BAdditional Visual Results",
+        "images": []
+    },
+    {
+        "header": "Appendix CAdditional Qualitative Comparisons",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.26511/2611.26511v1/more_compare.png",
+                "caption": "Figure 15.Additional qualitative comparisons with recent image-to-3D generation methods.Additional qualitative comparisons for image-to-3D generation, showing the input images and generated meshes from different methods.",
+                "position": 1726
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
