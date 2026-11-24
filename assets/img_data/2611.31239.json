@@ -1,0 +1,94 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.31239/2611.31239v1/pipeline_nonotation.png",
+                "caption": "Figure 2:Overview of Lyris.To decide what lies beyond the input views, we use a vision-language model to plan a 3D layoutℬ\\mathcal{B}of labeled object boxes before each chunkkk. We then render this layout and our point-cloud memory𝒫\\mathcal{P}at its cameras𝒞k\\mathcal{C}_{k}to guide the video model. The memory video preserves what has been seen, while the layout video specifies what appears where beyond it and anchors the camera to its path. To remain consistent upon return, we reconstruct each generated chunk and write it into the memory.",
+                "position": 304
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.31239/2611.31239v1/fig_layout_planning.png",
+                "caption": "Figure 3:Layout planning.To keep the layout consistent with the observed scene, the vision-language model first fits boxes to the objects visible in the input view (a). It then adds a box for every object that the chunks should reveal, following their descriptions (b). To ensure that the layout is physically plausible and visible along the path, we verify the proposal with geometric checks (c) and revise the boxes they flag from their proposed positions (dashed inb) to their final ones. The video model then generates each object where its box places it, such as the vase, which was moved into view (d).",
+                "position": 365
+            },
+            {
+                "img": "https://arxiv.org/html/2611.31239/2611.31239v1/comparison_directed.png",
+                "caption": "Figure 4:Directed round trips.Given the same start frame, cameras, and descriptions (top), we plot each method’s rotation error along the way out over the 20 CA-1M scenes (left) and show five cameras of one round trip with each frame’s error (right). The baselines drift once the path leaves the start view (by roughly 20–40∘at its end), as does our model without its layout (dotted). Lyris is the only method to follow the path throughout, staying within4∘4^{\\circ}of the requested cameras.",
+                "position": 431
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.31239/2611.31239v1/fig_exploration.png",
+                "caption": "Figure 5:Autonomous round trips.Given only the start frame, its caption, and the cameras, we plot each method’s consistency upon return (Revisit) against the frames between the two visits (left) and show two cameras on the way out and back (right). We average over the 40 CA-1M and ScanNet++ round trips and leave out views that the start frame shows, so that no method can copy its input. As the gap grows, the baselines return to shifted views or changed objects (such as WorldCrafter’s ceiling light, dashed), and our model without its layout loses consistency as well (dotted). Lyris is the only method to return to the content it generated, even over 600 frames later.",
+                "position": 918
+            },
+            {
+                "img": "https://arxiv.org/html/2611.31239/2611.31239v1/fig_why_layouts.png",
+                "caption": "Figure 6:Layout control.We edit the plan ofFig.3and regenerate with the same inputs and seed. Without a layout, the model places the described objects itself and drifts from the requested camera (a), while with the plan each object appears in its box (b). Moving the television’s box moves the television and leaves its former place (dashed) empty (c), and swapping the aquarium and the orchids in the layout and the descriptions swaps them (d), which lets a user edit the scene before it is generated.",
+                "position": 954
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix AAdditional Results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.31239/2611.31239v1/fig_diagnostics.png",
+                "caption": "Figure 7:Qualitative ablation.We show the frames that Lyris and its ablations (Tab.3) generate at the same camera of a directed CA-1M round trip, on the way out and 217 frames later on the way back, with the DINOv2 similarity of the two frames (Revisit). We also show the layout video that each variant receives on the way out, and its memory video and appearance references on the way back. Lyris returns to the same content, whereas the camera drifts without the layout (RotErr of93.9∘93.9^{\\circ}at this camera), the content changes without the memory’s point cloud, and details change without the appearance references (circled).",
+                "position": 2798
+            }
+        ]
+    },
+    {
+        "header": "Appendix BMethod Details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.31239/2611.31239v1/fig_architecture.png",
+                "caption": "Figure 9:Video model.The DiT processes the latents of the noisy target together with those of the memory video, the prefix frame and appearance references, and the layout video, and with the Qwen3-VL embedding of the text prompt, through joint self-attention. We freeze the VAE and Qwen3-VL, fine-tune the DiT with LoRA, and add only a zero-initialized linear layer per block that embeds the cameras𝒞k\\mathcal{C}_{k}as Plücker rays.",
+                "position": 2987
+            }
+        ]
+    },
+    {
+        "header": "Appendix CEvaluation Protocol",
+        "images": []
+    },
+    {
+        "header": "Appendix DLimitations",
+        "images": []
+    },
+    {
+        "header": "Appendix ESocietal Impact",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
