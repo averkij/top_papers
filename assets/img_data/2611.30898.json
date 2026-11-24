@@ -1,0 +1,128 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/teaser.png",
+                "caption": "Figure 1:World models as native latent action models.(a) Existing LAMs learn an IDM and an FDM from scratch.\n(b) A pretrained video world model is already an FDM.\n(c) Native LAM runs one world model in two modes, reading a latent action𝐚^\\hat{\\mathbf{a}}from video and regenerating the future from𝐚^\\hat{\\mathbf{a}}.\n(d) Latent actions share one space and replay the same motion from edited first\nframes in new setups.\n(e) PAWlicy pretrains a VLA on𝐚^\\hat{\\mathbf{a}}without reconstructing pixels.",
+                "position": 271
+            }
+        ]
+    },
+    {
+        "header": "1  Introduction",
+        "images": []
+    },
+    {
+        "header": "2  Related Work",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/method.png",
+                "caption": "Figure 2:Training Native LAM.(a) Each videoxxis paired with a retimed copyx′=x∘ϕx^{\\prime}=x\\circ\\phiof the same\nfootage that shares the first frame but not the motion.\n(b) In IDM mode, dynamics registers read the clean video through a read-only\nattention mask and are projected to the latent action𝐚^\\hat{\\mathbf{a}}; on AgiBot World\nand DROID, a kinematic head grounds𝐚^\\hat{\\mathbf{a}}in end-effector motion.\n(c) In FDM mode, the same DiT regenerates the future from𝐯0\\mathbf{v}_{0}and𝐚^\\hat{\\mathbf{a}}alone, with𝐚^\\hat{\\mathbf{a}}inserted into the token sequence through the adapterMLPin\\mathrm{MLP}_{\\text{in}}, taking over the conditioning role of text,\ntrained with its original flow-matching loss; both clips of a pair share the\nnoise and diffusion time, so only𝐚^\\hat{\\mathbf{a}}can explain their difference.",
+                "position": 450
+            }
+        ]
+    },
+    {
+        "header": "3  Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/pawlicy.png",
+                "caption": "Figure 3:PAWlicy.A frozen Native LAM labels each video window\nwith one past and three future latent groups;t−1,t,…,t+3t{-}1,t,\\dots,t{+}3index\ntemporal groups, each containing four video frames. Sharing attention with the VLM,\nthe latent action DiT reconstructs the past and predicts the future, and the\naction DiT conditions on it to generate actions. Video without actions still\ntrains the latent pathway.",
+                "position": 607
+            }
+        ]
+    },
+    {
+        "header": "4  Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/transfer.png",
+                "caption": "Figure 4:Native latent actions transfer.A latent𝐚^\\hat{\\mathbf{a}}is read\nonce from a source clip (blue) in the IDM mode of Native LAM and replayed\nin its FDM mode from a different first frame (orange), which is generated\nwith GPT image generation from the source first frame; dotted frames are\ngenerated. The generated videos carry out the source\nmotion with another embodiment, in another scene, from human to robot, and\nfrom simulation to a photorealistic scene, although no transfer objective is used in\ntraining.",
+                "position": 1011
+            },
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/interp.png",
+                "caption": "Figure 5:Interpolating latents interpolates the motion.Latents read\nfrom a still clip and a full-action clip are blended and replayed from the same\nfirst frame. The top and bottom rows are the two source clips; the dotted\nframes between them are generated. Each intermediate latent yields one\ncoherent motion that travels part of the way, further asβ\\betagrows;\nblending pixels instead superimposes static and moving arms (red box).",
+                "position": 1034
+            },
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/gen_compare.png",
+                "caption": "Figure 6:Frames generated from the latent\nactions of different LAMs.A real-robot clip of picking up a banana and\nplacing it in a basket (top row) runs left to right;\nthe first frame is real.\n(a) Frame by frame: every method, Native LAM included, is used as a\nconventional LAM on frame pairs; for each two consecutive frames, it encodes\nthe latent action between them (IDM) and generates the second frame from the\nreal first one with its own world model (FDM), similar to teacher forcing.\n(b) Whole clip (autoregressive): the other LAMs generate each frame from the\npreviouslygeneratedone with the latent action of the corresponding\npair of real frames;\nNative LAM reads the whole clip at once in IDM mode and generates the\nwhole clip from the real first frame in one pass in FDM mode.",
+                "position": 1059
+            },
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/figures/supp_cf/move_start.jpg",
+                "caption": "Figure 7:Counterfactual pairs prevent posterior collapse.A latent\naction is read in IDM mode from a source clip in which the left arm grasps the\ntissue (top) or from its still counterfactual, which holds the first frame\n(bottom), and the FDM regenerates the clip from the same start frame with\nshared prompt, noise, and seed. Circles mark the end pose of the arm. Trained\nfor 2k steps without counterfactual pairs, the FDM reaches for the cup in both\ncases. This is posterior collapse: the FDM ignores the latent and\nhallucinates a reach for the cup from the first frame alone.\nWith counterfactual pairs, the same 2k steps already keep the still latent still, although\nthe moving latent still reaches for the cup. At 13k steps the generated end\nframes match the source in both cases.",
+                "position": 1090
+            },
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/figures/supp_cf/move_end.jpg",
+                "caption": "",
+                "position": 1130
+            },
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/figures/supp_cf/move_np.jpg",
+                "caption": "",
+                "position": 1131
+            },
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/figures/supp_cf/move_p2k.jpg",
+                "caption": "",
+                "position": 1132
+            },
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/figures/supp_cf/move_final.jpg",
+                "caption": "",
+                "position": 1133
+            },
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/figures/supp_cf/still_start.jpg",
+                "caption": "",
+                "position": 1149
+            },
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/figures/supp_cf/still_end.jpg",
+                "caption": "",
+                "position": 1150
+            },
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/figures/supp_cf/still_np.jpg",
+                "caption": "",
+                "position": 1151
+            },
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/figures/supp_cf/still_p2k.jpg",
+                "caption": "",
+                "position": 1152
+            },
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/figures/supp_cf/still_final.jpg",
+                "caption": "",
+                "position": 1153
+            },
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/realrobot_frames.png",
+                "caption": "Table 3:RoboTwin 2.0 with clean training(success rate, %). Policies\nare trained on 50 clean demos per task and tested in clean (c2c) or randomized\n(c2r) scenes, with 100 seeds per task.π0.5\\pi_{0.5}+ past +\naug. uses the same past frame and augmentation as PAWlicy.",
+                "position": 1206
+            },
+            {
+                "img": "https://arxiv.org/html/2611.30898/2611.30898v1/realrobot_frames.png",
+                "caption": "Table 4:Real-robot taskson AgileX NERO. Top: start and end\nof each task. Bottom: success rate (%) over 30 trials, with 100 training\ndemonstrations per task.",
+                "position": 1237
+            }
+        ]
+    },
+    {
+        "header": "5  Conclusion and Future Work",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
