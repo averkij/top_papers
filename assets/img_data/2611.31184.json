@@ -1,0 +1,146 @@
+[
+    {
+        "header": "Abstract",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.31184/2611.31184v1/teaser_B_compact.png",
+                "caption": "",
+                "position": 339
+            }
+        ]
+    },
+    {
+        "header": "1Introduction",
+        "images": []
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.31184/2611.31184v1/codec.png",
+                "caption": "Figure 2:From codec signals to kept tokens.(a) An I-frame predicts each block from its coded neighbours.\n(b) A P-frame finds the best match of each block in a previous frame and stores its motion vector.\n(c) The residual is the difference between the block and its best match.\n(d) Each token receives a motion score and a residual score from the blocks it covers, and threshold-based or priority-based pruning then selects the kept tokens.",
+                "position": 458
+            },
+            {
+                "img": "https://arxiv.org/html/2611.31184/2611.31184v1/pipeline.png",
+                "caption": "Figure 3:Pipeline of CodecOPSD.Left:Codec pruning runs in parallel with the VAE encoder and drops condition tokens at a dynamic rate per condition, and the kept tokens concatenate with the noisy latent as the DiT input.\nIt optionally drops the vision tokens of a VLM, which enter the DiT by cross-attention or joint attention depending on the model.Right:On-Policy Codec Distillation provides the tokens removed by codec pruning to the frozen teacher as privileged information and compares the student’s prediction with the teacher’s.",
+                "position": 466
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": []
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "6Acknowledgments",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "AImplementation details",
+        "images": []
+    },
+    {
+        "header": "BVideo codec implementation details",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.31184/2611.31184v1/supp_codec_fixes.png",
+                "caption": "Figure S2:Codec fixes.Each row shows an input, followed by its codec signal and the tokens after codec pruning, without the corresponding fix on the left and with it on the right.\nThe four fixes (a) set uncoded intra blocks to128128, (b) set uncoded inter blocks to128128, (c) read the residual from the luma plane of the decoder instead of an RGB conversion, and (d) treat skipped macroblocks as static.\nWithout these fixes, flat regions and backgrounds are mistaken for new content, and their tokens are not dropped.",
+                "position": 3411
+            }
+        ]
+    },
+    {
+        "header": "CEvaluation setup and metrics",
+        "images": []
+    },
+    {
+        "header": "DMore quantitative results",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.31184/2611.31184v1/supp_qual_ours_v2.png",
+                "caption": "Figure S3:Qualitative results of CodecOPSD on our multi-condition model.Each case shows the conditions with the tokens dropped by codec pruning darkened, followed by five frames of the teacher with all condition tokens and of CodecOPSD with the remaining tokens.\nA play icon marks a video condition shown by one frame, the results of (b) are cropped to 4:3, and all results are shown with condition overlay.\nCodecOPSD follows every condition as the teacher does while dropping 83–92% of the condition tokens.",
+                "position": 4486
+            }
+        ]
+    },
+    {
+        "header": "EQualitative results",
+        "images": []
+    },
+    {
+        "header": "FMore ablation studies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.31184/2611.31184v1/supp_privileged_v2.png",
+                "caption": "Figure S4:A more privileged teacher degrades the student on cases with few conditions.Each panel shows the ground truth, each condition with its drop rate and with the tokens dropped by threshold-based pruning in grey, and the results of CodecOPSD and of its variant with a more privileged teacher, which also sees the other conditions of the clip.\nBoth students are trained for 2K steps on the distilled version of our internal model and receive the same input and remaining condition tokens, so they differ in the teacher used for training alone.",
+                "position": 4692
+            }
+        ]
+    },
+    {
+        "header": "GMiniMax-H3 Ref2VA",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.31184/2611.31184v1/supp_trainfree_minimax_v2.png",
+                "caption": "Figure S5:Training-Free Codec and CodecOPSD on MiniMax-H3 Ref2VA.We show (a) a rough-storyboard video, (b) a video continuation, and (c) a human-pose control video, with condition overlay in (a) and (c).\nBoth models receive the same remaining reference tokens, inputs, and seed.",
+                "position": 5224
+            },
+            {
+                "img": "https://arxiv.org/html/2611.31184/2611.31184v1/supp_addon_minimax_v2.png",
+                "caption": "",
+                "position": 5242
+            }
+        ]
+    },
+    {
+        "header": "HMiniMax-H3-Image",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.31184/2611.31184v1/supp_trainfree_h3img.png",
+                "caption": "Figure S7:Training-Free Codec and CodecOPSD on MiniMax-H3-Image[45].Both models receive the same remaining tokens after codec pruning, as well as the same inputs and seed, and all images show the same crop.\nWithin the red box, Training-Free Codec redraws the dropped thin lettering and generates garbled print on the blank label, while CodecOPSD matches the teacher.",
+                "position": 5630
+            },
+            {
+                "img": "https://arxiv.org/html/2611.31184/2611.31184v1/supp_addon_h3img.png",
+                "caption": "Figure S8:Stacked speedups on MiniMax-H3-Image LoRA without further training.Each case shows the reference images at a short side of 2,048 pixels with the tokens dropped by codec pruning darkened, followed by the results of 2-step PDMD[68]alone and with CodecOPSD, generated from the same inputs and seed.\nTimes are denoising seconds per image, and each label shows the extra speedup of CodecOPSD over PDMD alone, which is large here because the references are at a high resolution.",
+                "position": 5635
+            }
+        ]
+    },
+    {
+        "header": "ICosmos3-Nano",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.31184/2611.31184v1/supp_cosmos_transfer_v2.png",
+                "caption": "Figure S9:Codec pruning for Cosmos3-Nano transfer on robot clips with all four controls together.The rows show the ground truth, the four controls with the dropped tokens in grey, the teacher, which is Cosmos3-Nano[1]with all tokens, and CodecOPSD, where codec pruning drops 80% of the control tokens in both clips.\nThe PAI-Bench-C[83]robot clips have 81 frames at 480×\\times832, are cropped to 4:3, and use the same input and seed for both models.\nThis setting lies outside Tab.6, and CodecOPSD uses an earlier LoRA here.",
+                "position": 5689
+            },
+            {
+                "img": "https://arxiv.org/html/2611.31184/2611.31184v1/supp_cosmos_av_xyz.png",
+                "caption": "Figure S10:Codec pruning for video-to-action (robot inverse dynamics) and video-to-audio on Cosmos3-Nano[1].(a, b) DROID[33]episodes and (c, d) FoleyBench[11]clips show the input with the dropped video tokens darkened, followed by the end-effector path or the log-mel spectrogram of the teacher, of CodecOPSD, and of the teacher with another noise seed.\nCodecOPSD stays close to the teacher in both tasks, and it uses an earlier LoRA than in Tab.6.",
+                "position": 5706
+            }
+        ]
+    },
+    {
+        "header": "JLimitations",
+        "images": []
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
