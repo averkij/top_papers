@@ -1,0 +1,153 @@
+[
+    {
+        "header": "Abstract",
+        "images": []
+    },
+    {
+        "header": "1Introduction",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.34420/2611.34420v1/finding.png",
+                "caption": "Figure 1:Left:Page-wise VLMs are sensitive to pagination.\nRe-paginating the same documents with twice as many pages reduces baseline performance; breaking document structure by cutting through tables and paragraphs causes a further drop.\nDocSEAM reduces the performance gap between structure-preserving and structure-breaking re-pagination to 0.8 and 0.7 percentage points on MMLongBench-Doc and LongDocURL, respectively (§4.3).Right:DocSEAM achieves the best results among the evaluated open-weight models of up to 10B parameters on five multi-page document VQA benchmarks.",
+                "position": 292
+            }
+        ]
+    },
+    {
+        "header": "2Related Work",
+        "images": []
+    },
+    {
+        "header": "3Method",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.34420/2611.34420v1/architecture.png",
+                "caption": "Figure 2:DocSEAM overview.For each pagepp, DocSEAM forms a local triplet(Zp−1,Zp,Zp+1)(Z_{p-1},Z_{p},Z_{p+1}), applies center-anchored self-attention with directional salience gates, and returns only the enriched center-page tokensEpE_{p}. The language model receives the same number of visual tokens as in the stateless baseline.",
+                "position": 360
+            }
+        ]
+    },
+    {
+        "header": "4Experiments",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.34420/2611.34420v1/attention_trace_main.png",
+                "caption": "Figure 3:LLM layer-wise attention trace for cross-page span localization. Given a text span query crossing a page boundary, DocSEAM concentrates attention on the ground-truth evidence in early LLM layers (Layer 7), whereas the baseline forms a comparable pattern only in late layers (Layer 11). For readability, layer heatmaps display cropped top/bottom boundary regions of consecutive pages. Green and red dashed boxes indicate correct and missing attention, respectively.",
+                "position": 811
+            },
+            {
+                "img": "https://arxiv.org/html/2611.34420/2611.34420v1/bidirectional_heatmap_new.png",
+                "caption": "Figure 4:Cross-page attention within DocSEAM.Across a triplet fromAttention Is All You Need(Pages 4–6).(a–b)Page 5 reads backward: attention flows to continuous text at the bottom of Page 4 and grounds on Figure 2.(c–d)Page 5 reads forward: despite Table 1 intervening at the top of Page 6, DocSEAM attends to both the table and the text continuation beneath it.\nBlank margins receive near-zero attention throughout.",
+                "position": 880
+            }
+        ]
+    },
+    {
+        "header": "5Conclusion",
+        "images": []
+    },
+    {
+        "header": "References",
+        "images": []
+    },
+    {
+        "header": "Appendix ATraining Details",
+        "images": []
+    },
+    {
+        "header": "Appendix BGate and Loss Details",
+        "images": []
+    },
+    {
+        "header": "Appendix CBenchmark Details",
+        "images": []
+    },
+    {
+        "header": "Appendix DLongDocURL Stratified Analysis",
+        "images": []
+    },
+    {
+        "header": "Appendix EMulti-Page Document Parsing",
+        "images": []
+    },
+    {
+        "header": "Appendix FFull Ablation Details",
+        "images": []
+    },
+    {
+        "header": "Appendix GRe-pagination Protocol",
+        "images": []
+    },
+    {
+        "header": "Appendix HAggregate Gate Activation Statistics",
+        "images": []
+    },
+    {
+        "header": "Appendix IAnalysis of Post-Encoder Representation Leakage",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.34420/2611.34420v1/vit.png",
+                "caption": "Figure 5:Receive gates under post-encoder boundary reconstruction.When trained with self-supervised boundary reconstruction post-encoder, the receive gates on the center page (right) fall near zero (dark blue), strongly downweighting cross-page attention even though the source features on the previous page (left) contain valid content signals. This behavior is consistent with a same-page shortcut: global self-attention in the vision encoder can make information from interior tokens available in the boundary representations.",
+                "position": 2440
+            }
+        ]
+    },
+    {
+        "header": "Appendix JExtended Layer-Wise Attention Trace Analysis",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.34420/2611.34420v1/attention_trace.png",
+                "caption": "Figure 6:Extended layer-wise attention trace across deep LLM layers.Comparison of attention maps between DocSEAM (top) and the stateless baseline (bottom) at Layers 3, 7, 11, and 19 for a cross-page span localization query.\nWith DocSEAM, attention sharply concentrates on the boundary-spanning ground-truth evidence as early as Layer 7 and maintains a sharp, focused pattern through Layer 19.\nIn contrast, the baseline exhibits diffuse attention at shallow layers (Layers 3 and 7), only forms a relevant pattern around Layer 11, and retains noticeable background noise even at Layer 19.",
+                "position": 2478
+            }
+        ]
+    },
+    {
+        "header": "Appendix KAdditional Directional Salience Case Studies",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.34420/2611.34420v1/heatmap.png",
+                "caption": "Figure 7:Case study of directional salience gate activation across a table continuation.Attention heatmaps across three consecutive single-column document pages containing a multi-page table split across a page boundary. DocSEAM dynamically activates cross-page attention to connect table rows truncated at the bottom of the previous page with their continuation at the top of the center page, while suppressing uninformative margins.",
+                "position": 2507
+            },
+            {
+                "img": "https://arxiv.org/html/2611.34420/2611.34420v1/bidirectional_heatmap_2cols.png",
+                "caption": "Figure 8:Generalization to complex two-column layouts and robustness to structural interruptions.Attention routing across consecutive two-column scientific paper pages. The displayed activation patterns overlap text columns and continuation regions despite intervening figures.",
+                "position": 2510
+            }
+        ]
+    },
+    {
+        "header": "Appendix LQualitative Answer Comparisons",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.34420/2611.34420v1/wrong_and_correct_3.png",
+                "caption": "Figure 11:Qualitative comparison on multi-page cross-modal QA.Given a question spanning a text description (Page 13) and a supporting chart (Page 14), DocSEAM correctly identifies the target demographic group with precise page attribution, whereas the baseline hallucinates page citations and URaG produces an ungrounded fragment.",
+                "position": 2598
+            },
+            {
+                "img": "https://arxiv.org/html/2611.34420/2611.34420v1/wrong_and_correct_4.png",
+                "caption": "Figure 12:Qualitative comparison on section tracking across page breaks.When identifying a section title continuing over a page boundary (Pages 50-51), DocSEAM extracts the complete section title and context, while baseline models fail to retrieve the full title.",
+                "position": 2601
+            }
+        ]
+    },
+    {
+        "header": "Appendix MRe-pagination Training Augmentation Control",
+        "images": []
+    },
+    {
+        "header": "Appendix NComparison with Stateful Visual Encoders",
+        "images": [
+            {
+                "img": "https://arxiv.org/html/2611.34420/2611.34420v1/sve_bi.png",
+                "caption": "Figure 13:Causal SVE cross-page attention and update magnitudes.Source panels show attention averaged over query tokens and heads, relative to uniform attention. Receiving panels show the L2 norm of projected cross-attention updates, including projection bias. Each panel is independently scaled for display.",
+                "position": 2748
+            }
+        ]
+    },
+    {
+        "header": "Instructions for reporting errors",
+        "images": []
+    }
+]
